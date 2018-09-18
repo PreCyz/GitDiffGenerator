@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
         ApplicationProperties appProps = new ApplicationProperties(args).init();
 
-        String gitCommand = gitCommand(appProps.author());
+        String gitCommand = gitCommand(appProps.author(), appProps.days());
         System.out.printf("Git command: %s%n", gitCommand);
 
         try {
@@ -51,10 +51,10 @@ public class Main {
         is.close();
     }
 
-    private static String gitCommand(String author) {
+    private static String gitCommand(String author, int daysInThePast) {
         LocalDate now = LocalDate.now();
-        LocalDate minus7Days = now.minusDays(7);
-        return "git log -p --all --author='" + author + "' --since " + minus7Days.format(yyyyMMdd) + " --until " + now.format(yyyyMMdd);
+        LocalDate minusDays = now.minusDays(daysInThePast);
+        return "git log -p --all --author='" + author + "' --since " + minusDays.format(yyyyMMdd) + " --until " + now.format(yyyyMMdd);
     }
 
 }

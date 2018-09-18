@@ -10,7 +10,8 @@ final class ArgExtractor {
         author("NO_AUTHOR_GIVEN"),
         itemPath("NO_ITEM_PATH_GIVEN"),
         projectPath("NO_PROJECT_PATH_GIVEN"),
-        gitBashPath("C:\\Program Files\\Git\\bin\\bash.exe");
+        gitBashPath("C:\\Program Files\\Git\\bin\\bash.exe"),
+        minusDays("7");
 
         private String defaultValue;
 
@@ -56,6 +57,13 @@ final class ArgExtractor {
             return getValue(args, ArgName.projectPath, ArgName.projectPath.defaultValue());
         }
         return ArgName.projectPath.defaultValue();
+    }
+
+    static int days(String[] args) {
+        if (hasArgs(args)) {
+            return Integer.parseInt(getValue(args, ArgName.minusDays, ArgName.minusDays.defaultValue()));
+        }
+        return Integer.parseInt(ArgName.gitBashPath.defaultValue());
     }
 
     static String gitBashPath(String[] args) {
