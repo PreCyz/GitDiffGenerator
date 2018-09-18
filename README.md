@@ -1,5 +1,5 @@
 # GitDiffGenerator
-Generates git diff files from given repositories 
+Generates git diff file from given repositories by default from last 7 days.
 
 ## How to execute
 There are 2 ways of execution this program
