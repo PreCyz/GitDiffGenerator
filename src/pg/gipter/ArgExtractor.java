@@ -11,7 +11,8 @@ final class ArgExtractor {
         itemPath("NO_ITEM_PATH_GIVEN"),
         projectPath("NO_PROJECT_PATH_GIVEN"),
         gitBashPath("C:\\Program Files\\Git\\bin\\bash.exe"),
-        minusDays("7");
+        minusDays("7"),
+        committerEmail("");
 
         private String defaultValue;
 
@@ -71,6 +72,13 @@ final class ArgExtractor {
             return getValue(args, ArgName.gitBashPath, ArgName.gitBashPath.defaultValue());
         }
         return ArgName.gitBashPath.defaultValue();
+    }
+
+    static String gitCommitterEmail(String[] args) {
+        if (hasArgs(args)) {
+            return getValue(args, ArgName.committerEmail, ArgName.committerEmail.defaultValue());
+        }
+        return ArgName.committerEmail.defaultValue();
     }
 
 }

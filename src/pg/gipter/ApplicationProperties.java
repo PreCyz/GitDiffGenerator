@@ -80,8 +80,16 @@ class ApplicationProperties {
         return ArgExtractor.days(args);
     }
 
+    String committerEmail() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgExtractor.ArgName.committerEmail.name(), ArgExtractor.ArgName.committerEmail.defaultValue());
+        }
+        return ArgExtractor.gitCommitterEmail(args);
+    }
+
     private String log() {
         return  "author='" + author() + '\'' +
+                "committerEmail='" + committerEmail() + '\'' +
                 ", itemPath='" + itemPath() + '\'' +
                 ", projectPath='" + String.join(",", projectPaths()) + '\'' +
                 ", gitBashPath='" + gitBashPath() + '\'' +
