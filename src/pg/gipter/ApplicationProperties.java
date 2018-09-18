@@ -24,7 +24,7 @@ class ApplicationProperties {
         try (InputStream is = new FileInputStream("application.properties")) {
             properties = new Properties();
             properties.load(is);
-            System.out.printf("Properties loaded %s%n", log());
+            System.out.printf("Properties loaded [%s]%n", log());
         } catch (IOException | NullPointerException e) {
             System.out.println("Problem with reading application.properties");
             properties = null;
@@ -89,7 +89,7 @@ class ApplicationProperties {
 
     private String log() {
         return  "author='" + author() + '\'' +
-                "committerEmail='" + committerEmail() + '\'' +
+                ", committerEmail='" + committerEmail() + '\'' +
                 ", itemPath='" + itemPath() + '\'' +
                 ", projectPath='" + String.join(",", projectPaths()) + '\'' +
                 ", gitBashPath='" + gitBashPath() + '\'' +
