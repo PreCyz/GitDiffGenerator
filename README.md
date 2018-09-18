@@ -33,6 +33,8 @@ If one runs program with parameters and _application.properties_ at the same tim
 
 _author_ - the git user who committed the code.
 
+_committerEmail_ - email of the user who committed the code.
+
 _itemPath_ - path where file with git diff should be saved.
 
 _projectPath_ - comma separated project paths containing _.git_ folder.
