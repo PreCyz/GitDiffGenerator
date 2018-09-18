@@ -12,24 +12,28 @@ public class Main {
     public static void main(String[] args) {
         ApplicationProperties appProps = new ApplicationProperties(args).init();
 
-        String gitCommand = gitCommand(appProps.author(), appProps.days());
-        System.out.printf("Git command: %s%n", gitCommand);
-
-        try {
-            String itemPath = appProps.itemPath();
-            FileWriter fw = new FileWriter(itemPath);
-
+        try (FileWriter fw = new FileWriter(appProps.itemPath());) {
+            
+            String gitCommand = gitCommand(appProps.author(), appProps.days());
+            System.out.printf("Git command: %s%n", gitCommand);
+            
             for (String projectPath : appProps.projectPaths()) {
                 System.out.printf("Project path %s%n", projectPath);
                 String command = appProps.gitBashPath() + " --cd=\"" + projectPath + "\" --login -i -c \"" + gitCommand + "\"";
                 writeItemToFile(fw, command);
             }
-            fw.close();
-
+            
         } catch (Exception ex) {
             System.err.println(ex);
+            System.exit(-1);
         }
         System.exit(0);
+    }
+    
+    private static String gitCommand(String author, int daysInThePast) {
+        LocalDate now = LocalDate.now();
+        LocalDate minusDays = now.minusDays(daysInThePast);
+        return "git log -p --all --author='" + author + "' --since " + minusDays.format(yyyyMMdd) + " --until " + now.format(yyyyMMdd);
     }
 
     private static void writeItemToFile(FileWriter fw, String command) throws IOException {
@@ -49,12 +53,6 @@ public class Main {
         br.close();
         isr.close();
         is.close();
-    }
-
-    private static String gitCommand(String author, int daysInThePast) {
-        LocalDate now = LocalDate.now();
-        LocalDate minusDays = now.minusDays(daysInThePast);
-        return "git log -p --all --author='" + author + "' --since " + minusDays.format(yyyyMMdd) + " --until " + now.format(yyyyMMdd);
     }
 
 }
