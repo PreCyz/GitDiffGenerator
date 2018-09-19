@@ -1,5 +1,5 @@
 # GitDiffGenerator
-Generates git diff file from given repositories. By default it generates from last 7 days till now.
+Generates git diff file from given repositories. By default it generates from last 7 days till now. Can be run on Windows and Linux (from v2.0).
 
 ## How to execute
 There are 2 ways of execution this program:
@@ -39,6 +39,6 @@ _itemPath_ - path where file with git diff should be saved.
 
 _projectPath_ - comma separated project paths containing _.git_ folder.
 
-_gitBashPath_ - path to git bash.
+_gitBashPath_ - path to git bash. Mandatory for Windows platform.
 
 _minusDays_ - when to start calculating git diff given in days. Default value is 7.
