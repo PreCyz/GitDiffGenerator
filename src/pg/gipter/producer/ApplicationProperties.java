@@ -1,4 +1,4 @@
-package pg.gipter;
+package pg.gipter.producer;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package pg.gipter;
+package pg.gipter.producer;
 
 import java.util.Arrays;
 import java.util.Optional;
