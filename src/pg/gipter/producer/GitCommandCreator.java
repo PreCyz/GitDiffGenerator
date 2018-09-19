@@ -17,7 +17,7 @@ final class GitCommandCreator {
             builder.append(" --author='").append(author).append("'");
         }
         if (notEmpty(committerEmail)) {
-            builder.append(" --committer='").append(committerEmail).append("'");
+            builder.append(" --author='").append(committerEmail).append("'");
         }
         builder.append(" --since ").append(minusDays.format(yyyyMMdd));
         builder.append(" --until ").append(now.format(yyyyMMdd));
