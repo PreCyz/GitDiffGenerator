@@ -93,7 +93,7 @@ startDate=2018/06/01
 endDate=2018/06/30
 itemFileName=diff
 ```
-*Explanation:* setup _itemFileName=diff_ in order to have self explanatory item file name.
+*Explanation:* set _itemFileName=diff_ in order to have self explanatory item file name.
 *Explanation:* you can also use _author_ and _committerEmail_ together.
 
 #### Linux
@@ -125,7 +125,7 @@ startDate=2018/06/01
 endDate=2018/06/30
 itemFileName=diff
 ```
-*Explanation:* setup _itemFileName=diff_ (or any other value) in order to have self explanatory item file name.
+*Explanation:* set _itemFileName=diff_ (or any other value) in order to have self explanatory item file name.
 
 ### Download
 To download latest version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
