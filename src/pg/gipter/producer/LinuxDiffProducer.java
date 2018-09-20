@@ -39,14 +39,13 @@ class LinuxDiffProducer implements DiffProducer {
 
         try (FileWriter fw = new FileWriter(appProps.itemPath())) {
 
-            String gitCommand = GitCommandCreator.gitCommand(appProps.author(), appProps.committerEmail(), appProps.days());
+            List<String> gitCommand = GitCommandCreator.gitCommandAsList(appProps.author(), appProps.committerEmail(), appProps.days());
             System.out.printf("Git command: %s%n", gitCommand);
-            final List<String> gitCmd = Arrays.asList(gitCommand.split(" "));
 
             for (String projectPath : appProps.projectPaths()) {
                 System.out.printf("Project path %s%n", projectPath);
                 List<String> cdCmd = Arrays.asList("cd", projectPath);
-                writeItemToFile(fw, cdCmd, gitCmd);
+                writeItemToFile(fw, cdCmd, gitCommand);
             }
 
         } catch (Exception ex) {
