@@ -1,5 +1,5 @@
 # GitDiffGenerator
-Generates git diff file from given repositories. By default it generates from last 7 days till now. Can be run on Windows and Linux (from v2.0).
+Generates git diff file from given repositories. By default it generates from last 7 days till now. Can be run on Windows and Linux (from v2.0). 
 
 ## How to execute
 There are 2 ways of execution this program:
@@ -27,7 +27,9 @@ projectPath=c:\\Git\\Project1,c:\\Git\\Project2
 gitBashPath=C:\\Path\\to\\Git\\bash.exe
 ```
 #### Tip
-If one runs program with parameters and _application.properties_ at the same time, then configuration from file has higher priority. 
+If one runs program with parameters and _application.properties_ at the same time, then configuration from file has higher priority.
+Generated file name by default is ```String.format("%s-week-%d.txt", now.getMonth().name(), weekNumber).toLowerCase()```. 
+It can be switched to ```String.format("diff-%s-%s.txt", startDate, endDate)``` by setting any value to parameter _itemFileName_.
 
 ### Params description
 
@@ -42,3 +44,9 @@ _projectPath_ - comma separated project paths containing _.git_ folder.
 _gitBashPath_ - path to git bash. Mandatory for Windows platform.
 
 _minusDays_ - when to start calculating git diff given in days. Default value is 7.
+
+_startDate_ - start date of diff given in format yyyy/MM/dd.
+
+_endDate_ - end date of diff given in format yyyy/MM/dd.
+
+_itemFileName_ - if given then different item file name will be produced. By default item file name is ```String.format("%s-week-%d.txt", now.getMonth().name(), weekNumber).toLowerCase()```

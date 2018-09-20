@@ -39,7 +39,9 @@ class LinuxDiffProducer implements DiffProducer {
 
         try (FileWriter fw = new FileWriter(appProps.itemPath())) {
 
-            List<String> gitCommand = GitCommandCreator.gitCommandAsList(appProps.author(), appProps.committerEmail(), appProps.days());
+            List<String> gitCommand = GitCommandCreator.gitCommandAsList(
+                    appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
+            );
             System.out.printf("Git command: %s%n", gitCommand);
 
             for (String projectPath : appProps.projectPaths()) {

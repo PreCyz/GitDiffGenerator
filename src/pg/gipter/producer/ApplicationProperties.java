@@ -56,7 +56,18 @@ class ApplicationProperties {
         LocalDate now = LocalDate.now();
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
-        return String.format("%s-week-%d.txt", now.getMonth().name(), weekNumber).toLowerCase();
+        String fileName = String.format("%s-week-%d.txt", now.getMonth().name(), weekNumber).toLowerCase();
+        if (!itemFileName().isEmpty()) {
+            fileName = String.format("diff-%s-%s.txt", startDate().replace("/", ""), endDate().replace("/", ""));
+        }
+        return fileName;
+    }
+
+    private String itemFileName() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgExtractor.ArgName.itemFileName.name(), ArgExtractor.ArgName.itemFileName.defaultValue());
+        }
+        return ArgExtractor.itemFileName(args);
     }
 
     String[] projectPaths() {
@@ -64,7 +75,7 @@ class ApplicationProperties {
             return properties.getProperty(ArgExtractor.ArgName.projectPath.name(), ArgExtractor.ArgName.projectPath.defaultValue()).split(",");
         }
         return ArgExtractor.projectPaths(args).split(",");
-        }
+    }
 
     String gitBashPath() {
         if (hasProperties()) {
@@ -73,7 +84,7 @@ class ApplicationProperties {
         return ArgExtractor.gitBashPath(args);
     }
 
-    int days() {
+    private int days() {
         if (hasProperties()) {
             return Integer.parseInt(properties.getProperty(ArgExtractor.ArgName.minusDays.name(), ArgExtractor.ArgName.minusDays.defaultValue()));
         }
@@ -87,12 +98,36 @@ class ApplicationProperties {
         return ArgExtractor.gitCommitterEmail(args);
     }
 
+    String startDate() {
+        if (hasProperties()) {
+            String startDate = properties.getProperty(ArgExtractor.ArgName.startDate.name(), ArgExtractor.ArgName.startDate.defaultValue());
+            if (startDate.isEmpty()) {
+                startDate = LocalDate.now().minusDays(days()).format(ArgExtractor.yyyyMMdd);
+            }
+            return startDate;
+        }
+        return ArgExtractor.startDate(args);
+    }
+
+    String endDate() {
+        if (hasProperties()) {
+            String endDate = properties.getProperty(ArgExtractor.ArgName.endDate.name(), ArgExtractor.ArgName.endDate.defaultValue());
+            if (endDate.isEmpty()) {
+                endDate = LocalDate.now().format(ArgExtractor.yyyyMMdd);
+            }
+            return endDate;
+        }
+        return ArgExtractor.endDate(args);
+    }
+
     private String log() {
         return  "author='" + author() + '\'' +
                 ", committerEmail='" + committerEmail() + '\'' +
                 ", itemPath='" + itemPath() + '\'' +
                 ", projectPath='" + String.join(",", projectPaths()) + '\'' +
                 ", gitBashPath='" + gitBashPath() + '\'' +
-                ", days='" + days() + '\'';
+                ", days='" + days() + '\'' +
+                ", startDate='" + startDate() + '\'' +
+                ", endDate='" + endDate() + '\'';
     }
 }

@@ -1,18 +1,25 @@
 package pg.gipter.producer;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Optional;
 
 /** Created by Pawel Gawedzki on 17-Sep-2018.*/
 final class ArgExtractor {
 
+    static final DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
     enum ArgName {
         author("NO_AUTHOR_GIVEN"),
         itemPath("NO_ITEM_PATH_GIVEN"),
         projectPath("NO_PROJECT_PATH_GIVEN"),
-        gitBashPath("C:\\Program Files\\Git\\bin\\bash.exe"),
+        gitBashPath("NO_GIT_BASH_GIVEN"),
         minusDays("7"),
-        committerEmail("");
+        committerEmail(""),
+        startDate(LocalDate.now().minusDays(Integer.parseInt(minusDays.defaultValue)).format(yyyyMMdd)),
+        endDate(LocalDate.now().format(yyyyMMdd)),
+        itemFileName("");
 
         private String defaultValue;
 
@@ -79,6 +86,27 @@ final class ArgExtractor {
             return getValue(args, ArgName.committerEmail, ArgName.committerEmail.defaultValue());
         }
         return ArgName.committerEmail.defaultValue();
+    }
+
+    static String startDate(String[] args) {
+        if (hasArgs(args)) {
+            return getValue(args, ArgName.startDate, ArgName.startDate.defaultValue());
+        }
+        return ArgName.startDate.defaultValue();
+    }
+
+    static String endDate(String[] args) {
+        if (hasArgs(args)) {
+            return getValue(args, ArgName.endDate, ArgName.endDate.defaultValue());
+        }
+        return ArgName.endDate.defaultValue();
+    }
+
+    static String itemFileName(String[] args) {
+        if (hasArgs(args)) {
+            return getValue(args, ArgName.itemFileName, ArgName.itemFileName.defaultValue());
+        }
+        return ArgName.itemFileName.defaultValue();
     }
 
 }

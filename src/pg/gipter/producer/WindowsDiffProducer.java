@@ -15,7 +15,9 @@ class WindowsDiffProducer implements DiffProducer {
 
         try (FileWriter fw = new FileWriter(appProps.itemPath())) {
 
-            String gitCommand = GitCommandCreator.gitCommandAsString(appProps.author(), appProps.committerEmail(), appProps.days());
+            String gitCommand = GitCommandCreator.gitCommandAsString(
+                    appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
+            );
             System.out.printf("Git command: %s%n", gitCommand);
 
             for (String projectPath : appProps.projectPaths()) {
