@@ -29,6 +29,7 @@ If there are _application.properties_ file at the same location as your jar file
 
 #### Tip
 If one runs program with parameters and _application.properties_ at the same time, then setup in _application.properties_ has higher priority.
+
 Generated file name by default is
 ```String.format("%s-week-%d.txt", now.getMonth().name(), weekNumber).toLowerCase()```.
 It can be switched to ```String.format("diff-%s-%s.txt", startDate, endDate)``` by setting any value to parameter _itemFileName_.
