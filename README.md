@@ -76,14 +76,13 @@ author=Anakin Skywalker
 itemPath=c:\\Path\\to\\git\\diff\\item
 projectPath=c:\\Git\\Project1,c:\\Git\\Project2
 gitBashPath=C:\\Path\\to\\Git\\bash.exe
-minusDays=26
+minusDays=12
 ```
 *Remember:* Java + Windows == double backslash in the paths!
 #####
 **Example 3**
 
-If you want to create diff for Project1 and Project2 from 1st of June 2018 to 30th of June 2018 and you know only email of committer ```BB8@death.star```,
-create following setup in your _application.properties_:
+If you want to create diff for Project1 and Project2 from 1st of June 2018 to 30th of June 2018 and you know only email of committer ```BB8@death.star```, create following setup in your _application.properties_:
 
 ```
 committerEmail=BB8@death.star
@@ -102,16 +101,16 @@ The setup for linux is similarly.
 
 **Example 1**
 
-If you want to create diff for Project1 and Project2 for last 12 days for _Anakin Skywalker_, create following setup in your _application.properties_:
+If you want to create diff for Project1 and Project2 for last 26 days for jedi master _Ki Adi Mundi_, create following setup in your _application.properties_:
 
 ```
-author=C3PO
+author=Ki Adi Mundi
 itemPath=/home/Vader/Path/to/git/diff/item
-projectPath=/home/Vader/Git/Project1,/home/Vader/Git/Project2
+projectPath=/home/Vader/Mustafar/Project1,/home/Vader/Mustafar/Project2
 minusDays=26
 ```
 *Explanation 1* Java + Linux == simple paths with slashes!
-*Explanation 2* For Linux there is no need to set _gitBashPath_. Program uses builtin bash.
+*Explanation 2* For Linux there is no need to set _gitBashPath_. Program uses built-in bash.
 #####
 **Example 2**
 
