@@ -4,8 +4,8 @@ To download latest version go [here](https://github.com/PreCyz/GitDiffGenerator/
 
 ## How to execute
 There few ways of execution this program:
-- java -jar with params,
-- java -jar + application.properties at the same location as _*.jar_ file,
+- from command line java -jar with params,
+- from command line java -jar + application.properties at the same location as _*.jar_ file,
 - double click on *.jar file (no window will open, but you will see diff file at given item path),
 
 ### java -jar with params
