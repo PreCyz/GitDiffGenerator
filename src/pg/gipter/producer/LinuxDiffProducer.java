@@ -39,7 +39,7 @@ class LinuxDiffProducer implements DiffProducer {
 
         try (FileWriter fw = new FileWriter(appProps.itemPath())) {
 
-            String gitCommand = GitCommandCreator.gitCommand(appProps.author(), appProps.committerEmail(), appProps.days()).replace("'", "");
+            String gitCommand = GitCommandCreator.gitCommand(appProps.author(), appProps.committerEmail(), appProps.days());
             System.out.printf("Git command: %s%n", gitCommand);
             final List<String> gitCmd = Arrays.asList(gitCommand.split(" "));
 

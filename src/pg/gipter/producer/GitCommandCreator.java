@@ -14,10 +14,13 @@ final class GitCommandCreator {
         LocalDate minusDays = now.minusDays(daysInThePast);
         StringBuilder builder = new StringBuilder("git log -p --all");
         if (notEmpty(author)) {
-            builder.append(" --author='").append(author).append("'");
+            String[] authorWords = author.split(" ");
+            for (String word : authorWords) {
+                builder.append(" --author=").append(word);
+            }
         }
         if (notEmpty(committerEmail)) {
-            builder.append(" --author='").append(committerEmail).append("'");
+            builder.append(" --author=").append(committerEmail);
         }
         builder.append(" --since ").append(minusDays.format(yyyyMMdd));
         builder.append(" --until ").append(now.format(yyyyMMdd));
