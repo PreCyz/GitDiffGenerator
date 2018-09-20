@@ -33,9 +33,9 @@ It can be switched to ```String.format("diff-%s-%s.txt", startDate, endDate)``` 
 
 ### Params description
 
-_author_ - the git user who committed the code.
+_author_ - the git user who committed the code, user name from git config stored under key 'user.name'.
 
-_committerEmail_ - email of the user who committed the code.
+_committerEmail_ - email of the user who committed the code, user email from git config stored under key 'user.email'.
 
 _itemPath_ - path where file with git diff should be saved.
 
