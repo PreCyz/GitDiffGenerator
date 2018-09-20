@@ -4,11 +4,11 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
-public class LinuxDiffProducer implements DiffProducer {
+class LinuxDiffProducer implements DiffProducer {
 
     private ApplicationProperties appProps;
 
-    public LinuxDiffProducer(String[] args) {
+    LinuxDiffProducer(String[] args) {
         this.appProps = new ApplicationProperties(args).init();
     }
 
@@ -39,15 +39,9 @@ public class LinuxDiffProducer implements DiffProducer {
 
         try (FileWriter fw = new FileWriter(appProps.itemPath())) {
 
-            String gitCommand = GitCommandCreator.gitCommand(appProps.author(), appProps.committerEmail(), appProps.days()).replace("'", "");
+            String gitCommand = GitCommandCreator.gitCommand(appProps.author(), appProps.committerEmail(), appProps.days());
             System.out.printf("Git command: %s%n", gitCommand);
             final List<String> gitCmd = Arrays.asList(gitCommand.split(" "));
-            /*final List<String> gitCmd = Arrays.asList("git", "log", "-p","--all",
-                    "--committer=Pawel",
-                    "--committer=precpaw@op.pl",
-                    "--since", "2018/09/12",
-                    "--until", "2018/09/19"
-            );*/
 
             for (String projectPath : appProps.projectPaths()) {
                 System.out.printf("Project path %s%n", projectPath);

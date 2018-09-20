@@ -2,11 +2,11 @@ package pg.gipter.producer;
 
 import java.io.*;
 
-public class WindowsDiffProducer implements DiffProducer {
+class WindowsDiffProducer implements DiffProducer {
 
     private ApplicationProperties appProps;
 
-    public WindowsDiffProducer(String[] args) {
+    WindowsDiffProducer(String[] args) {
         this.appProps = new ApplicationProperties(args).init();
     }
 
