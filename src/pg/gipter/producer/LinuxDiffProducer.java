@@ -42,7 +42,7 @@ class LinuxDiffProducer implements DiffProducer {
             List<String> gitCommand = GitCommandCreator.gitCommandAsList(
                     appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
             );
-            System.out.printf("Git command: %s%n", gitCommand);
+            System.out.printf("Git command: %s%n", String.join(" ", gitCommand));
 
             for (String projectPath : appProps.projectPaths()) {
                 System.out.printf("Project path %s%n", projectPath);
