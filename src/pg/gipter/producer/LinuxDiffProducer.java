@@ -4,12 +4,32 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
-class LinuxDiffProducer implements DiffProducer {
+class LinuxDiffProducer extends AbstractDiffProducer {
 
-    private ApplicationProperties appProps;
+    LinuxDiffProducer(String[] programParameters) {
+        super(programParameters);
+    }
 
-    LinuxDiffProducer(String[] args) {
-        this.appProps = new ApplicationProperties(args).init();
+    @Override
+    public void produceDiff() {
+
+        try (FileWriter fw = new FileWriter(appProps.itemPath())) {
+
+            List<String> gitCommand = diffCommand.commandAsList(
+                    appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
+            );
+            System.out.printf("Git command: %s%n", String.join(" ", gitCommand));
+
+            for (String projectPath : appProps.projectPaths()) {
+                System.out.printf("Project path %s%n", projectPath);
+                List<String> cdCmd = Arrays.asList("cd", projectPath);
+                writeItemToFile(fw, cdCmd, gitCommand);
+            }
+
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            System.exit(-1);
+        }
     }
 
     private void writeItemToFile(FileWriter fw, List<String> cdCommand, List<String> gitCommand) throws IOException {
@@ -31,28 +51,6 @@ class LinuxDiffProducer implements DiffProducer {
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             throw new IOException(ex);
-        }
-    }
-
-    @Override
-    public void produceDiff() {
-
-        try (FileWriter fw = new FileWriter(appProps.itemPath())) {
-
-            List<String> gitCommand = GitCommandCreator.gitCommandAsList(
-                    appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
-            );
-            System.out.printf("Git command: %s%n", String.join(" ", gitCommand));
-
-            for (String projectPath : appProps.projectPaths()) {
-                System.out.printf("Project path %s%n", projectPath);
-                List<String> cdCmd = Arrays.asList("cd", projectPath);
-                writeItemToFile(fw, cdCmd, gitCommand);
-            }
-
-        } catch (Exception ex) {
-            System.err.println(ex.getMessage());
-            System.exit(-1);
         }
     }
 

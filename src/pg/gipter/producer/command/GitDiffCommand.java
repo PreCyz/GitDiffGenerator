@@ -1,19 +1,20 @@
-package pg.gipter.producer;
+package pg.gipter.producer.command;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-final class GitCommandCreator {
+final class GitDiffCommand implements DiffCommand {
 
-    private GitCommandCreator() { }
+    GitDiffCommand() { }
 
-    static String gitCommandAsString(String author, String committerEmail, String startDate, String endDate) {
+    @Override
+    public String commandAsString(String author, String committerEmail, String startDate, String endDate) {
         StringBuilder builder = new StringBuilder("git log -p --all");
-        if (notEmpty(author)) {
+        if (CommandUtils.notEmpty(author)) {
             builder.append(" --author='").append(author).append("'");
         }
-        if (notEmpty(committerEmail)) {
+        if (CommandUtils.notEmpty(committerEmail)) {
             builder.append(" --author=").append(committerEmail);
         }
         builder.append(" --since ").append(startDate);
@@ -22,12 +23,13 @@ final class GitCommandCreator {
         return builder.toString();
     }
 
-    static List<String> gitCommandAsList(String author, String committerEmail, String startDate, String endDate) {
+    @Override
+    public List<String> commandAsList(String author, String committerEmail, String startDate, String endDate) {
         List<String> command = new LinkedList<>(Arrays.asList("git", "log", "-p", "--all"));
-        if (notEmpty(author)) {
+        if (CommandUtils.notEmpty(author)) {
             command.add("--author=" + author);
         }
-        if (notEmpty(committerEmail)) {
+        if (CommandUtils.notEmpty(committerEmail)) {
             command.add("--author=" + committerEmail);
         }
 
@@ -39,7 +41,4 @@ final class GitCommandCreator {
         return command;
     }
 
-    private static boolean notEmpty(String value) {
-        return value != null && !value.trim().isEmpty();
-    }
 }

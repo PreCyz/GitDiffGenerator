@@ -1,5 +1,7 @@
 package pg.gipter.producer;
 
+import pg.gipter.producer.command.VersionControlSystem;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -19,7 +21,8 @@ final class ArgExtractor {
         committerEmail(""),
         startDate(LocalDate.now().minusDays(Integer.parseInt(minusDays.defaultValue)).format(yyyyMMdd)),
         endDate(LocalDate.now().format(yyyyMMdd)),
-        itemFileName("");
+        itemFileName(""),
+        versionControlSystem(VersionControlSystem.GIT.name());
 
         private String defaultValue;
 
@@ -107,6 +110,14 @@ final class ArgExtractor {
             return getValue(args, ArgName.itemFileName, ArgName.itemFileName.defaultValue());
         }
         return ArgName.itemFileName.defaultValue();
+    }
+
+    static VersionControlSystem versionControlSystem(String[] args) {
+        if (hasArgs(args)) {
+            String vcs = getValue(args, ArgName.versionControlSystem, ArgName.versionControlSystem.defaultValue());
+            return VersionControlSystem.valueFor(vcs.toUpperCase());
+        }
+        return VersionControlSystem.valueOf(ArgName.itemFileName.defaultValue());
     }
 
 }

@@ -2,12 +2,10 @@ package pg.gipter.producer;
 
 import java.io.*;
 
-class WindowsDiffProducer implements DiffProducer {
+class WindowsDiffProducer extends AbstractDiffProducer {
 
-    private ApplicationProperties appProps;
-
-    WindowsDiffProducer(String[] args) {
-        this.appProps = new ApplicationProperties(args).init();
+    WindowsDiffProducer(String[] programParameters) {
+        super(programParameters);
     }
 
     @Override
@@ -15,7 +13,7 @@ class WindowsDiffProducer implements DiffProducer {
 
         try (FileWriter fw = new FileWriter(appProps.itemPath())) {
 
-            String gitCommand = GitCommandCreator.gitCommandAsString(
+            String gitCommand = diffCommand.commandAsString(
                     appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
             );
             System.out.printf("Git command: %s%n", gitCommand);

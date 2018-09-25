@@ -1,5 +1,7 @@
 package pg.gipter.producer;
 
+import pg.gipter.producer.command.VersionControlSystem;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -120,6 +122,16 @@ class ApplicationProperties {
         return ArgExtractor.endDate(args);
     }
 
+    VersionControlSystem versionControlSystem() {
+        if (hasProperties()) {
+            String vcs = properties.getProperty(
+                    ArgExtractor.ArgName.versionControlSystem.name(), ArgExtractor.ArgName.versionControlSystem.defaultValue()
+            );
+            return VersionControlSystem.valueFor(vcs.toUpperCase());
+        }
+        return ArgExtractor.versionControlSystem(args);
+    }
+
     private String log() {
         return  "author='" + author() + '\'' +
                 ", committerEmail='" + committerEmail() + '\'' +
@@ -128,6 +140,7 @@ class ApplicationProperties {
                 ", gitBashPath='" + gitBashPath() + '\'' +
                 ", days='" + days() + '\'' +
                 ", startDate='" + startDate() + '\'' +
-                ", endDate='" + endDate() + '\'';
+                ", endDate='" + endDate() + '\'' +
+                ", versionControlSystem='" + versionControlSystem() + '\'';
     }
 }
