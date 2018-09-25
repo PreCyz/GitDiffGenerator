@@ -1,6 +1,6 @@
 # GitDiffGenerator
-Generates git diff file from given repositories. By default it generates from last 7 days till now. Can be run on Windows and Linux (from v2.0).
-To download latest version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
+Generates diff file from given repositories. By default it generates from last 7 days till now. Can be run on Windows and Linux (from v2.0).
+It handles Git and Mercurial version control systems. To download latest version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
 
 ## How to execute
 There few ways of execution this program:
@@ -51,6 +51,8 @@ _startDate_ - start date of diff given in format yyyy/MM/dd.
 _endDate_ - end date of diff given in format yyyy/MM/dd.
 
 _itemFileName_ - if given then different item file name will be produced. By default item file name is ```String.format("%s-week-%d.txt", now.getMonth().name(), weekNumber).toLowerCase()```
+
+_versionControlSystem_ - default value is ```GIT```. If user wants to generate diff from Mercurial then has to set this parameter as ```MERCURIAL```.
 
 ### Sample setup
 
