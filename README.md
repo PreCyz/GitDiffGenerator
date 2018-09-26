@@ -1,6 +1,12 @@
 # GitDiffGenerator
-Generates diff file from given repositories. By default it generates from last 7 days till now. Can be run on Windows and Linux (from v2.0).
-It handles Git and Mercurial version control systems. To download latest version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
+To download latest version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
+
+Program generates one text file containing diff from given repositories. By default it generates diff from last 7 days. Can be run on Windows and Linux (from v2.0).
+It handles Git and Mercurial version control systems. In order to produce diff program executes following commands:
+
+For Git: ```git log -p --all --author=userName --since yyyy/MM/dd --until yyyy/MM/dd```
+
+For Mercurial: ```hg log -p --user userName --date "yyyy-MM-dd to yyyy-MM-dd"```
 
 ## How to execute
 There few ways of execution this program:
