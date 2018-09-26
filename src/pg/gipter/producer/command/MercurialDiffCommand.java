@@ -12,7 +12,7 @@ final class MercurialDiffCommand implements DiffCommand {
     public String commandAsString(String author, String committerEmail, String startDate, String endDate) {
         StringBuilder builder = new StringBuilder("hg log -p");
         if (CommandUtils.notEmpty(author)) {
-            builder.append(" -user ").append(author);
+            builder.append(" --user ").append(author);
         }
         if (CommandUtils.notEmpty(committerEmail)) {
             builder.append(" --user ").append(committerEmail);
@@ -34,7 +34,7 @@ final class MercurialDiffCommand implements DiffCommand {
             command.add(author);
         }
         if (CommandUtils.notEmpty(committerEmail)) {
-            command.add("--user=");
+            command.add("--user");
             command.add(committerEmail);
         }
 
