@@ -101,6 +101,7 @@ endDate=2018/06/30
 itemFileName=diff
 ```
 *Explanation:* set _itemFileName=diff_ in order to have self explanatory item file name.
+
 *Explanation:* you can also use _author_ and _committerEmail_ together.
 
 #### Linux
@@ -117,6 +118,7 @@ projectPath=/home/Vader/Mustafar/Project1,/home/Vader/Mustafar/Project2
 minusDays=26
 ```
 *Explanation 1* Java + Linux == simple paths with slashes!
+
 *Explanation 2* For Linux there is no need to set _gitBashPath_. Program uses built-in bash.
 #####
 **Example 2**
