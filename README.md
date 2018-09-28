@@ -84,8 +84,8 @@ itemPath=/home/Vader/Path/to/git/diff/item
 projectPath=/home/Vader/Mustafar/Project1,/home/Vader/Mustafar/Project2
 minusDays=26
 ```
-*Explanation 1* Java + Linux == simple paths with slashes!  
-*Explanation 2* For Linux there is no need to set _gitBashPath_. Program uses built-in bash.
+*Explanation:* Java + Linux == simple paths with slashes!  
+*Explanation:* For Linux there is no need to set _gitBashPath_. Program uses built-in bash.
 #####
 **Example 2**  
 If you want to create diff for Project1 and Project2 from 1st of June 2018 to 30th of June 2018 and you know only email of committer ```BB8@death.star```,
