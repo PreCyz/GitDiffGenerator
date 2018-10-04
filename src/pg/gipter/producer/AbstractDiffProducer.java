@@ -37,7 +37,6 @@ abstract class AbstractDiffProducer implements DiffProducer {
     }
 
     private void writeItemToFile(FileWriter fw, String projectPath, List<String> gitCommand) throws IOException {
-
         ProcessBuilder processBuilder = new ProcessBuilder(gitCommand);
         processBuilder.directory(new File(projectPath));
         Process process = processBuilder.start();
@@ -47,7 +46,6 @@ abstract class AbstractDiffProducer implements DiffProducer {
              BufferedReader br = new BufferedReader(isr)) {
 
             String line;
-
             while ((line = br.readLine()) != null) {
                 fw.write(String.format("%s%n", line));
                 System.out.println(line);
