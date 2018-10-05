@@ -35,7 +35,8 @@ _minusDays_ - when to start calculating git diff given in days. Default value is
 _startDate_ - start date of diff given in format yyyy/MM/dd.<br />
 _endDate_ - end date of diff given in format yyyy/MM/dd.<br />
 _itemFileName_ - if given then different item file name will be produced. By default item file name is `String.format("%s-week-%d.txt", now.getMonth().name(), weekNumber).toLowerCase()`<br />
-_versionControlSystem_ - default value is `GIT`. If user wants to generate diff from Mercurial then has to set this parameter as `MERCURIAL`.
+_versionControlSystem_ - default value is `GIT`. If user wants to generate diff from Mercurial then has to set this parameter as `MERCURIAL`.<br />
+_codeProtected_ - default value is `false`. If code is protected and can not be share in anyway, then this parameter should be set as `true`.
 ### Sample setup
 #### Windows
 **Example 1**<br />
@@ -149,5 +150,23 @@ itemPath=/home/Vader/Path/to/git/diff/item
 projectPath=/home/Vader/Git/Project1
 versionControlSystem=MERCURIAL
 ```
+### Explanation of *codeProtected* parameter
+It may be that owner of the code forbids to share the code in anyway. If so, then it can not be attached to regular diff.
+In that case user should set parameter *codeProtected* to `true`. When *true* is set then no code is attached to diff.
+For `GIT` the protected diff will contain entries as follows:<br />
+```
+commit 32d111bf4483264e6a6bd89422b5b7b60e39bee7 (HEAD -> master)
+Author: Anton Gorodecki <dniewnoj@dozor.fantasy>
+Date:   Fri Oct 5 20:54:44 2018 +0200
+
+    Introducing StringUtils class.
+```
+No code! Just information about the change:
+ - who,
+ - when,
+ - commit hash,
+ - branch name,
+ - commit message.
+
 ### Download
 To download latest version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
