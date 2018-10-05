@@ -36,7 +36,7 @@ _startDate_ - start date of diff given in format yyyy/MM/dd.<br />
 _endDate_ - end date of diff given in format yyyy/MM/dd.<br />
 _itemFileName_ - if given then different item file name will be produced. By default item file name is `String.format("%s-week-%d.txt", now.getMonth().name(), weekNumber).toLowerCase()`<br />
 _versionControlSystem_ - default value is `GIT`. If user wants to generate diff from Mercurial then has to set this parameter as `MERCURIAL`.<br />
-_codeProtected_ - default value is `false`. If code is protected and can not be share in anyway, then this parameter should be set as `true`.
+_codeProtected_ - default value is `false`. If code is protected and can not be shared in anyway, then this parameter should be set as `true`.
 ### Sample setup
 #### Windows
 **Example 1**<br />
