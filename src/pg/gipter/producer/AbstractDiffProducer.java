@@ -26,7 +26,6 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
             for (String projectPath : appProps.projectPaths()) {
                 System.out.printf("Project path %s%n", projectPath);
-                //String command = appProps.gitBashPath() + " --cd=\"" + projectPath + "\" --login -i -c \"" + gitCommand + "\"";
                 writeItemToFile(fw, projectPath, getFullCommand(cmd));
             }
 
