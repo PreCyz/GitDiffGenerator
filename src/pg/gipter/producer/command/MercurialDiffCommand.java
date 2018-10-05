@@ -1,39 +1,25 @@
 package pg.gipter.producer.command;
 
+import pg.gipter.producer.util.StringUtils;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-final class MercurialDiffCommand implements DiffCommand {
+final class MercurialDiffCommand extends AbstractDiffCommand {
 
-    MercurialDiffCommand() { }
-
-    @Override
-    public String commandAsString(String author, String committerEmail, String startDate, String endDate) {
-        StringBuilder builder = new StringBuilder("hg log -p");
-        if (CommandUtils.notEmpty(author)) {
-            builder.append(" --user ").append(author);
-        }
-        if (CommandUtils.notEmpty(committerEmail)) {
-            builder.append(" --user ").append(committerEmail);
-        }
-        builder.append(" --date \"")
-                .append(startDate.replace("/", "-"))
-                .append(" to ")
-                .append(endDate.replace("/", "-"))
-                .append("\"");
-
-        return builder.toString();
+    MercurialDiffCommand(boolean codeProtected) {
+        super(codeProtected);
     }
 
     @Override
     public List<String> commandAsList(String author, String committerEmail, String startDate, String endDate) {
-        List<String> command = new LinkedList<>(Arrays.asList("hg", "log", "-p"));
-        if (CommandUtils.notEmpty(author)) {
+        List<String> command = getInitialCommand();
+        if (StringUtils.notEmpty(author)) {
             command.add("--user");
             command.add(author);
         }
-        if (CommandUtils.notEmpty(committerEmail)) {
+        if (StringUtils.notEmpty(committerEmail)) {
             command.add("--user");
             command.add(committerEmail);
         }
@@ -42,6 +28,18 @@ final class MercurialDiffCommand implements DiffCommand {
         command.add("\"" + startDate.replace("/", "-") + " to " + endDate.replace("/", "-") + "\"");
 
         return command;
+    }
+
+    @Override
+    List<String> getInitialCommand() {
+        LinkedList<String> initialCommand = new LinkedList<>(Arrays.asList("hg", "log"));
+        if (codeProtected) {
+            initialCommand.add("--style");
+            initialCommand.add("changelog");
+        } else {
+            initialCommand.add("--patch");
+        }
+        return initialCommand;
     }
 
 }

@@ -1,6 +1,7 @@
 package pg.gipter.producer;
 
 import pg.gipter.producer.command.VersionControlSystem;
+import pg.gipter.producer.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -125,6 +126,16 @@ class ApplicationProperties {
         return ArgExtractor.versionControlSystem(args);
     }
 
+    boolean isCodeProtected() {
+        if (hasProperties()) {
+            String codeProtected = properties.getProperty(
+                    ArgExtractor.ArgName.codeProtected.name(), ArgExtractor.ArgName.codeProtected.defaultValue()
+            );
+            return StringUtils.getBoolean(codeProtected);
+        }
+        return ArgExtractor.isCodeProtected(args);
+    }
+
     private String log() {
         return  "author='" + author() + '\'' +
                 ", committerEmail='" + committerEmail() + '\'' +
@@ -133,6 +144,7 @@ class ApplicationProperties {
                 ", days='" + days() + '\'' +
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
-                ", versionControlSystem='" + versionControlSystem() + '\'';
+                ", versionControlSystem='" + versionControlSystem() + '\'' +
+                ", codeProtected='" + isCodeProtected() + '\'';
     }
 }

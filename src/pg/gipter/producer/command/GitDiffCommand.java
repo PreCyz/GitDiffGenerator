@@ -1,35 +1,24 @@
 package pg.gipter.producer.command;
 
+import pg.gipter.producer.util.StringUtils;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-final class GitDiffCommand implements DiffCommand {
+final class GitDiffCommand extends AbstractDiffCommand {
 
-    GitDiffCommand() { }
-
-    @Override
-    public String commandAsString(String author, String committerEmail, String startDate, String endDate) {
-        StringBuilder builder = new StringBuilder("git log -p --all");
-        if (CommandUtils.notEmpty(author)) {
-            builder.append(" --author='").append(author).append("'");
-        }
-        if (CommandUtils.notEmpty(committerEmail)) {
-            builder.append(" --author=").append(committerEmail);
-        }
-        builder.append(" --since ").append(startDate);
-        builder.append(" --until ").append(endDate);
-
-        return builder.toString();
+    GitDiffCommand(boolean codeProtected) {
+        super(codeProtected);
     }
 
     @Override
     public List<String> commandAsList(String author, String committerEmail, String startDate, String endDate) {
-        List<String> command = new LinkedList<>(Arrays.asList("git", "log", "-p", "--all"));
-        if (CommandUtils.notEmpty(author)) {
+        List<String> command = getInitialCommand();
+        if (StringUtils.notEmpty(author)) {
             command.add("--author=" + author);
         }
-        if (CommandUtils.notEmpty(committerEmail)) {
+        if (StringUtils.notEmpty(committerEmail)) {
             command.add("--author=" + committerEmail);
         }
 
@@ -41,4 +30,14 @@ final class GitDiffCommand implements DiffCommand {
         return command;
     }
 
+    List<String> getInitialCommand() {
+        List<String> initialCommand = new LinkedList<>(Arrays.asList("git", "log"));
+        if (codeProtected) {
+            initialCommand.add("--decorate");
+        } else {
+            initialCommand.add("--patch");
+            initialCommand.add("--all");
+        }
+        return initialCommand;
+    }
 }

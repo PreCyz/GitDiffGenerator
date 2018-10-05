@@ -12,7 +12,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
     AbstractDiffProducer(String[] programParameters) {
         appProps = new ApplicationProperties(programParameters).init();
-        diffCommand = DiffCommandFactory.getInstance(appProps.versionControlSystem());
+        diffCommand = DiffCommandFactory.getInstance(appProps.versionControlSystem(), appProps.isCodeProtected());
     }
 
     @Override
@@ -22,7 +22,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
             List<String> cmd = diffCommand.commandAsList(
                     appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
             );
-            System.out.printf("%s command: %s%n", appProps.versionControlSystem().name(), cmd);
+            System.out.printf("%s command: %s%n", appProps.versionControlSystem().name(), String.join(" ", cmd));
 
             for (String projectPath : appProps.projectPaths()) {
                 System.out.printf("Project path %s%n", projectPath);

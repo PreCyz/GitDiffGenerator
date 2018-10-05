@@ -4,12 +4,12 @@ public class DiffCommandFactory {
 
     private DiffCommandFactory() { }
 
-    public static DiffCommand getInstance(VersionControlSystem versionControlSystem) {
+    public static DiffCommand getInstance(VersionControlSystem versionControlSystem, boolean codeProtected) {
         switch (versionControlSystem) {
             case MERCURIAL:
-                return new MercurialDiffCommand();
+                return new MercurialDiffCommand(codeProtected);
             default:
-                return new GitDiffCommand();
+                return new GitDiffCommand(codeProtected);
         }
     }
 }

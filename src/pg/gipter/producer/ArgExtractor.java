@@ -1,6 +1,7 @@
 package pg.gipter.producer;
 
 import pg.gipter.producer.command.VersionControlSystem;
+import pg.gipter.producer.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +22,8 @@ final class ArgExtractor {
         startDate(LocalDate.now().minusDays(Integer.parseInt(minusDays.defaultValue)).format(yyyyMMdd)),
         endDate(LocalDate.now().format(yyyyMMdd)),
         itemFileName(""),
-        versionControlSystem(VersionControlSystem.GIT.name());
+        versionControlSystem(VersionControlSystem.GIT.name()),
+        codeProtected("false");
 
         private String defaultValue;
 
@@ -110,6 +112,14 @@ final class ArgExtractor {
             return VersionControlSystem.valueFor(vcs.toUpperCase());
         }
         return VersionControlSystem.valueOf(ArgName.itemFileName.defaultValue());
+    }
+
+    static boolean isCodeProtected(String[] args) {
+        if (hasArgs(args)) {
+            String codeProtected = getValue(args, ArgName.codeProtected, ArgName.codeProtected.defaultValue());
+            return StringUtils.getBoolean(codeProtected);
+        }
+        return StringUtils.getBoolean(ArgName.codeProtected.defaultValue());
     }
 
 }
