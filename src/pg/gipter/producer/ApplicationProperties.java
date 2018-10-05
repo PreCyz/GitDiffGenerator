@@ -79,13 +79,6 @@ class ApplicationProperties {
         return ArgExtractor.projectPaths(args).split(",");
     }
 
-    String gitBashPath() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.gitBashPath.name(), ArgExtractor.ArgName.gitBashPath.defaultValue());
-        }
-        return ArgExtractor.gitBashPath(args);
-    }
-
     private int days() {
         if (hasProperties()) {
             return Integer.parseInt(properties.getProperty(ArgExtractor.ArgName.minusDays.name(), ArgExtractor.ArgName.minusDays.defaultValue()));
@@ -137,7 +130,6 @@ class ApplicationProperties {
                 ", committerEmail='" + committerEmail() + '\'' +
                 ", itemPath='" + itemPath() + '\'' +
                 ", projectPath='" + String.join(",", projectPaths()) + '\'' +
-                ", gitBashPath='" + gitBashPath() + '\'' +
                 ", days='" + days() + '\'' +
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +

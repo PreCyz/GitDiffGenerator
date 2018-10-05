@@ -13,8 +13,7 @@ There few ways of execution this program:
 For *Windows*
 ```
 java -jar Gipter.jar author="Anakin Skywalker" itemPath="c:\\Path\\to\\git\\diff\\item" 
-projectPath="c:\\Path\\to\\git\\project1,c:\\Path\\to\\git\\project" 
-gitBashPath="C:\\Program Files\\Git\\bin\\bash.exe"
+projectPath="c:\\Path\\to\\git\\project1,c:\\Path\\to\\git\\project"
 ```
 For *Linux*
 ```
@@ -31,7 +30,7 @@ _author_ - the git user who committed the code, user name from git config stored
 _committerEmail_ - email of the user who committed the code, user email from git config stored under key 'user.email'.<br />
 _itemPath_ - path where file with git diff should be saved.<br />
 _projectPath_ - comma separated project paths containing _.git_ folder.<br />
-_gitBashPath_ - path to git bash. Mandatory for Windows platform.<br />
+_gitBashPath_ - path to git bash. Mandatory for Windows platform. **THIS PARAMETER IS NOT NEED IN VERSIONS 2.2+**<br />
 _minusDays_ - when to start calculating git diff given in days. Default value is 7.<br />
 _startDate_ - start date of diff given in format yyyy/MM/dd.<br />
 _endDate_ - end date of diff given in format yyyy/MM/dd.<br />
@@ -39,13 +38,21 @@ _itemFileName_ - if given then different item file name will be produced. By def
 _versionControlSystem_ - default value is `GIT`. If user wants to generate diff from Mercurial then has to set this parameter as `MERCURIAL`.
 ### Sample setup
 #### Windows
-**Example 1**
+**Example 1**<br />
 If you want to create diff for Smeagol Golum and Project1 from last 7 days then create following setup in your _application.properties_:<br />
 ```
 author=Smeagol Golum
 itemPath=c:\\Path\\to\\git\\diff\\item
 projectPath=c:\\Git\\Project1
 gitBashPath=C:\\Path\\to\\Git\\bash.exe
+```
+#####
+**Example 1** *for version 2.2+*<br />
+If you want to create diff for Smeagol Golum and Project1 from last 7 days then create following setup in your _application.properties_:<br />
+```
+author=Smeagol Golum
+itemPath=c:\\Path\\to\\git\\diff\\item
+projectPath=c:\\Git\\Project1
 ```
 #####
 **Example 2**<br />
@@ -58,6 +65,15 @@ gitBashPath=C:\\Path\\to\\Git\\bash.exe
 minusDays=12
 ```
 *Remember:* Java + Windows == double backslash in the paths!
+#####
+**Example 2** *for version 2.2+*<br />
+If you want to create diff for Project1 and Project2 for last 12 days for _Anakin Skywalker_, create following setup in your _application.properties_:<br />
+```
+author=Anakin Skywalker
+itemPath=c:\\Path\\to\\git\\diff\\item
+projectPath=c:\\Git\\Project1,c:\\Git\\Project2
+minusDays=12
+```
 #####
 **Example 3**<br />
 If you want to create diff for Project1 and Project2 from 1st of June 2018 to 30th of June 2018 and you know only email of committer ```BB8@death.star```, create following setup in your _application.properties_:<br />
@@ -72,6 +88,31 @@ itemFileName=diff
 ```
 *Explanation:* set _itemFileName=diff_ in order to have self explanatory item file name.<br />
 *Explanation:* you can also use _author_ and _committerEmail_ together.
+#####
+**Example 3** *for version 2.2+*<br />
+If you want to create diff for Project1 and Project2 from 1st of June 2018 to 30th of June 2018 and you know only email of committer ```BB8@death.star```, create following setup in your _application.properties_:<br />
+```
+committerEmail=BB8@death.star
+itemPath=c:\\Path\\to\\git\\diff\\item
+projectPath=c:\\Git\\Project1,c:\\Git\\Project2
+gitBashPath=C:\\Path\\to\\Git\\bash.exe
+startDate=2018/06/01
+endDate=2018/06/30
+itemFileName=diff
+```
+#####
+**Example 4**<br />
+If you want to create **MERCURIAL** diff for Project1 and Project2 from 1st of June 2018 to 30th of June 2018 and you know only email of committer ```BB8@death.star```, create following setup in your _application.properties_:<br />
+```
+committerEmail=BB8@death.star
+itemPath=c:\\Path\\to\\git\\diff\\item
+projectPath=c:\\Git\\Project1,c:\\Git\\Project2
+gitBashPath=C:\\Path\\to\\Git\\bash.exe
+startDate=2018/06/01
+endDate=2018/06/30
+itemFileName=diff
+versionControlSystem=MERCURIAL
+```
 #### Linux
 The setup for linux is similarly.<br />
 
@@ -98,5 +139,15 @@ endDate=2018/06/30
 itemFileName=diff
 ```
 *Explanation:* set _itemFileName=diff_ (or any other value) in order to have self explanatory item file name.
+#####
+**Example 3**<br />
+If you want to create MERCURIAL diff for Project1 from last 7 days for user ```Kit Fisto```,
+create following setup in your _application.properties_:<br />
+```
+author=Kit Fisto
+itemPath=/home/Vader/Path/to/git/diff/item
+projectPath=/home/Vader/Git/Project1
+versionControlSystem=MERCURIAL
+```
 ### Download
 To download latest version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).

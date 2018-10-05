@@ -16,7 +16,6 @@ final class ArgExtractor {
         author("NO_AUTHOR_GIVEN"),
         itemPath("NO_ITEM_PATH_GIVEN"),
         projectPath("NO_PROJECT_PATH_GIVEN"),
-        gitBashPath("NO_GIT_BASH_GIVEN"),
         minusDays("7"),
         committerEmail(""),
         startDate(LocalDate.now().minusDays(Integer.parseInt(minusDays.defaultValue)).format(yyyyMMdd)),
@@ -74,14 +73,7 @@ final class ArgExtractor {
         if (hasArgs(args)) {
             return Integer.parseInt(getValue(args, ArgName.minusDays, ArgName.minusDays.defaultValue()));
         }
-        return Integer.parseInt(ArgName.gitBashPath.defaultValue());
-    }
-
-    static String gitBashPath(String[] args) {
-        if (hasArgs(args)) {
-            return getValue(args, ArgName.gitBashPath, ArgName.gitBashPath.defaultValue());
-        }
-        return ArgName.gitBashPath.defaultValue();
+        return Integer.parseInt(ArgName.minusDays.defaultValue());
     }
 
     static String gitCommitterEmail(String[] args) {
