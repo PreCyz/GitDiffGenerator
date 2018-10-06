@@ -9,11 +9,11 @@ public final class StringUtils {
     }
 
     public static boolean getBoolean(String value) {
-        value = value.trim();
-        boolean result = Boolean.valueOf(value);
-        result |= "t".equalsIgnoreCase(value);
-        result |= "yes".equalsIgnoreCase(value);
-        result |= "y".equalsIgnoreCase(value);
+        String trimmedValue = value.trim();
+        boolean result = Boolean.valueOf(trimmedValue);
+        result |= "t".equalsIgnoreCase(trimmedValue);
+        result |= "yes".equalsIgnoreCase(trimmedValue);
+        result |= "y".equalsIgnoreCase(trimmedValue);
         return result;
     }
 }
