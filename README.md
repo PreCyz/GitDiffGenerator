@@ -30,7 +30,7 @@ _author_ - the git user who committed the code, user name from git config stored
 _committerEmail_ - email of the user who committed the code, user email from git config stored under key 'user.email'.<br />
 _itemPath_ - path where file with git diff should be saved.<br />
 _projectPath_ - comma separated project paths containing _.git_ folder.<br />
-_gitBashPath_ - path to git bash. Mandatory for Windows platform. **THIS PARAMETER IS NOT NEED IN VERSIONS 2.2+**<br />
+_gitBashPath_ - path to git bash. Mandatory for Windows platform. **THIS PARAMETER IS NOT NEEDED IN VERSIONS 2.2+**<br />
 _minusDays_ - when to start calculating git diff given in days. Default value is 7.<br />
 _startDate_ - start date of diff given in format yyyy/MM/dd.<br />
 _endDate_ - end date of diff given in format yyyy/MM/dd.<br />
