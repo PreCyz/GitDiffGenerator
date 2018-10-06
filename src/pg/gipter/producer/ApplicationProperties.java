@@ -59,7 +59,7 @@ class ApplicationProperties {
         LocalDate now = LocalDate.now();
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
-        String fileName = String.format("%s-week-%d.txt", now.getMonth().name(), weekNumber).toLowerCase();
+        String fileName = String.format("%d-%s-week-%d.txt", now.getYear(), now.getMonth().name(), weekNumber).toLowerCase();
         if (!itemFileName().isEmpty()) {
             fileName = String.format("diff-%s-%s.txt", startDate().replace("/", ""), endDate().replace("/", ""));
         }

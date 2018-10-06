@@ -24,7 +24,7 @@ projectPath="/home/eva/Path/to/git/project1,/home/eva/Path/to/git/project2"
 If there are _application.properties_ file at the same location as your jar file then program can be run as follows: `java -jar Gipter.jar`
 #### Tip
 If one runs program with parameters and _application.properties_ at the same time, then setup in _application.properties_ has higher priority.<br />
-Generated file name by default is ```"monthName-week-weekNumber.txt"```. It can be switched to ```"diff-startDate-endDate.txt"``` by setting any value to parameter _itemFileName_.
+Generated file name by default is ```"year-monthName-week-weekNumber.txt"```. It can be switched to ```"diff-startDate-endDate.txt"``` by setting any value to parameter _itemFileName_.
 ### Params description
 _author_ - the git user who committed the code, user name from git config stored under key 'user.name'.<br />
 _committerEmail_ - email of the user who committed the code, user email from git config stored under key 'user.email'.<br />
