@@ -51,8 +51,8 @@ final class ArgExtractor {
     private static String getValue(String[] args, final ArgName argName, String defaultValue) {
         Optional<String> argument = Arrays.stream(args).filter(arg -> arg.startsWith(argName.name())).findAny();
         if (argument.isPresent()) {
-            String author = argument.get();
-            return author.substring(author.indexOf("=") + 1);
+            String value = argument.get();
+            return value.substring(value.indexOf("=") + 1);
         }
         return defaultValue;
     }
