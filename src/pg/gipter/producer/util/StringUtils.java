@@ -9,6 +9,7 @@ public final class StringUtils {
     }
 
     public static boolean getBoolean(String value) {
+        value = value.trim();
         boolean result = Boolean.valueOf(value);
         result |= "t".equalsIgnoreCase(value);
         result |= "yes".equalsIgnoreCase(value);
