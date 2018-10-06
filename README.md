@@ -1,5 +1,5 @@
 # GitDiffGenerator
-To download latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).<br />
+To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).<br />
 Program generates one text file containing diff from given repositories. By default it generates diff from last 7 days. Can be run on Windows and Linux (from v2.0).
 It handles Git and Mercurial version control systems. In order to produce diff program executes following commands:<br />
 For Git: `git log -p --all --author=userName --since yyyy/MM/dd --until yyyy/MM/dd`<br />
@@ -169,4 +169,4 @@ No code! Just information about the change:
  - commit message.
 
 ### Download
-To download latest version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
+To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
