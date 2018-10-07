@@ -25,7 +25,10 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
         }
 
         command.add("--date");
-        command.add("\"" + startDate.replace("/", "-") + " to " + endDate.replace("/", "-") + "\"");
+        command.add(String.format("\"%s to %s\"",
+                startDate.replace("/", "-"),
+                endDate.replace("/", "-")
+        ));
 
         return command;
     }

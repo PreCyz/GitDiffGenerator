@@ -22,11 +22,12 @@ abstract class AbstractDiffProducer implements DiffProducer {
             List<String> cmd = diffCommand.commandAsList(
                     appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
             );
+            cmd = getFullCommand(cmd);
             System.out.printf("%s command: %s%n", appProps.versionControlSystem().name(), String.join(" ", cmd));
 
             for (String projectPath : appProps.projectPaths()) {
                 System.out.printf("Project path %s%n", projectPath);
-                writeItemToFile(fw, projectPath, getFullCommand(cmd));
+                writeItemToFile(fw, projectPath, cmd);
             }
 
         } catch (Exception ex) {
