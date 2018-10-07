@@ -30,6 +30,8 @@ abstract class AbstractDiffProducer implements DiffProducer {
                 writeItemToFile(fw, projectPath, cmd);
             }
 
+            System.out.printf("Diff file generated and saved as: %s", appProps.itemPath());
+
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             System.exit(-1);
