@@ -63,7 +63,11 @@ class ApplicationProperties {
         int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
         String fileName = String.format("%d-%s-week-%d.txt", now.getYear(), now.getMonth().name(), weekNumber).toLowerCase();
         if (!itemFileName().isEmpty()) {
-            fileName = String.format("diff-%s-%s.txt", startDate().replace("/", ""), endDate().replace("/", ""));
+            fileName = String.format("%s-%s-%s.txt",
+                    itemFileName(),
+                    startDate().replace("/", ""),
+                    endDate().replace("/", "")
+            );
         }
         return fileName;
     }
