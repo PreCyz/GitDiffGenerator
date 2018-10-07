@@ -26,7 +26,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
             System.out.printf("%s command: %s%n", appProps.versionControlSystem().name(), String.join(" ", cmd));
 
             for (String projectPath : appProps.projectPaths()) {
-                System.out.printf("Project path %s%n", projectPath);
+                System.out.printf("Project path: %s%n", projectPath);
                 writeItemToFile(fw, projectPath, cmd);
             }
 

@@ -16,6 +16,8 @@ import java.util.Properties;
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 class ApplicationProperties {
 
+    private final static String APPLICATION_PROPERTIES = "application.properties";
+
     private Properties properties;
     private final String[] args;
 
@@ -24,14 +26,14 @@ class ApplicationProperties {
     }
 
     ApplicationProperties init() {
-        try (InputStream is = new FileInputStream("application.properties")) {
+        try (InputStream is = new FileInputStream(APPLICATION_PROPERTIES)) {
             properties = new Properties();
             properties.load(is);
             System.out.printf("Properties loaded [%s]%n", log());
         } catch (IOException | NullPointerException e) {
-            System.out.println("Problem with reading application.properties");
+            System.out.printf("Can not read [%s].%n", APPLICATION_PROPERTIES);
             properties = null;
-            System.out.printf("Program argument loaded %s%n", Arrays.toString(args));
+            System.out.printf("Program argument loaded: %s%n", Arrays.toString(args));
         }
         return this;
     }
