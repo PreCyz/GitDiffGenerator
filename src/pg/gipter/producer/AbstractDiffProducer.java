@@ -22,15 +22,17 @@ abstract class AbstractDiffProducer implements DiffProducer {
             List<String> cmd = diffCommand.commandAsList(
                     appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
             );
-            cmd = getFullCommand(cmd);
             System.out.printf("%s command: %s%n", appProps.versionControlSystem().name(), String.join(" ", cmd));
 
+            cmd = getFullCommand(cmd);
+            System.out.printf("Platform full command: %s%n", String.join(" ", cmd));
+
             for (String projectPath : appProps.projectPaths()) {
-                System.out.printf("Project path: %s%n", projectPath);
+                System.out.printf("Project path: %s%n%n", projectPath);
                 writeItemToFile(fw, projectPath, cmd);
             }
 
-            System.out.printf("Diff file generated and saved as: %s", appProps.itemPath());
+            System.out.printf("Diff file generated and saved as: %s.%n", appProps.itemPath());
 
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
