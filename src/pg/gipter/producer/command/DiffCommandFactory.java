@@ -8,6 +8,8 @@ public class DiffCommandFactory {
         switch (versionControlSystem) {
             case MERCURIAL:
                 return new MercurialDiffCommand(codeProtected);
+            case SVN:
+                return new SvnDiffCommand(codeProtected);
             default:
                 return new GitDiffCommand(codeProtected);
         }
