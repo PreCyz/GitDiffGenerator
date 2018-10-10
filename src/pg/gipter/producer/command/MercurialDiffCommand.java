@@ -1,34 +1,34 @@
 package pg.gipter.producer.command;
 
+import pg.gipter.producer.ApplicationProperties;
 import pg.gipter.producer.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static pg.gipter.Main.yyyy_MM_dd;
+
 final class MercurialDiffCommand extends AbstractDiffCommand {
 
-    MercurialDiffCommand(boolean codeProtected) {
-        super(codeProtected);
+    MercurialDiffCommand(ApplicationProperties appProps) {
+        super(appProps);
     }
 
     @Override
-    public List<String> commandAsList(String author, String committerEmail, String startDate, String endDate) {
+    public List<String> commandAsList() {
         List<String> command = getInitialCommand();
-        if (StringUtils.notEmpty(author)) {
+        if (StringUtils.notEmpty(appProps.author())) {
             command.add("--user");
-            command.add(author);
+            command.add(appProps.author());
         }
-        if (StringUtils.notEmpty(committerEmail)) {
+        if (StringUtils.notEmpty(appProps.committerEmail())) {
             command.add("--user");
-            command.add(committerEmail);
+            command.add(appProps.committerEmail());
         }
 
         command.add("--date");
-        command.add(String.format("\"%s to %s\"",
-                startDate.replace("/", "-"),
-                endDate.replace("/", "-")
-        ));
+        command.add(String.format("\"%s to %s\"", appProps.startDate().format(yyyy_MM_dd), appProps.endDate().format(yyyy_MM_dd)));
 
         return command;
     }
@@ -36,7 +36,7 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
     @Override
     List<String> getInitialCommand() {
         LinkedList<String> initialCommand = new LinkedList<>(Arrays.asList("hg", "log"));
-        if (codeProtected) {
+        if (appProps.isCodeProtected()) {
             initialCommand.add("--style");
             initialCommand.add("changelog");
         } else {

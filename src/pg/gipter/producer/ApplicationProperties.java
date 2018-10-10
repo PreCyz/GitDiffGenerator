@@ -8,13 +8,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
-class ApplicationProperties {
+public class ApplicationProperties {
 
     private final static String APPLICATION_PROPERTIES = "application.properties";
 
@@ -23,9 +24,10 @@ class ApplicationProperties {
 
     ApplicationProperties(String[] args) {
         this.args = args;
+        init();
     }
 
-    ApplicationProperties init() {
+    private void init() {
         try (InputStream is = new FileInputStream(APPLICATION_PROPERTIES)) {
             properties = new Properties();
             properties.load(is);
@@ -35,21 +37,20 @@ class ApplicationProperties {
             properties = null;
             System.out.printf("Program argument loaded: %s%n", Arrays.toString(args));
         }
-        return this;
     }
 
     private boolean hasProperties() {
         return properties != null;
     }
 
-    String author() {
+    public String author() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.author.name(), ArgExtractor.ArgName.author.defaultValue());
         }
         return ArgExtractor.author(args);
     }
 
-    String itemPath() {
+    public String itemPath() {
         String itemPath = ArgExtractor.path(args);
         if (hasProperties()) {
             itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), ArgExtractor.ArgName.itemPath.defaultValue());
@@ -65,8 +66,8 @@ class ApplicationProperties {
         if (!itemFileName().isEmpty()) {
             fileName = String.format("%s-%s-%s.txt",
                     itemFileName(),
-                    startDate().replace("/", ""),
-                    endDate().replace("/", "")
+                    startDate().format(DateTimeFormatter.ofPattern("yyyy_MM_dd")),
+                    endDate().format(DateTimeFormatter.ofPattern("yyyy_MM_dd"))
             );
         }
         return fileName;
@@ -79,7 +80,7 @@ class ApplicationProperties {
         return ArgExtractor.itemFileName(args);
     }
 
-    String[] projectPaths() {
+    public String[] projectPaths() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.projectPath.name(), ArgExtractor.ArgName.projectPath.defaultValue()).split(",");
         }
@@ -93,36 +94,38 @@ class ApplicationProperties {
         return ArgExtractor.days(args);
     }
 
-    String committerEmail() {
+    public String committerEmail() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.committerEmail.name(), ArgExtractor.ArgName.committerEmail.defaultValue());
         }
         return ArgExtractor.gitCommitterEmail(args);
     }
 
-    String startDate() {
+    public LocalDate startDate() {
+        String[] date = ArgExtractor.startDate(args).split("-");
         if (hasProperties()) {
             String startDate = properties.getProperty(ArgExtractor.ArgName.startDate.name(), ArgExtractor.ArgName.startDate.defaultValue());
             if (startDate.isEmpty()) {
-                startDate = LocalDate.now().minusDays(days()).format(ArgExtractor.yyyyMMdd);
+                return LocalDate.now().minusDays(days());
             }
-            return startDate;
+            date = startDate.split("-");
         }
-        return ArgExtractor.startDate(args);
+        return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
     }
 
-    String endDate() {
+    public LocalDate endDate() {
+        String[] date = ArgExtractor.endDate(args).split("-");
         if (hasProperties()) {
             String endDate = properties.getProperty(ArgExtractor.ArgName.endDate.name(), ArgExtractor.ArgName.endDate.defaultValue());
             if (endDate.isEmpty()) {
-                endDate = LocalDate.now().format(ArgExtractor.yyyyMMdd);
+                return LocalDate.now();
             }
-            return endDate;
+            date = endDate.split("-");
         }
-        return ArgExtractor.endDate(args);
+        return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
     }
 
-    VersionControlSystem versionControlSystem() {
+    public VersionControlSystem versionControlSystem() {
         if (hasProperties()) {
             String vcs = properties.getProperty(
                     ArgExtractor.ArgName.versionControlSystem.name(), ArgExtractor.ArgName.versionControlSystem.defaultValue()
@@ -132,7 +135,7 @@ class ApplicationProperties {
         return ArgExtractor.versionControlSystem(args);
     }
 
-    boolean isCodeProtected() {
+    public boolean isCodeProtected() {
         if (hasProperties()) {
             String codeProtected = properties.getProperty(
                     ArgExtractor.ArgName.codeProtected.name(), ArgExtractor.ArgName.codeProtected.defaultValue()

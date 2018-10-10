@@ -11,17 +11,15 @@ abstract class AbstractDiffProducer implements DiffProducer {
     private final DiffCommand diffCommand;
 
     AbstractDiffProducer(String[] programParameters) {
-        appProps = new ApplicationProperties(programParameters).init();
-        diffCommand = DiffCommandFactory.getInstance(appProps.versionControlSystem(), appProps.isCodeProtected());
+        appProps = new ApplicationProperties(programParameters);
+        diffCommand = DiffCommandFactory.getInstance(appProps.versionControlSystem(), appProps);
     }
 
     @Override
     public void produceDiff() {
         try (FileWriter fw = new FileWriter(appProps.itemPath())) {
 
-            List<String> cmd = diffCommand.commandAsList(
-                    appProps.author(), appProps.committerEmail(), appProps.startDate(), appProps.endDate()
-            );
+            List<String> cmd = diffCommand.commandAsList();
             System.out.printf("%s command: %s%n", appProps.versionControlSystem().name(), String.join(" ", cmd));
 
             cmd = getFullCommand(cmd);
