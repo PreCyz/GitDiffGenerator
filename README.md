@@ -1,9 +1,10 @@
 # GitDiffGenerator
 To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).<br />
 Program generates one text file containing diff from given repositories. By default it generates diff from last 7 days. Can be run on Windows and Linux (from v2.0).
-It handles Git and Mercurial version control systems. In order to produce diff program executes following commands:<br />
-For Git: `git log -p --all --author=userName --since yyyy/MM/dd --until yyyy/MM/dd`<br />
-For Mercurial: `hg log -p --user userName --date "yyyy-MM-dd to yyyy-MM-dd"`
+It handles Git, Mercurial and SVN version control systems. In order to produce diff program executes following commands:<br />
+For Git: `git log --patch --all --author=userName --since yyyy-MM-dd --until yyyy-MM-dd`<br />
+For Mercurial: `hg log --patch --user userName --date "yyyy-MM-dd to yyyy-MM-dd"`
+For SVN: `svn log --diff --search userName --revision {yyyy-MM-dd}:{yyyy-MM-dd}`
 ## How to execute
 There few ways of execution this program:
 - from command line java -jar with params,
@@ -32,10 +33,10 @@ _itemPath_ - path where file with git diff should be saved.<br />
 _projectPath_ - comma separated project paths containing _.git_ folder.<br />
 _gitBashPath_ - path to git bash. Mandatory for Windows platform. **THIS PARAMETER IS NOT NEEDED IN VERSIONS 2.2+**<br />
 _minusDays_ - when to start calculating git diff given in days. Default value is 7.<br />
-_startDate_ - start date of diff given in format yyyy/MM/dd.<br />
-_endDate_ - end date of diff given in format yyyy/MM/dd.<br />
+_startDate_ - start date of diff given in format yyyy-MM-dd.<br />
+_endDate_ - end date of diff given in format yyyy-MM-dd.<br />
 _itemFileName_ - if given then this value will be used as prefix of the file name. By default item file name is `yyyy-monthName-week-weekNumber.txt`<br />
-_versionControlSystem_ - default value is `GIT`. If user wants to generate diff from Mercurial then has to set this parameter as `MERCURIAL`.<br />
+_versionControlSystem_ - default value is `GIT`. If you want to generate diff from Mercurial or SVN then set this parameter as `MERCURIAL` or `SVN`.<br />
 _codeProtected_ - default value is `false`. If code is protected and can not be shared in anyway, then this parameter should be set as `true`.
 ### Sample setup
 #### Windows
