@@ -4,14 +4,13 @@ import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.producer.util.StringUtils;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static pg.gipter.Main.yyyy_MM_dd;
+
 /** Created by Pawel Gawedzki on 17-Sep-2018.*/
 final class ArgExtractor {
-
-    static final DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 
     enum ArgName {
         author("NO_AUTHOR_GIVEN"),
@@ -19,8 +18,8 @@ final class ArgExtractor {
         projectPath("NO_PROJECT_PATH_GIVEN"),
         minusDays("7"),
         committerEmail(""),
-        startDate(LocalDate.now().minusDays(Integer.parseInt(minusDays.defaultValue)).format(yyyyMMdd)),
-        endDate(LocalDate.now().format(yyyyMMdd)),
+        startDate(LocalDate.now().minusDays(Integer.parseInt(minusDays.defaultValue)).format(yyyy_MM_dd)),
+        endDate(LocalDate.now().format(yyyy_MM_dd)),
         itemFileName(""),
         versionControlSystem(VersionControlSystem.GIT.name()),
         codeProtected("false");
