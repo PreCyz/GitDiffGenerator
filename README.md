@@ -3,7 +3,7 @@ To download the latest stable version go [here](https://github.com/PreCyz/GitDif
 Program generates one text file containing diff from given repositories. By default it generates diff from last 7 days. Can be run on Windows and Linux (from v2.0).
 It handles Git, Mercurial and SVN version control systems. In order to produce diff program executes following commands:<br />
 For Git: `git log --patch --all --author=userName --since yyyy-MM-dd --until yyyy-MM-dd`<br />
-For Mercurial: `hg log --patch --user userName --date "yyyy-MM-dd to yyyy-MM-dd"`
+For Mercurial: `hg log --patch --user userName --date "yyyy-MM-dd to yyyy-MM-dd"`<br />
 For SVN: `svn log --diff --search userName --revision {yyyy-MM-dd}:{yyyy-MM-dd}`
 ## How to execute
 There few ways of execution this program:
