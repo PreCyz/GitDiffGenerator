@@ -1,13 +1,15 @@
 package pg.gipter.producer;
 
+import pg.gipter.settings.ApplicationProperties;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 class WindowsDiffProducer extends AbstractDiffProducer {
 
-    WindowsDiffProducer(String[] programParameters) {
-        super(programParameters);
+    WindowsDiffProducer(ApplicationProperties applicationProperties) {
+        super(applicationProperties);
     }
 
     @Override

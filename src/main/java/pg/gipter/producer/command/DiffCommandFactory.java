@@ -1,13 +1,13 @@
 package pg.gipter.producer.command;
 
-import pg.gipter.producer.ApplicationProperties;
+import pg.gipter.settings.ApplicationProperties;
 
 public class DiffCommandFactory {
 
     private DiffCommandFactory() { }
 
-    public static DiffCommand getInstance(VersionControlSystem versionControlSystem, ApplicationProperties applicationProperties) {
-        switch (versionControlSystem) {
+    public static DiffCommand getInstance(ApplicationProperties applicationProperties) {
+        switch (applicationProperties.versionControlSystem()) {
             case MERCURIAL:
                 return new MercurialDiffCommand(applicationProperties);
             case SVN:

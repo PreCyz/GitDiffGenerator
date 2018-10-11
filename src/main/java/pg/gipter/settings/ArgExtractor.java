@@ -1,4 +1,4 @@
-package pg.gipter.producer;
+package pg.gipter.settings;
 
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.producer.util.StringUtils;
@@ -77,25 +77,27 @@ final class ArgExtractor {
         return Integer.parseInt(ArgName.minusDays.defaultValue());
     }
 
-    static String gitCommitterEmail(String[] args) {
+    static String committerEmail(String[] args) {
         if (hasArgs(args)) {
             return getValue(args, ArgName.committerEmail, ArgName.committerEmail.defaultValue());
         }
         return ArgName.committerEmail.defaultValue();
     }
 
-    static String startDate(String[] args) {
+    static LocalDate startDate(String[] args) {
+        String[] date = ArgName.startDate.defaultValue().split("-");
         if (hasArgs(args)) {
-            return getValue(args, ArgName.startDate, ArgName.startDate.defaultValue());
+            date = getValue(args, ArgName.startDate, ArgName.startDate.defaultValue()).split("-");
         }
-        return ArgName.startDate.defaultValue();
+        return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
     }
 
-    static String endDate(String[] args) {
+    static LocalDate endDate(String[] args) {
+        String[] date = ArgName.endDate.defaultValue().split("-");
         if (hasArgs(args)) {
-            return getValue(args, ArgName.endDate, ArgName.endDate.defaultValue());
+            date = getValue(args, ArgName.endDate, ArgName.endDate.defaultValue()).split("-");
         }
-        return ArgName.endDate.defaultValue();
+        return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
     }
 
     static String itemFileName(String[] args) {
@@ -110,10 +112,10 @@ final class ArgExtractor {
             String vcs = getValue(args, ArgName.versionControlSystem, ArgName.versionControlSystem.defaultValue());
             return VersionControlSystem.valueFor(vcs.toUpperCase());
         }
-        return VersionControlSystem.valueOf(ArgName.itemFileName.defaultValue());
+        return VersionControlSystem.valueOf(ArgName.versionControlSystem.defaultValue());
     }
 
-    static boolean isCodeProtected(String[] args) {
+    static boolean codeProtected(String[] args) {
         if (hasArgs(args)) {
             String codeProtected = getValue(args, ArgName.codeProtected, ArgName.codeProtected.defaultValue());
             return StringUtils.getBoolean(codeProtected);

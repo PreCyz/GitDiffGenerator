@@ -1,6 +1,6 @@
 package pg.gipter.producer.command;
 
-import pg.gipter.producer.ApplicationProperties;
+import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.producer.util.StringUtils;
 
 import java.util.Arrays;

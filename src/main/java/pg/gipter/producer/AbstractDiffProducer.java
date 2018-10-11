@@ -2,6 +2,7 @@ package pg.gipter.producer;
 
 import pg.gipter.producer.command.DiffCommand;
 import pg.gipter.producer.command.DiffCommandFactory;
+import pg.gipter.settings.ApplicationProperties;
 
 import java.io.*;
 import java.util.List;
@@ -10,9 +11,9 @@ abstract class AbstractDiffProducer implements DiffProducer {
     private final ApplicationProperties appProps;
     private final DiffCommand diffCommand;
 
-    AbstractDiffProducer(String[] programParameters) {
-        appProps = new ApplicationProperties(programParameters);
-        diffCommand = DiffCommandFactory.getInstance(appProps.versionControlSystem(), appProps);
+    AbstractDiffProducer(ApplicationProperties applicationProperties) {
+        this.appProps = applicationProperties;
+        diffCommand = DiffCommandFactory.getInstance(appProps);
     }
 
     @Override

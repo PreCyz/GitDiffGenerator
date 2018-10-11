@@ -1,4 +1,4 @@
-package pg.gipter.producer;
+package pg.gipter.settings;
 
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.producer.util.StringUtils;
@@ -22,7 +22,7 @@ public class ApplicationProperties {
     private Properties properties;
     private final String[] args;
 
-    ApplicationProperties(String[] args) {
+    public ApplicationProperties(String[] args) {
         this.args = args;
         init();
     }
@@ -75,60 +75,65 @@ public class ApplicationProperties {
 
     private String itemFileName() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.itemFileName.name(), ArgExtractor.ArgName.itemFileName.defaultValue());
+            return properties.getProperty(
+                    ArgExtractor.ArgName.itemFileName.name(), ArgExtractor.ArgName.itemFileName.defaultValue()
+            );
         }
         return ArgExtractor.itemFileName(args);
     }
 
     public String[] projectPaths() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.projectPath.name(), ArgExtractor.ArgName.projectPath.defaultValue()).split(",");
+            return properties.getProperty(
+                    ArgExtractor.ArgName.projectPath.name(), ArgExtractor.ArgName.projectPath.defaultValue()
+            ).split(",");
         }
         return ArgExtractor.projectPaths(args).split(",");
     }
 
     private int days() {
         if (hasProperties()) {
-            return Integer.parseInt(properties.getProperty(ArgExtractor.ArgName.minusDays.name(), ArgExtractor.ArgName.minusDays.defaultValue()));
+            return Integer.parseInt(properties.getProperty(
+                    ArgExtractor.ArgName.minusDays.name(), ArgExtractor.ArgName.minusDays.defaultValue()
+            ));
         }
         return ArgExtractor.days(args);
     }
 
     public String committerEmail() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.committerEmail.name(), ArgExtractor.ArgName.committerEmail.defaultValue());
+            return properties.getProperty(
+                    ArgExtractor.ArgName.committerEmail.name(), ArgExtractor.ArgName.committerEmail.defaultValue()
+            );
         }
-        return ArgExtractor.gitCommitterEmail(args);
+        return ArgExtractor.committerEmail(args);
     }
 
     public LocalDate startDate() {
-        String[] date = ArgExtractor.startDate(args).split("-");
         if (hasProperties()) {
-            String startDate = properties.getProperty(ArgExtractor.ArgName.startDate.name(), ArgExtractor.ArgName.startDate.defaultValue());
-            if (startDate.isEmpty()) {
-                return LocalDate.now().minusDays(days());
-            }
-            date = startDate.split("-");
+            String[] date = properties.getProperty(
+                    ArgExtractor.ArgName.startDate.name(), ArgExtractor.ArgName.startDate.defaultValue()
+            ).split("-");
+            return LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
         }
-        return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
+        return ArgExtractor.startDate(args);
     }
 
     public LocalDate endDate() {
-        String[] date = ArgExtractor.endDate(args).split("-");
         if (hasProperties()) {
-            String endDate = properties.getProperty(ArgExtractor.ArgName.endDate.name(), ArgExtractor.ArgName.endDate.defaultValue());
-            if (endDate.isEmpty()) {
-                return LocalDate.now();
-            }
-            date = endDate.split("-");
+            String[] date = properties.getProperty(
+                    ArgExtractor.ArgName.endDate.name(), ArgExtractor.ArgName.endDate.defaultValue()
+            ).split("-");
+            return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
         }
-        return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
+        return ArgExtractor.endDate(args);
     }
 
     public VersionControlSystem versionControlSystem() {
         if (hasProperties()) {
             String vcs = properties.getProperty(
-                    ArgExtractor.ArgName.versionControlSystem.name(), ArgExtractor.ArgName.versionControlSystem.defaultValue()
+                    ArgExtractor.ArgName.versionControlSystem.name(),
+                    ArgExtractor.ArgName.versionControlSystem.defaultValue()
             );
             return VersionControlSystem.valueFor(vcs.toUpperCase());
         }
@@ -142,7 +147,7 @@ public class ApplicationProperties {
             );
             return StringUtils.getBoolean(codeProtected);
         }
-        return ArgExtractor.isCodeProtected(args);
+        return ArgExtractor.codeProtected(args);
     }
 
     private String log() {

@@ -1,13 +1,15 @@
 package pg.gipter.producer;
 
+import pg.gipter.settings.ApplicationProperties;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 class LinuxDiffProducer extends AbstractDiffProducer {
 
-    LinuxDiffProducer(String[] programParameters) {
-        super(programParameters);
+    LinuxDiffProducer(ApplicationProperties applicationProperties) {
+        super(applicationProperties);
     }
 
     @Override
