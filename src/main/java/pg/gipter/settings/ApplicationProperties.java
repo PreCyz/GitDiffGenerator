@@ -8,11 +8,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
+
+import static pg.gipter.Main.yyyy_MM_dd;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public class ApplicationProperties {
@@ -64,11 +65,7 @@ public class ApplicationProperties {
         int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
         String fileName = String.format("%d-%s-week-%d.txt", now.getYear(), now.getMonth().name(), weekNumber).toLowerCase();
         if (!itemFileName().isEmpty()) {
-            fileName = String.format("%s-%s-%s.txt",
-                    itemFileName(),
-                    startDate().format(DateTimeFormatter.ofPattern("yyyy_MM_dd")),
-                    endDate().format(DateTimeFormatter.ofPattern("yyyy_MM_dd"))
-            );
+            fileName = String.format("%s-%s-%s.txt", itemFileName(), startDate().format(yyyy_MM_dd), endDate().format(yyyy_MM_dd));
         }
         return fileName;
     }
