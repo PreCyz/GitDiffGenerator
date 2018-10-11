@@ -1,7 +1,5 @@
 package pg.gipter.producer.command;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.util.EnumSet;
 import java.util.stream.Collectors;
 
@@ -20,6 +18,6 @@ public enum VersionControlSystem {
                     value, String.join(", ", supportedVcs));
             System.exit(-1);
         }
-        throw new NotImplementedException();
+        throw new RuntimeException("Not implemented yet!!!");
     }
 }

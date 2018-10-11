@@ -1,7 +1,5 @@
 package pg.gipter.producer;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 /**Created by Pawel Gawedzki on 20-Sep-2018.*/
 public final class DiffProducerFactory {
 
@@ -17,7 +15,7 @@ public final class DiffProducerFactory {
             return new WindowsDiffProducer(programArguments);
         } else {
             System.err.printf("Platform %s not supported yet.%n", platform);
-            throw new NotImplementedException();
+            throw new RuntimeException("Not implemented yet!!!");
         }
     }
 }
