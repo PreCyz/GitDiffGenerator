@@ -1,8 +1,8 @@
 package pg.gipter;
 
-import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
+import pg.gipter.settings.ApplicationProperties;
 
 import java.time.format.DateTimeFormatter;
 
