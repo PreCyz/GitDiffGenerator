@@ -3,6 +3,7 @@ package pg.gipter;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.toolkit.DiffUploader;
 
 import java.time.format.DateTimeFormatter;
 
@@ -15,8 +16,10 @@ public class Main {
         ApplicationProperties applicationProperties = new ApplicationProperties(args);
 
         DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
-
         diffProducer.produceDiff();
+
+        DiffUploader diffUploader = new DiffUploader(applicationProperties.itemPath());
+        diffUploader.uploadDiff();
 
         System.exit(0);
     }
