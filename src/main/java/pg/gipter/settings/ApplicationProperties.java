@@ -137,7 +137,7 @@ public class ApplicationProperties {
         return ArgExtractor.versionControlSystem(args);
     }
 
-    public boolean isCodeProtected() {
+    public boolean codeProtected() {
         if (hasProperties()) {
             String codeProtected = properties.getProperty(
                     ArgExtractor.ArgName.codeProtected.name(), ArgExtractor.ArgName.codeProtected.defaultValue()
@@ -156,6 +156,6 @@ public class ApplicationProperties {
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
                 ", versionControlSystem='" + versionControlSystem() + '\'' +
-                ", codeProtected='" + isCodeProtected() + '\'';
+                ", codeProtected='" + codeProtected() + '\'';
     }
 }

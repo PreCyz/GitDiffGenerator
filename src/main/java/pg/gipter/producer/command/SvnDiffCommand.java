@@ -40,7 +40,7 @@ final class SvnDiffCommand extends AbstractDiffCommand {
     @Override
     List<String> getInitialCommand() {
         LinkedList<String> initialCommand = new LinkedList<>(Arrays.asList("svn", "log"));
-        if (appProps.isCodeProtected()) {
+        if (appProps.codeProtected()) {
             initialCommand.add("--verbose");
         } else {
             initialCommand.add("--diff");

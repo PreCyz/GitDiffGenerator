@@ -35,7 +35,7 @@ final class GitDiffCommand extends AbstractDiffCommand {
 
     List<String> getInitialCommand() {
         List<String> initialCommand = new LinkedList<>(Arrays.asList("git", "log"));
-        if (appProps.isCodeProtected()) {
+        if (appProps.codeProtected()) {
             initialCommand.add("--decorate");
         } else {
             initialCommand.add("--patch");
