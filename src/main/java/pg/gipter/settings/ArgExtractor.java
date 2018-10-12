@@ -5,7 +5,9 @@ import pg.gipter.producer.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static pg.gipter.Main.yyyy_MM_dd;
 
@@ -56,18 +58,19 @@ final class ArgExtractor {
         return defaultValue;
     }
 
-    static String path(String[] args) {
+    static String itemPath(String[] args) {
         if (hasArgs(args)) {
             return getValue(args, ArgName.itemPath, ArgName.itemPath.defaultValue());
         }
         return ArgName.itemPath.defaultValue();
     }
 
-    static String projectPaths(String[] args) {
+    static Set<String> projectPaths(String[] args) {
+        String[] projectPaths = new String[]{ArgName.projectPath.defaultValue()};
         if (hasArgs(args)) {
-            return getValue(args, ArgName.projectPath, ArgName.projectPath.defaultValue());
+            projectPaths = getValue(args, ArgName.projectPath, ArgName.projectPath.defaultValue()).split(",");
         }
-        return ArgName.projectPath.defaultValue();
+        return new HashSet<>(Arrays.asList(projectPaths));
     }
 
     static int days(String[] args) {

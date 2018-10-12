@@ -9,9 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Properties;
+import java.util.*;
 
 import static pg.gipter.Main.yyyy_MM_dd;
 
@@ -52,7 +50,7 @@ public class ApplicationProperties {
     }
 
     public String itemPath() {
-        String itemPath = ArgExtractor.path(args);
+        String itemPath = ArgExtractor.itemPath(args);
         if (hasProperties()) {
             itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), ArgExtractor.ArgName.itemPath.defaultValue());
         }
@@ -79,13 +77,14 @@ public class ApplicationProperties {
         return ArgExtractor.itemFileName(args);
     }
 
-    public String[] projectPaths() {
+    public Set<String> projectPaths() {
         if (hasProperties()) {
-            return properties.getProperty(
+            String[] projectPaths = properties.getProperty(
                     ArgExtractor.ArgName.projectPath.name(), ArgExtractor.ArgName.projectPath.defaultValue()
             ).split(",");
+            return new HashSet<>(Arrays.asList(projectPaths));
         }
-        return ArgExtractor.projectPaths(args).split(",");
+        return ArgExtractor.projectPaths(args);
     }
 
     private int days() {
