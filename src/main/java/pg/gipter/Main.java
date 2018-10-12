@@ -18,7 +18,7 @@ public class Main {
         DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
         diffProducer.produceDiff();
 
-        DiffUploader diffUploader = new DiffUploader(applicationProperties.itemPath());
+        DiffUploader diffUploader = new DiffUploader(applicationProperties);
         diffUploader.uploadDiff();
 
         System.exit(0);
