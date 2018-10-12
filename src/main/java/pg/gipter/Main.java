@@ -7,7 +7,7 @@ import pg.gipter.toolkit.DiffUploader;
 
 import java.time.format.DateTimeFormatter;
 
-/**Created by Pawel Gawedzki on 17-Sep-2018.*/
+/**Created by Pawel Gawedzki on 17-Sep-2018*/
 public class Main {
 
     public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -18,8 +18,10 @@ public class Main {
         DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
         diffProducer.produceDiff();
 
-        DiffUploader diffUploader = new DiffUploader(applicationProperties);
-        diffUploader.uploadDiff();
+        if (applicationProperties.isToolkitPropertiesSet()) {
+            DiffUploader diffUploader = new DiffUploader(applicationProperties);
+            diffUploader.uploadDiff();
+        }
 
         System.exit(0);
     }

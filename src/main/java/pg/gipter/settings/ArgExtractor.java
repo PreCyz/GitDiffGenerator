@@ -24,7 +24,10 @@ final class ArgExtractor {
         endDate(LocalDate.now().format(yyyy_MM_dd)),
         itemFileName(""),
         versionControlSystem(VersionControlSystem.GIT.name()),
-        codeProtected("false");
+        codeProtected("false"),
+        toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
+        toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
+        toolkitDomain("NCDMZ"),;
 
         private String defaultValue;
 
@@ -124,6 +127,27 @@ final class ArgExtractor {
             return StringUtils.getBoolean(codeProtected);
         }
         return StringUtils.getBoolean(ArgName.codeProtected.defaultValue());
+    }
+
+    static String toolkitUsername(String[] args) {
+        if (hasArgs(args)) {
+            return getValue(args, ArgName.toolkitUsername, ArgName.toolkitUsername.defaultValue());
+        }
+        return ArgName.toolkitUsername.defaultValue();
+    }
+
+    static String toolkitPassword(String[] args) {
+        if (hasArgs(args)) {
+            return getValue(args, ArgName.toolkitPassword, ArgName.toolkitPassword.defaultValue());
+        }
+        return ArgName.toolkitPassword.defaultValue();
+    }
+
+    static String toolkitDomain(String[] args) {
+        if (hasArgs(args)) {
+            return getValue(args, ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
+        }
+        return ArgName.toolkitDomain.defaultValue();
     }
 
 }

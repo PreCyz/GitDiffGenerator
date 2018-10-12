@@ -146,6 +146,38 @@ public class ApplicationProperties {
         return ArgExtractor.codeProtected(args);
     }
 
+    public String toolkitUsername() {
+        if (hasProperties()) {
+            return properties.getProperty(
+                    ArgExtractor.ArgName.toolkitUsername.name(), ArgExtractor.ArgName.toolkitUsername.defaultValue()
+            );
+        }
+        return ArgExtractor.toolkitUsername(args);
+    }
+
+    public String toolkitPassword() {
+        if (hasProperties()) {
+            return properties.getProperty(
+                    ArgExtractor.ArgName.toolkitPassword.name(), ArgExtractor.ArgName.toolkitPassword.defaultValue()
+            );
+        }
+        return ArgExtractor.toolkitPassword(args);
+    }
+
+    public String toolkitDomain() {
+        if (hasProperties()) {
+            return properties.getProperty(
+                    ArgExtractor.ArgName.toolkitDomain.name(), ArgExtractor.ArgName.toolkitDomain.defaultValue()
+            );
+        }
+        return ArgExtractor.toolkitDomain(args);
+    }
+
+    public boolean isToolkitPropertiesSet() {
+        return !toolkitUsername().equals(ArgExtractor.ArgName.toolkitUsername.defaultValue()) &&
+                !toolkitPassword().equals(ArgExtractor.ArgName.toolkitPassword.defaultValue());
+    }
+
     private String log() {
         return  "author='" + author() + '\'' +
                 ", committerEmail='" + committerEmail() + '\'' +
