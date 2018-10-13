@@ -5,7 +5,7 @@ import pg.gipter.producer.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -78,7 +78,7 @@ final class ArgExtractor {
         if (hasArgs()) {
             projectPaths = getValue(ArgName.projectPath, ArgName.projectPath.defaultValue()).split(",");
         }
-        return new HashSet<>(Arrays.asList(projectPaths));
+        return new LinkedHashSet<>(Arrays.asList(projectPaths));
     }
 
     int days() {
