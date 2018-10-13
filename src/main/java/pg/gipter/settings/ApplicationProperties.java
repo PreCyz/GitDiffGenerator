@@ -19,14 +19,14 @@ public class ApplicationProperties {
     private final static String APPLICATION_PROPERTIES = "application.properties";
 
     private Properties properties;
-    private final String[] args;
+    private final ArgExtractor argExtractor;
 
     public ApplicationProperties(String[] args) {
-        this.args = args;
-        init();
+        argExtractor = new ArgExtractor(args);
+        init(args);
     }
 
-    private void init() {
+    private void init(String[] args) {
         try (InputStream is = new FileInputStream(APPLICATION_PROPERTIES)) {
             properties = new Properties();
             properties.load(is);
@@ -46,11 +46,11 @@ public class ApplicationProperties {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.author.name(), ArgExtractor.ArgName.author.defaultValue());
         }
-        return ArgExtractor.author(args);
+        return argExtractor.author();
     }
 
     public String itemPath() {
-        String itemPath = ArgExtractor.itemPath(args);
+        String itemPath = argExtractor.itemPath();
         if (hasProperties()) {
             itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), ArgExtractor.ArgName.itemPath.defaultValue());
         }
@@ -74,7 +74,7 @@ public class ApplicationProperties {
                     ArgExtractor.ArgName.itemFileName.name(), ArgExtractor.ArgName.itemFileName.defaultValue()
             );
         }
-        return ArgExtractor.itemFileName(args);
+        return argExtractor.itemFileName();
     }
 
     public Set<String> projectPaths() {
@@ -84,7 +84,7 @@ public class ApplicationProperties {
             ).split(",");
             return new HashSet<>(Arrays.asList(projectPaths));
         }
-        return ArgExtractor.projectPaths(args);
+        return argExtractor.projectPaths();
     }
 
     private int days() {
@@ -93,7 +93,7 @@ public class ApplicationProperties {
                     ArgExtractor.ArgName.minusDays.name(), ArgExtractor.ArgName.minusDays.defaultValue()
             ));
         }
-        return ArgExtractor.days(args);
+        return argExtractor.days();
     }
 
     public String committerEmail() {
@@ -102,7 +102,7 @@ public class ApplicationProperties {
                     ArgExtractor.ArgName.committerEmail.name(), ArgExtractor.ArgName.committerEmail.defaultValue()
             );
         }
-        return ArgExtractor.committerEmail(args);
+        return argExtractor.committerEmail();
     }
 
     public LocalDate startDate() {
@@ -112,7 +112,7 @@ public class ApplicationProperties {
             ).split("-");
             return LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
         }
-        return ArgExtractor.startDate(args);
+        return argExtractor.startDate();
     }
 
     public LocalDate endDate() {
@@ -122,7 +122,7 @@ public class ApplicationProperties {
             ).split("-");
             return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
         }
-        return ArgExtractor.endDate(args);
+        return argExtractor.endDate();
     }
 
     public VersionControlSystem versionControlSystem() {
@@ -133,7 +133,7 @@ public class ApplicationProperties {
             );
             return VersionControlSystem.valueFor(vcs.toUpperCase());
         }
-        return ArgExtractor.versionControlSystem(args);
+        return argExtractor.versionControlSystem();
     }
 
     public boolean codeProtected() {
@@ -143,7 +143,7 @@ public class ApplicationProperties {
             );
             return StringUtils.getBoolean(codeProtected);
         }
-        return ArgExtractor.codeProtected(args);
+        return argExtractor.codeProtected();
     }
 
     public String toolkitUsername() {
@@ -152,7 +152,7 @@ public class ApplicationProperties {
                     ArgExtractor.ArgName.toolkitUsername.name(), ArgExtractor.ArgName.toolkitUsername.defaultValue()
             );
         }
-        return ArgExtractor.toolkitUsername(args);
+        return argExtractor.toolkitUsername();
     }
 
     public String toolkitPassword() {
@@ -161,7 +161,7 @@ public class ApplicationProperties {
                     ArgExtractor.ArgName.toolkitPassword.name(), ArgExtractor.ArgName.toolkitPassword.defaultValue()
             );
         }
-        return ArgExtractor.toolkitPassword(args);
+        return argExtractor.toolkitPassword();
     }
 
     public String toolkitDomain() {
@@ -170,7 +170,7 @@ public class ApplicationProperties {
                     ArgExtractor.ArgName.toolkitDomain.name(), ArgExtractor.ArgName.toolkitDomain.defaultValue()
             );
         }
-        return ArgExtractor.toolkitDomain(args);
+        return argExtractor.toolkitDomain();
     }
 
     public boolean isToolkitPropertiesSet() {
@@ -187,6 +187,7 @@ public class ApplicationProperties {
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
                 ", versionControlSystem='" + versionControlSystem() + '\'' +
-                ", codeProtected='" + codeProtected() + '\'';
+                ", codeProtected='" + codeProtected() + '\'' +
+                ", toolkitPropertiesSet='" + isToolkitPropertiesSet() + '\'';
     }
 }

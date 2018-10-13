@@ -39,20 +39,25 @@ final class ArgExtractor {
             return defaultValue;
         }
     }
-    private ArgExtractor() {}
 
-    private static boolean hasArgs(String[] args) {
+    private final String[] args;
+
+    ArgExtractor(String[] args) {
+        this.args = args;
+    }
+
+    private boolean hasArgs() {
         return args != null && args.length > 0;
     }
 
-    static String author(String[] args) {
-        if (hasArgs(args)) {
-            return getValue(args, ArgName.author, ArgName.author.defaultValue());
+    String author() {
+        if (hasArgs()) {
+            return getValue(ArgName.author, ArgName.author.defaultValue());
         }
         return ArgName.author.defaultValue();
     }
 
-    private static String getValue(String[] args, final ArgName argName, String defaultValue) {
+    private String getValue(final ArgName argName, String defaultValue) {
         Optional<String> argument = Arrays.stream(args).filter(arg -> arg.startsWith(argName.name())).findAny();
         if (argument.isPresent()) {
             String value = argument.get();
@@ -61,91 +66,91 @@ final class ArgExtractor {
         return defaultValue;
     }
 
-    static String itemPath(String[] args) {
-        if (hasArgs(args)) {
-            return getValue(args, ArgName.itemPath, ArgName.itemPath.defaultValue());
+    String itemPath() {
+        if (hasArgs()) {
+            return getValue(ArgName.itemPath, ArgName.itemPath.defaultValue());
         }
         return ArgName.itemPath.defaultValue();
     }
 
-    static Set<String> projectPaths(String[] args) {
+    Set<String> projectPaths() {
         String[] projectPaths = new String[]{ArgName.projectPath.defaultValue()};
-        if (hasArgs(args)) {
-            projectPaths = getValue(args, ArgName.projectPath, ArgName.projectPath.defaultValue()).split(",");
+        if (hasArgs()) {
+            projectPaths = getValue(ArgName.projectPath, ArgName.projectPath.defaultValue()).split(",");
         }
         return new HashSet<>(Arrays.asList(projectPaths));
     }
 
-    static int days(String[] args) {
-        if (hasArgs(args)) {
-            return Integer.parseInt(getValue(args, ArgName.minusDays, ArgName.minusDays.defaultValue()));
+    int days() {
+        if (hasArgs()) {
+            return Integer.parseInt(getValue(ArgName.minusDays, ArgName.minusDays.defaultValue()));
         }
         return Integer.parseInt(ArgName.minusDays.defaultValue());
     }
 
-    static String committerEmail(String[] args) {
-        if (hasArgs(args)) {
-            return getValue(args, ArgName.committerEmail, ArgName.committerEmail.defaultValue());
+    String committerEmail() {
+        if (hasArgs()) {
+            return getValue(ArgName.committerEmail, ArgName.committerEmail.defaultValue());
         }
         return ArgName.committerEmail.defaultValue();
     }
 
-    static LocalDate startDate(String[] args) {
+    LocalDate startDate() {
         String[] date = ArgName.startDate.defaultValue().split("-");
-        if (hasArgs(args)) {
-            date = getValue(args, ArgName.startDate, ArgName.startDate.defaultValue()).split("-");
+        if (hasArgs()) {
+            date = getValue(ArgName.startDate, ArgName.startDate.defaultValue()).split("-");
         }
         return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
     }
 
-    static LocalDate endDate(String[] args) {
+    LocalDate endDate() {
         String[] date = ArgName.endDate.defaultValue().split("-");
-        if (hasArgs(args)) {
-            date = getValue(args, ArgName.endDate, ArgName.endDate.defaultValue()).split("-");
+        if (hasArgs()) {
+            date = getValue(ArgName.endDate, ArgName.endDate.defaultValue()).split("-");
         }
         return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
     }
 
-    static String itemFileName(String[] args) {
-        if (hasArgs(args)) {
-            return getValue(args, ArgName.itemFileName, ArgName.itemFileName.defaultValue());
+    String itemFileName() {
+        if (hasArgs()) {
+            return getValue(ArgName.itemFileName, ArgName.itemFileName.defaultValue());
         }
         return ArgName.itemFileName.defaultValue();
     }
 
-    static VersionControlSystem versionControlSystem(String[] args) {
-        if (hasArgs(args)) {
-            String vcs = getValue(args, ArgName.versionControlSystem, ArgName.versionControlSystem.defaultValue());
+    VersionControlSystem versionControlSystem() {
+        if (hasArgs()) {
+            String vcs = getValue(ArgName.versionControlSystem, ArgName.versionControlSystem.defaultValue());
             return VersionControlSystem.valueFor(vcs.toUpperCase());
         }
         return VersionControlSystem.valueOf(ArgName.versionControlSystem.defaultValue());
     }
 
-    static boolean codeProtected(String[] args) {
-        if (hasArgs(args)) {
-            String codeProtected = getValue(args, ArgName.codeProtected, ArgName.codeProtected.defaultValue());
+    boolean codeProtected() {
+        if (hasArgs()) {
+            String codeProtected = getValue(ArgName.codeProtected, ArgName.codeProtected.defaultValue());
             return StringUtils.getBoolean(codeProtected);
         }
         return StringUtils.getBoolean(ArgName.codeProtected.defaultValue());
     }
 
-    static String toolkitUsername(String[] args) {
-        if (hasArgs(args)) {
-            return getValue(args, ArgName.toolkitUsername, ArgName.toolkitUsername.defaultValue());
+    String toolkitUsername() {
+        if (hasArgs()) {
+            return getValue(ArgName.toolkitUsername, ArgName.toolkitUsername.defaultValue());
         }
         return ArgName.toolkitUsername.defaultValue();
     }
 
-    static String toolkitPassword(String[] args) {
-        if (hasArgs(args)) {
-            return getValue(args, ArgName.toolkitPassword, ArgName.toolkitPassword.defaultValue());
+    String toolkitPassword() {
+        if (hasArgs()) {
+            return getValue(ArgName.toolkitPassword, ArgName.toolkitPassword.defaultValue());
         }
         return ArgName.toolkitPassword.defaultValue();
     }
 
-    static String toolkitDomain(String[] args) {
-        if (hasArgs(args)) {
-            return getValue(args, ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
+    String toolkitDomain() {
+        if (hasArgs()) {
+            return getValue(ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
         }
         return ArgName.toolkitDomain.defaultValue();
     }
