@@ -65,4 +65,26 @@ class MercurialDiffCommandTest {
         );
     }
 
+    @Test
+    void given_allParametersButCommitterEmail_when_commandAsList_thenReturnCommand() {
+        String author = "testAuthor";
+        LocalDate startDate = LocalDate.now().minusDays(7);
+        LocalDate endDate = LocalDate.now();
+        boolean codeProtected = false;
+
+        when(applicationProperties.author()).thenReturn(author);
+        when(applicationProperties.startDate()).thenReturn(startDate);
+        when(applicationProperties.endDate()).thenReturn(endDate);
+        when(applicationProperties.codeProtected()).thenReturn(codeProtected);
+        command = new MercurialDiffCommand(applicationProperties);
+
+        List<String> actual = command.commandAsList();
+
+        assertThat(actual).containsExactly("hg", "log", "--patch",
+                "--user", author,
+                "--date", "\"" + startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " to " +
+                        endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "\""
+        );
+    }
+
 }

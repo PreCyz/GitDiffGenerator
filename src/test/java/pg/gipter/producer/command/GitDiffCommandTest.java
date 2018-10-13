@@ -64,4 +64,26 @@ class GitDiffCommandTest {
                 "--until", endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         );
     }
+
+    @Test
+    void given_allParametersButCommitterEmail_when_commandAsList_thenReturnCommand() {
+        String author = "testAuthor";
+        LocalDate startDate = LocalDate.now().minusDays(7);
+        LocalDate endDate = LocalDate.now();
+        boolean codeProtected = false;
+
+        when(applicationProperties.author()).thenReturn(author);
+        when(applicationProperties.startDate()).thenReturn(startDate);
+        when(applicationProperties.endDate()).thenReturn(endDate);
+        when(applicationProperties.codeProtected()).thenReturn(codeProtected);
+        command = new GitDiffCommand(applicationProperties);
+
+        List<String> actual = command.commandAsList();
+
+        assertThat(actual).containsExactly("git", "log", "--patch", "--all",
+                "--author=" + author,
+                "--since", startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                "--until", endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        );
+    }
 }
