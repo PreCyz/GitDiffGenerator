@@ -17,8 +17,9 @@ import java.io.InputStream;
 /**Created by Pawel Gawedzki on 12-Oct-2018.*/
 public class SharePointClient {
 
-    private static final String WS_URL = "https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx";
-    private static final String CALLBACK_URL = "http://schemas.microsoft.com/sharepoint/soap/";
+    private final String WS_URL = "https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx";
+    private final String CALLBACK_URL = "http://schemas.microsoft.com/sharepoint/soap/";
+    private final String WORK_ITEMS = "WorkItems";
 
     private WebServiceTemplate webServiceTemplate;
     private final ObjectFactory objectFactory;
@@ -30,7 +31,7 @@ public class SharePointClient {
 
     public ListViewId getList() {
         GetList request = objectFactory.createGetList();
-        request.setListName("WorkItems");
+        request.setListName(WORK_ITEMS);
 
         GetListResponse response = (GetListResponse) webServiceTemplate.marshalSendAndReceive(
                 WS_URL,
@@ -38,9 +39,7 @@ public class SharePointClient {
                 getSoapActionCallback("GetList")
         );
 
-        Object content = response.getGetListResult().getContent().get(0);
-
-        ElementNSImpl eleNsImplObject = (ElementNSImpl) content;
+        ElementNSImpl eleNsImplObject = (ElementNSImpl) response.getGetListResult().getContent().get(0);
         Document document = eleNsImplObject.getOwnerDocument();
 
         Node list = document.getChildNodes().item(0);
@@ -58,7 +57,7 @@ public class SharePointClient {
         final String actionName = "GetListAndView";
 
         GetListAndView request = objectFactory.createGetListAndView();
-        request.setListName("WorkItems");
+        request.setListName(WORK_ITEMS);
         request.setViewName("");
 
         GetListAndViewResponse response = (GetListAndViewResponse) webServiceTemplate.marshalSendAndReceive(
@@ -114,7 +113,7 @@ public class SharePointClient {
         AddAttachment request = objectFactory.createAddAttachment();
         request.setListItemID(listItemId);
         request.setFileName(fileName);
-        request.setListName("WorkItems");
+        request.setListName(WORK_ITEMS);
         request.setAttachment(attachment);
 
         AddAttachmentResponse response = (AddAttachmentResponse) webServiceTemplate.marshalSendAndReceive(

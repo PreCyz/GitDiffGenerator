@@ -85,8 +85,8 @@ public final class XmlHelper {
 
             batch.appendChild(method);
 
-            documentToFile(document, "newItem");
-            System.out.println("Done creating XML File");
+            //documentToFile(document, "newItem");
+            System.out.println("Done creating XML for upload list.");
 
             return documentToString(document);
         } catch (ParserConfigurationException pce) {
@@ -95,24 +95,11 @@ public final class XmlHelper {
         return "";
     }
 
-    public static String documentToString(final Document document) {
+    private static String documentToString(final Document document) {
         try {
-            Transformer transformer = getTransformer();
-
             StringWriter sw = new StringWriter();
-            transformer.transform(new DOMSource(document), new StreamResult(sw));
+            getTransformer().transform(new DOMSource(document), new StreamResult(sw));
             return sw.toString();
-        } catch (Exception ex) {
-            throw new RuntimeException("Error converting to String", ex);
-        }
-    }
-
-    public static void documentToFile(final Document document, String fileName) {
-        try {
-            Transformer transformer = getTransformer();
-
-            StreamResult streamResult = new StreamResult(new File(fileName + ".xml"));
-            transformer.transform(new DOMSource(document), streamResult);
         } catch (Exception ex) {
             throw new RuntimeException("Error converting to String", ex);
         }
@@ -126,6 +113,15 @@ public final class XmlHelper {
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         return transformer;
+    }
+
+    private static void documentToFile(final Document document, String fileName) {
+        try {
+            StreamResult streamResult = new StreamResult(new File(fileName + ".xml"));
+            getTransformer().transform(new DOMSource(document), streamResult);
+        } catch (Exception ex) {
+            throw new RuntimeException("Error converting to String", ex);
+        }
     }
 
     public static String extractListItemId(Document document) {
@@ -151,8 +147,7 @@ public final class XmlHelper {
         if (value.contains(";#")) {
             String[] result = value.split(";#");
             if (result.length > 2) {
-                String res = String.join("; ", result);
-                return res;
+                return String.join("; ", result);
             }
             else {
                 return result[1];
