@@ -5,8 +5,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
 import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.toolkit.configuration.SharePointClient;
-import pg.gipter.toolkit.configuration.SharePointConfiguration;
+import pg.gipter.toolkit.helper.ListViewId;
+import pg.gipter.toolkit.sharepoint.SharePointClient;
+import pg.gipter.toolkit.sharepoint.SharePointConfiguration;
 
 import java.util.Properties;
 
@@ -40,10 +41,12 @@ public class DiffUploader {
     public void uploadDiff() {
         try {
             SharePointClient sharePointClient = springContext.getBean(SharePointClient.class);
-            System.out.println("Getting list from SharePoint.");
-            sharePointClient.getList();
+            //System.out.println("Getting list from SharePoint.");
+            //sharePointClient.getList();
             System.out.println("Getting list and view from SharePoint.");
-            sharePointClient.getListAndView();
+            ListViewId ids = sharePointClient.getListAndView();
+            String listItemId = sharePointClient.updateListItems(ids);
+            sharePointClient.addAttachment(listItemId, applicationProperties.fileName(), applicationProperties.itemPath());
         } catch (Exception ex) {
             ex.printStackTrace();
         }

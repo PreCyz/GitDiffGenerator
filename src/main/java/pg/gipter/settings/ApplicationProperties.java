@@ -57,7 +57,7 @@ public class ApplicationProperties {
         return itemPath + File.separator + fileName();
     }
 
-    private String fileName() {
+    public String fileName() {
         LocalDate now = LocalDate.now();
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int weekNumber = now.get(weekFields.weekOfWeekBasedYear());

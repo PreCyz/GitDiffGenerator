@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.configuration;
+package pg.gipter.toolkit.sharepoint;
 
 import org.apache.http.auth.NTCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
