@@ -23,19 +23,18 @@ public class DiffUploader {
 
     private ApplicationContext initSpringApplicationContext() {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
-        ConfigurableEnvironment environment = applicationContext.getEnvironment();
-        environment.getPropertySources().addLast(toolkitProperties());
+        setToolkitProperties(applicationContext.getEnvironment());
         applicationContext.register(SharePointConfiguration.class);
         applicationContext.refresh();
         return applicationContext;
     }
 
-    private PropertiesPropertySource toolkitProperties() {
+    private void setToolkitProperties(ConfigurableEnvironment environment) {
         Properties toolkitProperties = new Properties();
         toolkitProperties.put("toolkit.username", applicationProperties.toolkitUsername());
         toolkitProperties.put("toolkit.password", applicationProperties.toolkitPassword());
         toolkitProperties.put("toolkit.domain", applicationProperties.toolkitDomain());
-        return new PropertiesPropertySource("toolkit", toolkitProperties);
+        environment.getPropertySources().addLast(new PropertiesPropertySource("toolkit", toolkitProperties));
     }
 
     public void uploadDiff() {

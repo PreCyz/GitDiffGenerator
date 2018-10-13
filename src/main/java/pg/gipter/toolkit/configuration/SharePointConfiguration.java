@@ -17,29 +17,35 @@ public class SharePointConfiguration {
     @Autowired
     private Environment environment;
 
+    private String username() {
+        return environment.getProperty("toolkit.username");
+    }
+
+    private String password() {
+        return environment.getProperty("toolkit.password");
+    }
+
+    private String domain() {
+        return environment.getProperty("toolkit.domain");
+    }
+
     @Bean
     public HttpComponentsMessageSender httpComponentsMessageSender() {
-        String userName = environment.getProperty("toolkit.username");
-        String password = environment.getProperty("toolkit.password");
-        String domain = environment.getProperty("toolkit.domain");
-        System.out.printf("<username, password, domain> = <%s, ****, %s>%n", userName, domain);
-
-
         HttpComponentsMessageSender httpComponentsMessageSender = new HttpComponentsMessageSender();
-        NTCredentials credentials = new NTCredentials(userName, password, null, domain);
+        NTCredentials credentials = new NTCredentials(username(), password(), null, domain());
         httpComponentsMessageSender.setCredentials(credentials);
         return httpComponentsMessageSender;
     }
 
     @Bean
-    public Jaxb2Marshaller marshaller() {
+    Jaxb2Marshaller marshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
         marshaller.setPackagesToScan("pg.gipter.toolkit.ws");
         return marshaller;
     }
 
     @Bean
-    public WebServiceTemplate webServiceTemplate(Jaxb2Marshaller marshaller, WebServiceMessageSender messageSender) {
+    WebServiceTemplate webServiceTemplate(Jaxb2Marshaller marshaller, WebServiceMessageSender messageSender) {
         WebServiceTemplate webServiceTemplate = new WebServiceTemplate(marshaller, marshaller);
         webServiceTemplate.setMessageSender(messageSender);
         return webServiceTemplate;

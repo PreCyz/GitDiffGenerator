@@ -33,7 +33,9 @@ public class SharePointClient {
     public void getList() {
         final String actionName = "GetList";
 
-        GetList request = buildGetListRequest();
+        GetList request = objectFactory.createGetList();
+        request.setListName("WorkItems");
+
         GetListResponse response = (GetListResponse) webServiceTemplate.marshalSendAndReceive(
                 WS_URL,
                 request,
@@ -53,11 +55,11 @@ public class SharePointClient {
         ElementNSImpl eleNsImplObject = (ElementNSImpl) content;
         Document document = eleNsImplObject.getOwnerDocument();
         String xmlStr = documentToString(document);
-        System.out.println(xmlStr);
 
         try (FileWriter fileWriter = new FileWriter(fileName);
-             BufferedWriter writer = new BufferedWriter(fileWriter) ) {
+             BufferedWriter writer = new BufferedWriter(fileWriter)) {
 
+            System.out.printf("Writing xml to file %s.%n", fileName);
             writer.write(xmlStr);
 
         } catch (IOException e) {
@@ -90,6 +92,7 @@ public class SharePointClient {
         GetListAndView request = objectFactory.createGetListAndView();
         request.setListName("WorkItems");
         request.setViewName("");
+
         GetListAndViewResponse response = (GetListAndViewResponse) webServiceTemplate.marshalSendAndReceive(
                 WS_URL,
                 request,
@@ -99,12 +102,6 @@ public class SharePointClient {
         for (Object content : response.getGetListAndViewResult().getContent()) {
             writeToFile(content, actionName + ".xml");
         }
-    }
-
-    private GetList buildGetListRequest() {
-        GetList getListRequest = objectFactory.createGetList();
-        getListRequest.setListName("WorkItems");
-        return getListRequest;
     }
 
 }
