@@ -1,10 +1,10 @@
 package pg.gipter.toolkit.sharepoint;
 
-import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import org.apache.commons.io.IOUtils;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
@@ -39,14 +39,18 @@ public class SharePointClient {
                 getSoapActionCallback("GetList")
         );
 
-        ElementNSImpl eleNsImplObject = (ElementNSImpl) response.getGetListResult().getContent().get(0);
-        Document document = eleNsImplObject.getOwnerDocument();
+        Object content = response.getGetListResult().getContent().get(0);
+        if (content instanceof Element) {
+            Element element = (Element) content;
+            Document document = element.getOwnerDocument();
 
-        Node list = document.getChildNodes().item(0);
-        String listId = list.getAttributes().getNamedItem("Name").getNodeValue();
-        System.out.printf("<listId, viewId> = <%s, %s>%n", listId, null);
+            Node list = document.getChildNodes().item(0);
+            String listId = list.getAttributes().getNamedItem("Name").getNodeValue();
+            System.out.printf("<listId, viewId> = <%s, %s>%n", listId, null);
 
-        return new ListViewId(listId, null);
+            return new ListViewId(listId, null);
+        }
+        throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
     private SoapActionCallback getSoapActionCallback(String actionName) {
@@ -66,15 +70,19 @@ public class SharePointClient {
                 getSoapActionCallback(actionName)
         );
 
-        ElementNSImpl eleNsImplObject = (ElementNSImpl) response.getGetListAndViewResult().getContent().get(0);
-        Document document = eleNsImplObject.getOwnerDocument();
+        Object content = response.getGetListAndViewResult().getContent().get(0);
+        if (content instanceof Element) {
+            Element element = (Element) content;
+            Document document = element.getOwnerDocument();
 
-        Node listAndViewNode = document.getChildNodes().item(0);
-        String listId = listAndViewNode.getChildNodes().item(0).getAttributes().getNamedItem("Name").getNodeValue();
-        String viewId = listAndViewNode.getChildNodes().item(1).getAttributes().getNamedItem("Name").getNodeValue();
-        System.out.printf("<listId, viewId> = <%s, %s>%n", listId, viewId);
+            Node listAndViewNode = document.getChildNodes().item(0);
+            String listId = listAndViewNode.getChildNodes().item(0).getAttributes().getNamedItem("Name").getNodeValue();
+            String viewId = listAndViewNode.getChildNodes().item(1).getAttributes().getNamedItem("Name").getNodeValue();
+            System.out.printf("<listId, viewId> = <%s, %s>%n", listId, viewId);
 
-        return new ListViewId(listId, viewId);
+            return new ListViewId(listId, viewId);
+        }
+        throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
     public String updateListItems(ListViewId listViewId) {
@@ -93,10 +101,14 @@ public class SharePointClient {
         );
 
         UpdateListItemsResponse.UpdateListItemsResult updateResult = updateResponse.getUpdateListItemsResult();
-        ElementNSImpl eleNsImplObject = (ElementNSImpl) updateResult.getContent().get(0);
-        Document document = eleNsImplObject.getOwnerDocument();
 
-        return XmlHelper.extractListItemId(document);
+        Object content = updateResult.getContent().get(0);
+        if (content instanceof Element) {
+            Element element = (Element) content;
+            Document document = element.getOwnerDocument();
+            return XmlHelper.extractListItemId(document);
+        }
+        throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
     public void addAttachment(String listItemId, String fileName, String attachmentPath) {
