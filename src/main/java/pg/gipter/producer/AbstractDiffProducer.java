@@ -11,7 +11,6 @@ import java.util.List;
 
 abstract class AbstractDiffProducer implements DiffProducer {
 
-
     private final ApplicationProperties appProps;
     private final DiffCommand diffCommand;
     private final Logger logger;
