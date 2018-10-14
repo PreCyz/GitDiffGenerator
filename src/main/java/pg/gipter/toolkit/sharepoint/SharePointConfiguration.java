@@ -1,10 +1,9 @@
 package pg.gipter.toolkit.sharepoint;
 
 import org.apache.http.auth.NTCredentials;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.transport.WebServiceMessageSender;
@@ -14,25 +13,17 @@ import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 @Configuration
 public class SharePointConfiguration {
 
-    @Autowired
-    private Environment environment;
-
-    private String username() {
-        return environment.getProperty("toolkit.username");
-    }
-
-    private String password() {
-        return environment.getProperty("toolkit.password");
-    }
-
-    private String domain() {
-        return environment.getProperty("toolkit.domain");
-    }
+    @Value("${toolkit.username}")
+    private String username;
+    @Value("${toolkit.password}")
+    private String password;
+    @Value("${toolkit.domain}")
+    private String domain;
 
     @Bean
     public HttpComponentsMessageSender httpComponentsMessageSender() {
         HttpComponentsMessageSender httpComponentsMessageSender = new HttpComponentsMessageSender();
-        NTCredentials credentials = new NTCredentials(username(), password(), null, domain());
+        NTCredentials credentials = new NTCredentials(username, password, null, domain);
         httpComponentsMessageSender.setCredentials(credentials);
         return httpComponentsMessageSender;
     }
