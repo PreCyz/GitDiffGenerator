@@ -16,8 +16,7 @@ public enum VersionControlSystem {
                     .collect(Collectors.joining(", "));
             System.err.printf("Given value [%s] is not supported. Supported version control systems are: [%s]%n",
                     value, String.join(", ", supportedVcs));
-            System.exit(-1);
         }
-        throw new RuntimeException("Not implemented yet!!!");
+        throw new IllegalArgumentException("Not implemented yet!!!");
     }
 }
