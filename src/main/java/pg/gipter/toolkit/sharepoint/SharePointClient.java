@@ -1,6 +1,8 @@
 package pg.gipter.toolkit.sharepoint;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 import org.w3c.dom.Document;
@@ -16,6 +18,8 @@ import java.io.InputStream;
 
 /**Created by Pawel Gawedzki on 12-Oct-2018.*/
 public class SharePointClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(SharePointClient.class);
 
     private final String WS_URL = "https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx";
     private final String CALLBACK_URL = "http://schemas.microsoft.com/sharepoint/soap/";
@@ -46,7 +50,7 @@ public class SharePointClient {
 
             Node list = document.getChildNodes().item(0);
             String listId = list.getAttributes().getNamedItem("Name").getNodeValue();
-            System.out.printf("<listId, viewId> = <%s, %s>%n", listId, null);
+            logger.info("<listId, viewId> = <{}, {}>", listId, null);
 
             return new ListViewId(listId, null);
         }
@@ -78,10 +82,11 @@ public class SharePointClient {
             Node listAndViewNode = document.getChildNodes().item(0);
             String listId = listAndViewNode.getChildNodes().item(0).getAttributes().getNamedItem("Name").getNodeValue();
             String viewId = listAndViewNode.getChildNodes().item(1).getAttributes().getNamedItem("Name").getNodeValue();
-            System.out.printf("<listId, viewId> = <%s, %s>%n", listId, viewId);
+            logger.info("<listId, viewId> = <{}, {}>%n", listId, viewId);
 
             return new ListViewId(listId, viewId);
         }
+        logger.error("Weird response from toolkit. Response is not a xml.");
         throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
@@ -108,6 +113,7 @@ public class SharePointClient {
             Document document = element.getOwnerDocument();
             return XmlHelper.extractListItemId(document);
         }
+        logger.error("Weird response from toolkit. Response is not a xml.");
         throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
@@ -118,7 +124,7 @@ public class SharePointClient {
             attachment = IOUtils.toByteArray(is);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             throw new RuntimeException();
         }
 
@@ -134,6 +140,6 @@ public class SharePointClient {
                 getSoapActionCallback("AddAttachment")
         );
 
-        System.out.printf("Diff upload status %s%n", response.getAddAttachmentResult());
+        logger.error("Diff upload status {}", response.getAddAttachmentResult());
     }
 }

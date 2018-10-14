@@ -1,5 +1,7 @@
 package pg.gipter.toolkit.helper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -15,6 +17,8 @@ import java.io.File;
 import java.io.StringWriter;
 
 public final class XmlHelper {
+
+    private static final Logger logger = LoggerFactory.getLogger(XmlHelper.class);
 
     private XmlHelper() { }
 
@@ -86,7 +90,7 @@ public final class XmlHelper {
             batch.appendChild(method);
 
             //documentToFile(document, "newItem");
-            System.out.println("Done creating XML for upload list.");
+            logger.info("Done creating XML for upload list.");
 
             return documentToString(document);
         } catch (ParserConfigurationException pce) {
@@ -101,6 +105,7 @@ public final class XmlHelper {
             getTransformer().transform(new DOMSource(document), new StreamResult(sw));
             return sw.toString();
         } catch (Exception ex) {
+            logger.error("Error converting to string.", ex);
             throw new RuntimeException("Error converting to String", ex);
         }
     }
@@ -120,6 +125,7 @@ public final class XmlHelper {
             StreamResult streamResult = new StreamResult(new File(fileName + ".xml"));
             getTransformer().transform(new DOMSource(document), streamResult);
         } catch (Exception ex) {
+            logger.error("Error converting to String", ex);
             throw new RuntimeException("Error converting to String", ex);
         }
     }
@@ -132,7 +138,7 @@ public final class XmlHelper {
             if (owsID != null) {
                 String owsId = owsID.getNodeValue();
                 owsId = removeSharePointSigns(owsId);
-                System.out.printf("ows_ID = %s%n", owsId);
+                logger.info("ows_ID = {}", owsId);
             }
         }
         return "";
@@ -143,7 +149,7 @@ public final class XmlHelper {
             return "";
         }
 
-        String retValue = "";
+        String retValue;
         if (value.contains(";#")) {
             String[] result = value.split(";#");
             if (result.length > 2) {

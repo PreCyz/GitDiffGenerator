@@ -1,5 +1,7 @@
 package pg.gipter.settings;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.producer.util.StringUtils;
 
@@ -16,7 +18,8 @@ import static pg.gipter.Main.yyyy_MM_dd;
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public class ApplicationProperties {
 
-    private final static String APPLICATION_PROPERTIES = "application.properties";
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationProperties.class);
+    private static final String APPLICATION_PROPERTIES = "application.properties";
 
     private Properties properties;
     private final ArgExtractor argExtractor;
@@ -30,11 +33,11 @@ public class ApplicationProperties {
         try (InputStream is = new FileInputStream(APPLICATION_PROPERTIES)) {
             properties = new Properties();
             properties.load(is);
-            System.out.printf("Properties loaded [%s]%n", log());
+            logger.info("Properties loaded [{}]", log());
         } catch (IOException | NullPointerException e) {
-            System.out.printf("Can not read [%s].%n", APPLICATION_PROPERTIES);
+            logger.warn("Can not read [{}].", APPLICATION_PROPERTIES);
             properties = null;
-            System.out.printf("Program argument loaded: %s%n", Arrays.toString(args));
+            logger.info("Program argument loaded: {}", Arrays.toString(args));
         }
     }
 

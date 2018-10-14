@@ -1,5 +1,7 @@
 package pg.gipter.toolkit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -13,6 +15,8 @@ import java.util.Properties;
 
 /**Created by Pawel Gawedzki on 11-Oct-2018.*/
 public class DiffUploader {
+
+    private static final Logger logger = LoggerFactory.getLogger(DiffUploader.class);
 
     private final ApplicationContext springContext;
     private final ApplicationProperties applicationProperties;
@@ -43,13 +47,12 @@ public class DiffUploader {
             SharePointClient sharePointClient = springContext.getBean(SharePointClient.class);
             //System.out.println("Getting list from SharePoint.");
             //sharePointClient.getList();
-            System.out.println("Getting list and view from SharePoint.");
+            logger.info("Getting list and view from SharePoint.");
             ListViewId ids = sharePointClient.getListAndView();
             String listItemId = sharePointClient.updateListItems(ids);
             sharePointClient.addAttachment(listItemId, applicationProperties.fileName(), applicationProperties.itemPath());
         } catch (Exception ex) {
-            System.out.println("Error during upload diff.");
-            ex.printStackTrace();
+            logger.error("Error during upload diff.", ex);
         }
     }
 }

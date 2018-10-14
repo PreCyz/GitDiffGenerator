@@ -1,5 +1,7 @@
 package pg.gipter.producer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.DiffCommand;
 import pg.gipter.producer.command.DiffCommandFactory;
 import pg.gipter.settings.ApplicationProperties;
@@ -8,12 +10,16 @@ import java.io.*;
 import java.util.List;
 
 abstract class AbstractDiffProducer implements DiffProducer {
+
+
     private final ApplicationProperties appProps;
     private final DiffCommand diffCommand;
+    private final Logger logger;
 
     AbstractDiffProducer(ApplicationProperties applicationProperties) {
         this.appProps = applicationProperties;
         diffCommand = DiffCommandFactory.getInstance(appProps);
+        logger = LoggerFactory.getLogger(this.getClass());
     }
 
     @Override
@@ -21,21 +27,21 @@ abstract class AbstractDiffProducer implements DiffProducer {
         try (FileWriter fw = new FileWriter(appProps.itemPath())) {
 
             List<String> cmd = diffCommand.commandAsList();
-            System.out.printf("%s command: %s%n", appProps.versionControlSystem().name(), String.join(" ", cmd));
+            logger.info("{} command: {}", appProps.versionControlSystem().name(), String.join(" ", cmd));
 
             cmd = getFullCommand(cmd);
-            System.out.printf("Platform full command: %s%n", String.join(" ", cmd));
+            logger.info("Platform full command: {}", String.join(" ", cmd));
 
             for (String projectPath : appProps.projectPaths()) {
-                System.out.printf("Project path: %s%n%n", projectPath);
+                logger.info("Project path: {}", projectPath);
                 writeItemToFile(fw, projectPath, cmd);
             }
 
-            System.out.printf("Diff file generated and saved as: %s.%n", appProps.itemPath());
+            logger.info("Diff file generated and saved as: {}.", appProps.itemPath());
 
         } catch (Exception ex) {
-            System.err.println(ex.getMessage());
-            System.exit(-1);
+            logger.error("Error when producing diff.", ex);
+            throw new RuntimeException();
         }
     }
 
@@ -56,7 +62,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
             fw.write(String.format("%nEnd-of-diff-for-%s%n%n%n", projectPath));
 
         } catch (Exception ex) {
-            System.err.println(ex.getMessage());
+            logger.error(ex.getMessage());
             throw new IOException(ex);
         }
     }
