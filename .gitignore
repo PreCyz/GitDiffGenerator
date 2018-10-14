@@ -4,3 +4,4 @@ out
 target
 xml
 logs
+*.txt
