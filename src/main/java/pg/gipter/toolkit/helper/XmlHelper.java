@@ -125,15 +125,14 @@ public final class XmlHelper {
     }
 
     public static String extractListItemId(Document document) {
-        NodeList nodeList = document.getElementsByTagName("*");
+        NodeList nodeList = document.getElementsByTagName("z:row");
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                if ("z:row".equals(node.getNodeName())) {
-                    String owsId = node.getAttributes().getNamedItem("ows_ID").getNodeValue();
-                    owsId = removeSharePointSigns(owsId);
-                    System.out.printf("ows_ID = %s%n", owsId);
-                }
+            NamedNodeMap attributes = nodeList.item(i).getAttributes();
+            Node owsID = attributes.getNamedItem("ows_ID");
+            if (owsID != null) {
+                String owsId = owsID.getNodeValue();
+                owsId = removeSharePointSigns(owsId);
+                System.out.printf("ows_ID = %s%n", owsId);
             }
         }
         return "";
@@ -144,17 +143,19 @@ public final class XmlHelper {
             return "";
         }
 
+        String retValue = "";
         if (value.contains(";#")) {
             String[] result = value.split(";#");
             if (result.length > 2) {
-                return String.join("; ", result);
+                retValue = String.join("; ", result);
             }
             else {
-                return result[1];
+                retValue = result[1];
             }
         } else {
-            return value;
+            retValue = value;
         }
+        return retValue;
     }
 
 }
