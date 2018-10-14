@@ -48,6 +48,7 @@ public class DiffUploader {
             String listItemId = sharePointClient.updateListItems(ids);
             sharePointClient.addAttachment(listItemId, applicationProperties.fileName(), applicationProperties.itemPath());
         } catch (Exception ex) {
+            System.out.println("Error during upload diff.");
             ex.printStackTrace();
         }
     }
