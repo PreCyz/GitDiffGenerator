@@ -21,7 +21,7 @@ public class SharePointClient {
     private final String CALLBACK_URL = "http://schemas.microsoft.com/sharepoint/soap/";
     private final String WORK_ITEMS = "WorkItems";
 
-    private WebServiceTemplate webServiceTemplate;
+    private final WebServiceTemplate webServiceTemplate;
     private final ObjectFactory objectFactory;
 
     SharePointClient(WebServiceTemplate webServiceTemplate) {
