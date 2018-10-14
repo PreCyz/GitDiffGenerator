@@ -27,7 +27,7 @@ final class ArgExtractor {
         codeProtected("false"),
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
         toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
-        toolkitDomain("NCDMZ"),;
+        toolkitDomain("NCDMZ");
 
         private String defaultValue;
 
@@ -149,9 +149,9 @@ final class ArgExtractor {
     }
 
     String toolkitDomain() {
-        if (hasArgs()) {
+        /*if (hasArgs()) {
             return getValue(ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
-        }
+        }*/
         return ArgName.toolkitDomain.defaultValue();
     }
 

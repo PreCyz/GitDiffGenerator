@@ -244,4 +244,100 @@ class ArgExtractorTest {
             assertThat(ex).isInstanceOf(IllegalArgumentException.class);
         }
     }
+
+    @Test
+    void given_noCodeProtected_when_codeProtected_then_returnFalse() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        boolean actual = argExtractor.codeProtected();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_codeProtectedSetAsNo_when_codeProtected_then_returnFalse() {
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=no"});
+
+        boolean actual = argExtractor.codeProtected();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_codeProtectedSetAsYes_when_codeProtected_then_returnTrue() {
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=yes"});
+
+        boolean actual = argExtractor.codeProtected();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_allPossibleValuesForCodeProtected_when_codeProtected_then_returnAlwaysTrue() {
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=yes"});
+        boolean actual = argExtractor.codeProtected();
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=y"});
+        actual &= argExtractor.codeProtected();
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=Yes"});
+        actual &= argExtractor.codeProtected();
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=YES"});
+        actual &= argExtractor.codeProtected();
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=t"});
+        actual &= argExtractor.codeProtected();
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=true"});
+        actual &= argExtractor.codeProtected();
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=T"});
+        actual &= argExtractor.codeProtected();
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=TRUE"});
+        actual &= argExtractor.codeProtected();
+        argExtractor = new ArgExtractor(new String[]{"codeProtected=True"});
+        actual &= argExtractor.codeProtected();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_noToolkitUsername_when_toolkitUsername_then_returnDefaultValue() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        String actual = argExtractor.toolkitUsername();
+
+        assertThat(actual).isEqualTo("NO_TOOLKIT_USERNAME_GIVEN");
+    }
+
+    @Test
+    void given_toolkitUsername_when_toolkitUsername_then_returnThatUsername() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitUsername=username"});
+
+        String actual = argExtractor.toolkitUsername();
+
+        assertThat(actual).isEqualTo("username");
+    }
+
+    @Test
+    void given_noToolkitPassword_when_toolkitPassword_then_returnDefaultValue() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        String actual = argExtractor.toolkitPassword();
+
+        assertThat(actual).isEqualTo("NO_TOOLKIT_PASSWORD_GIVEN");
+    }
+
+    @Test
+    void given_toolkitPassword_when_toolkitPassword_then_returnThatPassword() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitPassword=password"});
+
+        String actual = argExtractor.toolkitPassword();
+
+        assertThat(actual).isEqualTo("password");
+    }
+
+    @Test
+    void when_toolkitDomain_then_returnNCDMZ() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        String actual = argExtractor.toolkitDomain();
+
+        assertThat(actual).isEqualTo("NCDMZ");
+    }
 }
