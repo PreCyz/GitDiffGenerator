@@ -93,21 +93,19 @@ public class SharePointClient {
     public String updateListItems(ListViewId listViewId) {
         String batchElement = XmlHelper.buildBatchElement(listViewId.viewId());
 
-        UpdateListItems updateRequest = objectFactory.createUpdateListItems();
-        updateRequest.setListName(listViewId.listId());
+        UpdateListItems request = objectFactory.createUpdateListItems();
+        request.setListName(listViewId.listId());
         UpdateListItems.Updates updates = objectFactory.createUpdateListItemsUpdates();
         updates.getContent().add(batchElement);
-        updateRequest.setUpdates(updates);
+        request.setUpdates(updates);
 
-        UpdateListItemsResponse updateResponse = (UpdateListItemsResponse) webServiceTemplate.marshalSendAndReceive(
+        UpdateListItemsResponse response = (UpdateListItemsResponse) webServiceTemplate.marshalSendAndReceive(
                 WS_URL,
-                updateRequest,
+                request,
                 getSoapActionCallback("UpdateListItems")
         );
 
-        UpdateListItemsResponse.UpdateListItemsResult updateResult = updateResponse.getUpdateListItemsResult();
-
-        Object content = updateResult.getContent().get(0);
+        Object content = response.getUpdateListItemsResult().getContent().get(0);
         if (content instanceof Element) {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
