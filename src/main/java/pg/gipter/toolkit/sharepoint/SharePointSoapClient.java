@@ -21,24 +21,24 @@ public class SharePointSoapClient {
 
     private static final Logger logger = LoggerFactory.getLogger(SharePointSoapClient.class);
 
-    private final String WS_URL = "https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx";
-    private final String CALLBACK_URL = "http://schemas.microsoft.com/sharepoint/soap/";
-    private final String WORK_ITEMS = "WorkItems";
-
     private final WebServiceTemplate webServiceTemplate;
+    private final String wsUrl;
+    private final String listName;
     private final ObjectFactory objectFactory;
 
-    SharePointSoapClient(WebServiceTemplate webServiceTemplate) {
+    SharePointSoapClient(WebServiceTemplate webServiceTemplate, String wsUrl, String listName) {
         this.webServiceTemplate = webServiceTemplate;
+        this.wsUrl = wsUrl;
+        this.listName = listName;
         objectFactory = new ObjectFactory();
     }
 
     public ListViewId getList() {
         GetList request = objectFactory.createGetList();
-        request.setListName(WORK_ITEMS);
+        request.setListName(listName);
 
         GetListResponse response = (GetListResponse) webServiceTemplate.marshalSendAndReceive(
-                WS_URL,
+                wsUrl,
                 request,
                 getSoapActionCallback("GetList")
         );
@@ -58,18 +58,18 @@ public class SharePointSoapClient {
     }
 
     private SoapActionCallback getSoapActionCallback(String actionName) {
-        return new SoapActionCallback(CALLBACK_URL + actionName);
+        return new SoapActionCallback("http://schemas.microsoft.com/sharepoint/soap/" + actionName);
     }
 
     public ListViewId getListAndView() {
         final String actionName = "GetListAndView";
 
         GetListAndView request = objectFactory.createGetListAndView();
-        request.setListName(WORK_ITEMS);
+        request.setListName(listName);
         request.setViewName("");
 
         GetListAndViewResponse response = (GetListAndViewResponse) webServiceTemplate.marshalSendAndReceive(
-                WS_URL,
+                wsUrl,
                 request,
                 getSoapActionCallback(actionName)
         );
@@ -100,7 +100,7 @@ public class SharePointSoapClient {
         request.setUpdates(updates);
 
         UpdateListItemsResponse response = (UpdateListItemsResponse) webServiceTemplate.marshalSendAndReceive(
-                WS_URL,
+                wsUrl,
                 request,
                 getSoapActionCallback("UpdateListItems")
         );
@@ -129,11 +129,11 @@ public class SharePointSoapClient {
         AddAttachment request = objectFactory.createAddAttachment();
         request.setListItemID(listItemId);
         request.setFileName(fileName);
-        request.setListName(WORK_ITEMS);
+        request.setListName(listName);
         request.setAttachment(attachment);
 
         AddAttachmentResponse response = (AddAttachmentResponse) webServiceTemplate.marshalSendAndReceive(
-                WS_URL,
+                wsUrl,
                 request,
                 getSoapActionCallback("AddAttachment")
         );

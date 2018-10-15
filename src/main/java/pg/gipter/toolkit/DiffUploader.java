@@ -39,6 +39,8 @@ public class DiffUploader {
         toolkitProperties.put("toolkit.username", applicationProperties.toolkitUsername());
         toolkitProperties.put("toolkit.password", applicationProperties.toolkitPassword());
         toolkitProperties.put("toolkit.domain", applicationProperties.toolkitDomain());
+        toolkitProperties.put("toolkit.url", applicationProperties.toolkitUrl());
+        toolkitProperties.put("toolkit.listName", applicationProperties.toolkitListName());
         environment.getPropertySources().addLast(new PropertiesPropertySource("toolkit", toolkitProperties));
     }
 
