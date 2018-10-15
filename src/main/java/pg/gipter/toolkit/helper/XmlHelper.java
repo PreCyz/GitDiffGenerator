@@ -15,6 +15,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.StringWriter;
+import java.time.LocalDate;
+
+import static pg.gipter.Main.yyyy_MM_dd;
 
 public final class XmlHelper {
 
@@ -22,7 +25,7 @@ public final class XmlHelper {
 
     private XmlHelper() { }
 
-    public static String buildBatchElement(String viewId) {
+    public static String buildBatchElement(String viewId, String titleTxt, String employeeTxt) {
         try {
             DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
@@ -51,13 +54,37 @@ public final class XmlHelper {
             method.setAttributeNode(id);
             method.setAttributeNode(cmd);
 
-            Element caseType = document.createElement("Field");
+            Element title = document.createElement("Field");
             Attr name = document.createAttribute("Name");
-            name.setValue("CaseType");
-            caseType.setAttributeNode(name);
-            caseType.setTextContent("Service Request");
+            name.setValue("Title");
+            title.setAttributeNode(name);
+            title.setTextContent(titleTxt);
 
-            Element portal = document.createElement("Field");
+            Element approver = document.createElement("Field");
+            name = document.createAttribute("Name");
+            name.setValue("AssignedTo");
+            approver.setAttributeNode(name);
+            approver.setTextContent("Steffen Bra Andersen");
+
+            Element description = document.createElement("Field");
+            name = document.createAttribute("Name");
+            name.setValue("Body");
+            description.setAttributeNode(name);
+            description.setTextContent("Git diff file");
+
+            Element startDate = document.createElement("Field");
+            name = document.createAttribute("Name");
+            name.setValue("StartDate");
+            startDate.setAttributeNode(name);
+            startDate.setTextContent(LocalDate.now().format(yyyy_MM_dd));
+
+            Element employee = document.createElement("Field");
+            name = document.createAttribute("Name");
+            name.setValue("Employee");
+            employee.setAttributeNode(name);
+            employee.setTextContent(employeeTxt);
+
+            /*Element portal = document.createElement("Field");
             name = document.createAttribute("Name");
             name.setValue("Oprindelse");
             portal.setAttributeNode(name);
@@ -79,13 +106,13 @@ public final class XmlHelper {
             name = document.createAttribute("Name");
             name.setValue("Status");
             status.setAttributeNode(name);
-            status.setTextContent("10 - Ny");
+            status.setTextContent("10 - Ny");*/
 
-            method.appendChild(caseType);
-            method.appendChild(portal);
-            method.appendChild(team);
-            method.appendChild(priority);
-            method.appendChild(status);
+            method.appendChild(title);
+            method.appendChild(approver);
+            method.appendChild(description);
+            method.appendChild(startDate);
+            method.appendChild(employee);
 
             batch.appendChild(method);
 
