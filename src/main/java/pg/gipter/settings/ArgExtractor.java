@@ -27,7 +27,9 @@ final class ArgExtractor {
         codeProtected("false"),
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
         toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
-        toolkitDomain("NCDMZ");
+        toolkitDomain("NCDMZ"),
+        toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx"),
+        toolkitListName("WorkItems");
 
         private String defaultValue;
 
@@ -153,6 +155,20 @@ final class ArgExtractor {
             return getValue(ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
         }*/
         return ArgName.toolkitDomain.defaultValue();
+    }
+
+    String toolkitUrl() {
+        /*if (hasArgs()) {
+            return getValue(ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
+        }*/
+        return ArgName.toolkitUrl.defaultValue();
+    }
+
+    String toolkitListName() {
+        /*if (hasArgs()) {
+            return getValue(ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
+        }*/
+        return ArgName.toolkitListName.defaultValue();
     }
 
 }

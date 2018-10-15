@@ -46,7 +46,7 @@ public class ApplicationProperties {
 
     public String author() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.author.name(), ArgExtractor.ArgName.author.defaultValue());
+            return properties.getProperty(ArgExtractor.ArgName.author.name(), argExtractor.author());
         }
         return argExtractor.author();
     }
@@ -54,7 +54,7 @@ public class ApplicationProperties {
     public String itemPath() {
         String itemPath = argExtractor.itemPath();
         if (hasProperties()) {
-            itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), ArgExtractor.ArgName.itemPath.defaultValue());
+            itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), itemPath);
         }
         return itemPath + File.separator + fileName();
     }
@@ -73,9 +73,7 @@ public class ApplicationProperties {
 
     private String itemFileName() {
         if (hasProperties()) {
-            return properties.getProperty(
-                    ArgExtractor.ArgName.itemFileName.name(), ArgExtractor.ArgName.itemFileName.defaultValue()
-            );
+            return properties.getProperty(ArgExtractor.ArgName.itemFileName.name(), argExtractor.itemFileName());
         }
         return argExtractor.itemFileName();
     }
@@ -101,9 +99,7 @@ public class ApplicationProperties {
 
     public String committerEmail() {
         if (hasProperties()) {
-            return properties.getProperty(
-                    ArgExtractor.ArgName.committerEmail.name(), ArgExtractor.ArgName.committerEmail.defaultValue()
-            );
+            return properties.getProperty(ArgExtractor.ArgName.committerEmail.name(), argExtractor.committerEmail());
         }
         return argExtractor.committerEmail();
     }
@@ -151,29 +147,37 @@ public class ApplicationProperties {
 
     public String toolkitUsername() {
         if (hasProperties()) {
-            return properties.getProperty(
-                    ArgExtractor.ArgName.toolkitUsername.name(), ArgExtractor.ArgName.toolkitUsername.defaultValue()
-            );
+            return properties.getProperty(ArgExtractor.ArgName.toolkitUsername.name(), argExtractor.toolkitUsername());
         }
         return argExtractor.toolkitUsername();
     }
 
     public String toolkitPassword() {
         if (hasProperties()) {
-            return properties.getProperty(
-                    ArgExtractor.ArgName.toolkitPassword.name(), ArgExtractor.ArgName.toolkitPassword.defaultValue()
-            );
+            return properties.getProperty(ArgExtractor.ArgName.toolkitPassword.name(), argExtractor.toolkitPassword());
         }
         return argExtractor.toolkitPassword();
     }
 
     public String toolkitDomain() {
         if (hasProperties()) {
-            return properties.getProperty(
-                    ArgExtractor.ArgName.toolkitDomain.name(), ArgExtractor.ArgName.toolkitDomain.defaultValue()
-            );
+            return properties.getProperty(ArgExtractor.ArgName.toolkitDomain.name(), argExtractor.toolkitDomain());
         }
         return argExtractor.toolkitDomain();
+    }
+
+    public String toolkitUrl() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgExtractor.ArgName.toolkitUrl.name(), argExtractor.toolkitUrl());
+        }
+        return argExtractor.toolkitUrl();
+    }
+
+    public String toolkitListName() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgExtractor.ArgName.toolkitListName.name(), argExtractor.toolkitListName());
+        }
+        return argExtractor.toolkitListName();
     }
 
     public boolean isToolkitPropertiesSet() {
@@ -191,6 +195,8 @@ public class ApplicationProperties {
                 ", endDate='" + endDate() + '\'' +
                 ", versionControlSystem='" + versionControlSystem() + '\'' +
                 ", codeProtected='" + codeProtected() + '\'' +
-                ", toolkitPropertiesSet='" + isToolkitPropertiesSet() + '\'';
+                ", toolkitPropertiesSet='" + isToolkitPropertiesSet() + '\'' +
+                ", toolkitUrl='" + toolkitUrl() + '\'' +
+                ", toolkitListName='" + toolkitListName() + '\'';
     }
 }
