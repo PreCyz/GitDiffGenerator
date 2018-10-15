@@ -340,4 +340,49 @@ class ArgExtractorTest {
 
         assertThat(actual).isEqualTo("NCDMZ");
     }
+
+    @Test
+    void given_toolkitDomainFromCommandLine_when_toolkitDomain_then_returnNCDMZ() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitDomain=sthElse"});
+
+        String actual = argExtractor.toolkitDomain();
+
+        assertThat(actual).isEqualTo("NCDMZ");
+    }
+
+    @Test
+    void when_toolkitUrl_then_returnDefaultUrl() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        String actual = argExtractor.toolkitUrl();
+
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
+    }
+
+    @Test
+    void given_toolkitUrlFromCommandLine_when_toolkitUrl_then_returnDefaultUrl() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitUrl=sthElse"});
+
+        String actual = argExtractor.toolkitUrl();
+
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
+    }
+
+    @Test
+    void when_toolkitListName_then_returnDefaultListName() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        String actual = argExtractor.toolkitListName();
+
+        assertThat(actual).isEqualTo("WorkItems");
+    }
+
+    @Test
+    void given_toolkitListNameFromCommandLine_when_toolkitListName_then_returnDefaultListName() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitListName=sthElse"});
+
+        String actual = argExtractor.toolkitListName();
+
+        assertThat(actual).isEqualTo("WorkItems");
+    }
 }
