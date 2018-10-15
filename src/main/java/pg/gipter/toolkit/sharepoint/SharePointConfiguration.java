@@ -43,8 +43,8 @@ public class SharePointConfiguration {
     }
 
     @Bean
-    public SharePointClient sharePointClient(WebServiceMessageSender messageSender) {
-        return new SharePointClient(webServiceTemplate(marshaller(), messageSender));
+    public SharePointSoapClient sharePointClient(WebServiceMessageSender messageSender) {
+        return new SharePointSoapClient(webServiceTemplate(marshaller(), messageSender));
     }
 
 }

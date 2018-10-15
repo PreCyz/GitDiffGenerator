@@ -8,8 +8,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.helper.ListViewId;
-import pg.gipter.toolkit.sharepoint.SharePointClient;
 import pg.gipter.toolkit.sharepoint.SharePointConfiguration;
+import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
 
 import java.util.Properties;
 
@@ -44,13 +44,13 @@ public class DiffUploader {
 
     public void uploadDiff() {
         try {
-            SharePointClient sharePointClient = springContext.getBean(SharePointClient.class);
+            SharePointSoapClient sharePointSoapClient = springContext.getBean(SharePointSoapClient.class);
             //System.out.println("Getting list from SharePoint.");
             //sharePointClient.getList();
             logger.info("Getting list and view from SharePoint.");
-            ListViewId ids = sharePointClient.getListAndView();
-            String listItemId = sharePointClient.updateListItems(ids);
-            sharePointClient.addAttachment(listItemId, applicationProperties.fileName(), applicationProperties.itemPath());
+            ListViewId ids = sharePointSoapClient.getListAndView();
+            String listItemId = sharePointSoapClient.updateListItems(ids);
+            sharePointSoapClient.addAttachment(listItemId, applicationProperties.fileName(), applicationProperties.itemPath());
         } catch (Exception ex) {
             logger.error("Error during upload diff.", ex);
         }

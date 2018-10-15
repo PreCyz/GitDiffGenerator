@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**Created by Pawel Gawedzki on 12-Oct-2018.*/
-public class SharePointClient {
+public class SharePointSoapClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(SharePointClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(SharePointSoapClient.class);
 
     private final String WS_URL = "https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx";
     private final String CALLBACK_URL = "http://schemas.microsoft.com/sharepoint/soap/";
@@ -28,7 +28,7 @@ public class SharePointClient {
     private final WebServiceTemplate webServiceTemplate;
     private final ObjectFactory objectFactory;
 
-    SharePointClient(WebServiceTemplate webServiceTemplate) {
+    SharePointSoapClient(WebServiceTemplate webServiceTemplate) {
         this.webServiceTemplate = webServiceTemplate;
         objectFactory = new ObjectFactory();
     }
