@@ -125,23 +125,24 @@ public final class XmlHelper {
             StreamResult streamResult = new StreamResult(new File(fileName + ".xml"));
             getTransformer().transform(new DOMSource(document), streamResult);
         } catch (Exception ex) {
-            logger.error("Error converting to String", ex);
+            logger.error("Error converting to String.", ex);
             throw new RuntimeException("Error converting to String", ex);
         }
     }
 
     public static String extractListItemId(Document document) {
+        String owsId = "";
         NodeList nodeList = document.getElementsByTagName("z:row");
         for (int i = 0; i < nodeList.getLength(); i++) {
             NamedNodeMap attributes = nodeList.item(i).getAttributes();
             Node owsID = attributes.getNamedItem("ows_ID");
             if (owsID != null) {
-                String owsId = owsID.getNodeValue();
-                owsId = removeSharePointSigns(owsId);
-                logger.info("ows_ID = {}", owsId);
+                owsId = removeSharePointSigns(owsID.getNodeValue());
+                break;
             }
         }
-        return "";
+        logger.info("ows_ID = {}", owsId);
+        return owsId;
     }
 
     private static String removeSharePointSigns(String value) {
