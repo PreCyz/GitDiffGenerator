@@ -2,6 +2,7 @@ package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
@@ -27,7 +28,7 @@ class ApplicationPropertiesTest {
 
         String actual = appProps.itemPath();
 
-        assertThat(actual).startsWith("testItemPath/");
+        assertThat(actual).startsWith("testItemPath" + File.separator);
     }
 
     @Test
