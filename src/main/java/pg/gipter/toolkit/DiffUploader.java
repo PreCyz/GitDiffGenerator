@@ -6,8 +6,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.helper.ListViewId;
+import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.sharepoint.SharePointConfiguration;
 import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
 
@@ -47,14 +49,20 @@ public class DiffUploader {
     public void uploadDiff() {
         try {
             SharePointSoapClient sharePointSoapClient = springContext.getBean(SharePointSoapClient.class);
-            //System.out.println("Getting list from SharePoint.");
-            //sharePointClient.getList();
             logger.info("Getting list and view from SharePoint.");
+            String fileName = applicationProperties.fileName();
+            String title = fileName.substring(0, fileName.indexOf(".txt"));
             ListViewId ids = sharePointSoapClient.getListAndView();
-            String listItemId = sharePointSoapClient.updateListItems(ids);
-            sharePointSoapClient.addAttachment(listItemId, applicationProperties.fileName(), applicationProperties.itemPath());
+            String listItemId = sharePointSoapClient.updateListItems(ids, title, applicationProperties.toolkitUsername());
+            sharePointSoapClient.addAttachment(listItemId, fileName, applicationProperties.itemPath());
         } catch (Exception ex) {
-            logger.error("Error during upload diff.", ex);
+            if (ex instanceof SoapFaultClientException) {
+                SoapFaultClientException sfce = (SoapFaultClientException) ex;
+                String errorMsg = XmlHelper.extractErrorMessage(sfce.getSoapFault().getSource());
+                logger.error("Error during upload diff. {}", errorMsg);
+            } else {
+                logger.error("Error during upload diff.", ex);
+            }
         }
     }
 }
