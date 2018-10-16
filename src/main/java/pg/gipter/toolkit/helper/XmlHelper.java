@@ -1,19 +1,19 @@
 package pg.gipter.toolkit.helper;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.time.LocalDate;
 
@@ -91,8 +91,9 @@ public final class XmlHelper {
             method.appendChild(description);
 
             batch.appendChild(method);
+            batch.normalize();
 
-            documentToXmlFile(document, "batchElement.xml");
+            //documentToXmlFile(document, "batchElement.xml");
 
             logger.info("Done creating XML for upload list.");
             return documentToString(document);
@@ -103,9 +104,13 @@ public final class XmlHelper {
     }
 
     private static String documentToString(final Document document) {
+        return documentToString(new DOMSource(document));
+    }
+
+    private static String documentToString(final Source source) {
         try {
             StringWriter sw = new StringWriter();
-            getTransformer().transform(new DOMSource(document), new StreamResult(sw));
+            getTransformer().transform(source, new StreamResult(sw));
             return sw.toString();
         } catch (Exception ex) {
             logger.error("Error converting to string.", ex);
@@ -116,7 +121,7 @@ public final class XmlHelper {
     private static Transformer getTransformer() throws TransformerConfigurationException {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -124,13 +129,17 @@ public final class XmlHelper {
     }
 
     public static void documentToXmlFile(final Document document, String fileName) {
+        documentToXmlFile(new DOMSource(document), fileName);
+    }
+
+    public static void documentToXmlFile(final Source source, String fileName) {
         if (!fileName.endsWith(".xml")) {
             fileName += fileName + ".xml";
         }
         fileName = getFullXmlDirPath(fileName);
         try {
             StreamResult streamResult = new StreamResult(new File(fileName));
-            getTransformer().transform(new DOMSource(document), streamResult);
+            getTransformer().transform(source, streamResult);
         } catch (Exception ex) {
             logger.error("Error converting to String.", ex);
             throw new RuntimeException("Error converting to String", ex);
@@ -175,6 +184,28 @@ public final class XmlHelper {
     public static String getFullXmlDirPath(String xmlFileName) {
         return String.format(".%ssrc%stest%sjava%sresources%sxml%s%s",
                 File.separator, File.separator, File.separator, File.separator, File.separator, File.separator, xmlFileName);
+    }
+
+    public static String extractErrorMsg(Source source) {
+        try {
+            StringWriter sw = new StringWriter();
+            getTransformer().transform(source, new StreamResult(sw));
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(IOUtils.toInputStream(sw.toString(), "UTF-8"));
+            NodeList nodeList = document.getElementsByTagName("errorstring");
+            StringBuilder strBuilder = new StringBuilder();
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                strBuilder.append(",").append(nodeList.item(i).getTextContent());
+            }
+            if (strBuilder.length() > 0) {
+                return strBuilder.toString().substring(1);
+            }
+            return strBuilder.toString();
+        } catch (TransformerException | ParserConfigurationException | SAXException | IOException e) {
+            logger.error("Error when extracting message.", e);
+        }
+        return null;
     }
 
 }

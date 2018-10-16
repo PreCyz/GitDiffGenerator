@@ -6,8 +6,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.helper.ListViewId;
+import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.sharepoint.SharePointConfiguration;
 import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
 
@@ -56,7 +58,14 @@ public class DiffUploader {
             String listItemId = sharePointSoapClient.updateListItems(ids, title, applicationProperties.toolkitUsername());
             sharePointSoapClient.addAttachment(listItemId, fileName, applicationProperties.itemPath());
         } catch (Exception ex) {
-            logger.error("Error during upload diff.", ex);
+            if (ex instanceof SoapFaultClientException) {
+                SoapFaultClientException soapException = (SoapFaultClientException) ex;
+                //XmlHelper.documentToXmlFile(soapException.getSoapFault().getSource(), "wsErrorSoapXml.xml");
+                String actualErrorMsg = XmlHelper.extractErrorMsg(soapException.getSoapFault().getSource());
+                logger.error(actualErrorMsg, ex);
+            } else {
+                logger.error("Error during upload diff.", ex);
+            }
         }
     }
 }
