@@ -51,7 +51,7 @@ public class DiffUploader {
             //sharePointClient.getList();
             logger.info("Getting list and view from SharePoint.");
             ListViewId ids = sharePointSoapClient.getListAndView();
-            String listItemId = sharePointSoapClient.updateListItems(ids);
+            String listItemId = sharePointSoapClient.updateListItems(ids, applicationProperties.fileName(), applicationProperties.toolkitUsername());
             sharePointSoapClient.addAttachment(listItemId, applicationProperties.fileName(), applicationProperties.itemPath());
         } catch (Exception ex) {
             logger.error("Error during upload diff.", ex);

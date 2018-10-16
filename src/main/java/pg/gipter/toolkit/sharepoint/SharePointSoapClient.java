@@ -70,8 +70,8 @@ public class SharePointSoapClient {
         throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
-    public String updateListItems(ListViewId listViewId) {
-        String batchElement = XmlHelper.buildBatchElement(listViewId.viewId(), "aa", "aa");
+    public String updateListItems(ListViewId listViewId, String title, String user) {
+        String batchElement = XmlHelper.buildBatchElement(listViewId.viewId(), title, user);
 
         UpdateListItems request = objectFactory.createUpdateListItems();
         request.setListName(listViewId.listId());

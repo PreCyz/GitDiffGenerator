@@ -60,59 +60,35 @@ public final class XmlHelper {
             title.setAttributeNode(name);
             title.setTextContent(titleTxt);
 
-            Element approver = document.createElement("Field");
-            name = document.createAttribute("Name");
-            name.setValue("AssignedTo");
-            approver.setAttributeNode(name);
-            approver.setTextContent("Steffen Bra Andersen");
-
-            Element description = document.createElement("Field");
-            name = document.createAttribute("Name");
-            name.setValue("Body");
-            description.setAttributeNode(name);
-            description.setTextContent("Git diff file");
-
-            Element startDate = document.createElement("Field");
-            name = document.createAttribute("Name");
-            name.setValue("StartDate");
-            startDate.setAttributeNode(name);
-            startDate.setTextContent(LocalDate.now().format(yyyy_MM_dd));
-
             Element employee = document.createElement("Field");
             name = document.createAttribute("Name");
             name.setValue("Employee");
             employee.setAttributeNode(name);
             employee.setTextContent(employeeTxt);
 
-            /*Element portal = document.createElement("Field");
+            Element submissionDate = document.createElement("Field");
             name = document.createAttribute("Name");
-            name.setValue("Oprindelse");
-            portal.setAttributeNode(name);
-            portal.setTextContent("Portal");
+            name.setValue("SubmissionDate");
+            submissionDate.setAttributeNode(name);
+            submissionDate.setTextContent(LocalDate.now().format(yyyy_MM_dd));
 
-            Element team = document.createElement("Field");
+            Element classification = document.createElement("Field");
             name = document.createAttribute("Name");
-            name.setValue("Team");
-            team.setAttributeNode(name);
-            team.setTextContent("4");
+            name.setValue("Classification");
+            classification.setAttributeNode(name);
+            classification.setTextContent("12"); //Changeset (repository change report)
 
-            Element priority = document.createElement("Field");
+            Element description = document.createElement("Field");
             name = document.createAttribute("Name");
-            name.setValue("Priority");
-            priority.setAttributeNode(name);
-            priority.setTextContent("C - Medium");
-
-            Element status = document.createElement("Field");
-            name = document.createAttribute("Name");
-            name.setValue("Status");
-            status.setAttributeNode(name);
-            status.setTextContent("10 - Ny");*/
+            name.setValue("Body");
+            description.setAttributeNode(name);
+            description.setTextContent("Git diff file.");
 
             method.appendChild(title);
-            method.appendChild(approver);
-            method.appendChild(description);
-            method.appendChild(startDate);
             method.appendChild(employee);
+            method.appendChild(submissionDate);
+            method.appendChild(classification);
+            method.appendChild(description);
 
             batch.appendChild(method);
 
