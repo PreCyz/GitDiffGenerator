@@ -138,7 +138,7 @@ final class ArgExtractor {
 
     String toolkitUsername() {
         if (hasArgs()) {
-            return getValue(ArgName.toolkitUsername, ArgName.toolkitUsername.defaultValue());
+            return getValue(ArgName.toolkitUsername, ArgName.toolkitUsername.defaultValue()).toUpperCase();
         }
         return ArgName.toolkitUsername.defaultValue();
     }

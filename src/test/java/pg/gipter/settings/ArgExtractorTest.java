@@ -306,12 +306,12 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_toolkitUsername_when_toolkitUsername_then_returnThatUsername() {
+    void given_toolkitUsername_when_toolkitUsername_then_returnThatUsernameUpperCased() {
         argExtractor = new ArgExtractor(new String[]{"toolkitUsername=username"});
 
         String actual = argExtractor.toolkitUsername();
 
-        assertThat(actual).isEqualTo("username");
+        assertThat(actual).isEqualTo("USERNAME");
     }
 
     @Test
