@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Batch ListVersion="1" OnError="Continue" ViewName="{3DEA3051-D9AA-42B5-BFD7-7FC8C59DC582}">
+    <Method Cmd="New" ID="4">
+        <Field Name="Title">svn-protected-20181009-20181016.txt</Field>
+        <Field Name="Employee">pawg</Field>
+        <Field Name="SubmissionDate">2018-10-16</Field>
+        <Field Name="Classification">12</Field>
+        <Field Name="Body">Git diff file.</Field>
+    </Method>
+</Batch>
