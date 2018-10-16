@@ -1,5 +1,6 @@
 package pg.gipter.toolkit.helper;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
@@ -7,15 +8,13 @@ import org.w3c.dom.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.StringWriter;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static pg.gipter.Main.yyyy_MM_dd;
 
@@ -126,7 +125,7 @@ public final class XmlHelper {
         return "";
     }
 
-    private static String documentToString(final Document document) {
+    public static String documentToString(final Document document) {
         try {
             StringWriter sw = new StringWriter();
             getTransformer().transform(new DOMSource(document), new StreamResult(sw));
@@ -185,8 +184,7 @@ public final class XmlHelper {
             String[] result = value.split(";#");
             if (result.length > 2) {
                 retValue = String.join("; ", result);
-            }
-            else {
+            } else {
                 retValue = result[1];
             }
         } else {
@@ -195,4 +193,39 @@ public final class XmlHelper {
         return retValue;
     }
 
+    public static Document xmlToDocument(final Source source) {
+        try {
+            StringWriter stringWriter = new StringWriter();
+            StreamResult streamResult = new StreamResult(stringWriter);
+            getTransformer().transform(source, streamResult);
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder parser = factory.newDocumentBuilder();
+            return parser.parse(IOUtils.toInputStream(stringWriter.toString(), "UTF-8"));
+        } catch (Exception ex) {
+            logger.error("Error converting to String.", ex);
+            throw new RuntimeException("Error converting to String", ex);
+        }
+    }
+
+    public static String extractErrorMessage(Source source) {
+        Document document = xmlToDocument(source);
+        NodeList errorStr = document.getElementsByTagName("errorstring");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < errorStr.getLength(); i++) {
+            stringBuilder.append(",").append(errorStr.item(i).getTextContent());
+        }
+        if (stringBuilder.length() > 0) {
+            return stringBuilder.toString().substring(1);
+        }
+        return stringBuilder.toString();
+    }
+
+    public static Optional<String> extractValue(Document document, String tagName) {
+        NodeList nodeList = document.getElementsByTagName(tagName);
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            return Optional.ofNullable(nodeList.item(i).getTextContent());
+        }
+        return Optional.empty();
+    }
 }
