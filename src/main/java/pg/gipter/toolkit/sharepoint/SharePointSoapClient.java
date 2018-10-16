@@ -53,7 +53,7 @@ public class SharePointSoapClient {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
 
-            XmlHelper.documentToXmlFile(document, "GetListAndView.xml");
+            //XmlHelper.documentToXmlFile(document, "GetListAndView.xml");
 
             Node listAndViewNode = document.getChildNodes().item(0);
             String listId = listAndViewNode.getChildNodes().item(0).getAttributes().getNamedItem("Name").getNodeValue();
@@ -85,7 +85,7 @@ public class SharePointSoapClient {
         if (content instanceof Element) {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
-            XmlHelper.documentToXmlFile(document, "updateList.xml");
+            XmlHelper.documentToXmlFile(document, "UpdateListItems.xml");
             return XmlHelper.extractListItemId(document);
         }
         logger.error("Weird response from toolkit. Response is not a xml.");
