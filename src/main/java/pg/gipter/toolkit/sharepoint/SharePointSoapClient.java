@@ -12,6 +12,7 @@ import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.ws.*;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,37 +34,11 @@ public class SharePointSoapClient {
         objectFactory = new ObjectFactory();
     }
 
-    public ListViewId getList() {
-        GetList request = objectFactory.createGetList();
-        request.setListName(listName);
-
-        GetListResponse response = (GetListResponse) webServiceTemplate.marshalSendAndReceive(
-                wsUrl,
-                request,
-                getSoapActionCallback("GetList")
-        );
-
-        Object content = response.getGetListResult().getContent().get(0);
-        if (content instanceof Element) {
-            Element element = (Element) content;
-            Document document = element.getOwnerDocument();
-
-            Node list = document.getChildNodes().item(0);
-            String listId = list.getAttributes().getNamedItem("Name").getNodeValue();
-            logger.info("<listId, viewId> = <{}, {}>", listId, null);
-
-            return new ListViewId(listId, null);
-        }
-        throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
-    }
-
     private SoapActionCallback getSoapActionCallback(String actionName) {
         return new SoapActionCallback("http://schemas.microsoft.com/sharepoint/soap/" + actionName);
     }
 
     public ListViewId getListAndView() {
-        final String actionName = "GetListAndView";
-
         GetListAndView request = objectFactory.createGetListAndView();
         request.setListName(listName);
         request.setViewName("");
@@ -71,13 +46,18 @@ public class SharePointSoapClient {
         GetListAndViewResponse response = (GetListAndViewResponse) webServiceTemplate.marshalSendAndReceive(
                 wsUrl,
                 request,
-                getSoapActionCallback(actionName)
+                getSoapActionCallback("GetListAndView")
         );
 
         Object content = response.getGetListAndViewResult().getContent().get(0);
         if (content instanceof Element) {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
+
+            String filePath = String.format(".%ssrc%stest%sjava%sresources%sxml%sGetListAndView.xml",
+                    File.separator, File.separator, File.separator, File.separator, File.separator, File.separator);
+
+            XmlHelper.documentToXmlFile(document, filePath);
 
             Node listAndViewNode = document.getChildNodes().item(0);
             String listId = listAndViewNode.getChildNodes().item(0).getAttributes().getNamedItem("Name").getNodeValue();
@@ -91,7 +71,7 @@ public class SharePointSoapClient {
     }
 
     public String updateListItems(ListViewId listViewId) {
-        String batchElement = XmlHelper.buildBatchElement(listViewId.viewId());
+        String batchElement = XmlHelper.buildBatchElement(listViewId.viewId(), "aa", "aa");
 
         UpdateListItems request = objectFactory.createUpdateListItems();
         request.setListName(listViewId.listId());
@@ -109,6 +89,7 @@ public class SharePointSoapClient {
         if (content instanceof Element) {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
+            XmlHelper.documentToXmlFile(document, "updateList.xml");
             return XmlHelper.extractListItemId(document);
         }
         logger.error("Weird response from toolkit. Response is not a xml.");

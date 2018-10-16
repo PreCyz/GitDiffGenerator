@@ -147,9 +147,12 @@ public final class XmlHelper {
         return transformer;
     }
 
-    private static void documentToFile(final Document document, String fileName) {
+    public static void documentToXmlFile(final Document document, String filePath) {
+        if (!filePath.endsWith(".xml")) {
+            filePath += filePath + ".xml";
+        }
         try {
-            StreamResult streamResult = new StreamResult(new File(fileName + ".xml"));
+            StreamResult streamResult = new StreamResult(new File(filePath));
             getTransformer().transform(new DOMSource(document), streamResult);
         } catch (Exception ex) {
             logger.error("Error converting to String.", ex);
