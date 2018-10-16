@@ -92,9 +92,9 @@ public final class XmlHelper {
 
             batch.appendChild(method);
 
-            //documentToFile(document, "newItem");
-            logger.info("Done creating XML for upload list.");
+            documentToXmlFile(document, "batchElement.xml");
 
+            logger.info("Done creating XML for upload list.");
             return documentToString(document);
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();
@@ -123,12 +123,13 @@ public final class XmlHelper {
         return transformer;
     }
 
-    public static void documentToXmlFile(final Document document, String filePath) {
-        if (!filePath.endsWith(".xml")) {
-            filePath += filePath + ".xml";
+    public static void documentToXmlFile(final Document document, String fileName) {
+        if (!fileName.endsWith(".xml")) {
+            fileName += fileName + ".xml";
         }
+        fileName = getFullXmlDirPath(fileName);
         try {
-            StreamResult streamResult = new StreamResult(new File(filePath));
+            StreamResult streamResult = new StreamResult(new File(fileName));
             getTransformer().transform(new DOMSource(document), streamResult);
         } catch (Exception ex) {
             logger.error("Error converting to String.", ex);
@@ -169,6 +170,11 @@ public final class XmlHelper {
             retValue = value;
         }
         return retValue;
+    }
+
+    public static String getFullXmlDirPath(String xmlFileName) {
+        return String.format(".%ssrc%stest%sjava%sresources%sxml%s%s",
+                File.separator, File.separator, File.separator, File.separator, File.separator, File.separator, xmlFileName);
     }
 
 }

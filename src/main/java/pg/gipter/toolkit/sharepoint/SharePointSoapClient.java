@@ -12,7 +12,6 @@ import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.ws.*;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,10 +53,7 @@ public class SharePointSoapClient {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
 
-            String filePath = String.format(".%ssrc%stest%sjava%sresources%sxml%sGetListAndView.xml",
-                    File.separator, File.separator, File.separator, File.separator, File.separator, File.separator);
-
-            XmlHelper.documentToXmlFile(document, filePath);
+            XmlHelper.documentToXmlFile(document, "GetListAndView.xml");
 
             Node listAndViewNode = document.getChildNodes().item(0);
             String listId = listAndViewNode.getChildNodes().item(0).getAttributes().getNamedItem("Name").getNodeValue();
