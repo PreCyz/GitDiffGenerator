@@ -27,9 +27,7 @@ class XmlHelperTest {
 
     @Test
     void given_responseUpdateListItemResponse_when_extractListItemId_then_returnId4() throws Exception {
-        String xmlFilePath = String.format(".%ssrc%stest%sjava%sresources%sxml%supdateListItemResponse.xml",
-                File.separator, File.separator, File.separator, File.separator, File.separator, File.separator);
-        xmlFilePath = xmlFilePath.replaceAll("@", File.separator);
+        String xmlFilePath = XmlHelper.getFullXmlDirPath("updateListItemResponse.xml");
 
         String id = XmlHelper.extractListItemId(readXml(xmlFilePath));
 
