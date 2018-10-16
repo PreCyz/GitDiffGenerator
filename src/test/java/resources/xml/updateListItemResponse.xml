@@ -1,0 +1,18 @@
+<Results xmlns="http://schemas.microsoft.com/sharepoint/soap/">
+    <Result ID="1,Update">
+        <ErrorCode>0x00000000</ErrorCode>
+        <z:row ows_ID="4" ows_Title="Title"
+               ows_Modified="2003-06-19 20:31:21"
+               ows_Created="2003-06-18 10:15:58"
+               ows_Author="3;#User1_Display_Name"
+               ows_Editor="7;#User2_Display_Name" ows_owshiddenversion="3"
+               ows_Attachments="-1"
+               ows__ModerationStatus="0" ows_LinkTitleNoMenu="Title"
+               ows_LinkTitle="Title"
+               ows_SelectTitle="4" ows_Order="400.000000000000"
+               ows_GUID="{4962F024-BBA5-4A0B-9EC1-641B731ABFED}"
+               ows_DateColumn="2003-09-04 00:00:00"
+               ows_NumberColumn="791.00000000000000"
+               xmlns:z="#RowsetSchema"/>
+    </Result>
+</Results>
