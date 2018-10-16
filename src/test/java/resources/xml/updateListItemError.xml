@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Results xmlns="http://schemas.microsoft.com/sharepoint/soap/"
+>
+    <Result ID="1,New">
+        <ErrorCode>0x80070005</ErrorCode>
+        <ErrorText>Access denied.
+
+            You do not have permission to perform this action or access this resource.
+        </ErrorText>
+    </Result>
+</Results>
