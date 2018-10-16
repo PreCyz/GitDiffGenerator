@@ -60,7 +60,7 @@ public class DiffUploader {
         } catch (Exception ex) {
             if (ex instanceof SoapFaultClientException) {
                 SoapFaultClientException soapException = (SoapFaultClientException) ex;
-                //XmlHelper.documentToXmlFile(soapException.getSoapFault().getSource(), "wsErrorSoapXml.xml");
+                //XmlHelper.documentToXmlFile(soapException.getSoapFault().getSource(), "wsErrorSoap.xml");
                 String actualErrorMsg = XmlHelper.extractErrorMsg(soapException.getSoapFault().getSource());
                 logger.error(actualErrorMsg, ex);
             } else {

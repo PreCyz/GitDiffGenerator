@@ -1,0 +1,7 @@
+<soap:Fault xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<faultcode>soap:Server</faultcode>
+<faultstring>Exception of type 'Microsoft.SharePoint.SoapServer.SoapServerException' was thrown.</faultstring>
+<detail>
+<errorstring xmlns="http://schemas.microsoft.com/sharepoint/soap/">Data at the root level is invalid. Line 1, position 1.</errorstring>
+</detail>
+</soap:Fault>
