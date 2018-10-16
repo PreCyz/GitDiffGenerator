@@ -97,9 +97,9 @@ public final class XmlHelper {
             logger.info("Done creating XML for upload list.");
             return documentToString(document);
         } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
+            logger.error("Error when building batchElement.", pce);
+            throw new RuntimeException(pce);
         }
-        return "";
     }
 
     private static String documentToString(final Document document) {
