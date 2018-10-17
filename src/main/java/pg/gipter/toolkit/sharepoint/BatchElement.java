@@ -23,7 +23,7 @@ class BatchElement {
     private String viewId;
     private String rootFolder;
     private Document rootDocument;
-    private Element rootDocContent;
+    private Element methodElement;
 
     BatchElement(Mode mode, String viewId, String rootFolder) {
         this.mode = mode;
@@ -31,45 +31,44 @@ class BatchElement {
         this.rootFolder = rootFolder;
     }
 
-    Document getRootDocument() {
-        return rootDocument;
+    Element getBatchElement() {
+        return rootDocument.getDocumentElement();
     }
 
-    void init() {
+    private void init() {
         try {
             DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
             rootDocument = docBuilder.newDocument();
 
-            //Creates the root element
-            Element rootElement = rootDocument.createElement("Batch");
-            rootDocument.appendChild(rootElement);
+            Element batch = rootDocument.createElement("Batch");
+            batch.setAttribute("ListVersion", "1");
+            batch.setAttribute("OnError", "Continue");
+            batch.setAttribute("ViewName", viewId);
+            batch.setAttribute("RootFolder", rootFolder);
 
-            //Creates the batch attributes
-            rootElement.setAttribute("ListVersion", "1");
-            rootElement.setAttribute("OnError", "Continue");
-            rootElement.setAttribute("ViewName", viewId);
-            rootElement.setAttribute("RootFolder", rootFolder);
-            rootDocContent = rootDocument.createElement("Method");
-            rootDocContent.setAttribute("Cmd", mode.cmd);
-            rootDocContent.setAttribute("ID", "1");
-            rootDocument.getElementsByTagName("Batch").item(0).appendChild(rootDocContent);
+            methodElement = rootDocument.createElement("Method");
+            methodElement.setAttribute("Cmd", mode.cmd);
+            methodElement.setAttribute("ID", "1");
+
+
+            batch.appendChild(methodElement);
+            rootDocument.appendChild(batch);
         } catch (ParserConfigurationException ex) {
             throw new RuntimeException(ex.toString());
         }
     }
 
     void createListItem(Map<String, String> fields) {
-        //params check
-        if (rootDocContent != null && this.getRootDocument() != null && fields != null && !fields.isEmpty()) {
+        init();
+        if (fields != null && !fields.isEmpty()) {
             Element createdElement;
-            //Adds attribute by attribute to fields
             for (Map.Entry<String, String> aField : fields.entrySet()) {
-                createdElement = getRootDocument().createElement("Field");
+                createdElement = rootDocument.createElement("Field");
                 createdElement.setAttribute("Name", aField.getKey());
-                Text attributeValue = getRootDocument().createTextNode("" + aField.getValue());
+                Text attributeValue = rootDocument.createTextNode("" + aField.getValue());
                 createdElement.appendChild(attributeValue);
-                rootDocContent.appendChild(createdElement);
+                methodElement.appendChild(createdElement);
             }
         }
     }

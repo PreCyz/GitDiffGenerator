@@ -81,13 +81,10 @@ public class SharePointSoapClient {
         itemAttributes.put("Body", "Git diff file");
 
         BatchElement batchElement = new BatchElement(BatchElement.Mode.CREATE, listViewId.viewId(), rootFolder);
-        batchElement.init();
         batchElement.createListItem(itemAttributes);
-        logger.info("REQUEST: \n{}", XmlHelper.documentToString(batchElement.getRootDocument()));
 
         UpdateListItems.Updates updates = objectFactory.createUpdateListItemsUpdates();
-        Object docObj = batchElement.getRootDocument().getDocumentElement();
-        updates.getContent().add(docObj);
+        updates.getContent().add(batchElement.getBatchElement());
 
         UpdateListItems request = objectFactory.createUpdateListItems();
         request.setListName(listViewId.listId());
@@ -105,7 +102,8 @@ public class SharePointSoapClient {
             Document document = element.getOwnerDocument();
 
             Optional<String> errorCode = XmlHelper.extractValue(document, "ErrorCode");
-            if (errorCode.isPresent() && !"0x00000000".equals(errorCode.get())) {
+            String codeOfSuccess = "0x00000000";
+            if (errorCode.isPresent() && !codeOfSuccess.equals(errorCode.get())) {
                 Optional<String> errorText = XmlHelper.extractValue(document, "ErrorText");
                 errorText.ifPresent(txt -> {
                     logger.error("Error when UpdateListItems. Response error code {} with message {}", errorCode.get(), txt);
