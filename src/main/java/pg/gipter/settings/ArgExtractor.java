@@ -1,8 +1,9 @@
 package pg.gipter.settings;
 
+import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.command.VersionControlSystem;
-import pg.gipter.producer.util.StringUtils;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -24,7 +25,8 @@ final class ArgExtractor {
         endDate(LocalDate.now().format(yyyy_MM_dd)),
         itemFileName(""),
         versionControlSystem(VersionControlSystem.GIT.name()),
-        codeProtected("false"),
+        codeProtection(CodeProtection.NONE.name()),
+        statementPath(""),
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
         toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
         toolkitDomain("NCDMZ"),
@@ -73,6 +75,9 @@ final class ArgExtractor {
 
     String itemPath() {
         if (hasArgs()) {
+            if (codeProtection() == CodeProtection.STATEMENT) {
+                return statementPath();
+            }
             return getValue(ArgName.itemPath, ArgName.itemPath.defaultValue());
         }
         return ArgName.itemPath.defaultValue();
@@ -118,9 +123,12 @@ final class ArgExtractor {
 
     String itemFileName() {
         if (hasArgs()) {
+            if (codeProtection() == CodeProtection.STATEMENT) {
+                return new File(statementPath()).getName();
+            }
             return getValue(ArgName.itemFileName, ArgName.itemFileName.defaultValue());
         }
-        return ArgName.itemFileName.defaultValue();
+        return codeProtection() == CodeProtection.STATEMENT ? new File(statementPath()).getName() : ArgName.itemFileName.defaultValue();
     }
 
     VersionControlSystem versionControlSystem() {
@@ -131,12 +139,19 @@ final class ArgExtractor {
         return VersionControlSystem.valueOf(ArgName.versionControlSystem.defaultValue());
     }
 
-    boolean codeProtected() {
+    CodeProtection codeProtection() {
         if (hasArgs()) {
-            String codeProtected = getValue(ArgName.codeProtected, ArgName.codeProtected.defaultValue());
-            return StringUtils.getBoolean(codeProtected);
+            String codeProtection = getValue(ArgName.codeProtection, ArgName.codeProtection.defaultValue());
+            return CodeProtection.valueFor(codeProtection);
         }
-        return StringUtils.getBoolean(ArgName.codeProtected.defaultValue());
+        return CodeProtection.valueFor(ArgName.codeProtection.defaultValue());
+    }
+
+    String statementPath() {
+        if (hasArgs()) {
+            return getValue(ArgName.statementPath, ArgName.statementPath.defaultValue());
+        }
+        return ArgName.statementPath.defaultValue();
     }
 
     String toolkitUsername() {

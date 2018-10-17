@@ -7,6 +7,7 @@ public enum VersionControlSystem {
     GIT, MERCURIAL, SVN;
 
     public static VersionControlSystem valueFor(String value) {
+        String errMsg;
         try {
             return VersionControlSystem.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
@@ -14,9 +15,9 @@ public enum VersionControlSystem {
                     .stream()
                     .map(VersionControlSystem::name)
                     .collect(Collectors.joining(", "));
-            System.err.printf("Given value [%s] is not supported. Supported version control systems are: [%s]%n",
+            errMsg = String.format("Given value [%s] is not supported. Supported version control systems are: [%s]%n",
                     value, String.join(", ", supportedVcs));
         }
-        throw new IllegalArgumentException("Not implemented yet!!!");
+        throw new IllegalArgumentException(errMsg);
     }
 }

@@ -21,8 +21,8 @@ class GitDiffCommandTest {
     private GitDiffCommand command;
 
     @Test
-    void given_notProtectedCode_when_getInitialCommand_then_returnInitialCommandForNotProtectedCode() {
-        when(applicationProperties.codeProtected()).thenReturn(false);
+    void given_codeProtectionNONE_when_getInitialCommand_then_returnInitialCommandForNotProtectionNONE() {
+        when(applicationProperties.codeProtection()).thenReturn(CodeProtection.NONE);
         command = new GitDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -31,8 +31,8 @@ class GitDiffCommandTest {
     }
 
     @Test
-    void given_protectedCode_when_getInitialCommand_then_returnInitialCommandForNotProtectedCode() {
-        when(applicationProperties.codeProtected()).thenReturn(true);
+    void given_codeProtectionSIMPLE_when_getInitialCommand_then_returnInitialCommandForProtectionSIMPLE() {
+        when(applicationProperties.codeProtection()).thenReturn(CodeProtection.SIMPLE);
         command = new GitDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -46,13 +46,13 @@ class GitDiffCommandTest {
         String committerEmail="test@email.com";
         LocalDate startDate = LocalDate.now().minusDays(7);
         LocalDate endDate = LocalDate.now();
-        boolean codeProtected = false;
+        CodeProtection codeProtection = CodeProtection.NONE;
 
         when(applicationProperties.author()).thenReturn(author);
         when(applicationProperties.committerEmail()).thenReturn(committerEmail);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
-        when(applicationProperties.codeProtected()).thenReturn(codeProtected);
+        when(applicationProperties.codeProtection()).thenReturn(codeProtection);
         command = new GitDiffCommand(applicationProperties);
 
         List<String> actual = command.commandAsList();
@@ -70,12 +70,12 @@ class GitDiffCommandTest {
         String author = "testAuthor";
         LocalDate startDate = LocalDate.now().minusDays(7);
         LocalDate endDate = LocalDate.now();
-        boolean codeProtected = false;
+        CodeProtection codeProtection = CodeProtection.NONE;
 
         when(applicationProperties.author()).thenReturn(author);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
-        when(applicationProperties.codeProtected()).thenReturn(codeProtected);
+        when(applicationProperties.codeProtection()).thenReturn(codeProtection);
         command = new GitDiffCommand(applicationProperties);
 
         List<String> actual = command.commandAsList();

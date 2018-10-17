@@ -1,6 +1,7 @@
 package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
+import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.command.VersionControlSystem;
 
 import java.time.LocalDate;
@@ -246,54 +247,39 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_noCodeProtected_when_codeProtected_then_returnFalse() {
+    void given_noCodeProtection_when_codeProtection_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
-        boolean actual = argExtractor.codeProtected();
+        CodeProtection actual = argExtractor.codeProtection();
 
-        assertThat(actual).isFalse();
+        assertThat(actual).isEqualTo(CodeProtection.NONE);
     }
 
     @Test
-    void given_codeProtectedSetAsNo_when_codeProtected_then_returnFalse() {
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=no"});
+    void given_codeProtectedSetAsNone_when_codeProtection_then_returnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"codeProtection=None"});
 
-        boolean actual = argExtractor.codeProtected();
+        CodeProtection actual = argExtractor.codeProtection();
 
-        assertThat(actual).isFalse();
+        assertThat(actual).isEqualTo(CodeProtection.NONE);
     }
 
     @Test
-    void given_codeProtectedSetAsYes_when_codeProtected_then_returnTrue() {
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=yes"});
+    void given_codeProtectedSetAsSimple_when_codeProtection_then_returnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"codeProtection=simple"});
 
-        boolean actual = argExtractor.codeProtected();
+        CodeProtection actual = argExtractor.codeProtection();
 
-        assertThat(actual).isTrue();
+        assertThat(actual).isEqualTo(CodeProtection.SIMPLE);
     }
 
     @Test
-    void given_allPossibleValuesForCodeProtected_when_codeProtected_then_returnAlwaysTrue() {
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=yes"});
-        boolean actual = argExtractor.codeProtected();
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=y"});
-        actual &= argExtractor.codeProtected();
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=Yes"});
-        actual &= argExtractor.codeProtected();
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=YES"});
-        actual &= argExtractor.codeProtected();
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=t"});
-        actual &= argExtractor.codeProtected();
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=true"});
-        actual &= argExtractor.codeProtected();
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=T"});
-        actual &= argExtractor.codeProtected();
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=TRUE"});
-        actual &= argExtractor.codeProtected();
-        argExtractor = new ArgExtractor(new String[]{"codeProtected=True"});
-        actual &= argExtractor.codeProtected();
+    void given_codeProtectedSetAsStatement_when_codeProtection_then_returnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"codeProtection=STaTeMeNt"});
 
-        assertThat(actual).isTrue();
+        CodeProtection actual = argExtractor.codeProtection();
+
+        assertThat(actual).isEqualTo(CodeProtection.STATEMENT);
     }
 
     @Test

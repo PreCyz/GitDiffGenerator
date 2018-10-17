@@ -36,11 +36,14 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
     @Override
     List<String> getInitialCommand() {
         LinkedList<String> initialCommand = new LinkedList<>(Arrays.asList("hg", "log"));
-        if (appProps.codeProtected()) {
-            initialCommand.add("--style");
-            initialCommand.add("changelog");
-        } else {
-            initialCommand.add("--patch");
+        switch (appProps.codeProtection()) {
+            case NONE:
+                initialCommand.add("--patch");
+                break;
+            case SIMPLE:
+                initialCommand.add("--style");
+                initialCommand.add("changelog");
+                break;
         }
         return initialCommand;
     }

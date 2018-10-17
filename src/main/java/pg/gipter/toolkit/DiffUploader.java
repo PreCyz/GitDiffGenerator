@@ -53,7 +53,7 @@ public class DiffUploader {
             ListViewId listViewId = sharePointSoapClient.getListAndView();
 
             String fileName = applicationProperties.fileName();
-            String title = fileName.substring(0, fileName.indexOf(".txt"));
+            String title = fileName.substring(0, fileName.indexOf("."));
             String listItemId = sharePointSoapClient.updateListItems(
                     listViewId,
                     title,
@@ -70,6 +70,7 @@ public class DiffUploader {
             } else {
                 logger.error("Error during upload diff.", ex);
             }
+            throw new RuntimeException(ex);
         }
     }
 }

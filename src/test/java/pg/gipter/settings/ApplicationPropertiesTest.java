@@ -45,6 +45,37 @@ class ApplicationPropertiesTest {
     }
 
     @Test
+    void given_statement_when_fileName_then_returnFileNameForStatement() {
+        appProps = new ApplicationProperties(new String[]{
+                "codeProtection=statement",
+                "statementPath=/home/gawa/IdeaProjects/GitDiffGenerator/src/test/java/resources/xml/batchElement.xml"
+        });
+        LocalDate now = LocalDate.now();
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
+        String fileName = String.format("%d-%s-week-%d.txt", now.getYear(), now.getMonth().name(), weekNumber).toLowerCase();
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).isEqualTo(fileName);
+    }
+
+    @Test
+    void given_onlyOneParameterForStatement_when_fileName_then_returnIncompleteFileName() {
+        appProps = new ApplicationProperties(new String[]{
+                "codeProtection=statement"
+        });
+        LocalDate now = LocalDate.now();
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
+        String fileName = String.format("%d-%s-week-%d.txt", now.getYear(), now.getMonth().name(), weekNumber).toLowerCase();
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).isEqualTo(fileName);
+    }
+
+    @Test
     void given_itemFileNameFromCommandLine_when_fileName_then_returnThatFileName() {
         appProps = new ApplicationProperties(new String[]{"itemFileName=fileName"});
 

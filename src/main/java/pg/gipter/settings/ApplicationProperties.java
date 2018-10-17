@@ -2,8 +2,8 @@ package pg.gipter.settings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.command.VersionControlSystem;
-import pg.gipter.producer.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,11 +32,11 @@ public class ApplicationProperties {
         try (InputStream is = new FileInputStream(APPLICATION_PROPERTIES)) {
             properties = new Properties();
             properties.load(is);
-            logger.info("Properties loaded [{}]", log());
+            logger.info("Properties from file loaded [{}]", log());
         } catch (IOException | NullPointerException e) {
             logger.warn("Can not read [{}].", APPLICATION_PROPERTIES);
             properties = null;
-            logger.info("Program argument loaded: {}", Arrays.toString(args));
+            logger.info("Command line argument loaded: {}", Arrays.toString(args));
         }
     }
 
@@ -52,6 +52,9 @@ public class ApplicationProperties {
     }
 
     public String itemPath() {
+        if (codeProtection() == CodeProtection.STATEMENT) {
+            return statementPath();
+        }
         String itemPath = argExtractor.itemPath();
         if (hasProperties()) {
             itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), itemPath);
@@ -64,7 +67,7 @@ public class ApplicationProperties {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
         String fileName = String.format("%d-%s-week-%d.txt", now.getYear(), now.getMonth().name(), weekNumber).toLowerCase();
-        if (!itemFileName().isEmpty()) {
+        if (!itemFileName().isEmpty() && codeProtection() != CodeProtection.STATEMENT) {
             DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
             fileName = String.format("%s-%s-%s.txt", itemFileName(), startDate().format(yyyyMMdd), endDate().format(yyyyMMdd));
         }
@@ -73,6 +76,9 @@ public class ApplicationProperties {
 
     private String itemFileName() {
         if (hasProperties()) {
+            if (codeProtection() == CodeProtection.STATEMENT) {
+                return new File(statementPath()).getName();
+            }
             return properties.getProperty(ArgExtractor.ArgName.itemFileName.name(), argExtractor.itemFileName());
         }
         return argExtractor.itemFileName();
@@ -135,14 +141,21 @@ public class ApplicationProperties {
         return argExtractor.versionControlSystem();
     }
 
-    public boolean codeProtected() {
+    public CodeProtection codeProtection() {
         if (hasProperties()) {
             String codeProtected = properties.getProperty(
-                    ArgExtractor.ArgName.codeProtected.name(), ArgExtractor.ArgName.codeProtected.defaultValue()
+                    ArgExtractor.ArgName.codeProtection.name(), ArgExtractor.ArgName.codeProtection.defaultValue()
             );
-            return StringUtils.getBoolean(codeProtected);
+            return CodeProtection.valueFor(codeProtected);
         }
-        return argExtractor.codeProtected();
+        return argExtractor.codeProtection();
+    }
+
+    public String statementPath() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgExtractor.ArgName.statementPath.name(), argExtractor.statementPath());
+        }
+        return argExtractor.statementPath();
     }
 
     public String toolkitUsername() {
@@ -176,7 +189,7 @@ public class ApplicationProperties {
         return argExtractor.toolkitDomain();
     }
 
-    public String toolkitUrl() {
+    private String toolkitUrl() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.toolkitUrl.name(), argExtractor.toolkitUrl());
         }
@@ -207,14 +220,21 @@ public class ApplicationProperties {
         return  "author='" + author() + '\'' +
                 ", committerEmail='" + committerEmail() + '\'' +
                 ", itemPath='" + itemPath() + '\'' +
+                ", fileName='" + fileName() + '\'' +
                 ", projectPath='" + String.join(",", projectPaths()) + '\'' +
                 ", days='" + days() + '\'' +
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
                 ", versionControlSystem='" + versionControlSystem() + '\'' +
-                ", codeProtected='" + codeProtected() + '\'' +
+                ", codeProtection='" + codeProtection() + '\'' +
+                ", statementPath='" + statementPath() + '\'' +
                 ", toolkitPropertiesSet='" + isToolkitPropertiesSet() + '\'' +
                 ", toolkitUrl='" + toolkitUrl() + '\'' +
-                ", toolkitListName='" + toolkitListName() + '\'';
+                ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
+                ", toolkitDomain='" + toolkitDomain() + '\'' +
+                ", toolkitListName='" + toolkitListName() + '\'' +
+                ", toolkitUserEmail='" + toolkitUserEmail()+ '\'' +
+                ", toolkitUserFolder='" + toolkitUserFolder()+ '\''
+                ;
     }
 }
