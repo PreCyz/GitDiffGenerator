@@ -15,6 +15,11 @@ import pg.gipter.toolkit.ws.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**Created by Pawel Gawedzki on 12-Oct-2018.*/
 public class SharePointSoapClient {
@@ -66,13 +71,27 @@ public class SharePointSoapClient {
         throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
-    public String updateListItems(ListViewId listViewId, String title, String user) {
-        String batchElement = XmlHelper.buildBatchElement(listViewId.viewId(), title, user);
+    public String updateListItems(ListViewId listViewId, String title, String employee) {
+        Map<String, String> itemAttributes = new HashMap<>();
+        itemAttributes.put("Title", title);
+        itemAttributes.put("Employee", employee);
+        itemAttributes.put("SubmissionDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-M-dd'T'HH:mm:ss'Z'")));
+        itemAttributes.put("Classification", "12");
+        itemAttributes.put("Body", "Git diff file");
+
+        //Building the CAML query with one item to add, and printing request
+        BatchElement batchElement = new BatchElement(BatchElement.Mode.CREATE, listViewId.viewId());
+        batchElement.init();
+        batchElement.createListItem(itemAttributes);
+        logger.info("REQUEST: {}", XmlHelper.documentToString(batchElement.getRootDocument()));
+
+        UpdateListItems.Updates updates = objectFactory.createUpdateListItemsUpdates();
+        //Preparing the request for the update
+        Object docObj = batchElement.getRootDocument().getDocumentElement();
+        updates.getContent().add(0, docObj);
 
         UpdateListItems request = objectFactory.createUpdateListItems();
         request.setListName(listViewId.listId());
-        UpdateListItems.Updates updates = objectFactory.createUpdateListItemsUpdates();
-        updates.getContent().add(batchElement);
         request.setUpdates(updates);
 
         UpdateListItemsResponse response = (UpdateListItemsResponse) webServiceTemplate.marshalSendAndReceive(
@@ -85,7 +104,16 @@ public class SharePointSoapClient {
         if (content instanceof Element) {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
-            XmlHelper.documentToXmlFile(document, "UpdateListItems.xml");
+            XmlHelper.documentToXmlFile(document, "updateList.xml");
+            Optional<String> errorCode = XmlHelper.extractValue(document, "ErrorCode");
+            if (errorCode.isPresent() && !"0x00000000".equals(errorCode.get())) {
+                Optional<String> errorText = XmlHelper.extractValue(document, "ErrorText");
+                errorText.ifPresent(txt -> {
+                    logger.error("Error when UpdateListItems. Response error code {} with message {}", errorCode.get(), txt);
+                    throw new RuntimeException(errorText.get());
+                });
+                throw new RuntimeException(errorCode.get());
+            }
             return XmlHelper.extractListItemId(document);
         }
         logger.error("Weird response from toolkit. Response is not a xml.");

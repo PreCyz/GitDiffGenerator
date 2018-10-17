@@ -4,7 +4,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,9 +12,9 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.io.IOException;
 import java.io.StringWriter;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static pg.gipter.Main.yyyy_MM_dd;
 
@@ -103,7 +102,7 @@ public final class XmlHelper {
         }
     }
 
-    private static String documentToString(final Document document) {
+    public static String documentToString(final Document document) {
         return documentToString(new DOMSource(document));
     }
 
@@ -171,8 +170,7 @@ public final class XmlHelper {
             String[] result = value.split(";#");
             if (result.length > 2) {
                 retValue = String.join("; ", result);
-            }
-            else {
+            } else {
                 retValue = result[1];
             }
         } else {
@@ -186,26 +184,40 @@ public final class XmlHelper {
                 File.separator, File.separator, File.separator, File.separator, File.separator, File.separator, xmlFileName);
     }
 
-    public static String extractErrorMsg(Source source) {
+    public static Document xmlToDocument(final Source source) {
         try {
-            StringWriter sw = new StringWriter();
-            getTransformer().transform(source, new StreamResult(sw));
+            StringWriter stringWriter = new StringWriter();
+            StreamResult streamResult = new StreamResult(stringWriter);
+            getTransformer().transform(source, streamResult);
+
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(IOUtils.toInputStream(sw.toString(), "UTF-8"));
-            NodeList nodeList = document.getElementsByTagName("errorstring");
-            StringBuilder strBuilder = new StringBuilder();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                strBuilder.append(",").append(nodeList.item(i).getTextContent());
-            }
-            if (strBuilder.length() > 0) {
-                return strBuilder.toString().substring(1);
-            }
-            return strBuilder.toString();
-        } catch (TransformerException | ParserConfigurationException | SAXException | IOException e) {
-            logger.error("Error when extracting message.", e);
+            DocumentBuilder parser = factory.newDocumentBuilder();
+            return parser.parse(IOUtils.toInputStream(stringWriter.toString(), "UTF-8"));
+        } catch (Exception ex) {
+            logger.error("Error converting to String.", ex);
+            throw new RuntimeException("Error converting to String", ex);
         }
-        return null;
+    }
+
+    public static String extractErrorMessage(Source source) {
+        Document document = xmlToDocument(source);
+        NodeList errorStr = document.getElementsByTagName("errorstring");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < errorStr.getLength(); i++) {
+            stringBuilder.append(",").append(errorStr.item(i).getTextContent());
+        }
+        if (stringBuilder.length() > 0) {
+            return stringBuilder.toString().substring(1);
+        }
+        return stringBuilder.toString();
+    }
+
+    public static Optional<String> extractValue(Document document, String tagName) {
+        NodeList nodeList = document.getElementsByTagName(tagName);
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            return Optional.ofNullable(nodeList.item(i).getTextContent());
+        }
+        return Optional.empty();
     }
 
 }

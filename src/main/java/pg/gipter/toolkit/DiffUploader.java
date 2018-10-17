@@ -49,8 +49,6 @@ public class DiffUploader {
     public void uploadDiff() {
         try {
             SharePointSoapClient sharePointSoapClient = springContext.getBean(SharePointSoapClient.class);
-            //System.out.println("Getting list from SharePoint.");
-            //sharePointClient.getList();
             logger.info("Getting list and view from SharePoint.");
             ListViewId ids = sharePointSoapClient.getListAndView();
             String fileName = applicationProperties.fileName();
@@ -59,10 +57,10 @@ public class DiffUploader {
             sharePointSoapClient.addAttachment(listItemId, fileName, applicationProperties.itemPath());
         } catch (Exception ex) {
             if (ex instanceof SoapFaultClientException) {
-                SoapFaultClientException soapException = (SoapFaultClientException) ex;
-                //XmlHelper.documentToXmlFile(soapException.getSoapFault().getSource(), "wsErrorSoap.xml");
-                String actualErrorMsg = XmlHelper.extractErrorMsg(soapException.getSoapFault().getSource());
-                logger.error(actualErrorMsg, ex);
+                SoapFaultClientException sfce = (SoapFaultClientException) ex;
+                //XmlHelper.documentToXmlFile(sfce.getSoapFault().getSource(), "wsErrorSoap.xml");
+                String errorMsg = XmlHelper.extractErrorMessage(sfce.getSoapFault().getSource());
+                logger.error("Error during upload diff. {}", errorMsg);
             } else {
                 logger.error("Error during upload diff.", ex);
             }
