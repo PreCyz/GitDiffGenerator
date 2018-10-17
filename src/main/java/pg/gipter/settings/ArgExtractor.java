@@ -28,8 +28,11 @@ final class ArgExtractor {
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
         toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
         toolkitDomain("NCDMZ"),
-        toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx"),
-        toolkitListName("WorkItems");
+        toolkitListName("WorkItems"),
+        toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY"),
+        toolkitWSUrl(toolkitUrl.defaultValue + "/_vti_bin/lists.asmx"),
+        toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/"),
+        emailDomain("@netcompany.com");
 
         private String defaultValue;
 
@@ -143,6 +146,14 @@ final class ArgExtractor {
         return ArgName.toolkitUsername.defaultValue();
     }
 
+    String emailDomain() {
+        return ArgName.emailDomain.defaultValue();
+    }
+
+    String toolkitUserEmail() {
+        return toolkitUsername() + emailDomain();
+    }
+
     String toolkitPassword() {
         if (hasArgs()) {
             return getValue(ArgName.toolkitPassword, ArgName.toolkitPassword.defaultValue());
@@ -151,24 +162,23 @@ final class ArgExtractor {
     }
 
     String toolkitDomain() {
-        /*if (hasArgs()) {
-            return getValue(ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
-        }*/
         return ArgName.toolkitDomain.defaultValue();
     }
 
     String toolkitUrl() {
-        /*if (hasArgs()) {
-            return getValue(ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
-        }*/
         return ArgName.toolkitUrl.defaultValue();
     }
 
     String toolkitListName() {
-        /*if (hasArgs()) {
-            return getValue(ArgName.toolkitDomain, ArgName.toolkitDomain.defaultValue());
-        }*/
         return ArgName.toolkitListName.defaultValue();
+    }
+
+    String toolkitWSUrl() {
+        return ArgName.toolkitWSUrl.defaultValue();
+    }
+
+    String toolkitUserFolder() {
+        return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
     }
 
 }

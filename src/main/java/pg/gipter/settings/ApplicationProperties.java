@@ -152,6 +152,16 @@ public class ApplicationProperties {
         return argExtractor.toolkitUsername();
     }
 
+    public String toolkitUserEmail() {
+        if (hasProperties()) {
+            String userName = properties.getProperty(ArgExtractor.ArgName.toolkitUsername.name());
+            if (userName == null || userName.isEmpty()) {
+                return userName + argExtractor.emailDomain();
+            }
+        }
+        return argExtractor.toolkitUserEmail();
+    }
+
     public String toolkitPassword() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.toolkitPassword.name(), argExtractor.toolkitPassword());
@@ -178,6 +188,14 @@ public class ApplicationProperties {
             return properties.getProperty(ArgExtractor.ArgName.toolkitListName.name(), argExtractor.toolkitListName());
         }
         return argExtractor.toolkitListName();
+    }
+
+    public String toolkitWSUrl() {
+        return argExtractor.toolkitWSUrl();
+    }
+
+    public String toolkitUserFolder() {
+        return argExtractor.toolkitUserFolder();
     }
 
     public boolean isToolkitPropertiesSet() {
