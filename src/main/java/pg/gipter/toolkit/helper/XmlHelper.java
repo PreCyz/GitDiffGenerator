@@ -3,104 +3,25 @@ package pg.gipter.toolkit.helper;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.StringWriter;
-import java.time.LocalDate;
 import java.util.Optional;
-
-import static pg.gipter.Main.yyyy_MM_dd;
 
 public final class XmlHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(XmlHelper.class);
 
     private XmlHelper() { }
-
-    public static String buildBatchElement(String viewId, String titleTxt, String employeeTxt) {
-        try {
-            DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
-            Document document = documentBuilder.newDocument();
-            // root element
-
-            Element batch = document.createElement("Batch");
-            document.appendChild(batch);
-            Attr onError = document.createAttribute("OnError");
-            onError.setValue("Continue");
-            Attr listVersion = document.createAttribute("ListVersion");
-            listVersion.setValue("1");
-            Attr viewName = document.createAttribute("ViewName");
-            viewName.setValue(viewId);
-
-            batch.setAttributeNode(onError);
-            batch.setAttributeNode(listVersion);
-            batch.setAttributeNode(viewName);
-
-            // employee element
-            Element method = document.createElement("Method");
-            Attr id = document.createAttribute("ID");
-            id.setValue("4");
-            Attr cmd = document.createAttribute("Cmd");
-            cmd.setValue("New");
-            method.setAttributeNode(id);
-            method.setAttributeNode(cmd);
-
-            Element title = document.createElement("Field");
-            Attr name = document.createAttribute("Name");
-            name.setValue("Title");
-            title.setAttributeNode(name);
-            title.setTextContent(titleTxt);
-
-            Element employee = document.createElement("Field");
-            name = document.createAttribute("Name");
-            name.setValue("Employee");
-            employee.setAttributeNode(name);
-            employee.setTextContent(employeeTxt);
-
-            Element submissionDate = document.createElement("Field");
-            name = document.createAttribute("Name");
-            name.setValue("SubmissionDate");
-            submissionDate.setAttributeNode(name);
-            submissionDate.setTextContent(LocalDate.now().format(yyyy_MM_dd));
-
-            Element classification = document.createElement("Field");
-            name = document.createAttribute("Name");
-            name.setValue("Classification");
-            classification.setAttributeNode(name);
-            classification.setTextContent("12"); //Changeset (repository change report)
-
-            Element description = document.createElement("Field");
-            name = document.createAttribute("Name");
-            name.setValue("Body");
-            description.setAttributeNode(name);
-            description.setTextContent("Git diff file.");
-
-            method.appendChild(title);
-            method.appendChild(employee);
-            method.appendChild(submissionDate);
-            method.appendChild(classification);
-            method.appendChild(description);
-
-            batch.appendChild(method);
-            batch.normalize();
-
-            //documentToXmlFile(document, "batchElement.xml");
-
-            logger.info("Done creating XML for upload list.");
-            return documentToString(document);
-        } catch (ParserConfigurationException pce) {
-            logger.error("Error when building batchElement.", pce);
-            throw new RuntimeException(pce);
-        }
-    }
 
     public static String documentToString(final Document document) {
         return documentToString(new DOMSource(document));
@@ -131,7 +52,7 @@ public final class XmlHelper {
         documentToXmlFile(new DOMSource(document), fileName);
     }
 
-    public static void documentToXmlFile(final Source source, String fileName) {
+    private static void documentToXmlFile(final Source source, String fileName) {
         if (!fileName.endsWith(".xml")) {
             fileName += fileName + ".xml";
         }
@@ -156,7 +77,7 @@ public final class XmlHelper {
                 break;
             }
         }
-        logger.info("ows_ID = {}", owsId);
+        logger.info("New item id: ows_ID = {}", owsId);
         return owsId;
     }
 
@@ -179,12 +100,12 @@ public final class XmlHelper {
         return retValue;
     }
 
-    public static String getFullXmlDirPath(String xmlFileName) {
+    private static String getFullXmlDirPath(String xmlFileName) {
         return String.format(".%ssrc%stest%sjava%sresources%sxml%s%s",
                 File.separator, File.separator, File.separator, File.separator, File.separator, File.separator, xmlFileName);
     }
 
-    public static Document xmlToDocument(final Source source) {
+    private static Document xmlToDocument(final Source source) {
         try {
             StringWriter stringWriter = new StringWriter();
             StreamResult streamResult = new StreamResult(stringWriter);
@@ -214,10 +135,7 @@ public final class XmlHelper {
 
     public static Optional<String> extractValue(Document document, String tagName) {
         NodeList nodeList = document.getElementsByTagName(tagName);
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            return Optional.ofNullable(nodeList.item(i).getTextContent());
-        }
-        return Optional.empty();
+        return Optional.ofNullable(nodeList.item(0).getTextContent());
     }
 
 }
