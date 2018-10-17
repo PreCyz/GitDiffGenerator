@@ -37,14 +37,9 @@ public class SharePointConfiguration {
 
     @Bean
     public SharePointSoapClient sharePointSoapClient(WebServiceMessageSender messageSender,
-                                                 @Value("${toolkit.url}") String wsUrl,
+                                                 @Value("${toolkit.WSUrl}") String wsUrl,
                                                  @Value("${toolkit.listName}") String listName) {
         return new SharePointSoapClient(webServiceTemplate(marshaller(), messageSender), wsUrl, listName);
-    }
-
-    @Bean
-    public SharePointRestClient sharePointRestClient(@Value("${toolkit.url}") String wsUrl, @Value("${toolkit.listName}") String listName) {
-        return new SharePointRestClient(wsUrl, listName);
     }
 
 }

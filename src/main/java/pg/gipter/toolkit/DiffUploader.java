@@ -41,7 +41,7 @@ public class DiffUploader {
         toolkitProperties.put("toolkit.username", applicationProperties.toolkitUsername());
         toolkitProperties.put("toolkit.password", applicationProperties.toolkitPassword());
         toolkitProperties.put("toolkit.domain", applicationProperties.toolkitDomain());
-        toolkitProperties.put("toolkit.url", applicationProperties.toolkitUrl());
+        toolkitProperties.put("toolkit.WSUrl", applicationProperties.toolkitWSUrl());
         toolkitProperties.put("toolkit.listName", applicationProperties.toolkitListName());
         environment.getPropertySources().addLast(new PropertiesPropertySource("toolkit", toolkitProperties));
     }
@@ -50,15 +50,21 @@ public class DiffUploader {
         try {
             SharePointSoapClient sharePointSoapClient = springContext.getBean(SharePointSoapClient.class);
             logger.info("Getting list and view from SharePoint.");
-            ListViewId ids = sharePointSoapClient.getListAndView();
+            ListViewId listViewId = sharePointSoapClient.getListAndView();
+
             String fileName = applicationProperties.fileName();
             String title = fileName.substring(0, fileName.indexOf(".txt"));
-            String listItemId = sharePointSoapClient.updateListItems(ids, title, applicationProperties.toolkitUsername());
+            String listItemId = sharePointSoapClient.updateListItems(
+                    listViewId,
+                    title,
+                    applicationProperties.toolkitUserEmail(),
+                    applicationProperties.toolkitUserFolder()
+            );
+
             sharePointSoapClient.addAttachment(listItemId, fileName, applicationProperties.itemPath());
         } catch (Exception ex) {
             if (ex instanceof SoapFaultClientException) {
                 SoapFaultClientException sfce = (SoapFaultClientException) ex;
-                //XmlHelper.documentToXmlFile(sfce.getSoapFault().getSource(), "wsErrorSoap.xml");
                 String errorMsg = XmlHelper.extractErrorMessage(sfce.getSoapFault().getSource());
                 logger.error("Error during upload diff. {}", errorMsg);
             } else {

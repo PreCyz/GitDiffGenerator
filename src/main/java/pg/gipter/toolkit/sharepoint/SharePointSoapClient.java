@@ -20,6 +20,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**Created by Pawel Gawedzki on 12-Oct-2018.*/
 public class SharePointSoapClient {
@@ -58,8 +61,6 @@ public class SharePointSoapClient {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
 
-            //XmlHelper.documentToXmlFile(document, "GetListAndView.xml");
-
             Node listAndViewNode = document.getChildNodes().item(0);
             String listId = listAndViewNode.getChildNodes().item(0).getAttributes().getNamedItem("Name").getNodeValue();
             String viewId = listAndViewNode.getChildNodes().item(1).getAttributes().getNamedItem("Name").getNodeValue();
@@ -71,24 +72,22 @@ public class SharePointSoapClient {
         throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
-    public String updateListItems(ListViewId listViewId, String title, String employee) {
+    public String updateListItems(ListViewId listViewId, String title, String userEmail, String rootFolder) {
         Map<String, String> itemAttributes = new HashMap<>();
         itemAttributes.put("Title", title);
-        itemAttributes.put("Employee", employee);
-        itemAttributes.put("SubmissionDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-M-dd'T'HH:mm:ss'Z'")));
-        itemAttributes.put("Classification", "12");
+        itemAttributes.put("Employee", "-1;#" + userEmail);
+        itemAttributes.put("SubmissionDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")));
+        itemAttributes.put("Classification", "12;#Changeset (repository change report)");
         itemAttributes.put("Body", "Git diff file");
 
-        //Building the CAML query with one item to add, and printing request
-        BatchElement batchElement = new BatchElement(BatchElement.Mode.CREATE, listViewId.viewId());
+        BatchElement batchElement = new BatchElement(BatchElement.Mode.CREATE, listViewId.viewId(), rootFolder);
         batchElement.init();
         batchElement.createListItem(itemAttributes);
-        logger.info("REQUEST: {}", XmlHelper.documentToString(batchElement.getRootDocument()));
+        logger.info("REQUEST: \n{}", XmlHelper.documentToString(batchElement.getRootDocument()));
 
         UpdateListItems.Updates updates = objectFactory.createUpdateListItemsUpdates();
-        //Preparing the request for the update
         Object docObj = batchElement.getRootDocument().getDocumentElement();
-        updates.getContent().add(0, docObj);
+        updates.getContent().add(docObj);
 
         UpdateListItems request = objectFactory.createUpdateListItems();
         request.setListName(listViewId.listId());
@@ -104,7 +103,7 @@ public class SharePointSoapClient {
         if (content instanceof Element) {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
-            XmlHelper.documentToXmlFile(document, "updateList.xml");
+
             Optional<String> errorCode = XmlHelper.extractValue(document, "ErrorCode");
             if (errorCode.isPresent() && !"0x00000000".equals(errorCode.get())) {
                 Optional<String> errorText = XmlHelper.extractValue(document, "ErrorText");
@@ -121,6 +120,22 @@ public class SharePointSoapClient {
     }
 
     public void addAttachment(String listItemId, String fileName, String attachmentPath) {
+        AddAttachment request = objectFactory.createAddAttachment();
+        request.setListItemID(listItemId);
+        request.setFileName(fileName);
+        request.setListName(listName);
+        request.setAttachment(getAttachmentByteArray(attachmentPath));
+
+        AddAttachmentResponse response = (AddAttachmentResponse) webServiceTemplate.marshalSendAndReceive(
+                wsUrl,
+                request,
+                getSoapActionCallback("AddAttachment")
+        );
+
+        logger.error("Diff upload status {}", response.getAddAttachmentResult());
+    }
+
+    private byte[] getAttachmentByteArray(String attachmentPath) {
         byte[] attachment;
         try (InputStream is = new FileInputStream(attachmentPath)) {
 
@@ -130,19 +145,44 @@ public class SharePointSoapClient {
             logger.error(e.getMessage(), e);
             throw new RuntimeException();
         }
+        return attachment;
+    }
 
-        AddAttachment request = objectFactory.createAddAttachment();
-        request.setListItemID(listItemId);
-        request.setFileName(fileName);
+    public void getListItems(String listName, String viewName, String title) {
+        GetListItems.Query query = objectFactory.createGetListItemsQuery();
+        query.getContent().add(GetListItemsElement.query(title));
+
+        GetListItems.QueryOptions queryOptions = objectFactory.createGetListItemsQueryOptions();
+        queryOptions.getContent().add(GetListItemsElement.queryOptions());
+
+        Set<String> fieldRefs = Stream.of(
+                "ColName", "Description", "DisplayName=", "FromBaseType", "ID", "Name", "Required", "Sealed", "SourceID", "StaticName", "Type"
+        ).collect(Collectors.toSet());
+        GetListItems.ViewFields viewFields = objectFactory.createGetListItemsViewFields();
+        viewFields.getContent().add(GetListItemsElement.viewFields(fieldRefs));
+
+        GetListItems request = objectFactory.createGetListItems();
         request.setListName(listName);
-        request.setAttachment(attachment);
+        request.setQuery(query);
+        request.setQueryOptions(queryOptions);
+        request.setViewFields(viewFields);
+        request.setRowLimit(null);
+        request.setViewName(viewName);
+        request.setWebID(null);
 
-        AddAttachmentResponse response = (AddAttachmentResponse) webServiceTemplate.marshalSendAndReceive(
+        GetListItemsResponse response = (GetListItemsResponse) webServiceTemplate.marshalSendAndReceive(
                 wsUrl,
                 request,
-                getSoapActionCallback("AddAttachment")
+                getSoapActionCallback("GetListItems")
         );
 
-        logger.error("Diff upload status {}", response.getAddAttachmentResult());
+        Object content = response.getGetListItemsResult().getContent().get(0);
+        if (content instanceof Element) {
+            Element element = (Element) content;
+            Document document = element.getOwnerDocument();
+            XmlHelper.documentToXmlFile(document, "GetListItemsResponse.xml");
+        }
+        logger.error("Weird response from toolkit. Response is not a xml.");
+        throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 }

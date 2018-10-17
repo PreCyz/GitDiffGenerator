@@ -9,56 +9,33 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.util.Map;
 
-public class BatchElement {
+class BatchElement {
 
     public enum Mode {
         CREATE("New"), UPDATE("Update"), DELETE("Delete");
-
         private String cmd;
-
         Mode(String cmd) {
-
             this.cmd = cmd;
-        }
-
-        private String cmd() {
-            return cmd;
         }
     }
 
     private Mode mode;
     private String viewId;
+    private String rootFolder;
     private Document rootDocument;
     private Element rootDocContent;
 
-    /**
-     * @return the rootDocument
-     */
-    public Document getRootDocument() {
+    BatchElement(Mode mode, String viewId, String rootFolder) {
+        this.mode = mode;
+        this.viewId = viewId;
+        this.rootFolder = rootFolder;
+    }
+
+    Document getRootDocument() {
         return rootDocument;
     }
 
-    /**
-     * @return the rootDocContent
-     */
-    public Element getRootDocContent() {
-        return rootDocContent;
-    }
-
-    /**
-     * This class creates a generic XML SOAP request pre-formatted for SharePoint
-     * Lists web services requests (aka CAML query). What remains to be added are
-     * the specific parameters (XML Elements with attributes).
-     * For an example of a CAML Doc http://msdn.microsoft.com/en-us/library/lists.lists.updatelistitems.aspx
-     * @param mode Either New, Update or Delete
-     * @throws Exception
-     */
-    public BatchElement(Mode mode, String viewId) {
-        this.mode = mode;
-        this.viewId = viewId;
-    }
-
-    public void init() {
+    void init() {
         try {
             DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
@@ -72,8 +49,9 @@ public class BatchElement {
             rootElement.setAttribute("ListVersion", "1");
             rootElement.setAttribute("OnError", "Continue");
             rootElement.setAttribute("ViewName", viewId);
+            rootElement.setAttribute("RootFolder", rootFolder);
             rootDocContent = rootDocument.createElement("Method");
-            rootDocContent.setAttribute("Cmd", mode.cmd());
+            rootDocContent.setAttribute("Cmd", mode.cmd);
             rootDocContent.setAttribute("ID", "1");
             rootDocument.getElementsByTagName("Batch").item(0).appendChild(rootDocContent);
         } catch (ParserConfigurationException ex) {
@@ -81,37 +59,18 @@ public class BatchElement {
         }
     }
 
-    /**
-     * Creates a SharePoint list item in the CAML format, and adds it to the rootRequest.
-     * In SharePoint, this corresponds to a line in a list. The parameters given
-     * here would correspond respectively to the name of the column where to
-     * insert the info, and then the info itself.
-     * The requestTypeElement should already be initialized before calling this
-     * method.
-     * XML example output:
-     * < Field Name="ID" >4< Field >
-     * < Field Name="Field_Name" >Value< /Field >
-     * @param fields Contains a HashMap with attribute names as keys, and attributes
-     * values as content
-     * @return true if the item has been successfully added to the caml request
-     */
-    public boolean createListItem(Map<String, String> fields) {
+    void createListItem(Map<String, String> fields) {
         //params check
-        if (getRootDocContent() != null && this.getRootDocument() != null && fields != null && !fields.isEmpty()) {
+        if (rootDocContent != null && this.getRootDocument() != null && fields != null && !fields.isEmpty()) {
             Element createdElement;
             //Adds attribute by attribute to fields
             for (Map.Entry<String, String> aField : fields.entrySet()) {
                 createdElement = getRootDocument().createElement("Field");
                 createdElement.setAttribute("Name", aField.getKey());
-                if ("Classification".equals(aField.getKey())) {
-                    createdElement.setAttribute("Type", "Lookup");
-                }
                 Text attributeValue = getRootDocument().createTextNode("" + aField.getValue());
                 createdElement.appendChild(attributeValue);
-                getRootDocContent().appendChild(createdElement);
+                rootDocContent.appendChild(createdElement);
             }
-            return true;
         }
-        return false;
     }
 }
