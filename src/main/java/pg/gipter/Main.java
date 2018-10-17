@@ -23,11 +23,15 @@ public class Main {
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
             diffProducer.produceDiff();
 
-            if (applicationProperties.isToolkitPropertiesSet()) {
-                DiffUploader diffUploader = new DiffUploader(applicationProperties);
-                diffUploader.uploadDiff();
-                logger.error("Diff upload success.");
+            if (!applicationProperties.isToolkitPropertiesSet()) {
+                logger.error("Toolkit details not set. Check your settings");
+                throw new IllegalArgumentException();
             }
+
+            DiffUploader diffUploader = new DiffUploader(applicationProperties);
+            diffUploader.uploadDiff();
+            logger.error("Diff upload success.");
+
             logger.error("Program is terminated.");
             System.exit(0);
         } catch (Exception ex) {
