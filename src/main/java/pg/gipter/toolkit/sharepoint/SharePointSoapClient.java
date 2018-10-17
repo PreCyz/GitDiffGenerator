@@ -154,7 +154,8 @@ public class SharePointSoapClient {
         queryOptions.getContent().add(GetListItemsElement.queryOptions());
 
         Set<String> fieldRefs = Stream.of(
-                "ColName", "Description", "DisplayName=", "FromBaseType", "ID", "Name", "Required", "Sealed", "SourceID", "StaticName", "Type"
+                "ColName", "Description", "DisplayName=", "FromBaseType", "ID", "Name", "Required", "Sealed", "SourceID",
+                "StaticName", "Type"
         ).collect(Collectors.toSet());
         GetListItems.ViewFields viewFields = objectFactory.createGetListItemsViewFields();
         viewFields.getContent().add(GetListItemsElement.viewFields(fieldRefs));
