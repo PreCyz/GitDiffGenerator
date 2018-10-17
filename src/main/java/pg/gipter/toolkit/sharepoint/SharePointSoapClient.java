@@ -132,7 +132,7 @@ public class SharePointSoapClient {
                 getSoapActionCallback("AddAttachment")
         );
 
-        logger.error("Diff upload status {}", response.getAddAttachmentResult());
+        logger.error("Your item was uploaded [{}].", response.getAddAttachmentResult());
     }
 
     private byte[] getAttachmentByteArray(String attachmentPath) {
