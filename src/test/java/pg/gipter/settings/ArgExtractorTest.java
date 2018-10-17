@@ -356,7 +356,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
     }
 
     @Test
@@ -365,7 +365,25 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitUrl();
 
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+    }
+
+    @Test
+    void given_toolkitWSUrlFromCommandLine_when_toolkitWSUrl_then_returnDefaultUrl() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitWSUrl=sthElse"});
+
+        String actual = argExtractor.toolkitWSUrl();
+
         assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
+    }
+
+    @Test
+    void given_toolkitUserFolderFromCommandLine_when_toolkitUserFolder_then_returnDefaultValue() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitUserFolder=sthElse", "toolkitUsername=XXX"});
+
+        String actual = argExtractor.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/XXX");
     }
 
     @Test
@@ -384,5 +402,14 @@ class ArgExtractorTest {
         String actual = argExtractor.toolkitListName();
 
         assertThat(actual).isEqualTo("WorkItems");
+    }
+
+    @Test
+    void given_toolkitUserNameFromCommandLine_when_toolkitUserEmail_then_returnEmail() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitUsername=XXX"});
+
+        String actual = argExtractor.toolkitUserEmail();
+
+        assertThat(actual).isEqualTo("XXX@netcompany.com");
     }
 }

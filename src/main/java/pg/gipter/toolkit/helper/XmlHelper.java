@@ -100,7 +100,7 @@ public final class XmlHelper {
         return retValue;
     }
 
-    private static String getFullXmlDirPath(String xmlFileName) {
+    static String getFullXmlDirPath(String xmlFileName) {
         return String.format(".%ssrc%stest%sjava%sresources%sxml%s%s",
                 File.separator, File.separator, File.separator, File.separator, File.separator, File.separator, xmlFileName);
     }
