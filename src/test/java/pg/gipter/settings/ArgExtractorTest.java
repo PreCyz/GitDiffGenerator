@@ -9,6 +9,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
+import static pg.gipter.Main.yyyy_MM_dd;
 
 class ArgExtractorTest {
 
@@ -111,6 +112,24 @@ class ArgExtractorTest {
         int actual = argExtractor.periodInDays();
 
         assertThat(actual).isEqualTo(16);
+    }
+
+    @Test
+    void given_periodInDaysAndStartDate_when_startDate_then_returnStartDate() {
+        argExtractor = new ArgExtractor(new String[]{"periodInDays=16","startDate=2018-10-18"});
+
+        LocalDate actual = argExtractor.startDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-18");
+    }
+
+    @Test
+    void given_onlyPeriodInDays_when_startDate_then_returnNowMinusPeriodInDays() {
+        argExtractor = new ArgExtractor(new String[]{"periodInDays=16"});
+
+        LocalDate actual = argExtractor.startDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo(LocalDate.now().minusDays(16).format(yyyy_MM_dd));
     }
 
     @Test

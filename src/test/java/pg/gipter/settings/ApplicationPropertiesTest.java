@@ -8,6 +8,7 @@ import java.time.temporal.WeekFields;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static pg.gipter.Main.yyyy_MM_dd;
 
 class ApplicationPropertiesTest {
 
@@ -75,5 +76,23 @@ class ApplicationPropertiesTest {
         String actual = appProps.fileName();
 
         assertThat(actual).isEqualTo("fileName-20181007-20181014.txt");
+    }
+
+    @Test
+    void given_periodInDaysAndStartDate_when_startDate_then_returnStartDate() {
+        appProps = new ApplicationProperties(new String[]{"periodInDays=16","startDate=2018-10-18"});
+
+        LocalDate actual = appProps.startDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-18");
+    }
+
+    @Test
+    void given_onlyPeriodInDays_when_startDate_then_returnNowMinusPeriodInDays() {
+        appProps = new ApplicationProperties(new String[]{"periodInDays=16"});
+
+        LocalDate actual = appProps.startDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo(LocalDate.now().minusDays(16).format(yyyy_MM_dd));
     }
 }

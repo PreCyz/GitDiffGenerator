@@ -103,7 +103,7 @@ final class ArgExtractor {
     LocalDate startDate() {
         String[] date = ArgName.startDate.defaultValue().split("-");
         if (hasArgs()) {
-            date = getValue(ArgName.startDate, ArgName.startDate.defaultValue()).split("-");
+            date = getValue(ArgName.startDate, LocalDate.now().minusDays(periodInDays()).format(yyyy_MM_dd)).split("-");
         }
         return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
     }

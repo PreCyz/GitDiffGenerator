@@ -14,6 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
+import static pg.gipter.Main.yyyy_MM_dd;
+
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public class ApplicationProperties {
 
@@ -110,7 +112,7 @@ public class ApplicationProperties {
     public LocalDate startDate() {
         if (hasProperties()) {
             String[] date = properties.getProperty(
-                    ArgExtractor.ArgName.startDate.name(), ArgExtractor.ArgName.startDate.defaultValue()
+                    ArgExtractor.ArgName.startDate.name(), LocalDate.now().minusDays(periodInDays()).format(yyyy_MM_dd)
             ).split("-");
             return LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
         }
