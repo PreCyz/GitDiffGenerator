@@ -30,7 +30,7 @@ public class Main {
 
             DiffUploader diffUploader = new DiffUploader(applicationProperties);
             diffUploader.uploadDiff();
-            logger.error("Diff upload success.");
+            logger.error("Diff upload complete.");
 
             logger.error("Program is terminated.");
             System.exit(0);
