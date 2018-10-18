@@ -42,10 +42,12 @@ _codeProtection_ - possible values are `NONE`, `SIMPLE` and `STATEMENT`. Default
 _itemPath_ - path where file with git diff should be saved or if `codeProtection` is set as `STATEMENT` then full path to the file with statement.<br />
 _projectPath_ - comma separated project paths containing _.git_ folder.<br />
 _periodInDays_ - integer number. Default value is 7. It helps define start date of diff calculations. Start date is `now - periodInDays`, end date is now.<br />
-_startDate_ - start date of diff given in format yyyy-MM-dd.<br />
-_endDate_ - end date of diff given in format yyyy-MM-dd. By default it is set as now.<br />
+_startDate_ - start date of diff given in format `yyyy-MM-dd`.<br />
+_endDate_ - end date of diff given in format `yyyy-MM-dd`. By default it is set as now.<br />
 _itemFileNamePrefix_ - if given then this value will be used as prefix of the diff file name.<br />
 _versionControlSystem_ - possible values are `GIT`, `MERCURIAL`, `SVN`. Default value is `GIT`.<br /><br />
+When _periodInDays_ is used together with _startDate_ then _starDate_ has higher priority.<br /><br />
+
 Below parameters are mandatory for toolkit:<br/>
 _toolkitUsername_ - user name used to login into SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
 _toolkitPassword_ - user password used to log in into SharePoint.<br />
@@ -139,3 +141,6 @@ codeProtection=STATEMENT
 **To all above examples toolkit parameters (_toolkitUsername_ & _toolkitPassword_) has to be set up.** 
 ### Download
 To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
+
+##Licence
+Free to use.
