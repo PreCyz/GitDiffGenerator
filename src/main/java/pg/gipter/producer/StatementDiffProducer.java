@@ -2,6 +2,7 @@ package pg.gipter.producer;
 
 import pg.gipter.settings.ApplicationProperties;
 
+import java.io.File;
 import java.util.List;
 
 class StatementDiffProducer extends AbstractDiffProducer {
@@ -17,11 +18,11 @@ class StatementDiffProducer extends AbstractDiffProducer {
 
     @Override
     public void produceDiff() {
-        String statementPath = appProps.statementPath();
-        if (statementPath.isEmpty()) {
-            logger.error("Statement path is empty. Can not produce diff.");
-            throw new IllegalArgumentException("Statement path is empty. Can not produce diff.");
+        File itemFile = new File(appProps.itemPath());
+        if (!itemFile.exists() || !itemFile.isFile()) {
+            logger.error("Statement does not exists or it is not a file. Can not produce diff.");
+            throw new IllegalArgumentException("Statement does not exists or it is not a file. Can not produce diff.");
         }
-        logger.info("Code protection set as STATEMENT. Statement '{}' is threaded as a diff file.", statementPath);
+        logger.info("Code protection set as STATEMENT. Statement '{}' is threaded as a diff file.", appProps.itemPath());
     }
 }

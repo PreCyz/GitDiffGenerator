@@ -52,14 +52,14 @@ public class ApplicationProperties {
     }
 
     public String itemPath() {
-        if (codeProtection() == CodeProtection.STATEMENT) {
-            return statementPath();
-        }
         String itemPath = argExtractor.itemPath();
         if (hasProperties()) {
             itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), itemPath);
+            if (codeProtection() == CodeProtection.STATEMENT) {
+                return itemPath;
+            }
         }
-        return itemPath + File.separator + fileName();
+        return codeProtection() == CodeProtection.STATEMENT ? itemPath : itemPath + File.separator + fileName();
     }
 
     public String fileName() {
@@ -76,9 +76,6 @@ public class ApplicationProperties {
 
     private String itemFileName() {
         if (hasProperties()) {
-            if (codeProtection() == CodeProtection.STATEMENT) {
-                return new File(statementPath()).getName();
-            }
             return properties.getProperty(ArgExtractor.ArgName.itemFileName.name(), argExtractor.itemFileName());
         }
         return argExtractor.itemFileName();
@@ -151,13 +148,6 @@ public class ApplicationProperties {
         return argExtractor.codeProtection();
     }
 
-    public String statementPath() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.statementPath.name(), argExtractor.statementPath());
-        }
-        return argExtractor.statementPath();
-    }
-
     public String toolkitUsername() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.toolkitUsername.name(), argExtractor.toolkitUsername());
@@ -227,7 +217,6 @@ public class ApplicationProperties {
                 ", endDate='" + endDate() + '\'' +
                 ", versionControlSystem='" + versionControlSystem() + '\'' +
                 ", codeProtection='" + codeProtection() + '\'' +
-                ", statementPath='" + statementPath() + '\'' +
                 ", toolkitPropertiesSet='" + isToolkitPropertiesSet() + '\'' +
                 ", toolkitUrl='" + toolkitUrl() + '\'' +
                 ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
