@@ -152,7 +152,7 @@ public class ApplicationProperties {
 
     public String toolkitUsername() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.toolkitUsername.name(), argExtractor.toolkitUsername());
+            return properties.getProperty(ArgExtractor.ArgName.toolkitUsername.name(), argExtractor.toolkitUsername()).trim().toUpperCase();
         }
         return argExtractor.toolkitUsername();
     }
@@ -160,8 +160,9 @@ public class ApplicationProperties {
     public String toolkitUserEmail() {
         if (hasProperties()) {
             String userName = properties.getProperty(ArgExtractor.ArgName.toolkitUsername.name());
-            if (userName == null || userName.isEmpty()) {
-                return userName + argExtractor.emailDomain();
+            if (userName != null && !userName.isEmpty()) {
+                String userEmail = userName + argExtractor.emailDomain();
+                return userEmail.toLowerCase();
             }
         }
         return argExtractor.toolkitUserEmail();
@@ -200,6 +201,9 @@ public class ApplicationProperties {
     }
 
     public String toolkitUserFolder() {
+        if (hasProperties()) {
+            return ArgExtractor.ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+        }
         return argExtractor.toolkitUserFolder();
     }
 
@@ -220,6 +224,7 @@ public class ApplicationProperties {
                 ", versionControlSystem='" + versionControlSystem() + '\'' +
                 ", codeProtection='" + codeProtection() + '\'' +
                 ", toolkitPropertiesSet='" + isToolkitPropertiesSet() + '\'' +
+                ", toolkitUsername='" + toolkitUsername() + '\'' +
                 ", toolkitUrl='" + toolkitUrl() + '\'' +
                 ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                 ", toolkitDomain='" + toolkitDomain() + '\'' +

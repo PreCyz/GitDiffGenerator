@@ -424,6 +424,6 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitUserEmail();
 
-        assertThat(actual).isEqualTo("XXX@netcompany.com");
+        assertThat(actual).isEqualTo("xxx@netcompany.com");
     }
 }

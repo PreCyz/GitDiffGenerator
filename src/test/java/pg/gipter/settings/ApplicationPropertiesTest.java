@@ -95,4 +95,22 @@ class ApplicationPropertiesTest {
 
         assertThat(actual.format(yyyy_MM_dd)).isEqualTo(LocalDate.now().minusDays(16).format(yyyy_MM_dd));
     }
+
+    @Test
+    void given_toolkitUsername_when_toolkitUsername_then_returnNowMinusPeriodInDays() {
+        appProps = new ApplicationProperties(new String[]{"toolkitUsername=userName"});
+
+        String actual = appProps.toolkitUsername();
+
+        assertThat(actual).isEqualTo("USERNAME");
+    }
+
+    @Test
+    void given_toolkitUsername_when_toolkitUserEmail_then_returnNowMinusPeriodInDays() {
+        appProps = new ApplicationProperties(new String[]{"toolkitUsername=userName"});
+
+        String actual = appProps.toolkitUserEmail();
+
+        assertThat(actual).isEqualTo("username@netcompany.com");
+    }
 }

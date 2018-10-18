@@ -143,7 +143,7 @@ final class ArgExtractor {
 
     String toolkitUsername() {
         if (hasArgs()) {
-            return getValue(ArgName.toolkitUsername, ArgName.toolkitUsername.defaultValue()).toUpperCase();
+            return getValue(ArgName.toolkitUsername, ArgName.toolkitUsername.defaultValue()).trim().toUpperCase();
         }
         return ArgName.toolkitUsername.defaultValue();
     }
@@ -153,7 +153,8 @@ final class ArgExtractor {
     }
 
     String toolkitUserEmail() {
-        return toolkitUsername() + emailDomain();
+        String userEmail = toolkitUsername() + emailDomain();
+        return userEmail.toLowerCase();
     }
 
     String toolkitPassword() {
