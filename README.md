@@ -31,31 +31,33 @@ projectPath="/home/eva/Path/to/git/project1,/home/eva/Path/to/git/project2"
 ```
 ### java -jar + application.properties at at the same location as jar file
 If there are _application.properties_ file at the same location as your jar file then program can be run as follows: `java -jar Gipter.jar`
-#### Tip
+#### Tips
 If program is executed with commandline parameters and _application.properties_ file at the same time, then setup in _application.properties_ has higher priority.<br />
 Generated file name by default is `"year-monthName-week-weekNumber.txt"`. It can be switched to `"yourPrefix-startDate-endDate.txt"` by setting `yourPrefix` to parameter _itemFileNamePrefix_.<br />
 You can pass some parameters commandline way and other _application.properties_ way. For instance if you do not want to set your password in _application.properties_, you can pass it as commandline param.
 ### Params description
-_author_ - the user who committed the code. For git it is user name from git config stored under key '_user.name_'.<br />
-_committerEmail_ - email of the user who committed the code. For git user email from git config stored under key '_user.email_'.<br />
-_codeProtection_ - possible values are `NONE`, `SIMPLE` and `STATEMENT`. Default value is `NONE`. Further explanation [here](https://github.com/PreCyz/GitDiffGenerator#explanation-of-codeprotection-parameter).
-_itemPath_ - path where file with git diff should be saved or if `codeProtection` is set as `STATEMENT` then full path to the file with statement.<br />
-_projectPath_ - comma separated project paths containing _.git_ folder.<br />
-_periodInDays_ - integer number. Default value is 7. It helps define start date of diff calculations. Start date is `now - periodInDays`, end date is now.<br />
-_startDate_ - start date of diff given in format `yyyy-MM-dd`.<br />
-_endDate_ - end date of diff given in format `yyyy-MM-dd`. By default it is set as now.<br />
-_itemFileNamePrefix_ - if given then this value will be used as prefix of the diff file name.<br />
-_versionControlSystem_ - possible values are `GIT`, `MERCURIAL`, `SVN`. Default value is `GIT`.<br /><br />
-When _periodInDays_ is used together with _startDate_ then _starDate_ has higher priority.<br /><br />
+**author** - the user who committed the code. For git it is user name from git config stored under key '_user.name_'.<br />
+**committerEmail** - email of the user who committed the code. For git user email from git config stored under key '_user.email_'.<br />
+**codeProtection** - possible values are `NONE`, `SIMPLE` and `STATEMENT`. Default value is `NONE`. Further explanation [here](https://github.com/PreCyz/GitDiffGenerator#explanation-of-codeprotection-parameter).<br />
+**itemPath** - path where file with git diff should be saved or if `codeProtection` is set as `STATEMENT` then full path to the file with statement.<br />
+**projectPath** - comma separated project paths containing _.git_ folder.<br />
+**periodInDays** - integer number. Default value is 7. It helps define start date of diff calculations. Start date is `now - periodInDays`, end date is now.<br />
+**startDate** - start date of diff given in format `yyyy-MM-dd`.<br />
+**endDate** - end date of diff given in format `yyyy-MM-dd`. By default it is set as now.<br />
+**itemFileNamePrefix** - if given then this value will be used as prefix of the diff file name.<br />
+**versionControlSystem** - possible values are `GIT`, `MERCURIAL`, `SVN`. Default value is `GIT`.<br /><br />
 
 Below parameters are mandatory for toolkit:<br/>
-_toolkitUsername_ - user name used to login into SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
-_toolkitPassword_ - user password used to log in into SharePoint.<br />
+**toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
+**toolkitPassword** - user password used to log in into SharePoint.<br /><br />
+
+_Note:_ When `periodInDays` is used together with `startDate` then **starDate** has higher priority.
 ### Explanation of *codeProtection* parameter
 * `NONE` - no protection,
 * `SIMPLE` - no code can not be shared in anyway but diff can contain headers of changes, 
 * `STATEMENT` - not even headers of changes are allowed in diff. File with statement is uploaded to SharePoint instead.
 #####
+**Case 1**<br />
 It may be that owner of the code forbids to share the code in anyway but you are allowed to put headers of the changes in the diff.
 In that case user should set parameter *codeProtection* to `SIMPLE`.
 For `GIT` the `SIMPLE` protection will contain entries as follows:<br />
@@ -73,13 +75,14 @@ No code! Just information about the change:
  - branch name,
  - commit message.
 #####
-It also may be that owner of the code forbids to share any kind of information about the code and changes, even headers. 
+**Case 2**<br />
+It also may be that owner of the code forbids to share any kind of information about the code and changes, even headers.
 If so then user should upload to SharePoint file with the statement. Application can do it for user if only *codeProtection* parameter is set as `STATEMENT`.
 ### Sample of setups
 **Example 1**<br />
 If you want to create diff for _Smeagol Golum_ and _Project1_ from last 7 days then create following setup in your _application.properties_:<br />
 ```
-author=Smeagol Golum
+author=Smeagol Gollum
 itemPath=c:\\Path\\to\\git\\diff\\item
 projectPath=c:\\Git\\Project1
 ```
@@ -142,5 +145,5 @@ codeProtection=STATEMENT
 ### Download
 To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
 
-##Licence
+### Licence
 Free to use.
