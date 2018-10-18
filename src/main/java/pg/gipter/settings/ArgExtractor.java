@@ -27,6 +27,8 @@ final class ArgExtractor {
         codeProtection(CodeProtection.NONE.name()),
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
         toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
+
+        //for now hardcoded
         toolkitDomain("NCDMZ"),
         toolkitListName("WorkItems"),
         toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY"),
