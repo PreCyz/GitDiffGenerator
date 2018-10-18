@@ -18,11 +18,11 @@ final class ArgExtractor {
         author("NO_AUTHOR_GIVEN"),
         itemPath("NO_ITEM_PATH_GIVEN"),
         projectPath("NO_PROJECT_PATH_GIVEN"),
-        minusDays("7"),
+        periodInDays("7"),
         committerEmail(""),
-        startDate(LocalDate.now().minusDays(Integer.parseInt(minusDays.defaultValue)).format(yyyy_MM_dd)),
+        startDate(LocalDate.now().minusDays(Integer.parseInt(periodInDays.defaultValue)).format(yyyy_MM_dd)),
         endDate(LocalDate.now().format(yyyy_MM_dd)),
-        itemFileName(""),
+        itemFileNamePrefix(""),
         versionControlSystem(VersionControlSystem.GIT.name()),
         codeProtection(CodeProtection.NONE.name()),
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
@@ -86,11 +86,11 @@ final class ArgExtractor {
         return new LinkedHashSet<>(Arrays.asList(projectPaths));
     }
 
-    int days() {
+    int periodInDays() {
         if (hasArgs()) {
-            return Integer.parseInt(getValue(ArgName.minusDays, ArgName.minusDays.defaultValue()));
+            return Math.abs(Integer.parseInt(getValue(ArgName.periodInDays, ArgName.periodInDays.defaultValue())));
         }
-        return Integer.parseInt(ArgName.minusDays.defaultValue());
+        return Integer.parseInt(ArgName.periodInDays.defaultValue());
     }
 
     String committerEmail() {
@@ -116,11 +116,11 @@ final class ArgExtractor {
         return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
     }
 
-    String itemFileName() {
+    String itemFileNamePrefix() {
         if (hasArgs()) {
-            return getValue(ArgName.itemFileName, ArgName.itemFileName.defaultValue());
+            return getValue(ArgName.itemFileNamePrefix, ArgName.itemFileNamePrefix.defaultValue());
         }
-        return ArgName.itemFileName.defaultValue();
+        return ArgName.itemFileNamePrefix.defaultValue();
     }
 
     VersionControlSystem versionControlSystem() {

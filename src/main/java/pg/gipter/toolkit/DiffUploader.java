@@ -7,6 +7,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.ws.soap.client.SoapFaultClientException;
+import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
@@ -54,11 +55,16 @@ public class DiffUploader {
 
             String fileName = applicationProperties.fileName();
             String title = fileName.substring(0, fileName.indexOf("."));
+            String description = String.format("%s diff file.", applicationProperties.versionControlSystem());
+            if (applicationProperties.codeProtection() == CodeProtection.STATEMENT) {
+                description = String.format("%s file.", CodeProtection.STATEMENT);
+            }
             String listItemId = sharePointSoapClient.updateListItems(
                     listViewId,
                     title,
                     applicationProperties.toolkitUserEmail(),
-                    applicationProperties.toolkitUserFolder()
+                    applicationProperties.toolkitUserFolder(),
+                    description
             );
 
             sharePointSoapClient.addAttachment(listItemId, fileName, applicationProperties.itemPath());

@@ -67,18 +67,18 @@ public class ApplicationProperties {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
         String fileName = String.format("%d-%s-week-%d.txt", now.getYear(), now.getMonth().name(), weekNumber).toLowerCase();
-        if (!itemFileName().isEmpty() && codeProtection() != CodeProtection.STATEMENT) {
+        if (!itemFileNamePrefix().isEmpty() && codeProtection() != CodeProtection.STATEMENT) {
             DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
-            fileName = String.format("%s-%s-%s.txt", itemFileName(), startDate().format(yyyyMMdd), endDate().format(yyyyMMdd));
+            fileName = String.format("%s-%s-%s.txt", itemFileNamePrefix(), startDate().format(yyyyMMdd), endDate().format(yyyyMMdd));
         }
         return fileName;
     }
 
-    private String itemFileName() {
+    private String itemFileNamePrefix() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.itemFileName.name(), argExtractor.itemFileName());
+            return properties.getProperty(ArgExtractor.ArgName.itemFileNamePrefix.name(), argExtractor.itemFileNamePrefix());
         }
-        return argExtractor.itemFileName();
+        return argExtractor.itemFileNamePrefix();
     }
 
     public Set<String> projectPaths() {
@@ -91,13 +91,13 @@ public class ApplicationProperties {
         return argExtractor.projectPaths();
     }
 
-    private int days() {
+    private int periodInDays() {
         if (hasProperties()) {
-            return Integer.parseInt(properties.getProperty(
-                    ArgExtractor.ArgName.minusDays.name(), ArgExtractor.ArgName.minusDays.defaultValue()
-            ));
+            return Math.abs(Integer.parseInt(properties.getProperty(
+                    ArgExtractor.ArgName.periodInDays.name(), String.valueOf(argExtractor.periodInDays())
+            )));
         }
-        return argExtractor.days();
+        return argExtractor.periodInDays();
     }
 
     public String committerEmail() {
@@ -212,7 +212,7 @@ public class ApplicationProperties {
                 ", itemPath='" + itemPath() + '\'' +
                 ", fileName='" + fileName() + '\'' +
                 ", projectPath='" + String.join(",", projectPaths()) + '\'' +
-                ", days='" + days() + '\'' +
+                ", periodInDays='" + periodInDays() + '\'' +
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
                 ", versionControlSystem='" + versionControlSystem() + '\'' +

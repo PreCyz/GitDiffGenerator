@@ -87,19 +87,28 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_noMinusDays_when_days_then_returnDefaultValue() {
+    void given_noMinusDays_when_periodInDays_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
-        int actual = argExtractor.days();
+        int actual = argExtractor.periodInDays();
 
         assertThat(actual).isEqualTo(7);
     }
 
     @Test
-    void given_minusDays_when_days_then_returnThatMinusDays() {
-        argExtractor = new ArgExtractor(new String[]{"minusDays=16"});
+    void given_periodInDays_when_periodInDays_then_returnThatMinusDays() {
+        argExtractor = new ArgExtractor(new String[]{"periodInDays=16"});
 
-        int actual = argExtractor.days();
+        int actual = argExtractor.periodInDays();
+
+        assertThat(actual).isEqualTo(16);
+    }
+
+    @Test
+    void given_negativePeriodInDays_when_periodInDays_then_returnThatMinusDays() {
+        argExtractor = new ArgExtractor(new String[]{"periodInDays=-16"});
+
+        int actual = argExtractor.periodInDays();
 
         assertThat(actual).isEqualTo(16);
     }
@@ -184,16 +193,16 @@ class ArgExtractorTest {
     void given_noItemFileName_when_itemFileName_then_returnEmptyString() {
         argExtractor = new ArgExtractor(new String[]{});
 
-        String actual = argExtractor.itemFileName();
+        String actual = argExtractor.itemFileNamePrefix();
 
         assertThat(actual).isEmpty();
     }
 
     @Test
     void given_itemFileName_when_itemFileName_then_returnThatItemFileName() {
-        argExtractor = new ArgExtractor(new String[]{"itemFileName=testItemFileName"});
+        argExtractor = new ArgExtractor(new String[]{"itemFileNamePrefix=testItemFileName"});
 
-        String actual = argExtractor.itemFileName();
+        String actual = argExtractor.itemFileNamePrefix();
 
         assertThat(actual).isEqualTo("testItemFileName");
     }

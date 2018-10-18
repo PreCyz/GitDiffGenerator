@@ -72,13 +72,13 @@ public class SharePointSoapClient {
         throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
-    public String updateListItems(ListViewId listViewId, String title, String userEmail, String rootFolder) {
+    public String updateListItems(ListViewId listViewId, String title, String userEmail, String rootFolder, String body) {
         Map<String, String> itemAttributes = new HashMap<>();
         itemAttributes.put("Title", title);
         itemAttributes.put("Employee", "-1;#" + userEmail);
         itemAttributes.put("SubmissionDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")));
         itemAttributes.put("Classification", "12;#Changeset (repository change report)");
-        itemAttributes.put("Body", "Git diff file");
+        itemAttributes.put("Body", body);
 
         BatchElement batchElement = new BatchElement(BatchElement.Mode.CREATE, listViewId.viewId(), rootFolder);
         batchElement.createListItem(itemAttributes);

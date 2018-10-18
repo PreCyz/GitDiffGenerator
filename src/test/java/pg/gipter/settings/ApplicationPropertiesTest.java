@@ -61,7 +61,7 @@ class ApplicationPropertiesTest {
 
     @Test
     void given_itemFileNameFromCommandLine_when_fileName_then_returnThatFileName() {
-        appProps = new ApplicationProperties(new String[]{"itemFileName=fileName"});
+        appProps = new ApplicationProperties(new String[]{"itemFileNamePrefix=fileName"});
 
         String actual = appProps.fileName();
 
@@ -70,7 +70,7 @@ class ApplicationPropertiesTest {
 
     @Test
     void given_itemFileNameAndStartDateAndEndDateFromCommandLine_when_fileName_then_returnBuildFileName() {
-        appProps = new ApplicationProperties(new String[]{"itemFileName=fileName", "startDate=2018-10-07", "endDate=2018-10-14"});
+        appProps = new ApplicationProperties(new String[]{"itemFileNamePrefix=fileName", "startDate=2018-10-07", "endDate=2018-10-14"});
 
         String actual = appProps.fileName();
 
