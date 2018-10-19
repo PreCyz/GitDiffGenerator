@@ -1,18 +1,49 @@
 package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
+import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.VersionControlSystem;
 
 import java.io.File;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static pg.gipter.Main.yyyy_MM_dd;
 
 class ApplicationPropertiesTest {
 
     private ApplicationProperties appProps;
+
+    private PropertiesLoader mockPropertiesLoader(Properties properties) {
+        PropertiesLoader loader = mock(PropertiesLoader.class);
+        when(loader.loadPropertiesFromFile()).thenReturn(Optional.of(properties));
+        return loader;
+    }
+
+    @Test
+    void given_propertiesFromFile_when_hasProperties_then_returnTrue() {
+        PropertiesLoader loader = mockPropertiesLoader(new Properties());
+        appProps = new ApplicationProperties(new String[]{});
+        appProps.init(new String[]{}, loader);
+
+        assertThat(appProps.hasProperties()).isTrue();
+    }
+
+    @Test
+    void given_noPropertiesFromFile_when_hasProperties_then_returnFalse() {
+        appProps = new ApplicationProperties(new String[]{});
+
+        assertThat(appProps.hasProperties()).isFalse();
+    }
 
     @Test
     void given_authorFromCommandLine_when_author_then_returnThatAuthor() {
@@ -24,12 +55,38 @@ class ApplicationPropertiesTest {
     }
 
     @Test
+    void given_authorFromPropertiesAndCommandLine_when_author_then_returnAuthorFromProperties() {
+        String[] args = {"author=testAuthor"};
+        Properties props = new Properties();
+        props.put("author", "propsAuthor");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.author();
+
+        assertThat(actual).isEqualTo("propsAuthor");
+    }
+
+    @Test
     void given_itemPathFromCommandLine_when_itemPath_then_returnThatItemPath() {
         appProps = new ApplicationProperties(new String[]{"itemPath=testItemPath"});
 
         String actual = appProps.itemPath();
 
         assertThat(actual).startsWith("testItemPath" + File.separator);
+    }
+
+    @Test
+    void given_itemPathFromPropertiesAndCommandLine_when_itemPath_then_returnItemPathFromProperties() {
+        String[] args = {"itemPath=testItemPath"};
+        Properties props = new Properties();
+        props.put("itemPath", "propertiesItemPath");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.itemPath();
+
+        assertThat(actual).startsWith("propertiesItemPath" + File.separator);
     }
 
     @Test
@@ -97,6 +154,41 @@ class ApplicationPropertiesTest {
     }
 
     @Test
+    void given_startDateFromPropertiesAndCommandLine_when_startDate_then_returnStartDateFromProperties() {
+        String[] args = {"startDate=2018-10-18"};
+        Properties props = new Properties();
+        props.put("startDate", "2018-10-19");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        LocalDate actual = appProps.startDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-19");
+    }
+
+    @Test
+    void given_itemFileNamePrefix_when_itemFileNamePrefix_then_returnThatItemFileNamePrefix() {
+        appProps = new ApplicationProperties(new String[]{"itemFileNamePrefix=testItemFileNamePrefix"});
+
+        String actual = appProps.itemFileNamePrefix();
+
+        assertThat(actual).isEqualTo("testItemFileNamePrefix");
+    }
+
+    @Test
+    void given_itemFileNamePrefixFromPropertiesAndCommandLine_when_startDate_then_returnitemFileNamePrefixFromProperties() {
+        String[] args = {"itemFileNamePrefix=testItemFileNamePrefix"};
+        Properties props = new Properties();
+        props.put("itemFileNamePrefix","propsItemFileNamePrefix");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.itemFileNamePrefix();
+
+        assertThat(actual).isEqualTo("propsItemFileNamePrefix");
+    }
+
+    @Test
     void given_toolkitUsername_when_toolkitUsername_then_returnNowMinusPeriodInDays() {
         appProps = new ApplicationProperties(new String[]{"toolkitUsername=userName"});
 
@@ -112,5 +204,250 @@ class ApplicationPropertiesTest {
         String actual = appProps.toolkitUserEmail();
 
         assertThat(actual).isEqualTo("username@netcompany.com");
+    }
+
+    @Test
+    void given_endDate_when_endDate_then_returnThatEndDate() {
+        appProps = new ApplicationProperties(new String[]{"endDate=2018-10-19"});
+
+        LocalDate actual = appProps.endDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-19");
+    }
+
+    @Test
+    void given_endDateFromPropertiesAndCommandLine_when_endDate_then_returnEndDateFromProperties() {
+        String[] args = {"endDate=2018-10-18"};
+        Properties props = new Properties();
+        props.put("endDate", "2018-10-19");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        LocalDate actual = appProps.endDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-19");
+    }
+
+    @Test
+    void given_wrongEndDate_when_endDate_then_throwDateTimeException() {
+        appProps = new ApplicationProperties(new String[]{"endDate=2018-02-30"});
+        try {
+            appProps.endDate();
+            fail("Shpild throw DateTimeException.");
+        } catch (DateTimeException ex) {
+            assertThat(ex.getMessage()).isEqualTo("Invalid date 'FEBRUARY 30'");
+        }
+    }
+
+    @Test
+    void given_wrongStartDate_when_startDate_then_throwDateTimeException() {
+        appProps = new ApplicationProperties(new String[]{"endDate=2018-02-30"});
+        try {
+            appProps.endDate();
+            fail("Should throw DateTimeException.");
+        } catch (DateTimeException ex) {
+            assertThat(ex.getMessage()).isEqualTo("Invalid date 'FEBRUARY 30'");
+        }
+    }
+
+    @Test
+    void given_projectPath_when_projectPaths_then_returnSetWithThatProjectPath() {
+        appProps = new ApplicationProperties(new String[]{"projectPath=Proj1"});
+
+        Set<String> actual = appProps.projectPaths();
+
+        assertThat(actual).containsExactly("Proj1");
+    }
+
+    @Test
+    void given_projectPathFromPropertiesAndCommandLine_when_projectPaths_then_returnSetWithProjectPathFromProperties() {
+        String[] args = {"projectPath=Proj1,Proj2"};
+        Properties props = new Properties();
+        props.put("projectPath", "Proj3");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = appProps.projectPaths();
+
+        assertThat(actual).containsExactly("Proj3");
+    }
+
+    @Test
+    void given_noPeriodInDaysFromCommandLine_when_periodInDays_then_returnDefaultValue7() {
+        appProps = new ApplicationProperties(new String[]{});
+
+        int actual = appProps.periodInDays();
+
+        assertThat(actual).isEqualTo(7);
+    }
+
+    @Test
+    void given_periodInDaysFromCommandLine_when_periodInDays_then_returnThatPeriodInDays() {
+        appProps = new ApplicationProperties(new String[]{"periodInDays=1"});
+
+        int actual = appProps.periodInDays();
+
+        assertThat(actual).isEqualTo(1);
+    }
+
+    @Test
+    void given_periodInDaysFromPropertiesAndCommandLine_when_periodInDays_then_returnPeriodInDaysFromProperties() {
+        String[] args = {"periodInDays=1"};
+        Properties props = new Properties();
+        props.put("periodInDays", "2");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        int actual = appProps.periodInDays();
+
+        assertThat(actual).isEqualTo(2);
+    }
+
+    @Test
+    void given_committerEmailFromCommandLine_when_committerEmail_then_returnThatCommitterEmail() {
+        appProps = new ApplicationProperties(new String[]{"committerEmail=testCommitterEmail"});
+
+        String actual = appProps.committerEmail();
+
+        assertThat(actual).isEqualTo("testCommitterEmail");
+    }
+
+    @Test
+    void given_committerEmailFromPropertiesAndCommandLine_when_committerEmail_then_returnCommitterEmailFromProperties() {
+        String[] args = {"committerEmail=testCommitterEmail"};
+        Properties props = new Properties();
+        props.put("committerEmail", "propsCommitterEmail");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.committerEmail();
+
+        assertThat(actual).isEqualTo("propsCommitterEmail");
+    }
+
+    @Test
+    void given_noVersionControlSystem_when_versionControlSystem_then_returnDefaultValueGit() {
+        appProps = new ApplicationProperties(new String[]{});
+
+        VersionControlSystem actual = appProps.versionControlSystem();
+
+        assertThat(actual).isEqualTo(VersionControlSystem.GIT);
+    }
+
+    @Test
+    void given_versionControlSystem_when_versionControlSystem_then_returnThatVersionControlSystem() {
+        appProps = new ApplicationProperties(new String[]{"versionControlSystem=SVN"});
+
+        VersionControlSystem actual = appProps.versionControlSystem();
+
+        assertThat(actual).isEqualTo(VersionControlSystem.SVN);
+    }
+
+    @Test
+    void given_versionControlSystemFromPropertiesAndCommandLine_when_versionControlSystem_then_returnVersionControlSystemFromProperties() {
+        String[] args = {"versionControlSystem=GIT"};
+        Properties props = new Properties();
+        props.put("versionControlSystem", "mercurial");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        VersionControlSystem actual = appProps.versionControlSystem();
+
+        assertThat(actual).isEqualTo(VersionControlSystem.MERCURIAL);
+    }
+
+    @Test
+    void given_noCodeProtection_when_codeProtection_then_returnDefaultValueNONE() {
+        appProps = new ApplicationProperties(new String[]{});
+
+        CodeProtection actual = appProps.codeProtection();
+
+        assertThat(actual).isEqualTo(CodeProtection.NONE);
+    }
+
+    @Test
+    void given_codeProtection_when_codeProtection_then_returnThatCodeProtection() {
+        appProps = new ApplicationProperties(new String[]{"codeProtection=simple"});
+
+        CodeProtection actual = appProps.codeProtection();
+
+        assertThat(actual).isEqualTo(CodeProtection.SIMPLE);
+    }
+
+    @Test
+    void given_codeProtectionFromPropertiesAndCommandLine_when_codeProtection_then_returnCodeProtectionFromProperties() {
+        String[] args = {"codeProtection=Simple"};
+        Properties props = new Properties();
+        props.put("codeProtection", "statement");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        CodeProtection actual = appProps.codeProtection();
+
+        assertThat(actual).isEqualTo(CodeProtection.STATEMENT);
+    }
+
+    @Test
+    void given_noToolkitUsername_when_toolkitUserEmail_then_returnDefaultValue() {
+        appProps = new ApplicationProperties(new String[]{});
+
+        String actual = appProps.toolkitUserEmail();
+
+        assertThat(actual).isEqualTo("no_toolkit_username_given@netcompany.com" );
+    }
+
+    @Test
+    void given_toolkitUserName_when_toolkitUserEmail_then_returnToolkitUserEmail() {
+        appProps = new ApplicationProperties(new String[]{"toolkitUsername=vzv"});
+
+        String actual = appProps.toolkitUserEmail();
+
+        assertThat(actual).isEqualTo("vzv@netcompany.com");
+    }
+
+    @Test
+    void given_codeToolkitUserNameFromPropertiesAndCommandLine_when_toolkitUserEmail_then_returnToolkitUserEmailBasedOnProperties() {
+        String[] args = {"toolkitUsername=asd"};
+        Properties props = new Properties();
+        props.put("toolkitUsername", "cvb");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.toolkitUserEmail();
+
+        assertThat(actual).isEqualTo("cvb@netcompany.com");
+    }
+
+    @Test
+    void given_noToolkitUsernameAndPassword_when_isToolkitPropertiesSet_then_returnFalse() {
+        String[] args = new String[]{};
+        appProps = new ApplicationProperties(args);
+
+        boolean actual = appProps.isToolkitPropertiesSet();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_emptyToolkitUsernameAndPassword_when_isToolkitPropertiesSet_then_returnFalse() {
+        String[] args = {"toolkitUsername=", "toolkitPassword="};
+        appProps = new ApplicationProperties(args);
+
+        boolean actual = appProps.isToolkitPropertiesSet();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_toolkitUsernameAndPassword_when_isToolkitPropertiesSet_then_returnTrue() {
+        String[] args = {"toolkitPassword=yui"};
+        Properties props = new Properties();
+        props.put("toolkitUsername", "cvb");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isToolkitPropertiesSet();
+
+        assertThat(actual).isTrue();
     }
 }

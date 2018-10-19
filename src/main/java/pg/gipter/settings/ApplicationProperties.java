@@ -72,7 +72,7 @@ public class ApplicationProperties {
         return fileName;
     }
 
-    private String itemFileNamePrefix() {
+    String itemFileNamePrefix() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.itemFileNamePrefix.name(), argExtractor.itemFileNamePrefix());
         }
@@ -89,7 +89,7 @@ public class ApplicationProperties {
         return argExtractor.projectPaths();
     }
 
-    private int periodInDays() {
+    int periodInDays() {
         if (hasProperties()) {
             return Math.abs(Integer.parseInt(properties.getProperty(
                     ArgExtractor.ArgName.periodInDays.name(), String.valueOf(argExtractor.periodInDays())
@@ -205,7 +205,8 @@ public class ApplicationProperties {
 
     public boolean isToolkitPropertiesSet() {
         return !toolkitUsername().equals(ArgExtractor.ArgName.toolkitUsername.defaultValue()) &&
-                !toolkitPassword().equals(ArgExtractor.ArgName.toolkitPassword.defaultValue());
+                !toolkitPassword().equals(ArgExtractor.ArgName.toolkitPassword.defaultValue()) &&
+                !toolkitUsername().isEmpty() && !toolkitPassword().isEmpty();
     }
 
     private String log() {
