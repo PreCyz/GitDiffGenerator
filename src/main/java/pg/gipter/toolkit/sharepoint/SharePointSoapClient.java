@@ -15,9 +15,6 @@ import pg.gipter.toolkit.ws.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -72,19 +69,10 @@ public class SharePointSoapClient {
         throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
-    public String updateListItems(ListViewId listViewId, String title, String userEmail, String rootFolder, String body) {
-        Map<String, String> itemAttributes = new HashMap<>();
-        itemAttributes.put("Title", title);
-        itemAttributes.put("Employee", "-1;#" + userEmail);
-        itemAttributes.put("SubmissionDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")));
-        itemAttributes.put("Classification", "12;#Changeset (repository change report)");
-        itemAttributes.put("Body", body);
-
-        BatchElement batchElement = new BatchElement(BatchElement.Mode.CREATE, listViewId.viewId(), rootFolder);
-        batchElement.createListItem(itemAttributes);
-
+    public String updateListItems(ListViewId listViewId, Map<String, String> itemAttributes) {
+        BatchElement batchElement = new BatchElement(itemAttributes);
         UpdateListItems.Updates updates = objectFactory.createUpdateListItemsUpdates();
-        updates.getContent().add(batchElement.getBatchElement());
+        updates.getContent().add(batchElement.create());
 
         UpdateListItems request = objectFactory.createUpdateListItems();
         request.setListName(listViewId.listId());
