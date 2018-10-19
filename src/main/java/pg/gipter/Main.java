@@ -59,9 +59,9 @@ public class Main extends Application {
 
             DiffUploader diffUploader = new DiffUploader(applicationProperties);
             diffUploader.uploadDiff();
-            logger.error("Diff upload complete.");
+            logger.info("Diff upload complete.");
 
-            logger.error("Program is terminated.");
+            logger.info("Program is terminated.");
             System.exit(0);
         } catch (Exception ex) {
             logger.error("Diff upload failure. Program is terminated.");
