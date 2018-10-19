@@ -15,6 +15,8 @@ public class DiffCommandFactory {
                 return new MercurialDiffCommand(applicationProperties);
             case SVN:
                 return new SvnDiffCommand(applicationProperties);
+            case TFVC:
+                return new TfvcDiffCommand(applicationProperties);
             default:
                 return new GitDiffCommand(applicationProperties);
         }

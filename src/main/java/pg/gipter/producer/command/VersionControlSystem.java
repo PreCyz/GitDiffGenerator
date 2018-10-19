@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 public enum VersionControlSystem {
-    GIT, MERCURIAL, SVN;
+    GIT, MERCURIAL, SVN, TFVC;
 
     public static VersionControlSystem valueFor(String value) {
         String errMsg;
