@@ -6,43 +6,39 @@ import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.command.VersionControlSystem;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
 import static pg.gipter.Main.yyyy_MM_dd;
+import static pg.gipter.settings.PropertiesLoader.APPLICATION_PROPERTIES;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public class ApplicationProperties {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationProperties.class);
-    private static final String APPLICATION_PROPERTIES = "application.properties";
 
     private Properties properties;
     private final ArgExtractor argExtractor;
 
     public ApplicationProperties(String[] args) {
         argExtractor = new ArgExtractor(args);
-        init(args);
+        init(args, new PropertiesLoader());
     }
 
-    private void init(String[] args) {
-        try (InputStream is = new FileInputStream(APPLICATION_PROPERTIES)) {
-            properties = new Properties();
-            properties.load(is);
+    void init(String[] args, PropertiesLoader propertiesLoader) {
+        Optional<Properties> propsFromFile = propertiesLoader.loadPropertiesFromFile();
+        if (propsFromFile.isPresent()) {
+            properties = propsFromFile.get();
             logger.info("Properties from file loaded [{}]", log());
-        } catch (IOException | NullPointerException e) {
+        } else {
             logger.warn("Can not read [{}].", APPLICATION_PROPERTIES);
-            properties = null;
             logger.info("Command line argument loaded: {}", Arrays.toString(args));
         }
     }
 
-    private boolean hasProperties() {
+    boolean hasProperties() {
         return properties != null;
     }
 
