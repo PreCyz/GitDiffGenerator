@@ -14,6 +14,9 @@ import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.sharepoint.SharePointConfiguration;
 import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +43,7 @@ public class DiffUploader {
         return applicationContext;
     }
 
-    private void setToolkitProperties(ConfigurableEnvironment environment) {
+    void setToolkitProperties(ConfigurableEnvironment environment) {
         Properties toolkitProperties = new Properties();
         toolkitProperties.put("toolkit.username", applicationProperties.toolkitUsername());
         toolkitProperties.put("toolkit.password", applicationProperties.toolkitPassword());
@@ -68,16 +71,19 @@ public class DiffUploader {
     }
 
     Map<String, String> buildAttributesMap(String viewName) {
+        LocalDate endDate = applicationProperties.endDate();
         String fileName = applicationProperties.fileName();
         String title = fileName.substring(0, fileName.indexOf("."));
         String description = String.format("%s diff file.", applicationProperties.versionControlSystem());
         if (applicationProperties.codeProtection() == CodeProtection.STATEMENT) {
             description = String.format("%s file.", CodeProtection.STATEMENT);
         }
+        LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
+
         Map<String, String> attributes = new HashMap<>();
         attributes.put("Title", title);
         attributes.put("Employee", "-1;#" + applicationProperties.toolkitUserEmail());
-        attributes.put("SubmissionDate", applicationProperties.endDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")));
+        attributes.put("SubmissionDate", submissionDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")));
         attributes.put("Classification", "12;#Changeset (repository change report)");
         attributes.put("Body", description);
 
