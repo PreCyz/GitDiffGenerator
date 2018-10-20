@@ -27,15 +27,23 @@ public class DiffUploader {
 
     private static final Logger logger = LoggerFactory.getLogger(DiffUploader.class);
 
-    private final ApplicationContext springContext;
-    private final ApplicationProperties applicationProperties;
+    private ApplicationContext springContext;
+    private ApplicationProperties applicationProperties;
+
+    /**For test purposes only*/
+    DiffUploader() { }
 
     public DiffUploader(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         this.springContext = initSpringApplicationContext();
     }
 
-    private ApplicationContext initSpringApplicationContext() {
+    /**For test purposes only*/
+    void setSpringContext(ApplicationContext springContext) {
+        this.springContext = springContext;
+    }
+
+    ApplicationContext initSpringApplicationContext() {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
         setToolkitProperties(applicationContext.getEnvironment());
         applicationContext.register(SharePointConfiguration.class);
@@ -63,10 +71,11 @@ public class DiffUploader {
         } catch (SoapFaultClientException ex) {
             String errorMsg = XmlHelper.extractErrorMessage(ex.getSoapFault().getSource());
             logger.error("Error during upload diff. {}", errorMsg);
-            throw new RuntimeException(ex);
+            throw new RuntimeException(errorMsg, ex);
         } catch (Exception ex) {
-            logger.error("Error during upload diff.", ex);
-            throw new RuntimeException(ex);
+            String errorMsg = "Error during upload diff.";
+            logger.error(errorMsg, ex);
+            throw new RuntimeException(errorMsg, ex);
         }
     }
 

@@ -2,17 +2,26 @@ package pg.gipter.toolkit;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.ws.soap.SoapFault;
+import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.MockitoExtension;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.toolkit.helper.XmlHelper;
+import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -102,5 +111,47 @@ class DiffUploaderTest {
             assertThat(propertySource.getProperty("toolkit.listName")).isEqualTo("WorkItems");
             return true;
         }));
+    }
+
+    @Test
+    void when_uploadDiff_then_throwSoapException() throws Exception {
+        String xml = XmlHelper.documentToString(XmlHelper.getDocument(XmlHelper.getFullXmlPath("wsErrorSoap.xml")));
+        Source xmlSource = new StreamSource(new StringReader(xml));
+        SoapFault soapFault = mock(SoapFault.class);
+        when(soapFault.getSource()).thenReturn(xmlSource);
+        SoapFaultClientException soapException = mock(SoapFaultClientException.class);
+        when(soapException.getSoapFault()).thenReturn(soapFault);
+        SharePointSoapClient client = mock(SharePointSoapClient.class);
+        when(client.getListAndView()).thenThrow(soapException);
+        ApplicationContext context = mock(ApplicationContext.class);
+        when(context.getBean(eq(SharePointSoapClient.class))).thenReturn(client);
+        uploader = spy(new DiffUploader());
+        uploader.setSpringContext(context);
+
+        try {
+            uploader.uploadDiff();
+            fail("Should throw RuntimeException with relevant message.");
+        } catch (RuntimeException ex) {
+            assertThat(ex.getMessage()).isEqualTo("Data at the root level is invalid. Line 1, position 1.");
+            verify(soapException, times(1)).getSoapFault();
+            verify(soapFault, times(1)).getSource();
+        }
+    }
+
+    @Test
+    void when_uploadDiff_then_throwException() {
+        SharePointSoapClient client = mock(SharePointSoapClient.class);
+        when(client.getListAndView()).thenThrow(new IllegalArgumentException());
+        ApplicationContext context = mock(ApplicationContext.class);
+        when(context.getBean(eq(SharePointSoapClient.class))).thenReturn(client);
+        uploader = spy(new DiffUploader());
+        uploader.setSpringContext(context);
+
+        try {
+            uploader.uploadDiff();
+            fail("Should throw RuntimeException with relevant message.");
+        } catch (RuntimeException ex) {
+            assertThat(ex.getMessage()).isEqualTo("Error during upload diff.");
+        }
     }
 }
