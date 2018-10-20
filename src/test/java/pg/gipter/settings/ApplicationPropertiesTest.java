@@ -118,6 +118,49 @@ class ApplicationPropertiesTest {
     }
 
     @Test
+    void given_endDateNotNow_when_fileName_then_returnYearMonthPeriod() {
+        appProps = new ApplicationProperties(new String[]{
+                "startDate=2018-09-19",
+                "endDate=2018-10-19"
+        });
+        String actual = appProps.fileName();
+
+        assertThat(actual).isEqualTo("2018-october-20180919-20181019.txt");
+    }
+
+    @Test
+    void given_propertiesFileAndEndDateFromDeepPast_when_fileName_then_returnWellBuildFileName() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("codeProtection", "statement");
+        props.put("startDate", "2017-10-19");
+        props.put("endDate", "2017-12-20");
+        props.put("itemFileNamePrefix", "custom");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).isEqualTo("custom-2017-december-20171019-20171220.txt");
+    }
+
+    @Test
+    void given_commandLinePropsAndEndDateFromDeepPast_when_fileName_then_returnWellBuildFileName() {
+        String[] args = {
+                "codeProtection=STATEMENT",
+                "startDate=2017-10-19",
+                "endDate=2017-12-20",
+                "itemFileNamePrefix=custom",
+                "toolkitUsername=xxx",
+        };
+        appProps = new ApplicationProperties(args);
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).isEqualTo("custom-2017-december-20171019-20171220.txt");
+    }
+
+    @Test
     void given_itemFileNameFromCommandLine_when_fileName_then_returnThatFileName() {
         appProps = new ApplicationProperties(new String[]{"itemFileNamePrefix=fileName"});
 
@@ -132,7 +175,7 @@ class ApplicationPropertiesTest {
 
         String actual = appProps.fileName();
 
-        assertThat(actual).isEqualTo("fileName-20181007-20181014.txt");
+        assertThat(actual).isEqualTo("fileName-2018-october-20181007-20181014.txt");
     }
 
     @Test

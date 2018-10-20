@@ -61,15 +61,21 @@ public class ApplicationProperties {
     }
 
     public String fileName() {
+        DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate now = LocalDate.now();
-        WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
-        String fileName = String.format("%d-%s-week-%d.txt", now.getYear(), now.getMonth().name(), weekNumber).toLowerCase();
-        if (!itemFileNamePrefix().isEmpty() && codeProtection() != CodeProtection.STATEMENT) {
-            DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
-            fileName = String.format("%s-%s-%s.txt", itemFileNamePrefix(), startDate().format(yyyyMMdd), endDate().format(yyyyMMdd));
+        LocalDate endDate = endDate();
+        String fileName;
+        if (now.isEqual(endDate)) {
+            WeekFields weekFields = WeekFields.of(Locale.getDefault());
+            int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
+            fileName = String.format("%d-%s-week-%d", now.getYear(), now.getMonth(), weekNumber).toLowerCase();
+        } else {
+            fileName = String.format("%d-%s-%s-%s", endDate.getYear(), endDate.getMonth(), startDate().format(yyyyMMdd), endDate.format(yyyyMMdd)).toLowerCase();
         }
-        return fileName;
+        if (!itemFileNamePrefix().isEmpty()) {
+            fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
+        }
+        return fileName + ".txt";
     }
 
     String itemFileNamePrefix() {
