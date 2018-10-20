@@ -121,7 +121,7 @@ public class SharePointSoapClient {
         logger.info("Your item was uploaded [{}].", response.getAddAttachmentResult());
     }
 
-    private byte[] getAttachmentByteArray(String attachmentPath) {
+    byte[] getAttachmentByteArray(String attachmentPath) {
         byte[] attachment;
         try (InputStream is = new FileInputStream(attachmentPath)) {
 
@@ -129,7 +129,7 @@ public class SharePointSoapClient {
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
         return attachment;
     }

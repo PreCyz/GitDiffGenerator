@@ -56,7 +56,7 @@ public final class XmlHelper {
         if (!fileName.endsWith(".xml")) {
             fileName += fileName + ".xml";
         }
-        fileName = getFullXmlDirPath(fileName);
+        fileName = getFullXmlPath(fileName);
         try {
             StreamResult streamResult = new StreamResult(new File(fileName));
             getTransformer().transform(source, streamResult);
@@ -100,7 +100,7 @@ public final class XmlHelper {
         return retValue;
     }
 
-    static String getFullXmlDirPath(String xmlFileName) {
+    public static String getFullXmlPath(String xmlFileName) {
         return String.format(".%ssrc%stest%sjava%sresources%sxml%s%s",
                 File.separator, File.separator, File.separator, File.separator, File.separator, File.separator, xmlFileName);
     }
@@ -138,4 +138,12 @@ public final class XmlHelper {
         return Optional.ofNullable(nodeList.item(0).getTextContent());
     }
 
+    public static Document getDocument(String fullXmlPath) throws Exception {
+        File file = new File(fullXmlPath);
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        Document document = documentBuilder.parse(file);
+        document.normalizeDocument();
+        return document;
+    }
 }

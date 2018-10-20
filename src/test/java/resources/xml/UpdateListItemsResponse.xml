@@ -1,7 +1,29 @@
 <Results xmlns="http://schemas.microsoft.com/sharepoint/soap/">
-<Result ID="1,New">
-<ErrorCode>0x00000000</ErrorCode>
-<ID/>
-<z:row xmlns:z="#RowsetSchema" ows_AssignedTo="" ows_Attachments="0" ows_Author="179;#Paweł Gawędzki" ows_BaseName="6371_" ows_Body="Git diff file" ows_Checkmark="boolean;#0" ows_Classification="12;#Changeset (repository change report)" ows_ContentType="Task" ows_ContentTypeId="0x010800CDCE389D6FA39D4092146404C5F9B293" ows_Created="2018-10-17 15:01:32" ows_Created_x0020_Date="6371;#2018-10-17 15:01:32" ows_Editor="179;#Paweł Gawędzki" ows_Employee="179;#Paweł Gawędzki" ows_EncodedAbsUrl="https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PAWG/6371_.000" ows_FSObjType="6371;#0" ows_FileDirRef="6371;#cases/GTE106/NCSCOPY/Lists/WorkItems/PAWG" ows_FileLeafRef="6371;#6371_.000" ows_FileRef="6371;#cases/GTE106/NCSCOPY/Lists/WorkItems/PAWG/6371_.000" ows_FolderChildCount="6371;#0" ows_GUID="{767C07A0-D15A-4CA5-BD82-6C1A996CCFA0}" ows_ID="6371" ows_ItemChildCount="6371;#0" ows_Last_x0020_Modified="6371;#2018-10-17 15:01:32" ows_LinkFilename="6371_.000" ows_LinkFilename2="6371_.000" ows_LinkFilenameNoMenu="6371_.000" ows_LinkTitle="svn-protected-20181010-20181017" ows_LinkTitle2="svn-protected-20181010-20181017" ows_LinkTitleNoMenu="svn-protected-20181010-20181017" ows_MetaInfo="6371;#" ows_Modified="2018-10-17 15:01:32" ows_Order="15400.0000000000" ows_PercentComplete="0" ows_PermMask="0x1b03c4312ef" ows_Predecessors="" ows_PreviouslyAssignedTo="" ows_Priority="(2) Normal" ows_ProgId="6371;#" ows_ScopeId="6371;#{0A4239FE-53D6-4998-BF05-A100059C0668}" ows_SelectTitle="6371" ows_ServerUrl="/cases/GTE106/NCSCOPY/Lists/WorkItems/PAWG/6371_.000" ows_SortBehavior="6371;#0" ows_SubmissionDate="2018-10-17 14:59:27" ows_Title="svn-protected-20181010-20181017" ows_UniqueId="6371;#{B6DFAF6D-C01D-4A66-B397-68AF0944EADB}" ows_WorkflowVersion="1" ows__EditMenuTableEnd="6371" ows__EditMenuTableStart="6371_.000" ows__EditMenuTableStart2="6371" ows__IsCurrentVersion="1" ows__Level="1" ows__ModerationStatus="0" ows__UIVersion="512" ows__UIVersionString="1.0" ows_owshiddenversion="1"/>
-</Result>
+    <Result ID="1,New">
+        <ErrorCode>0x00000000</ErrorCode>
+        <ID/>
+        <z:row xmlns:z="#RowsetSchema" ows_AssignedTo="" ows_Attachments="0" ows_Author="179;#Paweł Gawędzki"
+               ows_BaseName="6371_" ows_Body="Git diff file" ows_Checkmark="boolean;#0"
+               ows_Classification="12;#Changeset (repository change report)" ows_ContentType="Task"
+               ows_ContentTypeId="0x010800CDCE389D6FA39D4092146404C5F9B293" ows_Created="2018-10-17 15:01:32"
+               ows_Created_x0020_Date="6371;#2018-10-17 15:01:32" ows_Editor="179;#Paweł Gawędzki"
+               ows_Employee="179;#Paweł Gawędzki"
+               ows_EncodedAbsUrl="https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PAWG/6371_.000"
+               ows_FSObjType="6371;#0" ows_FileDirRef="6371;#cases/GTE106/NCSCOPY/Lists/WorkItems/PAWG"
+               ows_FileLeafRef="6371;#6371_.000" ows_FileRef="6371;#cases/GTE106/NCSCOPY/Lists/WorkItems/PAWG/6371_.000"
+               ows_FolderChildCount="6371;#0" ows_GUID="{767C07A0-D15A-4CA5-BD82-6C1A996CCFA0}" ows_ID="6371"
+               ows_ItemChildCount="6371;#0" ows_Last_x0020_Modified="6371;#2018-10-17 15:01:32"
+               ows_LinkFilename="6371_.000" ows_LinkFilename2="6371_.000" ows_LinkFilenameNoMenu="6371_.000"
+               ows_LinkTitle="svn-protected-20181010-20181017" ows_LinkTitle2="svn-protected-20181010-20181017"
+               ows_LinkTitleNoMenu="svn-protected-20181010-20181017" ows_MetaInfo="6371;#"
+               ows_Modified="2018-10-17 15:01:32" ows_Order="15400.0000000000" ows_PercentComplete="0"
+               ows_PermMask="0x1b03c4312ef" ows_Predecessors="" ows_PreviouslyAssignedTo="" ows_Priority="(2) Normal"
+               ows_ProgId="6371;#" ows_ScopeId="6371;#{0A4239FE-53D6-4998-BF05-A100059C0668}" ows_SelectTitle="6371"
+               ows_ServerUrl="/cases/GTE106/NCSCOPY/Lists/WorkItems/PAWG/6371_.000" ows_SortBehavior="6371;#0"
+               ows_SubmissionDate="2018-10-17 14:59:27" ows_Title="svn-protected-20181010-20181017"
+               ows_UniqueId="6371;#{B6DFAF6D-C01D-4A66-B397-68AF0944EADB}" ows_WorkflowVersion="1"
+               ows__EditMenuTableEnd="6371" ows__EditMenuTableStart="6371_.000" ows__EditMenuTableStart2="6371"
+               ows__IsCurrentVersion="1" ows__Level="1" ows__ModerationStatus="0" ows__UIVersion="512"
+               ows__UIVersionString="1.0" ows_owshiddenversion="1"/>
+    </Result>
 </Results>

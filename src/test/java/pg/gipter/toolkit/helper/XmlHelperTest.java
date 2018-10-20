@@ -27,10 +27,10 @@ class XmlHelperTest {
 
     @Test
     void given_responseUpdateListItemResponse_when_extractListItemId_then_returnId4() throws Exception {
-        String xmlFilePath = XmlHelper.getFullXmlDirPath("updateListItemResponse.xml");
+        String xmlFilePath = XmlHelper.getFullXmlPath("UpdateListItemsResponse.xml");
 
         String id = XmlHelper.extractListItemId(readXml(xmlFilePath));
 
-        assertThat(id).isEqualTo("4");
+        assertThat(id).isEqualTo("6371");
     }
 }
