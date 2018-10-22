@@ -45,7 +45,7 @@ class ApplicationPropertiesTest {
     }
 
     @Test
-    void given_authorFromCommandLine_when_author_then_returnThatAuthor() {
+    void given_authorFromCommandLine_when_gitAuthor_then_returnThatAuthor() {
         appProps = new ApplicationProperties(new String[]{"gitAuthor=testAuthor"});
 
         String actual = appProps.gitAuthor();
@@ -54,7 +54,7 @@ class ApplicationPropertiesTest {
     }
 
     @Test
-    void given_authorFromPropertiesAndCommandLine_when_author_then_returnAuthorFromProperties() {
+    void given_authorFromPropertiesAndCommandLine_when_gitAuthor_then_returnAuthorFromProperties() {
         String[] args = {"gitAuthor=testAuthor"};
         Properties props = new Properties();
         props.put("gitAuthor", "propsAuthor");
@@ -62,6 +62,72 @@ class ApplicationPropertiesTest {
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.gitAuthor();
+
+        assertThat(actual).isEqualTo("propsAuthor");
+    }
+
+    @Test
+    void given_authorFromCommandLine_when_mercurialAuthor_then_returnThatAuthor() {
+        appProps = new ApplicationProperties(new String[]{"mercurialAuthor=testAuthor"});
+
+        String actual = appProps.mercurialAuthor();
+
+        assertThat(actual).isEqualTo("testAuthor");
+    }
+
+    @Test
+    void given_authorFromPropertiesAndCommandLine_when_mercurialAuthor_then_returnAuthorFromProperties() {
+        String[] args = {"mercurialAuthor=testAuthor"};
+        Properties props = new Properties();
+        props.put("mercurialAuthor", "propsAuthor");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.mercurialAuthor();
+
+        assertThat(actual).isEqualTo("propsAuthor");
+    }
+
+    @Test
+    void given_authorFromCommandLine_when_svnAuthor_then_returnThatAuthor() {
+        appProps = new ApplicationProperties(new String[]{"svnAuthor=testAuthor"});
+
+        String actual = appProps.svnAuthor();
+
+        assertThat(actual).isEqualTo("testAuthor");
+    }
+
+    @Test
+    void given_authorFromPropertiesAndCommandLine_when_svnAuthor_then_returnAuthorFromProperties() {
+        String[] args = {"svnAuthor=testAuthor"};
+        Properties props = new Properties();
+        props.put("svnAuthor", "propsAuthor");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.svnAuthor();
+
+        assertThat(actual).isEqualTo("propsAuthor");
+    }
+
+    @Test
+    void given_authorFromCommandLine_when_tfvcAuthor_then_returnThatAuthor() {
+        appProps = new ApplicationProperties(new String[]{"tfvcAuthor=testAuthor"});
+
+        String actual = appProps.tfvcAuthor();
+
+        assertThat(actual).isEqualTo("testAuthor");
+    }
+
+    @Test
+    void given_authorFromPropertiesAndCommandLine_when_tfvcAuthor_then_returnAuthorFromProperties() {
+        String[] args = {"tfvcAuthor=testAuthor"};
+        Properties props = new Properties();
+        props.put("tfvcAuthor", "propsAuthor");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.tfvcAuthor();
 
         assertThat(actual).isEqualTo("propsAuthor");
     }

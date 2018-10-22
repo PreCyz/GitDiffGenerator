@@ -14,7 +14,7 @@ import static pg.gipter.Main.yyyy_MM_dd;
 final class ArgExtractor {
 
     enum ArgName {
-        gitAuthor("NO_AUTHOR_GIVEN"),
+        gitAuthor("GIT_NO_AUTHOR_GIVEN"),
         mercurialAuthor("MERCURIAL_NO_AUTHOR_GIVEN"),
         svnAuthor("SVN_NO_AUTHOR_GIVEN"),
         tfvcAuthor("TFVC_NO_AUTHOR_GIVEN"),

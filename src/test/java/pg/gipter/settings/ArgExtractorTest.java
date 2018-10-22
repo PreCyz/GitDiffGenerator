@@ -15,19 +15,73 @@ class ArgExtractorTest {
     private ArgExtractor argExtractor;
 
     @Test
-    void given_noAuthor_when_author_then_returnDefaultValue() {
+    void given_noAuthor_when_gitAuthor_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
         String actual = argExtractor.gitAuthor();
 
-        assertThat(actual).isEqualTo("NO_AUTHOR_GIVEN");
+        assertThat(actual).isEqualTo("GIT_NO_AUTHOR_GIVEN");
     }
 
     @Test
-    void given_author_when_author_then_returnThatAuthor() {
+    void given_author_when_gitAuthor_then_returnThatAuthor() {
         argExtractor = new ArgExtractor(new String[]{"gitAuthor=testAuthor"});
 
         String actual = argExtractor.gitAuthor();
+
+        assertThat(actual).isEqualTo("testAuthor");
+    }
+
+    @Test
+    void given_noAuthor_when_mercurialAuthor_then_returnDefaultValue() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        String actual = argExtractor.mercurialAuthor();
+
+        assertThat(actual).isEqualTo("MERCURIAL_NO_AUTHOR_GIVEN");
+    }
+
+    @Test
+    void given_author_when_mercurialAuthor_then_returnThatAuthor() {
+        argExtractor = new ArgExtractor(new String[]{"mercurialAuthor=testAuthor"});
+
+        String actual = argExtractor.mercurialAuthor();
+
+        assertThat(actual).isEqualTo("testAuthor");
+    }
+
+    @Test
+    void given_noAuthor_when_svnAuthor_then_returnDefaultValue() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        String actual = argExtractor.svnAuthor();
+
+        assertThat(actual).isEqualTo("SVN_NO_AUTHOR_GIVEN");
+    }
+
+    @Test
+    void given_author_when_svnAuthor_then_returnThatAuthor() {
+        argExtractor = new ArgExtractor(new String[]{"svnAuthor=testAuthor"});
+
+        String actual = argExtractor.svnAuthor();
+
+        assertThat(actual).isEqualTo("testAuthor");
+    }
+
+    @Test
+    void given_noAuthor_when_tfvcAuthor_then_returnDefaultValue() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        String actual = argExtractor.tfvcAuthor();
+
+        assertThat(actual).isEqualTo("TFVC_NO_AUTHOR_GIVEN");
+    }
+
+    @Test
+    void given_author_when_tfvcAuthor_then_returnThatAuthor() {
+        argExtractor = new ArgExtractor(new String[]{"tfvcAuthor=testAuthor"});
+
+        String actual = argExtractor.tfvcAuthor();
 
         assertThat(actual).isEqualTo("testAuthor");
     }
