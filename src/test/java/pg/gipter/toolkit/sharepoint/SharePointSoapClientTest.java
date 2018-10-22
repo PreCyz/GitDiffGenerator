@@ -266,7 +266,9 @@ class SharePointSoapClientTest {
             fail("Should throw FileNotFoundException");
         } catch (RuntimeException ex) {
             assertThat(ex.getCause()).isInstanceOf(FileNotFoundException.class);
-            assertThat(ex.getMessage()).isEqualTo("java.io.FileNotFoundException: attachment (No such file or directory)");
+            //works on Ubuntu
+            //assertThat(ex.getMessage()).isEqualTo("java.io.FileNotFoundException: attachment (No such file or directory)");
+            assertThat(ex.getMessage()).startsWith("java.io.FileNotFoundException: attachment");
         }
     }
 
@@ -286,7 +288,9 @@ class SharePointSoapClientTest {
             fail("Should throw FileNotFoundException");
         } catch (RuntimeException ex) {
             assertThat(ex.getCause()).isInstanceOf(FileNotFoundException.class);
-            assertThat(ex.getMessage()).isEqualTo("java.io.FileNotFoundException: notExisting (No such file or directory)");
+            //works on Ubuntu
+            //assertThat(ex.getMessage()).isEqualTo("java.io.FileNotFoundException: notExisting (No such file or directory)");
+            assertThat(ex.getMessage()).startsWith("java.io.FileNotFoundException: notExisting");
         }
     }
 }
