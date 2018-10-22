@@ -4,20 +4,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.DiffCommand;
 import pg.gipter.producer.command.DiffCommandFactory;
+import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.ApplicationProperties;
 
 import java.io.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 abstract class AbstractDiffProducer implements DiffProducer {
 
     protected final ApplicationProperties appProps;
-    private final DiffCommand diffCommand;
     protected final Logger logger;
 
     AbstractDiffProducer(ApplicationProperties applicationProperties) {
         appProps = applicationProperties;
-        diffCommand = DiffCommandFactory.getInstance(appProps);
         logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -25,16 +26,24 @@ abstract class AbstractDiffProducer implements DiffProducer {
     public void produceDiff() {
         try (FileWriter fw = new FileWriter(appProps.itemPath())) {
 
-            List<String> cmd = diffCommand.commandAsList();
-            logger.info("{} command: {}", appProps.versionControlSystem().name(), String.join(" ", cmd));
-
-            cmd = getFullCommand(cmd);
-            logger.info("Platform full command: {}", String.join(" ", cmd));
+            Set<VersionControlSystem> vcsSet = new HashSet<>();
 
             for (String projectPath : appProps.projectPaths()) {
                 logger.info("Project path: {}", projectPath);
+                VersionControlSystem vcs = VersionControlSystem.valueFrom(new File(projectPath));
+                logger.info("Discovered '{}' version control system.", vcs);
+
+                final DiffCommand diffCommand = DiffCommandFactory.getInstance(vcs, appProps);
+                List<String> cmd = diffCommand.commandAsList();
+                logger.info("{} command: {}", vcs.name(), String.join(" ", cmd));
+                cmd = getFullCommand(cmd);
+                logger.info("Platform full command: {}", String.join(" ", cmd));
+
                 writeItemToFile(fw, projectPath, cmd);
+                vcsSet.add(vcs);
             }
+
+            appProps.setVcs(vcsSet);
 
             logger.info("Diff file generated and saved as: {}.", appProps.itemPath());
 

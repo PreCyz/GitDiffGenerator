@@ -9,6 +9,7 @@ import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.ws.soap.SoapFault;
 import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.MockitoExtension;
+import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
@@ -18,6 +19,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumSet;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +39,7 @@ class DiffUploaderTest {
                 "endDate=2018-10-19",
                 "toolkitUsername=xxx",
         });
+        properties.setVcs(EnumSet.of(VersionControlSystem.GIT, VersionControlSystem.SVN));
         uploader = new DiffUploader(properties);
         Map<String, String> map = uploader.buildAttributesMap("viewName");
 
@@ -51,7 +54,7 @@ class DiffUploaderTest {
         assertThat(actualSubmissionDate.getMinute()).isBetween(0, 59);
         assertThat(actualSubmissionDate.getSecond()).isBetween(0, 59);
         assertThat(map.get("Classification")).isEqualTo("12;#Changeset (repository change report)");
-        assertThat(map.get("Body")).isEqualTo("GIT diff file.");
+        assertThat(map.get("Body")).isEqualTo("GIT,SVN diff file.");
         assertThat(map.get("ViewName")).isEqualTo("viewName");
         assertThat(map.get("RootFolder")).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/XXX");
         assertThat(map.get("Cmd")).isEqualTo("New");

@@ -1,10 +1,34 @@
 package pg.gipter.producer.command;
 
+import java.io.File;
 import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 public enum VersionControlSystem {
-    GIT, MERCURIAL, SVN, TFVC;
+    GIT(".git"),
+    MERCURIAL(".hg"),
+    SVN(".svn"),
+    TFVC("notSupportedYet");
+
+    private String dirName;
+
+    VersionControlSystem(String dirName) {
+        this.dirName = dirName;
+    }
+
+    public static VersionControlSystem valueFrom(File file) {
+        if (file == null || file.listFiles() == null) {
+            throw new IllegalArgumentException("Can not determine version control system.");
+        }
+        for (VersionControlSystem vcs : VersionControlSystem.values()) {
+            for (File dir : file.listFiles()) {
+                if (dir.isDirectory() && vcs.dirName.equals(dir.getName())) {
+                    return vcs;
+                }
+            }
+        }
+        throw new IllegalArgumentException("Can not determine version control system.");
+    }
 
     public static VersionControlSystem valueFor(String value) {
         String errMsg;

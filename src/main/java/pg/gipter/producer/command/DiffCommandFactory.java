@@ -6,11 +6,11 @@ public class DiffCommandFactory {
 
     private DiffCommandFactory() { }
 
-    public static DiffCommand getInstance(ApplicationProperties applicationProperties) {
+    public static DiffCommand getInstance(VersionControlSystem vcs, ApplicationProperties applicationProperties) {
         if (applicationProperties.codeProtection() == CodeProtection.STATEMENT) {
             return new EmptyDiffCommand(applicationProperties);
         }
-        switch (applicationProperties.versionControlSystem()) {
+        switch (vcs) {
             case MERCURIAL:
                 return new MercurialDiffCommand(applicationProperties);
             case SVN:

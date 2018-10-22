@@ -2,7 +2,6 @@ package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
 import pg.gipter.producer.command.CodeProtection;
-import pg.gipter.producer.command.VersionControlSystem;
 
 import java.io.File;
 import java.time.DateTimeException;
@@ -366,37 +365,6 @@ class ApplicationPropertiesTest {
         String actual = appProps.committerEmail();
 
         assertThat(actual).isEqualTo("propsCommitterEmail");
-    }
-
-    @Test
-    void given_noVersionControlSystem_when_versionControlSystem_then_returnDefaultValueGit() {
-        appProps = new ApplicationProperties(new String[]{});
-
-        VersionControlSystem actual = appProps.versionControlSystem();
-
-        assertThat(actual).isEqualTo(VersionControlSystem.GIT);
-    }
-
-    @Test
-    void given_versionControlSystem_when_versionControlSystem_then_returnThatVersionControlSystem() {
-        appProps = new ApplicationProperties(new String[]{"versionControlSystem=SVN"});
-
-        VersionControlSystem actual = appProps.versionControlSystem();
-
-        assertThat(actual).isEqualTo(VersionControlSystem.SVN);
-    }
-
-    @Test
-    void given_versionControlSystemFromPropertiesAndCommandLine_when_versionControlSystem_then_returnVersionControlSystemFromProperties() {
-        String[] args = {"versionControlSystem=GIT"};
-        Properties props = new Properties();
-        props.put("versionControlSystem", "mercurial");
-        appProps = new ApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        VersionControlSystem actual = appProps.versionControlSystem();
-
-        assertThat(actual).isEqualTo(VersionControlSystem.MERCURIAL);
     }
 
     @Test

@@ -21,10 +21,20 @@ public class ApplicationProperties {
 
     private Properties properties;
     private final ArgExtractor argExtractor;
+    private Set<VersionControlSystem> vcs;
 
     public ApplicationProperties(String[] args) {
         argExtractor = new ArgExtractor(args);
         init(args, new PropertiesLoader());
+        vcs = new HashSet<>();
+    }
+
+    public void setVcs(Set<VersionControlSystem> vcs) {
+        this.vcs = vcs;
+    }
+
+    public Set<VersionControlSystem> vcsSet() {
+        return vcs;
     }
 
     void init(String[] args, PropertiesLoader propertiesLoader) {
@@ -131,17 +141,6 @@ public class ApplicationProperties {
         return argExtractor.endDate();
     }
 
-    public VersionControlSystem versionControlSystem() {
-        if (hasProperties()) {
-            String vcs = properties.getProperty(
-                    ArgExtractor.ArgName.versionControlSystem.name(),
-                    ArgExtractor.ArgName.versionControlSystem.defaultValue()
-            );
-            return VersionControlSystem.valueFor(vcs.toUpperCase());
-        }
-        return argExtractor.versionControlSystem();
-    }
-
     public CodeProtection codeProtection() {
         if (hasProperties()) {
             String codeProtected = properties.getProperty(
@@ -224,7 +223,6 @@ public class ApplicationProperties {
                 ", periodInDays='" + periodInDays() + '\'' +
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
-                ", versionControlSystem='" + versionControlSystem() + '\'' +
                 ", codeProtection='" + codeProtection() + '\'' +
                 ", toolkitPropertiesSet='" + isToolkitPropertiesSet() + '\'' +
                 ", toolkitUsername='" + toolkitUsername() + '\'' +

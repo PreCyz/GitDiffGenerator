@@ -2,7 +2,6 @@ package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
 import pg.gipter.producer.command.CodeProtection;
-import pg.gipter.producer.command.VersionControlSystem;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -224,54 +223,6 @@ class ArgExtractorTest {
         String actual = argExtractor.itemFileNamePrefix();
 
         assertThat(actual).isEqualTo("testItemFileName");
-    }
-
-    @Test
-    void given_noVersionControlSystem_when_versionControlSystem_then_returnDefaultValue() {
-        argExtractor = new ArgExtractor(new String[]{});
-
-        VersionControlSystem actual = argExtractor.versionControlSystem();
-
-        assertThat(actual).isEqualTo(VersionControlSystem.GIT);
-    }
-
-    @Test
-    void given_gitVersionControlSystem_when_versionControlSystem_then_returnGitVersionControlSystem() {
-        argExtractor = new ArgExtractor(new String[]{"versionControlSystem=git"});
-
-        VersionControlSystem actual = argExtractor.versionControlSystem();
-
-        assertThat(actual).isEqualTo(VersionControlSystem.GIT);
-    }
-
-    @Test
-    void given_svnVersionControlSystem_when_versionControlSystem_then_returnSvnVersionControlSystem() {
-        argExtractor = new ArgExtractor(new String[]{"versionControlSystem=svn"});
-
-        VersionControlSystem actual = argExtractor.versionControlSystem();
-
-        assertThat(actual).isEqualTo(VersionControlSystem.SVN);
-    }
-
-    @Test
-    void given_mercurialVersionControlSystem_when_versionControlSystem_then_returnMercurialVersionControlSystem() {
-        argExtractor = new ArgExtractor(new String[]{"versionControlSystem=mercurial"});
-
-        VersionControlSystem actual = argExtractor.versionControlSystem();
-
-        assertThat(actual).isEqualTo(VersionControlSystem.MERCURIAL);
-    }
-
-    @Test
-    void given_notSupportedVersionControlSystem_when_versionControlSystem_then_throwException() {
-        argExtractor = new ArgExtractor(new String[]{"versionControlSystem=cvs"});
-
-        try {
-            argExtractor.versionControlSystem();
-            fail("Should throw exception.");
-        } catch (Exception ex) {
-            assertThat(ex).isInstanceOf(IllegalArgumentException.class);
-        }
     }
 
     @Test

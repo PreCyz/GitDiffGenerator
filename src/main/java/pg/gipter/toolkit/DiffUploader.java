@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static java.util.stream.Collectors.joining;
+
 /**Created by Pawel Gawedzki on 11-Oct-2018.*/
 public class DiffUploader {
 
@@ -83,7 +85,8 @@ public class DiffUploader {
         LocalDate endDate = applicationProperties.endDate();
         String fileName = applicationProperties.fileName();
         String title = fileName.substring(0, fileName.indexOf("."));
-        String description = String.format("%s diff file.", applicationProperties.versionControlSystem());
+        String allVcs = applicationProperties.vcsSet().stream().map(Enum::name).collect(joining(","));
+        String description = String.format("%s diff file.", allVcs);
         if (applicationProperties.codeProtection() == CodeProtection.STATEMENT) {
             description = String.format("%s file.", CodeProtection.STATEMENT);
         }
