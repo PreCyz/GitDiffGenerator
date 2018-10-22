@@ -18,16 +18,16 @@ class ArgExtractorTest {
     void given_noAuthor_when_author_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
-        String actual = argExtractor.author();
+        String actual = argExtractor.gitAuthor();
 
         assertThat(actual).isEqualTo("NO_AUTHOR_GIVEN");
     }
 
     @Test
     void given_author_when_author_then_returnThatAuthor() {
-        argExtractor = new ArgExtractor(new String[]{"author=testAuthor"});
+        argExtractor = new ArgExtractor(new String[]{"gitAuthor=testAuthor"});
 
-        String actual = argExtractor.author();
+        String actual = argExtractor.gitAuthor();
 
         assertThat(actual).isEqualTo("testAuthor");
     }

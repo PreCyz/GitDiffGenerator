@@ -17,11 +17,11 @@ final class TfvcDiffCommand extends AbstractDiffCommand {
     @Override
     public List<String> commandAsList() {
         List<String> command = getInitialCommand();
-        if (StringUtils.notEmpty(appProps.author())) {
-            command.add("/user:" + appProps.author());
+        if (StringUtils.notEmpty(appProps.tfvcAuthor())) {
+            command.add("/user:" + appProps.tfvcAuthor());
         }
         /*if (StringUtils.notEmpty(appProps.committerEmail())) {
-            command.add("--author=" + appProps.committerEmail());
+            command.add("--gitAuthor=" + appProps.committerEmail());
         }*/
 
         String dateRange = String.format("/version:D\"%s\"~D\"%s\"",

@@ -18,9 +18,9 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
     @Override
     public List<String> commandAsList() {
         List<String> command = getInitialCommand();
-        if (StringUtils.notEmpty(appProps.author())) {
+        if (StringUtils.notEmpty(appProps.mercurialAuthor())) {
             command.add("--user");
-            command.add(appProps.author());
+            command.add(appProps.mercurialAuthor());
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {
             command.add("--user");

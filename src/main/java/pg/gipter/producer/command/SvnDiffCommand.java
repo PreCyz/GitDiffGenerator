@@ -19,9 +19,9 @@ final class SvnDiffCommand extends AbstractDiffCommand {
     @Override
     public List<String> commandAsList() {
         List<String> command = getInitialCommand();
-        if (StringUtils.notEmpty(appProps.author())) {
+        if (StringUtils.notEmpty(appProps.svnAuthor())) {
             command.add("--search");
-            command.add(appProps.author());
+            command.add(appProps.svnAuthor());
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {
             command.add("--search");

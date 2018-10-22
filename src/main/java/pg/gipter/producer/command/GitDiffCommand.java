@@ -18,8 +18,8 @@ final class GitDiffCommand extends AbstractDiffCommand {
     @Override
     public List<String> commandAsList() {
         List<String> command = getInitialCommand();
-        if (StringUtils.notEmpty(appProps.author())) {
-            command.add("--author=" + appProps.author());
+        if (StringUtils.notEmpty(appProps.gitAuthor())) {
+            command.add("--author=" + appProps.gitAuthor());
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {
             command.add("--author=" + appProps.committerEmail());

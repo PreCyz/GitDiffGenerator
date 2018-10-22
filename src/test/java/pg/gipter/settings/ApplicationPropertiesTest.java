@@ -46,22 +46,22 @@ class ApplicationPropertiesTest {
 
     @Test
     void given_authorFromCommandLine_when_author_then_returnThatAuthor() {
-        appProps = new ApplicationProperties(new String[]{"author=testAuthor"});
+        appProps = new ApplicationProperties(new String[]{"gitAuthor=testAuthor"});
 
-        String actual = appProps.author();
+        String actual = appProps.gitAuthor();
 
         assertThat(actual).isEqualTo("testAuthor");
     }
 
     @Test
     void given_authorFromPropertiesAndCommandLine_when_author_then_returnAuthorFromProperties() {
-        String[] args = {"author=testAuthor"};
+        String[] args = {"gitAuthor=testAuthor"};
         Properties props = new Properties();
-        props.put("author", "propsAuthor");
+        props.put("gitAuthor", "propsAuthor");
         appProps = new ApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
-        String actual = appProps.author();
+        String actual = appProps.gitAuthor();
 
         assertThat(actual).isEqualTo("propsAuthor");
     }

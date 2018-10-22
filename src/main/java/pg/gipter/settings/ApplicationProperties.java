@@ -52,11 +52,32 @@ public class ApplicationProperties {
         return properties != null;
     }
 
-    public String author() {
+    public String gitAuthor() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.author.name(), argExtractor.author());
+            return properties.getProperty(ArgExtractor.ArgName.gitAuthor.name(), argExtractor.gitAuthor());
         }
-        return argExtractor.author();
+        return argExtractor.gitAuthor();
+    }
+
+    public String mercurialAuthor() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgExtractor.ArgName.mercurialAuthor.name(), argExtractor.mercurialAuthor());
+        }
+        return argExtractor.mercurialAuthor();
+    }
+
+    public String svnAuthor() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgExtractor.ArgName.svnAuthor.name(), argExtractor.svnAuthor());
+        }
+        return argExtractor.svnAuthor();
+    }
+
+    public String tfvcAuthor() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgExtractor.ArgName.tfvcAuthor.name(), argExtractor.tfvcAuthor());
+        }
+        return argExtractor.tfvcAuthor();
     }
 
     public String itemPath() {
@@ -215,7 +236,7 @@ public class ApplicationProperties {
     }
 
     private String log() {
-        return  "author='" + author() + '\'' +
+        return  "gitAuthor='" + gitAuthor() + '\'' +
                 ", committerEmail='" + committerEmail() + '\'' +
                 ", itemPath='" + itemPath() + '\'' +
                 ", fileName='" + fileName() + '\'' +

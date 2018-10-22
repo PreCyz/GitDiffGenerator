@@ -14,7 +14,10 @@ import static pg.gipter.Main.yyyy_MM_dd;
 final class ArgExtractor {
 
     enum ArgName {
-        author("NO_AUTHOR_GIVEN"),
+        gitAuthor("NO_AUTHOR_GIVEN"),
+        mercurialAuthor("MERCURIAL_NO_AUTHOR_GIVEN"),
+        svnAuthor("SVN_NO_AUTHOR_GIVEN"),
+        tfvcAuthor("TFVC_NO_AUTHOR_GIVEN"),
         itemPath("NO_ITEM_PATH_GIVEN"),
         projectPath("NO_PROJECT_PATH_GIVEN"),
         periodInDays("7"),
@@ -55,11 +58,32 @@ final class ArgExtractor {
         return args != null && args.length > 0;
     }
 
-    String author() {
+    String gitAuthor() {
         if (hasArgs()) {
-            return getValue(ArgName.author, ArgName.author.defaultValue());
+            return getValue(ArgName.gitAuthor, ArgName.gitAuthor.defaultValue());
         }
-        return ArgName.author.defaultValue();
+        return ArgName.gitAuthor.defaultValue();
+    }
+
+    String mercurialAuthor() {
+        if (hasArgs()) {
+            return getValue(ArgName.mercurialAuthor, ArgName.mercurialAuthor.defaultValue());
+        }
+        return ArgName.mercurialAuthor.defaultValue();
+    }
+
+    String svnAuthor() {
+        if (hasArgs()) {
+            return getValue(ArgName.svnAuthor, ArgName.svnAuthor.defaultValue());
+        }
+        return ArgName.svnAuthor.defaultValue();
+    }
+
+    String tfvcAuthor() {
+        if (hasArgs()) {
+            return getValue(ArgName.tfvcAuthor, ArgName.tfvcAuthor.defaultValue());
+        }
+        return ArgName.tfvcAuthor.defaultValue();
     }
 
     private String getValue(final ArgName argName, String defaultValue) {

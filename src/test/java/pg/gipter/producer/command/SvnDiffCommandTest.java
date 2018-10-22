@@ -48,7 +48,7 @@ class SvnDiffCommandTest {
         LocalDate endDate = LocalDate.now();
         CodeProtection codeProtection = CodeProtection.NONE;
 
-        when(applicationProperties.author()).thenReturn(author);
+        when(applicationProperties.svnAuthor()).thenReturn(author);
         when(applicationProperties.committerEmail()).thenReturn(committerEmail);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
@@ -72,7 +72,7 @@ class SvnDiffCommandTest {
         LocalDate endDate = LocalDate.now();
         CodeProtection codeProtection = CodeProtection.NONE;
 
-        when(applicationProperties.author()).thenReturn(author);
+        when(applicationProperties.svnAuthor()).thenReturn(author);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
         when(applicationProperties.codeProtection()).thenReturn(codeProtection);
