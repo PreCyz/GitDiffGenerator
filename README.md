@@ -33,7 +33,8 @@ projectPath="/home/eva/Path/to/git/project1,/home/eva/Path/to/git/project2"
 If there are _application.properties_ file at the same location as your jar file then program can be run as follows: `java -jar Gipter.jar`
 #### Tips
 If program is executed with commandline parameters and _application.properties_ file at the same time, then setup in _application.properties_ has higher priority.<br />
-Generated file name by default is `"year-monthName-week-weekNumber.txt"`. It can be switched to `"yourPrefix-startDate-endDate.txt"` by setting `yourPrefix` to parameter _itemFileNamePrefix_.<br />
+Generated file name by default is `year-monthName-week-weekNumber.txt`. If diff is generated with end date set in the past then diff file name is `year-monthName-startDate-endDate.txt`.
+If parameter _itemFileNamePrefix_ is set then its value is added at the front of the file name. File name (without extension) is used also as the title of the toolkit item, that is created.<br />
 You can pass some parameters commandline way and other _application.properties_ way. For instance if you do not want to set your password in _application.properties_, you can pass it as commandline param.
 ### Params description
 **author** - the user who committed the code. For git it is user name from git config stored under key '_user.name_'.<br />
@@ -78,6 +79,14 @@ No code! Just information about the change:
 **Case 2**<br />
 It also may be that owner of the code forbids to share any kind of information about the code and changes, even headers.
 If so then user should upload to SharePoint file with the statement. Application can do it for user if only *codeProtection* parameter is set as `STATEMENT`.
+### Toolkit
+To setup toolkit details only two parameters has to be set: _toolkitUsername_ and _toolkitPassword_. If parameters are not set the application will generate diff file and report an error.
+Popup window will be displayed and in the logs there will be relevant entry. If parameters are set then new item in the toolkit will be created. New item will contain attachment, which is generated
+file with diffs from repositories. Below are details of that item:<br />
+**Title**: _diff file name_<br />
+**Submission date**: _endDate + LocalTime.now()_<br />
+**Classification**: Changeset (repository change report)<br />
+**Body**: _vcsName_ diff file     or     STATEMENT diff<br />
 ### Sample of setups
 **Example 1**<br />
 If you want to create diff for _Smeagol Golum_ and _Project1_ from last 7 days then create following setup in your _application.properties_:<br />
@@ -108,7 +117,7 @@ startDate=2018-06-01
 endDate=2018-06-30
 itemFileNamePrefix=june
 ```
-*Explanation:* set _itemFileNamePrefix=june_ in order to have self explanatory item file name.<br />
+*Explanation:* set _itemFileNamePrefix=june_ in order to have file name starts with _june_.<br />
 *Explanation:* you can also use _author_ and _committerEmail_ together.
 #####
 **Example 4**<br />
