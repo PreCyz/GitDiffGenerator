@@ -46,7 +46,7 @@ public class Main extends Application {
     public static void main(String[] args) {
         Logger logger = LoggerFactory.getLogger(Main.class);
         try {
-            logger.error("Gipter started.");
+            logger.info("Gipter started.");
             ApplicationProperties applicationProperties = new ApplicationProperties(args);
 
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
