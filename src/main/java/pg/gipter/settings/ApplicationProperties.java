@@ -241,7 +241,7 @@ public class ApplicationProperties {
     }
 
     private String log() {
-        return  ", authors='" + authors() + '\'' +
+        return  "authors='" + authors() + '\'' +
                 ", gitAuthor='" + gitAuthor() + '\'' +
                 ", mercurialAuthor='" + mercurialAuthor() + '\'' +
                 ", svnAuthor='" + svnAuthor() + '\'' +
