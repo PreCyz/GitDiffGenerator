@@ -37,7 +37,7 @@ Generated file name by default is `year-monthName-week-weekNumber.txt`. If diff 
 If parameter _itemFileNamePrefix_ is set then its value is added at the front of the file name. File name (without extension) is used also as the title of the toolkit item, that is created.<br />
 You can pass some parameters commandline way and other _application.properties_ way. For instance if you do not want to set your password in _application.properties_, you can pass it as commandline param.
 ### Params description
-**author** - the user who committed the code. For git it is user name from git config stored under key '_user.name_'.<br />
+**author** - comma separated users who committed the code.<br />
 **committerEmail** - email of the user who committed the code. For git user email from git config stored under key '_user.email_'.<br />
 **codeProtection** - possible values are `NONE`, `SIMPLE` and `STATEMENT`. Default value is `NONE`. Further explanation [here](https://github.com/PreCyz/GitDiffGenerator#explanation-of-codeprotection-parameter).<br />
 **itemPath** - path where file with git diff should be saved or if `codeProtection` is set as `STATEMENT` then full path to the file with statement.<br />
@@ -46,7 +46,9 @@ You can pass some parameters commandline way and other _application.properties_ 
 **startDate** - start date of diff given in format `yyyy-MM-dd`.<br />
 **endDate** - end date of diff given in format `yyyy-MM-dd`. By default it is set as now.<br />
 **itemFileNamePrefix** - if given then this value will be used as prefix of the diff file name.<br />
-**versionControlSystem** - possible values are `GIT`, `MERCURIAL`, `SVN`. Default value is `GIT`.<br /><br />
+**gitAuthor** - author specific for git repository stored at git config under key '_user.name_'. When used together with _author_, this parameter has higher priority.<br />
+**mercurialAuthor** - author specific for mercurial repository. When used together with _author_, this parameter has higher priority.<br />
+**svnAuthor** - author specific for svn repository. When used together with _author_, this parameter has higher priority.<br />
 
 Below parameters are mandatory for toolkit:<br/>
 **toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
@@ -105,42 +107,39 @@ itemPath=c:\\Path\\to\\git\\diff\\item
 projectPath=c:\\Git\\Project1,c:\\Git\\Project2
 periodInDays=12
 ```
-*Remember:* Java + Windows == double backslash in the paths!
 #####
 **Example 3**<br />
-If you want to create diff for _Project1_ and _Project2_ from _1st of June 2018_ to _30th of June 2018_ and you know only email of committer `BB8@death.star`, create following setup in your _application.properties_:<br />
+If you want to create diff for _Project1_, _Project2_ and _Project3_ from _1st of June 2018_ to _30th of June 2018_ for authors _Ezra Bridger_ and _Kanan Jarrus_, create following setup in your _application.properties_:<br />
 ```
-committerEmail=BB8@death.star
-itemPath=c:\\Path\\to\\git\\diff\\item
-projectPath=c:\\Git\\Project1,c:\\Git\\Project2
+author=Ezra Bridger,Kanan Jarrus
+itemPath=c:\\Path\\to\\diff\\item
+projectPath=c:\\Git\\Project1,c:\\Svn\\Project2,c:\\hg\\Project3
 startDate=2018-06-01
 endDate=2018-06-30
 itemFileNamePrefix=june
 ```
 *Explanation:* set _itemFileNamePrefix=june_ in order to have file name starts with _june_.<br />
-*Explanation:* you can also use _author_ and _committerEmail_ together.
 #####
 **Example 4**<br />
-If you want to create **MERCURIAL** diff for _Project1_ and _Project2_ from _1st of June 2018_ to _30th of June 2018_ and you know only email of committer `BB8@death.star`, create following setup in your _application.properties_:<br />
+If you want to create diff for _Git-Project_ with author _Shak Ti_, _Svn-Project_ with author _Starkiller_ and _Hg-Project_ with author _Juno_ from _1st of June 2018_ to _30th of June 2018_ for authors _Ezra Bridger_ and _Kanan Jarrus_, create following setup in your _application.properties_:<br />
 ```
-committerEmail=BB8@death.star
-itemPath=c:\\Path\\to\\git\\diff\\item
-projectPath=c:\\Git\\Project1,c:\\Git\\Project2
+gitAuthor=Shak Ti
+svnAuthor=Starkiller
+mercurialAuthor=Juno
+itemPath=c:\\Path\\to\\diff\\item
+projectPath=c:\\Git-Project,c:\\Svn-Project,c:\\Hg-Project
 startDate=2018-06-01
 endDate=2018-06-30
 itemFileNamePrefix=june
-versionControlSystem=MERCURIAL
 ```
-*Explanation:* set _itemFileNamePrefix=june_ (or any other value) in order to have your prefix in the item file name.
 #####
 **Example 5**<br />
-If you want to create SVN diff for author `Kit Fisto` and Project1 which is protected by the owner. But you are allowed to use headers of the changes,
+If you want to create SVN diff for author _Kit Fisto_ and _Project1_ which is protected by the owner, but you are allowed to use headers of the changes,
 create following setup in your _application.properties_:<br />
 ```
-author=Kit Fisto
-itemPath=/home/Vader/Path/to/git/diff/item
-projectPath=/home/Vader/Git/Project1
-versionControlSystem=SVN
+svnAuthor=Kit Fisto
+itemPath=/home/Vader/Path/to/diff/item
+projectPath=/home/Vader/SVN/Project1
 codeProtection=SIMPLE
 ```
 *Explanation:* Java + Linux == simple paths with slashes!<br />
