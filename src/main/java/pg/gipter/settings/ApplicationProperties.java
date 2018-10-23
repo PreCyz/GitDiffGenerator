@@ -85,13 +85,6 @@ public class ApplicationProperties {
         return argExtractor.svnAuthor();
     }
 
-    public String tfvcAuthor() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.tfvcAuthor.name(), argExtractor.tfvcAuthor());
-        }
-        return argExtractor.tfvcAuthor();
-    }
-
     public String itemPath() {
         String itemPath = argExtractor.itemPath();
         if (hasProperties()) {

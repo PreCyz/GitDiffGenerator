@@ -89,24 +89,6 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_noAuthor_when_tfvcAuthor_then_returnDefaultValue() {
-        argExtractor = new ArgExtractor(new String[]{});
-
-        String actual = argExtractor.tfvcAuthor();
-
-        assertThat(actual).isEqualTo("");
-    }
-
-    @Test
-    void given_author_when_tfvcAuthor_then_returnThatAuthor() {
-        argExtractor = new ArgExtractor(new String[]{"tfvcAuthor=testAuthor"});
-
-        String actual = argExtractor.tfvcAuthor();
-
-        assertThat(actual).isEqualTo("testAuthor");
-    }
-
-    @Test
     void given_noItemPath_when_itemPath_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 

@@ -7,8 +7,7 @@ import java.util.stream.Collectors;
 public enum VersionControlSystem {
     GIT(".git"),
     MERCURIAL(".hg"),
-    SVN(".svn"),
-    TFVC("notSupportedYet");
+    SVN(".svn");
 
     private String dirName;
 

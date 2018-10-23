@@ -39,11 +39,4 @@ class DiffCommandFactoryTest {
         assertThat(instance).isInstanceOf(MercurialDiffCommand.class);
     }
 
-    @Test
-    void given_codeProtectionDefaultAndTfvc_when_getInstance_then_returnTfvcDiffCommand() {
-        DiffCommand instance = DiffCommandFactory.getInstance(
-                VersionControlSystem.TFVC, new ApplicationProperties(new String[]{})
-        );
-        assertThat(instance).isInstanceOf(TfvcDiffCommand.class);
-    }
 }

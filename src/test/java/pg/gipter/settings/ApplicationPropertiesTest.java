@@ -135,28 +135,6 @@ class ApplicationPropertiesTest {
     }
 
     @Test
-    void given_authorFromCommandLine_when_tfvcAuthor_then_returnThatAuthor() {
-        appProps = new ApplicationProperties(new String[]{"tfvcAuthor=testAuthor"});
-
-        String actual = appProps.tfvcAuthor();
-
-        assertThat(actual).isEqualTo("testAuthor");
-    }
-
-    @Test
-    void given_authorFromPropertiesAndCommandLine_when_tfvcAuthor_then_returnAuthorFromProperties() {
-        String[] args = {"tfvcAuthor=testAuthor"};
-        Properties props = new Properties();
-        props.put("tfvcAuthor", "propsAuthor");
-        appProps = new ApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.tfvcAuthor();
-
-        assertThat(actual).isEqualTo("propsAuthor");
-    }
-
-    @Test
     void given_itemPathFromCommandLine_when_itemPath_then_returnThatItemPath() {
         appProps = new ApplicationProperties(new String[]{"itemPath=testItemPath"});
 

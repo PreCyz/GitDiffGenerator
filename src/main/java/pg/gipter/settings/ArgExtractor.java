@@ -17,7 +17,6 @@ final class ArgExtractor {
         gitAuthor(""),
         mercurialAuthor(""),
         svnAuthor(""),
-        tfvcAuthor(""),
         itemPath("NO_ITEM_PATH_GIVEN"),
         projectPath("NO_PROJECT_PATH_GIVEN"),
         periodInDays("7"),
@@ -85,13 +84,6 @@ final class ArgExtractor {
             return getValue(ArgName.svnAuthor, ArgName.svnAuthor.defaultValue());
         }
         return ArgName.svnAuthor.defaultValue();
-    }
-
-    String tfvcAuthor() {
-        if (hasArgs()) {
-            return getValue(ArgName.tfvcAuthor, ArgName.tfvcAuthor.defaultValue());
-        }
-        return ArgName.tfvcAuthor.defaultValue();
     }
 
     private String getValue(final ArgName argName, String defaultValue) {
