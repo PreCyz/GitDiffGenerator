@@ -41,7 +41,7 @@ You can pass some parameters commandline way and other _application.properties_ 
 **committerEmail** - email of the user who committed the code. For git user email from git config stored under key '_user.email_'.<br />
 **codeProtection** - possible values are `NONE`, `SIMPLE` and `STATEMENT`. Default value is `NONE`. Further explanation [here](https://github.com/PreCyz/GitDiffGenerator#explanation-of-codeprotection-parameter).<br />
 **itemPath** - path where file with git diff should be saved or if `codeProtection` is set as `STATEMENT` then full path to the file with statement.<br />
-**projectPath** - comma separated project paths containing _.git_ folder.<br />
+**projectPath** - comma separated project paths containing _.git_, _.svn_ or _.hg_ folders.<br />
 **periodInDays** - integer number. Default value is 7. It helps define start date of diff calculations. Start date is `now - periodInDays`, end date is now.<br />
 **startDate** - start date of diff given in format `yyyy-MM-dd`.<br />
 **endDate** - end date of diff given in format `yyyy-MM-dd`. By default it is set as now.<br />
