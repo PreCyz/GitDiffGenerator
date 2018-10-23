@@ -8,8 +8,12 @@ import pg.gipter.settings.ApplicationProperties;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -85,6 +89,43 @@ class MercurialDiffCommandTest {
                 "--date", "\"" + startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " to " +
                         endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "\""
         );
+    }
+
+    @Test
+    void given_authors_when_authors_thenReturnAuthors() {
+        Set<String> authors = Stream.of("author1", "author2").collect(toCollection(LinkedHashSet::new));
+
+        when(applicationProperties.authors()).thenReturn(authors);
+        when(applicationProperties.mercurialAuthor()).thenReturn("");
+        command = new MercurialDiffCommand(applicationProperties);
+
+        List<String> actual = command.authors();
+
+        assertThat(actual).containsExactly("--user", "author1", "--user", "author2");
+    }
+
+    @Test
+    void given_authorsAndMercurialAuthor_when_authors_thenReturnMercurialAuthor() {
+        Set<String> authors = Stream.of("author1", "author2").collect(toCollection(LinkedHashSet::new));
+
+        when(applicationProperties.authors()).thenReturn(authors);
+        when(applicationProperties.mercurialAuthor()).thenReturn("mercurialAuthor");
+        command = new MercurialDiffCommand(applicationProperties);
+
+        List<String> actual = command.authors();
+
+        assertThat(actual).containsExactly("--user", "mercurialAuthor");
+    }
+
+    @Test
+    void given_mercurialAuthorAndCommitterEmail_when_authors_thenReturnMercurialAuthorAndCommitterEmail() {
+        when(applicationProperties.mercurialAuthor()).thenReturn("mercurialAuthor");
+        when(applicationProperties.committerEmail()).thenReturn("committerEmail");
+        command = new MercurialDiffCommand(applicationProperties);
+
+        List<String> actual = command.authors();
+
+        assertThat(actual).containsExactly("--user", "mercurialAuthor", "--user", "committerEmail");
     }
 
 }

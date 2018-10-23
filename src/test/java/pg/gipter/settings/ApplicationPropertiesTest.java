@@ -45,6 +45,30 @@ class ApplicationPropertiesTest {
     }
 
     @Test
+    void given_authorFromCommandLine_when_authors_then_returnThatAuthor() {
+        appProps = new ApplicationProperties(new String[]{"author=author1"});
+
+        Set<String> actual = appProps.authors();
+
+        assertThat(actual).hasSize(1);
+        assertThat(actual).containsExactly("author1");
+    }
+
+    @Test
+    void given_authorFromPropertiesAndCommandLine_when_authors_then_returnAuthorsFromProperties() {
+        String[] args = {"author=testAuthor"};
+        Properties props = new Properties();
+        props.put("author", "propsAuthor1,propsAuthor2");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = appProps.authors();
+
+        assertThat(actual).hasSize(2);
+        assertThat(actual).containsExactly("propsAuthor1", "propsAuthor2");
+    }
+
+    @Test
     void given_authorFromCommandLine_when_gitAuthor_then_returnThatAuthor() {
         appProps = new ApplicationProperties(new String[]{"gitAuthor=testAuthor"});
 

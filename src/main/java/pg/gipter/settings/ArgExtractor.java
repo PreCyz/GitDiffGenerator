@@ -3,10 +3,9 @@ package pg.gipter.settings;
 import pg.gipter.producer.command.CodeProtection;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static pg.gipter.Main.yyyy_MM_dd;
 
@@ -14,10 +13,11 @@ import static pg.gipter.Main.yyyy_MM_dd;
 final class ArgExtractor {
 
     enum ArgName {
-        gitAuthor("GIT_NO_AUTHOR_GIVEN"),
-        mercurialAuthor("MERCURIAL_NO_AUTHOR_GIVEN"),
-        svnAuthor("SVN_NO_AUTHOR_GIVEN"),
-        tfvcAuthor("TFVC_NO_AUTHOR_GIVEN"),
+        author("NO_AUTHORS_GIVEN"),
+        gitAuthor(""),
+        mercurialAuthor(""),
+        svnAuthor(""),
+        tfvcAuthor(""),
         itemPath("NO_ITEM_PATH_GIVEN"),
         projectPath("NO_PROJECT_PATH_GIVEN"),
         periodInDays("7"),
@@ -56,6 +56,14 @@ final class ArgExtractor {
 
     private boolean hasArgs() {
         return args != null && args.length > 0;
+    }
+
+    Set<String> authors() {
+        if (hasArgs()) {
+            String authors = getValue(ArgName.author, ArgName.author.defaultValue());
+            return Stream.of(authors.split(",")).collect(Collectors.toCollection(LinkedHashSet::new));
+        }
+        return Stream.of(ArgName.author.defaultValue()).collect(Collectors.toCollection(HashSet::new));
     }
 
     String gitAuthor() {

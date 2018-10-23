@@ -10,7 +10,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toCollection;
 import static pg.gipter.Main.yyyy_MM_dd;
 import static pg.gipter.settings.PropertiesLoader.APPLICATION_PROPERTIES;
 
@@ -50,6 +52,16 @@ public class ApplicationProperties {
 
     boolean hasProperties() {
         return properties != null;
+    }
+
+    public Set<String> authors() {
+        if (hasProperties()) {
+            String authors = properties.getProperty(
+                    ArgExtractor.ArgName.author.name(), String.join(",", argExtractor.authors())
+            );
+            return Stream.of(authors.split(",")).collect(toCollection(LinkedHashSet::new));
+        }
+        return argExtractor.authors();
     }
 
     public String gitAuthor() {
@@ -236,7 +248,10 @@ public class ApplicationProperties {
     }
 
     private String log() {
-        return  "gitAuthor='" + gitAuthor() + '\'' +
+        return  ", authors='" + authors() + '\'' +
+                ", gitAuthor='" + gitAuthor() + '\'' +
+                ", mercurialAuthor='" + mercurialAuthor() + '\'' +
+                ", svnAuthor='" + svnAuthor() + '\'' +
                 ", committerEmail='" + committerEmail() + '\'' +
                 ", itemPath='" + itemPath() + '\'' +
                 ", fileName='" + fileName() + '\'' +

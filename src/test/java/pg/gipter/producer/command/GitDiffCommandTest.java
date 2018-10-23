@@ -8,8 +8,12 @@ import pg.gipter.settings.ApplicationProperties;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -85,5 +89,42 @@ class GitDiffCommandTest {
                 "--since", startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 "--until", endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         );
+    }
+
+    @Test
+    void given_authors_when_authors_thenReturnAuthors() {
+        Set<String> authors = Stream.of("author1", "author2").collect(toCollection(LinkedHashSet::new));
+
+        when(applicationProperties.authors()).thenReturn(authors);
+        when(applicationProperties.gitAuthor()).thenReturn("");
+        command = new GitDiffCommand(applicationProperties);
+
+        List<String> actual = command.authors();
+
+        assertThat(actual).containsExactly("--author=author1", "--author=author2");
+    }
+
+    @Test
+    void given_authorsAndGitAuthor_when_authors_thenReturnGitAuthor() {
+        Set<String> authors = Stream.of("author1", "author2").collect(toCollection(LinkedHashSet::new));
+
+        when(applicationProperties.authors()).thenReturn(authors);
+        when(applicationProperties.gitAuthor()).thenReturn("gitAuthor");
+        command = new GitDiffCommand(applicationProperties);
+
+        List<String> actual = command.authors();
+
+        assertThat(actual).containsExactly("--author=gitAuthor");
+    }
+
+    @Test
+    void given_gitAuthorAndCommitterEmail_when_authors_thenReturnGitAuthorAndCommitterEmail() {
+        when(applicationProperties.gitAuthor()).thenReturn("gitAuthor");
+        when(applicationProperties.committerEmail()).thenReturn("committerEmail");
+        command = new GitDiffCommand(applicationProperties);
+
+        List<String> actual = command.authors();
+
+        assertThat(actual).containsExactly("--author=gitAuthor", "--author=committerEmail");
     }
 }

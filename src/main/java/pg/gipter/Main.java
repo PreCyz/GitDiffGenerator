@@ -42,7 +42,6 @@ public class Main extends Application {
         alert.showAndWait();
     }
 
-
     public static void main(String[] args) {
         Logger logger = LoggerFactory.getLogger(Main.class);
         try {

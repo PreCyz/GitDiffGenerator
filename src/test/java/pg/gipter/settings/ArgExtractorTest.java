@@ -15,12 +15,32 @@ class ArgExtractorTest {
     private ArgExtractor argExtractor;
 
     @Test
+    void given_noAuthor_when_authors_then_returnDefaultValue() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        Set<String> actual = argExtractor.authors();
+
+        assertThat(actual).hasSize(1);
+        assertThat(actual).containsExactly("NO_AUTHORS_GIVEN");
+    }
+
+    @Test
+    void given_authors_when_authors_then_returnDefaultValue() {
+        argExtractor = new ArgExtractor(new String[]{"author=author1,author2"});
+
+        Set<String> actual = argExtractor.authors();
+
+        assertThat(actual).hasSize(2);
+        assertThat(actual).containsExactly("author1", "author2");
+    }
+
+    @Test
     void given_noAuthor_when_gitAuthor_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
         String actual = argExtractor.gitAuthor();
 
-        assertThat(actual).isEqualTo("GIT_NO_AUTHOR_GIVEN");
+        assertThat(actual).isEqualTo("");
     }
 
     @Test
@@ -38,7 +58,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.mercurialAuthor();
 
-        assertThat(actual).isEqualTo("MERCURIAL_NO_AUTHOR_GIVEN");
+        assertThat(actual).isEqualTo("");
     }
 
     @Test
@@ -56,7 +76,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.svnAuthor();
 
-        assertThat(actual).isEqualTo("SVN_NO_AUTHOR_GIVEN");
+        assertThat(actual).isEqualTo("");
     }
 
     @Test
@@ -74,7 +94,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.tfvcAuthor();
 
-        assertThat(actual).isEqualTo("TFVC_NO_AUTHOR_GIVEN");
+        assertThat(actual).isEqualTo("");
     }
 
     @Test

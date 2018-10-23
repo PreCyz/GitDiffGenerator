@@ -18,18 +18,9 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
     @Override
     public List<String> commandAsList() {
         List<String> command = getInitialCommand();
-        if (StringUtils.notEmpty(appProps.mercurialAuthor())) {
-            command.add("--user");
-            command.add(appProps.mercurialAuthor());
-        }
-        if (StringUtils.notEmpty(appProps.committerEmail())) {
-            command.add("--user");
-            command.add(appProps.committerEmail());
-        }
-
+        command.addAll(authors());
         command.add("--date");
         command.add(String.format("\"%s to %s\"", appProps.startDate().format(yyyy_MM_dd), appProps.endDate().format(yyyy_MM_dd)));
-
         return command;
     }
 
@@ -46,6 +37,24 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
                 break;
         }
         return initialCommand;
+    }
+
+    List<String> authors() {
+        List<String> authors = new LinkedList<>();
+        if (!appProps.mercurialAuthor().isEmpty()) {
+            authors.add("--user");
+            authors.add(appProps.mercurialAuthor());
+        } else {
+            for (String author : appProps.authors()) {
+                authors.add("--user");
+                authors.add(author);
+            }
+        }
+        if (StringUtils.notEmpty(appProps.committerEmail())) {
+            authors.add("--user");
+            authors.add(appProps.committerEmail());
+        }
+        return authors;
     }
 
 }

@@ -19,15 +19,7 @@ final class SvnDiffCommand extends AbstractDiffCommand {
     @Override
     public List<String> commandAsList() {
         List<String> command = getInitialCommand();
-        if (StringUtils.notEmpty(appProps.svnAuthor())) {
-            command.add("--search");
-            command.add(appProps.svnAuthor());
-        }
-        if (StringUtils.notEmpty(appProps.committerEmail())) {
-            command.add("--search");
-            command.add(appProps.committerEmail());
-        }
-
+        command.addAll(authors());
         command.add("--revision");
         command.add(String.format("{%s}:{%s}",
                 appProps.startDate().format(yyyy_MM_dd),
@@ -50,6 +42,24 @@ final class SvnDiffCommand extends AbstractDiffCommand {
                 break;
         }
         return initialCommand;
+    }
+
+    List<String> authors() {
+        List<String> authors = new LinkedList<>();
+        if (StringUtils.notEmpty(appProps.svnAuthor())) {
+            authors.add("--search");
+            authors.add(appProps.svnAuthor());
+        } else {
+            for (String author : appProps.authors()) {
+                authors.add("--search");
+                authors.add(author);
+            }
+        }
+        if (StringUtils.notEmpty(appProps.committerEmail())) {
+            authors.add("--search");
+            authors.add(appProps.committerEmail());
+        }
+        return authors;
     }
 
 }
