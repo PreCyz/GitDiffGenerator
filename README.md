@@ -65,18 +65,15 @@ It may be that owner of the code forbids to share the code in anyway but you are
 In that case user should set parameter *codeProtection* to `SIMPLE`.
 For `GIT` the `SIMPLE` protection will contain entries as follows:<br />
 ```
-commit 32d111bf4483264e6a6bd89422b5b7b60e39bee7 (HEAD -> master)
-Author: Anton Gorodecki <dniewnoj@dozor.fantasy>
-Date:   Fri Oct 5 20:54:44 2018 +0200
-
-    Introducing StringUtils class.
+a42212890 Cleaning code.
+5cfc248ad Fixing that balck hole.
 ```
-No code! Just information about the change:
- - who,
- - when,
- - commit hash,
- - branch name,
- - commit message.
+No code! Just:
+ - who - optional,
+ - when - optional,
+ - commit hash - mandatory,
+ - branch name - optional,
+ - commit message - mandatory.
 #####
 **Case 2**<br />
 It also may be that owner of the code forbids to share any kind of information about the code and changes, even headers.
