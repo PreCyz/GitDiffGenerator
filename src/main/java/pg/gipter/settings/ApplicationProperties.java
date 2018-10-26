@@ -184,17 +184,6 @@ public class ApplicationProperties {
         return argExtractor.toolkitUsername();
     }
 
-    public String toolkitUserEmail() {
-        if (hasProperties()) {
-            String userName = properties.getProperty(ArgExtractor.ArgName.toolkitUsername.name());
-            if (userName != null && !userName.isEmpty()) {
-                String userEmail = userName + argExtractor.emailDomain();
-                return userEmail.toLowerCase();
-            }
-        }
-        return argExtractor.toolkitUserEmail();
-    }
-
     public String toolkitPassword() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.toolkitPassword.name(), argExtractor.toolkitPassword());
@@ -234,10 +223,9 @@ public class ApplicationProperties {
         return argExtractor.toolkitUserFolder();
     }
 
-    public boolean isToolkitPropertiesSet() {
-        return !toolkitUsername().equals(ArgExtractor.ArgName.toolkitUsername.defaultValue()) &&
-                !toolkitPassword().equals(ArgExtractor.ArgName.toolkitPassword.defaultValue()) &&
-                !toolkitUsername().isEmpty() && !toolkitPassword().isEmpty();
+    public boolean isToolkitCredentialsSet() {
+        return !toolkitUsername().isEmpty() && !ArgExtractor.ArgName.toolkitUsername.defaultValue().equals(toolkitUsername()) &&
+                !toolkitPassword().isEmpty() && !ArgExtractor.ArgName.toolkitPassword.defaultValue().equals(toolkitPassword());
     }
 
     private String log() {
@@ -253,13 +241,12 @@ public class ApplicationProperties {
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
                 ", codeProtection='" + codeProtection() + '\'' +
-                ", toolkitPropertiesSet='" + isToolkitPropertiesSet() + '\'' +
+                ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
                 ", toolkitUsername='" + toolkitUsername() + '\'' +
                 ", toolkitUrl='" + toolkitUrl() + '\'' +
                 ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                 ", toolkitDomain='" + toolkitDomain() + '\'' +
                 ", toolkitListName='" + toolkitListName() + '\'' +
-                ", toolkitUserEmail='" + toolkitUserEmail()+ '\'' +
                 ", toolkitUserFolder='" + toolkitUserFolder()+ '\''
                 ;
     }

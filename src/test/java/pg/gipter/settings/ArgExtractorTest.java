@@ -424,13 +424,4 @@ class ArgExtractorTest {
 
         assertThat(actual).isEqualTo("WorkItems");
     }
-
-    @Test
-    void given_toolkitUserNameFromCommandLine_when_toolkitUserEmail_then_returnEmail() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitUsername=XXX"});
-
-        String actual = argExtractor.toolkitUserEmail();
-
-        assertThat(actual).isEqualTo("xxx@netcompany.com");
-    }
 }

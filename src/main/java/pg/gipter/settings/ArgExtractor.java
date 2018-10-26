@@ -33,8 +33,7 @@ final class ArgExtractor {
         toolkitListName("WorkItems"),
         toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY"),
         toolkitWSUrl(toolkitUrl.defaultValue + "/_vti_bin/lists.asmx"),
-        toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/"),
-        emailDomain("@netcompany.com");
+        toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/");
 
         private String defaultValue;
 
@@ -160,15 +159,6 @@ final class ArgExtractor {
             return getValue(ArgName.toolkitUsername, ArgName.toolkitUsername.defaultValue()).trim().toUpperCase();
         }
         return ArgName.toolkitUsername.defaultValue();
-    }
-
-    String emailDomain() {
-        return ArgName.emailDomain.defaultValue();
-    }
-
-    String toolkitUserEmail() {
-        String userEmail = toolkitUsername() + emailDomain();
-        return userEmail.toLowerCase();
     }
 
     String toolkitPassword() {

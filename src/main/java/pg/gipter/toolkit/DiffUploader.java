@@ -94,7 +94,7 @@ public class DiffUploader {
 
         Map<String, String> attributes = new HashMap<>();
         attributes.put("Title", title);
-        attributes.put("Employee", "-1;#" + applicationProperties.toolkitUserEmail());
+        attributes.put("Employee", "-1;#" + applicationProperties.toolkitUsername());
         attributes.put("SubmissionDate", submissionDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")));
         attributes.put("Classification", "12;#Changeset (repository change report)");
         attributes.put("Body", description);

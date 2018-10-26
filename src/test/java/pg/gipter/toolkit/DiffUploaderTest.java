@@ -47,7 +47,7 @@ class DiffUploaderTest {
         LocalDateTime actualSubmissionDate = LocalDateTime.parse(map.get("SubmissionDate"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
         assertThat(map).hasSize(8);
         assertThat(map.get("Title")).isEqualTo("2018-october-20181018-20181019");
-        assertThat(map.get("Employee")).isEqualTo("-1;#xxx@netcompany.com");
+        assertThat(map.get("Employee")).isEqualTo("-1;#XXX");
         assertThat(actualSubmissionDate.getYear()).isEqualTo(2018);
         assertThat(actualSubmissionDate.getMonthValue()).isEqualTo(10);
         assertThat(actualSubmissionDate.getDayOfMonth()).isEqualTo(19);
@@ -76,7 +76,7 @@ class DiffUploaderTest {
         LocalDateTime actualSubmissionDate = LocalDateTime.parse(map.get("SubmissionDate"), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
         assertThat(map).hasSize(8);
         assertThat(map.get("Title")).isEqualTo("custom-2017-december-20171019-20171220");
-        assertThat(map.get("Employee")).isEqualTo("-1;#xxx@netcompany.com");
+        assertThat(map.get("Employee")).isEqualTo("-1;#XXX");
         assertThat(actualSubmissionDate.getYear()).isEqualTo(2017);
         assertThat(actualSubmissionDate.getMonthValue()).isEqualTo(12);
         assertThat(actualSubmissionDate.getDayOfMonth()).isEqualTo(20);

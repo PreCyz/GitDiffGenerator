@@ -308,15 +308,6 @@ class ApplicationPropertiesTest {
     }
 
     @Test
-    void given_toolkitUsername_when_toolkitUserEmail_then_returnNowMinusPeriodInDays() {
-        appProps = new ApplicationProperties(new String[]{"toolkitUsername=userName"});
-
-        String actual = appProps.toolkitUserEmail();
-
-        assertThat(actual).isEqualTo("username@netcompany.com");
-    }
-
-    @Test
     void given_endDate_when_endDate_then_returnThatEndDate() {
         appProps = new ApplicationProperties(new String[]{"endDate=2018-10-19"});
 
@@ -467,42 +458,11 @@ class ApplicationPropertiesTest {
     }
 
     @Test
-    void given_noToolkitUsername_when_toolkitUserEmail_then_returnDefaultValue() {
-        appProps = new ApplicationProperties(new String[]{});
-
-        String actual = appProps.toolkitUserEmail();
-
-        assertThat(actual).isEqualTo("no_toolkit_username_given@netcompany.com" );
-    }
-
-    @Test
-    void given_toolkitUserName_when_toolkitUserEmail_then_returnToolkitUserEmail() {
-        appProps = new ApplicationProperties(new String[]{"toolkitUsername=vzv"});
-
-        String actual = appProps.toolkitUserEmail();
-
-        assertThat(actual).isEqualTo("vzv@netcompany.com");
-    }
-
-    @Test
-    void given_codeToolkitUserNameFromPropertiesAndCommandLine_when_toolkitUserEmail_then_returnToolkitUserEmailBasedOnProperties() {
-        String[] args = {"toolkitUsername=asd"};
-        Properties props = new Properties();
-        props.put("toolkitUsername", "cvb");
-        appProps = new ApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitUserEmail();
-
-        assertThat(actual).isEqualTo("cvb@netcompany.com");
-    }
-
-    @Test
     void given_noToolkitUsernameAndPassword_when_isToolkitPropertiesSet_then_returnFalse() {
         String[] args = new String[]{};
         appProps = new ApplicationProperties(args);
 
-        boolean actual = appProps.isToolkitPropertiesSet();
+        boolean actual = appProps.isToolkitCredentialsSet();
 
         assertThat(actual).isFalse();
     }
@@ -512,7 +472,7 @@ class ApplicationPropertiesTest {
         String[] args = {"toolkitUsername=", "toolkitPassword="};
         appProps = new ApplicationProperties(args);
 
-        boolean actual = appProps.isToolkitPropertiesSet();
+        boolean actual = appProps.isToolkitCredentialsSet();
 
         assertThat(actual).isFalse();
     }
@@ -525,7 +485,7 @@ class ApplicationPropertiesTest {
         appProps = new ApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
-        boolean actual = appProps.isToolkitPropertiesSet();
+        boolean actual = appProps.isToolkitCredentialsSet();
 
         assertThat(actual).isTrue();
     }

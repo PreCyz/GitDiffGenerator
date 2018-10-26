@@ -55,7 +55,7 @@ public class Main extends Application {
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
             diffProducer.produceDiff();
 
-            if (!applicationProperties.isToolkitPropertiesSet()) {
+            if (!applicationProperties.isToolkitCredentialsSet()) {
                 logger.error("Toolkit details not set. Check your settings.");
                 throw new IllegalArgumentException();
             }
