@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static pg.gipter.Main.yyyy_MM_dd;
+import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 
 final class SvnDiffCommand extends AbstractDiffCommand {

@@ -14,12 +14,9 @@ import pg.gipter.toolkit.DiffUploader;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.format.DateTimeFormatter;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018*/
 public class Main extends Application {
-
-    public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     public void start(Stage primaryStage) throws URISyntaxException {

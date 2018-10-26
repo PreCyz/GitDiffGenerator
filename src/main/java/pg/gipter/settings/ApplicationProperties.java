@@ -13,13 +13,13 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
-import static pg.gipter.Main.yyyy_MM_dd;
 import static pg.gipter.settings.PropertiesLoader.APPLICATION_PROPERTIES;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public class ApplicationProperties {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationProperties.class);
+    public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private Properties properties;
     private final ArgExtractor argExtractor;
@@ -43,10 +43,10 @@ public class ApplicationProperties {
         Optional<Properties> propsFromFile = propertiesLoader.loadPropertiesFromFile();
         if (propsFromFile.isPresent()) {
             properties = propsFromFile.get();
-            logger.info("Properties from file loaded [{}]", log());
+            logger.info("Properties from file loaded [{}].", log());
         } else {
             logger.warn("Can not read [{}].", APPLICATION_PROPERTIES);
-            logger.info("Command line argument loaded: {}", Arrays.toString(args));
+            logger.info("Command line argument loaded: {}.", Arrays.toString(args));
         }
     }
 

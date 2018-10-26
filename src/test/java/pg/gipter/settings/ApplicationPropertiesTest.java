@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static pg.gipter.Main.yyyy_MM_dd;
+import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 class ApplicationPropertiesTest {
 
