@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.ws.soap.SoapFault;
@@ -156,5 +157,29 @@ class DiffUploaderTest {
         } catch (RuntimeException ex) {
             assertThat(ex.getMessage()).isEqualTo("Error during upload diff.");
         }
+    }
+
+    @Test
+    void when_initSpringApplicationContext_then_returnApplicationContext() {
+        ApplicationProperties applicationProperties = new ApplicationProperties(new String[]{"toolkitUsername=userName", "toolkitPassword=password"});
+        uploader = new DiffUploader(applicationProperties);
+
+        ApplicationContext actual = uploader.initSpringApplicationContext();
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getBeanDefinitionNames()).contains(
+                "sharePointConfiguration",
+                "httpComponentsMessageSender",
+                "marshaller",
+                "webServiceTemplate",
+                "sharePointSoapClient"
+        );
+        Environment actualEnv = actual.getEnvironment();
+        assertThat(actualEnv).isNotNull();
+        assertThat(actualEnv.getProperty("toolkit.username")).isEqualTo("USERNAME");
+        assertThat(actualEnv.getProperty("toolkit.password")).isEqualTo("password");
+        assertThat(actualEnv.getProperty("toolkit.domain")).isEqualTo("NCDMZ");
+        assertThat(actualEnv.getProperty("toolkit.WSUrl")).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
+        assertThat(actualEnv.getProperty("toolkit.listName")).isEqualTo("WorkItems");
     }
 }
