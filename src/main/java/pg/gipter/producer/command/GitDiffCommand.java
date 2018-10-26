@@ -28,7 +28,7 @@ final class GitDiffCommand extends AbstractDiffCommand {
     }
 
     List<String> getInitialCommand() {
-        List<String> initialCommand = new LinkedList<>(Arrays.asList("git", "log", "--all", "--remotes=origin"));
+        List<String> initialCommand = new LinkedList<>(Arrays.asList("git", "log", "--remotes=origin"));
         switch (appProps.codeProtection()) {
             case NONE:
                 initialCommand.add("--patch");
