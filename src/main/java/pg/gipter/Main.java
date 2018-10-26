@@ -23,11 +23,18 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws URISyntaxException {
-        File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        String jarDirectory = jarFile.getPath().replace(jarFile.getName(), "");
-        String errMsg = String.format("Hey!!%nIt's Gipter here && I have bad news!%nYour copyright item was not uploaded.%n" +
-                "Check the logs to find out why.%nLogs are located here:%n%slogs", jarDirectory);
+        String errMsg = createErrorMessage();
+        displayAlertWindow(errMsg);
+    }
 
+    private String createErrorMessage() throws URISyntaxException {
+        File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+        String logsDirectory = jarFile.getPath().replace(jarFile.getName(), "logs");
+        return String.format("Hey!!%nIt's Gipter here && I have bad news!%nYour copyright item was not uploaded.%n" +
+                "Check the logs to find out why.%nLogs are located here:%n%s", logsDirectory);
+    }
+
+    private void displayAlertWindow(String errMsg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Oh Chicken Face ('> ");
         alert.setHeaderText(null);
@@ -52,7 +59,7 @@ public class Main extends Application {
             diffProducer.produceDiff();
 
             if (!applicationProperties.isToolkitPropertiesSet()) {
-                logger.error("Toolkit details not set. Check your settings");
+                logger.error("Toolkit details not set. Check your settings.");
                 throw new IllegalArgumentException();
             }
 
