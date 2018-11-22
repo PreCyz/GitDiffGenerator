@@ -16,6 +16,6 @@ class WindowsDiffProducerTest {
 
         List<String> actual = producer.getFullCommand(Arrays.asList("c", "\"c2\"", "c3"));
 
-        assertThat(actual).containsExactly("cmd.exe", "/c", "c", "\"c2\"", "c3");
+        assertThat(actual).containsExactly("c", "\"c2\"", "c3");
     }
 }
