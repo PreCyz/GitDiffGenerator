@@ -49,6 +49,7 @@ You can pass some parameters commandline way and other _application.properties_ 
 **gitAuthor** - author specific for git repository stored at git config under key '_user.name_'. When used together with _author_, this parameter has higher priority.<br />
 **mercurialAuthor** - author specific for mercurial repository. When used together with _author_, this parameter has higher priority.<br />
 **svnAuthor** - author specific for svn repository. When used together with _author_, this parameter has higher priority.<br />
+**confirmationWindow** - if parameter set as `Y` then confirmation window will be displayed after successful upload. Default value is `N`.<br />
 
 Below parameters are mandatory for toolkit:<br/>
 **toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
