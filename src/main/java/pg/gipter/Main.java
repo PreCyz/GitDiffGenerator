@@ -28,7 +28,11 @@ public class Main extends Application {
             String errMsg = createErrorMessage();
             displayWindow(errMsg, Alert.AlertType.ERROR);
         } else if (applicationProperties.isConfirmation()) {
-            displayWindow("Your copyright item was uploaded succesfully", Alert.AlertType.ERROR);
+            String confirmationMsg = String.format(
+                    "Your copyright item was uploaded successfully. If you do not believe me, check it here %s.",
+                    applicationProperties.toolkitUserFolder()
+            );
+            displayWindow(confirmationMsg, Alert.AlertType.CONFIRMATION);
         }
     }
 
@@ -39,11 +43,11 @@ public class Main extends Application {
                 "Check the logs to find out why.%nLogs are located here:%n%s", logsDirectory);
     }
 
-    private void displayWindow(String errMsg, Alert.AlertType alertType) {
+    private void displayWindow(String message, Alert.AlertType alertType) {
         Alert alert = new Alert(alertType);
         alert.setTitle("Oh Chicken Face ('> ");
         alert.setHeaderText(null);
-        alert.setContentText(errMsg);
+        alert.setContentText(message);
 
         URL imgUrl = this.getClass().getClassLoader().getResource("img/chicken-face.jpg");
         if (imgUrl != null) {
