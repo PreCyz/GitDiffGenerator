@@ -424,4 +424,22 @@ class ArgExtractorTest {
 
         assertThat(actual).isEqualTo("WorkItems");
     }
+
+    @Test
+    void when_isConfirmation_then_returnFalse() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        boolean actual = argExtractor.isConfirmation();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_confirmationWindowSetY_when_isConfirmation_then_returnFalse() {
+        argExtractor = new ArgExtractor(new String[]{"confirmationWindow=Y"});
+
+        boolean actual = argExtractor.isConfirmation();
+
+        assertThat(actual).isTrue();
+    }
 }

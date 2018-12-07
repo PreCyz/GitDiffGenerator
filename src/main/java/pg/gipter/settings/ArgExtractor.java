@@ -1,6 +1,7 @@
 package pg.gipter.settings;
 
 import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -25,6 +26,7 @@ final class ArgExtractor {
         endDate(LocalDate.now().format(yyyy_MM_dd)),
         itemFileNamePrefix(""),
         codeProtection(CodeProtection.NONE.name()),
+        confirmationWindow("N"),
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
         toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
 
@@ -152,6 +154,13 @@ final class ArgExtractor {
             return CodeProtection.valueFor(codeProtection);
         }
         return CodeProtection.valueFor(ArgName.codeProtection.defaultValue());
+    }
+
+    boolean isConfirmation() {
+        if (hasArgs()) {
+            return StringUtils.getBoolean(getValue(ArgName.confirmationWindow, ArgName.codeProtection.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
     }
 
     String toolkitUsername() {

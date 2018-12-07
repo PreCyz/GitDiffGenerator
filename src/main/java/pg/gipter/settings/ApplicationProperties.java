@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.command.VersionControlSystem;
+import pg.gipter.producer.util.StringUtils;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -175,6 +176,15 @@ public class ApplicationProperties {
             return CodeProtection.valueFor(codeProtected);
         }
         return argExtractor.codeProtection();
+    }
+
+    public boolean isConfirmation() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgExtractor.ArgName.confirmationWindow.name(), ArgExtractor.ArgName.confirmationWindow.defaultValue()
+            ));
+        }
+        return argExtractor.isConfirmation();
     }
 
     public String toolkitUsername() {

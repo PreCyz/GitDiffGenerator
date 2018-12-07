@@ -489,4 +489,42 @@ class ApplicationPropertiesTest {
 
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void given_emptyConfirmationWindow_when_isConfirmation_then_returnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isConfirmation();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_confirmationWindowSetN_when_isConfirmation_then_returnFalse() {
+        String[] args = {"confirmationWindow=Y"};
+        Properties props = new Properties();
+        props.put("confirmationWindow", "N");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isConfirmation();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_confirmationWindowSetY_when_isConfirmation_then_returnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("confirmationWindow", "Y");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isConfirmation();
+
+        assertThat(actual).isTrue();
+    }
 }

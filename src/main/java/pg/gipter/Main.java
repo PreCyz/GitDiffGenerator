@@ -18,10 +18,18 @@ import java.net.URL;
 /**Created by Pawel Gawedzki on 17-Sep-2018*/
 public class Main extends Application {
 
+    private static ApplicationProperties applicationProperties;
+    private static boolean error = false;
+
+
     @Override
     public void start(Stage primaryStage) throws URISyntaxException {
-        String errMsg = createErrorMessage();
-        displayAlertWindow(errMsg);
+        if (error) {
+            String errMsg = createErrorMessage();
+            displayWindow(errMsg, Alert.AlertType.ERROR);
+        } else if (applicationProperties.isConfirmation()) {
+            displayWindow("Your copyright item was uploaded succesfully", Alert.AlertType.ERROR);
+        }
     }
 
     private String createErrorMessage() throws URISyntaxException {
@@ -31,8 +39,8 @@ public class Main extends Application {
                 "Check the logs to find out why.%nLogs are located here:%n%s", logsDirectory);
     }
 
-    private void displayAlertWindow(String errMsg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    private void displayWindow(String errMsg, Alert.AlertType alertType) {
+        Alert alert = new Alert(alertType);
         alert.setTitle("Oh Chicken Face ('> ");
         alert.setHeaderText(null);
         alert.setContentText(errMsg);
@@ -50,7 +58,7 @@ public class Main extends Application {
         Logger logger = LoggerFactory.getLogger(Main.class);
         try {
             logger.info("Gipter started.");
-            ApplicationProperties applicationProperties = new ApplicationProperties(args);
+            applicationProperties = new ApplicationProperties(args);
 
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
             diffProducer.produceDiff();
@@ -63,15 +71,14 @@ public class Main extends Application {
             DiffUploader diffUploader = new DiffUploader(applicationProperties);
             diffUploader.uploadDiff();
             logger.info("Diff upload complete.");
-
-            logger.info("Program is terminated.");
-            System.exit(0);
         } catch (Exception ex) {
             logger.error("Diff upload failure. Program is terminated.");
-            //TODO: inform user upload was unsuccessful
+            error = true;
+        } finally {
             launch(args);
-            System.exit(-1);
+            logger.info("Program is terminated.");
         }
+        System.exit(-1);
     }
 
 }
