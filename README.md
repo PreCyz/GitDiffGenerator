@@ -55,7 +55,7 @@ Below parameters are mandatory for toolkit:<br/>
 **toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
 **toolkitPassword** - user password used to log in into SharePoint.<br /><br />
 
-_Note:_ When `periodInDays` is used together with `startDate` then **starDate** has higher priority.
+_Note:_ When `periodInDays` is used together with `startDate` then **startDate** has higher priority.
 ### Explanation of *codeProtection* parameter
 * `NONE` - no protection,
 * `SIMPLE` - no code can not be shared in anyway but diff can contain headers of changes, 
