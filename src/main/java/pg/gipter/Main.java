@@ -32,7 +32,7 @@ public class Main extends Application {
                     "Your copyright item was uploaded successfully. If you do not believe me, check it here %s.",
                     applicationProperties.toolkitUserFolder()
             );
-            displayWindow(confirmationMsg, Alert.AlertType.CONFIRMATION);
+            displayWindow(confirmationMsg, Alert.AlertType.INFORMATION);
         }
     }
 
