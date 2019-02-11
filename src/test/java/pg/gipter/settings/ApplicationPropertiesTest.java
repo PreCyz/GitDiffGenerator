@@ -286,7 +286,7 @@ class ApplicationPropertiesTest {
     }
 
     @Test
-    void given_itemFileNamePrefixFromPropertiesAndCommandLine_when_startDate_then_returnitemFileNamePrefixFromProperties() {
+    void given_itemFileNamePrefixFromPropertiesAndCommandLine_when_startDate_then_returnItemFileNamePrefixFromProperties() {
         String[] args = {"itemFileNamePrefix=testItemFileNamePrefix"};
         Properties props = new Properties();
         props.put("itemFileNamePrefix","propsItemFileNamePrefix");
@@ -314,6 +314,39 @@ class ApplicationPropertiesTest {
         LocalDate actual = appProps.endDate();
 
         assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-19");
+    }
+
+    @Test
+    void given_noEndDateInAppPropertiesAndEndDateFromCliArgs_when_endDate_then_returnEndDateFromCliArgs() {
+        String[] args = {"startDate=2018-09-19", "endDate=2018-10-15"};
+        Properties props = new Properties();
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        LocalDate actual = appProps.endDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-15");
+    }
+
+    @Test
+    void given_endDateInAppPropertiesAndInCommandLineArgs_when_endDate_then_returnEndDateFromProperties() {
+        String[] args = {"startDate=2018-09-19", "endDate=2018-10-15"};
+        Properties props = new Properties();
+        props.put("endDate", "2018-10-19");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        LocalDate actual = appProps.endDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-19");
+    }
+
+    @Test
+    void given_noEndDate_when_endDate_then_returnNow() {
+        appProps = new ApplicationProperties(new String[]{});
+        LocalDate actual = appProps.endDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo(LocalDate.now().format(yyyy_MM_dd));
     }
 
     @Test

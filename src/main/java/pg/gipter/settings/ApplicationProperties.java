@@ -161,7 +161,7 @@ public class ApplicationProperties {
     public LocalDate endDate() {
         if (hasProperties()) {
             String[] date = properties.getProperty(
-                    ArgExtractor.ArgName.endDate.name(), ArgExtractor.ArgName.endDate.defaultValue()
+                    ArgExtractor.ArgName.endDate.name(), argExtractor.endDate().format(yyyy_MM_dd)
             ).split("-");
             return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
         }
