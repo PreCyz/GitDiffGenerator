@@ -1,7 +1,7 @@
 package pg.gipter.producer.command;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.settings.FilePreferredApplicationProperties;
+import pg.gipter.settings.ApplicationPropertiesFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,7 +10,8 @@ class DiffCommandFactoryTest {
     @Test
     void given_codeProtectionSTATEMENT_when_getInstance_then_returnEmptyDiffCommand() {
         DiffCommand instance = DiffCommandFactory.getInstance(
-                VersionControlSystem.GIT, new FilePreferredApplicationProperties(new String[]{"codeProtection=statement"})
+                VersionControlSystem.GIT,
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE", "codeProtection=statement"})
         );
         assertThat(instance).isInstanceOf(EmptyDiffCommand.class);
     }
@@ -18,7 +19,8 @@ class DiffCommandFactoryTest {
     @Test
     void given_codeProtectionDefault_when_getInstance_then_returnGitDiffCommand() {
         DiffCommand instance = DiffCommandFactory.getInstance(
-                VersionControlSystem.GIT, new FilePreferredApplicationProperties(new String[]{})
+                VersionControlSystem.GIT,
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
         );
         assertThat(instance).isInstanceOf(GitDiffCommand.class);
     }
@@ -26,7 +28,8 @@ class DiffCommandFactoryTest {
     @Test
     void given_codeProtectionDefaultAndVcsSVN_when_getInstance_then_returnSvnDiffCommand() {
         DiffCommand instance = DiffCommandFactory.getInstance(
-                VersionControlSystem.SVN, new FilePreferredApplicationProperties(new String[]{})
+                VersionControlSystem.SVN,
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
         );
         assertThat(instance).isInstanceOf(SvnDiffCommand.class);
     }
@@ -34,7 +37,8 @@ class DiffCommandFactoryTest {
     @Test
     void given_codeProtectionDefaultAndVcsMercurial_when_getInstance_then_returnMercurialDiffCommand() {
         DiffCommand instance = DiffCommandFactory.getInstance(
-                VersionControlSystem.MERCURIAL, new FilePreferredApplicationProperties(new String[]{})
+                VersionControlSystem.MERCURIAL,
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
         );
         assertThat(instance).isInstanceOf(MercurialDiffCommand.class);
     }

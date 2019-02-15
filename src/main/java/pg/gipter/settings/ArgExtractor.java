@@ -35,7 +35,9 @@ final class ArgExtractor {
         toolkitListName("WorkItems"),
         toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY"),
         toolkitWSUrl(toolkitUrl.defaultValue + "/_vti_bin/lists.asmx"),
-        toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/");
+        toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/"),
+
+        preferredArgSource(PreferredArgSource.CLI.name());
 
         private String defaultValue;
 
@@ -195,6 +197,14 @@ final class ArgExtractor {
 
     String toolkitUserFolder() {
         return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+    }
+
+    PreferredArgSource preferredArgSource() {
+        if (hasArgs()) {
+            String preferredArgSrc = getValue(ArgName.preferredArgSource, ArgName.preferredArgSource.defaultValue());
+            return PreferredArgSource.valueFor(preferredArgSrc);
+        }
+        return PreferredArgSource.valueFor(ArgName.preferredArgSource.defaultValue());
     }
 
 }

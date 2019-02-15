@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import pg.gipter.MockitoExtension;
-import pg.gipter.settings.FilePreferredApplicationProperties;
+import pg.gipter.settings.ApplicationProperties;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 class SvnDiffCommandTest {
 
     @Mock
-    private FilePreferredApplicationProperties applicationProperties;
+    private ApplicationProperties applicationProperties;
     private SvnDiffCommand command;
 
     @Test

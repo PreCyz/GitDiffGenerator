@@ -442,4 +442,31 @@ class ArgExtractorTest {
 
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void given_noPreferredArgSource_when_preferredArgSource_then_returnCLI() {
+        argExtractor = new ArgExtractor(new String[]{""});
+
+        PreferredArgSource actual = argExtractor.preferredArgSource();
+
+        assertThat(actual).isEqualTo(PreferredArgSource.CLI);
+    }
+
+    @Test
+    void given_cliPreferredArgSource_when_preferredArgSource_then_returnCLI() {
+        argExtractor = new ArgExtractor(new String[]{"preferredArgSource=cli"});
+
+        PreferredArgSource actual = argExtractor.preferredArgSource();
+
+        assertThat(actual).isEqualTo(PreferredArgSource.CLI);
+    }
+
+    @Test
+    void given_filePreferredArgSource_when_preferredArgSource_then_returnCLI() {
+        argExtractor = new ArgExtractor(new String[]{"preferredArgSource=file"});
+
+        PreferredArgSource actual = argExtractor.preferredArgSource();
+
+        assertThat(actual).isEqualTo(PreferredArgSource.FILE);
+    }
 }

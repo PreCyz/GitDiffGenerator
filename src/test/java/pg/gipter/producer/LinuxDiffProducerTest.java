@@ -1,7 +1,7 @@
 package pg.gipter.producer;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.settings.FilePreferredApplicationProperties;
+import pg.gipter.settings.ApplicationPropertiesFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +12,9 @@ class LinuxDiffProducerTest {
 
     @Test
     void given_listOfCommands_when_getFullCommand_then_returnFullCommand() {
-        LinuxDiffProducer producer = new LinuxDiffProducer(new FilePreferredApplicationProperties(new String[]{}));
+        LinuxDiffProducer producer = new LinuxDiffProducer(
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
+        );
 
         List<String> actual = producer.getFullCommand(Arrays.asList("c", "\"c2\"", "c3"));
 

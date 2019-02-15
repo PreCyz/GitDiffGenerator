@@ -11,7 +11,8 @@ import org.springframework.ws.soap.SoapFault;
 import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.MockitoExtension;
 import pg.gipter.producer.command.VersionControlSystem;
-import pg.gipter.settings.FilePreferredApplicationProperties;
+import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
 
@@ -34,7 +35,7 @@ class DiffUploaderTest {
 
     @Test
     void given_applicationProperties_when_buildAttributesMap_then_return_properMap() {
-        FilePreferredApplicationProperties properties = new FilePreferredApplicationProperties(new String[]{
+        ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(new String[]{
                 "codeProtection=NONE",
                 "startDate=2018-10-18",
                 "endDate=2018-10-19",
@@ -63,7 +64,7 @@ class DiffUploaderTest {
 
     @Test
     void given_codeProtectionStatement_when_buildAttributesMap_then_return_properMap() {
-        FilePreferredApplicationProperties properties = new FilePreferredApplicationProperties(new String[]{
+        ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(new String[]{
                 "codeProtection=STATEMENT",
                 "startDate=2017-10-19",
                 "endDate=2017-12-20",
@@ -92,7 +93,7 @@ class DiffUploaderTest {
 
     @Test
     void given_springEnvironment_when_setToolkitProperties_then_addPropertiesToEnvironment() {
-        FilePreferredApplicationProperties properties = new FilePreferredApplicationProperties(new String[]{
+        ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(new String[]{
                 "toolkitUsername=xxx",
                 "toolkitPassword=pass",
         });
@@ -161,7 +162,9 @@ class DiffUploaderTest {
 
     @Test
     void when_initSpringApplicationContext_then_returnApplicationContext() {
-        FilePreferredApplicationProperties applicationProperties = new FilePreferredApplicationProperties(new String[]{"toolkitUsername=userName", "toolkitPassword=password"});
+        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
+                new String[]{"toolkitUsername=userName", "toolkitPassword=password"}
+        );
         uploader = new DiffUploader(applicationProperties);
 
         ApplicationContext actual = uploader.initSpringApplicationContext();
