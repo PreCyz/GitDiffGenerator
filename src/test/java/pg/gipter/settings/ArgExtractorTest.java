@@ -8,7 +8,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
-import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
+import static pg.gipter.settings.FilePreferredApplicationProperties.yyyy_MM_dd;
 
 class ArgExtractorTest {
 

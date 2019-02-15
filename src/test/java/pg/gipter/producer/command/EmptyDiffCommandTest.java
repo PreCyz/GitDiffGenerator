@@ -1,7 +1,7 @@
 package pg.gipter.producer.command;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.FilePreferredApplicationProperties;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ class EmptyDiffCommandTest {
 
     @Test
     void when_commandAsList_then_returnEmptyList() {
-        command = new EmptyDiffCommand(new ApplicationProperties(new String[]{}));
+        command = new EmptyDiffCommand(new FilePreferredApplicationProperties(new String[]{}));
 
         List<String> actual = command.commandAsList();
 
@@ -22,7 +22,7 @@ class EmptyDiffCommandTest {
 
     @Test
     void when_getInitialCommand_then_return_emptyList() {
-        command = new EmptyDiffCommand(new ApplicationProperties(new String[]{}));
+        command = new EmptyDiffCommand(new FilePreferredApplicationProperties(new String[]{}));
 
         List<String> actual = command.getInitialCommand();
 

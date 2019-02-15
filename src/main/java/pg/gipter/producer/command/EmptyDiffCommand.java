@@ -5,7 +5,6 @@ import pg.gipter.settings.ApplicationProperties;
 import java.util.Collections;
 import java.util.List;
 
-
 final class EmptyDiffCommand extends AbstractDiffCommand {
 
     EmptyDiffCommand(ApplicationProperties appProps) {

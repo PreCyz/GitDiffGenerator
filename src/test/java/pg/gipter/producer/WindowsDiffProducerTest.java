@@ -1,7 +1,7 @@
 package pg.gipter.producer;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.FilePreferredApplicationProperties;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +12,7 @@ class WindowsDiffProducerTest {
 
     @Test
     void given_listOfCommands_when_getFullCommand_then_returnFullCommand() {
-        WindowsDiffProducer producer = new WindowsDiffProducer(new ApplicationProperties(new String[]{}));
+        WindowsDiffProducer producer = new WindowsDiffProducer(new FilePreferredApplicationProperties(new String[]{}));
 
         List<String> actual = producer.getFullCommand(Arrays.asList("c", "\"c2\"", "c3"));
 

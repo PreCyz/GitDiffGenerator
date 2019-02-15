@@ -1,7 +1,7 @@
 package pg.gipter.producer;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.FilePreferredApplicationProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ class StatementDiffProducerTest {
 
     @Test
     void given_emptyList_when_getFullCommand_then_returnThatEmptyList() {
-        producer = new StatementDiffProducer(new ApplicationProperties(new String[]{}));
+        producer = new StatementDiffProducer(new FilePreferredApplicationProperties(new String[]{}));
         List<String> emptyList = new ArrayList<>();
 
         List<String> actual = producer.getFullCommand(emptyList);
@@ -25,7 +25,7 @@ class StatementDiffProducerTest {
 
     @Test
     void given_noItemPath_when_produceDiff_then_throwIllegalArgumentException() {
-        producer = new StatementDiffProducer(new ApplicationProperties(new String[]{
+        producer = new StatementDiffProducer(new FilePreferredApplicationProperties(new String[]{
                 "itemPath=none"
         }));
         try {

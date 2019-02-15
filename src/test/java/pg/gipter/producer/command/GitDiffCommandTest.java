@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import pg.gipter.MockitoExtension;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.FilePreferredApplicationProperties;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 class GitDiffCommandTest {
 
     @Mock
-    private ApplicationProperties applicationProperties;
+    private FilePreferredApplicationProperties applicationProperties;
     private GitDiffCommand command;
 
     @Test

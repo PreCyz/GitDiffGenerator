@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.FilePreferredApplicationProperties;
 import pg.gipter.toolkit.DiffUploader;
 
 import java.io.File;
@@ -62,7 +63,7 @@ public class Main extends Application {
         Logger logger = LoggerFactory.getLogger(Main.class);
         try {
             logger.info("Gipter started.");
-            applicationProperties = new ApplicationProperties(args);
+            applicationProperties = new FilePreferredApplicationProperties(args);
 
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
             diffProducer.produceDiff();
