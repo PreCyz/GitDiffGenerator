@@ -342,6 +342,19 @@ class ApplicationPropertiesTest {
     }
 
     @Test
+    void given_emptyEndDateInAppPropertiesAndInCommandLineArgs_when_endDate_then_returnEndDateFromProperties() {
+        String[] args = {"startDate=2018-09-19", "endDate=2018-10-15"};
+        Properties props = new Properties();
+        props.put("endDate", "");
+        appProps = new ApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        LocalDate actual = appProps.endDate();
+
+        assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-15");
+    }
+
+    @Test
     void given_noEndDate_when_endDate_then_returnNow() {
         appProps = new ApplicationProperties(new String[]{});
         LocalDate actual = appProps.endDate();
