@@ -11,9 +11,9 @@ public enum CodeProtection {
         try {
             return CodeProtection.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
-            String supportedValues = EnumSet.allOf(VersionControlSystem.class)
+            String supportedValues = EnumSet.allOf(CodeProtection.class)
                     .stream()
-                    .map(VersionControlSystem::name)
+                    .map(CodeProtection::name)
                     .collect(Collectors.joining(", "));
             errMsg = String.format("Given value [%s] is not supported. Supported values are: [%s]%n",
                     value, String.join(", ", supportedValues));
