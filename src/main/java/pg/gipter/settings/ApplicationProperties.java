@@ -7,6 +7,7 @@ import pg.gipter.producer.command.VersionControlSystem;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.*;
 
 import static pg.gipter.settings.PropertiesLoader.APPLICATION_PROPERTIES;
@@ -60,6 +61,29 @@ public abstract class ApplicationProperties {
                 !toolkitPassword().isEmpty() && !ArgExtractor.ArgName.toolkitPassword.defaultValue().equals(toolkitPassword());
     }
 
+    public final String fileName() {
+        DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate now = LocalDate.now();
+        LocalDate endDate = endDate();
+        String fileName;
+        if (now.isEqual(endDate)) {
+            WeekFields weekFields = WeekFields.of(Locale.getDefault());
+            int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
+            fileName = String.format("%d-%s-week-%d", now.getYear(), now.getMonth(), weekNumber).toLowerCase();
+        } else {
+            fileName = String.format("%d-%s-%s-%s",
+                    endDate.getYear(),
+                    endDate.getMonth(),
+                    startDate().format(yyyyMMdd),
+                    endDate.format(yyyyMMdd)
+            ).toLowerCase();
+        }
+        if (!itemFileNamePrefix().isEmpty()) {
+            fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
+        }
+        return fileName + ".txt";
+    }
+
     protected final String log() {
         return  "authors='" + authors() + '\'' +
                 ", gitAuthor='" + gitAuthor() + '\'' +
@@ -88,7 +112,6 @@ public abstract class ApplicationProperties {
     public abstract String mercurialAuthor();
     public abstract String svnAuthor();
     public abstract String itemPath();
-    public abstract String fileName();
     public abstract Set<String> projectPaths();
     public abstract String committerEmail();
     public abstract LocalDate startDate();

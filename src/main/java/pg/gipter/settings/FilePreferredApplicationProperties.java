@@ -5,9 +5,10 @@ import pg.gipter.producer.util.StringUtils;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -64,25 +65,6 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
             }
         }
         return codeProtection() == CodeProtection.STATEMENT ? itemPath : itemPath + File.separator + fileName();
-    }
-
-    @Override
-    public String fileName() {
-        DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate now = LocalDate.now();
-        LocalDate endDate = endDate();
-        String fileName;
-        if (now.isEqual(endDate)) {
-            WeekFields weekFields = WeekFields.of(Locale.getDefault());
-            int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
-            fileName = String.format("%d-%s-week-%d", now.getYear(), now.getMonth(), weekNumber).toLowerCase();
-        } else {
-            fileName = String.format("%d-%s-%s-%s", endDate.getYear(), endDate.getMonth(), startDate().format(yyyyMMdd), endDate.format(yyyyMMdd)).toLowerCase();
-        }
-        if (!itemFileNamePrefix().isEmpty()) {
-            fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
-        }
-        return fileName + ".txt";
     }
 
     @Override
