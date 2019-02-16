@@ -56,7 +56,7 @@ final class ArgExtractor {
         this.args = args;
     }
 
-    private boolean hasArgs() {
+    boolean hasArgs() {
         return args != null && args.length > 0;
     }
 
