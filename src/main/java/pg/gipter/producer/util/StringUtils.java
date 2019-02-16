@@ -8,6 +8,10 @@ public final class StringUtils {
         return value != null && !value.trim().isEmpty();
     }
 
+    public static boolean nullOrEmpty(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
     public static boolean getBoolean(String value) {
         String trimmedValue = value.trim();
         boolean result = Boolean.valueOf(trimmedValue);
