@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toCollection;
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 class FilePreferredApplicationProperties extends ApplicationProperties {
 
-    public FilePreferredApplicationProperties(String[] args) {
+    FilePreferredApplicationProperties(String[] args) {
         super(args);
     }
 
