@@ -140,13 +140,13 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public boolean isConfirmation() {
+    public boolean isConfirmationWindow() {
         if (hasProperties()) {
             return StringUtils.getBoolean(properties.getProperty(
                     ArgExtractor.ArgName.confirmationWindow.name(), ArgExtractor.ArgName.confirmationWindow.defaultValue()
             ));
         }
-        return argExtractor.isConfirmation();
+        return argExtractor.isConfirmationWindow();
     }
 
     @Override

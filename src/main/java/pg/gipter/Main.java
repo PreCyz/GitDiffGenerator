@@ -28,7 +28,7 @@ public class Main extends Application {
         if (error) {
             String errMsg = createErrorMessage();
             displayWindow(errMsg, Alert.AlertType.ERROR);
-        } else if (applicationProperties.isConfirmation()) {
+        } else if (applicationProperties.isConfirmationWindow()) {
             String confirmationMsg = String.format(
                     "Your copyright item was uploaded successfully. If you do not believe me, check it here %s.",
                     applicationProperties.toolkitUserFolder()

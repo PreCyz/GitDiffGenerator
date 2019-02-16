@@ -543,7 +543,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FilePreferredApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
-        boolean actual = appProps.isConfirmation();
+        boolean actual = appProps.isConfirmationWindow();
 
         assertThat(actual).isFalse();
     }
@@ -556,7 +556,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FilePreferredApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
-        boolean actual = appProps.isConfirmation();
+        boolean actual = appProps.isConfirmationWindow();
 
         assertThat(actual).isFalse();
     }
@@ -569,7 +569,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FilePreferredApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
-        boolean actual = appProps.isConfirmation();
+        boolean actual = appProps.isConfirmationWindow();
 
         assertThat(actual).isTrue();
     }

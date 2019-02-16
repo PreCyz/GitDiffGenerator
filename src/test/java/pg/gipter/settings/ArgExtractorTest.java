@@ -429,7 +429,7 @@ class ArgExtractorTest {
     void when_isConfirmation_then_returnFalse() {
         argExtractor = new ArgExtractor(new String[]{});
 
-        boolean actual = argExtractor.isConfirmation();
+        boolean actual = argExtractor.isConfirmationWindow();
 
         assertThat(actual).isFalse();
     }
@@ -438,7 +438,7 @@ class ArgExtractorTest {
     void given_confirmationWindowSetY_when_isConfirmation_then_returnFalse() {
         argExtractor = new ArgExtractor(new String[]{"confirmationWindow=Y"});
 
-        boolean actual = argExtractor.isConfirmation();
+        boolean actual = argExtractor.isConfirmationWindow();
 
         assertThat(actual).isTrue();
     }

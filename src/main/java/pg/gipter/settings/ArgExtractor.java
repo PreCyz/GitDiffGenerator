@@ -165,7 +165,7 @@ final class ArgExtractor {
         return CodeProtection.valueFor(ArgName.codeProtection.defaultValue());
     }
 
-    boolean isConfirmation() {
+    boolean isConfirmationWindow() {
         if (hasArgs()) {
             return StringUtils.getBoolean(getValue(ArgName.confirmationWindow, ArgName.codeProtection.defaultValue()));
         }
