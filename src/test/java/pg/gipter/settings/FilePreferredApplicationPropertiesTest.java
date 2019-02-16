@@ -357,22 +357,10 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void given_noEndDate_when_endDate_then_returnNow() {
         appProps = new FilePreferredApplicationProperties(new String[]{});
+
         LocalDate actual = appProps.endDate();
 
         assertThat(actual.format(yyyy_MM_dd)).isEqualTo(LocalDate.now().format(yyyy_MM_dd));
-    }
-
-    @Test
-    void given_endDateFromPropertiesAndCommandLine_when_endDate_then_returnEndDateFromProperties() {
-        String[] args = {"endDate=2018-10-18"};
-        Properties props = new Properties();
-        props.put("endDate", "2018-10-19");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        LocalDate actual = appProps.endDate();
-
-        assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-19");
     }
 
     @Test
@@ -380,7 +368,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FilePreferredApplicationProperties(new String[]{"endDate=2018-02-30"});
         try {
             appProps.endDate();
-            fail("Shpild throw DateTimeException.");
+            fail("Should throw DateTimeException.");
         } catch (DateTimeException ex) {
             assertThat(ex.getMessage()).isEqualTo("Invalid date 'FEBRUARY 30'");
         }
