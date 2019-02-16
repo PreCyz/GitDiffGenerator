@@ -52,6 +52,14 @@ public abstract class ApplicationProperties {
         return properties != null;
     }
 
+    protected final boolean containsProperty(String key) {
+        return hasProperties() && properties.containsKey(key);
+    }
+
+    protected final boolean containsArg(String argName) {
+        return argExtractor.containsArg(argName);
+    }
+
     public final String toolkitWSUrl() {
         return argExtractor.toolkitWSUrl();
     }
@@ -117,7 +125,7 @@ public abstract class ApplicationProperties {
     public abstract LocalDate startDate();
     public abstract LocalDate endDate();
     public abstract CodeProtection codeProtection();
-    public abstract boolean isConfirmation();
+    public abstract boolean isConfirmationWindow();
     public abstract String toolkitUsername();
     public abstract String toolkitPassword();
     public abstract String toolkitDomain();
