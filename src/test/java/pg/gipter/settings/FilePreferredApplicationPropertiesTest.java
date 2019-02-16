@@ -20,7 +20,7 @@ import static pg.gipter.settings.FilePreferredApplicationProperties.yyyy_MM_dd;
 
 class FilePreferredApplicationPropertiesTest {
 
-    private FilePreferredApplicationProperties appProps;
+    private ApplicationProperties appProps;
 
     private PropertiesLoader mockPropertiesLoader(Properties properties) {
         PropertiesLoader loader = mock(PropertiesLoader.class);
