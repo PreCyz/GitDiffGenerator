@@ -17,7 +17,7 @@ Application logs everything. Logs can be found inside following folder `${APP_HO
 There are few ways to execute this program:
 - from command line java -jar with params,
 - from command line java -jar + application.properties at the same location as _*.jar_ file,
-- double click on *.jar file (no window will open, but you will see diff file at given item path),
+- double click on *.jar file (no window will open or confirmation window opens if set, but you will see diff file at given item path),
 ### java -jar with params
 For *Windows*
 ```
@@ -32,7 +32,7 @@ projectPath="/home/eva/Path/to/git/project1,/home/eva/Path/to/git/project2"
 ### java -jar + application.properties at at the same location as jar file
 If there are _application.properties_ file at the same location as your jar file then program can be run as follows: `java -jar Gipter.jar`
 #### Tips
-If program is executed with commandline parameters and _application.properties_ file at the same time, then setup in _application.properties_ has higher priority.<br />
+If program is executed with commandline parameters and _application.properties_ file at the same time, then setup from commandline has higher priority. Unless `preferredArgSource` is set to `FILE`, then _application.properties_ has higher priority.<br />
 Generated file name by default is `year-monthName-week-weekNumber.txt`. If diff is generated with end date set in the past then diff file name is `year-monthName-startDate-endDate.txt`.
 If parameter _itemFileNamePrefix_ is set then its value is added at the front of the file name. File name (without extension) is used also as the title of the toolkit item, that is created.<br />
 You can pass some parameters commandline way and other _application.properties_ way. For instance if you do not want to set your password in _application.properties_, you can pass it as commandline param.
@@ -50,6 +50,8 @@ You can pass some parameters commandline way and other _application.properties_ 
 **mercurialAuthor** - author specific for mercurial repository. When used together with _author_, this parameter has higher priority.<br />
 **svnAuthor** - author specific for svn repository. When used together with _author_, this parameter has higher priority.<br />
 **confirmationWindow** - if parameter set as `Y` then confirmation window will be displayed after successful upload. Default value is `N`.<br />
+**preferredArgSource** - if parameter set as `FILE` then arguments from _application.properties_ will be resolved as first. Default value is `CLI`.<br />
+**skipRemote** - if parameter set as `N` then git diff will be generated only from origin (`--remotes=origin`). If set as `Y` then git diff will be generated only from local git repository. Default value is `Y`.<br />
 
 Below parameters are mandatory for toolkit:<br/>
 **toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
@@ -60,6 +62,9 @@ _Note:_ When `periodInDays` is used together with `startDate` then **startDate**
 * `NONE` - no protection,
 * `SIMPLE` - no code can not be shared in anyway but diff can contain headers of changes, 
 * `STATEMENT` - not even headers of changes are allowed in diff. File with statement is uploaded to SharePoint instead.
+### Explanation of *preferredArgSource* parameter
+* `CLI` - commandLine arguments will be used as first then missing parameters will be read from _application.properties_,
+* `FILE` - arguments from _application.properties_ will be used as first then missing parameters will be read from commandLine arguments.
 #####
 **Case 1**<br />
 It may be that owner of the code forbids to share the code in anyway but you are allowed to put headers of the changes in the diff.
