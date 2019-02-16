@@ -45,6 +45,17 @@ class GitDiffCommandTest {
     }
 
     @Test
+    void given_skipRemoteTrue_when_getInitialCommand_then_returnInitialCommandWithoutRemotes() {
+        when(applicationProperties.codeProtection()).thenReturn(CodeProtection.SIMPLE);
+        when(applicationProperties.isSkipRemote()).thenReturn(true);
+        command = new GitDiffCommand(applicationProperties);
+
+        List<String> actual = command.getInitialCommand();
+
+        assertThat(actual).containsExactly("git", "log", "--oneline");
+    }
+
+    @Test
     void given_allPossibleParameters_when_commandAsList_thenReturnCommand() {
         String author = "testAuthor";
         String committerEmail="test@email.com";
@@ -75,16 +86,18 @@ class GitDiffCommandTest {
         LocalDate startDate = LocalDate.now().minusDays(7);
         LocalDate endDate = LocalDate.now();
         CodeProtection codeProtection = CodeProtection.NONE;
+        boolean skipRemote = true;
 
         when(applicationProperties.gitAuthor()).thenReturn(author);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
         when(applicationProperties.codeProtection()).thenReturn(codeProtection);
+        when(applicationProperties.isSkipRemote()).thenReturn(skipRemote);
         command = new GitDiffCommand(applicationProperties);
 
         List<String> actual = command.commandAsList();
 
-        assertThat(actual).containsExactly("git", "log", "--remotes=origin", "--patch",
+        assertThat(actual).containsExactly("git", "log", "--patch",
                 "--author=" + author,
                 "--since", startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 "--until", endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))

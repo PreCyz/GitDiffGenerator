@@ -561,4 +561,42 @@ class FilePreferredApplicationPropertiesTest {
 
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void given_emptySkipRemote_when_isSkipRemote_then_returnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isSkipRemote();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_skipRemotePropertiesSetNAndCliSetY_when_isSkipRemote_then_returnFalse() {
+        String[] args = {"skipRemote=Y"};
+        Properties props = new Properties();
+        props.put("skipRemote", "N");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isSkipRemote();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_noSkipRemoteCliAndPropertySetY_when_isSkipRemote_then_returnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("skipRemote", "Y");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isSkipRemote();
+
+        assertThat(actual).isTrue();
+    }
 }

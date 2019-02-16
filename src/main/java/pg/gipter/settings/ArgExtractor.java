@@ -27,6 +27,7 @@ final class ArgExtractor {
         itemFileNamePrefix(""),
         codeProtection(CodeProtection.NONE.name()),
         confirmationWindow("N"),
+        skipRemote("Y"),
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
         toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
 
@@ -56,19 +57,15 @@ final class ArgExtractor {
         this.args = args;
     }
 
-    boolean hasArgs() {
-        return args != null && args.length > 0;
-    }
-
     boolean containsArg(String argumentName) {
-        if (!hasArgs()) {
+        if (args == null || args.length == 0) {
             return false;
         }
         return Arrays.stream(args).anyMatch(arg -> arg.startsWith(argumentName));
     }
 
     Set<String> authors() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.author.name())) {
             String authors = getValue(ArgName.author, ArgName.author.defaultValue());
             return Stream.of(authors.split(",")).collect(Collectors.toCollection(LinkedHashSet::new));
         }
@@ -76,21 +73,21 @@ final class ArgExtractor {
     }
 
     String gitAuthor() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.gitAuthor.name())) {
             return getValue(ArgName.gitAuthor, ArgName.gitAuthor.defaultValue());
         }
         return ArgName.gitAuthor.defaultValue();
     }
 
     String mercurialAuthor() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.mercurialAuthor.name())) {
             return getValue(ArgName.mercurialAuthor, ArgName.mercurialAuthor.defaultValue());
         }
         return ArgName.mercurialAuthor.defaultValue();
     }
 
     String svnAuthor() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.svnAuthor.name())) {
             return getValue(ArgName.svnAuthor, ArgName.svnAuthor.defaultValue());
         }
         return ArgName.svnAuthor.defaultValue();
@@ -106,7 +103,7 @@ final class ArgExtractor {
     }
 
     String itemPath() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.itemPath.name())) {
             return getValue(ArgName.itemPath, ArgName.itemPath.defaultValue());
         }
         return ArgName.itemPath.defaultValue();
@@ -114,21 +111,21 @@ final class ArgExtractor {
 
     Set<String> projectPaths() {
         String[] projectPaths = new String[]{ArgName.projectPath.defaultValue()};
-        if (hasArgs()) {
+        if (containsArg(ArgName.projectPath.name())) {
             projectPaths = getValue(ArgName.projectPath, ArgName.projectPath.defaultValue()).split(",");
         }
         return new LinkedHashSet<>(Arrays.asList(projectPaths));
     }
 
     int periodInDays() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.periodInDays.name())) {
             return Math.abs(Integer.parseInt(getValue(ArgName.periodInDays, ArgName.periodInDays.defaultValue())));
         }
         return Integer.parseInt(ArgName.periodInDays.defaultValue());
     }
 
     String committerEmail() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.committerEmail.name())) {
             return getValue(ArgName.committerEmail, ArgName.committerEmail.defaultValue());
         }
         return ArgName.committerEmail.defaultValue();
@@ -136,7 +133,7 @@ final class ArgExtractor {
 
     LocalDate startDate() {
         String[] date = ArgName.startDate.defaultValue().split("-");
-        if (hasArgs()) {
+        if (containsArg(ArgName.startDate.name()) || containsArg(ArgName.periodInDays.name())) {
             date = getValue(ArgName.startDate, LocalDate.now().minusDays(periodInDays()).format(yyyy_MM_dd)).split("-");
         }
         return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
@@ -144,21 +141,21 @@ final class ArgExtractor {
 
     LocalDate endDate() {
         String[] date = ArgName.endDate.defaultValue().split("-");
-        if (hasArgs()) {
+        if (containsArg(ArgName.endDate.name())) {
             date = getValue(ArgName.endDate, ArgName.endDate.defaultValue()).split("-");
         }
         return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
     }
 
     String itemFileNamePrefix() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.itemFileNamePrefix.name())) {
             return getValue(ArgName.itemFileNamePrefix, ArgName.itemFileNamePrefix.defaultValue());
         }
         return ArgName.itemFileNamePrefix.defaultValue();
     }
 
     CodeProtection codeProtection() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.codeProtection.name())) {
             String codeProtection = getValue(ArgName.codeProtection, ArgName.codeProtection.defaultValue());
             return CodeProtection.valueFor(codeProtection);
         }
@@ -166,21 +163,21 @@ final class ArgExtractor {
     }
 
     boolean isConfirmationWindow() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.confirmationWindow.name())) {
             return StringUtils.getBoolean(getValue(ArgName.confirmationWindow, ArgName.codeProtection.defaultValue()));
         }
         return StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
     }
 
     String toolkitUsername() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.toolkitUsername.name())) {
             return getValue(ArgName.toolkitUsername, ArgName.toolkitUsername.defaultValue()).trim().toUpperCase();
         }
         return ArgName.toolkitUsername.defaultValue();
     }
 
     String toolkitPassword() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.toolkitPassword.name())) {
             return getValue(ArgName.toolkitPassword, ArgName.toolkitPassword.defaultValue());
         }
         return ArgName.toolkitPassword.defaultValue();
@@ -207,11 +204,18 @@ final class ArgExtractor {
     }
 
     PreferredArgSource preferredArgSource() {
-        if (hasArgs()) {
+        if (containsArg(ArgName.preferredArgSource.name())) {
             String preferredArgSrc = getValue(ArgName.preferredArgSource, ArgName.preferredArgSource.defaultValue());
             return PreferredArgSource.valueFor(preferredArgSrc);
         }
         return PreferredArgSource.valueFor(ArgName.preferredArgSource.defaultValue());
+    }
+
+    boolean isSkipRemote() {
+        if (containsArg(ArgName.skipRemote.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.skipRemote, ArgName.skipRemote.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.skipRemote.defaultValue());
     }
 
 }

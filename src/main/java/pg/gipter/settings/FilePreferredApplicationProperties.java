@@ -190,6 +190,17 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public boolean isSkipRemote() {
+        String propertyName = ArgExtractor.ArgName.skipRemote.name();
+        if (containsProperty(propertyName)) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    propertyName, ArgExtractor.ArgName.skipRemote.defaultValue()
+            ));
+        }
+        return argExtractor.isSkipRemote();
+    }
+
+    @Override
     public String toolkitUserFolder() {
         if (hasProperties()) {
             return ArgExtractor.ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();

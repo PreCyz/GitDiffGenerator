@@ -489,4 +489,31 @@ class ArgExtractorTest {
 
         assertThat(actual).isFalse();
     }
+
+    @Test
+    void when_isSkipRemote_then_returnTrue() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        boolean actual = argExtractor.isSkipRemote();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_skipRemoteN_when_isSkipRemote_then_returnFalse() {
+        argExtractor = new ArgExtractor(new String[]{"skipRemote=N"});
+
+        boolean actual = argExtractor.isSkipRemote();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_skipRemoteY_when_isSkipRemote_then_returnTrue() {
+        argExtractor = new ArgExtractor(new String[]{"skipRemote=Y"});
+
+        boolean actual = argExtractor.isSkipRemote();
+
+        assertThat(actual).isTrue();
+    }
 }

@@ -213,6 +213,16 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public boolean isSkipRemote() {
+        boolean skipRemote = argExtractor.isSkipRemote();
+        String argName = ArgExtractor.ArgName.skipRemote.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            skipRemote = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(skipRemote)));
+        }
+        return skipRemote;
+    }
+
+    @Override
     public String toolkitUserFolder() {
         return ArgExtractor.ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
     }

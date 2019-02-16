@@ -1083,4 +1083,61 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
     }
+
+    @Test
+    void given_noSkipRemote_when_isSkipRemote_then_returnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isSkipRemote();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_skipRemoteFromCLI_when_isSkipRemote_then_returnCliSkipRemote() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"skipRemote=N"});
+
+        boolean actual = applicationProperties.isSkipRemote();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_skipRemoteFileAndCLI_when_isSkipRemote_then_returnCliSkipRemote() {
+        String[] args = {"skipRemote=n"};
+        Properties props = new Properties();
+        props.put("skipRemote", "y");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isSkipRemote();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_skipRemoteFromProperties_when_isSkipRemote_then_returnSkipRemoteFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("skipRemote", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isSkipRemote();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_skipRemoteFromPropertiesAndOtherArgs_when_isSkipRemote_then_returnSkipRemoteFromProperties() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("skipRemote", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isSkipRemote();
+
+        assertThat(actual).isFalse();
+    }
 }
