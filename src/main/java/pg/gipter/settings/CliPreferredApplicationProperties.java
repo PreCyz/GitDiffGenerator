@@ -5,9 +5,9 @@ import pg.gipter.producer.util.StringUtils;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -15,93 +15,80 @@ import static java.util.stream.Collectors.toCollection;
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 class CliPreferredApplicationProperties extends ApplicationProperties {
 
-    public CliPreferredApplicationProperties(String[] args) {
+    CliPreferredApplicationProperties(String[] args) {
         super(args);
     }
 
     @Override
     public Set<String> authors() {
-        if (hasProperties()) {
-            String authors = properties.getProperty(
+        Set<String> authors = argExtractor.authors();
+        if (authors.contains(ArgExtractor.ArgName.author.defaultValue()) && hasProperties()) {
+            String author = properties.getProperty(
                     ArgExtractor.ArgName.author.name(), String.join(",", argExtractor.authors())
             );
-            return Stream.of(authors.split(",")).collect(toCollection(LinkedHashSet::new));
+            authors = Stream.of(author.split(",")).collect(toCollection(LinkedHashSet::new));
         }
-        return argExtractor.authors();
+        return authors;
     }
 
     @Override
     public String gitAuthor() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.gitAuthor.name(), argExtractor.gitAuthor());
+        String gitAuthor = argExtractor.gitAuthor();
+        if (StringUtils.nullOrEmpty(gitAuthor) && hasProperties()) {
+            gitAuthor = properties.getProperty(ArgExtractor.ArgName.gitAuthor.name(), argExtractor.gitAuthor());
         }
-        return argExtractor.gitAuthor();
+        return gitAuthor;
     }
 
     @Override
     public String mercurialAuthor() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.mercurialAuthor.name(), argExtractor.mercurialAuthor());
+        String mercurialAuthor = argExtractor.mercurialAuthor();
+        if (StringUtils.nullOrEmpty(mercurialAuthor) && hasProperties()) {
+            mercurialAuthor = properties.getProperty(ArgExtractor.ArgName.mercurialAuthor.name(), argExtractor.mercurialAuthor());
         }
-        return argExtractor.mercurialAuthor();
+        return mercurialAuthor;
     }
 
     @Override
     public String svnAuthor() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.svnAuthor.name(), argExtractor.svnAuthor());
+        String svnAuthor = argExtractor.svnAuthor();
+        if (StringUtils.nullOrEmpty(svnAuthor) && hasProperties()) {
+            svnAuthor = properties.getProperty(ArgExtractor.ArgName.svnAuthor.name(), argExtractor.svnAuthor());
         }
-        return argExtractor.svnAuthor();
+        return svnAuthor;
     }
 
     @Override
     public String itemPath() {
-        String itemPath = argExtractor.itemPath();
-        if (hasProperties()) {
-            itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), itemPath);
-            if (codeProtection() == CodeProtection.STATEMENT) {
-                return itemPath;
-            }
+        String itemPath = ArgExtractor.ArgName.itemPath.defaultValue();
+        if (argExtractor.hasArgs()) {
+            itemPath = argExtractor.itemPath();
+        }
+        if (itemPath.startsWith(ArgExtractor.ArgName.itemPath.defaultValue()) && hasProperties()) {
+            itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), argExtractor.itemPath());
         }
         return codeProtection() == CodeProtection.STATEMENT ? itemPath : itemPath + File.separator + fileName();
     }
 
     @Override
-    public String fileName() {
-        DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate now = LocalDate.now();
-        LocalDate endDate = endDate();
-        String fileName;
-        if (now.isEqual(endDate)) {
-            WeekFields weekFields = WeekFields.of(Locale.getDefault());
-            int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
-            fileName = String.format("%d-%s-week-%d", now.getYear(), now.getMonth(), weekNumber).toLowerCase();
-        } else {
-            fileName = String.format("%d-%s-%s-%s", endDate.getYear(), endDate.getMonth(), startDate().format(yyyyMMdd), endDate.format(yyyyMMdd)).toLowerCase();
-        }
-        if (!itemFileNamePrefix().isEmpty()) {
-            fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
-        }
-        return fileName + ".txt";
-    }
-
-    @Override
     String itemFileNamePrefix() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.itemFileNamePrefix.name(), argExtractor.itemFileNamePrefix());
+        String itemFileNamePrefix = argExtractor.itemFileNamePrefix();
+        if (itemFileNamePrefix.isEmpty() && hasProperties()) {
+            itemFileNamePrefix = properties.getProperty(ArgExtractor.ArgName.itemFileNamePrefix.name(), argExtractor.itemFileNamePrefix());
         }
-        return argExtractor.itemFileNamePrefix();
+        return itemFileNamePrefix;
     }
 
     @Override
     public Set<String> projectPaths() {
-        if (hasProperties()) {
-            String[] projectPaths = properties.getProperty(
+        Set<String> projectPaths = argExtractor.projectPaths();
+        if (projectPaths.contains(ArgExtractor.ArgName.projectPath.defaultValue()) && hasProperties()) {
+            String[] projectPathsArray = properties.getProperty(
                     ArgExtractor.ArgName.projectPath.name(), ArgExtractor.ArgName.projectPath.defaultValue()
             ).split(",");
-            return new HashSet<>(Arrays.asList(projectPaths));
+            projectPaths = new LinkedHashSet<>(Arrays.asList(projectPathsArray));
         }
-        return argExtractor.projectPaths();
+        return projectPaths;
     }
 
     @Override
