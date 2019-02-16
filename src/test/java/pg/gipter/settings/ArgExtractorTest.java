@@ -469,4 +469,24 @@ class ArgExtractorTest {
 
         assertThat(actual).isEqualTo(PreferredArgSource.FILE);
     }
+
+    @Test
+    void given_properArgs_when_containsArg_then_returnTrue() {
+        String[] args = {"author=testAuthor"};
+        argExtractor = new ArgExtractor(args);
+
+        boolean actual = argExtractor.containsArg(ArgExtractor.ArgName.author.name());
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_wrongArgs_when_containsArg_then_returnFalse() {
+        String[] args = {"author=testAuthor"};
+        argExtractor = new ArgExtractor(args);
+
+        boolean actual = argExtractor.containsArg(ArgExtractor.ArgName.gitAuthor.name());
+
+        assertThat(actual).isFalse();
+    }
 }

@@ -60,6 +60,13 @@ final class ArgExtractor {
         return args != null && args.length > 0;
     }
 
+    boolean containsArg(String argumentName) {
+        if (!hasArgs()) {
+            return false;
+        }
+        return Arrays.stream(args).anyMatch(arg -> arg.startsWith(argumentName));
+    }
+
     Set<String> authors() {
         if (hasArgs()) {
             String authors = getValue(ArgName.author, ArgName.author.defaultValue());
