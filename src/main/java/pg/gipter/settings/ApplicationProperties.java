@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.command.VersionControlSystem;
 
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
@@ -41,11 +42,12 @@ public abstract class ApplicationProperties {
         Optional<Properties> propsFromFile = propertiesLoader.loadPropertiesFromFile();
         if (propsFromFile.isPresent()) {
             properties = propsFromFile.get();
-            logger.info("Properties from file loaded [{}].", log());
+            logger.info("Properties from [{}] file loaded.", APPLICATION_PROPERTIES);
         } else {
-            logger.warn("Can not read [{}].", APPLICATION_PROPERTIES);
+            logger.warn("Can not load [{}].", APPLICATION_PROPERTIES);
             logger.info("Command line argument loaded: {}.", Arrays.toString(args));
         }
+        logger.info("Application properties loaded: {}.", log());
     }
 
     protected final boolean hasProperties() {
@@ -92,8 +94,28 @@ public abstract class ApplicationProperties {
         return fileName + ".txt";
     }
 
+    public PreferredArgSource preferredArgSource() {
+        return argExtractor.preferredArgSource();
+    }
+
+    public String version() {
+        String version = "";
+
+        InputStream is = getClass().getClassLoader().getResourceAsStream("version.txt");
+        if (is == null) {
+            logger.warn("Can not read version.");
+        } else {
+            Scanner scan = new Scanner(is);
+            if (scan.hasNextLine()) {
+                version = scan.nextLine();
+            }
+        }
+        return version;
+    }
+
     protected final String log() {
-        return  "authors='" + authors() + '\'' +
+        return  "version='" + version() + '\'' +
+                ", authors='" + authors() + '\'' +
                 ", gitAuthor='" + gitAuthor() + '\'' +
                 ", mercurialAuthor='" + mercurialAuthor() + '\'' +
                 ", svnAuthor='" + svnAuthor() + '\'' +
@@ -105,6 +127,8 @@ public abstract class ApplicationProperties {
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
                 ", codeProtection='" + codeProtection() + '\'' +
+                ", preferredArgSource='" + preferredArgSource() + '\'' +
+                ", skipRemote='" + isSkipRemote() + '\'' +
                 ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
                 ", toolkitUsername='" + toolkitUsername() + '\'' +
                 ", toolkitUrl='" + toolkitUrl() + '\'' +

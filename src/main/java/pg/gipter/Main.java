@@ -13,10 +13,8 @@ import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.toolkit.DiffUploader;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Scanner;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018*/
 public class Main extends Application {
@@ -63,8 +61,9 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         try {
-            logger.info("Gipter v.{} started.", version());
+            logger.info("Gipter started.");
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+            logger.info("Version of application {}.", applicationProperties.version());
 
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
             diffProducer.produceDiff();
@@ -85,22 +84,6 @@ public class Main extends Application {
             logger.info("Program is terminated.");
         }
         System.exit(-1);
-    }
-
-    private static String version() {
-        Class<Main> mainClass = Main.class;
-        String version = "";
-
-        InputStream is = mainClass.getClassLoader().getResourceAsStream("version.txt");
-        if (is == null) {
-            logger.warn("Can not read version.");
-        } else {
-            Scanner scan = new Scanner(is);
-            if (scan.hasNextLine()) {
-                version = scan.nextLine();
-            }
-        }
-        return version;
     }
 
 }

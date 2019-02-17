@@ -365,8 +365,9 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_wrongEndDate_when_endDate_then_throwDateTimeException() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"endDate=2018-02-30"});
         try {
+            appProps = new FilePreferredApplicationProperties(new String[]{"endDate=2018-02-30"});
+
             appProps.endDate();
             fail("Should throw DateTimeException.");
         } catch (DateTimeException ex) {
@@ -376,8 +377,9 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_wrongStartDate_when_startDate_then_throwDateTimeException() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"endDate=2018-02-30"});
         try {
+            appProps = new FilePreferredApplicationProperties(new String[]{"endDate=2018-02-30"});
+
             appProps.endDate();
             fail("Should throw DateTimeException.");
         } catch (DateTimeException ex) {
