@@ -1140,4 +1140,61 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).isFalse();
     }
+
+    @Test
+    void given_noPreferredArgSource_when_preferredArgSource_then_returnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        PreferredArgSource actual = applicationProperties.preferredArgSource();
+
+        assertThat(actual).isEqualTo(PreferredArgSource.CLI);
+    }
+
+    @Test
+    void given_preferredArgSourceFromCLI_when_preferredArgSource_then_returnCliPreferredArgSource() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"preferredArgSource=file"});
+
+        PreferredArgSource actual = applicationProperties.preferredArgSource();
+
+        assertThat(actual).isEqualTo(PreferredArgSource.FILE);
+    }
+
+    @Test
+    void given_preferredArgSourceFileAndCLI_when_preferredArgSource_then_returnCliPreferredArgSource() {
+        String[] args = {"preferredArgSource=FILE"};
+        Properties props = new Properties();
+        props.put("preferredArgSource", "cli");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        PreferredArgSource actual = applicationProperties.preferredArgSource();
+
+        assertThat(actual).isEqualTo(PreferredArgSource.FILE);
+    }
+
+    @Test
+    void given_preferredArgSourceFromProperties_when_preferredArgSource_then_returnPreferredArgSourceCLI() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("preferredArgSource", "FILE");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        PreferredArgSource actual = applicationProperties.preferredArgSource();
+
+        assertThat(actual).isEqualTo(PreferredArgSource.CLI);
+    }
+
+    @Test
+    void given_preferredArgSourceFromPropertiesAndOtherArgs_when_preferredArgSource_then_returnPreferredArgSourceCLI() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("preferredArgSource", "FILE");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        PreferredArgSource actual = applicationProperties.preferredArgSource();
+
+        assertThat(actual).isEqualTo(PreferredArgSource.CLI);
+    }
 }
