@@ -50,7 +50,7 @@ You can pass some parameters commandline way and other _application.properties_ 
 **mercurialAuthor** - author specific for mercurial repository. When used together with _author_, this parameter has higher priority.<br />
 **svnAuthor** - author specific for svn repository. When used together with _author_, this parameter has higher priority.<br />
 **confirmationWindow** - if parameter set as `Y` then confirmation window will be displayed after successful upload. Default value is `N`.<br />
-**preferredArgSource** - if parameter set as `FILE` then arguments from _application.properties_ will be resolved as first. Default value is `CLI`.<br />
+**preferredArgSource** - if parameter set as `FILE` then arguments from _application.properties_ will be resolved as first. Default value is `CLI`. This parameter can be changed only from command line.<br />
 **skipRemote** - if parameter set as `N` then git diff will be generated only from origin (`--remotes=origin`). If set as `Y` then git diff will be generated only from local git repository. Default value is `Y`.<br />
 
 Below parameters are mandatory for toolkit:<br/>
