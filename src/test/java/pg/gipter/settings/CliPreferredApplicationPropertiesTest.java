@@ -1197,4 +1197,14 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).isEqualTo(PreferredArgSource.CLI);
     }
+
+    @Test
+    void given_versionTxt_when_version_then_returnVersion() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.version();
+
+        assertThat(actual).isNotEmpty();
+        assertThat(actual).isNotBlank();
+    }
 }
