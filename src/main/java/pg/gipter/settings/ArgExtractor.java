@@ -18,27 +18,28 @@ final class ArgExtractor {
         gitAuthor(""),
         mercurialAuthor(""),
         svnAuthor(""),
+        committerEmail(""),
+        codeProtection(CodeProtection.NONE.name()),
+        skipRemote("Y"),
+
         itemPath("NO_ITEM_PATH_GIVEN"),
         projectPath("NO_PROJECT_PATH_GIVEN"),
+        itemFileNamePrefix(""),
+
         periodInDays("7"),
-        committerEmail(""),
         startDate(LocalDate.now().minusDays(Integer.parseInt(periodInDays.defaultValue)).format(yyyy_MM_dd)),
         endDate(LocalDate.now().format(yyyy_MM_dd)),
-        itemFileNamePrefix(""),
-        codeProtection(CodeProtection.NONE.name()),
+
         confirmationWindow("N"),
-        skipRemote("Y"),
+        preferredArgSource(PreferredArgSource.CLI.name()),
+
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
         toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
-
-        //for now hardcoded
         toolkitDomain("NCDMZ"),
         toolkitListName("WorkItems"),
         toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY"),
         toolkitWSUrl(toolkitUrl.defaultValue + "/_vti_bin/lists.asmx"),
-        toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/"),
-
-        preferredArgSource(PreferredArgSource.CLI.name());
+        toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/");
 
         private String defaultValue;
 
