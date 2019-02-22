@@ -1207,4 +1207,61 @@ class CliPreferredApplicationPropertiesTest {
         assertThat(actual).isNotEmpty();
         assertThat(actual).isNotBlank();
     }
+
+    @Test
+    void given_noUseUI_when_isUseUI_then_returnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isUseUI();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_useUIFromCLI_when_isUseUI_then_returnCliUseUI() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"useUI=T"});
+
+        boolean actual = applicationProperties.isUseUI();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_useUIFileAndCLI_when_isUseUI_then_returnCliUseUI() {
+        String[] args = {"useUI=t"};
+        Properties props = new Properties();
+        props.put("useUI", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUseUI();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_useUIFromProperties_when_isUseUI_then_returnUseUIFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("useUI", "t");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUseUI();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_useUIFromPropertiesAndOtherArgs_when_isUseUI_then_returnUseUIFromProperties() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("useUI", "y");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUseUI();
+
+        assertThat(actual).isTrue();
+    }
 }

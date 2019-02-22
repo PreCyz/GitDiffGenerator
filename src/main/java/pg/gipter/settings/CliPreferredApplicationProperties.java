@@ -227,4 +227,14 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         return ArgExtractor.ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
     }
 
+    @Override
+    public boolean isUseUI() {
+        boolean useUI = argExtractor.isUseUI();
+        String argName = ArgExtractor.ArgName.useUI.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            useUI = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(useUI)));
+        }
+        return useUI;
+    }
+
 }

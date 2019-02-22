@@ -208,4 +208,15 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return argExtractor.toolkitUserFolder();
     }
 
+    @Override
+    public boolean isUseUI() {
+        String propertyName = ArgExtractor.ArgName.useUI.name();
+        if (containsProperty(propertyName)) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    propertyName, ArgExtractor.ArgName.useUI.defaultValue()
+            ));
+        }
+        return argExtractor.isUseUI();
+    }
+
 }

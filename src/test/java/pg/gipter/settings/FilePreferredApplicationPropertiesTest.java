@@ -552,7 +552,7 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void given_confirmationWindowSetY_when_isConfirmation_then_returnFalse() {
+    void given_confirmationWindowSetY_when_isConfirmation_then_returnTrue() {
         String[] args = {""};
         Properties props = new Properties();
         props.put("confirmationWindow", "Y");
@@ -598,6 +598,44 @@ class FilePreferredApplicationPropertiesTest {
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isSkipRemote();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void given_emptyUseUI_when_isUseUI_then_returnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUseUI();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_useUIPropertiesSetNAndCliSetY_when_isUseUI_then_returnFalse() {
+        String[] args = {"useUI=Y"};
+        Properties props = new Properties();
+        props.put("useUI", "N");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUseUI();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_noUseUICliAndPropertySetY_when_isUseUI_then_returnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("useUI", "Y");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUseUI();
 
         assertThat(actual).isTrue();
     }

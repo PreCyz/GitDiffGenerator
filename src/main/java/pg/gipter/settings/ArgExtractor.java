@@ -32,6 +32,7 @@ final class ArgExtractor {
 
         confirmationWindow("N"),
         preferredArgSource(PreferredArgSource.CLI.name()),
+        useUI("N"),
 
         toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
         toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
@@ -217,6 +218,13 @@ final class ArgExtractor {
             return StringUtils.getBoolean(getValue(ArgName.skipRemote, ArgName.skipRemote.defaultValue()));
         }
         return StringUtils.getBoolean(ArgName.skipRemote.defaultValue());
+    }
+
+    boolean isUseUI() {
+        if (containsArg(ArgName.useUI.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.useUI, ArgName.useUI.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.useUI.defaultValue());
     }
 
 }

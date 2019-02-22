@@ -156,7 +156,9 @@ public abstract class ApplicationProperties {
     public abstract String toolkitUserFolder();
     public abstract String toolkitListName();
     public abstract boolean isSkipRemote();
+    public abstract boolean isUseUI();
     protected abstract String toolkitUrl();
     abstract int periodInDays();
+
     abstract String itemFileNamePrefix();
 }
