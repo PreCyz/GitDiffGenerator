@@ -22,12 +22,18 @@ public abstract class ApplicationProperties {
     protected Properties properties;
     protected final ArgExtractor argExtractor;
     private Set<VersionControlSystem> vcs;
+    private String[] args;
 
     public ApplicationProperties(String[] args) {
+        this.args = args;
         argExtractor = new ArgExtractor(args);
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
         init(args, new PropertiesLoader());
+    }
+
+    public String[] getArgs() {
+        return args;
     }
 
     public final void setVcs(Set<VersionControlSystem> vcs) {
