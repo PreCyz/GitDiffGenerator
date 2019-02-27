@@ -76,7 +76,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    String itemFileNamePrefix() {
+    public String itemFileNamePrefix() {
         String itemFileNamePrefix = argExtractor.itemFileNamePrefix();
         String argName = ArgExtractor.ArgName.itemFileNamePrefix.name();
         if (!containsArg(argName) && containsProperty(argName)) {
@@ -97,7 +97,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    int periodInDays() {
+    public int periodInDays() {
         int periodInDays = argExtractor.periodInDays();
         String argName = ArgExtractor.ArgName.periodInDays.name();
         if (!containsArg(argName) && containsProperty(argName)) {
@@ -193,7 +193,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    protected String toolkitUrl() {
+    public String toolkitUrl() {
         String toolkitUrl = argExtractor.toolkitUrl();
         String argName = ArgExtractor.ArgName.toolkitUrl.name();
         if (!containsArg(argName) && containsProperty(argName)) {

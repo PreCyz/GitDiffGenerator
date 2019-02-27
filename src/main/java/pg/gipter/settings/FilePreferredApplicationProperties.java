@@ -68,7 +68,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    String itemFileNamePrefix() {
+    public String itemFileNamePrefix() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.itemFileNamePrefix.name(), argExtractor.itemFileNamePrefix());
         }
@@ -87,7 +87,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    int periodInDays() {
+    public int periodInDays() {
         if (hasProperties()) {
             return Math.abs(Integer.parseInt(properties.getProperty(
                     ArgExtractor.ArgName.periodInDays.name(), String.valueOf(argExtractor.periodInDays())
@@ -174,7 +174,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    protected String toolkitUrl() {
+    public String toolkitUrl() {
         if (hasProperties()) {
             return properties.getProperty(ArgExtractor.ArgName.toolkitUrl.name(), argExtractor.toolkitUrl());
         }

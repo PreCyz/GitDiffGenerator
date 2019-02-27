@@ -135,6 +135,7 @@ public abstract class ApplicationProperties {
                 ", codeProtection='" + codeProtection() + '\'' +
                 ", preferredArgSource='" + preferredArgSource() + '\'' +
                 ", skipRemote='" + isSkipRemote() + '\'' +
+                ", useUI='" + isUseUI() + '\'' +
                 ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
                 ", toolkitUsername='" + toolkitUsername() + '\'' +
                 ", toolkitUrl='" + toolkitUrl() + '\'' +
@@ -151,9 +152,11 @@ public abstract class ApplicationProperties {
     public abstract String svnAuthor();
     public abstract String itemPath();
     public abstract Set<String> projectPaths();
+    public abstract String itemFileNamePrefix();
     public abstract String committerEmail();
     public abstract LocalDate startDate();
     public abstract LocalDate endDate();
+    public abstract int periodInDays();
     public abstract CodeProtection codeProtection();
     public abstract boolean isConfirmationWindow();
     public abstract String toolkitUsername();
@@ -161,10 +164,8 @@ public abstract class ApplicationProperties {
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
     public abstract String toolkitListName();
+    public abstract String toolkitUrl();
     public abstract boolean isSkipRemote();
     public abstract boolean isUseUI();
-    protected abstract String toolkitUrl();
-    abstract int periodInDays();
 
-    abstract String itemFileNamePrefix();
 }
