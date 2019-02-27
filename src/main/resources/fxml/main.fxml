@@ -3,9 +3,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="552.0" prefWidth="583.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="608.0" prefWidth="583.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Button fx:id="runButton" layoutX="532.0" layoutY="512.0" mnemonicParsing="false" text="Run" />
+        <Button fx:id="runButton" layoutX="532.0" layoutY="570.0" mnemonicParsing="false" text="Run" />
         <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="14.0" text="CVS details">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="235.0" prefWidth="270.0">
@@ -31,18 +31,18 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="283.0" text="Paths details">
+        <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="448.0" text="Paths details">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="270.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="553.0">
                     <children>
                         <Label layoutX="14.0" layoutY="10.0" text="Project path" />
                         <Label layoutX="14.0" layoutY="33.0" text="Item path" />
                         <Label layoutX="14.0" layoutY="57.0" text="Filename prefix" />
                         <TextField fx:id="itemFileNamePrefixTextField" layoutX="108.0" layoutY="55.0" prefHeight="25.0" prefWidth="153.0" />
-                        <Label fx:id="projectPathLabel" layoutX="108.0" layoutY="10.0" prefHeight="17.0" prefWidth="149.0" text="need set up" />
-                        <Label fx:id="itemPathLabel" layoutX="108.0" layoutY="33.0" prefHeight="17.0" prefWidth="149.0" text="need set up" />
-                        <Button fx:id="projectPathButton" layoutX="227.0" layoutY="6.0" mnemonicParsing="false" text="Set" />
-                        <Button fx:id="itemPathButton" layoutX="227.0" layoutY="29.0" mnemonicParsing="false" text="Set" />
+                        <Label fx:id="projectPathLabel" layoutX="108.0" layoutY="10.0" prefHeight="17.0" prefWidth="434.0" text="need set up" />
+                        <Label fx:id="itemPathLabel" layoutX="108.0" layoutY="33.0" prefHeight="17.0" prefWidth="434.0" text="need set up" />
+                        <Button fx:id="projectPathButton" layoutX="510.0" layoutY="6.0" mnemonicParsing="false" text="Set" />
+                        <Button fx:id="itemPathButton" layoutX="510.0" layoutY="29.0" mnemonicParsing="false" text="Set" />
                     </children>
                 </AnchorPane>
             </content>
@@ -50,16 +50,16 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="407.0" text="Time frame">
+        <TitledPane animated="false" collapsible="false" layoutX="297.0" layoutY="303.0" text="Time frame">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="104.0" prefWidth="270.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="111.0" prefWidth="270.0">
                     <children>
-                        <DatePicker fx:id="startDatePicker" layoutX="105.0" layoutY="6.0" prefHeight="25.0" prefWidth="153.0" />
-                        <Label layoutX="14.0" layoutY="10.0" text="Start date" />
-                        <Label layoutX="14.0" layoutY="43.0" text="End date" />
-                        <DatePicker fx:id="endDatePicker" layoutX="105.0" layoutY="39.0" prefHeight="25.0" prefWidth="153.0" />
-                        <Label layoutX="14.0" layoutY="75.0" text="Period in days" />
-                        <TextField fx:id="periodInDaysTextField" layoutX="105.0" layoutY="71.0" prefWidth="153.0" />
+                        <DatePicker fx:id="startDatePicker" layoutX="105.0" layoutY="11.0" prefHeight="25.0" prefWidth="153.0" />
+                        <Label layoutX="14.0" layoutY="15.0" text="Start date" />
+                        <Label layoutX="14.0" layoutY="48.0" text="End date" />
+                        <DatePicker fx:id="endDatePicker" layoutX="105.0" layoutY="44.0" prefHeight="25.0" prefWidth="153.0" />
+                        <Label layoutX="14.0" layoutY="80.0" text="Period in days" />
+                        <TextField fx:id="periodInDaysTextField" layoutX="105.0" layoutY="76.0" prefWidth="153.0" />
                     </children>
                 </AnchorPane>
             </content>
@@ -67,7 +67,7 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="297.0" layoutY="305.0" prefHeight="159.0" prefWidth="272.0" text="Launch details">
+        <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="281.0" prefHeight="159.0" prefWidth="272.0" text="Launch details">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="270.0">
                     <children>
