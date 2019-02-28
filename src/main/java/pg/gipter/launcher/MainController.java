@@ -96,6 +96,12 @@ public class MainController implements Initializable {
     }
 
     private void setProperties() {
+        toolkitDomainTextField.setDisable(true);
+        toolkitListNameTextField.setDisable(true);
+        toolkitUrlTextField.setDisable(true);
+        toolkitWSTextField.setDisable(true);
+        toolkitUserFolderTextField.setDisable(true);
+
         projectPathButton.setVisible(applicationProperties.projectPaths().isEmpty());
         itemPathButton.setVisible(StringUtils.nullOrEmpty(applicationProperties.itemPath()));
     }
