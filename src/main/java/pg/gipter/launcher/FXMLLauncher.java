@@ -10,16 +10,20 @@ import pg.gipter.settings.ApplicationProperties;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 class FXMLLauncher implements Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(FXMLLauncher.class);
     private ApplicationProperties applicationProperties;
     private Stage primaryStage;
+    private final ResourceBundle resourceBundle;
 
     FXMLLauncher(ApplicationProperties applicationProperties, Stage primaryStage) {
         this.applicationProperties = applicationProperties;
         this.primaryStage = primaryStage;
+        resourceBundle = ResourceBundle.getBundle("bundle.translation", Locale.getDefault());
     }
 
     private URL url() {
@@ -32,9 +36,11 @@ class FXMLLauncher implements Launcher {
     public void execute() {
         try {
             logger.info("Launching UI style.");
-            primaryStage.setTitle(String.format("Gipter v%s", applicationProperties.version()));
+            primaryStage.setTitle(String.format("%sv%s",
+                    resourceBundle.getString("main.title"), applicationProperties.version()
+            ));
             primaryStage.setResizable(false);
-            FXMLLoader loader = new FXMLLoader(url());
+            FXMLLoader loader = new FXMLLoader(url(), resourceBundle);
             loader.setController(new MainController(applicationProperties, primaryStage));
             Scene scene = new Scene(loader.load());
             //scene.getStylesheets().add(window.css());

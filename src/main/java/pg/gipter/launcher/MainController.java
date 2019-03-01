@@ -65,8 +65,8 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setInitValues();
-        setProperties();
-        setActions();
+        setProperties(resources);
+        setActions(resources);
     }
 
     private void setInitValues() {
@@ -102,7 +102,7 @@ public class MainController implements Initializable {
         saveConfigurationCheckBox.setSelected(false);
     }
 
-    private void setProperties() {
+    private void setProperties(ResourceBundle resources) {
         toolkitDomainTextField.setEditable(false);
         toolkitListNameTextField.setEditable(false);
         toolkitUrlTextField.setEditable(false);
@@ -110,46 +110,46 @@ public class MainController implements Initializable {
         toolkitUserFolderTextField.setEditable(false);
 
         if (applicationProperties.projectPaths().isEmpty()) {
-            projectPathButton.setText("Add");
+            projectPathButton.setText(resources.getString("button.add"));
         } else {
-            projectPathButton.setText("Change");
+            projectPathButton.setText(resources.getString("button.change"));
         }
 
         if (StringUtils.nullOrEmpty(applicationProperties.itemPath())) {
-            itemPathButton.setText("Add");
+            itemPathButton.setText(resources.getString("button.add"));
         } else {
-            itemPathButton.setText("Change");
+            itemPathButton.setText(resources.getString("button.change"));
         }
     }
 
-    private void setActions() {
+    private void setActions(ResourceBundle resources) {
         runButton.setOnAction(event -> runner.run());
-        projectPathButton.setOnAction(projectPathAction());
-        itemPathButton.setOnAction(itemPathAction());
+        projectPathButton.setOnAction(projectPathAction(resources));
+        itemPathButton.setOnAction(itemPathAction(resources));
     }
 
-    private EventHandler<ActionEvent> projectPathAction() {
+    private EventHandler<ActionEvent> projectPathAction(final ResourceBundle resources) {
         return event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(new File("."));
-            directoryChooser.setTitle("Select where to save the item");
+            directoryChooser.setTitle(resources.getString("directory.item.title"));
             File itemPathDirectory = directoryChooser.showDialog(parentWindow);
             if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                 itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
-                projectPathButton.setText("Change");
+                projectPathButton.setText(resources.getString("button.change"));
             }
         };
     }
 
-    private EventHandler<ActionEvent> itemPathAction() {
+    private EventHandler<ActionEvent> itemPathAction(final ResourceBundle resources) {
         return event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(new File("."));
-            directoryChooser.setTitle("Select where to save the item");
+            directoryChooser.setTitle(resources.getString("directory.project.title"));
             File itemPathDirectory = directoryChooser.showDialog(parentWindow);
             if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                 itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
-                itemPathButton.setText("Change");
+                itemPathButton.setText(resources.getString("button.change"));
             }
         };
     }
