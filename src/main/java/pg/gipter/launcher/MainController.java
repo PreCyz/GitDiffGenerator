@@ -1,14 +1,19 @@
 package pg.gipter.launcher;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Window;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.util.StringUtils;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.PreferredArgSource;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -49,10 +54,12 @@ public class MainController implements Initializable {
 
     private ApplicationProperties applicationProperties;
     private Runnable runner;
+    private final Window parentWindow;
 
-    MainController(ApplicationProperties applicationProperties) {
+    MainController(ApplicationProperties applicationProperties, Window parentWindow) {
         this.applicationProperties = applicationProperties;
         this.runner = new Runner(applicationProperties);
+        this.parentWindow = parentWindow;
     }
 
     @Override
@@ -96,20 +103,55 @@ public class MainController implements Initializable {
     }
 
     private void setProperties() {
-        toolkitDomainTextField.setDisable(true);
-        toolkitListNameTextField.setDisable(true);
-        toolkitUrlTextField.setDisable(true);
-        toolkitWSTextField.setDisable(true);
-        toolkitUserFolderTextField.setDisable(true);
+        toolkitDomainTextField.setEditable(false);
+        toolkitListNameTextField.setEditable(false);
+        toolkitUrlTextField.setEditable(false);
+        toolkitWSTextField.setEditable(false);
+        toolkitUserFolderTextField.setEditable(false);
 
-        projectPathButton.setVisible(applicationProperties.projectPaths().isEmpty());
-        itemPathButton.setVisible(StringUtils.nullOrEmpty(applicationProperties.itemPath()));
+        if (applicationProperties.projectPaths().isEmpty()) {
+            projectPathButton.setText("Add");
+        } else {
+            projectPathButton.setText("Change");
+        }
+
+        if (StringUtils.nullOrEmpty(applicationProperties.itemPath())) {
+            itemPathButton.setText("Add");
+        } else {
+            itemPathButton.setText("Change");
+        }
     }
 
     private void setActions() {
         runButton.setOnAction(event -> runner.run());
-        projectPathButton.setOnAction(event -> {});
-        itemPathButton.setOnAction(event -> {});
+        projectPathButton.setOnAction(projectPathAction());
+        itemPathButton.setOnAction(itemPathAction());
+    }
+
+    private EventHandler<ActionEvent> projectPathAction() {
+        return event -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setInitialDirectory(new File("."));
+            directoryChooser.setTitle("Select where to save the item");
+            File itemPathDirectory = directoryChooser.showDialog(parentWindow);
+            if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
+                itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
+                projectPathButton.setText("Change");
+            }
+        };
+    }
+
+    private EventHandler<ActionEvent> itemPathAction() {
+        return event -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setInitialDirectory(new File("."));
+            directoryChooser.setTitle("Select where to save the item");
+            File itemPathDirectory = directoryChooser.showDialog(parentWindow);
+            if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
+                itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
+                itemPathButton.setText("Change");
+            }
+        };
     }
 
 }

@@ -32,10 +32,10 @@ class FXMLLauncher implements Launcher {
     public void execute() {
         try {
             logger.info("Launching UI style.");
-            FXMLLoader loader = new FXMLLoader(url());
-            loader.setController(new MainController(applicationProperties));
             primaryStage.setTitle(String.format("Gipter v%s", applicationProperties.version()));
             primaryStage.setResizable(false);
+            FXMLLoader loader = new FXMLLoader(url());
+            loader.setController(new MainController(applicationProperties, primaryStage));
             Scene scene = new Scene(loader.load());
             //scene.getStylesheets().add(window.css());
             primaryStage.setScene(scene);
