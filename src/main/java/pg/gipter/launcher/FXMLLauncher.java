@@ -27,9 +27,17 @@ class FXMLLauncher implements Launcher {
     }
 
     private URL url() {
+        String platform = System.getProperty("os.name");
+        String resource = "";
+        if ("Linux".equalsIgnoreCase(platform)) {
+            resource = String.format("fxml%smain.fxml", File.separator);
+        } else if (platform.startsWith("Windows")) {
+            resource = String.format("fxml%s%smain.fxml", File.separator, File.separator);
+        }
+
         return getClass()
                 .getClassLoader()
-                .getResource(String.format("fxml%smain.fxml", File.separator));
+                .getResource(resource);
     }
 
     @Override
