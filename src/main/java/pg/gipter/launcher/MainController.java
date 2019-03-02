@@ -12,6 +12,7 @@ import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.util.StringUtils;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
+import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 
 import java.io.File;
@@ -156,28 +157,28 @@ public class MainController implements Initializable {
     private EventHandler<ActionEvent> runActionEventHandler() {
         return event -> {
             String[] args = {
-                    "author=" + authorsTextField.getText(),
-                    "committerEmail=" + committerEmailTextField.getText(),
-                    "gitAuthor=" + gitAuthorTextField.getText(),
-                    "mercurialAuthor=" + mercurialAuthorTextField.getText(),
-                    "svnAuthor=" + svnAuthorTextField.getText(),
-                    "codeProtection=" + codeProtectionComboBox.getValue(),
-                    "skipRemote=" + skipRemoteCheckBox.isSelected(),
+                    ArgName.author + "=" + authorsTextField.getText(),
+                    ArgName.committerEmail + "=" + committerEmailTextField.getText(),
+                    ArgName.gitAuthor + "=" + gitAuthorTextField.getText(),
+                    ArgName.mercurialAuthor + "=" + mercurialAuthorTextField.getText(),
+                    ArgName.svnAuthor + "=" + svnAuthorTextField.getText(),
+                    ArgName.codeProtection + "=" + codeProtectionComboBox.getValue(),
+                    ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected(),
 
-                    "toolkitUsername=" + toolkitUsernameTextField.getText(),
-                    "toolkitPassword=" + toolkitPasswordField.getText(),
+                    ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText(),
+                    ArgName.toolkitPassword + "=" + toolkitPasswordField.getText(),
 
-                    "projectPath=" + projectPathLabel.getText(),
-                    "itemPath=" + itemPathLabel.getText(),
-                    "itemFileNamePrefix=" + itemFileNamePrefixTextField.getText(),
+                    ArgName.projectPath + "=" + projectPathLabel.getText(),
+                    ArgName.itemPath + "=" + itemPathLabel.getText(),
+                    ArgName.itemFileNamePrefix + "=" + itemFileNamePrefixTextField.getText(),
 
-                    "startDate=" + startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd),
-                    "endDate=" + endDatePicker.getValue(),
-                    "periodInDays=" + periodInDaysTextField.getText(),
+                    ArgName.startDate + "=" + startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd),
+                    ArgName.endDate + "=" + endDatePicker.getValue(),
+                    ArgName.periodInDays + "=" + periodInDaysTextField.getText(),
 
-                    "confirmationWindow=" + confirmationWindowCheckBox.isSelected(),
-                    "preferredArgSource=" + PreferredArgSource.CLI,
-                    "useUI=" + useUICheckBox.isSelected()
+                    ArgName.confirmationWindow + "=" + confirmationWindowCheckBox.isSelected(),
+                    ArgName.preferredArgSource + "=" + PreferredArgSource.CLI,
+                    ArgName.useUI + "=" + useUICheckBox.isSelected()
             };
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
             Runnable runner = new Runner(uiAppProperties);
