@@ -11,6 +11,7 @@ import javafx.stage.Window;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.util.StringUtils;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.PreferredArgSource;
 
 import java.io.File;
@@ -53,12 +54,10 @@ public class MainController implements Initializable {
     @FXML private Button runButton;
 
     private ApplicationProperties applicationProperties;
-    private Runnable runner;
     private final Window parentWindow;
 
     MainController(ApplicationProperties applicationProperties, Window parentWindow) {
         this.applicationProperties = applicationProperties;
-        this.runner = new Runner(applicationProperties);
         this.parentWindow = parentWindow;
     }
 
@@ -123,12 +122,12 @@ public class MainController implements Initializable {
     }
 
     private void setActions(ResourceBundle resources) {
-        runButton.setOnAction(event -> runner.run());
-        projectPathButton.setOnAction(projectPathAction(resources));
-        itemPathButton.setOnAction(itemPathAction(resources));
+        projectPathButton.setOnAction(projectPathActionEventHandler(resources));
+        itemPathButton.setOnAction(itemPathActionEventHandler(resources));
+        runButton.setOnAction(runActionEventHandler());
     }
 
-    private EventHandler<ActionEvent> projectPathAction(final ResourceBundle resources) {
+    private EventHandler<ActionEvent> projectPathActionEventHandler(final ResourceBundle resources) {
         return event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(new File("."));
@@ -141,7 +140,7 @@ public class MainController implements Initializable {
         };
     }
 
-    private EventHandler<ActionEvent> itemPathAction(final ResourceBundle resources) {
+    private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
         return event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(new File("."));
@@ -151,6 +150,38 @@ public class MainController implements Initializable {
                 itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
                 itemPathButton.setText(resources.getString("button.change"));
             }
+        };
+    }
+
+    private EventHandler<ActionEvent> runActionEventHandler() {
+        return event -> {
+            String[] args = {
+                    "author=" + authorsTextField.getText(),
+                    "committerEmail=" + committerEmailTextField.getText(),
+                    "gitAuthor=" + gitAuthorTextField.getText(),
+                    "mercurialAuthor=" + mercurialAuthorTextField.getText(),
+                    "svnAuthor=" + svnAuthorTextField.getText(),
+                    "codeProtection=" + codeProtectionComboBox.getValue(),
+                    "skipRemote=" + skipRemoteCheckBox.isSelected(),
+
+                    "toolkitUsername=" + toolkitUsernameTextField.getText(),
+                    "toolkitPassword=" + toolkitPasswordField.getText(),
+
+                    "projectPath=" + projectPathLabel.getText(),
+                    "itemPath=" + itemPathLabel.getText(),
+                    "itemFileNamePrefix=" + itemFileNamePrefixTextField.getText(),
+
+                    "startDate=" + startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd),
+                    "endDate=" + endDatePicker.getValue(),
+                    "periodInDays=" + periodInDaysTextField.getText(),
+
+                    "confirmationWindow=" + confirmationWindowCheckBox.isSelected(),
+                    "preferredArgSource=" + PreferredArgSource.CLI,
+                    "useUI=" + useUICheckBox.isSelected()
+            };
+            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
+            Runnable runner = new Runner(uiAppProperties);
+            runner.run();
         };
     }
 
