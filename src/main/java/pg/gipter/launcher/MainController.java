@@ -51,7 +51,7 @@ public class MainController implements Initializable {
     @FXML private CheckBox useUICheckBox;
     @FXML private CheckBox saveConfigurationCheckBox;
 
-    @FXML private Button runButton;
+    @FXML private Button executeButton;
 
     private ApplicationProperties applicationProperties;
     private final Window parentWindow;
@@ -124,7 +124,7 @@ public class MainController implements Initializable {
     private void setActions(ResourceBundle resources) {
         projectPathButton.setOnAction(projectPathActionEventHandler(resources));
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
-        runButton.setOnAction(runActionEventHandler());
+        executeButton.setOnAction(runActionEventHandler());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler(final ResourceBundle resources) {
