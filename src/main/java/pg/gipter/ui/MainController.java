@@ -1,25 +1,25 @@
-package pg.gipter.launcher;
+package pg.gipter.ui;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Window;
+import pg.gipter.launcher.Runner;
 import pg.gipter.producer.command.CodeProtection;
-import pg.gipter.producer.util.StringUtils;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.util.StringUtils;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
-public class MainController implements Initializable {
+class MainController extends AbstractController {
 
     @FXML private TextField authorsTextField;
     @FXML private TextField committerEmailTextField;
@@ -53,23 +53,26 @@ public class MainController implements Initializable {
     @FXML private CheckBox saveConfigurationCheckBox;
 
     @FXML private Button executeButton;
+    @FXML private ComboBox<String> languageComboBox;
 
     private ApplicationProperties applicationProperties;
-    private final Window parentWindow;
 
-    MainController(ApplicationProperties applicationProperties, Window parentWindow) {
+    private final String[] supportedLanguages = {"en", "pl"};
+
+    MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+        super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        this.parentWindow = parentWindow;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setInitValues();
+        super.initialize(location, resources);
+        setInitValues(resources);
         setProperties(resources);
         setActions(resources);
     }
 
-    private void setInitValues() {
+    private void setInitValues(ResourceBundle resources) {
         authorsTextField.setText(String.join(",", applicationProperties.authors()));
         committerEmailTextField.setText(applicationProperties.committerEmail());
         gitAuthorTextField.setText(applicationProperties.gitAuthor());
@@ -100,6 +103,14 @@ public class MainController implements Initializable {
         preferredArgSourceComboBox.setValue(applicationProperties.preferredArgSource());
         useUICheckBox.setSelected(applicationProperties.isUseUI());
         saveConfigurationCheckBox.setSelected(false);
+
+        languageComboBox.setItems(FXCollections.observableList(Arrays.asList(supportedLanguages)));
+        if (StringUtils.nullOrEmpty(resources.getLocale().getLanguage())
+                || supportedLanguages[0].equals(resources.getLocale().getLanguage())) {
+            languageComboBox.setValue(supportedLanguages[0]);
+        } else if (supportedLanguages[1].equals(resources.getLocale().getLanguage())) {
+            languageComboBox.setValue(supportedLanguages[1]);
+        }
     }
 
     private void setProperties(ResourceBundle resources) {
@@ -133,7 +144,7 @@ public class MainController implements Initializable {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(new File("."));
             directoryChooser.setTitle(resources.getString("directory.item.title"));
-            File itemPathDirectory = directoryChooser.showDialog(parentWindow);
+            File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
             if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                 itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
                 projectPathButton.setText(resources.getString("button.change"));
@@ -146,7 +157,7 @@ public class MainController implements Initializable {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(new File("."));
             directoryChooser.setTitle(resources.getString("directory.project.title"));
-            File itemPathDirectory = directoryChooser.showDialog(parentWindow);
+            File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
             if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                 itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
                 itemPathButton.setText(resources.getString("button.change"));
@@ -181,7 +192,7 @@ public class MainController implements Initializable {
                     ArgName.useUI + "=" + useUICheckBox.isSelected()
             };
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
-            Runnable runner = new Runner(uiAppProperties);
+            Runner runner = new Runner(uiAppProperties);
             runner.run();
         };
     }

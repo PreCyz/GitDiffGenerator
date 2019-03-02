@@ -1,7 +1,7 @@
 package pg.gipter.settings;
 
 import pg.gipter.producer.command.CodeProtection;
-import pg.gipter.producer.util.StringUtils;
+import pg.gipter.util.StringUtils;
 
 import java.io.File;
 import java.time.LocalDate;

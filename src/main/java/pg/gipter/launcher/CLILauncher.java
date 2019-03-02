@@ -10,17 +10,15 @@ import pg.gipter.settings.ApplicationProperties;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
 
 class CLILauncher implements Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(CLILauncher.class);
-    private ApplicationProperties applicationProperties;
-    private Runnable runner;
-
+    private final ApplicationProperties applicationProperties;
 
     CLILauncher(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        runner = new Runner(applicationProperties);
     }
 
     @Override
@@ -28,6 +26,7 @@ class CLILauncher implements Launcher {
         boolean error = false;
         try {
             logger.info("Launching command line style.");
+            Runner runner = new Runner(applicationProperties);
             runner.run();
         } catch (Exception ex) {
             logger.error("Diff upload failure. Program is terminated.");
@@ -67,7 +66,7 @@ class CLILauncher implements Launcher {
         alert.setHeaderText(null);
         alert.setContentText(message);
 
-        URL imgUrl = getClass().getClassLoader().getResource("img/chicken-face.jpg");
+        URL imgUrl = getClass().getClassLoader().getResource(Paths.get("img", "chicken-face.jpg").toString());
         if (imgUrl != null) {
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image(imgUrl.toString()));

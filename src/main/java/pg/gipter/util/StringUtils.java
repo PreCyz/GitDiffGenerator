@@ -1,4 +1,4 @@
-package pg.gipter.producer.util;
+package pg.gipter.util;
 
 public final class StringUtils {
 
