@@ -24,7 +24,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     public Set<String> authors() {
         if (hasProperties()) {
             String authors = properties.getProperty(
-                    ArgExtractor.ArgName.author.name(), String.join(",", argExtractor.authors())
+                    ArgName.author.name(), String.join(",", argExtractor.authors())
             );
             return Stream.of(authors.split(",")).collect(toCollection(LinkedHashSet::new));
         }
@@ -34,7 +34,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String gitAuthor() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.gitAuthor.name(), argExtractor.gitAuthor());
+            return properties.getProperty(ArgName.gitAuthor.name(), argExtractor.gitAuthor());
         }
         return argExtractor.gitAuthor();
     }
@@ -42,7 +42,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String mercurialAuthor() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.mercurialAuthor.name(), argExtractor.mercurialAuthor());
+            return properties.getProperty(ArgName.mercurialAuthor.name(), argExtractor.mercurialAuthor());
         }
         return argExtractor.mercurialAuthor();
     }
@@ -50,7 +50,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String svnAuthor() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.svnAuthor.name(), argExtractor.svnAuthor());
+            return properties.getProperty(ArgName.svnAuthor.name(), argExtractor.svnAuthor());
         }
         return argExtractor.svnAuthor();
     }
@@ -59,7 +59,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     public String itemPath() {
         String itemPath = argExtractor.itemPath();
         if (hasProperties()) {
-            itemPath = properties.getProperty(ArgExtractor.ArgName.itemPath.name(), itemPath);
+            itemPath = properties.getProperty(ArgName.itemPath.name(), itemPath);
             if (codeProtection() == CodeProtection.STATEMENT) {
                 return itemPath;
             }
@@ -70,7 +70,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String itemFileNamePrefix() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.itemFileNamePrefix.name(), argExtractor.itemFileNamePrefix());
+            return properties.getProperty(ArgName.itemFileNamePrefix.name(), argExtractor.itemFileNamePrefix());
         }
         return argExtractor.itemFileNamePrefix();
     }
@@ -79,7 +79,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     public Set<String> projectPaths() {
         if (hasProperties()) {
             String[] projectPaths = properties.getProperty(
-                    ArgExtractor.ArgName.projectPath.name(), ArgExtractor.ArgName.projectPath.defaultValue()
+                    ArgName.projectPath.name(), ArgName.projectPath.defaultValue()
             ).split(",");
             return new HashSet<>(Arrays.asList(projectPaths));
         }
@@ -90,7 +90,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     public int periodInDays() {
         if (hasProperties()) {
             return Math.abs(Integer.parseInt(properties.getProperty(
-                    ArgExtractor.ArgName.periodInDays.name(), String.valueOf(argExtractor.periodInDays())
+                    ArgName.periodInDays.name(), String.valueOf(argExtractor.periodInDays())
             )));
         }
         return argExtractor.periodInDays();
@@ -99,7 +99,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String committerEmail() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.committerEmail.name(), argExtractor.committerEmail());
+            return properties.getProperty(ArgName.committerEmail.name(), argExtractor.committerEmail());
         }
         return argExtractor.committerEmail();
     }
@@ -108,7 +108,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     public LocalDate startDate() {
         if (hasProperties()) {
             String[] date = properties.getProperty(
-                    ArgExtractor.ArgName.startDate.name(), LocalDate.now().minusDays(periodInDays()).format(yyyy_MM_dd)
+                    ArgName.startDate.name(), LocalDate.now().minusDays(periodInDays()).format(yyyy_MM_dd)
             ).split("-");
             return LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
         }
@@ -119,7 +119,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     public LocalDate endDate() {
         if (hasProperties()) {
             String[] date = argExtractor.endDate().format(yyyy_MM_dd).split("-");
-            String endDateStr = properties.getProperty(ArgExtractor.ArgName.endDate.name());
+            String endDateStr = properties.getProperty(ArgName.endDate.name());
             if (StringUtils.notEmpty(endDateStr)) {
                 date = endDateStr.split("-");
             }
@@ -132,7 +132,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     public CodeProtection codeProtection() {
         if (hasProperties()) {
             String codeProtected = properties.getProperty(
-                    ArgExtractor.ArgName.codeProtection.name(), ArgExtractor.ArgName.codeProtection.defaultValue()
+                    ArgName.codeProtection.name(), ArgName.codeProtection.defaultValue()
             );
             return CodeProtection.valueFor(codeProtected);
         }
@@ -143,7 +143,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     public boolean isConfirmationWindow() {
         if (hasProperties()) {
             return StringUtils.getBoolean(properties.getProperty(
-                    ArgExtractor.ArgName.confirmationWindow.name(), ArgExtractor.ArgName.confirmationWindow.defaultValue()
+                    ArgName.confirmationWindow.name(), ArgName.confirmationWindow.defaultValue()
             ));
         }
         return argExtractor.isConfirmationWindow();
@@ -152,7 +152,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitUsername() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.toolkitUsername.name(), argExtractor.toolkitUsername()).trim().toUpperCase();
+            return properties.getProperty(ArgName.toolkitUsername.name(), argExtractor.toolkitUsername()).trim().toUpperCase();
         }
         return argExtractor.toolkitUsername();
     }
@@ -160,7 +160,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitPassword() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.toolkitPassword.name(), argExtractor.toolkitPassword());
+            return properties.getProperty(ArgName.toolkitPassword.name(), argExtractor.toolkitPassword());
         }
         return argExtractor.toolkitPassword();
     }
@@ -168,7 +168,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitDomain() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.toolkitDomain.name(), argExtractor.toolkitDomain());
+            return properties.getProperty(ArgName.toolkitDomain.name(), argExtractor.toolkitDomain());
         }
         return argExtractor.toolkitDomain();
     }
@@ -176,7 +176,7 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitUrl() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.toolkitUrl.name(), argExtractor.toolkitUrl());
+            return properties.getProperty(ArgName.toolkitUrl.name(), argExtractor.toolkitUrl());
         }
         return argExtractor.toolkitUrl();
     }
@@ -184,17 +184,17 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitListName() {
         if (hasProperties()) {
-            return properties.getProperty(ArgExtractor.ArgName.toolkitListName.name(), argExtractor.toolkitListName());
+            return properties.getProperty(ArgName.toolkitListName.name(), argExtractor.toolkitListName());
         }
         return argExtractor.toolkitListName();
     }
 
     @Override
     public boolean isSkipRemote() {
-        String propertyName = ArgExtractor.ArgName.skipRemote.name();
+        String propertyName = ArgName.skipRemote.name();
         if (containsProperty(propertyName)) {
             return StringUtils.getBoolean(properties.getProperty(
-                    propertyName, ArgExtractor.ArgName.skipRemote.defaultValue()
+                    propertyName, ArgName.skipRemote.defaultValue()
             ));
         }
         return argExtractor.isSkipRemote();
@@ -203,17 +203,17 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitUserFolder() {
         if (hasProperties()) {
-            return ArgExtractor.ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+            return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
         }
         return argExtractor.toolkitUserFolder();
     }
 
     @Override
     public boolean isUseUI() {
-        String propertyName = ArgExtractor.ArgName.useUI.name();
+        String propertyName = ArgName.useUI.name();
         if (containsProperty(propertyName)) {
             return StringUtils.getBoolean(properties.getProperty(
-                    propertyName, ArgExtractor.ArgName.useUI.defaultValue()
+                    propertyName, ArgName.useUI.defaultValue()
             ));
         }
         return argExtractor.isUseUI();

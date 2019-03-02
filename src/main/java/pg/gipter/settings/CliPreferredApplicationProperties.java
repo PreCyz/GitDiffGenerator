@@ -22,7 +22,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public Set<String> authors() {
         Set<String> authors = argExtractor.authors();
-        String argName = ArgExtractor.ArgName.author.name();
+        String argName = ArgName.author.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             String author = properties.getProperty(
                     argName, String.join(",", authors)
@@ -35,7 +35,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String gitAuthor() {
         String gitAuthor = argExtractor.gitAuthor();
-        String argName = ArgExtractor.ArgName.gitAuthor.name();
+        String argName = ArgName.gitAuthor.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             gitAuthor = properties.getProperty(argName, gitAuthor);
         }
@@ -45,7 +45,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String mercurialAuthor() {
         String mercurialAuthor = argExtractor.mercurialAuthor();
-        String argName = ArgExtractor.ArgName.mercurialAuthor.name();
+        String argName = ArgName.mercurialAuthor.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             mercurialAuthor = properties.getProperty(argName, mercurialAuthor);
         }
@@ -55,7 +55,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String svnAuthor() {
         String svnAuthor = argExtractor.svnAuthor();
-        String argName = ArgExtractor.ArgName.svnAuthor.name();
+        String argName = ArgName.svnAuthor.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             svnAuthor = properties.getProperty(argName, svnAuthor);
         }
@@ -64,8 +64,8 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
 
     @Override
     public String itemPath() {
-        String itemPath = ArgExtractor.ArgName.itemPath.defaultValue();
-        String argName = ArgExtractor.ArgName.itemPath.name();
+        String itemPath = ArgName.itemPath.defaultValue();
+        String argName = ArgName.itemPath.name();
         if (containsArg(argName)) {
             itemPath = argExtractor.itemPath();
         }
@@ -78,7 +78,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String itemFileNamePrefix() {
         String itemFileNamePrefix = argExtractor.itemFileNamePrefix();
-        String argName = ArgExtractor.ArgName.itemFileNamePrefix.name();
+        String argName = ArgName.itemFileNamePrefix.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             itemFileNamePrefix = properties.getProperty(argName, itemFileNamePrefix);
         }
@@ -88,7 +88,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public Set<String> projectPaths() {
         Set<String> projectPaths = argExtractor.projectPaths();
-        String argName = ArgExtractor.ArgName.projectPath.name();
+        String argName = ArgName.projectPath.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             String[] projectPathsArray = properties.getProperty(argName, String.join(",", projectPaths)).split(",");
             projectPaths = new LinkedHashSet<>(Arrays.asList(projectPathsArray));
@@ -99,7 +99,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public int periodInDays() {
         int periodInDays = argExtractor.periodInDays();
-        String argName = ArgExtractor.ArgName.periodInDays.name();
+        String argName = ArgName.periodInDays.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             periodInDays = Math.abs(Integer.parseInt(properties.getProperty(argName, String.valueOf(periodInDays))));
         }
@@ -109,7 +109,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String committerEmail() {
         String committerEmail = argExtractor.committerEmail();
-        String argName = ArgExtractor.ArgName.committerEmail.name();
+        String argName = ArgName.committerEmail.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             committerEmail = properties.getProperty(argName, committerEmail);
         }
@@ -119,7 +119,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public LocalDate startDate() {
         LocalDate startDate = argExtractor.startDate();
-        String argName = ArgExtractor.ArgName.startDate.name();
+        String argName = ArgName.startDate.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             String[] date = properties.getProperty(argName, startDate.format(yyyy_MM_dd)).split("-");
             startDate = LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
@@ -130,7 +130,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public LocalDate endDate() {
         LocalDate endDate = argExtractor.endDate();
-        String argName = ArgExtractor.ArgName.endDate.name();
+        String argName = ArgName.endDate.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             String[] date = endDate.format(yyyy_MM_dd).split("-");
             String endDateStr = properties.getProperty(argName);
@@ -145,7 +145,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public CodeProtection codeProtection() {
         CodeProtection codeProtection = argExtractor.codeProtection();
-        String argName = ArgExtractor.ArgName.codeProtection.name();
+        String argName = ArgName.codeProtection.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             codeProtection = CodeProtection.valueFor(properties.getProperty(argName, codeProtection.name()));
         }
@@ -155,7 +155,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public boolean isConfirmationWindow() {
         boolean confirmation = argExtractor.isConfirmationWindow();
-        String argName = ArgExtractor.ArgName.confirmationWindow.name();
+        String argName = ArgName.confirmationWindow.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             confirmation = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(confirmation)));
         }
@@ -165,7 +165,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitUsername() {
         String toolkitUsername = argExtractor.toolkitUsername();
-        String argName = ArgExtractor.ArgName.toolkitUsername.name();
+        String argName = ArgName.toolkitUsername.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             toolkitUsername = properties.getProperty(argName, toolkitUsername).trim().toUpperCase();
         }
@@ -175,7 +175,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitPassword() {
         String toolkitPassword = argExtractor.toolkitPassword();
-        String argName = ArgExtractor.ArgName.toolkitPassword.name();
+        String argName = ArgName.toolkitPassword.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             toolkitPassword = properties.getProperty(argName, toolkitPassword);
         }
@@ -185,7 +185,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitDomain() {
         String toolkitDomain = argExtractor.toolkitDomain();
-        String argName = ArgExtractor.ArgName.toolkitDomain.name();
+        String argName = ArgName.toolkitDomain.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             toolkitDomain = properties.getProperty(argName, toolkitDomain);
         }
@@ -195,7 +195,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitUrl() {
         String toolkitUrl = argExtractor.toolkitUrl();
-        String argName = ArgExtractor.ArgName.toolkitUrl.name();
+        String argName = ArgName.toolkitUrl.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             toolkitUrl = properties.getProperty(argName, toolkitUrl);
         }
@@ -205,7 +205,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitListName() {
         String toolkitListName = argExtractor.toolkitListName();
-        String argName = ArgExtractor.ArgName.toolkitListName.name();
+        String argName = ArgName.toolkitListName.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             toolkitListName = properties.getProperty(argName, toolkitListName);
         }
@@ -215,7 +215,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     @Override
     public boolean isSkipRemote() {
         boolean skipRemote = argExtractor.isSkipRemote();
-        String argName = ArgExtractor.ArgName.skipRemote.name();
+        String argName = ArgName.skipRemote.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             skipRemote = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(skipRemote)));
         }
@@ -224,13 +224,13 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
 
     @Override
     public String toolkitUserFolder() {
-        return ArgExtractor.ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+        return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
     }
 
     @Override
     public boolean isUseUI() {
         boolean useUI = argExtractor.isUseUI();
-        String argName = ArgExtractor.ArgName.useUI.name();
+        String argName = ArgName.useUI.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             useUI = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(useUI)));
         }

@@ -73,8 +73,8 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitCredentialsSet() {
-        return !toolkitUsername().isEmpty() && !ArgExtractor.ArgName.toolkitUsername.defaultValue().equals(toolkitUsername()) &&
-                !toolkitPassword().isEmpty() && !ArgExtractor.ArgName.toolkitPassword.defaultValue().equals(toolkitPassword());
+        return !toolkitUsername().isEmpty() && !ArgName.toolkitUsername.defaultValue().equals(toolkitUsername()) &&
+                !toolkitPassword().isEmpty() && !ArgName.toolkitPassword.defaultValue().equals(toolkitPassword());
     }
 
     public final String fileName() {

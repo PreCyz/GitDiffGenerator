@@ -475,7 +475,7 @@ class ArgExtractorTest {
         String[] args = {"author=testAuthor"};
         argExtractor = new ArgExtractor(args);
 
-        boolean actual = argExtractor.containsArg(ArgExtractor.ArgName.author.name());
+        boolean actual = argExtractor.containsArg(ArgName.author.name());
 
         assertThat(actual).isTrue();
     }
@@ -485,7 +485,7 @@ class ArgExtractorTest {
         String[] args = {"author=testAuthor"};
         argExtractor = new ArgExtractor(args);
 
-        boolean actual = argExtractor.containsArg(ArgExtractor.ArgName.gitAuthor.name());
+        boolean actual = argExtractor.containsArg(ArgName.gitAuthor.name());
 
         assertThat(actual).isFalse();
     }
