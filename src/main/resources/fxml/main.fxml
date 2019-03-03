@@ -86,14 +86,14 @@
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="300.0">
                     <children>
-                        <Label layoutX="14.0" layoutY="52.0" text="%launch.panel.confirmationWindow" />
-                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="199.0" layoutY="52.0" mnemonicParsing="false" />
-                        <Label layoutX="14.0" layoutY="18.0" text="%launch.panel.preferredArgSource" />
-                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="199.0" layoutY="15.0" prefHeight="25.0" prefWidth="90.0" />
-                        <Label layoutX="14.0" layoutY="78.0" text="%launch.panel.useUI" />
-                        <CheckBox fx:id="useUICheckBox" layoutX="199.0" layoutY="78.0" mnemonicParsing="false" />
-                  <CheckBox fx:id="saveConfigurationCheckBox" layoutX="199.0" layoutY="105.0" mnemonicParsing="false" />
-                  <Label layoutX="14.0" layoutY="103.0" prefHeight="17.0" prefWidth="174.0" text="%launch.panel.saveCurrentConfiguration" />
+                        <Label layoutX="13.0" layoutY="51.0" text="%launch.panel.confirmationWindow" />
+                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="198.0" layoutY="51.0" mnemonicParsing="false" />
+                        <Label layoutX="13.0" layoutY="18.0" text="%launch.panel.preferredArgSource" />
+                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="198.0" layoutY="15.0" prefHeight="25.0" prefWidth="90.0" />
+                        <Label layoutX="13.0" layoutY="78.0" text="%launch.panel.useUI" />
+                        <CheckBox fx:id="useUICheckBox" layoutX="198.0" layoutY="77.0" mnemonicParsing="false" />
+                  <CheckBox fx:id="saveConfigurationCheckBox" layoutX="198.0" layoutY="104.0" mnemonicParsing="false" />
+                  <Label layoutX="13.0" layoutY="104.0" prefHeight="17.0" prefWidth="174.0" text="%launch.panel.saveCurrentConfiguration" />
                     </children>
                 </AnchorPane>
             </content>
