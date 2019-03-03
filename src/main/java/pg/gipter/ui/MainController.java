@@ -93,6 +93,7 @@ class MainController extends AbstractController {
 
     private final String[] supportedLanguages = {"en", "pl"};
     private static String currentLanguage;
+    private static boolean saveCurrentSettings = false;
 
     MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -127,7 +128,9 @@ class MainController extends AbstractController {
         toolkitUserFolderTextField.setText(applicationProperties.toolkitUserFolder());
 
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
-        itemPathLabel.setText(applicationProperties.itemPath());
+        String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
+        String itemPath = applicationProperties.itemPath().substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
+        itemPathLabel.setText(itemPath);
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
 
         startDatePicker.setValue(applicationProperties.startDate());
@@ -138,7 +141,7 @@ class MainController extends AbstractController {
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
-        saveConfigurationCheckBox.setSelected(false);
+        saveConfigurationCheckBox.setSelected(saveCurrentSettings);
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(supportedLanguages)));
         if (StringUtils.nullOrEmpty(currentLanguage)) {
@@ -309,6 +312,7 @@ class MainController extends AbstractController {
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     currentLanguage = languageComboBox.getValue();
+                    saveCurrentSettings = saveConfigurationCheckBox.isSelected();
                     uiLauncher.changeLanguage(languageComboBox.getValue());
                 }
         );
