@@ -186,10 +186,36 @@ class MainController extends AbstractController {
             directoryChooser.setTitle(resources.getString("directory.item.title"));
             File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
             if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
+                String result = itemPathDirectory.getAbsolutePath();
+                if (isAddPath(resources)) {
+                    result = result + (StringUtils.nullOrEmpty(projectPathLabel.getText()) ? "" : ",") + projectPathLabel.getText();
+                }
+                projectPathLabel.setText(result);
                 projectPathButton.setText(resources.getString("button.change"));
             }
         };
+    }
+
+    private boolean isAddPath(ResourceBundle resource) {
+        String add = resource.getString("popup.addOrReplace.add");
+        String replace = resource.getString("popup.addOrReplace.replace");
+        ButtonType addButton = new ButtonType(add, ButtonBar.ButtonData.OK_DONE);
+        ButtonType replaceButton = new ButtonType(replace, ButtonBar.ButtonData.CANCEL_CLOSE);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                resource.getString("popup.addOrReplace.message"),
+                addButton,
+                replaceButton
+        );
+        alert.setTitle(resource.getString("popup.title"));
+        alert.setHeaderText(resource.getString("popup.header"));
+
+        URL imgUrl = getClass().getClassLoader().getResource(Paths.get("img", "chicken-face.jpg").toString());
+        if (imgUrl != null) {
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(imgUrl.toString()));
+        }
+
+        return alert.showAndWait().orElse(replaceButton) == addButton;
     }
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
@@ -260,8 +286,8 @@ class MainController extends AbstractController {
                 overrideButton,
                 createButton
         );
-        alert.setTitle(resource.getString("popup.overrideProperties.title"));
-        alert.setHeaderText(resource.getString("popup.overrideProperties.header"));
+        alert.setTitle(resource.getString("popup.title"));
+        alert.setHeaderText(resource.getString("popup.header"));
 
         URL imgUrl = getClass().getClassLoader().getResource(Paths.get("img", "chicken-face.jpg").toString());
         if (imgUrl != null) {
