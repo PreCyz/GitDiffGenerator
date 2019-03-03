@@ -85,10 +85,10 @@ public class UILauncher implements Launcher {
 
     void changeLanguage(String language) {
         primaryStage.close();
-        if (Locale.ENGLISH.getLanguage().equals(language)) {
-            this.bundle = ResourceBundle.getBundle("bundle.translation", Locale.ENGLISH);
-        } else if ("pl".equals(language)) {
+        if ("pl".equals(language)) {
             this.bundle = ResourceBundle.getBundle("bundle.translation_pl");
+        } else {
+            this.bundle = ResourceBundle.getBundle("bundle.translation", Locale.getDefault());
         }
         execute();
     }

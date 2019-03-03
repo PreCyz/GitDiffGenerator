@@ -27,43 +27,72 @@ import java.util.ResourceBundle;
 
 class MainController extends AbstractController {
 
-    @FXML private TextField authorsTextField;
-    @FXML private TextField committerEmailTextField;
-    @FXML private TextField gitAuthorTextField;
-    @FXML private TextField mercurialAuthorTextField;
-    @FXML private TextField svnAuthorTextField;
-    @FXML private ComboBox<CodeProtection> codeProtectionComboBox;
-    @FXML private CheckBox skipRemoteCheckBox;
+    @FXML
+    private TextField authorsTextField;
+    @FXML
+    private TextField committerEmailTextField;
+    @FXML
+    private TextField gitAuthorTextField;
+    @FXML
+    private TextField mercurialAuthorTextField;
+    @FXML
+    private TextField svnAuthorTextField;
+    @FXML
+    private ComboBox<CodeProtection> codeProtectionComboBox;
+    @FXML
+    private CheckBox skipRemoteCheckBox;
 
-    @FXML private TextField toolkitUsernameTextField;
-    @FXML private PasswordField toolkitPasswordField;
-    @FXML private TextField toolkitDomainTextField;
-    @FXML private TextField toolkitListNameTextField;
-    @FXML private TextField toolkitUrlTextField;
-    @FXML private TextField toolkitWSTextField;
-    @FXML private TextField toolkitUserFolderTextField;
+    @FXML
+    private TextField toolkitUsernameTextField;
+    @FXML
+    private PasswordField toolkitPasswordField;
+    @FXML
+    private TextField toolkitDomainTextField;
+    @FXML
+    private TextField toolkitListNameTextField;
+    @FXML
+    private TextField toolkitUrlTextField;
+    @FXML
+    private TextField toolkitWSTextField;
+    @FXML
+    private TextField toolkitUserFolderTextField;
 
-    @FXML private Label projectPathLabel;
-    @FXML private Label itemPathLabel;
-    @FXML private TextField itemFileNamePrefixTextField;
-    @FXML private Button projectPathButton;
-    @FXML private Button itemPathButton;
+    @FXML
+    private Label projectPathLabel;
+    @FXML
+    private Label itemPathLabel;
+    @FXML
+    private TextField itemFileNamePrefixTextField;
+    @FXML
+    private Button projectPathButton;
+    @FXML
+    private Button itemPathButton;
 
-    @FXML private DatePicker startDatePicker;
-    @FXML private DatePicker endDatePicker;
-    @FXML private TextField periodInDaysTextField;
+    @FXML
+    private DatePicker startDatePicker;
+    @FXML
+    private DatePicker endDatePicker;
+    @FXML
+    private TextField periodInDaysTextField;
 
-    @FXML private CheckBox confirmationWindowCheckBox;
-    @FXML private ComboBox<PreferredArgSource> preferredArgSourceComboBox;
-    @FXML private CheckBox useUICheckBox;
-    @FXML private CheckBox saveConfigurationCheckBox;
+    @FXML
+    private CheckBox confirmationWindowCheckBox;
+    @FXML
+    private ComboBox<PreferredArgSource> preferredArgSourceComboBox;
+    @FXML
+    private CheckBox useUICheckBox;
+    @FXML
+    private CheckBox saveConfigurationCheckBox;
 
-    @FXML private Button executeButton;
-    @FXML private ComboBox<String> languageComboBox;
+    @FXML
+    private Button executeButton;
+    @FXML
+    private ComboBox<String> languageComboBox;
 
     private ApplicationProperties applicationProperties;
 
     private final String[] supportedLanguages = {"en", "pl"};
+    private static String currentLanguage;
 
     MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -76,6 +105,7 @@ class MainController extends AbstractController {
         setInitValues(resources);
         setProperties(resources);
         setActions(resources);
+        setListeners();
     }
 
     private void setInitValues(ResourceBundle resources) {
@@ -111,12 +141,16 @@ class MainController extends AbstractController {
         saveConfigurationCheckBox.setSelected(false);
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(supportedLanguages)));
-        if (StringUtils.nullOrEmpty(resources.getLocale().getLanguage())
-                || supportedLanguages[0].equals(resources.getLocale().getLanguage())) {
-            languageComboBox.setValue(supportedLanguages[0]);
-        } else if (supportedLanguages[1].equals(resources.getLocale().getLanguage())) {
-            languageComboBox.setValue(supportedLanguages[1]);
+        if (StringUtils.nullOrEmpty(currentLanguage)) {
+            if (StringUtils.nullOrEmpty(resources.getLocale().getLanguage())
+                    || supportedLanguages[0].equals(resources.getLocale().getLanguage())) {
+                currentLanguage = supportedLanguages[0];
+
+            } else if (supportedLanguages[1].equals(resources.getLocale().getLanguage())) {
+                currentLanguage = supportedLanguages[1];
+            }
         }
+        languageComboBox.setValue(currentLanguage);
     }
 
     private void setProperties(ResourceBundle resources) {
@@ -143,7 +177,6 @@ class MainController extends AbstractController {
         projectPathButton.setOnAction(projectPathActionEventHandler(resources));
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         executeButton.setOnAction(runActionEventHandler(resources));
-        languageComboBox.setOnAction(languageComboBoxAction());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler(final ResourceBundle resources) {
@@ -246,8 +279,14 @@ class MainController extends AbstractController {
         }
     }
 
-    private EventHandler<ActionEvent> languageComboBoxAction() {
-        return event -> uiLauncher.changeLanguage(languageComboBox.getValue());
+    private void setListeners() {
+        languageComboBox.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((options, oldValue, newValue) -> {
+                    currentLanguage = languageComboBox.getValue();
+                    uiLauncher.changeLanguage(languageComboBox.getValue());
+                }
+        );
     }
 
 }
