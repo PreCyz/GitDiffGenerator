@@ -135,6 +135,6 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-      <ComboBox fx:id="languageComboBox" layoutX="555.0" layoutY="724.0" prefWidth="70.0" />
+      <ComboBox fx:id="languageComboBox" layoutX="560.0" layoutY="724.0" prefWidth="65.0" />
     </children>
 </AnchorPane>
