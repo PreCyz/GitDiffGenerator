@@ -2,6 +2,7 @@ package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
 import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.util.PropertiesHelper;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -18,8 +19,8 @@ class CliPreferredApplicationPropertiesTest {
 
     private ApplicationProperties applicationProperties;
 
-    private PropertiesLoader mockPropertiesLoader(Properties properties) {
-        PropertiesLoader loader = mock(PropertiesLoader.class);
+    private PropertiesHelper mockPropertiesLoader(Properties properties) {
+        PropertiesHelper loader = mock(PropertiesHelper.class);
         when(loader.loadPropertiesFromFile()).thenReturn(Optional.of(properties));
         return loader;
     }
@@ -48,7 +49,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_cliAuthorAndFileAuthor_when_author_then_returnCliAuthor() {
         Properties properties = new Properties();
         properties.setProperty("author", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=cliAuthor"});
         applicationProperties.init(new String[]{"author=fileAuthor"}, loader);
 
@@ -61,7 +62,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_noCliAuthorAndFileAuthor_when_author_then_returnFileAuthor() {
         Properties properties = new Properties();
         properties.setProperty("author", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{"author=fileAuthor"}, loader);
 
@@ -74,7 +75,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_fileAuthorAndOtherArgs_when_author_then_returnFileAuthor() {
         Properties properties = new Properties();
         properties.setProperty("author", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=2019-02-16"});
         applicationProperties.init(new String[]{"author=fileAuthor"}, loader);
 
@@ -107,7 +108,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_cliGitAuthorAndFileGitAuthor_when_gitAuthor_then_returnCliAuthor() {
         Properties properties = new Properties();
         properties.setProperty("gitAuthor", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{"gitAuthor=cliAuthor"});
         applicationProperties.init(new String[]{"gitAuthor=fileAuthor"}, loader);
 
@@ -120,7 +121,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_noCliGitAuthorAndFileAuthor_when_gitAuthor_then_returnFileAuthor() {
         Properties properties = new Properties();
         properties.setProperty("gitAuthor", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{"gitAuthor=fileAuthor"}, loader);
 
@@ -133,7 +134,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_fileAuthorAndOtherArgs_when_gitAuthor_then_returnFileAuthor() {
         Properties properties = new Properties();
         properties.setProperty("gitAuthor", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(new String[]{"gitAuthor=fileAuthor"}, loader);
 
@@ -166,7 +167,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_cliMercurialAuthorAndFileGitAuthor_when_mercurialAuthor_then_returnCliAuthor() {
         Properties properties = new Properties();
         properties.setProperty("mercurialAuthor", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{"mercurialAuthor=cliAuthor"});
         applicationProperties.init(new String[]{"mercurialAuthor=fileAuthor"}, loader);
 
@@ -179,7 +180,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_noCliMercurialAuthorAndFileAuthor_when_mercurialAuthor_then_returnFileAuthor() {
         Properties properties = new Properties();
         properties.setProperty("mercurialAuthor", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{"mercurialAuthor=fileAuthor"}, loader);
 
@@ -192,7 +193,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_fileAuthorAndOtherArgs_when_mercurialAuthor_then_returnFileAuthor() {
         Properties properties = new Properties();
         properties.setProperty("mercurialAuthor", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(new String[]{"mercurialAuthor=fileAuthor"}, loader);
 
@@ -225,7 +226,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_cliSvnAuthorAndFileGitAuthor_when_svnAuthor_then_returnCliAuthor() {
         Properties properties = new Properties();
         properties.setProperty("svnAuthor", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{"svnAuthor=cliAuthor"});
         applicationProperties.init(new String[]{"svnAuthor=fileAuthor"}, loader);
 
@@ -238,7 +239,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_noCliSvnAuthorAndFileAuthor_when_svnAuthor_then_returnFileAuthor() {
         Properties properties = new Properties();
         properties.setProperty("svnAuthor", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{"svnAuthor=fileAuthor"}, loader);
 
@@ -251,7 +252,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_fileAuthorAndOtherArgs_when_svnAuthor_then_returnFileAuthor() {
         Properties properties = new Properties();
         properties.setProperty("svnAuthor", "fileAuthor");
-        PropertiesLoader loader = mockPropertiesLoader(properties);
+        PropertiesHelper loader = mockPropertiesLoader(properties);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(new String[]{"svnAuthor=fileAuthor"}, loader);
 

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.command.VersionControlSystem;
+import pg.gipter.util.PropertiesHelper;
 
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -11,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
-import static pg.gipter.settings.PropertiesLoader.APPLICATION_PROPERTIES;
+import static pg.gipter.util.PropertiesHelper.APPLICATION_PROPERTIES;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public abstract class ApplicationProperties {
@@ -29,7 +30,7 @@ public abstract class ApplicationProperties {
         argExtractor = new ArgExtractor(args);
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
-        init(args, new PropertiesLoader());
+        init(args, new PropertiesHelper());
     }
 
     public String[] getArgs() {
@@ -44,8 +45,8 @@ public abstract class ApplicationProperties {
         return vcs;
     }
 
-    protected final void init(String[] args, PropertiesLoader propertiesLoader) {
-        Optional<Properties> propsFromFile = propertiesLoader.loadPropertiesFromFile();
+    protected final void init(String[] args, PropertiesHelper propertiesHelper) {
+        Optional<Properties> propsFromFile = propertiesHelper.loadPropertiesFromFile();
         if (propsFromFile.isPresent()) {
             properties = propsFromFile.get();
             logger.info("Properties from [{}] file loaded.", APPLICATION_PROPERTIES);

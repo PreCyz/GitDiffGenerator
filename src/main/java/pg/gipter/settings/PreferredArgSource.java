@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 public enum PreferredArgSource {
-    CLI, FILE;
+    CLI, FILE, UI;
 
     public static PreferredArgSource valueFor(String value) {
         String errMsg;

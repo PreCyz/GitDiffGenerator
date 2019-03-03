@@ -5,18 +5,24 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 import pg.gipter.launcher.Runner;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 class MainController extends AbstractController {
@@ -100,7 +106,7 @@ class MainController extends AbstractController {
 
         confirmationWindowCheckBox.setSelected(applicationProperties.isConfirmationWindow());
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
-        preferredArgSourceComboBox.setValue(applicationProperties.preferredArgSource());
+        preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
         saveConfigurationCheckBox.setSelected(false);
 
@@ -136,7 +142,7 @@ class MainController extends AbstractController {
     private void setActions(ResourceBundle resources) {
         projectPathButton.setOnAction(projectPathActionEventHandler(resources));
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
-        executeButton.setOnAction(runActionEventHandler());
+        executeButton.setOnAction(runActionEventHandler(resources));
         languageComboBox.setOnAction(languageComboBoxAction());
     }
 
@@ -166,7 +172,7 @@ class MainController extends AbstractController {
         };
     }
 
-    private EventHandler<ActionEvent> runActionEventHandler() {
+    private EventHandler<ActionEvent> runActionEventHandler(final ResourceBundle resources) {
         return event -> {
             String[] args = {
                     ArgName.author + "=" + authorsTextField.getText(),
@@ -189,13 +195,55 @@ class MainController extends AbstractController {
                     ArgName.periodInDays + "=" + periodInDaysTextField.getText(),
 
                     ArgName.confirmationWindow + "=" + confirmationWindowCheckBox.isSelected(),
-                    ArgName.preferredArgSource + "=" + PreferredArgSource.CLI,
+                    ArgName.preferredArgSource + "=" + PreferredArgSource.UI,
                     ArgName.useUI + "=" + useUICheckBox.isSelected()
             };
+            if (saveConfigurationCheckBox.isSelected()) {
+                saveCurrentConfiguration(resources, createProperties(args));
+            }
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
             Runner runner = new Runner(uiAppProperties);
             runner.run();
         };
+    }
+
+    private Properties createProperties(String[] args) {
+        Properties properties = new Properties();
+        for (String arg : args) {
+            String key = arg.substring(0, arg.indexOf("="));
+            String value = arg.substring(arg.indexOf("=") + 1);
+            properties.setProperty(key, value);
+        }
+        return properties;
+    }
+
+    private void saveCurrentConfiguration(ResourceBundle resource, Properties properties) {
+        String override = resource.getString("popup.overrideProperties.buttonOverride");
+        String create = resource.getString("popup.overrideProperties.buttonUIProperties");
+        ButtonType createButton = new ButtonType(create, ButtonBar.ButtonData.OK_DONE);
+        ButtonType overrideButton = new ButtonType(override, ButtonBar.ButtonData.CANCEL_CLOSE);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                resource.getString("popup.overrideProperties.message"),
+                overrideButton,
+                createButton
+        );
+        alert.setTitle(resource.getString("popup.overrideProperties.title"));
+        alert.setHeaderText(resource.getString("popup.overrideProperties.header"));
+        //alert.setWidth(400d);
+
+        URL imgUrl = getClass().getClassLoader().getResource(Paths.get("img", "chicken-face.jpg").toString());
+        if (imgUrl != null) {
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(imgUrl.toString()));
+        }
+
+        Optional<ButtonType> result = alert.showAndWait();
+        PropertiesHelper helper = new PropertiesHelper();
+        if (result.orElse(createButton) == overrideButton) {
+            helper.saveToApplicationProperties(properties);
+        } else {
+            helper.saveToUIApplicationProperties(properties);
+        }
     }
 
     private EventHandler<ActionEvent> languageComboBoxAction() {

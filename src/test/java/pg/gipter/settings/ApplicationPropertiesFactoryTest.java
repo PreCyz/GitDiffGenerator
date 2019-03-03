@@ -21,9 +21,16 @@ class ApplicationPropertiesFactoryTest {
     }
 
     @Test
-    void given_filePreferredArgSource_when_getInstance_then_returnCliApplicationProperties() {
+    void given_filePreferredArgSource_when_getInstance_then_returnFileApplicationProperties() {
         ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=file"});
 
         assertThat(actual).isInstanceOf(FilePreferredApplicationProperties.class);
+    }
+
+    @Test
+    void given_uiPreferredArgSource_when_getInstance_then_returnCliApplicationProperties() {
+        ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=ui"});
+
+        assertThat(actual).isInstanceOf(CliPreferredApplicationProperties.class);
     }
 }

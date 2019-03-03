@@ -2,6 +2,7 @@ package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
 import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.util.PropertiesHelper;
 
 import java.io.File;
 import java.time.DateTimeException;
@@ -22,15 +23,15 @@ class FilePreferredApplicationPropertiesTest {
 
     private ApplicationProperties appProps;
 
-    private PropertiesLoader mockPropertiesLoader(Properties properties) {
-        PropertiesLoader loader = mock(PropertiesLoader.class);
+    private PropertiesHelper mockPropertiesLoader(Properties properties) {
+        PropertiesHelper loader = mock(PropertiesHelper.class);
         when(loader.loadPropertiesFromFile()).thenReturn(Optional.of(properties));
         return loader;
     }
 
     @Test
     void given_propertiesFromFile_when_hasProperties_then_returnTrue() {
-        PropertiesLoader loader = mockPropertiesLoader(new Properties());
+        PropertiesHelper loader = mockPropertiesLoader(new Properties());
         appProps = new FilePreferredApplicationProperties(new String[]{});
         appProps.init(new String[]{}, loader);
 
