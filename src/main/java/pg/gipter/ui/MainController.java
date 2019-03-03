@@ -262,7 +262,6 @@ class MainController extends AbstractController {
         );
         alert.setTitle(resource.getString("popup.overrideProperties.title"));
         alert.setHeaderText(resource.getString("popup.overrideProperties.header"));
-        //alert.setWidth(400d);
 
         URL imgUrl = getClass().getClassLoader().getResource(Paths.get("img", "chicken-face.jpg").toString());
         if (imgUrl != null) {
