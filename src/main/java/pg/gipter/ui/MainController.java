@@ -137,6 +137,7 @@ class MainController extends AbstractController {
         projectPathButton.setOnAction(projectPathActionEventHandler(resources));
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         executeButton.setOnAction(runActionEventHandler());
+        languageComboBox.setOnAction(languageComboBoxAction());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler(final ResourceBundle resources) {
@@ -195,6 +196,10 @@ class MainController extends AbstractController {
             Runner runner = new Runner(uiAppProperties);
             runner.run();
         };
+    }
+
+    private EventHandler<ActionEvent> languageComboBoxAction() {
+        return event -> uiLauncher.changeLanguage(languageComboBox.getValue());
     }
 
 }

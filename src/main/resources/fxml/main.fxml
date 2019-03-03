@@ -69,12 +69,12 @@
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="111.0" prefWidth="300.0">
                     <children>
-                        <DatePicker fx:id="startDatePicker" layoutX="116.0" layoutY="11.0" prefHeight="25.0" prefWidth="170.0" />
+                        <DatePicker fx:id="startDatePicker" layoutX="125.0" layoutY="11.0" prefHeight="25.0" prefWidth="160.0" />
                         <Label layoutX="14.0" layoutY="15.0" text="%timeFrame.panel.startDate" />
                         <Label layoutX="14.0" layoutY="48.0" text="%timeFrame.panel.endDate" />
-                        <DatePicker fx:id="endDatePicker" layoutX="116.0" layoutY="44.0" prefHeight="25.0" prefWidth="170.0" />
+                        <DatePicker fx:id="endDatePicker" layoutX="125.0" layoutY="44.0" prefHeight="25.0" prefWidth="160.0" />
                         <Label layoutX="14.0" layoutY="80.0" text="%timeFrame.panel.periodInDays" />
-                        <TextField fx:id="periodInDaysTextField" layoutX="116.0" layoutY="76.0" prefWidth="170.0" />
+                        <TextField fx:id="periodInDaysTextField" layoutX="125.0" layoutY="76.0" prefWidth="160.0" />
                     </children>
                 </AnchorPane>
             </content>
@@ -86,12 +86,12 @@
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="300.0">
                     <children>
-                        <Label layoutX="14.0" layoutY="16.0" text="%launch.panel.confirmationWindow" />
-                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="163.0" layoutY="17.0" mnemonicParsing="false" />
-                        <Label layoutX="14.0" layoutY="46.0" text="%launch.panel.preferredArgSource" />
-                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="163.0" layoutY="44.0" prefHeight="25.0" prefWidth="123.0" />
-                        <Label layoutX="14.0" layoutY="76.0" text="%launch.panel.useUI" />
-                        <CheckBox fx:id="useUICheckBox" layoutX="164.0" layoutY="76.0" mnemonicParsing="false" />
+                        <Label layoutX="14.0" layoutY="52.0" text="%launch.panel.confirmationWindow" />
+                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="199.0" layoutY="52.0" mnemonicParsing="false" />
+                        <Label layoutX="14.0" layoutY="18.0" text="%launch.panel.preferredArgSource" />
+                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="199.0" layoutY="15.0" prefHeight="25.0" prefWidth="90.0" />
+                        <Label layoutX="14.0" layoutY="78.0" text="%launch.panel.useUI" />
+                        <CheckBox fx:id="useUICheckBox" layoutX="199.0" layoutY="78.0" mnemonicParsing="false" />
                   <CheckBox fx:id="saveConfigurationCheckBox" layoutX="199.0" layoutY="105.0" mnemonicParsing="false" />
                   <Label layoutX="14.0" layoutY="103.0" prefHeight="17.0" prefWidth="174.0" text="%launch.panel.saveCurrentConfiguration" />
                     </children>

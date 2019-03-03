@@ -82,4 +82,14 @@ public class UILauncher implements Launcher {
             return new Image(is);
         }
     }
+
+    void changeLanguage(String language) {
+        primaryStage.close();
+        if (Locale.ENGLISH.getLanguage().equals(language)) {
+            this.bundle = ResourceBundle.getBundle("bundle.translation", Locale.ENGLISH);
+        } else if ("pl".equals(language)) {
+            this.bundle = ResourceBundle.getBundle("bundle.translation_pl");
+        }
+        execute();
+    }
 }
