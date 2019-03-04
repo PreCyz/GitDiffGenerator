@@ -5,9 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
 import pg.gipter.launcher.Runner;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.settings.ApplicationProperties;
@@ -209,16 +207,16 @@ class MainController extends AbstractController {
                 addButton,
                 replaceButton
         );
+        setAlertCommonAttributes(resource, alert);
+
+        return alert.showAndWait().orElse(replaceButton) == addButton;
+    }
+
+    private void setAlertCommonAttributes(ResourceBundle resource, Alert alert) {
         alert.setTitle(resource.getString("popup.title"));
         alert.setHeaderText(resource.getString("popup.header"));
 
-        URL imgUrl = getClass().getClassLoader().getResource(Paths.get("img", "chicken-face.jpg").toString());
-        if (imgUrl != null) {
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(imgUrl.toString()));
-        }
-
-        return alert.showAndWait().orElse(replaceButton) == addButton;
+        setImageOnAlertWindow(alert);
     }
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
@@ -289,14 +287,7 @@ class MainController extends AbstractController {
                 overrideButton,
                 createButton
         );
-        alert.setTitle(resource.getString("popup.title"));
-        alert.setHeaderText(resource.getString("popup.header"));
-
-        URL imgUrl = getClass().getClassLoader().getResource(Paths.get("img", "chicken-face.jpg").toString());
-        if (imgUrl != null) {
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(imgUrl.toString()));
-        }
+        setAlertCommonAttributes(resource, alert);
 
         Optional<ButtonType> result = alert.showAndWait();
         PropertiesHelper helper = new PropertiesHelper();

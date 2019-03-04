@@ -1,16 +1,13 @@
 package pg.gipter.launcher;
 
 import javafx.scene.control.Alert;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.ui.AbstractController;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
 
 class CLILauncher implements Launcher {
 
@@ -66,11 +63,7 @@ class CLILauncher implements Launcher {
         alert.setHeaderText(null);
         alert.setContentText(message);
 
-        URL imgUrl = getClass().getClassLoader().getResource(Paths.get("img", "chicken-face.jpg").toString());
-        if (imgUrl != null) {
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(imgUrl.toString()));
-        }
+        AbstractController.setImageOnAlertWindow(alert);
 
         alert.showAndWait();
     }
