@@ -8,6 +8,7 @@ import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.ApplicationProperties;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,13 +25,13 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
     @Override
     public void produceDiff() {
-        try (FileWriter fw = new FileWriter(appProps.itemPath())) {
+        try (FileWriter fw = new FileWriter(Paths.get(appProps.itemPath()).toFile())) {
 
             Set<VersionControlSystem> vcsSet = new HashSet<>();
 
             for (String projectPath : appProps.projectPaths()) {
                 logger.info("Project path: {}", projectPath);
-                VersionControlSystem vcs = VersionControlSystem.valueFrom(new File(projectPath));
+                VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath).toFile());
                 logger.info("Discovered '{}' version control system.", vcs);
 
                 final DiffCommand diffCommand = DiffCommandFactory.getInstance(vcs, appProps);
@@ -55,7 +56,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
     private void writeItemToFile(FileWriter fw, String projectPath, List<String> gitCommand) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(gitCommand);
-        processBuilder.directory(new File(projectPath));
+        processBuilder.directory(Paths.get(projectPath).toFile());
         Process process = processBuilder.start();
 
         try (InputStream is = process.getInputStream();
