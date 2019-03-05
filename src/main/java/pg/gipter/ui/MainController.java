@@ -12,6 +12,7 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
 
@@ -89,7 +90,6 @@ class MainController extends AbstractController {
 
     private ApplicationProperties applicationProperties;
 
-    private final String[] supportedLanguages = {"en", "pl"};
     private static String currentLanguage;
     private static boolean saveCurrentSettings = false;
 
@@ -141,14 +141,14 @@ class MainController extends AbstractController {
         useUICheckBox.setSelected(applicationProperties.isUseUI());
         saveConfigurationCheckBox.setSelected(saveCurrentSettings);
 
-        languageComboBox.setItems(FXCollections.observableList(Arrays.asList(supportedLanguages)));
+        languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
         if (StringUtils.nullOrEmpty(currentLanguage)) {
             if (StringUtils.nullOrEmpty(resources.getLocale().getLanguage())
-                    || supportedLanguages[0].equals(resources.getLocale().getLanguage())) {
-                currentLanguage = supportedLanguages[0];
+                    || BundleUtils.SUPPORTED_LANGUAGES[0].equals(resources.getLocale().getLanguage())) {
+                currentLanguage = BundleUtils.SUPPORTED_LANGUAGES[0];
 
-            } else if (supportedLanguages[1].equals(resources.getLocale().getLanguage())) {
-                currentLanguage = supportedLanguages[1];
+            } else if (BundleUtils.SUPPORTED_LANGUAGES[1].equals(resources.getLocale().getLanguage())) {
+                currentLanguage = BundleUtils.SUPPORTED_LANGUAGES[1];
             }
         }
         languageComboBox.setValue(currentLanguage);
