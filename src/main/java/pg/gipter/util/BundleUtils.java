@@ -30,16 +30,18 @@ public final class BundleUtils {
         return message;
     }
 
-    public static ResourceBundle changeResource(String language) {
+    public static void changeBundle(String language) {
         if ("pl".equals(language)) {
             bundle = ResourceBundle.getBundle(String.format("%s_%s", BUNDLE_BASE_NAME, language));
         } else {
             bundle = ResourceBundle.getBundle(BUNDLE_BASE_NAME, Locale.getDefault());
         }
-        return bundle;
     }
 
     public static ResourceBundle loadBundle() {
-        return bundle = ResourceBundle.getBundle(BundleUtils.BUNDLE_BASE_NAME, Locale.getDefault());
+        if (bundle == null) {
+            return bundle = ResourceBundle.getBundle(BundleUtils.BUNDLE_BASE_NAME, Locale.getDefault());
+        }
+        return bundle;
     }
 }

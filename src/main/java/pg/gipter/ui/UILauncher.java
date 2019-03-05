@@ -17,7 +17,6 @@ import pg.gipter.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ResourceBundle;
 
 /**Created by Gawa 2017-10-04*/
 public class UILauncher implements Launcher {
@@ -25,7 +24,6 @@ public class UILauncher implements Launcher {
     private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
 
     private final Stage primaryStage;
-    private ResourceBundle bundle;
     private Window window;
     private final ApplicationProperties applicationProperties;
 
@@ -33,7 +31,6 @@ public class UILauncher implements Launcher {
         this.primaryStage = primaryStage;
         this.applicationProperties = applicationProperties;
         this.primaryStage.setOnCloseRequest(onCloseEventHandler());
-        this.bundle = BundleUtils.loadBundle();
     }
 
     private EventHandler<WindowEvent> onCloseEventHandler() {
@@ -46,7 +43,10 @@ public class UILauncher implements Launcher {
     @Override
     public void execute() {
         logger.info("Launching UI.");
-        buildScene(primaryStage, WindowFactory.MAIN.createWindow(applicationProperties, this, bundle));
+        buildScene(
+                primaryStage,
+                WindowFactory.MAIN.createWindow(applicationProperties, this, BundleUtils.loadBundle())
+        );
         primaryStage.show();
     }
 
@@ -58,9 +58,8 @@ public class UILauncher implements Launcher {
             logger.warn("Problem with loading window icon: {}.", ex.getMessage());
         }
         try {
-            stage.setTitle(String.format("%s v%s",
-                    bundle.getString(window.windowTitleBundle()),
-                    applicationProperties.version()
+            stage.setTitle(BundleUtils.getMsg(
+                    window.windowTitleBundle(), applicationProperties.version()
             ));
             stage.setResizable(window.resizable());
 	        Scene scene = new Scene(window.root());
@@ -86,7 +85,7 @@ public class UILauncher implements Launcher {
 
     void changeLanguage(String language) {
         primaryStage.close();
-        this.bundle = BundleUtils.changeResource(language);
+        BundleUtils.changeBundle(language);
         execute();
     }
 }
