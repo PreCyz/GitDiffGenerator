@@ -42,19 +42,19 @@
                         <Label layoutX="14.0" layoutY="35.0" text="%paths.panel.itemPath" />
                         <Label layoutX="14.0" layoutY="61.0" text="%paths.panel.fileNamePrefix" />
                         <TextField fx:id="itemFileNamePrefixTextField" layoutX="125.0" layoutY="59.0" prefHeight="25.0" prefWidth="153.0" />
-                        <Label fx:id="projectPathLabel" layoutX="108.0" layoutY="10.0" prefHeight="17.0" prefWidth="435.0" text="need set up">
+                        <Label fx:id="projectPathLabel" layoutX="108.0" layoutY="10.0" prefHeight="17.0" prefWidth="430.0" text="need set up">
                      <font>
                         <Font size="12.0" />
                      </font></Label>
-                        <Label fx:id="itemPathLabel" layoutX="108.0" layoutY="35.0" prefHeight="17.0" prefWidth="435.0" text="need set up">
+                        <Label fx:id="itemPathLabel" layoutX="108.0" layoutY="35.0" prefHeight="17.0" prefWidth="430.0" text="need set up">
                      <font>
                         <Font size="12.0" />
                      </font></Label>
-                        <Button fx:id="projectPathButton" layoutX="546.0" layoutY="6.0" mnemonicParsing="false" text="Add">
+                        <Button fx:id="projectPathButton" layoutX="541.0" layoutY="6.0" mnemonicParsing="false" text="Add">
                      <font>
                         <Font name="System Bold" size="11.0" />
                      </font></Button>
-                        <Button fx:id="itemPathButton" layoutX="546.0" layoutY="31.0" mnemonicParsing="false" text="Change">
+                        <Button fx:id="itemPathButton" layoutX="541.0" layoutY="31.0" mnemonicParsing="false" text="Change">
                      <font>
                         <Font name="System Bold" size="11.0" />
                      </font></Button>
@@ -135,6 +135,6 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-      <ComboBox fx:id="languageComboBox" layoutX="552.0" layoutY="724.0" prefWidth="65.0" />
+      <ComboBox fx:id="languageComboBox" layoutX="11.0" layoutY="724.0" prefWidth="65.0" />
     </children>
 </AnchorPane>
