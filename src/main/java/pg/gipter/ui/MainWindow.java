@@ -1,12 +1,10 @@
 package pg.gipter.ui;
 
-import java.util.ResourceBundle;
-
-/**Created by Gawa 2017-10-04*/
+/**Created by Gawa 2019-03-02*/
 class MainWindow extends AbstractWindow {
 
-    MainWindow(AbstractController controller, ResourceBundle bundle) {
-        super(controller, bundle);
+    MainWindow(AbstractController controller) {
+        super(controller);
     }
 
     @Override

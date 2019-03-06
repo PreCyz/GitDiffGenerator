@@ -13,10 +13,6 @@ public final class BundleUtils {
 
     private BundleUtils() {}
 
-    public static String getMsg(String key) {
-        return bundle.getString(key);
-    }
-
     public static String getMsg(String key, String ... params) {
         String message = bundle.getString(key);
         for (int i = params.length - 1; i>= 0; i--) {

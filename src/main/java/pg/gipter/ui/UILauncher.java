@@ -3,7 +3,6 @@ package pg.gipter.ui;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.Main;
@@ -21,7 +20,6 @@ public class UILauncher implements Launcher {
     private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
 
     private final Stage primaryStage;
-    private Window window;
     private final ApplicationProperties applicationProperties;
 
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
@@ -32,9 +30,10 @@ public class UILauncher implements Launcher {
     @Override
     public void execute() {
         logger.info("Launching UI.");
+        BundleUtils.loadBundle();
         buildScene(
                 primaryStage,
-                WindowFactory.MAIN.createWindow(applicationProperties, this, BundleUtils.loadBundle())
+                WindowFactory.MAIN.createWindow(applicationProperties, this)
         );
         primaryStage.show();
     }
@@ -56,14 +55,13 @@ public class UILauncher implements Launcher {
 	            scene.getStylesheets().add(window.css());
             }
 	        stage.setScene(scene);
-            this.window = stage;
         } catch (IOException ex) {
             logger.error("Building scene error.", ex);
         }
     }
 
-    Window currentWindow() {
-        return window;
+    Stage currentWindow() {
+        return primaryStage;
     }
 
     private Image readImage(String imgPath) throws IOException {

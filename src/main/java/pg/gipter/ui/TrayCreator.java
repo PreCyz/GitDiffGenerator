@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.launcher.Runner;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.util.BundleUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,23 +17,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 
-public class TrayCreator {
+class TrayCreator {
 
     private static final Logger logger = LoggerFactory.getLogger(TrayCreator.class);
 
     private final Stage stage;
-    private boolean firstTime;
-    private TrayIcon trayIcon;
-    private final ApplicationProperties applicationProperties;
+    private ApplicationProperties applicationProperties;
 
-    public TrayCreator(Stage stage, ApplicationProperties applicationProperties) {
-        this.firstTime = false;
+    TrayCreator(Stage stage, ApplicationProperties applicationProperties) {
         this.stage = stage;
+        this.applicationProperties = applicationProperties;
+    }
+
+    public void setApplicationProperties(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }
 
     public void createTrayIcon() {
         if (SystemTray.isSupported() && applicationProperties.isUseUI() && applicationProperties.isActiveTray()) {
+            stage.setOnCloseRequest(trayOnCloseEventHandler());
+
             Platform.setImplicitExit(false);
             // get the SystemTray instance
             SystemTray tray = SystemTray.getSystemTray();
@@ -44,42 +48,41 @@ public class TrayCreator {
                 logger.error("Can not read try icon image.", ex);
             }
 
+            BundleUtils.loadBundle();
 
-            stage.setOnCloseRequest(onCloseEventHandler());
-
-            // create a popup menu
             PopupMenu popup = new PopupMenu();
 
-            MenuItem showItem = new MenuItem("Show");
+            MenuItem statusItem = new MenuItem(BundleUtils.getMsg("tray.item.lastUpdate"));
+            popup.add(statusItem);
+            popup.addSeparator();
+
+            MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
             showItem.addActionListener(showActionListener());
             popup.add(showItem);
 
-            MenuItem uploadItem = new MenuItem("Upload item");
+            MenuItem uploadItem = new MenuItem(BundleUtils.getMsg("tray.item.upload"));
             uploadItem.addActionListener(uploadActionListener());
             popup.add(uploadItem);
+            popup.addSeparator();
 
-            MenuItem statusItem = new MenuItem("Actual status");
-            popup.add(statusItem);
-
-            MenuItem closeItem = new MenuItem("Close");
+            MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
             closeItem.addActionListener(closeActionListener());
             popup.add(closeItem);
 
-            // construct a TrayIcon
-            trayIcon = new TrayIcon(image, "Title", popup);
-            // set the TrayIcon properties
+            TrayIcon trayIcon = new TrayIcon(image, BundleUtils.getMsg("main.title", applicationProperties.version()), popup);
             trayIcon.addActionListener(showActionListener());
-            // ...
-            // add the tray image
+
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
                 logger.error("Error when creating tray.", e);
             }
+        } else {
+            stage.setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
         }
     }
 
-    private EventHandler<WindowEvent> onCloseEventHandler() {
+    EventHandler<WindowEvent> trayOnCloseEventHandler() {
         return windowEvent -> hide(stage);
     }
 
@@ -88,7 +91,7 @@ public class TrayCreator {
     }
 
     private ActionListener closeActionListener() {
-        return e -> System.exit(0);
+        return e -> AbstractController.platformExit();
     }
 
     private ActionListener uploadActionListener() {
@@ -99,19 +102,9 @@ public class TrayCreator {
         Platform.runLater(() -> {
             if (SystemTray.isSupported()) {
                 stage.hide();
-                showProgramIsMinimizedMsg();
             } else {
-                System.exit(0);
+                AbstractController.platformExit();
             }
         });
-    }
-
-    private void showProgramIsMinimizedMsg() {
-        if (firstTime) {
-            trayIcon.displayMessage("Some message.",
-                    "Some other message.",
-                    TrayIcon.MessageType.INFO);
-            firstTime = false;
-        }
     }
 }

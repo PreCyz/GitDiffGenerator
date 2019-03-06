@@ -2,25 +2,23 @@ package pg.gipter.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import pg.gipter.util.BundleUtils;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.ResourceBundle;
 
 /**Created by Gawa 2017-10-04*/
 public abstract class AbstractWindow {
 
     private final AbstractController controller;
-    private final ResourceBundle bundle;
 
-    AbstractWindow(AbstractController controller, ResourceBundle bundle) {
+    AbstractWindow(AbstractController controller) {
         this.controller = controller;
-        this.bundle = bundle;
     }
 
     public Parent root() throws IOException {
-        FXMLLoader loader = new FXMLLoader(url(), bundle);
+        FXMLLoader loader = new FXMLLoader(url(), BundleUtils.loadBundle());
         loader.setController(controller);
         return loader.load();
     }

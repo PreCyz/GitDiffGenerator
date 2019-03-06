@@ -8,7 +8,6 @@ import pg.gipter.launcher.Launcher;
 import pg.gipter.launcher.LauncherFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.ui.TrayCreator;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018*/
 public class Main extends Application {
@@ -25,8 +24,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         logger.info("Version of application '{}'.", applicationProperties.version());
-        TrayCreator trayCreator = new TrayCreator(primaryStage, applicationProperties);
-        trayCreator.createTrayIcon();
         Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
         launcher.execute();
     }

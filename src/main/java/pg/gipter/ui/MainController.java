@@ -94,6 +94,7 @@ class MainController extends AbstractController {
     private ComboBox<String> languageComboBox;
 
     private ApplicationProperties applicationProperties;
+    protected TrayCreator trayCreator;
 
     private static String currentLanguage;
     private static boolean saveCurrentSettings = false;
@@ -110,6 +111,14 @@ class MainController extends AbstractController {
         setProperties(resources);
         setActions(resources);
         setListeners();
+        initTray();
+    }
+
+    private void initTray() {
+        if (applicationProperties.isActiveTray()) {
+            trayCreator = new TrayCreator(uiLauncher.currentWindow(), applicationProperties);
+            trayCreator.createTrayIcon();
+        }
     }
 
     private void setInitValues(ResourceBundle resources) {
@@ -269,38 +278,47 @@ class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> runActionEventHandler(final ResourceBundle resources) {
         return event -> {
-            String[] args = {
-                    ArgName.author + "=" + authorsTextField.getText(),
-                    ArgName.committerEmail + "=" + committerEmailTextField.getText(),
-                    ArgName.gitAuthor + "=" + gitAuthorTextField.getText(),
-                    ArgName.mercurialAuthor + "=" + mercurialAuthorTextField.getText(),
-                    ArgName.svnAuthor + "=" + svnAuthorTextField.getText(),
-                    ArgName.codeProtection + "=" + codeProtectionComboBox.getValue(),
-                    ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected(),
-
-                    ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText(),
-                    ArgName.toolkitPassword + "=" + toolkitPasswordField.getText(),
-
-                    ArgName.projectPath + "=" + projectPathLabel.getText(),
-                    ArgName.itemPath + "=" + itemPathLabel.getText(),
-                    ArgName.itemFileNamePrefix + "=" + itemFileNamePrefixTextField.getText(),
-
-                    ArgName.startDate + "=" + startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd),
-                    ArgName.endDate + "=" + endDatePicker.getValue(),
-                    ArgName.periodInDays + "=" + periodInDaysTextField.getText(),
-
-                    ArgName.confirmationWindow + "=" + confirmationWindowCheckBox.isSelected(),
-                    ArgName.preferredArgSource + "=" + PreferredArgSource.UI,
-                    ArgName.useUI + "=" + useUICheckBox.isSelected(),
-                    ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected()
-            };
+            String[] args = createArgsFromUI();
             if (saveConfigurationCheckBox.isSelected()) {
                 saveCurrentConfiguration(resources, createProperties(args));
             }
+
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
+
+            if (uiAppProperties.isActiveTray()) {
+                trayCreator.setApplicationProperties(uiAppProperties);
+            }
             Runner runner = new Runner(uiAppProperties);
             runner.run();
         };
+    }
+
+    private String[] createArgsFromUI() {
+        return new String[]{
+                        ArgName.author + "=" + authorsTextField.getText(),
+                        ArgName.committerEmail + "=" + committerEmailTextField.getText(),
+                        ArgName.gitAuthor + "=" + gitAuthorTextField.getText(),
+                        ArgName.mercurialAuthor + "=" + mercurialAuthorTextField.getText(),
+                        ArgName.svnAuthor + "=" + svnAuthorTextField.getText(),
+                        ArgName.codeProtection + "=" + codeProtectionComboBox.getValue(),
+                        ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected(),
+
+                        ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText(),
+                        ArgName.toolkitPassword + "=" + toolkitPasswordField.getText(),
+
+                        ArgName.projectPath + "=" + projectPathLabel.getText(),
+                        ArgName.itemPath + "=" + itemPathLabel.getText(),
+                        ArgName.itemFileNamePrefix + "=" + itemFileNamePrefixTextField.getText(),
+
+                        ArgName.startDate + "=" + startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd),
+                        ArgName.endDate + "=" + endDatePicker.getValue(),
+                        ArgName.periodInDays + "=" + periodInDaysTextField.getText(),
+
+                        ArgName.confirmationWindow + "=" + confirmationWindowCheckBox.isSelected(),
+                        ArgName.preferredArgSource + "=" + PreferredArgSource.UI,
+                        ArgName.useUI + "=" + useUICheckBox.isSelected(),
+                        ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected()
+                };
     }
 
     private EventHandler<ActionEvent> codeProtectionActionEventHandler() {
@@ -352,6 +370,16 @@ class MainController extends AbstractController {
                     uiLauncher.changeLanguage(languageComboBox.getValue());
                 }
         );
+
+        activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
+                trayCreator.setApplicationProperties(uiAppProperties);
+                uiLauncher.currentWindow().setOnCloseRequest(trayCreator.trayOnCloseEventHandler());
+            } else {
+                uiLauncher.currentWindow().setOnCloseRequest(regularOnCloseEventHandler());
+            }
+        });
     }
 
 }
