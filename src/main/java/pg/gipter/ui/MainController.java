@@ -91,6 +91,8 @@ class MainController extends AbstractController {
     @FXML
     private Button executeButton;
     @FXML
+    private Button deamonButton;
+    @FXML
     private ComboBox<String> languageComboBox;
 
     private ApplicationProperties applicationProperties;
@@ -211,6 +213,7 @@ class MainController extends AbstractController {
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         executeButton.setOnAction(runActionEventHandler(resources));
         codeProtectionComboBox.setOnAction(codeProtectionActionEventHandler());
+        deamonButton.setOnAction(deamonActionEventHandler(resources));
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler(final ResourceBundle resources) {
@@ -330,16 +333,6 @@ class MainController extends AbstractController {
         };
     }
 
-    private Properties createProperties(String[] args) {
-        Properties properties = new Properties();
-        for (String arg : args) {
-            String key = arg.substring(0, arg.indexOf("="));
-            String value = arg.substring(arg.indexOf("=") + 1);
-            properties.setProperty(key, value);
-        }
-        return properties;
-    }
-
     private void saveCurrentConfiguration(ResourceBundle resource, Properties properties) {
         String override = resource.getString("popup.overrideProperties.buttonOverride");
         String create = resource.getString("popup.overrideProperties.buttonUIProperties");
@@ -359,6 +352,44 @@ class MainController extends AbstractController {
         } else {
             helper.saveToUIApplicationProperties(properties);
         }
+    }
+
+    private Properties createProperties(String[] args) {
+        Properties properties = new Properties();
+        for (String arg : args) {
+            String key = arg.substring(0, arg.indexOf("="));
+            String value = arg.substring(arg.indexOf("=") + 1);
+            properties.setProperty(key, value);
+        }
+        return properties;
+    }
+
+    private EventHandler<ActionEvent> deamonActionEventHandler(ResourceBundle resource) {
+        return event -> {
+            String yes = resource.getString("popup.scheduler.yes");
+            String no = resource.getString("popup.scheduler.no");
+            ButtonType yesButton = new ButtonType(yes, ButtonBar.ButtonData.OK_DONE);
+            ButtonType noButton = new ButtonType(no, ButtonBar.ButtonData.CANCEL_CLOSE);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                    resource.getString("popup.scheduler.message"),
+                    yesButton,
+                    noButton
+            );
+            setAlertCommonAttributes(resource, alert);
+
+            boolean setupScheduler = alert.showAndWait().orElse(noButton) == yesButton;
+            if (setupScheduler) {
+                //setup schedule, display schedule window
+            }
+
+            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
+            if (uiAppProperties.isActiveTray()) {
+                trayCreator.setApplicationProperties(uiAppProperties);
+                trayCreator.hide();
+            } else {
+                AbstractController.platformExit();
+            }
+        };
     }
 
     private void setListeners() {

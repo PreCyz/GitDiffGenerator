@@ -83,7 +83,7 @@ class TrayCreator {
     }
 
     EventHandler<WindowEvent> trayOnCloseEventHandler() {
-        return windowEvent -> hide(stage);
+        return windowEvent -> hide();
     }
 
     private ActionListener showActionListener() {
@@ -98,7 +98,7 @@ class TrayCreator {
         return e -> Platform.runLater(() -> new Runner(applicationProperties).run());
     }
 
-    private void hide(final Stage stage) {
+    void hide() {
         Platform.runLater(() -> {
             if (SystemTray.isSupported()) {
                 stage.hide();
