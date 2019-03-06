@@ -1,9 +1,12 @@
-package pg.gipter.ui;
+package pg.gipter.ui.main;
+
+import pg.gipter.ui.AbstractController;
+import pg.gipter.ui.AbstractWindow;
 
 /**Created by Gawa 2019-03-02*/
-class MainWindow extends AbstractWindow {
+public class MainWindow extends AbstractWindow {
 
-    MainWindow(AbstractController controller) {
+    public MainWindow(AbstractController controller) {
         super(controller);
     }
 

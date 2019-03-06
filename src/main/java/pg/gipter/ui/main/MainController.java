@@ -1,9 +1,12 @@
-package pg.gipter.ui;
+package pg.gipter.ui.main;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -14,10 +17,14 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.ui.AbstractController;
+import pg.gipter.ui.TrayCreator;
+import pg.gipter.ui.UILauncher;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
 
+import java.awt.*;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
@@ -27,7 +34,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
-class MainController extends AbstractController {
+public class MainController extends AbstractController {
 
     @FXML
     private TextField authorsTextField;
@@ -96,12 +103,12 @@ class MainController extends AbstractController {
     private ComboBox<String> languageComboBox;
 
     private ApplicationProperties applicationProperties;
-    protected TrayCreator trayCreator;
+    private TrayCreator trayCreator;
 
     private static String currentLanguage;
     private static boolean saveCurrentSettings = false;
 
-    MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+    public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
     }
@@ -118,7 +125,7 @@ class MainController extends AbstractController {
 
     private void initTray() {
         if (applicationProperties.isActiveTray()) {
-            trayCreator = new TrayCreator(uiLauncher.currentWindow(), applicationProperties);
+            trayCreator = new TrayCreator(uiLauncher, applicationProperties);
             trayCreator.createTrayIcon();
         }
     }
@@ -155,7 +162,7 @@ class MainController extends AbstractController {
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
-        activeteTrayCheckBox.setSelected(applicationProperties.isActiveTray());
+        activeteTrayCheckBox.setSelected(applicationProperties.isActiveTray() && SystemTray.isSupported());
         saveConfigurationCheckBox.setSelected(saveCurrentSettings);
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
@@ -192,6 +199,12 @@ class MainController extends AbstractController {
 
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
+
+        activeteTrayCheckBox.setDisable(!SystemTray.isSupported());
+
+        if (!applicationProperties.isActiveTray() || !SystemTray.isSupported()) {
+            deamonButton.setVisible(false);
+        }
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -387,7 +400,7 @@ class MainController extends AbstractController {
                 trayCreator.setApplicationProperties(uiAppProperties);
                 trayCreator.hide();
             } else {
-                AbstractController.platformExit();
+                UILauncher.platformExit();
             }
         };
     }
@@ -408,7 +421,7 @@ class MainController extends AbstractController {
                 trayCreator.setApplicationProperties(uiAppProperties);
                 uiLauncher.currentWindow().setOnCloseRequest(trayCreator.trayOnCloseEventHandler());
             } else {
-                uiLauncher.currentWindow().setOnCloseRequest(regularOnCloseEventHandler());
+                uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
             }
         });
     }

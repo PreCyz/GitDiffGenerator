@@ -1,5 +1,6 @@
 package pg.gipter.ui;
 
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
@@ -60,7 +61,7 @@ public class UILauncher implements Launcher {
         }
     }
 
-    Stage currentWindow() {
+    public Stage currentWindow() {
         return primaryStage;
     }
 
@@ -70,9 +71,14 @@ public class UILauncher implements Launcher {
         }
     }
 
-    void changeLanguage(String language) {
+    public void changeLanguage(String language) {
         primaryStage.close();
         BundleUtils.changeBundle(language);
         execute();
+    }
+
+    public static void platformExit() {
+        Platform.exit();
+        System.exit(0);
     }
 }

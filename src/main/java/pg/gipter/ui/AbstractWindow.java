@@ -13,7 +13,7 @@ public abstract class AbstractWindow {
 
     private final AbstractController controller;
 
-    AbstractWindow(AbstractController controller) {
+    protected AbstractWindow(AbstractController controller) {
         this.controller = controller;
     }
 

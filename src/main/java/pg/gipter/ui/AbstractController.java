@@ -1,6 +1,5 @@
 package pg.gipter.ui;
 
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -17,7 +16,6 @@ public abstract class AbstractController implements Initializable {
 
     protected final UILauncher uiLauncher;
     protected URL location;
-    protected ResourceBundle bundle;
 
     protected AbstractController(UILauncher uiLauncher) {
         this.uiLauncher = uiLauncher;
@@ -26,7 +24,6 @@ public abstract class AbstractController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.location = location;
-        bundle = resources;
     }
 
     public static void setImageOnAlertWindow(Alert alert) {
@@ -37,12 +34,8 @@ public abstract class AbstractController implements Initializable {
         }
     }
 
-    static EventHandler<WindowEvent> regularOnCloseEventHandler() {
-        return t -> platformExit();
+    protected static EventHandler<WindowEvent> regularOnCloseEventHandler() {
+        return t -> UILauncher.platformExit();
     }
 
-    static void platformExit() {
-        Platform.exit();
-        System.exit(0);
-    }
 }

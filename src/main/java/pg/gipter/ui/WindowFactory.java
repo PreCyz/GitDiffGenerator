@@ -1,6 +1,8 @@
 package pg.gipter.ui;
 
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.ui.main.MainController;
+import pg.gipter.ui.main.MainWindow;
 
 /**Created by Gawa 2017-10-04*/
 public enum WindowFactory {

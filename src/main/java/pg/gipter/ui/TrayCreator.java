@@ -17,15 +17,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 
-class TrayCreator {
+public class TrayCreator {
 
     private static final Logger logger = LoggerFactory.getLogger(TrayCreator.class);
 
     private final Stage stage;
     private ApplicationProperties applicationProperties;
+    private UILauncher uiLauncher;
 
-    TrayCreator(Stage stage, ApplicationProperties applicationProperties) {
-        this.stage = stage;
+    public TrayCreator(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
+        this.uiLauncher = uiLauncher;
+        this.stage = uiLauncher.currentWindow();
         this.applicationProperties = applicationProperties;
     }
 
@@ -82,7 +84,7 @@ class TrayCreator {
         }
     }
 
-    EventHandler<WindowEvent> trayOnCloseEventHandler() {
+    public EventHandler<WindowEvent> trayOnCloseEventHandler() {
         return windowEvent -> hide();
     }
 
@@ -91,19 +93,19 @@ class TrayCreator {
     }
 
     private ActionListener closeActionListener() {
-        return e -> AbstractController.platformExit();
+        return e -> UILauncher.platformExit();
     }
 
     private ActionListener uploadActionListener() {
         return e -> Platform.runLater(() -> new Runner(applicationProperties).run());
     }
 
-    void hide() {
+    public void hide() {
         Platform.runLater(() -> {
             if (SystemTray.isSupported()) {
                 stage.hide();
             } else {
-                AbstractController.platformExit();
+                UILauncher.platformExit();
             }
         });
     }
