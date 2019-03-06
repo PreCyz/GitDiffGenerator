@@ -178,6 +178,23 @@ class MainController extends AbstractController {
         } else {
             itemPathButton.setText(resources.getString("button.change"));
         }
+
+        startDatePicker.setConverter(dateConverter());
+        endDatePicker.setConverter(dateConverter());
+    }
+
+    private StringConverter<LocalDate> dateConverter() {
+        return new StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate object) {
+                return object.format(ApplicationProperties.yyyy_MM_dd);
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                return LocalDate.parse(string, ApplicationProperties.yyyy_MM_dd);
+            }
+        };
     }
 
     private void setActions(ResourceBundle resources) {
