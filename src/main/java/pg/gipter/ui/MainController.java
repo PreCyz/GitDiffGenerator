@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.util.StringConverter;
 import pg.gipter.launcher.Runner;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.settings.ApplicationProperties;
@@ -20,6 +21,7 @@ import pg.gipter.util.StringUtils;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
@@ -82,6 +84,8 @@ class MainController extends AbstractController {
     @FXML
     private CheckBox useUICheckBox;
     @FXML
+    private CheckBox activeteTrayCheckBox;
+    @FXML
     private CheckBox saveConfigurationCheckBox;
 
     @FXML
@@ -140,6 +144,7 @@ class MainController extends AbstractController {
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
+        activeteTrayCheckBox.setSelected(applicationProperties.isActiveTray());
         saveConfigurationCheckBox.setSelected(saveCurrentSettings);
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
@@ -269,7 +274,8 @@ class MainController extends AbstractController {
 
                     ArgName.confirmationWindow + "=" + confirmationWindowCheckBox.isSelected(),
                     ArgName.preferredArgSource + "=" + PreferredArgSource.UI,
-                    ArgName.useUI + "=" + useUICheckBox.isSelected()
+                    ArgName.useUI + "=" + useUICheckBox.isSelected(),
+                    ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected()
             };
             if (saveConfigurationCheckBox.isSelected()) {
                 saveCurrentConfiguration(resources, createProperties(args));

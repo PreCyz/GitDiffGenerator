@@ -237,4 +237,9 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         return useUI;
     }
 
+    @Override
+    public boolean isActiveTray() {
+        return false;
+    }
+
 }

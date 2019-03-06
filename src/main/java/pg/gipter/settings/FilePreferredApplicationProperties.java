@@ -219,4 +219,9 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return argExtractor.isUseUI();
     }
 
+    @Override
+    public boolean isActiveTray() {
+        return false;
+    }
+
 }

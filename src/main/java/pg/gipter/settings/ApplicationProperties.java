@@ -168,5 +168,5 @@ public abstract class ApplicationProperties {
     public abstract String toolkitUrl();
     public abstract boolean isSkipRemote();
     public abstract boolean isUseUI();
-
+    public abstract boolean isActiveTray();
 }

@@ -187,4 +187,11 @@ final class ArgExtractor {
         return StringUtils.getBoolean(ArgName.useUI.defaultValue());
     }
 
+    public boolean isActiveTray() {
+        if (containsArg(ArgName.activeTray.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.activeTray, ArgName.activeTray.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.activeTray.defaultValue());
+
+    }
 }
