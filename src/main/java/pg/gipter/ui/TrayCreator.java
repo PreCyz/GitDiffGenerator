@@ -13,33 +13,36 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Paths;
 
-public class UICustomization {
+public class TrayCreator {
 
-    private static final Logger logger = LoggerFactory.getLogger(UICustomization.class);
+    private static final Logger logger = LoggerFactory.getLogger(TrayCreator.class);
 
     private final Stage stage;
     private boolean firstTime;
     private TrayIcon trayIcon;
     private final ApplicationProperties applicationProperties;
 
-    public UICustomization(Stage stage, ApplicationProperties applicationProperties) {
+    public TrayCreator(Stage stage, ApplicationProperties applicationProperties) {
         this.firstTime = false;
         this.stage = stage;
         this.applicationProperties = applicationProperties;
     }
 
     public void createTrayIcon() {
-        if (SystemTray.isSupported()) {
+        if (SystemTray.isSupported() ) {
             Platform.setImplicitExit(false);
             // get the SystemTray instance
             SystemTray tray = SystemTray.getSystemTray();
             // load an image
             java.awt.Image image = null;
-            try {
-                //URL url = new URL("http://www.digitalphotoartistry.com/rose1.jpg");
-                image = ImageIO.read(Paths.get("img", "chicken-face.jpg").toFile());
+            try (InputStream imgIs = getClass().getClassLoader().getResourceAsStream(Paths.get("img", "chicken-face.jpg").toString());){
+                URL url = new URL("http://www.digitalphotoartistry.com/rose1.jpg");
+                //image = ImageIO.read(imgIs);
+                image = ImageIO.read(url);
             } catch (IOException ex) {
                 logger.error("Can not read try icon image.", ex);
             }
