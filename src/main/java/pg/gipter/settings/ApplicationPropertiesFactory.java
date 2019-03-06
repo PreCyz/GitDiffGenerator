@@ -10,6 +10,11 @@ public class ApplicationPropertiesFactory {
             case FILE:
                 return new FilePreferredApplicationProperties(args);
             case UI:
+                return new UIPreferredApplicationProperties(args);
+            case CLI:
+                if (argExtractor.isUseUI()) {
+                    return new UIPreferredApplicationProperties(args);
+                }
                 return new CliPreferredApplicationProperties(args);
             default:
                 return new CliPreferredApplicationProperties(args);
