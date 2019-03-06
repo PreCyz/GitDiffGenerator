@@ -3,12 +3,14 @@ package pg.gipter.ui;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.Main;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.ui.job.JobDetails;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.StringUtils;
 
@@ -22,10 +24,19 @@ public class UILauncher implements Launcher {
 
     private final Stage primaryStage;
     private final ApplicationProperties applicationProperties;
+    private JobDetails jobDetails;
 
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
         this.primaryStage = primaryStage;
         this.applicationProperties = applicationProperties;
+    }
+
+    public JobDetails getJobDetails() {
+        return jobDetails;
+    }
+
+    public void setJobDetails(JobDetails jobDetails) {
+        this.jobDetails = jobDetails;
     }
 
     @Override
@@ -80,5 +91,12 @@ public class UILauncher implements Launcher {
     public static void platformExit() {
         Platform.exit();
         System.exit(0);
+    }
+
+    void showJobWindow() {
+        Stage jobStage = new Stage();
+        jobStage.initModality(Modality.WINDOW_MODAL);
+        buildScene(jobStage, WindowFactory.JOB.createWindow(applicationProperties, this));
+        jobStage.showAndWait();
     }
 }

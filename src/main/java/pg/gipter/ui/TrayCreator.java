@@ -65,6 +65,10 @@ public class TrayCreator {
             MenuItem uploadItem = new MenuItem(BundleUtils.getMsg("tray.item.upload"));
             uploadItem.addActionListener(uploadActionListener());
             popup.add(uploadItem);
+
+            MenuItem createJobItem = new MenuItem(BundleUtils.getMsg("tray.item.createJob"));
+            createJobItem.addActionListener(createJobActionListener());
+            popup.add(createJobItem);
             popup.addSeparator();
 
             MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
@@ -82,6 +86,10 @@ public class TrayCreator {
         } else {
             stage.setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
         }
+    }
+
+    private ActionListener createJobActionListener() {
+        return e -> Platform.runLater(() -> uiLauncher.showJobWindow());
     }
 
     public EventHandler<WindowEvent> trayOnCloseEventHandler() {
