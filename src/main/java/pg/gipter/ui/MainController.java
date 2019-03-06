@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import pg.gipter.launcher.Runner;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.settings.ApplicationProperties;
@@ -178,6 +179,7 @@ class MainController extends AbstractController {
         projectPathButton.setOnAction(projectPathActionEventHandler(resources));
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         executeButton.setOnAction(runActionEventHandler(resources));
+        codeProtectionComboBox.setOnAction(codeProtectionActionEventHandler());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler(final ResourceBundle resources) {
@@ -221,13 +223,24 @@ class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
         return event -> {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(new File("."));
-            directoryChooser.setTitle(resources.getString("directory.project.title"));
-            File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
-            if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
-                itemPathButton.setText(resources.getString("button.change"));
+            if (codeProtectionComboBox.getValue() == CodeProtection.STATEMENT) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setInitialDirectory(new File("."));
+                fileChooser.setTitle(resources.getString("directory.item.statement.title"));
+                File statementFile = fileChooser.showOpenDialog(uiLauncher.currentWindow());
+                if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
+                    itemPathLabel.setText(statementFile.getAbsolutePath());
+                    itemPathButton.setText(resources.getString("button.open"));
+                }
+            } else {
+                DirectoryChooser directoryChooser = new DirectoryChooser();
+                directoryChooser.setInitialDirectory(new File("."));
+                directoryChooser.setTitle(resources.getString("directory.project.title"));
+                File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
+                if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
+                    itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
+                    itemPathButton.setText(resources.getString("button.change"));
+                }
             }
         };
     }
@@ -264,6 +277,15 @@ class MainController extends AbstractController {
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
             Runner runner = new Runner(uiAppProperties);
             runner.run();
+        };
+    }
+
+    private EventHandler<ActionEvent> codeProtectionActionEventHandler() {
+        return event -> {
+            projectPathButton.setDisable(false);
+            if (codeProtectionComboBox.getValue() == CodeProtection.STATEMENT) {
+                projectPathButton.setDisable(true);
+            }
         };
     }
 
