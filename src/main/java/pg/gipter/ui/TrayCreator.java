@@ -14,7 +14,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Paths;
 
 public class TrayCreator {
@@ -33,16 +32,14 @@ public class TrayCreator {
     }
 
     public void createTrayIcon() {
-        if (SystemTray.isSupported() ) {
+        if (SystemTray.isSupported() && applicationProperties.isUseUI() && applicationProperties.isActiveTray()) {
             Platform.setImplicitExit(false);
             // get the SystemTray instance
             SystemTray tray = SystemTray.getSystemTray();
             // load an image
-            java.awt.Image image = null;
-            try (InputStream imgIs = getClass().getClassLoader().getResourceAsStream(Paths.get("img", "chicken-face.jpg").toString());){
-                URL url = new URL("http://www.digitalphotoartistry.com/rose1.jpg");
-                //image = ImageIO.read(imgIs);
-                image = ImageIO.read(url);
+            Image image = null;
+            try (InputStream imgIs = getClass().getClassLoader().getResourceAsStream(Paths.get("img", "chicken-face.jpg").toString())){
+                image = ImageIO.read(imgIs);
             } catch (IOException ex) {
                 logger.error("Can not read try icon image.", ex);
             }

@@ -1,12 +1,9 @@
 package pg.gipter.ui;
 
-import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.Main;
@@ -30,14 +27,6 @@ public class UILauncher implements Launcher {
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
         this.primaryStage = primaryStage;
         this.applicationProperties = applicationProperties;
-        this.primaryStage.setOnCloseRequest(onCloseEventHandler());
-    }
-
-    private EventHandler<WindowEvent> onCloseEventHandler() {
-        return t -> {
-            Platform.exit();
-            System.exit(0);
-        };
     }
 
     @Override
