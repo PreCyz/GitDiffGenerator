@@ -27,6 +27,6 @@ public class JobWindow extends AbstractWindow {
 
     @Override
     public String windowTitleBundle() {
-        return "job.main.title";
+        return "job.title";
     }
 }

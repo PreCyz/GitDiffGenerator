@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.Main;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.ui.job.JobDetails;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.StringUtils;
 
@@ -24,7 +23,6 @@ public class UILauncher implements Launcher {
 
     private final Stage primaryStage;
     private ApplicationProperties applicationProperties;
-    private JobDetails jobDetails;
 
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
         this.primaryStage = primaryStage;
@@ -33,14 +31,6 @@ public class UILauncher implements Launcher {
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-    }
-
-    public JobDetails getJobDetails() {
-        return jobDetails;
-    }
-
-    public void setJobDetails(JobDetails jobDetails) {
-        this.jobDetails = jobDetails;
     }
 
     @Override
