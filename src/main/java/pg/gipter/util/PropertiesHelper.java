@@ -20,7 +20,7 @@ public class PropertiesHelper {
             properties = new Properties();
             properties.load(is);
         } catch (IOException | NullPointerException e) {
-            logger.warn("Error when loading {}.", APPLICATION_PROPERTIES, e);
+            logger.warn("Error when loading {}. Exception message is {}", APPLICATION_PROPERTIES, e.getMessage());
             properties = null;
         }
         return Optional.ofNullable(properties);
