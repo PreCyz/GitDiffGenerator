@@ -138,7 +138,7 @@
             </font>
         </TitledPane>
       <ComboBox fx:id="languageComboBox" layoutX="11.0" layoutY="743.0" prefWidth="65.0" />
-      <Button fx:id="deamonButton" layoutX="542.0" layoutY="743.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="74.0" text="%button.deamon" textFill="#32a1c9">
+      <Button fx:id="deamonButton" layoutX="543.0" layoutY="743.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="74.0" text="%button.deamon" textFill="#32a1c9">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
