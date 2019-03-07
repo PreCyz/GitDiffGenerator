@@ -23,11 +23,15 @@ public class UILauncher implements Launcher {
     private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
 
     private final Stage primaryStage;
-    private final ApplicationProperties applicationProperties;
+    private ApplicationProperties applicationProperties;
     private JobDetails jobDetails;
 
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
         this.primaryStage = primaryStage;
+        this.applicationProperties = applicationProperties;
+    }
+
+    public void setApplicationProperties(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }
 
