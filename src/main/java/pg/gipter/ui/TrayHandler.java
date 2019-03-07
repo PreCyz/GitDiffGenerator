@@ -17,15 +17,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 
-public class TrayCreator {
+public class TrayHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(TrayCreator.class);
+    private static final Logger logger = LoggerFactory.getLogger(TrayHandler.class);
 
     private final Stage stage;
     private ApplicationProperties applicationProperties;
     private UILauncher uiLauncher;
+    private TrayIcon trayIcon;
 
-    public TrayCreator(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
+    public TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
         this.uiLauncher = uiLauncher;
         this.stage = uiLauncher.currentWindow();
         this.applicationProperties = applicationProperties;
@@ -36,7 +37,7 @@ public class TrayCreator {
     }
 
     public void createTrayIcon() {
-        if (SystemTray.isSupported() && applicationProperties.isUseUI() && applicationProperties.isActiveTray()) {
+        if (canCreateTrayIcon()) {
             stage.setOnCloseRequest(trayOnCloseEventHandler());
 
             Platform.setImplicitExit(false);
@@ -75,7 +76,7 @@ public class TrayCreator {
             closeItem.addActionListener(closeActionListener());
             popup.add(closeItem);
 
-            TrayIcon trayIcon = new TrayIcon(image, BundleUtils.getMsg("main.title", applicationProperties.version()), popup);
+            trayIcon = new TrayIcon(image, BundleUtils.getMsg("main.title", applicationProperties.version()), popup);
             trayIcon.addActionListener(showActionListener());
 
             try {
@@ -86,6 +87,10 @@ public class TrayCreator {
         } else {
             stage.setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
         }
+    }
+
+    private boolean canCreateTrayIcon() {
+        return SystemTray.isSupported() && applicationProperties.isUseUI() && applicationProperties.isActiveTray();
     }
 
     private ActionListener createJobActionListener() {
@@ -117,4 +122,21 @@ public class TrayCreator {
             }
         });
     }
+
+    public void removeTrayIcon() {
+        if (canCreateTrayIcon()) {
+            SystemTray tray = SystemTray.getSystemTray();
+            boolean exist = false;
+            for (TrayIcon icon : tray.getTrayIcons()) {
+                if (icon.getImage().equals(trayIcon.getImage()) && icon.getToolTip().equals(trayIcon.getToolTip())) {
+                    exist = true;
+                    break;
+                }
+            }
+            if (exist) {
+                tray.remove(trayIcon);
+            }
+        }
+    }
+
 }

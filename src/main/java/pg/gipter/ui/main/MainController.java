@@ -18,7 +18,7 @@ import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
-import pg.gipter.ui.TrayCreator;
+import pg.gipter.ui.TrayHandler;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
@@ -103,7 +103,7 @@ public class MainController extends AbstractController {
     private ComboBox<String> languageComboBox;
 
     private ApplicationProperties applicationProperties;
-    private TrayCreator trayCreator;
+    private TrayHandler trayHandler;
 
     private static String currentLanguage;
     private static boolean saveCurrentSettings = false;
@@ -125,8 +125,8 @@ public class MainController extends AbstractController {
 
     private void initTray() {
         if (applicationProperties.isActiveTray()) {
-            trayCreator = new TrayCreator(uiLauncher, applicationProperties);
-            trayCreator.createTrayIcon();
+            trayHandler = new TrayHandler(uiLauncher, applicationProperties);
+            trayHandler.createTrayIcon();
         }
     }
 
@@ -302,7 +302,7 @@ public class MainController extends AbstractController {
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
 
             if (uiAppProperties.isActiveTray()) {
-                trayCreator.setApplicationProperties(uiAppProperties);
+                trayHandler.setApplicationProperties(uiAppProperties);
             }
             Runner runner = new Runner(uiAppProperties);
             runner.run();
@@ -397,8 +397,8 @@ public class MainController extends AbstractController {
 
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
             if (uiAppProperties.isActiveTray()) {
-                trayCreator.setApplicationProperties(uiAppProperties);
-                trayCreator.hide();
+                trayHandler.setApplicationProperties(uiAppProperties);
+                trayHandler.hide();
             } else {
                 UILauncher.platformExit();
             }
@@ -411,6 +411,8 @@ public class MainController extends AbstractController {
                 .addListener((options, oldValue, newValue) -> {
                     currentLanguage = languageComboBox.getValue();
                     saveCurrentSettings = saveConfigurationCheckBox.isSelected();
+                    trayHandler.removeTrayIcon();
+                    uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(createArgsFromUI()));
                     uiLauncher.changeLanguage(languageComboBox.getValue());
                 }
         );
@@ -418,8 +420,8 @@ public class MainController extends AbstractController {
         activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
-                trayCreator.setApplicationProperties(uiAppProperties);
-                uiLauncher.currentWindow().setOnCloseRequest(trayCreator.trayOnCloseEventHandler());
+                trayHandler.setApplicationProperties(uiAppProperties);
+                uiLauncher.currentWindow().setOnCloseRequest(trayHandler.trayOnCloseEventHandler());
             } else {
                 uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
             }
