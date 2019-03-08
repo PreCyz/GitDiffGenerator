@@ -87,7 +87,7 @@ public class UILauncher implements Launcher {
         System.exit(0);
     }
 
-    void showJobWindow() {
+    public void showJobWindow() {
         Stage jobStage = new Stage();
         jobStage.initModality(Modality.WINDOW_MODAL);
         buildScene(jobStage, WindowFactory.JOB.createWindow(applicationProperties, this));

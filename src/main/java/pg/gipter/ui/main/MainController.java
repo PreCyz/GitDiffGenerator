@@ -379,30 +379,33 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> deamonActionEventHandler(ResourceBundle resource) {
         return event -> {
-            String yes = resource.getString("popup.scheduler.yes");
-            String no = resource.getString("popup.scheduler.no");
-            ButtonType yesButton = new ButtonType(yes, ButtonBar.ButtonData.OK_DONE);
-            ButtonType noButton = new ButtonType(no, ButtonBar.ButtonData.CANCEL_CLOSE);
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                    resource.getString("popup.scheduler.message"),
-                    yesButton,
-                    noButton
-            );
-            setAlertCommonAttributes(resource, alert);
-
-            boolean setupScheduler = alert.showAndWait().orElse(noButton) == yesButton;
-            if (setupScheduler) {
-                //setup schedule, display schedule window
-            }
-
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
             if (uiAppProperties.isActiveTray()) {
                 trayHandler.setApplicationProperties(uiAppProperties);
                 trayHandler.hide();
+
+                boolean isShowJobWindow = isShowJobWindow(resource);
+                if (isShowJobWindow) {
+                    uiLauncher.showJobWindow();
+                }
             } else {
                 UILauncher.platformExit();
             }
         };
+    }
+
+    private boolean isShowJobWindow(ResourceBundle resource) {
+        String yes = resource.getString("popup.scheduler.yes");
+        String no = resource.getString("popup.scheduler.no");
+        ButtonType yesButton = new ButtonType(yes, ButtonBar.ButtonData.OK_DONE);
+        ButtonType noButton = new ButtonType(no, ButtonBar.ButtonData.NO);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                resource.getString("popup.scheduler.message"),
+                yesButton,
+                noButton
+        );
+        setAlertCommonAttributes(resource, alert);
+        return alert.showAndWait().orElse(noButton) == yesButton;
     }
 
     private void setListeners() {

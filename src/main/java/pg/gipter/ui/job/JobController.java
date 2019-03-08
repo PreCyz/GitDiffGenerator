@@ -4,10 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -23,7 +20,9 @@ import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.ResourceBundle;
+import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.toList;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 public class JobController extends AbstractController {
@@ -35,13 +34,19 @@ public class JobController extends AbstractController {
     @FXML
     private ComboBox<DayOfWeek> dayNameComboBox;
     @FXML
+    private ComboBox<Integer> dayOfMonthComboBox;
+    @FXML
+    private ComboBox<Integer> hourOfDayComboBox;
+    @FXML
     private RadioButton everyMonthRadioButton;
     @FXML
     private RadioButton every2WeeksRadioButton;
     @FXML
     private RadioButton everyWeekRadioButton;
     @FXML
-    private Button scheduleButtonButton;
+    private Button scheduleButton;
+    @FXML
+    private ToggleGroup triggerOptionsToggleGroup;
 
     private final ApplicationProperties applicationProperties;
     private static Scheduler scheduler;
@@ -56,7 +61,11 @@ public class JobController extends AbstractController {
         super.initialize(location, resources);
         dayNameComboBox.setItems(FXCollections.observableList(new ArrayList<>(EnumSet.allOf(DayOfWeek.class))));
         dayNameComboBox.setValue(DayOfWeek.FRIDAY);
-        scheduleButtonButton.setOnAction(scheduleJobActionEvent());
+        dayOfMonthComboBox.setItems(FXCollections.observableList(IntStream.range(1, 29).boxed().collect(toList())));
+        dayOfMonthComboBox.setValue(Integer.valueOf(1));
+        hourOfDayComboBox.setItems(FXCollections.observableList(IntStream.range(7, 18).boxed().collect(toList())));
+        hourOfDayComboBox.setValue(Integer.valueOf(7));
+        scheduleButton.setOnAction(scheduleJobActionEvent());
     }
 
     private EventHandler<ActionEvent> scheduleJobActionEvent() {
