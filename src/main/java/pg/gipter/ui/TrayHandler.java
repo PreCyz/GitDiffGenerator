@@ -10,11 +10,11 @@ import pg.gipter.launcher.Runner;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.util.BundleUtils;
 
-import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TrayHandler {
@@ -41,18 +41,9 @@ public class TrayHandler {
             stage.setOnCloseRequest(trayOnCloseEventHandler());
 
             Platform.setImplicitExit(false);
-            // get the SystemTray instance
             SystemTray tray = SystemTray.getSystemTray();
-            // load an image
-            Image image = null;
-            try (InputStream imgIs = getClass().getClassLoader().getResourceAsStream(Paths.get("img", "chicken-face.jpg").toString())){
-                image = ImageIO.read(imgIs);
-            } catch (IOException ex) {
-                logger.error("Can not read try icon image.", ex);
-            }
 
             BundleUtils.loadBundle();
-
             PopupMenu popup = new PopupMenu();
 
             MenuItem statusItem = new MenuItem(BundleUtils.getMsg("tray.item.lastUpdate"));
@@ -76,6 +67,7 @@ public class TrayHandler {
             closeItem.addActionListener(closeActionListener());
             popup.add(closeItem);
 
+            Image image = createImage(Paths.get("img", "chicken-tray.gif"), "Tray icon");
             trayIcon = new TrayIcon(image, BundleUtils.getMsg("main.title", applicationProperties.version()), popup);
             trayIcon.addActionListener(showActionListener());
 
@@ -91,6 +83,16 @@ public class TrayHandler {
 
     private boolean canCreateTrayIcon() {
         return SystemTray.isSupported() && applicationProperties.isUseUI() && applicationProperties.isActiveTray();
+    }
+
+    private Image createImage(Path path, String description) {
+        URL imageURL = getClass().getClassLoader().getResource(path.toString());
+        if (imageURL == null) {
+            logger.error("Resource not found: {}", path);
+            return null;
+        } else {
+            return (new ImageIcon(imageURL, description)).getImage();
+        }
     }
 
     private ActionListener createJobActionListener() {
