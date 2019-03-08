@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -39,6 +40,8 @@ public class JobController extends AbstractController {
     private RadioButton every2WeeksRadioButton;
     @FXML
     private RadioButton everyWeekRadioButton;
+    @FXML
+    private Button scheduleButtonButton;
 
     private final ApplicationProperties applicationProperties;
     private static Scheduler scheduler;
@@ -53,30 +56,31 @@ public class JobController extends AbstractController {
         super.initialize(location, resources);
         dayNameComboBox.setItems(FXCollections.observableList(new ArrayList<>(EnumSet.allOf(DayOfWeek.class))));
         dayNameComboBox.setValue(DayOfWeek.FRIDAY);
+        scheduleButtonButton.setOnAction(scheduleJobActionEvent());
     }
 
     private EventHandler<ActionEvent> scheduleJobActionEvent() {
         return event -> {
             try {
                 Trigger trigger;
-                String triggrName;
-                String triggrGroup;
+                String triggerName;
+                String triggerGroup;
                 if (!StringUtils.nullOrEmpty(cronExpressionTextField.getText())) {
-                    triggrName = "cronTrigger";
-                    triggrGroup = "cronTriggerGroup";
-                    trigger = createCronTrigger(triggrName, triggrGroup);
+                    triggerName = "cronTrigger";
+                    triggerGroup = "cronTriggerGroup";
+                    trigger = createCronTrigger(triggerName, triggerGroup);
                 } else if (everyMonthRadioButton.isSelected()) {
-                    triggrName = "everyMonthTrigger";
-                    triggrGroup = "everyMonthTriggerGroup";
-                    trigger = createTriggerEveryMonth(triggrName, triggrGroup);
+                    triggerName = "everyMonthTrigger";
+                    triggerGroup = "everyMonthTriggerGroup";
+                    trigger = createTriggerEveryMonth(triggerName, triggerGroup);
                 } else if (every2WeeksRadioButton.isSelected()) {
-                    triggrName = "every2WeeksTrigger";
-                    triggrGroup = "every2WeeksTriggerGroup";
-                    trigger = createTriggerEvery2Weeks(triggrName, triggrGroup);
+                    triggerName = "every2WeeksTrigger";
+                    triggerGroup = "every2WeeksTriggerGroup";
+                    trigger = createTriggerEvery2Weeks(triggerName, triggerGroup);
                 } else {
-                    triggrName = "everyWeekTrigger";
-                    triggrGroup = "everyWeekTriggerGroup";
-                    trigger = createTriggerEveryWeek(triggrName, triggrGroup);
+                    triggerName = "everyWeekTrigger";
+                    triggerGroup = "everyWeekTriggerGroup";
+                    trigger = createTriggerEveryWeek(triggerName, triggerGroup);
                 }
 
                 // Grab the Scheduler instance from the Factory
@@ -84,7 +88,7 @@ public class JobController extends AbstractController {
                     scheduler = StdSchedulerFactory.getDefaultScheduler();
                     scheduler.scheduleJob(trigger);
                 } else {
-                    scheduler.rescheduleJob(TriggerKey.triggerKey(triggrName, triggrGroup), trigger);
+                    scheduler.rescheduleJob(TriggerKey.triggerKey(triggerName, triggerGroup), trigger);
                 }
 
                 // and start it off
@@ -94,24 +98,24 @@ public class JobController extends AbstractController {
 
                 //scheduler.shutdown();
 
-            } catch (SchedulerException se) {
+            } catch (SchedulerException | ParseException se) {
                 se.printStackTrace();
             }
         };
     }
 
-    private Trigger createTriggerEveryMonth(String triggrName, String triggrGroup) {
+    private Trigger createTriggerEveryMonth(String triggerName, String triggerGroup) {
         return newTrigger()
-                .withIdentity(triggrName, triggrGroup)
+                .withIdentity(triggerName, triggerGroup)
                 .startNow()
                 .withSchedule(CronScheduleBuilder.monthlyOnDayAndHourAndMinute(1, 15, 30))
                 .forJob(createJobDetail())
                 .build();
     }
 
-    private Trigger createTriggerEvery2Weeks(String triggrName, String triggrGroup) {
+    private Trigger createTriggerEvery2Weeks(String triggerName, String triggerGroup) {
         return TriggerBuilder.newTrigger()
-                .withIdentity(triggrName, triggrGroup)
+                .withIdentity(triggerName, triggerGroup)
                 .startAt(DateBuilder.tomorrowAt(15, 0, 0))  // first fire time 15:00:00 tomorrow
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                         .withIntervalInHours(14 * 24) // interval is actually set at 14 * 24 hours' worth of milliseconds
@@ -120,30 +124,25 @@ public class JobController extends AbstractController {
                 .build();
     }
 
-    private Trigger createTriggerEveryWeek(String triggrName, String triggrGroup) {
+    private Trigger createTriggerEveryWeek(String triggerName, String triggerGroup) {
         return newTrigger()
-                .withIdentity(triggrName, triggrGroup)
+                .withIdentity(triggerName, triggerGroup)
                 .startNow()
                 .withSchedule(CronScheduleBuilder.cronSchedule("0 0 15 ? * WED")) // fire every wednesday at 15:00
                 .forJob(createJobDetail())
                 .build();
     }
 
-    private Trigger createCronTrigger(String triggrName, String triggrGroup) {
-        try {
-            CronExpression cronExpression = new CronExpression(cronExpressionTextField.getText());
-            CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
+    private Trigger createCronTrigger(String triggerName, String triggerGroup) throws ParseException {
+        CronExpression cronExpression = new CronExpression(cronExpressionTextField.getText());
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
 
-            return newTrigger()
-                    .withIdentity(triggrName, triggrGroup)
-                    .startNow()
-                    .withSchedule(cronScheduleBuilder)
-                    .forJob(createJobDetail())
-                    .build();
-        } catch (ParseException e) {
-            logger.error("Wrong cron expression.");
-        }
-        return null;
+        return newTrigger()
+                .withIdentity(triggerName, triggerGroup)
+                .startNow()
+                .withSchedule(cronScheduleBuilder)
+                .forJob(createJobDetail())
+                .build();
     }
 
     private JobDetail createJobDetail() {

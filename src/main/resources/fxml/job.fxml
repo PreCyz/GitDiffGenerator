@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
@@ -25,7 +24,7 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="394.0" layoutY="14.0" prefHeight="147.0" prefWidth="315.0" text="%job.cronWay.title">
+      <TitledPane animated="false" collapsible="false" layoutX="394.0" layoutY="14.0" prefHeight="150.0" prefWidth="315.0" text="%job.cronWay.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="130.0" prefWidth="195.0">
                <children>
@@ -38,7 +37,7 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </TitledPane>
-      <Button layoutX="343.0" layoutY="166.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="95.0" text="%job.schedule" textFill="#24bf31">
+      <Button fx:id="scheduleButton" layoutX="343.0" layoutY="168.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="95.0" text="%job.schedule" textFill="#24bf31">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
