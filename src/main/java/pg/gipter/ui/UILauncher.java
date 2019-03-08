@@ -23,6 +23,7 @@ public class UILauncher implements Launcher {
 
     private final Stage primaryStage;
     private ApplicationProperties applicationProperties;
+    private Stage jobWindow;
 
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
         this.primaryStage = primaryStage;
@@ -88,9 +89,13 @@ public class UILauncher implements Launcher {
     }
 
     public void showJobWindow() {
-        Stage jobStage = new Stage();
-        jobStage.initModality(Modality.WINDOW_MODAL);
-        buildScene(jobStage, WindowFactory.JOB.createWindow(applicationProperties, this));
-        jobStage.showAndWait();
+        jobWindow = new Stage();
+        jobWindow.initModality(Modality.WINDOW_MODAL);
+        buildScene(jobWindow, WindowFactory.JOB.createWindow(applicationProperties, this));
+        jobWindow.showAndWait();
+    }
+
+    public void hideJobWindow() {
+        jobWindow.close();
     }
 }
