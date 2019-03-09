@@ -1,5 +1,6 @@
 package pg.gipter.launcher;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +49,13 @@ public class Runner {
             logger.error("Diff upload failure. Program is terminated.");
             error = true;
             String errMsg = createErrorMessage();
-            displayWindow(errMsg, Alert.AlertType.ERROR);
+            displayWindowFxSupport(errMsg, Alert.AlertType.ERROR);
         } finally {
             saveUploadInfo(error ? "FAIL" : "SUCCESS");
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
             String confirmationMsg = BundleUtils.getMsg("popup.confirmation.message", applicationProperties.toolkitUserFolder());
-            displayWindow(confirmationMsg, Alert.AlertType.INFORMATION);
+            displayWindowFxSupport(confirmationMsg, Alert.AlertType.INFORMATION);
         }
     }
 
@@ -79,6 +80,16 @@ public class Runner {
         AbstractController.setImageOnAlertWindow(alert);
 
         alert.showAndWait();
+    }
+
+    private void displayWindowFxSupport(String message, Alert.AlertType alertType) {
+        if (!applicationProperties.isUseUI()) {
+            displayWindow(message, alertType);
+        } else if (Platform.isFxApplicationThread()) {
+            displayWindow(message, alertType);
+        } else {
+            Platform.runLater(() -> displayWindow(message, alertType));
+        }
     }
 
     private void saveUploadInfo(String status) {

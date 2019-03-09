@@ -44,7 +44,6 @@ public class TrayHandler {
             Platform.setImplicitExit(false);
             SystemTray tray = SystemTray.getSystemTray();
 
-            BundleUtils.loadBundle();
             PopupMenu popup = new PopupMenu();
 
             PropertiesHelper propertiesHelper = new PropertiesHelper();

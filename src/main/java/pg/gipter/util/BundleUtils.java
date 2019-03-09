@@ -14,6 +14,9 @@ public final class BundleUtils {
     private BundleUtils() {}
 
     public static String getMsg(String key, String ... params) {
+        if (bundle == null) {
+            loadBundle();
+        }
         String message = bundle.getString(key);
         for (int i = params.length - 1; i>= 0; i--) {
             int index = message.lastIndexOf(REPLACEMENT_TEXT);

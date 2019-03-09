@@ -33,6 +33,8 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MainController extends AbstractController {
 
@@ -100,10 +102,13 @@ public class MainController extends AbstractController {
     @FXML
     private Button deamonButton;
     @FXML
+    private Button exitButton;
+    @FXML
     private ComboBox<String> languageComboBox;
 
     private ApplicationProperties applicationProperties;
     private TrayHandler trayHandler;
+    private Executor executor;
 
     private static String currentLanguage;
     private static boolean saveCurrentSettings = false;
@@ -111,6 +116,7 @@ public class MainController extends AbstractController {
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
+        executor = Executors.newFixedThreadPool(3);
     }
 
     @Override
@@ -163,6 +169,7 @@ public class MainController extends AbstractController {
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
         activeteTrayCheckBox.setSelected(applicationProperties.isActiveTray() && SystemTray.isSupported());
+        deamonButton.setVisible(activeteTrayCheckBox.isSelected());
         saveConfigurationCheckBox.setSelected(saveCurrentSettings);
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
@@ -224,9 +231,10 @@ public class MainController extends AbstractController {
     private void setActions(ResourceBundle resources) {
         projectPathButton.setOnAction(projectPathActionEventHandler(resources));
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
-        executeButton.setOnAction(runActionEventHandler(resources));
         codeProtectionComboBox.setOnAction(codeProtectionActionEventHandler());
+        executeButton.setOnAction(executeActionEventHandler(resources));
         deamonButton.setOnAction(deamonActionEventHandler(resources));
+        exitButton.setOnAction(exitActionEventHandler());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler(final ResourceBundle resources) {
@@ -292,7 +300,7 @@ public class MainController extends AbstractController {
         };
     }
 
-    private EventHandler<ActionEvent> runActionEventHandler(final ResourceBundle resources) {
+    private EventHandler<ActionEvent> executeActionEventHandler(final ResourceBundle resources) {
         return event -> {
             String[] args = createArgsFromUI();
             if (saveConfigurationCheckBox.isSelected()) {
@@ -304,8 +312,10 @@ public class MainController extends AbstractController {
             if (uiAppProperties.isActiveTray()) {
                 trayHandler.setApplicationProperties(uiAppProperties);
             }
-            Runner runner = new Runner(uiAppProperties);
-            runner.run();
+            executor.execute(() -> {
+                Runner runner = new Runner(uiAppProperties);
+                runner.run();
+            });
         };
     }
 
@@ -408,6 +418,10 @@ public class MainController extends AbstractController {
         return alert.showAndWait().orElse(noButton) == yesButton;
     }
 
+    private EventHandler<ActionEvent> exitActionEventHandler() {
+        return event -> UILauncher.platformExit();
+    }
+
     private void setListeners() {
         languageComboBox.getSelectionModel()
                 .selectedItemProperty()
@@ -422,10 +436,12 @@ public class MainController extends AbstractController {
 
         activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
+                deamonButton.setVisible(true);
                 ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
                 trayHandler.setApplicationProperties(uiAppProperties);
                 uiLauncher.currentWindow().setOnCloseRequest(trayHandler.trayOnCloseEventHandler());
             } else {
+                deamonButton.setVisible(false);
                 uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
             }
         });

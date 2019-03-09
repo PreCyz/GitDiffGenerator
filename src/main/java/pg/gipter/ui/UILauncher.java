@@ -36,7 +36,6 @@ public class UILauncher implements Launcher {
     @Override
     public void execute() {
         logger.info("Launching UI.");
-        BundleUtils.loadBundle();
         buildScene(
                 primaryStage,
                 WindowFactory.MAIN.createWindow(applicationProperties, this)
