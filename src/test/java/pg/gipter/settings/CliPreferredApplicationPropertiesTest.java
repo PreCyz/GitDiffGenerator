@@ -21,7 +21,7 @@ class CliPreferredApplicationPropertiesTest {
 
     private PropertiesHelper mockPropertiesLoader(Properties properties) {
         PropertiesHelper loader = mock(PropertiesHelper.class);
-        when(loader.loadPropertiesFromFile()).thenReturn(Optional.of(properties));
+        when(loader.loadApplicationProperties()).thenReturn(Optional.of(properties));
         return loader;
     }
 

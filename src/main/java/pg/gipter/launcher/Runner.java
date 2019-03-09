@@ -9,17 +9,26 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.util.BundleUtils;
+import pg.gipter.util.PropertiesHelper;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import java.util.Properties;
 
 public class Runner {
 
     private static final Logger logger = LoggerFactory.getLogger(Runner.class);
     private ApplicationProperties applicationProperties;
+    private final PropertiesHelper propertiesHelper;
+    private final String SUCCESS = "success";
+    private final String FAIL = "fail";
 
     public Runner(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
+        this.propertiesHelper = new PropertiesHelper();
     }
 
     public void run() {
@@ -42,6 +51,8 @@ public class Runner {
             error = true;
             String errMsg = createErrorMessage();
             displayWindow(errMsg, Alert.AlertType.ERROR);
+        } finally {
+            saveUploadInfo(error ? FAIL : SUCCESS);
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
             String confirmationMsg = BundleUtils.getMsg("popup.confirmation.message", applicationProperties.toolkitUserFolder());
@@ -70,6 +81,14 @@ public class Runner {
         AbstractController.setImageOnAlertWindow(alert);
 
         alert.showAndWait();
+    }
+
+    private void saveUploadInfo(String status) {
+        Optional<Properties> dataProperties = propertiesHelper.loadDataProperties();
+        Properties data = dataProperties.orElseGet(Properties::new);
+        data.put("lastUploadDateTime", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        data.put("lastUploadStatus", status);
+        propertiesHelper.saveToDataProperties(data);
     }
 
 }

@@ -13,10 +13,15 @@ public class PropertiesHelper {
 
     public static final String APPLICATION_PROPERTIES = "application.properties";
     private static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
+    private static final String DATA_PROPERTIES = "data.properties";
 
-    public Optional<Properties> loadPropertiesFromFile() {
+    public Optional<Properties> loadApplicationProperties() {
+        return loadProperties(APPLICATION_PROPERTIES);
+    }
+
+    private Optional<Properties> loadProperties(String fileName) {
         Properties properties;
-        try (InputStream is = new FileInputStream(APPLICATION_PROPERTIES)) {
+        try (InputStream is = new FileInputStream(fileName)) {
             properties = new Properties();
             properties.load(is);
         } catch (IOException | NullPointerException e) {
@@ -24,6 +29,10 @@ public class PropertiesHelper {
             properties = null;
         }
         return Optional.ofNullable(properties);
+    }
+
+    public Optional<Properties> loadDataProperties() {
+        return loadProperties(DATA_PROPERTIES);
     }
 
     private void saveProperties(Properties properties, String file) {
@@ -40,6 +49,10 @@ public class PropertiesHelper {
 
     public void saveToUIApplicationProperties(Properties properties) {
         saveProperties(properties, UI_APPLICATION_PROPERTIES);
+    }
+
+    public void saveToDataProperties(Properties properties) {
+        saveProperties(properties, DATA_PROPERTIES);
     }
 
 }

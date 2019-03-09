@@ -46,7 +46,7 @@ public abstract class ApplicationProperties {
     }
 
     protected final void init(String[] args, PropertiesHelper propertiesHelper) {
-        Optional<Properties> propsFromFile = propertiesHelper.loadPropertiesFromFile();
+        Optional<Properties> propsFromFile = propertiesHelper.loadApplicationProperties();
         if (propsFromFile.isPresent()) {
             properties = propsFromFile.get();
             logger.info("Properties from [{}] file loaded.", APPLICATION_PROPERTIES);
