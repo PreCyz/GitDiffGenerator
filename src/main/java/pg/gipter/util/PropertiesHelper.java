@@ -15,6 +15,9 @@ public class PropertiesHelper {
     private static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
     private static final String DATA_PROPERTIES = "data.properties";
 
+    public static final String UPLOAD_STATUS_KEY = "lastUploadStatus";
+    public static final String UPLOAD_DATE_TIME_KEY = "lastUploadDateTime";
+
     public Optional<Properties> loadApplicationProperties() {
         return loadProperties(APPLICATION_PROPERTIES);
     }

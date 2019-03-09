@@ -23,8 +23,6 @@ public class Runner {
     private static final Logger logger = LoggerFactory.getLogger(Runner.class);
     private ApplicationProperties applicationProperties;
     private final PropertiesHelper propertiesHelper;
-    private final String SUCCESS = "success";
-    private final String FAIL = "fail";
 
     public Runner(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -52,7 +50,7 @@ public class Runner {
             String errMsg = createErrorMessage();
             displayWindow(errMsg, Alert.AlertType.ERROR);
         } finally {
-            saveUploadInfo(error ? FAIL : SUCCESS);
+            saveUploadInfo(error ? "FAIL" : "SUCCESS");
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
             String confirmationMsg = BundleUtils.getMsg("popup.confirmation.message", applicationProperties.toolkitUserFolder());
@@ -86,8 +84,8 @@ public class Runner {
     private void saveUploadInfo(String status) {
         Optional<Properties> dataProperties = propertiesHelper.loadDataProperties();
         Properties data = dataProperties.orElseGet(Properties::new);
-        data.put("lastUploadDateTime", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        data.put("lastUploadStatus", status);
+        data.put(PropertiesHelper.UPLOAD_DATE_TIME_KEY, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        data.put(PropertiesHelper.UPLOAD_STATUS_KEY, status);
         propertiesHelper.saveToDataProperties(data);
     }
 

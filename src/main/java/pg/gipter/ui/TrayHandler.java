@@ -9,11 +9,14 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.launcher.Runner;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.util.BundleUtils;
+import pg.gipter.util.PropertiesHelper;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.Optional;
+import java.util.Properties;
 
 public class TrayHandler {
 
@@ -44,9 +47,18 @@ public class TrayHandler {
             BundleUtils.loadBundle();
             PopupMenu popup = new PopupMenu();
 
-            MenuItem statusItem = new MenuItem(BundleUtils.getMsg("tray.item.lastUpdate"));
-            popup.add(statusItem);
-            popup.addSeparator();
+            PropertiesHelper propertiesHelper = new PropertiesHelper();
+            Optional<Properties> data = propertiesHelper.loadDataProperties();
+
+            if (data.isPresent()) {
+                String uploadInfo = String.format("%s [%s]",
+                        data.get().getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
+                        data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
+                );
+                MenuItem statusItem = new MenuItem(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+                popup.add(statusItem);
+                popup.addSeparator();
+            }
 
             MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
             showItem.addActionListener(showActionListener());
