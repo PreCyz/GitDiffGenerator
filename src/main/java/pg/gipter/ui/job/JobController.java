@@ -158,11 +158,9 @@ public class JobController extends AbstractController {
                 if (scheduler != null) {
                     scheduler.shutdown();
                 }
-                //trigger = testTrigger("testTrigger", "testGroup");
 
                 scheduler = StdSchedulerFactory.getDefaultScheduler();
                 scheduler.scheduleJob(createJobDetail(), trigger);
-
                 scheduler.start();
 
                 uiLauncher.hideJobWindow();
@@ -181,16 +179,16 @@ public class JobController extends AbstractController {
         };
     }
 
-    private Trigger testTrigger(String triggerName, String triggerGroup) {
+    private Trigger testTrigger() {
         LocalDateTime now = LocalDateTime.now();
 
         Date startDate = DateBuilder.dateOf(
-                now.getHour(), now.getMinute(), now.getSecond() + 15,
+                now.getHour(), now.getMinute(), now.getSecond() + 30,
                 now.getDayOfMonth(), now.getMonthValue(), now.getYear()
         );
 
         return newTrigger()
-                .withIdentity(triggerName, triggerGroup)
+                .withIdentity("testTrigger", "testGroup")
                 .startAt(startDate)
                 .withSchedule(SimpleScheduleBuilder.repeatSecondlyForTotalCount(10))
                 .build();
