@@ -14,8 +14,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class TrayHandler {
 
@@ -67,8 +65,7 @@ public class TrayHandler {
             closeItem.addActionListener(closeActionListener());
             popup.add(closeItem);
 
-            Image image = createImage(Paths.get("img", "chicken-tray.gif"), "Tray icon");
-            trayIcon = new TrayIcon(image, BundleUtils.getMsg("main.title", applicationProperties.version()), popup);
+            trayIcon = new TrayIcon(createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), popup);
             trayIcon.addActionListener(showActionListener());
 
             try {
@@ -85,12 +82,14 @@ public class TrayHandler {
         return SystemTray.isSupported() && applicationProperties.isUseUI() && applicationProperties.isActiveTray();
     }
 
-    private Image createImage(Path path, String description) {
-        URL imageURL = getClass().getClassLoader().getResource(path.toString());
+    private Image createTrayImage() {
+        String path = "img/chicken-tray.gif";
+        URL imageURL = getClass().getClassLoader().getResource(path);
         if (imageURL == null) {
             logger.error("Resource not found: {}", path);
             return null;
         } else {
+            String description = "Tray icon";
             return (new ImageIcon(imageURL, description)).getImage();
         }
     }

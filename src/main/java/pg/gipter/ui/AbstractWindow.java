@@ -6,7 +6,6 @@ import pg.gipter.util.BundleUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Paths;
 
 /**Created by Gawa 2017-10-04*/
 public abstract class AbstractWindow {
@@ -17,7 +16,7 @@ public abstract class AbstractWindow {
         this.controller = controller;
     }
 
-    public Parent root() throws IOException {
+    Parent root() throws IOException {
         FXMLLoader loader = new FXMLLoader(url(), BundleUtils.loadBundle());
         loader.setController(controller);
         return loader.load();
@@ -26,21 +25,21 @@ public abstract class AbstractWindow {
     private URL url() {
         return getClass()
                 .getClassLoader()
-                .getResource(Paths.get("fxml", fxmlFileName()).toString());
+                .getResource(String.format("fxml/%s", fxmlFileName()));
     }
 
-    public String windowImgFilePath() {
-        return Paths.get("img", windowImgFileName()).toString();
+    String windowImgFilePath() {
+        return String.format("img/%s", windowImgFileName());
     }
 
-    public boolean resizable() {
+    boolean resizable() {
         return false;
     }
 
-    public String css() {
+    String css() {
         URL css = getClass()
                 .getClassLoader()
-                .getResource(Paths.get("css", cssFileName()).toString());
+                .getResource(String.format("css/%s", cssFileName()));
         String result = "";
         if (css != null) {
             result = css.toExternalForm();

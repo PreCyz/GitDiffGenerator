@@ -7,7 +7,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.Main;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.util.BundleUtils;
@@ -72,7 +71,7 @@ public class UILauncher implements Launcher {
     }
 
     private Image readImage(String imgPath) throws IOException {
-        try (InputStream is = Main.class.getClassLoader().getResourceAsStream(imgPath)) {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(imgPath)) {
             return new Image(is);
         }
     }
