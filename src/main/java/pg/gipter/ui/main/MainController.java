@@ -315,6 +315,8 @@ public class MainController extends AbstractController {
             executor.execute(() -> {
                 Runner runner = new Runner(uiAppProperties);
                 runner.run();
+                trayHandler.removeTrayIcon();
+                trayHandler.createTrayIcon();
             });
         };
     }

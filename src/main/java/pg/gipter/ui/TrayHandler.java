@@ -26,11 +26,14 @@ public class TrayHandler {
     private ApplicationProperties applicationProperties;
     private UILauncher uiLauncher;
     private TrayIcon trayIcon;
+    private PopupMenu popup;
+    private PropertiesHelper propertiesHelper;
 
     public TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
         this.uiLauncher = uiLauncher;
         this.stage = uiLauncher.currentWindow();
         this.applicationProperties = applicationProperties;
+        this.propertiesHelper = new PropertiesHelper();
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -44,9 +47,9 @@ public class TrayHandler {
             Platform.setImplicitExit(false);
             SystemTray tray = SystemTray.getSystemTray();
 
-            PopupMenu popup = new PopupMenu();
+            popup = new PopupMenu();
 
-            PropertiesHelper propertiesHelper = new PropertiesHelper();
+            propertiesHelper = new PropertiesHelper();
             Optional<Properties> data = propertiesHelper.loadDataProperties();
 
             if (data.isPresent()) {
@@ -150,5 +153,4 @@ public class TrayHandler {
             }
         }
     }
-
 }
