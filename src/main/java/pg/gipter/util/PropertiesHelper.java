@@ -14,7 +14,7 @@ public class PropertiesHelper {
     private final Logger logger = LoggerFactory.getLogger(PropertiesHelper.class);
 
     public static final String APPLICATION_PROPERTIES = "application.properties";
-    private static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
+    public static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
     private static final String DATA_PROPERTIES = "data.properties";
 
     public static final String UPLOAD_STATUS_KEY = "lastUploadStatus";
@@ -24,13 +24,17 @@ public class PropertiesHelper {
         return loadProperties(APPLICATION_PROPERTIES);
     }
 
+    public Optional<Properties> loadUIApplicationProperties() {
+        return loadProperties(UI_APPLICATION_PROPERTIES);
+    }
+
     private Optional<Properties> loadProperties(String fileName) {
         Properties properties;
         try (InputStream is = new FileInputStream(fileName)) {
             properties = new Properties();
             properties.load(is);
         } catch (IOException | NullPointerException e) {
-            logger.warn("Error when loading {}. Exception message is {}", APPLICATION_PROPERTIES, e.getMessage());
+            logger.warn("Error when loading {}. Exception message is: {}", fileName, e.getMessage());
             properties = null;
         }
         return Optional.ofNullable(properties);

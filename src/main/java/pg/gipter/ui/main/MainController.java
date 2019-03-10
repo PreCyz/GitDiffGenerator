@@ -96,7 +96,7 @@ public class MainController extends AbstractController {
     @FXML
     private CheckBox activeteTrayCheckBox;
     @FXML
-    private CheckBox saveConfigurationCheckBox;
+    private Button saveConfigurationButton;
 
     @FXML
     private Button executeButton;
@@ -116,7 +116,6 @@ public class MainController extends AbstractController {
     private Executor executor;
 
     private static String currentLanguage;
-    private static boolean saveCurrentSettings = false;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -175,7 +174,6 @@ public class MainController extends AbstractController {
         useUICheckBox.setSelected(applicationProperties.isUseUI());
         activeteTrayCheckBox.setSelected(applicationProperties.isActiveTray() && SystemTray.isSupported());
         deamonButton.setVisible(activeteTrayCheckBox.isSelected());
-        saveConfigurationCheckBox.setSelected(saveCurrentSettings);
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
         if (StringUtils.nullOrEmpty(currentLanguage)) {
@@ -219,6 +217,8 @@ public class MainController extends AbstractController {
         }
 
         progressIndicator.setVisible(false);
+        useUICheckBox.setDisable(true);
+        preferredArgSourceComboBox.setDisable(true);
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -242,6 +242,7 @@ public class MainController extends AbstractController {
         executeButton.setOnAction(executeActionEventHandler(resources));
         deamonButton.setOnAction(deamonActionEventHandler(resources));
         exitButton.setOnAction(exitActionEventHandler());
+        saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler(resources));
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler(final ResourceBundle resources) {
@@ -310,10 +311,6 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> executeActionEventHandler(final ResourceBundle resources) {
         return event -> {
             String[] args = createArgsFromUI();
-            if (saveConfigurationCheckBox.isSelected()) {
-                saveCurrentConfiguration(resources, createProperties(args));
-            }
-
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
 
             if (uiAppProperties.isActiveTray()) {
@@ -432,12 +429,18 @@ public class MainController extends AbstractController {
         return event -> UILauncher.platformExit();
     }
 
+    private EventHandler<ActionEvent> saveConfigurationActionEventHandler(ResourceBundle resources) {
+        return event -> {
+            String[] args = createArgsFromUI();
+            saveCurrentConfiguration(resources, createProperties(args));
+        };
+    }
+
     private void setListeners() {
         languageComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     currentLanguage = languageComboBox.getValue();
-                    saveCurrentSettings = saveConfigurationCheckBox.isSelected();
                     trayHandler.removeTrayIcon();
                     uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(createArgsFromUI()));
                     uiLauncher.changeLanguage(languageComboBox.getValue());

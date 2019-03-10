@@ -6,4 +6,4 @@ logs
 *.txt
 !version.txt
 libs
-data.properties
+*.properties

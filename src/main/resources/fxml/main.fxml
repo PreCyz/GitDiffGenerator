@@ -92,10 +92,14 @@
                         <ComboBox fx:id="preferredArgSourceComboBox" layoutX="195.0" layoutY="11.0" prefHeight="25.0" prefWidth="90.0" />
                         <Label layoutX="10.0" layoutY="73.0" text="%launch.panel.useUI" />
                         <CheckBox fx:id="useUICheckBox" layoutX="195.0" layoutY="75.0" mnemonicParsing="false" />
-                  <CheckBox fx:id="saveConfigurationCheckBox" layoutX="195.0" layoutY="131.0" mnemonicParsing="false" />
                   <Label layoutX="10.0" layoutY="129.0" prefHeight="17.0" prefWidth="174.0" text="%launch.panel.saveCurrentConfiguration" />
                   <Label layoutX="10.0" layoutY="101.0" text="%launch.panel.activateTray" />
                   <CheckBox fx:id="activeteTrayCheckBox" layoutX="195.0" layoutY="103.0" mnemonicParsing="false" />
+                  <Button fx:id="saveConfigurationButton" layoutX="195.0" layoutY="127.0" mnemonicParsing="false" prefWidth="50.0" text="%button.save">
+                     <font>
+                        <Font name="System Bold" size="11.0" />
+                     </font>
+                  </Button>
                     </children>
                 </AnchorPane>
             </content>

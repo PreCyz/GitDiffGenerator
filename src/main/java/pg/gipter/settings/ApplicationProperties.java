@@ -17,7 +17,7 @@ import static pg.gipter.util.PropertiesHelper.APPLICATION_PROPERTIES;
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public abstract class ApplicationProperties {
 
-    private final Logger logger;
+    protected final Logger logger;
     public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     protected Properties properties;
@@ -45,7 +45,7 @@ public abstract class ApplicationProperties {
         return vcs;
     }
 
-    protected final void init(String[] args, PropertiesHelper propertiesHelper) {
+    protected void init(String[] args, PropertiesHelper propertiesHelper) {
         Optional<Properties> propsFromFile = propertiesHelper.loadApplicationProperties();
         if (propsFromFile.isPresent()) {
             properties = propsFromFile.get();
