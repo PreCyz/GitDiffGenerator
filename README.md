@@ -17,16 +17,16 @@ Application logs everything. Logs can be found inside following folder `${APP_HO
 There are few ways to execute this program:
 - from command line java -jar with params,
 - from command line java -jar + application.properties at the same location as _*.jar_ file,
-- double click on *.jar file (no window will open or confirmation window opens if set, but you will see diff file at given item path),
+- double click on *.jar file will open the application in UI mode,
 ### java -jar with params
 For *Windows*
 ```
-java -jar Gipter.jar author="Anakin Skywalker" itemPath="c:\\Path\\to\\git\\diff\\item" 
+java -jar Gipter.jar useUI=N author="Anakin Skywalker" itemPath="c:\\Path\\to\\git\\diff\\item" 
 projectPath="c:\\Path\\to\\git\\project1,c:\\Path\\to\\git\\project"
 ```
 For *Linux*
 ```
-java -jar Gipter.jar author="Anakin Skywalker" itemPath="/home/wall-e/Path/to/git/diff/item"
+java -jar Gipter.jar useUI=N author="Anakin Skywalker" itemPath="/home/wall-e/Path/to/git/diff/item"
 projectPath="/home/eva/Path/to/git/project1,/home/eva/Path/to/git/project2"
 ```
 ### java -jar + application.properties at at the same location as jar file
@@ -52,6 +52,7 @@ You can pass some parameters commandline way and other _application.properties_ 
 **confirmationWindow** - if parameter set as `Y` then confirmation window will be displayed after successful upload. Default value is `N`.<br />
 **preferredArgSource** - if parameter set as `FILE` then arguments from _application.properties_ will be resolved as first. Default value is `CLI`. This parameter can be changed only from command line.<br />
 **skipRemote** - if parameter set as `N` then git diff will be generated only from origin (`--remotes=origin`). If set as `Y` then git diff will be generated only from local git repository. Default value is `Y`.<br />
+**useUI** - if parameter set as `N` application will be launched in command line mode. If set as `Y` then UI mode is launched. Default value is `Y`.<br />
 
 Below parameters are mandatory for toolkit:<br/>
 **toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
