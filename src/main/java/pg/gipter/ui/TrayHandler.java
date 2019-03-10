@@ -57,12 +57,12 @@ public class TrayHandler {
                         data.get().getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
                         data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
                 );
-                MenuItem statusItem = new MenuItem(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
-                popup.add(statusItem);
+                popup.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
                 popup.addSeparator();
             }
 
             MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
+
             showItem.addActionListener(showActionListener());
             popup.add(showItem);
 
@@ -81,6 +81,7 @@ public class TrayHandler {
 
             trayIcon = new TrayIcon(createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), popup);
             trayIcon.addActionListener(showActionListener());
+            trayIcon.setImageAutoSize(true);
 
             try {
                 tray.add(trayIcon);
