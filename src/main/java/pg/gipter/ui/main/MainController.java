@@ -1,6 +1,7 @@
 package pg.gipter.ui.main;
 
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -11,13 +12,13 @@ import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
-import pg.gipter.launcher.Runner;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
+import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.TrayHandler;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.util.BundleUtils;
@@ -105,6 +106,10 @@ public class MainController extends AbstractController {
     private Button exitButton;
     @FXML
     private ComboBox<String> languageComboBox;
+    @FXML
+    private ProgressIndicator progressIndicator;
+    @FXML
+    private Label infoLabel;
 
     private ApplicationProperties applicationProperties;
     private TrayHandler trayHandler;
@@ -212,6 +217,8 @@ public class MainController extends AbstractController {
         if (!applicationProperties.isActiveTray() || !SystemTray.isSupported()) {
             deamonButton.setVisible(false);
         }
+
+        progressIndicator.setVisible(false);
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -312,9 +319,10 @@ public class MainController extends AbstractController {
             if (uiAppProperties.isActiveTray()) {
                 trayHandler.setApplicationProperties(uiAppProperties);
             }
+            FXRunner runner = new FXRunner(uiAppProperties);
+            resetIndicatorProperties(runner);
             executor.execute(() -> {
-                Runner runner = new Runner(uiAppProperties);
-                runner.run();
+                runner.call();
                 trayHandler.removeTrayIcon();
                 trayHandler.createTrayIcon();
             });
@@ -447,6 +455,14 @@ public class MainController extends AbstractController {
                 uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
             }
         });
+    }
+
+    private void resetIndicatorProperties(Task task) {
+        progressIndicator.setVisible(true);
+        progressIndicator.progressProperty().unbind();
+        progressIndicator.progressProperty().bind(task.progressProperty());
+        infoLabel.textProperty().unbind();
+        infoLabel.textProperty().bind(task.messageProperty());
     }
 
 }

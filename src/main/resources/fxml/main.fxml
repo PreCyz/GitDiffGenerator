@@ -3,9 +3,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="784.0" prefWidth="625.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="795.0" prefWidth="625.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Button fx:id="executeButton" layoutX="254.0" layoutY="743.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="130.0" text="%button.execute" textFill="#1eb235">
+        <Button fx:id="executeButton" layoutX="87.0" layoutY="743.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="130.0" text="%button.execute" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="15.0" />
          </font></Button>
@@ -143,10 +143,12 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </Button>
-      <Button fx:id="exitButton" layoutX="543.0" layoutY="744.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="74.0" text="%button.exit" textFill="#0d0d0d">
+      <Button fx:id="exitButton" layoutX="543.0" layoutY="743.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="74.0" text="%button.exit" textFill="#0d0d0d">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Button>
+      <ProgressIndicator fx:id="progressIndicator" layoutX="228.0" layoutY="744.0" progress="0.0" />
+      <Label fx:id="infoLabel" layoutX="271.0" layoutY="747.0" prefHeight="17.0" prefWidth="177.0" />
     </children>
 </AnchorPane>

@@ -6,6 +6,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.ui.FXRunner;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,8 +17,6 @@ public class GipterJob implements Job {
     static final String NAME = "GipterJob";
     static final String GROUP = "GipterJobGroup";
     static final String APP_PROPS_KEY = "applicationProperties";
-
-    private static int counter = 0;
 
     public GipterJob() {
         // Instances of Job must have a public no-argument constructor.
@@ -30,9 +29,8 @@ public class GipterJob implements Job {
         logger.info("Gipter job initialized and triggered at {}.",
                 LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
         );
-        logger.info("Application properties {} - {}.", applicationProperties.codeProtection(), ++counter);
-        //Runner run = new Runner(applicationProperties);
-        //run.run();
+        FXRunner runner = new FXRunner(applicationProperties);
+        runner.run();
         logger.info("Gipter job finished {}.");
     }
 }

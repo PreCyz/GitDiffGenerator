@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -54,8 +56,12 @@ public class PropertiesHelper {
         saveProperties(properties, UI_APPLICATION_PROPERTIES);
     }
 
-    public void saveToDataProperties(Properties properties) {
-        saveProperties(properties, DATA_PROPERTIES);
+    public void saveUploadInfo(String status) {
+        Optional<Properties> dataProperties = loadDataProperties();
+        Properties data = dataProperties.orElseGet(Properties::new);
+        data.put(PropertiesHelper.UPLOAD_DATE_TIME_KEY, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        data.put(PropertiesHelper.UPLOAD_STATUS_KEY, status);
+        saveProperties(data, DATA_PROPERTIES);
     }
 
 }
