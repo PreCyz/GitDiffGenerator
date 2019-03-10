@@ -1215,7 +1215,7 @@ class CliPreferredApplicationPropertiesTest {
 
         boolean actual = applicationProperties.isUseUI();
 
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
     }
 
     @Test

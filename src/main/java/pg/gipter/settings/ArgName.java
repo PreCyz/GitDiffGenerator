@@ -26,7 +26,7 @@ public enum ArgName {
 
     confirmationWindow("N"),
     preferredArgSource(PreferredArgSource.CLI.name()),
-    useUI("N"),
+    useUI("Y"),
     activeTray("Y"),
 
     toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),

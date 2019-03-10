@@ -604,7 +604,7 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void given_emptyUseUI_when_isUseUI_then_returnFalse() {
+    void given_emptyUseUI_when_isUseUI_then_returnTrue() {
         String[] args = {""};
         Properties props = new Properties();
         appProps = new FilePreferredApplicationProperties(args);
@@ -612,7 +612,7 @@ class FilePreferredApplicationPropertiesTest {
 
         boolean actual = appProps.isUseUI();
 
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
     }
 
     @Test
