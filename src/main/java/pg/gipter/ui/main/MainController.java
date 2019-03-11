@@ -136,7 +136,11 @@ public class MainController extends AbstractController {
     private void initTray() {
         if (applicationProperties.isActiveTray()) {
             trayHandler = new TrayHandler(uiLauncher, applicationProperties);
-            trayHandler.createTrayIcon();
+            if (trayHandler.tryIconExists()) {
+                trayHandler.updateTrayLabels();
+            } else {
+                trayHandler.createTrayIcon();
+            }
         }
     }
 
@@ -239,7 +243,7 @@ public class MainController extends AbstractController {
         projectPathButton.setOnAction(projectPathActionEventHandler(resources));
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         codeProtectionComboBox.setOnAction(codeProtectionActionEventHandler());
-        executeButton.setOnAction(executeActionEventHandler(resources));
+        executeButton.setOnAction(executeActionEventHandler());
         deamonButton.setOnAction(deamonActionEventHandler(resources));
         exitButton.setOnAction(exitActionEventHandler());
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler(resources));
@@ -308,20 +312,19 @@ public class MainController extends AbstractController {
         };
     }
 
-    private EventHandler<ActionEvent> executeActionEventHandler(final ResourceBundle resources) {
+    private EventHandler<ActionEvent> executeActionEventHandler() {
         return event -> {
             String[] args = createArgsFromUI();
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
 
-            if (uiAppProperties.isActiveTray()) {
-                trayHandler.setApplicationProperties(uiAppProperties);
-            }
             FXRunner runner = new FXRunner(uiAppProperties);
             resetIndicatorProperties(runner);
             executor.execute(() -> {
                 runner.call();
-                trayHandler.removeTrayIcon();
-                trayHandler.createTrayIcon();
+                if (uiAppProperties.isActiveTray()) {
+                    trayHandler.setApplicationProperties(uiAppProperties);
+                    trayHandler.updateTrayLabels();
+                }
             });
         };
     }
@@ -399,6 +402,7 @@ public class MainController extends AbstractController {
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
             if (uiAppProperties.isActiveTray()) {
                 trayHandler.setApplicationProperties(uiAppProperties);
+                trayHandler.updateTrayLabels();
                 trayHandler.hide();
 
                 boolean isShowJobWindow = isShowJobWindow(resource);
@@ -433,6 +437,9 @@ public class MainController extends AbstractController {
         return event -> {
             String[] args = createArgsFromUI();
             saveCurrentConfiguration(resources, createProperties(args));
+            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
+            trayHandler.setApplicationProperties(uiAppProperties);
+            trayHandler.updateTrayLabels();
         };
     }
 
@@ -441,7 +448,6 @@ public class MainController extends AbstractController {
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     currentLanguage = languageComboBox.getValue();
-                    trayHandler.removeTrayIcon();
                     uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(createArgsFromUI()));
                     uiLauncher.changeLanguage(languageComboBox.getValue());
                 }

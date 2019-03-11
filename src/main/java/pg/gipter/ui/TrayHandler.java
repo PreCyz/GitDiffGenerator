@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.launcher.Runner;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.ApplicationPropertiesFactory;
+import pg.gipter.settings.ArgName;
+import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 
@@ -15,6 +18,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -25,8 +29,8 @@ public class TrayHandler {
     private final Stage stage;
     private ApplicationProperties applicationProperties;
     private UILauncher uiLauncher;
-    private TrayIcon trayIcon;
-    private PopupMenu popup;
+    private static TrayIcon trayIcon;
+    private static PopupMenu trayPopupMenu;
     private PropertiesHelper propertiesHelper;
 
     public TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
@@ -47,39 +51,10 @@ public class TrayHandler {
             Platform.setImplicitExit(false);
             SystemTray tray = SystemTray.getSystemTray();
 
-            popup = new PopupMenu();
+            trayPopupMenu = new PopupMenu();
+            addMenuItemsToMenu(trayPopupMenu);
 
-            propertiesHelper = new PropertiesHelper();
-            Optional<Properties> data = propertiesHelper.loadDataProperties();
-
-            if (data.isPresent()) {
-                String uploadInfo = String.format("%s [%s]",
-                        data.get().getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
-                        data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
-                );
-                popup.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
-                popup.addSeparator();
-            }
-
-            MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
-
-            showItem.addActionListener(showActionListener());
-            popup.add(showItem);
-
-            MenuItem uploadItem = new MenuItem(BundleUtils.getMsg("tray.item.upload"));
-            uploadItem.addActionListener(uploadActionListener());
-            popup.add(uploadItem);
-
-            MenuItem createJobItem = new MenuItem(BundleUtils.getMsg("tray.item.createJob"));
-            createJobItem.addActionListener(createJobActionListener());
-            popup.add(createJobItem);
-            popup.addSeparator();
-
-            MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
-            closeItem.addActionListener(closeActionListener());
-            popup.add(closeItem);
-
-            trayIcon = new TrayIcon(createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), popup);
+            trayIcon = new TrayIcon(createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), trayPopupMenu);
             trayIcon.addActionListener(showActionListener());
             trayIcon.setImageAutoSize(true);
 
@@ -97,6 +72,37 @@ public class TrayHandler {
         return SystemTray.isSupported() && applicationProperties.isUseUI() && applicationProperties.isActiveTray();
     }
 
+    private void addMenuItemsToMenu(PopupMenu popupMenu) {
+        propertiesHelper = new PropertiesHelper();
+        Optional<Properties> data = propertiesHelper.loadDataProperties();
+        if (data.isPresent()) {
+            String uploadInfo = String.format("%s [%s]",
+                    data.get().getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
+                    data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
+            );
+            popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+            popupMenu.addSeparator();
+        }
+
+        MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
+
+        showItem.addActionListener(showActionListener());
+        popupMenu.add(showItem);
+
+        MenuItem uploadItem = new MenuItem(BundleUtils.getMsg("tray.item.upload", String.valueOf(applicationProperties.periodInDays())));
+        uploadItem.addActionListener(uploadActionListener());
+        popupMenu.add(uploadItem);
+
+        MenuItem createJobItem = new MenuItem(BundleUtils.getMsg("tray.item.createJob"));
+        createJobItem.addActionListener(createJobActionListener());
+        popupMenu.add(createJobItem);
+        popupMenu.addSeparator();
+
+        MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
+        closeItem.addActionListener(closeActionListener());
+        popupMenu.add(closeItem);
+    }
+
     private Image createTrayImage() {
         String path = "img/chicken-tray.gif";
         URL imageURL = getClass().getClassLoader().getResource(path);
@@ -105,7 +111,7 @@ public class TrayHandler {
             return null;
         } else {
             String description = "Tray icon";
-            return (new ImageIcon(imageURL, description)).getImage();
+            return new ImageIcon(imageURL, description).getImage();
         }
     }
 
@@ -126,7 +132,20 @@ public class TrayHandler {
     }
 
     private ActionListener uploadActionListener() {
-        return e -> Platform.runLater(() -> new Runner(applicationProperties).run());
+        return e -> Platform.runLater(() -> {
+            LocalDate startDate = LocalDate.now().minusDays(applicationProperties.periodInDays());
+            LocalDate endDate = LocalDate.now();
+
+            String[] args = {
+                    String.format("%s=%s", ArgName.startDate, startDate.format(ApplicationProperties.yyyy_MM_dd)),
+                    String.format("%s=%s", ArgName.endDate, endDate.format(ApplicationProperties.yyyy_MM_dd)),
+                    String.format("%s=%s", ArgName.preferredArgSource, PreferredArgSource.UI),
+            };
+
+            ApplicationProperties appProperties = ApplicationPropertiesFactory.getInstance(args);
+            setApplicationProperties(appProperties);
+            new Runner(appProperties).run();
+        });
     }
 
     public void hide() {
@@ -153,5 +172,14 @@ public class TrayHandler {
                 tray.remove(trayIcon);
             }
         }
+    }
+
+    public void updateTrayLabels() {
+        trayPopupMenu.removeAll();
+        addMenuItemsToMenu(trayPopupMenu);
+    }
+
+    public boolean tryIconExists() {
+        return trayIcon != null;
     }
 }
