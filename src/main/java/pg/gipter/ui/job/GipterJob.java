@@ -6,15 +6,19 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.ApplicationPropertiesFactory;
+import pg.gipter.settings.ArgName;
+import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.FXRunner;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class GipterJob implements Job {
 
     private static final Logger logger = LoggerFactory.getLogger(GipterJob.class);
-    static final String NAME = "GipterJob";
+    public static final String NAME = "Gipter-job";
     static final String GROUP = "GipterJobGroup";
     static final String APP_PROPS_KEY = "applicationProperties";
 
@@ -26,11 +30,21 @@ public class GipterJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         ApplicationProperties applicationProperties =
                 (ApplicationProperties) jobExecutionContext.getMergedJobDataMap().get(APP_PROPS_KEY);
-        logger.info("Gipter job initialized and triggered at {}.",
-                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+
+        LocalDate startDate = LocalDate.now().minusDays(applicationProperties.periodInDays());
+        LocalDate endDate = LocalDate.now();
+
+        String[] args = {
+                String.format("%s=%s", ArgName.startDate, startDate.format(ApplicationProperties.yyyy_MM_dd)),
+                String.format("%s=%s", ArgName.endDate, endDate.format(ApplicationProperties.yyyy_MM_dd)),
+                String.format("%s=%s", ArgName.preferredArgSource, PreferredArgSource.UI),
+        };
+
+        ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(args);
+        logger.info("{} initialized and triggered at {}.",
+                NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
         );
-        FXRunner runner = new FXRunner(applicationProperties);
-        runner.run();
-        logger.info("Gipter job finished {}.");
+        new FXRunner(uiAppProps).call();
+        logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
     }
 }

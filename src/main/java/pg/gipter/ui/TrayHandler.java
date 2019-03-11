@@ -11,6 +11,8 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.ui.job.GipterJob;
+import pg.gipter.ui.job.JobKey;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 
@@ -54,7 +56,9 @@ public class TrayHandler {
             trayPopupMenu = new PopupMenu();
             addMenuItemsToMenu(trayPopupMenu);
 
-            trayIcon = new TrayIcon(createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), trayPopupMenu);
+            trayIcon = new TrayIcon(
+                    createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), trayPopupMenu
+            );
             trayIcon.addActionListener(showActionListener());
             trayIcon.setImageAutoSize(true);
 
@@ -81,15 +85,28 @@ public class TrayHandler {
                     data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
             );
             popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+
+            if (data.get().containsKey(JobKey.TYPE.value())) {
+                Menu jobMenu = new Menu(
+                        String.format("%s %s", GipterJob.NAME, data.get().getProperty(JobKey.TYPE.value()))
+                );
+                buildMenuItem(data.get(), JobKey.DAY_OF_WEEK).ifPresent(jobMenu::add);
+                buildMenuItem(data.get(), JobKey.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);
+                buildMenuItem(data.get(), JobKey.DAY_OF_MONTH).ifPresent(jobMenu::add);
+                buildMenuItem(data.get(), JobKey.SCHEDULE_START).ifPresent(jobMenu::add);
+                buildMenuItem(data.get(), JobKey.CRON).ifPresent(jobMenu::add);
+                popupMenu.add(jobMenu);
+            }
             popupMenu.addSeparator();
         }
 
         MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
-
         showItem.addActionListener(showActionListener());
         popupMenu.add(showItem);
 
-        MenuItem uploadItem = new MenuItem(BundleUtils.getMsg("tray.item.upload", String.valueOf(applicationProperties.periodInDays())));
+        MenuItem uploadItem = new MenuItem(
+                BundleUtils.getMsg("tray.item.upload", String.valueOf(applicationProperties.periodInDays()))
+        );
         uploadItem.addActionListener(uploadActionListener());
         popupMenu.add(uploadItem);
 
@@ -101,6 +118,13 @@ public class TrayHandler {
         MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
         closeItem.addActionListener(closeActionListener());
         popupMenu.add(closeItem);
+    }
+
+    private Optional<String> buildMenuItem(Properties data, JobKey key) {
+        if (data.containsKey(key.value())) {
+            return Optional.of(String.format("%s: %s", key, data.getProperty(key.value())));
+        }
+        return Optional.empty();
     }
 
     private Image createTrayImage() {
@@ -156,22 +180,6 @@ public class TrayHandler {
                 UILauncher.platformExit();
             }
         });
-    }
-
-    public void removeTrayIcon() {
-        if (canCreateTrayIcon()) {
-            SystemTray tray = SystemTray.getSystemTray();
-            boolean exist = false;
-            for (TrayIcon icon : tray.getTrayIcons()) {
-                if (icon.getImage().equals(trayIcon.getImage()) && icon.getToolTip().equals(trayIcon.getToolTip())) {
-                    exist = true;
-                    break;
-                }
-            }
-            if (exist) {
-                tray.remove(trayIcon);
-            }
-        }
     }
 
     public void updateTrayLabels() {

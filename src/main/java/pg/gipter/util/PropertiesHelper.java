@@ -57,16 +57,19 @@ public class PropertiesHelper {
         saveProperties(properties, APPLICATION_PROPERTIES);
     }
 
+    public void saveUploadInfo(String status) {
+        Properties data = loadDataProperties().orElseGet(Properties::new);
+        data.put(PropertiesHelper.UPLOAD_DATE_TIME_KEY, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        data.put(PropertiesHelper.UPLOAD_STATUS_KEY, status);
+        saveProperties(data, DATA_PROPERTIES);
+    }
+
     public void saveToUIApplicationProperties(Properties properties) {
         saveProperties(properties, UI_APPLICATION_PROPERTIES);
     }
 
-    public void saveUploadInfo(String status) {
-        Optional<Properties> dataProperties = loadDataProperties();
-        Properties data = dataProperties.orElseGet(Properties::new);
-        data.put(PropertiesHelper.UPLOAD_DATE_TIME_KEY, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        data.put(PropertiesHelper.UPLOAD_STATUS_KEY, status);
-        saveProperties(data, DATA_PROPERTIES);
+    public void saveDataProperties(Properties properties) {
+        saveProperties(properties, DATA_PROPERTIES);
     }
 
 }

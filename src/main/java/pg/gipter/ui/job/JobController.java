@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
 
 import java.net.URL;
@@ -21,10 +22,7 @@ import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -57,10 +55,12 @@ public class JobController extends AbstractController {
 
     private final ApplicationProperties applicationProperties;
     private static Scheduler scheduler;
+    private PropertiesHelper propertiesHelper;
 
     public JobController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
+        propertiesHelper = new PropertiesHelper();
     }
 
     @Override
@@ -146,14 +146,30 @@ public class JobController extends AbstractController {
     private EventHandler<ActionEvent> scheduleJobActionEvent(ResourceBundle resource) {
         return event -> {
             try {
-                Trigger trigger = createTriggerEveryWeek();
+                Properties data = propertiesHelper.loadDataProperties().orElseGet(Properties::new);
+
+                Trigger trigger = null;
                 if (!StringUtils.nullOrEmpty(cronExpressionTextField.getText())) {
                     trigger = createCronTrigger();
+                    data.put(JobKey.TYPE.value(), JobType.CRON);
+                    data.put(JobKey.CRON.value(), cronExpressionTextField.getText());
                 } else if (everyMonthRadioButton.isSelected()) {
                     trigger = createTriggerEveryMonth();
+                    data.put(JobKey.TYPE.value(), JobType.EVERY_MONTH);
+                    data.put(JobKey.DAY_OF_MONTH.value(), dayOfMonthComboBox.getValue());
+                    data.put(JobKey.SCHEDULE_START.value(), startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd));
                 } else if (every2WeeksRadioButton.isSelected()) {
                     trigger = createTriggerEvery2Weeks();
+                    data.put(JobKey.TYPE.value(), JobType.EVERY_2_WEEKS);
+                    data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfDayComboBox.getValue());
+                    data.put(JobKey.SCHEDULE_START.value(), startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd));
+                } else if (everyWeekRadioButton.isSelected()) {
+                    trigger = createTriggerEveryWeek();
+                    data.put(JobKey.TYPE.value(), JobType.EVERY_WEEK);
+                    data.put(JobKey.DAY_OF_WEEK.value(), dayNameComboBox.getValue());
+                    data.put(JobKey.SCHEDULE_START.value(), startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd));
                 }
+                propertiesHelper.saveDataProperties(data);
 
                 if (scheduler != null) {
                     scheduler.shutdown();
