@@ -47,6 +47,7 @@ public class PropertiesHelper {
     private void saveProperties(Properties properties, String file) {
         try (OutputStream os = new FileOutputStream(file)) {
             properties.store(os, null);
+            logger.info("File {} saved.", file);
         } catch (IOException | NullPointerException e) {
             logger.error("Error when saving {}.", file, e);
         }
