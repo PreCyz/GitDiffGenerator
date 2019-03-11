@@ -17,7 +17,7 @@ Application logs everything. Logs can be found inside following folder `${APP_HO
 There are few ways to execute this program:
 - from command line java -jar with params,
 - from command line java -jar + application.properties at the same location as _*.jar_ file,
-- double click on *.jar file will open the application in UI mode,
+- double click on *.jar file will run the application in UI mode and this is the default mode, description of user interface can be found [here](https://github.com/PreCyz/GitDiffGenerator/tree/master/docs)
 ### java -jar with params
 For *Windows*
 ```
@@ -30,7 +30,7 @@ java -jar Gipter.jar useUI=N author="Anakin Skywalker" itemPath="/home/wall-e/Pa
 projectPath="/home/eva/Path/to/git/project1,/home/eva/Path/to/git/project2"
 ```
 ### java -jar + application.properties at at the same location as jar file
-If there are _application.properties_ file at the same location as your jar file then program can be run as follows: `java -jar Gipter.jar`
+If there are _application.properties_ file at the same location as your jar file then program can be run as follows: `java -jar Gipter.jar useUI=N`
 #### Tips
 If program is executed with commandline parameters and _application.properties_ file at the same time, then setup from commandline has higher priority. Unless `preferredArgSource` is set to `FILE`, then _application.properties_ has higher priority.<br />
 Generated file name by default is `year-monthName-week-weekNumber.txt`. If diff is generated with end date set in the past then diff file name is `year-monthName-startDate-endDate.txt`.
