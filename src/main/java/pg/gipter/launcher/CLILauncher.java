@@ -18,7 +18,7 @@ class CLILauncher implements Launcher {
         logger.info("Launching command line style.");
 
         Runner runner = new Runner(applicationProperties);
-        runner.run();
+        runner.start();
 
         logger.info("Program is terminated.");
         System.exit(-1);

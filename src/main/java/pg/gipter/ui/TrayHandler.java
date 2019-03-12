@@ -6,7 +6,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.launcher.Runner;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -24,7 +23,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Properties;
 
-public class TrayHandler {
+class TrayHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(TrayHandler.class);
 
@@ -35,7 +34,7 @@ public class TrayHandler {
     private static PopupMenu trayPopupMenu;
     private PropertiesHelper propertiesHelper;
 
-    public TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
+    TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
         this.uiLauncher = uiLauncher;
         this.stage = uiLauncher.currentWindow();
         this.applicationProperties = applicationProperties;
@@ -46,7 +45,7 @@ public class TrayHandler {
         this.applicationProperties = applicationProperties;
     }
 
-    public void createTrayIcon() {
+    void createTrayIcon() {
         if (canCreateTrayIcon()) {
             stage.setOnCloseRequest(trayOnCloseEventHandler());
 
@@ -80,11 +79,17 @@ public class TrayHandler {
         propertiesHelper = new PropertiesHelper();
         Optional<Properties> data = propertiesHelper.loadDataProperties();
         if (data.isPresent()) {
-            String uploadInfo = String.format("%s [%s]",
-                    data.get().getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
-                    data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
-            );
-            popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+
+            boolean addSeparator = false;
+
+            if (data.get().containsKey(PropertiesHelper.UPLOAD_DATE_TIME_KEY) && data.get().containsKey(PropertiesHelper.UPLOAD_STATUS_KEY)) {
+                String uploadInfo = String.format("%s [%s]",
+                        data.get().getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
+                        data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
+                );
+                popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+                addSeparator = true;
+            }
 
             if (data.get().containsKey(JobKey.TYPE.value())) {
                 Menu jobMenu = new Menu(
@@ -95,9 +100,18 @@ public class TrayHandler {
                 buildMenuItem(data.get(), JobKey.DAY_OF_MONTH).ifPresent(jobMenu::add);
                 buildMenuItem(data.get(), JobKey.SCHEDULE_START).ifPresent(jobMenu::add);
                 buildMenuItem(data.get(), JobKey.CRON).ifPresent(jobMenu::add);
+                jobMenu.addSeparator();
+
+                MenuItem cancelJobItem = new MenuItem("Cancel job");
+                cancelJobItem.addActionListener(cancelJobActionListener());
+                jobMenu.add(cancelJobItem);
+
                 popupMenu.add(jobMenu);
+                addSeparator = true;
             }
-            popupMenu.addSeparator();
+            if (addSeparator) {
+                popupMenu.addSeparator();
+            }
         }
 
         MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
@@ -143,7 +157,7 @@ public class TrayHandler {
         return e -> Platform.runLater(() -> uiLauncher.showJobWindow());
     }
 
-    public EventHandler<WindowEvent> trayOnCloseEventHandler() {
+    EventHandler<WindowEvent> trayOnCloseEventHandler() {
         return windowEvent -> hide();
     }
 
@@ -166,13 +180,17 @@ public class TrayHandler {
                     String.format("%s=%s", ArgName.preferredArgSource, PreferredArgSource.UI),
             };
 
-            ApplicationProperties appProperties = ApplicationPropertiesFactory.getInstance(args);
-            setApplicationProperties(appProperties);
-            new Runner(appProperties).run();
+            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
+            setApplicationProperties(uiAppProperties);
+            new FXRunner(uiAppProperties).start();
         });
     }
 
-    public void hide() {
+    private ActionListener cancelJobActionListener() {
+        return e -> uiLauncher.cancelJob();
+    }
+
+    void hide() {
         Platform.runLater(() -> {
             if (SystemTray.isSupported()) {
                 stage.hide();
@@ -182,12 +200,29 @@ public class TrayHandler {
         });
     }
 
-    public void updateTrayLabels() {
+    void removeTrayIcon() {
+        if (canCreateTrayIcon()) {
+            SystemTray tray = SystemTray.getSystemTray();
+            boolean exist = false;
+            for (TrayIcon icon : tray.getTrayIcons()) {
+                if (icon.getImage().equals(trayIcon.getImage()) && icon.getToolTip().equals(trayIcon.getToolTip())) {
+                    exist = true;
+                    break;
+                }
+            }
+            if (exist) {
+                tray.remove(trayIcon);
+                trayIcon = null;
+            }
+        }
+    }
+
+    void updateTrayLabels() {
         trayPopupMenu.removeAll();
         addMenuItemsToMenu(trayPopupMenu);
     }
 
-    public boolean tryIconExists() {
-        return trayIcon != null;
+    boolean tryIconExists() {
+        return trayIcon != null ;//&& SystemTray.getSystemTray().getTrayIcons().length != 0  ;
     }
 }

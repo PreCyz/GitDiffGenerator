@@ -14,14 +14,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.ui.job.GipterJob;
+import pg.gipter.ui.job.JobKey;
 import pg.gipter.util.AlertHelper;
 import pg.gipter.util.BundleUtils;
+import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.stream.Stream;
 
-/**Created by Gawa 2017-10-04*/
+/**
+ * Created by Gawa 2017-10-04
+ */
 public class UILauncher implements Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
@@ -31,10 +39,12 @@ public class UILauncher implements Launcher {
     private Stage jobWindow;
     private TrayHandler trayHandler;
     private Scheduler scheduler;
+    private PropertiesHelper propertiesHelper;
 
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
         this.primaryStage = primaryStage;
         this.applicationProperties = applicationProperties;
+        propertiesHelper = new PropertiesHelper();
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -72,11 +82,11 @@ public class UILauncher implements Launcher {
                     window.windowTitleBundle(), applicationProperties.version()
             ));
             stage.setResizable(window.resizable());
-	        Scene scene = new Scene(window.root());
-	        if (!StringUtils.nullOrEmpty(window.css())) {
-	            scene.getStylesheets().add(window.css());
+            Scene scene = new Scene(window.root());
+            if (!StringUtils.nullOrEmpty(window.css())) {
+                scene.getStylesheets().add(window.css());
             }
-	        stage.setScene(scene);
+            stage.setScene(scene);
         } catch (IOException ex) {
             logger.error("Building scene error.", ex);
         }
@@ -103,7 +113,7 @@ public class UILauncher implements Launcher {
         System.exit(0);
     }
 
-    public void showJobWindow() {
+    void showJobWindow() {
         jobWindow = new Stage();
         jobWindow.initModality(Modality.WINDOW_MODAL);
         buildScene(jobWindow, WindowFactory.JOB.createWindow(applicationProperties, this));
@@ -114,13 +124,21 @@ public class UILauncher implements Launcher {
         jobWindow.close();
     }
 
+    public void updateTray() {
+        updateTray(applicationProperties);
+    }
+
     public void updateTray(ApplicationProperties applicationProperties) {
         trayHandler.setApplicationProperties(applicationProperties);
         trayHandler.updateTrayLabels();
     }
 
-    public void hideTray() {
+    public void hideToTray() {
         trayHandler.hide();
+    }
+
+    public void removeTray() {
+        trayHandler.removeTrayIcon();
     }
 
     public EventHandler<WindowEvent> trayOnCloseEventHandler() {
@@ -131,14 +149,26 @@ public class UILauncher implements Launcher {
         this.scheduler = scheduler;
     }
 
-    public void cancelJob() {
-        if (scheduler != null) {
-            try {
+    void cancelJob() {
+        try {
+            if (scheduler != null) {
                 scheduler.shutdown();
-            } catch (SchedulerException e) {
-                String errorMessage = String.format("Can not cancel the job. Reason: %s", e.getMessage());
-                AlertHelper.displayWindow(errorMessage, Alert.AlertType.ERROR);
             }
+        } catch (SchedulerException e) {
+            String errorMessage = String.format("Can not shutdown the job scheduler [%s]. Reason: %s",
+                    scheduler.getClass().getName(), e.getMessage()
+            );
+            logger.error(errorMessage);
+            AlertHelper.displayWindow(errorMessage, Alert.AlertType.ERROR);
+        } finally {
+            Optional<Properties> data = propertiesHelper.loadDataProperties();
+            if (data.isPresent()) {
+                data.ifPresent(properties -> Stream.of(JobKey.values()).forEach(jobKey -> properties.remove(jobKey.value())));
+                propertiesHelper.saveDataProperties(data.get());
+            }
+
+            logger.info("{} canceled.", GipterJob.NAME);
+            updateTray();
         }
     }
 }

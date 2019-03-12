@@ -53,7 +53,8 @@ public class GipterJob implements Job {
                 }
                 Date now = new Date(System.currentTimeMillis());
                 Date nextValidTimeAfter = cronExpression.getNextValidTimeAfter(now);
-                int differenceInDays = (int) ((nextValidTimeAfter.getTime() - now.getTime()) / 1000 * 60 * 60 * 24);
+                int daysInMillis = 1000 * 60 * 60 * 24;
+                int differenceInDays = (int) (nextValidTimeAfter.getTime() - now.getTime()) / daysInMillis;
                 startDate = startDate.minusDays(differenceInDays);
                 break;
         }
@@ -68,7 +69,7 @@ public class GipterJob implements Job {
         logger.info("{} initialized and triggered at {}.",
                 NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
         );
-        new FXRunner(uiAppProps).call();
+        new FXRunner(uiAppProps).start();
         logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
         uiLauncher.updateTray(uiAppProps);

@@ -11,18 +11,18 @@ import pg.gipter.util.AlertHelper;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 
-public class Runner {
+class Runner implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(Runner.class);
     private ApplicationProperties applicationProperties;
     private final PropertiesHelper propertiesHelper;
 
-    public Runner(ApplicationProperties applicationProperties) {
+    Runner(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         this.propertiesHelper = new PropertiesHelper();
     }
 
-    public void run() {
+    public void start() {
         boolean error = false;
         try {
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);

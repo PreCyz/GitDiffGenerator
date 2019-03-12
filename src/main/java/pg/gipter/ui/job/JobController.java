@@ -21,7 +21,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -171,6 +170,7 @@ public class JobController extends AbstractController {
 
                 uiLauncher.setScheduler(scheduler);
                 uiLauncher.hideJobWindow();
+                uiLauncher.updateTray();
 
             } catch (SchedulerException | ParseException se) {
                 logger.error("Error when creating a job.", se);
@@ -186,26 +186,11 @@ public class JobController extends AbstractController {
         };
     }
 
-    private Trigger testTrigger() {
-        LocalDateTime now = LocalDateTime.now();
-
-        Date startDate = DateBuilder.dateOf(
-                now.getHour(), now.getMinute(), now.getSecond() + 30,
-                now.getDayOfMonth(), now.getMonthValue(), now.getYear()
-        );
-
-        return newTrigger()
-                .withIdentity("testTrigger", "testGroup")
-                .startAt(startDate)
-                .withSchedule(SimpleScheduleBuilder.repeatSecondlyForTotalCount(10))
-                .build();
-    }
-
     private Trigger createTriggerEveryMonth(Properties data) {
         String scheduleStart = startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd);
 
-        data.put(JobKey.TYPE.value(), JobType.EVERY_MONTH);
-        data.put(JobKey.DAY_OF_MONTH.value(), dayOfMonthComboBox.getValue());
+        data.put(JobKey.TYPE.value(), JobType.EVERY_MONTH.name());
+        data.put(JobKey.DAY_OF_MONTH.value(), dayOfMonthComboBox.getValue().toString());
         data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
         data.remove(JobKey.CRON.value());
         data.remove(JobKey.HOUR_OF_THE_DAY.value());
@@ -224,7 +209,7 @@ public class JobController extends AbstractController {
         String hourOfThDay = String.format("%s:%s", hourOfDayComboBox.getValue(), minuteComboBox.getValue());
         String scheduleStart = startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd);
 
-        data.put(JobKey.TYPE.value(), JobType.EVERY_2_WEEKS);
+        data.put(JobKey.TYPE.value(), JobType.EVERY_2_WEEKS.name());
         data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfThDay);
         data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
         data.remove(JobKey.DAY_OF_MONTH.value());
@@ -248,7 +233,7 @@ public class JobController extends AbstractController {
         String hourOfThDay = String.format("%s:%s", hourOfDayComboBox.getValue(), minuteComboBox.getValue());
         String scheduleStart = startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd);
 
-        data.put(JobKey.TYPE.value(), JobType.EVERY_WEEK);
+        data.put(JobKey.TYPE.value(), JobType.EVERY_WEEK.name());
         data.put(JobKey.DAY_OF_WEEK.value(), dayNameComboBox.getValue());
         data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfThDay);
         data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
@@ -267,7 +252,7 @@ public class JobController extends AbstractController {
     }
 
     private Trigger createCronTrigger(Properties data) throws ParseException {
-        data.put(JobKey.TYPE.value(), JobType.CRON);
+        data.put(JobKey.TYPE.value(), JobType.CRON.name());
         data.put(JobKey.CRON.value(), cronExpressionTextField.getText());
         data.remove(JobKey.HOUR_OF_THE_DAY.value());
         data.remove(JobKey.DAY_OF_MONTH.value());

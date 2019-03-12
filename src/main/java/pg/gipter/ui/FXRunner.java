@@ -5,6 +5,7 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.launcher.Starter;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
@@ -14,7 +15,7 @@ import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 
 /** Created by Pawel Gawedzki on 10-Mar-2019. */
-public class FXRunner extends Task<Void>{
+public class FXRunner extends Task<Void> implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(FXRunner .class);
     private ApplicationProperties applicationProperties;
@@ -27,6 +28,11 @@ public class FXRunner extends Task<Void>{
 
     @Override
     public Void call() {
+        start();
+        return null;
+    }
+
+    public void start() {
         boolean error = false;
         try {
             updateMessage(BundleUtils.getMsg("progress.start"));
@@ -66,7 +72,6 @@ public class FXRunner extends Task<Void>{
             String confirmationMsg = BundleUtils.getMsg("popup.confirmation.message", applicationProperties.toolkitUserFolder());
             displayWindowFxSupport(confirmationMsg, Alert.AlertType.INFORMATION);
         }
-        return null;
     }
 
     private void displayWindowFxSupport(String message, Alert.AlertType alertType) {

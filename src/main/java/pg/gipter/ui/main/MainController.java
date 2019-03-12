@@ -112,6 +112,7 @@ public class MainController extends AbstractController {
 
     private ApplicationProperties applicationProperties;
     private Executor executor;
+    private PropertiesHelper propertiesHelper;
 
     private static String currentLanguage;
 
@@ -119,6 +120,7 @@ public class MainController extends AbstractController {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         executor = Executors.newFixedThreadPool(3);
+        propertiesHelper = new PropertiesHelper();
     }
 
     @Override
@@ -237,7 +239,7 @@ public class MainController extends AbstractController {
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         codeProtectionComboBox.setOnAction(codeProtectionActionEventHandler());
         executeButton.setOnAction(executeActionEventHandler());
-        deamonButton.setOnAction(deamonActionEventHandler(resources));
+        deamonButton.setOnAction(deamonActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler(resources));
     }
@@ -389,12 +391,14 @@ public class MainController extends AbstractController {
         return properties;
     }
 
-    private EventHandler<ActionEvent> deamonActionEventHandler(ResourceBundle resource) {
+    private EventHandler<ActionEvent> deamonActionEventHandler() {
         return event -> {
-            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
+            String[] argsFromUI = createArgsFromUI();
+            propertiesHelper.saveToUIApplicationProperties(createProperties(argsFromUI));
+            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(argsFromUI);
             if (uiAppProperties.isActiveTray()) {
                 uiLauncher.updateTray(uiAppProperties);
-                uiLauncher.hideTray();
+                uiLauncher.hideToTray();
             } else {
                 UILauncher.platformExit();
             }
@@ -428,11 +432,13 @@ public class MainController extends AbstractController {
             if (newValue) {
                 deamonButton.setVisible(true);
                 ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
-                uiLauncher.updateTray(uiAppProperties);
+                uiLauncher.setApplicationProperties(uiAppProperties);
+                uiLauncher.initTrayHandler();
                 uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
             } else {
                 deamonButton.setVisible(false);
                 uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
+                uiLauncher.removeTray();
             }
         });
     }
