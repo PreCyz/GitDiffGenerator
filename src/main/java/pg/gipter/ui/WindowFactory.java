@@ -17,7 +17,7 @@ public enum WindowFactory {
     JOB {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new JobWindow(new JobController(applicationProperties, uiLauncher));
+            return new JobWindow(new JobController(uiLauncher));
         }
     };
 

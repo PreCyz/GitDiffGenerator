@@ -19,7 +19,6 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXRunner;
-import pg.gipter.ui.TrayHandler;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
@@ -112,7 +111,6 @@ public class MainController extends AbstractController {
     private Label infoLabel;
 
     private ApplicationProperties applicationProperties;
-    private TrayHandler trayHandler;
     private Executor executor;
 
     private static String currentLanguage;
@@ -135,12 +133,7 @@ public class MainController extends AbstractController {
 
     private void initTray() {
         if (applicationProperties.isActiveTray()) {
-            trayHandler = new TrayHandler(uiLauncher, applicationProperties);
-            if (trayHandler.tryIconExists()) {
-                trayHandler.updateTrayLabels();
-            } else {
-                trayHandler.createTrayIcon();
-            }
+            uiLauncher.initTrayHandler();
         }
     }
 
@@ -322,8 +315,7 @@ public class MainController extends AbstractController {
             executor.execute(() -> {
                 runner.call();
                 if (uiAppProperties.isActiveTray()) {
-                    trayHandler.setApplicationProperties(uiAppProperties);
-                    trayHandler.updateTrayLabels();
+                    uiLauncher.updateTray(uiAppProperties);
                 }
             });
         };
@@ -401,32 +393,12 @@ public class MainController extends AbstractController {
         return event -> {
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
             if (uiAppProperties.isActiveTray()) {
-                trayHandler.setApplicationProperties(uiAppProperties);
-                trayHandler.updateTrayLabels();
-                trayHandler.hide();
-
-                boolean isShowJobWindow = isShowJobWindow(resource);
-                if (isShowJobWindow) {
-                    uiLauncher.showJobWindow();
-                }
+                uiLauncher.updateTray(uiAppProperties);
+                uiLauncher.hideTray();
             } else {
                 UILauncher.platformExit();
             }
         };
-    }
-
-    private boolean isShowJobWindow(ResourceBundle resource) {
-        String yes = resource.getString("popup.scheduler.yes");
-        String no = resource.getString("popup.scheduler.no");
-        ButtonType yesButton = new ButtonType(yes, ButtonBar.ButtonData.OK_DONE);
-        ButtonType noButton = new ButtonType(no, ButtonBar.ButtonData.NO);
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                resource.getString("popup.scheduler.message"),
-                yesButton,
-                noButton
-        );
-        setAlertCommonAttributes(resource, alert);
-        return alert.showAndWait().orElse(noButton) == yesButton;
     }
 
     private EventHandler<ActionEvent> exitActionEventHandler() {
@@ -438,8 +410,7 @@ public class MainController extends AbstractController {
             String[] args = createArgsFromUI();
             saveCurrentConfiguration(resources, createProperties(args));
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
-            trayHandler.setApplicationProperties(uiAppProperties);
-            trayHandler.updateTrayLabels();
+            uiLauncher.updateTray(uiAppProperties);
         };
     }
 
@@ -457,8 +428,8 @@ public class MainController extends AbstractController {
             if (newValue) {
                 deamonButton.setVisible(true);
                 ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
-                trayHandler.setApplicationProperties(uiAppProperties);
-                uiLauncher.currentWindow().setOnCloseRequest(trayHandler.trayOnCloseEventHandler());
+                uiLauncher.updateTray(uiAppProperties);
+                uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
             } else {
                 deamonButton.setVisible(false);
                 uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());

@@ -1,14 +1,20 @@
 package pg.gipter.ui;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.util.AlertHelper;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.StringUtils;
 
@@ -23,6 +29,8 @@ public class UILauncher implements Launcher {
     private final Stage primaryStage;
     private ApplicationProperties applicationProperties;
     private Stage jobWindow;
+    private TrayHandler trayHandler;
+    private Scheduler scheduler;
 
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
         this.primaryStage = primaryStage;
@@ -31,6 +39,15 @@ public class UILauncher implements Launcher {
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
+    }
+
+    public void initTrayHandler() {
+        trayHandler = new TrayHandler(this, applicationProperties);
+        if (trayHandler.tryIconExists()) {
+            trayHandler.updateTrayLabels();
+        } else {
+            trayHandler.createTrayIcon();
+        }
     }
 
     @Override
@@ -95,5 +112,33 @@ public class UILauncher implements Launcher {
 
     public void hideJobWindow() {
         jobWindow.close();
+    }
+
+    public void updateTray(ApplicationProperties applicationProperties) {
+        trayHandler.setApplicationProperties(applicationProperties);
+        trayHandler.updateTrayLabels();
+    }
+
+    public void hideTray() {
+        trayHandler.hide();
+    }
+
+    public EventHandler<WindowEvent> trayOnCloseEventHandler() {
+        return trayHandler.trayOnCloseEventHandler();
+    }
+
+    public void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    public void cancelJob() {
+        if (scheduler != null) {
+            try {
+                scheduler.shutdown();
+            } catch (SchedulerException e) {
+                String errorMessage = String.format("Can not cancel the job. Reason: %s", e.getMessage());
+                AlertHelper.displayWindow(errorMessage, Alert.AlertType.ERROR);
+            }
+        }
     }
 }

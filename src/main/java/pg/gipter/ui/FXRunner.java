@@ -54,7 +54,7 @@ public class FXRunner extends Task<Void>{
         } catch (Exception ex) {
             logger.error("Diff upload failure. Program is terminated.");
             error = true;
-            String errMsg = AlertHelper.createErrorMessage();
+            String errMsg = AlertHelper.createLogsErrorMessage();
             displayWindowFxSupport(errMsg, Alert.AlertType.ERROR);
         } finally {
             String status = error ? "FAIL" : "SUCCESS";

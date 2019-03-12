@@ -11,7 +11,7 @@ public final class AlertHelper {
 
     private AlertHelper() {}
 
-    public static String createErrorMessage() {
+    public static String createLogsErrorMessage() {
         String errorMsg;
         try {
             File jarFile = new File(AlertHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI());

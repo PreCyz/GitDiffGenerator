@@ -53,13 +53,11 @@ public class JobController extends AbstractController {
     @FXML
     private Button scheduleButton;
 
-    private final ApplicationProperties applicationProperties;
     private static Scheduler scheduler;
-    private PropertiesHelper propertiesHelper;
+    private final PropertiesHelper propertiesHelper;
 
-    public JobController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+    public JobController(UILauncher uiLauncher) {
         super(uiLauncher);
-        this.applicationProperties = applicationProperties;
         propertiesHelper = new PropertiesHelper();
     }
 
@@ -147,38 +145,31 @@ public class JobController extends AbstractController {
         return event -> {
             try {
                 Properties data = propertiesHelper.loadDataProperties().orElseGet(Properties::new);
+                Trigger trigger = createTriggerEveryWeek(data);
+                JobDetail jobDetail = createJobDetail(data);
 
-                Trigger trigger = null;
                 if (!StringUtils.nullOrEmpty(cronExpressionTextField.getText())) {
-                    trigger = createCronTrigger();
-                    data.put(JobKey.TYPE.value(), JobType.CRON);
-                    data.put(JobKey.CRON.value(), cronExpressionTextField.getText());
+                    trigger = createCronTrigger(data);
+                    jobDetail = createJobDetail(data);
                 } else if (everyMonthRadioButton.isSelected()) {
-                    trigger = createTriggerEveryMonth();
-                    data.put(JobKey.TYPE.value(), JobType.EVERY_MONTH);
-                    data.put(JobKey.DAY_OF_MONTH.value(), dayOfMonthComboBox.getValue());
-                    data.put(JobKey.SCHEDULE_START.value(), startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd));
+                    trigger = createTriggerEveryMonth(data);
+                    jobDetail = createJobDetail(data);
                 } else if (every2WeeksRadioButton.isSelected()) {
-                    trigger = createTriggerEvery2Weeks();
-                    data.put(JobKey.TYPE.value(), JobType.EVERY_2_WEEKS);
-                    data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfDayComboBox.getValue());
-                    data.put(JobKey.SCHEDULE_START.value(), startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd));
-                } else if (everyWeekRadioButton.isSelected()) {
-                    trigger = createTriggerEveryWeek();
-                    data.put(JobKey.TYPE.value(), JobType.EVERY_WEEK);
-                    data.put(JobKey.DAY_OF_WEEK.value(), dayNameComboBox.getValue());
-                    data.put(JobKey.SCHEDULE_START.value(), startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd));
+                    trigger = createTriggerEvery2Weeks(data);
+                    jobDetail = createJobDetail(data);
                 }
                 propertiesHelper.saveDataProperties(data);
+                jobDetail.getJobDataMap().put(UILauncher.class.getName(), uiLauncher);
 
                 if (scheduler != null) {
                     scheduler.shutdown();
                 }
 
                 scheduler = StdSchedulerFactory.getDefaultScheduler();
-                scheduler.scheduleJob(createJobDetail(), trigger);
+                scheduler.scheduleJob(jobDetail, trigger);
                 scheduler.start();
 
+                uiLauncher.setScheduler(scheduler);
                 uiLauncher.hideJobWindow();
 
             } catch (SchedulerException | ParseException se) {
@@ -210,7 +201,16 @@ public class JobController extends AbstractController {
                 .build();
     }
 
-    private Trigger createTriggerEveryMonth() {
+    private Trigger createTriggerEveryMonth(Properties data) {
+        String scheduleStart = startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd);
+
+        data.put(JobKey.TYPE.value(), JobType.EVERY_MONTH);
+        data.put(JobKey.DAY_OF_MONTH.value(), dayOfMonthComboBox.getValue());
+        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
+        data.remove(JobKey.CRON.value());
+        data.remove(JobKey.HOUR_OF_THE_DAY.value());
+        data.remove(JobKey.DAY_OF_WEEK.value());
+
         return newTrigger()
                 .withIdentity("everyMonthTrigger", "everyMonthTriggerGroup")
                 .startNow()
@@ -220,7 +220,17 @@ public class JobController extends AbstractController {
                 .build();
     }
 
-    private Trigger createTriggerEvery2Weeks() {
+    private Trigger createTriggerEvery2Weeks(Properties data) {
+        String hourOfThDay = String.format("%s:%s", hourOfDayComboBox.getValue(), minuteComboBox.getValue());
+        String scheduleStart = startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd);
+
+        data.put(JobKey.TYPE.value(), JobType.EVERY_2_WEEKS);
+        data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfThDay);
+        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
+        data.remove(JobKey.DAY_OF_MONTH.value());
+        data.remove(JobKey.CRON.value());
+        data.remove(JobKey.DAY_OF_WEEK.value());
+
         Date startDate = DateBuilder.dateOf(
                 hourOfDayComboBox.getValue(), minuteComboBox.getValue(), 0,
                 startDatePicker.getValue().getDayOfMonth(), startDatePicker.getValue().getMonthValue(), startDatePicker.getValue().getYear()
@@ -234,7 +244,17 @@ public class JobController extends AbstractController {
                 .build();
     }
 
-    private Trigger createTriggerEveryWeek() {
+    private Trigger createTriggerEveryWeek(Properties data) {
+        String hourOfThDay = String.format("%s:%s", hourOfDayComboBox.getValue(), minuteComboBox.getValue());
+        String scheduleStart = startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd);
+
+        data.put(JobKey.TYPE.value(), JobType.EVERY_WEEK);
+        data.put(JobKey.DAY_OF_WEEK.value(), dayNameComboBox.getValue());
+        data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfThDay);
+        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
+        data.remove(JobKey.CRON.value());
+        data.remove(JobKey.DAY_OF_MONTH.value());
+
         Date startDate = DateBuilder.dateOf(
                 hourOfDayComboBox.getValue(), minuteComboBox.getValue(), 0,
                 startDatePicker.getValue().getDayOfMonth(), startDatePicker.getValue().getMonthValue(), startDatePicker.getValue().getYear()
@@ -246,7 +266,14 @@ public class JobController extends AbstractController {
                 .build();
     }
 
-    private Trigger createCronTrigger() throws ParseException {
+    private Trigger createCronTrigger(Properties data) throws ParseException {
+        data.put(JobKey.TYPE.value(), JobType.CRON);
+        data.put(JobKey.CRON.value(), cronExpressionTextField.getText());
+        data.remove(JobKey.HOUR_OF_THE_DAY.value());
+        data.remove(JobKey.DAY_OF_MONTH.value());
+        data.remove(JobKey.DAY_OF_WEEK.value());
+        data.remove(JobKey.SCHEDULE_START.value());
+
         CronExpression cronExpression = new CronExpression(cronExpressionTextField.getText());
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
 
@@ -254,13 +281,16 @@ public class JobController extends AbstractController {
                 .withIdentity("cronTrigger", "cronTriggerGroup")
                 .startNow()
                 .withSchedule(cronScheduleBuilder)
-                .forJob(createJobDetail())
                 .build();
     }
 
-    private JobDetail createJobDetail() {
+    private JobDetail createJobDetail(Properties data) {
         JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put(GipterJob.APP_PROPS_KEY, applicationProperties);
+        for (JobKey key: JobKey.values()) {
+            if (data.containsKey(key.value())) {
+                jobDataMap.put(key.value(), data.getProperty(key.value()));
+            }
+        }
         return JobBuilder.newJob(GipterJob.class)
                 .withIdentity(GipterJob.NAME, GipterJob.GROUP)
                 .setJobData(jobDataMap)

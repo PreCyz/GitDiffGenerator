@@ -40,7 +40,7 @@ public class Runner {
         } catch (Exception ex) {
             logger.error("Diff upload failure. Program is terminated.");
             error = true;
-            String errMsg = AlertHelper.createErrorMessage();
+            String errMsg = AlertHelper.createLogsErrorMessage();
             AlertHelper.displayWindow(errMsg, Alert.AlertType.ERROR);
         } finally {
             propertiesHelper.saveUploadInfo(error ? "FAIL" : "SUCCESS");
