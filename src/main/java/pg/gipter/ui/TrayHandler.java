@@ -102,7 +102,7 @@ class TrayHandler {
                 buildMenuItem(data.get(), JobKey.CRON).ifPresent(jobMenu::add);
                 jobMenu.addSeparator();
 
-                MenuItem cancelJobItem = new MenuItem("Cancel job");
+                MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));
                 cancelJobItem.addActionListener(cancelJobActionListener());
                 jobMenu.add(cancelJobItem);
 
@@ -223,6 +223,6 @@ class TrayHandler {
     }
 
     boolean tryIconExists() {
-        return trayIcon != null ;//&& SystemTray.getSystemTray().getTrayIcons().length != 0  ;
+        return trayIcon != null;
     }
 }
