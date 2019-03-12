@@ -21,7 +21,6 @@ public class GipterJob implements Job {
     private static final Logger logger = LoggerFactory.getLogger(GipterJob.class);
     public static final String NAME = "Gipter-job";
     static final String GROUP = "GipterJobGroup";
-    static final String APP_PROPS_KEY = "applicationProperties";
 
     public GipterJob() {
         // Instances of Job must have a public no-argument constructor.

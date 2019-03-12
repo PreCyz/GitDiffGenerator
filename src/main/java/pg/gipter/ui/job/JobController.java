@@ -7,8 +7,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
@@ -25,7 +25,6 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
-import static org.quartz.TriggerBuilder.newTrigger;
 
 public class JobController extends AbstractController {
 
@@ -66,6 +65,7 @@ public class JobController extends AbstractController {
         setInitValues();
         setActions(resources);
         setProperties();
+        scheduler = uiLauncher.getScheduler();
     }
 
     private void setInitValues() {
@@ -77,7 +77,7 @@ public class JobController extends AbstractController {
         hourOfDayComboBox.setValue(hourOfDayComboBox.getItems().get(0));
         minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
-        startDatePicker.setValue(LocalDate.now().plusDays(1));
+        startDatePicker.setValue(LocalDate.now());
     }
 
     private void setActions(ResourceBundle resources) {
@@ -98,7 +98,7 @@ public class JobController extends AbstractController {
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 LocalDate today = LocalDate.now();
-                setDisable(empty || date.compareTo(today) <= 0);
+                setDisable(empty || date.compareTo(today) < 0);
             }
         };
     }
@@ -143,30 +143,24 @@ public class JobController extends AbstractController {
     private EventHandler<ActionEvent> scheduleJobActionEvent(ResourceBundle resource) {
         return event -> {
             try {
-                Properties data = propertiesHelper.loadDataProperties().orElseGet(Properties::new);
-                Trigger trigger = createTriggerEveryWeek(data);
-                JobDetail jobDetail = createJobDetail(data);
-
+                JobType jobType = JobType.EVERY_WEEK;
                 if (!StringUtils.nullOrEmpty(cronExpressionTextField.getText())) {
-                    trigger = createCronTrigger(data);
-                    jobDetail = createJobDetail(data);
+                    jobType = JobType.CRON;
                 } else if (everyMonthRadioButton.isSelected()) {
-                    trigger = createTriggerEveryMonth(data);
-                    jobDetail = createJobDetail(data);
+                    jobType = JobType.EVERY_MONTH;
                 } else if (every2WeeksRadioButton.isSelected()) {
-                    trigger = createTriggerEvery2Weeks(data);
-                    jobDetail = createJobDetail(data);
-                }
-                propertiesHelper.saveDataProperties(data);
-                jobDetail.getJobDataMap().put(UILauncher.class.getName(), uiLauncher);
-
-                if (scheduler != null) {
-                    scheduler.shutdown();
+                    jobType = JobType.EVERY_2_WEEKS;
                 }
 
-                scheduler = StdSchedulerFactory.getDefaultScheduler();
-                scheduler.scheduleJob(jobDetail, trigger);
-                scheduler.start();
+                Properties data = propertiesHelper.loadDataProperties().orElseGet(Properties::new);
+                JobCreator jobCreator = new JobCreator(data, jobType, startDatePicker.getValue(),
+                        dayOfMonthComboBox.getValue(), hourOfDayComboBox.getValue(), minuteComboBox.getValue(),
+                        dayNameComboBox.getValue(), cronExpressionTextField.getText(), scheduler);
+
+                Map<String, Object> additionalJobParams = new HashMap<>();
+                additionalJobParams.put(UILauncher.class.getName(), uiLauncher);
+                scheduler = jobCreator.scheduleJob(additionalJobParams);
+                propertiesHelper.saveDataProperties(jobCreator.getDataProperties());
 
                 uiLauncher.setScheduler(scheduler);
                 uiLauncher.hideJobWindow();
@@ -184,102 +178,6 @@ public class JobController extends AbstractController {
                 alert.showAndWait();
             }
         };
-    }
-
-    private Trigger createTriggerEveryMonth(Properties data) {
-        String scheduleStart = startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd);
-
-        data.put(JobKey.TYPE.value(), JobType.EVERY_MONTH.name());
-        data.put(JobKey.DAY_OF_MONTH.value(), dayOfMonthComboBox.getValue().toString());
-        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
-        data.remove(JobKey.CRON.value());
-        data.remove(JobKey.HOUR_OF_THE_DAY.value());
-        data.remove(JobKey.DAY_OF_WEEK.value());
-
-        return newTrigger()
-                .withIdentity("everyMonthTrigger", "everyMonthTriggerGroup")
-                .startNow()
-                .withSchedule(CronScheduleBuilder.monthlyOnDayAndHourAndMinute(
-                        dayOfMonthComboBox.getValue(), hourOfDayComboBox.getValue(), minuteComboBox.getValue())
-                )
-                .build();
-    }
-
-    private Trigger createTriggerEvery2Weeks(Properties data) {
-        String hourOfThDay = String.format("%s:%s", hourOfDayComboBox.getValue(), minuteComboBox.getValue());
-        String scheduleStart = startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd);
-
-        data.put(JobKey.TYPE.value(), JobType.EVERY_2_WEEKS.name());
-        data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfThDay);
-        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
-        data.remove(JobKey.DAY_OF_MONTH.value());
-        data.remove(JobKey.CRON.value());
-        data.remove(JobKey.DAY_OF_WEEK.value());
-
-        Date startDate = DateBuilder.dateOf(
-                hourOfDayComboBox.getValue(), minuteComboBox.getValue(), 0,
-                startDatePicker.getValue().getDayOfMonth(), startDatePicker.getValue().getMonthValue(), startDatePicker.getValue().getYear()
-        );
-        return TriggerBuilder.newTrigger()
-                .withIdentity("every2WeeksTrigger", "every2WeeksTriggerGroup")
-                .startAt(startDate)
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .withIntervalInHours(14 * 24) // interval is actually set at 14 * 24 hours' worth of milliseconds
-                        .repeatForever())
-                .build();
-    }
-
-    private Trigger createTriggerEveryWeek(Properties data) {
-        String hourOfThDay = String.format("%s:%s", hourOfDayComboBox.getValue(), minuteComboBox.getValue());
-        String scheduleStart = startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd);
-
-        data.put(JobKey.TYPE.value(), JobType.EVERY_WEEK.name());
-        data.put(JobKey.DAY_OF_WEEK.value(), dayNameComboBox.getValue());
-        data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfThDay);
-        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
-        data.remove(JobKey.CRON.value());
-        data.remove(JobKey.DAY_OF_MONTH.value());
-
-        Date startDate = DateBuilder.dateOf(
-                hourOfDayComboBox.getValue(), minuteComboBox.getValue(), 0,
-                startDatePicker.getValue().getDayOfMonth(), startDatePicker.getValue().getMonthValue(), startDatePicker.getValue().getYear()
-        );
-        return newTrigger()
-                .withIdentity("everyWeekTrigger", "everyWeekTriggerGroup")
-                .startAt(startDate)
-                .withSchedule(CronScheduleBuilder.weeklyOnDayAndHourAndMinute(dayNameComboBox.getValue().getValue(), hourOfDayComboBox.getValue(), 0)) // fire every wednesday at 15:00
-                .build();
-    }
-
-    private Trigger createCronTrigger(Properties data) throws ParseException {
-        data.put(JobKey.TYPE.value(), JobType.CRON.name());
-        data.put(JobKey.CRON.value(), cronExpressionTextField.getText());
-        data.remove(JobKey.HOUR_OF_THE_DAY.value());
-        data.remove(JobKey.DAY_OF_MONTH.value());
-        data.remove(JobKey.DAY_OF_WEEK.value());
-        data.remove(JobKey.SCHEDULE_START.value());
-
-        CronExpression cronExpression = new CronExpression(cronExpressionTextField.getText());
-        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cronExpression);
-
-        return newTrigger()
-                .withIdentity("cronTrigger", "cronTriggerGroup")
-                .startNow()
-                .withSchedule(cronScheduleBuilder)
-                .build();
-    }
-
-    private JobDetail createJobDetail(Properties data) {
-        JobDataMap jobDataMap = new JobDataMap();
-        for (JobKey key: JobKey.values()) {
-            if (data.containsKey(key.value())) {
-                jobDataMap.put(key.value(), data.getProperty(key.value()));
-            }
-        }
-        return JobBuilder.newJob(GipterJob.class)
-                .withIdentity(GipterJob.NAME, GipterJob.GROUP)
-                .setJobData(jobDataMap)
-                .build();
     }
 
 }

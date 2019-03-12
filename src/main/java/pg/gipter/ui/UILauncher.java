@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.job.GipterJob;
+import pg.gipter.ui.job.JobCreator;
 import pg.gipter.ui.job.JobKey;
+import pg.gipter.ui.job.JobType;
 import pg.gipter.util.AlertHelper;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
@@ -23,6 +25,11 @@ import pg.gipter.util.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
@@ -51,12 +58,17 @@ public class UILauncher implements Launcher {
         this.applicationProperties = applicationProperties;
     }
 
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
     public void initTrayHandler() {
         trayHandler = new TrayHandler(this, applicationProperties);
         if (trayHandler.tryIconExists()) {
             trayHandler.updateTrayLabels();
         } else {
             trayHandler.createTrayIcon();
+            scheduleJobIfExists();
         }
     }
 
@@ -169,6 +181,49 @@ public class UILauncher implements Launcher {
 
             logger.info("{} canceled.", GipterJob.NAME);
             updateTray();
+        }
+    }
+
+    private void scheduleJobIfExists() {
+        Optional<Properties> data = propertiesHelper.loadDataProperties();
+        if (data.isPresent() && scheduler == null && data.get().containsKey(JobKey.TYPE.value())) {
+            try {
+                JobType jobType = JobType.valueOf(data.get().getProperty(JobKey.TYPE.value()));
+
+                LocalDate scheduleStart = null;
+                if (data.get().containsKey(JobKey.SCHEDULE_START.value())) {
+                    scheduleStart = LocalDate.parse(
+                            data.get().getProperty(JobKey.SCHEDULE_START.value()),
+                            ApplicationProperties.yyyy_MM_dd
+                    );
+                }
+                int dayOfMonth = 0;
+                if (data.get().containsKey(JobKey.DAY_OF_MONTH.value())) {
+                    dayOfMonth = Integer.valueOf(data.get().getProperty(JobKey.DAY_OF_MONTH.value()));
+                }
+                int hourOfDay = 0;
+                int minuteOfHour = 0;
+                if (data.get().containsKey(JobKey.HOUR_OF_THE_DAY.value())) {
+                    String hourOfDayString = data.get().getProperty(JobKey.HOUR_OF_THE_DAY.value());
+                    hourOfDay = Integer.valueOf(hourOfDayString.substring(0, hourOfDayString.lastIndexOf(":")));
+                    minuteOfHour = Integer.valueOf(hourOfDayString.substring(hourOfDayString.lastIndexOf(":") + 1));
+                }
+                DayOfWeek dayOfWeek = null;
+                if (data.get().containsKey(JobKey.DAY_OF_WEEK.value())) {
+                    dayOfWeek = DayOfWeek.valueOf(data.get().getProperty(JobKey.DAY_OF_WEEK.value()));
+                }
+                String cronExpression = data.get().getProperty(JobKey.CRON.value());
+
+                Map<String, Object> additionalJobParams = new HashMap<>();
+                additionalJobParams.put(UILauncher.class.getName(), this);
+
+                JobCreator jobCreator = new JobCreator(data.get(), jobType, scheduleStart, dayOfMonth,
+                        hourOfDay, minuteOfHour, dayOfWeek, cronExpression, scheduler);
+
+                scheduler = jobCreator.scheduleJob(additionalJobParams);
+            } catch (ParseException | SchedulerException e) {
+                logger.warn("Can not restart the scheduler.", e);
+            }
         }
     }
 }
