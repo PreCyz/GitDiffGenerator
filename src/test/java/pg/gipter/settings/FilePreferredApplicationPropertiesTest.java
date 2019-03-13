@@ -261,7 +261,7 @@ class FilePreferredApplicationPropertiesTest {
 
         LocalDate actual = appProps.startDate();
 
-        assertThat(actual.format(yyyy_MM_dd)).isEqualTo(LocalDate.now().minusDays(16).format(yyyy_MM_dd));
+        assertThat(actual).isEqualTo(LocalDate.now().minusDays(16));
     }
 
     @Test
@@ -275,6 +275,19 @@ class FilePreferredApplicationPropertiesTest {
         LocalDate actual = appProps.startDate();
 
         assertThat(actual.format(yyyy_MM_dd)).isEqualTo("2018-10-19");
+    }
+
+    @Test
+    void givenStartDateFromCliAndPeriodInDaysFromProperties_whenStartDate_thenReturnStartDateFromProperties() {
+        String[] args = {"startDate=2018-10-18"};
+        Properties props = new Properties();
+        props.put("periodInDays", "12");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        LocalDate actual = appProps.startDate();
+
+        assertThat(actual).isEqualTo(LocalDate.now().minusDays(12));
     }
 
     @Test

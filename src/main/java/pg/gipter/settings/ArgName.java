@@ -43,7 +43,7 @@ public enum ArgName {
         this.defaultValue = defaultValue;
     }
 
-    String defaultValue() {
+    public String defaultValue() {
         return defaultValue;
     }
 }

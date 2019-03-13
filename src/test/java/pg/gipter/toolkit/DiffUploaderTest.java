@@ -40,6 +40,7 @@ class DiffUploaderTest {
                 "startDate=2018-10-18",
                 "endDate=2018-10-19",
                 "toolkitUsername=xxx",
+                "useUI=n",
         });
         properties.setVcs(EnumSet.of(VersionControlSystem.GIT, VersionControlSystem.SVN));
         uploader = new DiffUploader(properties);
@@ -70,6 +71,7 @@ class DiffUploaderTest {
                 "endDate=2017-12-20",
                 "itemFileNamePrefix=custom",
                 "toolkitUsername=xxx",
+                "useUI=n",
         });
         uploader = new DiffUploader(properties);
         Map<String, String> map = uploader.buildAttributesMap("viewName");

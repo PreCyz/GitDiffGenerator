@@ -29,12 +29,12 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
 
@@ -224,12 +224,12 @@ public class MainController extends AbstractController {
         return new StringConverter<LocalDate>() {
             @Override
             public String toString(LocalDate object) {
-                return object.format(ApplicationProperties.yyyy_MM_dd);
+                return object.format(yyyy_MM_dd);
             }
 
             @Override
             public LocalDate fromString(String string) {
-                return LocalDate.parse(string, ApplicationProperties.yyyy_MM_dd);
+                return LocalDate.parse(string, yyyy_MM_dd);
             }
         };
     }
@@ -324,31 +324,51 @@ public class MainController extends AbstractController {
     }
 
     private String[] createArgsFromUI() {
-        return new String[]{
-                        ArgName.author + "=" + authorsTextField.getText(),
-                        ArgName.committerEmail + "=" + committerEmailTextField.getText(),
-                        ArgName.gitAuthor + "=" + gitAuthorTextField.getText(),
-                        ArgName.mercurialAuthor + "=" + mercurialAuthorTextField.getText(),
-                        ArgName.svnAuthor + "=" + svnAuthorTextField.getText(),
-                        ArgName.codeProtection + "=" + codeProtectionComboBox.getValue(),
-                        ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected(),
+        List<String> argList = new LinkedList<>();
 
-                        ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText(),
-                        ArgName.toolkitPassword + "=" + toolkitPasswordField.getText(),
+        if (!StringUtils.nullOrEmpty(authorsTextField.getText())) {
+            argList.add(ArgName.author + "=" + authorsTextField.getText());
+        }
+        if (!StringUtils.nullOrEmpty(committerEmailTextField.getText())) {
+            argList.add(ArgName.committerEmail + "=" + committerEmailTextField.getText());
+        }
+        if (!StringUtils.nullOrEmpty(gitAuthorTextField.getText())) {
+            argList.add(ArgName.gitAuthor + "=" + gitAuthorTextField.getText());
+        }
+        if (!StringUtils.nullOrEmpty(mercurialAuthorTextField.getText())) {
+            argList.add(ArgName.mercurialAuthor + "=" + mercurialAuthorTextField.getText());
+        }
+        if (!StringUtils.nullOrEmpty(svnAuthorTextField.getText())) {
+            argList.add(ArgName.svnAuthor + "=" + svnAuthorTextField.getText());
+        }
+        argList.add(ArgName.codeProtection + "=" + codeProtectionComboBox.getValue());
+        argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
 
-                        ArgName.projectPath + "=" + projectPathLabel.getText(),
-                        ArgName.itemPath + "=" + itemPathLabel.getText(),
-                        ArgName.itemFileNamePrefix + "=" + itemFileNamePrefixTextField.getText(),
+        argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
+        argList.add(ArgName.toolkitPassword + "=" + toolkitPasswordField.getText());
 
-                        ArgName.startDate + "=" + startDatePicker.getValue().format(ApplicationProperties.yyyy_MM_dd),
-                        ArgName.endDate + "=" + endDatePicker.getValue(),
-                        ArgName.periodInDays + "=" + periodInDaysTextField.getText(),
+        argList.add(ArgName.projectPath + "=" + projectPathLabel.getText());
+        argList.add(ArgName.itemPath + "=" + itemPathLabel.getText());
+        if (!StringUtils.nullOrEmpty(itemFileNamePrefixTextField.getText())) {
+            argList.add(ArgName.itemFileNamePrefix + "=" + itemFileNamePrefixTextField.getText());
+        }
 
-                        ArgName.confirmationWindow + "=" + confirmationWindowCheckBox.isSelected(),
-                        ArgName.preferredArgSource + "=" + PreferredArgSource.UI,
-                        ArgName.useUI + "=" + useUICheckBox.isSelected(),
-                        ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected()
-                };
+        if (!startDatePicker.getValue().format(yyyy_MM_dd).equals(ArgName.startDate.defaultValue())) {
+            argList.add(ArgName.startDate + "=" + startDatePicker.getValue().format(yyyy_MM_dd));
+        }
+        if (!endDatePicker.getValue().format(yyyy_MM_dd).equals(ArgName.endDate.defaultValue())) {
+            argList.add(ArgName.endDate + "=" + endDatePicker.getValue().format(yyyy_MM_dd));
+        }
+        if (!ArgName.periodInDays.defaultValue().equals(periodInDaysTextField.getText())) {
+            argList.add(ArgName.periodInDays + "=" + periodInDaysTextField.getText());
+        }
+
+        argList.add(ArgName.confirmationWindow + "=" + confirmationWindowCheckBox.isSelected());
+        argList.add(ArgName.preferredArgSource + "=" + PreferredArgSource.UI);
+        argList.add(ArgName.useUI + "=" + useUICheckBox.isSelected());
+        argList.add(ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected());
+
+        return argList.stream().toArray(String[]::new);
     }
 
     private EventHandler<ActionEvent> codeProtectionActionEventHandler() {

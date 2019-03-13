@@ -555,6 +555,42 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
+    void givenPeriodInDaysFromCli_when_startDate_then_returnStartDateBasedOnPeriodInDays() {
+        String[] args = {"periodInDays=5"};
+        applicationProperties = new CliPreferredApplicationProperties(args);
+
+        LocalDate actual = applicationProperties.startDate();
+
+        assertThat(actual).isEqualTo(LocalDate.now().minusDays(5));
+    }
+
+    @Test
+    void givenPeriodInDaysFromCliAndProperties_when_startDate_then_returnStartDateBasedOnCliPeriodInDays() {
+        String[] args = {"periodInDays=5"};
+        Properties props = new Properties();
+        props.put("periodInDays", "6");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        LocalDate actual = applicationProperties.startDate();
+
+        assertThat(actual).isEqualTo(LocalDate.now().minusDays(5));
+    }
+
+    @Test
+    void givenPeriodInDaysFromProperties_when_startDate_then_returnStartDateBasedOnPropertiesPeriodInDays() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("periodInDays", "6");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        LocalDate actual = applicationProperties.startDate();
+
+        assertThat(actual).isEqualTo(LocalDate.now().minusDays(6));
+    }
+
+    @Test
     void given_noEndDate_when_endDate_then_returnDefault() {
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
 

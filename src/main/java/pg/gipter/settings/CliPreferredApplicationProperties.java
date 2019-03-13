@@ -123,6 +123,8 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         if (!containsArg(argName) && containsProperty(argName)) {
             String[] date = properties.getProperty(argName, startDate.format(yyyy_MM_dd)).split("-");
             startDate = LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
+        } else if (!containsArg(ArgName.periodInDays.name()) && containsProperty(ArgName.periodInDays.name())) {
+            startDate = LocalDate.now().minusDays(periodInDays());
         }
         return startDate;
     }
