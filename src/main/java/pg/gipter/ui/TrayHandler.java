@@ -71,7 +71,7 @@ class TrayHandler {
         }
     }
 
-    private boolean canCreateTrayIcon() {
+    boolean canCreateTrayIcon() {
         return SystemTray.isSupported() && applicationProperties.isUseUI() && applicationProperties.isActiveTray();
     }
 
@@ -218,8 +218,10 @@ class TrayHandler {
     }
 
     void updateTrayLabels() {
-        trayPopupMenu.removeAll();
-        addMenuItemsToMenu(trayPopupMenu);
+        if (canCreateTrayIcon()) {
+            trayPopupMenu.removeAll();
+            addMenuItemsToMenu(trayPopupMenu);
+        }
     }
 
     boolean tryIconExists() {

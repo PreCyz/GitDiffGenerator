@@ -141,8 +141,10 @@ public class UILauncher implements Launcher {
     }
 
     public void updateTray(ApplicationProperties applicationProperties) {
-        trayHandler.setApplicationProperties(applicationProperties);
-        trayHandler.updateTrayLabels();
+        if (trayHandler != null && trayHandler.canCreateTrayIcon()) {
+            trayHandler.setApplicationProperties(applicationProperties);
+            trayHandler.updateTrayLabels();
+        }
     }
 
     public void hideToTray() {
