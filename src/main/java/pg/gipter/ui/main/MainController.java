@@ -461,6 +461,12 @@ public class MainController extends AbstractController {
                 uiLauncher.removeTray();
             }
         });
+
+        toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            String userFolder = toolkitUserFolderTextField.getText();
+            userFolder = userFolder.substring(0, userFolder.lastIndexOf("/") + 1) + newValue;
+            toolkitUserFolderTextField.setText(userFolder);
+        });
     }
 
     private void resetIndicatorProperties(Task task) {
