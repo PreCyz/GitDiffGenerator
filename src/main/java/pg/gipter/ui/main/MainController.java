@@ -9,6 +9,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
@@ -218,6 +220,7 @@ public class MainController extends AbstractController {
         progressIndicator.setVisible(false);
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
+        projectPathLabel.setTooltip(buildProjectPathsTooltip(projectPathLabel.getText()));
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -257,8 +260,19 @@ public class MainController extends AbstractController {
                 }
                 projectPathLabel.setText(result);
                 projectPathButton.setText(resources.getString("button.change"));
+                projectPathLabel.setTooltip(buildProjectPathsTooltip(result));
             }
         };
+    }
+
+    private Tooltip buildProjectPathsTooltip(String result) {
+        String[] paths = result.split(",");
+        StringBuilder builder = new StringBuilder();
+        Arrays.asList(paths).forEach(path -> builder.append(path).append("\n"));
+        Tooltip tooltip = new Tooltip(builder.toString());
+        tooltip.setTextAlignment(TextAlignment.LEFT);
+        tooltip.setFont(Font.font("Courier New", 14));
+        return tooltip;
     }
 
     private boolean isAddPath(ResourceBundle resource) {
@@ -442,11 +456,11 @@ public class MainController extends AbstractController {
         languageComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
-                    currentLanguage = languageComboBox.getValue();
-                    uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(createArgsFromUI()));
-                    uiLauncher.changeLanguage(languageComboBox.getValue());
-                }
-        );
+                            currentLanguage = languageComboBox.getValue();
+                            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(createArgsFromUI()));
+                            uiLauncher.changeLanguage(languageComboBox.getValue());
+                        }
+                );
 
         activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
