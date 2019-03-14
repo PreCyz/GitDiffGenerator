@@ -33,6 +33,7 @@ public class FXRunner extends Task<Void> implements Starter {
     }
 
     public void start() {
+        logger.info("{} started.", this.getClass().getName());
         boolean error = false;
         try {
             updateMessage(BundleUtils.getMsg("progress.start"));
@@ -67,6 +68,7 @@ public class FXRunner extends Task<Void> implements Starter {
             propertiesHelper.saveUploadInfo(status);
             updateProgress(5, 5);
             updateMessage(BundleUtils.getMsg("progress.finished", status));
+            logger.info("{} ended.", this.getClass().getName());
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
             String confirmationMsg = BundleUtils.getMsg("popup.confirmation.message", applicationProperties.toolkitUserFolder());

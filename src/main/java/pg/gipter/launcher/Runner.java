@@ -23,6 +23,7 @@ class Runner implements Starter {
     }
 
     public void start() {
+        logger.info("{} started.", this.getClass().getName());
         boolean error = false;
         try {
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
@@ -44,6 +45,7 @@ class Runner implements Starter {
             AlertHelper.displayWindow(errMsg, Alert.AlertType.ERROR);
         } finally {
             propertiesHelper.saveUploadInfo(error ? "FAIL" : "SUCCESS");
+            logger.info("{} ended.", this.getClass().getName());
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
             String confirmationMsg = BundleUtils.getMsg("popup.confirmation.message", applicationProperties.toolkitUserFolder());
