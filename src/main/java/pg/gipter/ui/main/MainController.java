@@ -407,11 +407,11 @@ public class MainController extends AbstractController {
         setAlertCommonAttributes(resource, alert);
 
         Optional<ButtonType> result = alert.showAndWait();
-        PropertiesHelper helper = new PropertiesHelper();
         if (result.orElse(createButton) == overrideButton) {
-            helper.saveToApplicationProperties(properties);
+            properties.replace(ArgName.preferredArgSource.name(), PreferredArgSource.FILE.name());
+            propertiesHelper.saveToApplicationProperties(properties);
         } else {
-            helper.saveToUIApplicationProperties(properties);
+            propertiesHelper.saveToUIApplicationProperties(properties);
         }
     }
 
