@@ -2,8 +2,10 @@ package pg.gipter.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.settings.ArgName;
 
 import java.io.*;
+import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -21,11 +23,28 @@ public class PropertiesHelper {
     public static final String UPLOAD_DATE_TIME_KEY = "lastUploadDateTime";
 
     public Optional<Properties> loadApplicationProperties() {
-        return loadProperties(APPLICATION_PROPERTIES);
+        Optional<Properties> properties = loadProperties(APPLICATION_PROPERTIES);
+        properties.ifPresent(this::decryptPassword);
+        return properties;
+    }
+
+    private void decryptPassword(Properties properties) {
+        if (properties.containsKey(ArgName.toolkitPassword.name())) {
+            try {
+                properties.replace(
+                        ArgName.toolkitPassword.name(),
+                        CryptoUtils.decrypt(properties.getProperty(ArgName.toolkitPassword.name()))
+                );
+            } catch (GeneralSecurityException | IOException e) {
+                logger.warn("Can not decode property.", e.getMessage());
+            }
+        }
     }
 
     public Optional<Properties> loadUIApplicationProperties() {
-        return loadProperties(UI_APPLICATION_PROPERTIES);
+        Optional<Properties> properties = loadProperties(UI_APPLICATION_PROPERTIES);
+        properties.ifPresent(this::decryptPassword);
+        return properties;
     }
 
     private Optional<Properties> loadProperties(String fileName) {
@@ -54,7 +73,21 @@ public class PropertiesHelper {
     }
 
     public void saveToApplicationProperties(Properties properties) {
+        encryptPassword(properties);
         saveProperties(properties, APPLICATION_PROPERTIES);
+    }
+
+    private void encryptPassword(Properties properties) {
+        if (properties.containsKey(ArgName.toolkitPassword.name())) {
+            try {
+                properties.replace(
+                        ArgName.toolkitPassword.name(),
+                        CryptoUtils.encrypt(properties.getProperty(ArgName.toolkitPassword.name()))
+                );
+            } catch (GeneralSecurityException e) {
+                logger.warn("Can not decode property.", e.getMessage());
+            }
+        }
     }
 
     public void saveUploadInfo(String status) {
@@ -65,6 +98,7 @@ public class PropertiesHelper {
     }
 
     public void saveToUIApplicationProperties(Properties properties) {
+        encryptPassword(properties);
         saveProperties(properties, UI_APPLICATION_PROPERTIES);
     }
 
