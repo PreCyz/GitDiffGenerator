@@ -5,9 +5,6 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -26,12 +23,10 @@ import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
 
-import java.awt.*;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -131,7 +126,7 @@ public class MainController extends AbstractController {
         setInitValues(resources);
         setProperties(resources);
         setActions(resources);
-        setListeners();
+        setListeners(resources);
         initTray();
     }
 
@@ -173,8 +168,7 @@ public class MainController extends AbstractController {
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
-        activeteTrayCheckBox.setSelected(applicationProperties.isActiveTray() && SystemTray.isSupported());
-        deamonButton.setVisible(activeteTrayCheckBox.isSelected());
+        activeteTrayCheckBox.setSelected(applicationProperties.isActiveTray() && uiLauncher.isTraySupported());
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
         if (StringUtils.nullOrEmpty(currentLanguage)) {
@@ -210,17 +204,16 @@ public class MainController extends AbstractController {
 
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
-
-        activeteTrayCheckBox.setDisable(!SystemTray.isSupported());
-
-        if (!applicationProperties.isActiveTray() || !SystemTray.isSupported()) {
-            deamonButton.setVisible(false);
-        }
-
+        activeteTrayCheckBox.setDisable(!uiLauncher.isTraySupported());
         progressIndicator.setVisible(false);
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
         projectPathLabel.setTooltip(buildProjectPathsTooltip(projectPathLabel.getText()));
+        if (uiLauncher.isTraySupported()) {
+            deamonButton.setText(resources.getString("button.deamon"));
+        } else {
+            deamonButton.setText(resources.getString("button.job"));
+        }
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -427,14 +420,18 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> deamonActionEventHandler() {
         return event -> {
-            String[] argsFromUI = createArgsFromUI();
-            propertiesHelper.saveToUIApplicationProperties(createProperties(argsFromUI));
-            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(argsFromUI);
-            if (uiAppProperties.isActiveTray()) {
-                uiLauncher.updateTray(uiAppProperties);
-                uiLauncher.hideToTray();
+            if (uiLauncher.isTraySupported()) {
+                String[] argsFromUI = createArgsFromUI();
+                propertiesHelper.saveToUIApplicationProperties(createProperties(argsFromUI));
+                ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(argsFromUI);
+                if (uiAppProperties.isActiveTray()) {
+                    uiLauncher.updateTray(uiAppProperties);
+                    uiLauncher.hideToTray();
+                } else {
+                    UILauncher.platformExit();
+                }
             } else {
-                UILauncher.platformExit();
+                uiLauncher.showJobWindow();
             }
         };
     }
@@ -452,7 +449,7 @@ public class MainController extends AbstractController {
         };
     }
 
-    private void setListeners() {
+    private void setListeners(final ResourceBundle resources) {
         languageComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
@@ -464,13 +461,13 @@ public class MainController extends AbstractController {
 
         activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                deamonButton.setVisible(true);
+                deamonButton.setText(resources.getString("button.deamon"));
                 ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
                 uiLauncher.setApplicationProperties(uiAppProperties);
                 uiLauncher.initTrayHandler();
                 uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
             } else {
-                deamonButton.setVisible(false);
+                deamonButton.setText(resources.getString("button.job"));
                 uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
                 uiLauncher.removeTray();
             }

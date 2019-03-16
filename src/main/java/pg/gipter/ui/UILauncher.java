@@ -125,7 +125,7 @@ public class UILauncher implements Launcher {
         System.exit(0);
     }
 
-    void showJobWindow() {
+    public void showJobWindow() {
         jobWindow = new Stage();
         jobWindow.initModality(Modality.WINDOW_MODAL);
         buildScene(jobWindow, WindowFactory.JOB.createWindow(applicationProperties, this));
@@ -227,5 +227,9 @@ public class UILauncher implements Launcher {
                 logger.warn("Can not restart the scheduler.", e);
             }
         }
+    }
+
+    public boolean isTraySupported() {
+        return trayHandler != null && trayHandler.canCreateTrayIcon();
     }
 }
