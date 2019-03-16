@@ -22,6 +22,7 @@ class Runner implements Starter {
         this.propertiesHelper = new PropertiesHelper();
     }
 
+    @Override
     public void start() {
         logger.info("{} started.", this.getClass().getName());
         boolean error = false;
