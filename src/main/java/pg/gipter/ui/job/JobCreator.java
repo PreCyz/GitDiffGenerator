@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import static org.quartz.TriggerBuilder.newTrigger;
 
-/**Created by Pawel Gawedzki on 12-Mar-2019.*/
+/** Created by Pawel Gawedzki on 12-Mar-2019. */
 public class JobCreator {
 
     private Properties data;
@@ -42,84 +42,100 @@ public class JobCreator {
         this.scheduler = scheduler;
     }
 
-    private Trigger createTriggerEveryMonth() {
-        String scheduleStart = startDateTime.format(ApplicationProperties.yyyy_MM_dd);
-
-        data.put(JobKey.TYPE.value(), JobType.EVERY_MONTH.name());
-        data.put(JobKey.DAY_OF_MONTH.value(), String.valueOf(dayOfMonth));
-        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
+    private void clearProperties() {
+        data.remove(JobKey.TYPE.value());
+        data.remove(JobKey.DAY_OF_MONTH.value());
+        data.remove(JobKey.SCHEDULE_START.value());
         data.remove(JobKey.CRON.value());
         data.remove(JobKey.HOUR_OF_THE_DAY.value());
         data.remove(JobKey.DAY_OF_WEEK.value());
+    }
+
+    private Trigger createTriggerEveryMonth() {
+        //0 0 12 1 * ? 	Every month on the 1st, at noon
+        String scheduleStart = startDateTime.format(ApplicationProperties.yyyy_MM_dd);
+
+        clearProperties();
+        data.put(JobKey.TYPE.value(), JobType.EVERY_MONTH.name());
+        data.put(JobKey.DAY_OF_MONTH.value(), String.valueOf(dayOfMonth));
+        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
+        data.put(JobKey.HOUR_OF_THE_DAY.value(), String.format("%d:%d", hourOfDay, minuteOfHour));
 
         return newTrigger()
                 .withIdentity("everyMonthTrigger", "everyMonthTriggerGroup")
                 .startNow()
-                .withSchedule(CronScheduleBuilder.monthlyOnDayAndHourAndMinute(
-                        dayOfMonth, hourOfDay, minuteOfHour)
-                )
+                .withSchedule(CronScheduleBuilder.monthlyOnDayAndHourAndMinute(dayOfMonth, hourOfDay, minuteOfHour))
                 .build();
     }
 
-    private Trigger createTriggerEvery2Weeks() {
-        String hourOfThDay = String.format("%d:%d", hourOfDay, minuteOfHour);
-        String scheduleStart = startDateTime.format(ApplicationProperties.yyyy_MM_dd);
-
+    private Trigger createTriggerEvery2Weeks() throws ParseException {
+        //0 0 12 */14 * ? 	Every 14 days at noon
+        clearProperties();
         data.put(JobKey.TYPE.value(), JobType.EVERY_2_WEEKS.name());
-        data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfThDay);
-        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
-        data.remove(JobKey.DAY_OF_MONTH.value());
-        data.remove(JobKey.CRON.value());
-        data.remove(JobKey.DAY_OF_WEEK.value());
+        data.put(JobKey.HOUR_OF_THE_DAY.value(), String.format("%d:%d", hourOfDay, minuteOfHour));
+        data.put(JobKey.SCHEDULE_START.value(), startDateTime.format(ApplicationProperties.yyyy_MM_dd));
 
-        Date startDate = DateBuilder.dateOf(hourOfDay, minuteOfHour, 0,
-                startDateTime.getDayOfMonth(), startDateTime.getMonthValue(), startDateTime.getYear()
+        int second = 0;
+        Date startDate = DateBuilder.dateOf(
+                hourOfDay,
+                minuteOfHour,
+                second,
+                startDateTime.getDayOfMonth(),
+                startDateTime.getMonthValue(),
+                startDateTime.getYear()
         );
+
+        String cronExpr = "0" + " " +
+                minuteOfHour + " " +
+                hourOfDay + " " +
+                "*/14" + " " +
+                "* " +
+                "?";
+        CronExpression expression = new CronExpression(cronExpr);
         return TriggerBuilder.newTrigger()
                 .withIdentity("every2WeeksTrigger", "every2WeeksTriggerGroup")
                 .startAt(startDate)
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .withIntervalInHours(14 * 24) // interval is actually set at 14 * 24 hours' worth of milliseconds
-                        .repeatForever())
+                .withSchedule(CronScheduleBuilder.cronSchedule(expression))
                 .build();
     }
 
     private Trigger createTriggerEveryWeek() {
+        //0 0 12 * * FRI - Every Friday at noon
         String hourOfThDay = String.format("%s:%s", hourOfDay, minuteOfHour);
         String scheduleStart = startDateTime.format(ApplicationProperties.yyyy_MM_dd);
 
+        clearProperties();
         data.put(JobKey.TYPE.value(), JobType.EVERY_WEEK.name());
         data.put(JobKey.DAY_OF_WEEK.value(), dayOfWeek.name());
         data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfThDay);
         data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
-        data.remove(JobKey.CRON.value());
-        data.remove(JobKey.DAY_OF_MONTH.value());
 
-        Date startDate = DateBuilder.dateOf(hourOfDay, minuteOfHour, 0,
-                startDateTime.getDayOfMonth(), startDateTime.getMonthValue(), startDateTime.getYear()
+        int second = 0;
+        Date startDate = DateBuilder.dateOf(
+                hourOfDay,
+                minuteOfHour,
+                second,
+                startDateTime.getDayOfMonth(),
+                startDateTime.getMonthValue(),
+                startDateTime.getYear()
         );
         return newTrigger()
                 .withIdentity("everyWeekTrigger", "everyWeekTriggerGroup")
                 .startAt(startDate)
-                .withSchedule(CronScheduleBuilder.weeklyOnDayAndHourAndMinute(dayOfWeek.getValue(), hourOfDay, 0))
+                .withSchedule(CronScheduleBuilder.weeklyOnDayAndHourAndMinute(dayOfWeek.getValue(), hourOfDay, minuteOfHour))
                 .build();
     }
 
     private Trigger createCronTrigger() throws ParseException {
+        clearProperties();
         data.put(JobKey.TYPE.value(), JobType.CRON.name());
         data.put(JobKey.CRON.value(), cronExpression);
-        data.remove(JobKey.HOUR_OF_THE_DAY.value());
-        data.remove(JobKey.DAY_OF_MONTH.value());
-        data.remove(JobKey.DAY_OF_WEEK.value());
-        data.remove(JobKey.SCHEDULE_START.value());
 
         CronExpression expression = new CronExpression(cronExpression);
-        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(expression);
-
         return newTrigger()
                 .withIdentity("cronTrigger", "cronTriggerGroup")
                 .startNow()
-                .withSchedule(cronScheduleBuilder)
+                .withSchedule(CronScheduleBuilder.cronSchedule(expression))
                 .build();
     }
 
