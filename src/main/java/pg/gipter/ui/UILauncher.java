@@ -163,7 +163,7 @@ public class UILauncher implements Launcher {
         this.scheduler = scheduler;
     }
 
-    void cancelJob() {
+    public void cancelJob() {
         try {
             if (scheduler != null) {
                 scheduler.shutdown();

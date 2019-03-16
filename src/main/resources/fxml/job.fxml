@@ -2,7 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.*?>
 <AnchorPane prefHeight="250.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="14.0" text="%job.clickWay.title">
@@ -37,12 +37,12 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="394.0" layoutY="14.0" prefHeight="185.0" prefWidth="315.0" text="%job.cronWay.title">
+      <TitledPane animated="false" collapsible="false" layoutX="394.0" layoutY="14.0" prefHeight="72.0" prefWidth="315.0" text="%job.cronWay.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="143.0" prefWidth="313.0">
                <children>
-                  <TextField fx:id="cronExpressionTextField" layoutX="131.0" layoutY="58.0" />
-                  <Label layoutX="14.0" layoutY="63.0" text="%job.cronWay.cronExp" />
+                  <TextField fx:id="cronExpressionTextField" layoutX="131.0" layoutY="10.0" />
+                  <Label layoutX="14.0" layoutY="15.0" text="%job.cronWay.cronExp" />
                </children>
             </AnchorPane>
          </content>
@@ -53,6 +53,34 @@
       <Button fx:id="scheduleButton" layoutX="343.0" layoutY="207.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="95.0" text="%job.schedule" textFill="#24bf31">
          <font>
             <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <TitledPane animated="false" collapsible="false" layoutX="394.0" layoutY="88.0" prefHeight="108.0" prefWidth="315.0" text="%job.definition.title">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="143.0" prefWidth="313.0">
+               <children>
+                  <Label layoutX="53.0" layoutY="9.0" text="%job.definition.type" />
+                  <Label layoutX="192.0" layoutY="9.0" text="%job.definition.details" />
+                  <Label fx:id="jobTypeLabel" layoutX="11.0" layoutY="41.0" prefHeight="15.0" prefWidth="115.0">
+                     <font>
+                        <Font name="System Bold" size="10.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="jobDetailsLabel" layoutX="130.0" layoutY="27.0" prefHeight="45.0" prefWidth="169.0">
+                     <font>
+                        <Font name="System Bold" size="10.0" />
+                     </font>
+                  </Label>
+               </children>
+            </AnchorPane>
+         </content>
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </TitledPane>
+      <Button fx:id="cancelJobButton" layoutX="616.0" layoutY="207.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="93.0" text="%job.cancel" textFill="#32a1c9">
+         <font>
+            <Font name="System Bold" size="12.0" />
          </font>
       </Button>
    </children>

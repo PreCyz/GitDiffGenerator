@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -50,6 +51,12 @@ public class JobController extends AbstractController {
     private DatePicker startDatePicker;
     @FXML
     private Button scheduleButton;
+    @FXML
+    private Label jobTypeLabel;
+    @FXML
+    private Label jobDetailsLabel;
+    @FXML
+    private Button cancelJobButton;
 
     private static Scheduler scheduler;
     private final PropertiesHelper propertiesHelper;
@@ -78,6 +85,31 @@ public class JobController extends AbstractController {
         minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
         startDatePicker.setValue(LocalDate.now());
+        setJobDetailsControls();
+        Optional<Properties> data = propertiesHelper.loadDataProperties();
+        if (data.isPresent()) {
+            Properties dataProp = data.get();
+            if (dataProp.containsKey(JobKey.TYPE.value())) {
+                cancelJobButton.setVisible(true);
+                jobTypeLabel.setAlignment(Pos.TOP_LEFT);
+                jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
+                JobType jobType = JobType.valueOf(dataProp.getProperty(JobKey.TYPE.value()));
+                jobTypeLabel.setText(jobType.name());
+                if (jobType == JobType.CRON) {
+                    jobDetailsLabel.setText(dataProp.getProperty(JobKey.CRON.value()));
+                } else {
+                    String details = StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.SCHEDULE_START.value())) ? "" :
+                            (JobKey.SCHEDULE_START.name() + ": " + dataProp.getProperty(JobKey.SCHEDULE_START.value()));
+                    details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.DAY_OF_MONTH.value())) ? "" :
+                            ("\n" + JobKey.DAY_OF_MONTH.name() + ": " + dataProp.getProperty(JobKey.DAY_OF_MONTH.value()));
+                    details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.DAY_OF_WEEK.value())) ? "" :
+                            ("\n" + JobKey.DAY_OF_WEEK.name() + ": " + dataProp.getProperty(JobKey.DAY_OF_WEEK.value()));
+                    details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.HOUR_OF_THE_DAY.value())) ? "" :
+                            ("\n" + JobKey.HOUR_OF_THE_DAY.name() + ": " + dataProp.getProperty(JobKey.HOUR_OF_THE_DAY.value()));
+                    jobDetailsLabel.setText(details);
+                }
+            }
+        }
     }
 
     private void setActions(ResourceBundle resources) {
@@ -85,6 +117,22 @@ public class JobController extends AbstractController {
         everyMonthRadioButton.setOnAction(everyMonthAction());
         every2WeeksRadioButton.setOnAction(every2WeeksActionEvent());
         everyWeekRadioButton.setOnAction(everyWeekActionEvent());
+        cancelJobButton.setOnAction(cancelJobActionEventHandler());
+    }
+
+    private EventHandler<ActionEvent> cancelJobActionEventHandler() {
+        return event -> {
+            uiLauncher.cancelJob();
+            setJobDetailsControls();
+        };
+    }
+
+    private void setJobDetailsControls() {
+        jobTypeLabel.setText("N/A");
+        jobTypeLabel.setAlignment(Pos.CENTER);
+        jobDetailsLabel.setText("N/A");
+        jobDetailsLabel.setAlignment(Pos.CENTER);
+        cancelJobButton.setVisible(false);
     }
 
     private void setProperties() {
@@ -133,6 +181,7 @@ public class JobController extends AbstractController {
             public String toString(LocalDate object) {
                 return object != null ? object.format(ApplicationProperties.yyyy_MM_dd) : "";
             }
+
             @Override
             public LocalDate fromString(String string) {
                 return LocalDate.parse(string, ApplicationProperties.yyyy_MM_dd);
