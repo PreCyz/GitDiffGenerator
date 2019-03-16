@@ -95,7 +95,7 @@
                   <Label layoutX="10.0" layoutY="129.0" prefHeight="17.0" prefWidth="174.0" text="%launch.panel.saveCurrentConfiguration" />
                   <Label layoutX="10.0" layoutY="101.0" text="%launch.panel.activateTray" />
                   <CheckBox fx:id="activeteTrayCheckBox" layoutX="195.0" layoutY="103.0" mnemonicParsing="false" />
-                  <Button fx:id="saveConfigurationButton" layoutX="195.0" layoutY="127.0" mnemonicParsing="false" prefWidth="50.0" text="%button.save">
+                  <Button fx:id="saveConfigurationButton" layoutX="195.0" layoutY="127.0" mnemonicParsing="false" prefWidth="56.0" text="%button.save">
                      <font>
                         <Font name="System Bold" size="11.0" />
                      </font>
@@ -142,12 +142,12 @@
             </font>
         </TitledPane>
       <ComboBox fx:id="languageComboBox" layoutX="11.0" layoutY="743.0" prefWidth="65.0" />
-      <Button fx:id="deamonButton" layoutX="459.0" layoutY="743.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="74.0" text="%button.deamon" textFill="#32a1c9">
+      <Button fx:id="deamonButton" layoutX="452.0" layoutY="743.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Button>
-      <Button fx:id="exitButton" layoutX="543.0" layoutY="743.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="74.0" text="%button.exit" textFill="#0d0d0d">
+      <Button fx:id="exitButton" layoutX="541.0" layoutY="743.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="77.0" text="%button.exit" textFill="#0d0d0d">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
