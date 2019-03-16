@@ -9,23 +9,23 @@
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="155.0" prefWidth="378.0">
                <children>
-                  <ComboBox fx:id="dayNameComboBox" layoutX="98.0" layoutY="85.0" prefWidth="117.0" />
-                  <ComboBox fx:id="dayOfMonthComboBox" layoutX="98.0" layoutY="48.0" prefWidth="60.0" />
-                  <ComboBox fx:id="hourOfDayComboBox" layoutX="98.0" layoutY="11.0" prefWidth="60.0" />
+                  <ComboBox fx:id="dayNameComboBox" layoutX="112.0" layoutY="85.0" prefWidth="130.0" />
+                  <ComboBox fx:id="dayOfMonthComboBox" layoutX="112.0" layoutY="48.0" prefWidth="60.0" />
+                  <ComboBox fx:id="hourOfDayComboBox" layoutX="112.0" layoutY="11.0" prefWidth="60.0" />
                   <Label layoutX="10.0" layoutY="54.0" text="%job.clickWay.dayOfMonth" />
                   <Label layoutX="10.0" layoutY="16.0" text="%job.clickWay.hourOfTheDay" />
                   <Label layoutX="10.0" layoutY="89.0" text="%job.clickWay.dayOfWeek" />
-                  <RadioButton fx:id="everyMonthRadioButton" layoutX="269.0" layoutY="10.0" mnemonicParsing="false" text="%job.clickWay.everyMonth">
+                  <RadioButton fx:id="everyMonthRadioButton" layoutX="255.0" layoutY="72.0" mnemonicParsing="false" text="%job.clickWay.everyMonth">
                      <toggleGroup>
                         <ToggleGroup fx:id="triggerOptionsToggleGroup" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton fx:id="every2WeeksRadioButton" layoutX="269.0" layoutY="37.0" mnemonicParsing="false" text="%job.clickWay.every2Weeks" toggleGroup="$triggerOptionsToggleGroup" />
-                  <RadioButton fx:id="everyWeekRadioButton" layoutX="269.0" layoutY="64.0" mnemonicParsing="false" selected="true" text="%job.clickWay.everyWeek" toggleGroup="$triggerOptionsToggleGroup" />
+                  <RadioButton fx:id="every2WeeksRadioButton" layoutX="255.0" layoutY="99.0" mnemonicParsing="false" text="%job.clickWay.every2Weeks" toggleGroup="$triggerOptionsToggleGroup" />
+                  <RadioButton fx:id="everyWeekRadioButton" layoutX="255.0" layoutY="126.0" mnemonicParsing="false" selected="true" text="%job.clickWay.everyWeek" toggleGroup="$triggerOptionsToggleGroup" />
                   <Label layoutX="10.0" layoutY="126.0" text="%job.clickWay.startDate" />
-                  <DatePicker fx:id="startDatePicker" layoutX="98.0" layoutY="123.0" prefHeight="27.0" prefWidth="117.0" />
-                  <ComboBox fx:id="minuteComboBox" layoutX="182.0" layoutY="10.0" prefWidth="60.0" />
-                  <Label layoutX="168.0" layoutY="11.0" text=":">
+                  <DatePicker fx:id="startDatePicker" layoutX="112.0" layoutY="121.0" prefWidth="130.0" />
+                  <ComboBox fx:id="minuteComboBox" layoutX="196.0" layoutY="10.0" prefWidth="60.0" />
+                  <Label layoutX="182.0" layoutY="11.0" text=":">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
@@ -50,7 +50,7 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </TitledPane>
-      <Button fx:id="scheduleButton" layoutX="343.0" layoutY="207.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="95.0" text="%job.schedule" textFill="#24bf31">
+      <Button fx:id="scheduleButton" layoutX="341.0" layoutY="207.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="102.0" text="%job.schedule" textFill="#24bf31">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -66,7 +66,7 @@
                         <Font name="System Bold" size="10.0" />
                      </font>
                   </Label>
-                  <Label fx:id="jobDetailsLabel" layoutX="130.0" layoutY="27.0" prefHeight="45.0" prefWidth="169.0">
+                  <Label fx:id="jobDetailsLabel" layoutX="130.0" layoutY="27.0" prefHeight="45.0" prefWidth="175.0">
                      <font>
                         <Font name="System Bold" size="10.0" />
                      </font>

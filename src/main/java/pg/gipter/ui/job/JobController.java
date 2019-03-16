@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
 
@@ -96,7 +97,7 @@ public class JobController extends AbstractController {
                 JobType jobType = JobType.valueOf(dataProp.getProperty(JobKey.TYPE.value()));
                 jobTypeLabel.setText(jobType.name());
                 if (jobType == JobType.CRON) {
-                    jobDetailsLabel.setText(dataProp.getProperty(JobKey.CRON.value()));
+                    jobDetailsLabel.setText(BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobKey.CRON.value())));
                 } else {
                     String details = StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.SCHEDULE_START.value())) ? "" :
                             (JobKey.SCHEDULE_START.name() + ": " + dataProp.getProperty(JobKey.SCHEDULE_START.value()));
