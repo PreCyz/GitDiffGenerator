@@ -1,16 +1,13 @@
 package pg.gipter.util;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.util.Base64;
 
 final class CryptoUtils {
 
@@ -33,10 +30,10 @@ final class CryptoUtils {
     }
 
     private static String base64Encode(byte[] bytes) {
-        return new BASE64Encoder().encode(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
-    static String decrypt(String property) throws GeneralSecurityException, IOException {
+    static String decrypt(String property) throws GeneralSecurityException {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(CIPHER);
         SecretKey key = keyFactory.generateSecret(new PBEKeySpec(KEY_SPEC));
         Cipher pbeCipher = Cipher.getInstance(CIPHER);
@@ -44,8 +41,8 @@ final class CryptoUtils {
         return new String(pbeCipher.doFinal(base64Decode(property)), StandardCharsets.UTF_8);
     }
 
-    private static byte[] base64Decode(String property) throws IOException {
-        return new BASE64Decoder().decodeBuffer(property);
+    private static byte[] base64Decode(String property) {
+        return Base64.getDecoder().decode(property);
     }
 
 }

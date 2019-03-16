@@ -35,7 +35,7 @@ public class PropertiesHelper {
                         ArgName.toolkitPassword.name(),
                         CryptoUtils.decrypt(properties.getProperty(ArgName.toolkitPassword.name()))
                 );
-            } catch (GeneralSecurityException | IOException e) {
+            } catch (GeneralSecurityException e) {
                 logger.warn("Can not decode property.", e.getMessage());
             }
         }
