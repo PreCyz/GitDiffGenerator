@@ -58,6 +58,8 @@ public class JobController extends AbstractController {
     private Label jobDetailsLabel;
     @FXML
     private Button cancelJobButton;
+    @FXML
+    private Label lastExecutionLabel;
 
     private static Scheduler scheduler;
     private final PropertiesHelper propertiesHelper;
@@ -86,29 +88,44 @@ public class JobController extends AbstractController {
         minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
         startDatePicker.setValue(LocalDate.now());
-        setJobDetailsControls();
+        setDefaultsForJobDetailsControls();
         Optional<Properties> data = propertiesHelper.loadDataProperties();
         if (data.isPresent()) {
-            Properties dataProp = data.get();
-            if (dataProp.containsKey(JobKey.TYPE.value())) {
-                cancelJobButton.setVisible(true);
-                jobTypeLabel.setAlignment(Pos.TOP_LEFT);
-                jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
-                JobType jobType = JobType.valueOf(dataProp.getProperty(JobKey.TYPE.value()));
-                jobTypeLabel.setText(jobType.name());
-                if (jobType == JobType.CRON) {
-                    jobDetailsLabel.setText(BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobKey.CRON.value())));
-                } else {
-                    String details = StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.SCHEDULE_START.value())) ? "" :
-                            (JobKey.SCHEDULE_START.name() + ": " + dataProp.getProperty(JobKey.SCHEDULE_START.value()));
-                    details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.DAY_OF_MONTH.value())) ? "" :
-                            ("\n" + JobKey.DAY_OF_MONTH.name() + ": " + dataProp.getProperty(JobKey.DAY_OF_MONTH.value()));
-                    details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.DAY_OF_WEEK.value())) ? "" :
-                            ("\n" + JobKey.DAY_OF_WEEK.name() + ": " + dataProp.getProperty(JobKey.DAY_OF_WEEK.value()));
-                    details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.HOUR_OF_THE_DAY.value())) ? "" :
-                            ("\n" + JobKey.HOUR_OF_THE_DAY.name() + ": " + dataProp.getProperty(JobKey.HOUR_OF_THE_DAY.value()));
-                    jobDetailsLabel.setText(details);
-                }
+            setDefinedJobDetails(data.get());
+            setLastExecutionDetails(data.get());
+        } else {
+            lastExecutionLabel.setText("");
+        }
+    }
+
+    private void setLastExecutionDetails(Properties data) {
+        if (data.containsKey(PropertiesHelper.UPLOAD_STATUS_KEY) && data.containsKey(PropertiesHelper.UPLOAD_DATE_TIME_KEY)) {
+            String uploadInfo = String.format("%s [%s]",
+                    data.getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
+                    data.getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
+            );
+            lastExecutionLabel.setText(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+        }
+    }
+
+    private void setDefinedJobDetails(Properties dataProp) {
+        if (dataProp.containsKey(JobKey.TYPE.value())) {
+            cancelJobButton.setVisible(true);
+            jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
+            JobType jobType = JobType.valueOf(dataProp.getProperty(JobKey.TYPE.value()));
+            jobTypeLabel.setText(jobType.name());
+            if (jobType == JobType.CRON) {
+                jobDetailsLabel.setText(BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobKey.CRON.value())));
+            } else {
+                String details = StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.SCHEDULE_START.value())) ? "" :
+                        (JobKey.SCHEDULE_START.name() + ": " + dataProp.getProperty(JobKey.SCHEDULE_START.value()));
+                details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.DAY_OF_MONTH.value())) ? "" :
+                        ("\n" + JobKey.DAY_OF_MONTH.name() + ": " + dataProp.getProperty(JobKey.DAY_OF_MONTH.value()));
+                details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.DAY_OF_WEEK.value())) ? "" :
+                        ("\n" + JobKey.DAY_OF_WEEK.name() + ": " + dataProp.getProperty(JobKey.DAY_OF_WEEK.value()));
+                details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.HOUR_OF_THE_DAY.value())) ? "" :
+                        ("\n" + JobKey.HOUR_OF_THE_DAY.name() + ": " + dataProp.getProperty(JobKey.HOUR_OF_THE_DAY.value()));
+                jobDetailsLabel.setText(details);
             }
         }
     }
@@ -124,15 +141,15 @@ public class JobController extends AbstractController {
     private EventHandler<ActionEvent> cancelJobActionEventHandler() {
         return event -> {
             uiLauncher.cancelJob();
-            setJobDetailsControls();
+            setDefaultsForJobDetailsControls();
         };
     }
 
-    private void setJobDetailsControls() {
+    private void setDefaultsForJobDetailsControls() {
         jobTypeLabel.setText("N/A");
         jobTypeLabel.setAlignment(Pos.CENTER);
         jobDetailsLabel.setText("N/A");
-        jobDetailsLabel.setAlignment(Pos.CENTER);
+        jobDetailsLabel.setAlignment(Pos.TOP_CENTER);
         cancelJobButton.setVisible(false);
     }
 

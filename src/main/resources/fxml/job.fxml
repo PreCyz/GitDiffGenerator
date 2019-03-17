@@ -61,7 +61,7 @@
                <children>
                   <Label layoutX="53.0" layoutY="9.0" text="%job.definition.type" />
                   <Label layoutX="192.0" layoutY="9.0" text="%job.definition.details" />
-                  <Label fx:id="jobTypeLabel" layoutX="11.0" layoutY="41.0" prefHeight="15.0" prefWidth="115.0">
+                  <Label fx:id="jobTypeLabel" layoutX="11.0" layoutY="27.0" prefHeight="15.0" prefWidth="115.0">
                      <font>
                         <Font name="System Bold" size="10.0" />
                      </font>
@@ -83,5 +83,10 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
+      <Label fx:id="lastExecutionLabel" layoutX="10.0" layoutY="217.0">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
