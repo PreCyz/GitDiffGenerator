@@ -131,9 +131,13 @@ public class MainController extends AbstractController {
     }
 
     private void initTray() {
-        if (applicationProperties.isActiveTray()) {
+        if (isTrayActivated()) {
             uiLauncher.initTrayHandler();
         }
+    }
+
+    private boolean isTrayActivated() {
+        return uiLauncher.isTraySupported() && applicationProperties.isActiveTray();
     }
 
     private void setInitValues(ResourceBundle resources) {
@@ -168,7 +172,7 @@ public class MainController extends AbstractController {
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
-        activeteTrayCheckBox.setSelected(applicationProperties.isActiveTray() && uiLauncher.isTraySupported());
+        activeteTrayCheckBox.setSelected(isTrayActivated());
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
         if (StringUtils.nullOrEmpty(currentLanguage)) {
@@ -209,7 +213,7 @@ public class MainController extends AbstractController {
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
         projectPathLabel.setTooltip(buildProjectPathsTooltip(projectPathLabel.getText()));
-        if (uiLauncher.isTraySupported() && activeteTrayCheckBox.isSelected()) {
+        if (isTrayActivated()) {
             deamonButton.setText(resources.getString("button.deamon"));
         } else {
             deamonButton.setText(resources.getString("button.job"));
