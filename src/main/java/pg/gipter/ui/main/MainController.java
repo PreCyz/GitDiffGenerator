@@ -123,11 +123,11 @@ public class MainController extends AbstractController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
+        initTray();
         setInitValues(resources);
         setProperties(resources);
         setActions(resources);
         setListeners(resources);
-        initTray();
     }
 
     private void initTray() {
@@ -209,7 +209,7 @@ public class MainController extends AbstractController {
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
         projectPathLabel.setTooltip(buildProjectPathsTooltip(projectPathLabel.getText()));
-        if (uiLauncher.isTraySupported()) {
+        if (uiLauncher.isTraySupported() && activeteTrayCheckBox.isSelected()) {
             deamonButton.setText(resources.getString("button.deamon"));
         } else {
             deamonButton.setText(resources.getString("button.job"));
@@ -429,7 +429,7 @@ public class MainController extends AbstractController {
                     uiLauncher.updateTray(uiAppProperties);
                     uiLauncher.hideToTray();
                 } else {
-                    UILauncher.platformExit();
+                    uiLauncher.showJobWindow();
                 }
             } else {
                 uiLauncher.showJobWindow();

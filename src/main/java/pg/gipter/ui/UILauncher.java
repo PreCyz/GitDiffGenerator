@@ -23,6 +23,7 @@ import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -230,6 +231,6 @@ public class UILauncher implements Launcher {
     }
 
     public boolean isTraySupported() {
-        return trayHandler != null && trayHandler.canCreateTrayIcon();
+        return (trayHandler != null || SystemTray.isSupported()) && applicationProperties.isUseUI();
     }
 }
