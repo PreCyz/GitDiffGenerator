@@ -55,7 +55,7 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Button>
-      <TitledPane animated="false" collapsible="false" layoutX="394.0" layoutY="88.0" prefHeight="108.0" prefWidth="315.0" text="%job.definition.title">
+      <TitledPane animated="false" collapsible="false" layoutX="394.0" layoutY="88.0" prefHeight="111.0" prefWidth="315.0" text="%job.definition.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="143.0" prefWidth="313.0">
                <children>
