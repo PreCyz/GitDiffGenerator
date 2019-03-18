@@ -360,7 +360,8 @@ public class MainController extends AbstractController {
             argList.add(ArgName.itemFileNamePrefix + "=" + itemFileNamePrefixTextField.getText());
         }
 
-        if (!startDatePicker.getValue().format(yyyy_MM_dd).equals(ArgName.startDate.defaultValue())) {
+        if (!startDatePicker.getValue().format(yyyy_MM_dd).equals(ArgName.startDate.defaultValue()) &&
+                !startDatePicker.getValue().isEqual(LocalDate.now().minusDays(Integer.valueOf(periodInDaysTextField.getText())))) {
             argList.add(ArgName.startDate + "=" + startDatePicker.getValue().format(yyyy_MM_dd));
         }
         if (!endDatePicker.getValue().format(yyyy_MM_dd).equals(ArgName.endDate.defaultValue())) {
