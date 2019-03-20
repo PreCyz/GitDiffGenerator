@@ -187,11 +187,17 @@ final class ArgExtractor {
         return StringUtils.getBoolean(ArgName.useUI.defaultValue());
     }
 
-    public boolean isActiveTray() {
+    boolean isActiveTray() {
         if (containsArg(ArgName.activeTray.name())) {
             return StringUtils.getBoolean(getValue(ArgName.activeTray, ArgName.activeTray.defaultValue()));
         }
         return StringUtils.getBoolean(ArgName.activeTray.defaultValue());
+    }
 
+    boolean isSilentMode() {
+        if (containsArg(ArgName.silentMode.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.silentMode, ArgName.silentMode.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.silentMode.defaultValue());
     }
 }

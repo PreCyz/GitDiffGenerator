@@ -48,11 +48,13 @@ public class UILauncher implements Launcher {
     private TrayHandler trayHandler;
     private Scheduler scheduler;
     private PropertiesHelper propertiesHelper;
+    private boolean silentMode;
 
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
         this.primaryStage = primaryStage;
         this.applicationProperties = applicationProperties;
         propertiesHelper = new PropertiesHelper();
+        silentMode = applicationProperties.isSilentMode();
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -63,11 +65,21 @@ public class UILauncher implements Launcher {
         return scheduler;
     }
 
+    boolean isSilentMode() {
+        return silentMode;
+    }
+
+    void setSilentMode(boolean silentMode) {
+        this.silentMode = silentMode;
+    }
+
     public void initTrayHandler() {
         trayHandler = new TrayHandler(this, applicationProperties);
         if (trayHandler.tryIconExists()) {
+            logger.info("Updating tray icon.", silentMode);
             trayHandler.updateTrayLabels();
         } else {
+            logger.info("Initializing tray icon.", silentMode);
             trayHandler.createTrayIcon();
             scheduleJobIfExists();
         }
@@ -75,11 +87,26 @@ public class UILauncher implements Launcher {
 
     @Override
     public void execute() {
-        logger.info("Launching UI.");
+        if (!isTraySupported() && silentMode) {
+            logger.info("Tray icon is not supported. Can't launch in silent mode. Program is terminated");
+            Platform.exit();
+        }
+        logger.info("Launching UI in silent mode: [{}].", silentMode);
+        initTray();
+        if (!silentMode) {
+            buildAndShowMainWindow();
+        }
+    }
+
+    void buildAndShowMainWindow() {
         buildScene(
                 primaryStage,
                 WindowFactory.MAIN.createWindow(applicationProperties, this)
         );
+        showMainWindow();
+    }
+
+    void showMainWindow() {
         primaryStage.show();
     }
 
@@ -230,7 +257,25 @@ public class UILauncher implements Launcher {
         }
     }
 
+    public boolean isTrayActivated() {
+        return isTraySupported() && applicationProperties.isActiveTray();
+    }
+
     public boolean isTraySupported() {
         return (trayHandler != null || SystemTray.isSupported()) && applicationProperties.isUseUI();
+    }
+
+    private void initTray() {
+        if (isTrayActivated()) {
+            initTrayHandler();
+        }
+    }
+
+    void setMainOnCloseRequest(EventHandler<WindowEvent> trayOnCloseEventHandler) {
+        primaryStage.setOnCloseRequest(trayOnCloseEventHandler);
+    }
+
+    void hideMainWindow() {
+        primaryStage.hide();
     }
 }

@@ -120,6 +120,10 @@ public abstract class ApplicationProperties {
         return version;
     }
 
+    public final boolean isSilentMode() {
+        return argExtractor.isSilentMode();
+    }
+
     protected final String log() {
         return  "version='" + version() + '\'' +
                 ", authors='" + authors() + '\'' +
@@ -137,6 +141,7 @@ public abstract class ApplicationProperties {
                 ", preferredArgSource='" + preferredArgSource() + '\'' +
                 ", skipRemote='" + isSkipRemote() + '\'' +
                 ", useUI='" + isUseUI() + '\'' +
+                ", silentMode='" + isSilentMode() + '\'' +
                 ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
                 ", toolkitUsername='" + toolkitUsername() + '\'' +
                 ", toolkitUrl='" + toolkitUrl() + '\'' +

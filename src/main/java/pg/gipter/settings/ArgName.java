@@ -28,6 +28,7 @@ public enum ArgName {
     preferredArgSource(PreferredArgSource.CLI.name()),
     useUI("Y"),
     activeTray("Y"),
+    silentMode("N"),
 
     toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
     toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),

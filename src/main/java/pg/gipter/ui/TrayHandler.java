@@ -2,7 +2,6 @@ package pg.gipter.ui;
 
 import javafx.application.Platform;
 import javafx.event.EventHandler;
-import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,6 @@ class TrayHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(TrayHandler.class);
 
-    private final Stage stage;
     private ApplicationProperties applicationProperties;
     private UILauncher uiLauncher;
     private static TrayIcon trayIcon;
@@ -36,7 +34,6 @@ class TrayHandler {
 
     TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
         this.uiLauncher = uiLauncher;
-        this.stage = uiLauncher.currentWindow();
         this.applicationProperties = applicationProperties;
         this.propertiesHelper = new PropertiesHelper();
     }
@@ -47,7 +44,7 @@ class TrayHandler {
 
     void createTrayIcon() {
         if (canCreateTrayIcon()) {
-            stage.setOnCloseRequest(trayOnCloseEventHandler());
+            uiLauncher.setMainOnCloseRequest(trayOnCloseEventHandler());
 
             Platform.setImplicitExit(false);
             SystemTray tray = SystemTray.getSystemTray();
@@ -67,7 +64,7 @@ class TrayHandler {
                 logger.error("Error when creating tray.", e);
             }
         } else {
-            stage.setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
+            uiLauncher.setMainOnCloseRequest(AbstractController.regularOnCloseEventHandler());
         }
     }
 
@@ -162,7 +159,14 @@ class TrayHandler {
     }
 
     private ActionListener showActionListener() {
-        return e -> Platform.runLater(stage::show);
+        return e -> Platform.runLater(() -> {
+            if (uiLauncher.isSilentMode()) {
+                uiLauncher.setSilentMode(false);
+                uiLauncher.buildAndShowMainWindow();
+            } else {
+                uiLauncher.showMainWindow();
+            }
+        });
     }
 
     private ActionListener closeActionListener() {
@@ -193,7 +197,7 @@ class TrayHandler {
     void hide() {
         Platform.runLater(() -> {
             if (SystemTray.isSupported()) {
-                stage.hide();
+                uiLauncher.hideMainWindow();
             } else {
                 UILauncher.platformExit();
             }
