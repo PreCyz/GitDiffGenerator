@@ -6,7 +6,7 @@
 
     <groupId>pg.gipter</groupId>
     <artifactId>Gipter</artifactId>
-    <version>3.3.1</version>
+    <version>3.4</version>
     <packaging>jar</packaging>
 
     <build>
@@ -168,6 +168,11 @@
             <version>2.3.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.vatbub</groupId>
+            <artifactId>mslinks</artifactId>
+            <version>1.0.5</version>
+        </dependency>
 
         <!--Unit tests-->
         <dependency>

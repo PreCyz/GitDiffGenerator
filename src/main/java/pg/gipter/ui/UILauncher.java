@@ -8,12 +8,15 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import mslinks.ShellLink;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.Main;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.ArgName;
 import pg.gipter.ui.job.GipterJob;
 import pg.gipter.ui.job.JobCreator;
 import pg.gipter.ui.job.JobKey;
@@ -24,8 +27,10 @@ import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -91,10 +96,49 @@ public class UILauncher implements Launcher {
             logger.info("Tray icon is not supported. Can't launch in silent mode. Program is terminated");
             Platform.exit();
         }
+        setStartOnStartup();
         logger.info("Launching UI in silent mode: [{}].", silentMode);
         initTray();
         if (!silentMode) {
             buildAndShowMainWindow();
+        }
+    }
+
+    private void setStartOnStartup() {
+        logger.info("Checking if Gipter can be started on system startup.");
+        if (!isTraySupported()) {
+            logger.info("Tray not supported. Can not set start on startup.");
+            return;
+        }
+
+        String platform = System.getProperty("os.name");
+        if (platform.startsWith("Windows")) {
+            String systemUsername = System.getProperty("user.name");
+
+            String shortcutLnkPath = String.format("C:\\Users\\%s\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\" +
+                            "Programs\\Startup\\Gipter.lnk", systemUsername);
+
+            if (!new File(shortcutLnkPath).exists()) {
+                logger.info("Creating shortcut and placing it in startup folder.");
+                try {
+                    File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                    String workingDir = jarFile.getPath().replace(jarFile.getName(), "");
+                    ShellLink shellLink = ShellLink.createLink(jarFile.getAbsolutePath())
+                            .setWorkingDir(workingDir)
+                            .setIconLocation("img/chicken-tray.gif")
+                            .setCMDArgs(ArgName.silentMode.name() + "=" + Boolean.TRUE)
+                            .saveTo(shortcutLnkPath);
+                    logger.info("Shortcut located in startup folder [{}].", shortcutLnkPath);
+                    logger.info("Link working dir {}", shellLink.getWorkingDir());
+                    logger.info("Link target {}", shellLink.resolveTarget());
+                    logger.info("Link arguments [{}]", shellLink.getCMDArgs());
+                } catch (IOException | URISyntaxException e) {
+                    logger.warn("Can not create shortcut file and place it startup folder.", e);
+                }
+                logger.info("Shortcut created and placed in Windows startup folder.");
+            } else {
+                logger.info("Gipter have already been set to start on startup. Shortcut already exists [{}]. ", shortcutLnkPath);
+            }
         }
     }
 
