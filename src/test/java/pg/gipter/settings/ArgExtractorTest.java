@@ -543,4 +543,31 @@ class ArgExtractorTest {
 
         assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
     }
+
+    @Test
+    void givenNoSilentMode_whenIsSilentMode_thenReturnFalse() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        boolean actual = argExtractor.isSilentMode();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenSilentModeN_whenIsSilentMode_thenReturnFalse() {
+        argExtractor = new ArgExtractor(new String[]{"silentMode=N"});
+
+        boolean actual = argExtractor.isSilentMode();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenSilentModeY_whenIsSilentMode_thenReturnTrue() {
+        argExtractor = new ArgExtractor(new String[]{"silentMode=Y"});
+
+        boolean actual = argExtractor.isSilentMode();
+
+        assertThat(actual).isTrue();
+    }
 }
