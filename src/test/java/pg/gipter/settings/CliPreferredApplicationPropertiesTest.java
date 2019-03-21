@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 class CliPreferredApplicationPropertiesTest {
 
-    private ApplicationProperties applicationProperties;
+    private CliPreferredApplicationProperties applicationProperties;
 
     private PropertiesHelper mockPropertiesLoader(Properties properties) {
         PropertiesHelper loader = mock(PropertiesHelper.class);
@@ -1300,5 +1300,133 @@ class CliPreferredApplicationPropertiesTest {
         boolean actual = applicationProperties.isUseUI();
 
         assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnDefault() {
+        String[] args = {};
+        applicationProperties = new CliPreferredApplicationProperties(args);
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
+    }
+
+    @Test
+    void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
+        String[] args = {"toolkitUsername=xxx"};
+        applicationProperties = new CliPreferredApplicationProperties(args);
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "XXX");
+    }
+
+    @Test
+    void givenToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
+        String[] args = {"toolkitUsername=xxx"};
+        Properties props = new Properties();
+        props.put("toolkitUsername", "aaa");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "XXX");
+    }
+
+    @Test
+    void givenNoToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("toolkitUsername", "aaa");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
+    }
+
+    @Test
+    void givenToolkitUserCliAndCliCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomFolder() {
+        String[] args = {"toolkitCustomUserFolder=qqq", "toolkitUsername=aaa"};
+        applicationProperties = new CliPreferredApplicationProperties(args);
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "QQQ");
+    }
+
+    @Test
+    void givenNoToolkitUserCliAndCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomUserFolder() {
+        String[] args = {"toolkitCustomUserFolder=qqq"};
+        Properties props = new Properties();
+        props.put("toolkitCustomUserFolder", "aaa");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "QQQ");
+    }
+
+    @Test
+    void givenToolkitUserCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomUserFolder() {
+        String[] args = {"toolkitUsername=qqq"};
+        Properties props = new Properties();
+        props.put("toolkitCustomUserFolder", "aaa");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "QQQ");
+    }
+
+    @Test
+    void givenCliCustomUserFolder_whenToolkitCustomUserFolder_thenReturnCLICustomUserFolder() {
+        String[] args = {"toolkitCustomUserFolder=qqq"};
+        applicationProperties = new CliPreferredApplicationProperties(args);
+
+        String actual = applicationProperties.toolkitCustomUserFolder();
+
+        assertThat(actual).isEqualTo("QQQ");
+    }
+
+    @Test
+    void givenNoCliCustomUserFolder_whenToolkitCustomUserFolder_thenReturnEmptyString() {
+        String[] args = {};
+        applicationProperties = new CliPreferredApplicationProperties(args);
+
+        String actual = applicationProperties.toolkitCustomUserFolder();
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void givenCliCustomUserFolderAndFileCustomUserFolder_whenToolkitCustomUserFolder_thenReturnCliCustomUserFolder() {
+        String[] args = {"toolkitCustomUserFolder=eee"};
+        Properties props = new Properties();
+        props.put("toolkitCustomUserFolder", "aaa");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        String actual = applicationProperties.toolkitCustomUserFolder();
+
+        assertThat(actual).isEqualTo("EEE");
+    }
+
+    @Test
+    void givenNoCliCustomUserFolderAndFileCustomUserFolder_whenToolkitCustomUserFolder_thenReturnFileCustomUserFolder() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("toolkitCustomUserFolder", "aaa");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        String actual = applicationProperties.toolkitCustomUserFolder();
+
+        assertThat(actual).isEqualTo("AAA");
     }
 }

@@ -202,10 +202,26 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
 
     @Override
     public String toolkitUserFolder() {
+        if (containsProperty(ArgName.toolkitUsername.name()) && !containsProperty(ArgName.toolkitCustomUserFolder.name())) {
+            return ArgName.toolkitUserFolder.defaultValue() + properties.getProperty(ArgName.toolkitUsername.name()).toUpperCase();
+        }
+        String userFolder = toolkitCustomUserFolder();
+        if (!StringUtils.nullOrEmpty(userFolder)) {
+            return ArgName.toolkitUserFolder.defaultValue() + userFolder;
+        }
         if (hasProperties()) {
             return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
         }
         return argExtractor.toolkitUserFolder();
+    }
+
+    @Override
+    public String toolkitCustomUserFolder() {
+        String propertyName = ArgName.toolkitCustomUserFolder.name();
+        if (containsProperty(propertyName)) {
+            return properties.getProperty(propertyName, ArgName.toolkitCustomUserFolder.defaultValue()).toUpperCase();
+        }
+        return argExtractor.toolkitCustomUserFolder().toUpperCase();
     }
 
     @Override

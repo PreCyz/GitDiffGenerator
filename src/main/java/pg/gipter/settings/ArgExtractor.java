@@ -162,7 +162,18 @@ final class ArgExtractor {
     }
 
     String toolkitUserFolder() {
-        return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+        String userFolder = toolkitCustomUserFolder();
+        if (StringUtils.nullOrEmpty(userFolder)) {
+            userFolder = toolkitUsername();
+        }
+        return ArgName.toolkitUserFolder.defaultValue() + userFolder;
+    }
+
+    String toolkitCustomUserFolder() {
+        if (containsArg(ArgName.toolkitCustomUserFolder.name())) {
+            return getValue(ArgName.toolkitCustomUserFolder, ArgName.toolkitCustomUserFolder.defaultValue()).toUpperCase();
+        }
+        return ArgName.toolkitCustomUserFolder.defaultValue();
     }
 
     PreferredArgSource preferredArgSource() {

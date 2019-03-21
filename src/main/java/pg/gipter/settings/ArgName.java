@@ -36,7 +36,8 @@ public enum ArgName {
     toolkitListName("WorkItems"),
     toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY"),
     toolkitWSUrl(toolkitUrl.defaultValue + "/_vti_bin/lists.asmx"),
-    toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/");
+    toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/"),
+    toolkitCustomUserFolder("");
 
     private String defaultValue;
 

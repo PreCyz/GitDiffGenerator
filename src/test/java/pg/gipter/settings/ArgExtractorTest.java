@@ -516,4 +516,31 @@ class ArgExtractorTest {
 
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void givenNoCustomUserFolderAndNoToolkitUserName_whenToolkitUserFolder_thenReturnDefault() {
+        argExtractor = new ArgExtractor(new String[]{""});
+
+        String actual = argExtractor.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
+    }
+
+    @Test
+    void givenNoCustomUserFolderAndToolkitUserName_whenToolkitUserFolder_thenReturnDefault() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitUsername=XXX"});
+
+        String actual = argExtractor.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "XXX");
+    }
+
+    @Test
+    void givenCustomUserFolderAndToolkitUserName_whenToolkitUserFolder_thenReturnDefault() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitUsername=XXX", "toolkitCustomUserFolder=aaa"});
+
+        String actual = argExtractor.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
+    }
 }

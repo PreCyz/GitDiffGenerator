@@ -226,7 +226,24 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
 
     @Override
     public String toolkitUserFolder() {
-        return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+        if (containsArg(ArgName.toolkitUsername.name()) && !containsArg(ArgName.toolkitCustomUserFolder.name())) {
+            return ArgName.toolkitUserFolder.defaultValue() + argExtractor.toolkitUsername();
+        }
+        String userFolder = toolkitCustomUserFolder();
+        if (StringUtils.nullOrEmpty(userFolder)) {
+            userFolder = toolkitUsername();
+        }
+        return ArgName.toolkitUserFolder.defaultValue() + userFolder;
+    }
+
+    @Override
+    public String toolkitCustomUserFolder() {
+        String toolkitCustomUserFolder = argExtractor.toolkitCustomUserFolder();
+        String argName = ArgName.toolkitCustomUserFolder.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            toolkitCustomUserFolder = properties.getProperty(argName, toolkitCustomUserFolder);
+        }
+        return toolkitCustomUserFolder.toUpperCase();
     }
 
     @Override

@@ -169,6 +169,7 @@ public abstract class ApplicationProperties {
     public abstract String toolkitPassword();
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
+    public abstract String toolkitCustomUserFolder();
     public abstract String toolkitListName();
     public abstract String toolkitUrl();
     public abstract boolean isSkipRemote();
