@@ -1,6 +1,5 @@
 package pg.gipter.ui;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
@@ -61,8 +60,12 @@ public class FXRunner extends Task<Void> implements Starter {
         } catch (Exception ex) {
             logger.error("Diff upload failure. Program is terminated.");
             error = true;
-            String errMsg = AlertHelper.createLogsErrorMessage();
-            displayWindowFxSupport(errMsg, Alert.AlertType.ERROR);
+            AlertHelper.displayWindow(
+                    BundleUtils.getMsg("popup.error.messageWithLog"),
+                    AlertHelper.logsFolder(),
+                    AlertHelper.LOG_WINDOW,
+                    Alert.AlertType.ERROR
+            );
         } finally {
             String status = error ? "FAIL" : "SUCCESS";
             propertiesHelper.saveUploadInfo(status);
@@ -71,16 +74,12 @@ public class FXRunner extends Task<Void> implements Starter {
             logger.info("{} ended.", this.getClass().getName());
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
-            String confirmationMsg = BundleUtils.getMsg("popup.confirmation.message", applicationProperties.toolkitUserFolder());
-            displayWindowFxSupport(confirmationMsg, Alert.AlertType.INFORMATION);
-        }
-    }
-
-    private void displayWindowFxSupport(String message, Alert.AlertType alertType) {
-        if (Platform.isFxApplicationThread()) {
-            AlertHelper.displayWindow(message, alertType);
-        } else {
-            Platform.runLater(() -> AlertHelper.displayWindow(message, alertType));
+            AlertHelper.displayWindow(
+                    BundleUtils.getMsg("popup.confirmation.message"),
+                    applicationProperties.toolkitUserFolder(),
+                    AlertHelper.BROWSER_WINDOW,
+                    Alert.AlertType.INFORMATION
+            );
         }
     }
 }

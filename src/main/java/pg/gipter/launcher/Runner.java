@@ -42,15 +42,23 @@ class Runner implements Starter {
         } catch (Exception ex) {
             logger.error("Diff upload failure. Program is terminated.");
             error = true;
-            String errMsg = AlertHelper.createLogsErrorMessage();
-            AlertHelper.displayWindow(errMsg, Alert.AlertType.ERROR);
+            AlertHelper.displayWindow(
+                    BundleUtils.getMsg("popup.error.messageWithLog"),
+                    AlertHelper.logsFolder(),
+                    AlertHelper.LOG_WINDOW,
+                    Alert.AlertType.ERROR
+            );
         } finally {
             propertiesHelper.saveUploadInfo(error ? "FAIL" : "SUCCESS");
             logger.info("{} ended.", this.getClass().getName());
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
-            String confirmationMsg = BundleUtils.getMsg("popup.confirmation.message", applicationProperties.toolkitUserFolder());
-            AlertHelper.displayWindow(confirmationMsg, Alert.AlertType.INFORMATION);
+            AlertHelper.displayWindow(
+                    BundleUtils.getMsg("popup.confirmation.message"),
+                    applicationProperties.toolkitUserFolder(),
+                    AlertHelper.BROWSER_WINDOW,
+                    Alert.AlertType.INFORMATION
+            );
         }
     }
 

@@ -8,7 +8,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.net.URL;
-import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
 /**Created by Gawa 2017-10-04*/
@@ -27,7 +26,7 @@ public abstract class AbstractController implements Initializable {
     }
 
     public static void setImageOnAlertWindow(Alert alert) {
-        URL imgUrl = AbstractController.class.getClassLoader().getResource(Paths.get("img", "chicken-face.jpg").toString());
+        URL imgUrl = AbstractController.class.getClassLoader().getResource("img/chicken-face.jpg");
         if (imgUrl != null) {
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image(imgUrl.toString()));

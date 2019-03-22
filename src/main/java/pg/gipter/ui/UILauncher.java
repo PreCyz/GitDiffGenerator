@@ -241,11 +241,9 @@ public class UILauncher implements Launcher {
                 scheduler.shutdown();
             }
         } catch (SchedulerException e) {
-            String errorMessage = String.format("Can not shutdown the job scheduler [%s]. Reason: %s",
-                    scheduler.getClass().getName(), e.getMessage()
-            );
+            String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", scheduler.getClass().getName(), e.getMessage());
             logger.error(errorMessage);
-            AlertHelper.displayWindow(errorMessage, Alert.AlertType.ERROR);
+            AlertHelper.displayWindow(errorMessage, AlertHelper.logsFolder(), AlertHelper.LOG_WINDOW, Alert.AlertType.ERROR);
         } finally {
             Optional<Properties> data = propertiesHelper.loadDataProperties();
             if (data.isPresent()) {
