@@ -134,6 +134,8 @@
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
+                  <TextField fx:id="toolkitCustomFolderTextField" layoutX="422.0" layoutY="7.0" />
+                  <CheckBox fx:id="customFolderCheckBox" layoutX="298.0" layoutY="11.0" mnemonicParsing="false" text="%toolkit.panel.customUserFolder" />
                     </children>
                 </AnchorPane>
             </content>
