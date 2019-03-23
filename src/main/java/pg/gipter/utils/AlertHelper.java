@@ -108,9 +108,9 @@ public final class AlertHelper {
         Alert alert = buildDefaultAlert(Alert.AlertType.CONFIRMATION);
         alert.getButtonTypes().removeAll(ButtonType.OK, ButtonType.CANCEL);
 
-        ButtonType createButton = new ButtonType(createText, ButtonBar.ButtonData.CANCEL_CLOSE);
-        ButtonType overrideButton = new ButtonType(overrideText, ButtonBar.ButtonData.OK_DONE);
-        alert.getButtonTypes().addAll(overrideButton, createButton);
+        ButtonType createButton = new ButtonType(createText, ButtonBar.ButtonData.OK_DONE);
+        ButtonType overrideButton = new ButtonType(overrideText, ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().addAll(createButton, overrideButton);
 
         FlowPane fp = buildFlowPane(message, new Hyperlink(""));
         alert.getDialogPane().contentProperty().set(fp);

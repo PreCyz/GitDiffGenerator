@@ -387,8 +387,8 @@ public class MainController extends AbstractController {
 
     private void saveCurrentConfiguration(ResourceBundle resource, Properties properties) {
         boolean isOverride = AlertHelper.displayOverrideWindow(
-                resource.getString("popup.overrideProperties.buttonOverride"),
                 resource.getString("popup.overrideProperties.buttonUIProperties"),
+                resource.getString("popup.overrideProperties.buttonOverride"),
                 resource.getString("popup.overrideProperties.message")
         );
         if (isOverride) {
