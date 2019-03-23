@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.Main;
 import pg.gipter.launcher.Launcher;
+import pg.gipter.service.GithubService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
 import pg.gipter.ui.job.GipterJob;
@@ -38,6 +39,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 /**
@@ -54,12 +57,15 @@ public class UILauncher implements Launcher {
     private Scheduler scheduler;
     private PropertiesHelper propertiesHelper;
     private boolean silentMode;
+    private boolean upgradeChecked = false;
+    private Executor executor;
 
     public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
         this.primaryStage = primaryStage;
         this.applicationProperties = applicationProperties;
         propertiesHelper = new PropertiesHelper();
         silentMode = applicationProperties.isSilentMode();
+        this.executor = Executors.newFixedThreadPool(3);
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -76,6 +82,10 @@ public class UILauncher implements Launcher {
 
     void setSilentMode(boolean silentMode) {
         this.silentMode = silentMode;
+    }
+
+    public void execute(Runnable runnable) {
+        executor.execute(runnable);
     }
 
     public void initTrayHandler() {
@@ -96,11 +106,20 @@ public class UILauncher implements Launcher {
             logger.info("Tray icon is not supported. Can't launch in silent mode. Program is terminated");
             Platform.exit();
         }
+        checkUpgrades();
         setStartOnStartup();
         logger.info("Launching UI in silent mode: [{}].", silentMode);
         initTray();
         if (!silentMode) {
             buildAndShowMainWindow();
+        }
+    }
+
+    private void checkUpgrades() {
+        if (!upgradeChecked) {
+            GithubService service = new GithubService(applicationProperties);
+            executor.execute(service::checkUpgrades);
+            upgradeChecked = true;
         }
     }
 

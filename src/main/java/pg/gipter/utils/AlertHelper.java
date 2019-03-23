@@ -35,11 +35,9 @@ public final class AlertHelper {
     public static void displayWindow(String message, String htmlLink, int windowType, Alert.AlertType alertType) {
         if (Platform.isFxApplicationThread()) {
             buildAndDisplayWindow(message, htmlLink, windowType, alertType);
-            buildAndDisplayWindow(message, "https://github.com/precyz", BROWSER_WINDOW, alertType);
         } else {
             Platform.runLater(() -> {
                 buildAndDisplayWindow(message, htmlLink, windowType, alertType);
-                buildAndDisplayWindow(message, "https://github.com/precyz", BROWSER_WINDOW, alertType);
             });
         }
     }

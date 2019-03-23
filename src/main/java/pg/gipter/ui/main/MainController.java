@@ -29,8 +29,6 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
@@ -113,7 +111,6 @@ public class MainController extends AbstractController {
     private Label infoLabel;
 
     private ApplicationProperties applicationProperties;
-    private Executor executor;
     private PropertiesHelper propertiesHelper;
 
     private static String currentLanguage;
@@ -121,7 +118,6 @@ public class MainController extends AbstractController {
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        executor = Executors.newFixedThreadPool(3);
         propertiesHelper = new PropertiesHelper();
     }
 
@@ -311,7 +307,7 @@ public class MainController extends AbstractController {
 
             FXRunner runner = new FXRunner(uiAppProperties);
             resetIndicatorProperties(runner);
-            executor.execute(() -> {
+            uiLauncher.execute(() -> {
                 runner.call();
                 if (uiAppProperties.isActiveTray()) {
                     uiLauncher.updateTray(uiAppProperties);
