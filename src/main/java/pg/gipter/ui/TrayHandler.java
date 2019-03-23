@@ -11,8 +11,8 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.job.GipterJob;
 import pg.gipter.ui.job.JobKey;
-import pg.gipter.util.BundleUtils;
-import pg.gipter.util.PropertiesHelper;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.PropertiesHelper;
 
 import javax.swing.*;
 import java.awt.*;

@@ -2,7 +2,7 @@ package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
 import pg.gipter.producer.command.CodeProtection;
-import pg.gipter.util.PropertiesHelper;
+import pg.gipter.utils.PropertiesHelper;
 
 import java.io.File;
 import java.time.LocalDate;

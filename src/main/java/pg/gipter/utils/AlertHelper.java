@@ -1,4 +1,4 @@
-package pg.gipter.util;
+package pg.gipter.utils;
 
 import javafx.application.Platform;
 import javafx.scene.control.*;

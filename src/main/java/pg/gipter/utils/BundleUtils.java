@@ -1,4 +1,4 @@
-package pg.gipter.util;
+package pg.gipter.utils;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

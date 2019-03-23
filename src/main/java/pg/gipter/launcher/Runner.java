@@ -7,9 +7,9 @@ import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.util.AlertHelper;
-import pg.gipter.util.BundleUtils;
-import pg.gipter.util.PropertiesHelper;
+import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.PropertiesHelper;
 
 class Runner implements Starter {
 

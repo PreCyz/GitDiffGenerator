@@ -1,7 +1,7 @@
 package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.util.PropertiesHelper;
+import pg.gipter.utils.PropertiesHelper;
 
 import java.util.Optional;
 import java.util.Properties;

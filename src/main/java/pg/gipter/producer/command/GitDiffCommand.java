@@ -1,7 +1,7 @@
 package pg.gipter.producer.command;
 
 import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.util.StringUtils;
+import pg.gipter.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;

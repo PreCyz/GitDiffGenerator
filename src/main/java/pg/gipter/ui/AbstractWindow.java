@@ -2,7 +2,7 @@ package pg.gipter.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import pg.gipter.util.BundleUtils;
+import pg.gipter.utils.BundleUtils;
 
 import java.io.IOException;
 import java.net.URL;

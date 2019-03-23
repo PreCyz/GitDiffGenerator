@@ -19,10 +19,10 @@ import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.util.AlertHelper;
-import pg.gipter.util.BundleUtils;
-import pg.gipter.util.PropertiesHelper;
-import pg.gipter.util.StringUtils;
+import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.PropertiesHelper;
+import pg.gipter.utils.StringUtils;
 
 import java.io.File;
 import java.net.URL;

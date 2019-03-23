@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.CodeProtection;
 import pg.gipter.producer.command.VersionControlSystem;
-import pg.gipter.util.PropertiesHelper;
+import pg.gipter.utils.PropertiesHelper;
 
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
-import static pg.gipter.util.PropertiesHelper.APPLICATION_PROPERTIES;
+import static pg.gipter.utils.PropertiesHelper.APPLICATION_PROPERTIES;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public abstract class ApplicationProperties {
