@@ -1,16 +1,17 @@
 package pg.gipter.util;
 
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
+import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.ui.AbstractController;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 /** Created by Pawel Gawedzki on 10-Mar-2019.*/
 public final class AlertHelper {
@@ -34,8 +35,12 @@ public final class AlertHelper {
     public static void displayWindow(String message, String htmlLink, int windowType, Alert.AlertType alertType) {
         if (Platform.isFxApplicationThread()) {
             buildAndDisplayWindow(message, htmlLink, windowType, alertType);
+            buildAndDisplayWindow(message, "https://github.com/precyz", BROWSER_WINDOW, alertType);
         } else {
-            Platform.runLater(() -> buildAndDisplayWindow(message, htmlLink, windowType, alertType));
+            Platform.runLater(() -> {
+                buildAndDisplayWindow(message, htmlLink, windowType, alertType);
+                buildAndDisplayWindow(message, "https://github.com/precyz", BROWSER_WINDOW, alertType);
+            });
         }
     }
 
@@ -45,8 +50,8 @@ public final class AlertHelper {
         FlowPane fp = buildFlowPane(message, hyperLink);
 
         alert.getDialogPane().contentProperty().set(fp);
-        AbstractController.setImageOnAlertWindow(alert);
         alert.showAndWait();
+
     }
 
     @NotNull
@@ -54,6 +59,11 @@ public final class AlertHelper {
         Alert alert = new Alert(alertType);
         alert.setTitle(BundleUtils.getMsg("popup.title"));
         alert.setHeaderText(BundleUtils.getMsg("popup.header.error"));
+        URL imgUrl = AbstractController.class.getClassLoader().getResource("img/chicken-face.jpg");
+        if (imgUrl != null) {
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(imgUrl.toString()));
+        }
         return alert;
     }
 
@@ -80,5 +90,33 @@ public final class AlertHelper {
         Label lbl = new Label(message);
         fp.getChildren().addAll(lbl, hyperLink);
         return fp;
+    }
+
+    public static boolean displayAddWindow(String addText, String replaceText, String message) {
+        Alert alert = buildDefaultAlert(Alert.AlertType.CONFIRMATION);
+        alert.getButtonTypes().removeAll(ButtonType.OK, ButtonType.CANCEL);
+
+        ButtonType addButton = new ButtonType(addText, ButtonBar.ButtonData.OK_DONE);
+        ButtonType replaceButton = new ButtonType(replaceText, ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().addAll(addButton, replaceButton);
+
+        FlowPane fp = buildFlowPane(message, new Hyperlink(""));
+        alert.getDialogPane().contentProperty().set(fp);
+
+        return alert.showAndWait().orElse(replaceButton) == addButton;
+    }
+
+    public static boolean displayOverrideWindow(String createText, String overrideText, String message) {
+        Alert alert = buildDefaultAlert(Alert.AlertType.CONFIRMATION);
+        alert.getButtonTypes().removeAll(ButtonType.OK, ButtonType.CANCEL);
+
+        ButtonType createButton = new ButtonType(createText, ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType overrideButton = new ButtonType(overrideText, ButtonBar.ButtonData.OK_DONE);
+        alert.getButtonTypes().addAll(overrideButton, createButton);
+
+        FlowPane fp = buildFlowPane(message, new Hyperlink(""));
+        alert.getDialogPane().contentProperty().set(fp);
+
+        return alert.showAndWait().orElse(createButton) == overrideButton ;
     }
 }

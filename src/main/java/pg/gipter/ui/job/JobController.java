@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.util.AlertHelper;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
@@ -235,14 +236,8 @@ public class JobController extends AbstractController {
 
             } catch (SchedulerException | ParseException se) {
                 logger.error("Error when creating a job.", se);
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(resource.getString("popup.title"));
-                alert.setHeaderText(resource.getString("popup.header.error"));
-                alert.setContentText(resource.getString("popup.job.errorMsg"));
-
-                AbstractController.setImageOnAlertWindow(alert);
-
-                alert.showAndWait();
+                String errorMsg = resource.getString("popup.job.errorMsg");
+                AlertHelper.displayWindow(errorMsg, AlertHelper.logsFolder(), AlertHelper.LOG_WINDOW, Alert.AlertType.ERROR);
             }
         };
     }

@@ -19,6 +19,7 @@ import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.util.AlertHelper;
 import pg.gipter.util.BundleUtils;
 import pg.gipter.util.PropertiesHelper;
 import pg.gipter.util.StringUtils;
@@ -254,7 +255,12 @@ public class MainController extends AbstractController {
             File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
             if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                 String result = itemPathDirectory.getAbsolutePath();
-                if (isAddPath(resources)) {
+                boolean isAdd = AlertHelper.displayAddWindow(
+                        resources.getString("popup.addOrReplace.add"),
+                        resources.getString("popup.addOrReplace.replace"),
+                        resources.getString("popup.addOrReplace.message")
+                );
+                if (isAdd) {
                     result = result + (StringUtils.nullOrEmpty(projectPathLabel.getText()) ? "" : ",") + projectPathLabel.getText();
                 }
                 projectPathLabel.setText(result);
@@ -272,28 +278,6 @@ public class MainController extends AbstractController {
         tooltip.setTextAlignment(TextAlignment.LEFT);
         tooltip.setFont(Font.font("Courier New", 14));
         return tooltip;
-    }
-
-    private boolean isAddPath(ResourceBundle resource) {
-        String add = resource.getString("popup.addOrReplace.add");
-        String replace = resource.getString("popup.addOrReplace.replace");
-        ButtonType addButton = new ButtonType(add, ButtonBar.ButtonData.OK_DONE);
-        ButtonType replaceButton = new ButtonType(replace, ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                resource.getString("popup.addOrReplace.message"),
-                addButton,
-                replaceButton
-        );
-        setAlertCommonAttributes(resource, alert);
-
-        return alert.showAndWait().orElse(replaceButton) == addButton;
-    }
-
-    private void setAlertCommonAttributes(ResourceBundle resource, Alert alert) {
-        alert.setTitle(resource.getString("popup.title"));
-        alert.setHeaderText(resource.getString("popup.header"));
-
-        setImageOnAlertWindow(alert);
     }
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
@@ -406,19 +390,12 @@ public class MainController extends AbstractController {
     }
 
     private void saveCurrentConfiguration(ResourceBundle resource, Properties properties) {
-        String override = resource.getString("popup.overrideProperties.buttonOverride");
-        String create = resource.getString("popup.overrideProperties.buttonUIProperties");
-        ButtonType createButton = new ButtonType(create, ButtonBar.ButtonData.OK_DONE);
-        ButtonType overrideButton = new ButtonType(override, ButtonBar.ButtonData.CANCEL_CLOSE);
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
-                resource.getString("popup.overrideProperties.message"),
-                overrideButton,
-                createButton
+        boolean isOverride = AlertHelper.displayOverrideWindow(
+                resource.getString("popup.overrideProperties.buttonOverride"),
+                resource.getString("popup.overrideProperties.buttonUIProperties"),
+                resource.getString("popup.overrideProperties.message")
         );
-        setAlertCommonAttributes(resource, alert);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.orElse(createButton) == overrideButton) {
+        if (isOverride) {
             properties.replace(ArgName.preferredArgSource.name(), PreferredArgSource.FILE.name());
             propertiesHelper.saveToApplicationProperties(properties);
         } else {
