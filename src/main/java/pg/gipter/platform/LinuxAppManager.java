@@ -27,9 +27,7 @@ class LinuxAppManager implements AppManager {
     public void launchDefaultBrowser(String url) {
         try {
             LinkedList<String> command = new LinkedList<>();
-            command.add("xdg-settings");
-            command.add("get");
-            command.add("default-web-browser");
+            command.add("x-www-browser");
             command.add(url);
             new ProcessBuilder(command).start();
         } catch (IOException ex) {
