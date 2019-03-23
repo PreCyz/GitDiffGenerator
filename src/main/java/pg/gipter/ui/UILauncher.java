@@ -329,11 +329,13 @@ public class UILauncher implements Launcher {
     private void initTray() {
         if (isTrayActivated()) {
             initTrayHandler();
+        } else {
+            setMainOnCloseRequest(AbstractController.regularOnCloseEventHandler());
         }
     }
 
-    void setMainOnCloseRequest(EventHandler<WindowEvent> trayOnCloseEventHandler) {
-        primaryStage.setOnCloseRequest(trayOnCloseEventHandler);
+    void setMainOnCloseRequest(EventHandler<WindowEvent> onCloseEventHandler) {
+        primaryStage.setOnCloseRequest(onCloseEventHandler);
     }
 
     void hideMainWindow() {

@@ -43,28 +43,24 @@ class TrayHandler {
     }
 
     void createTrayIcon() {
-        if (canCreateTrayIcon()) {
-            uiLauncher.setMainOnCloseRequest(trayOnCloseEventHandler());
+        uiLauncher.setMainOnCloseRequest(trayOnCloseEventHandler());
 
-            Platform.setImplicitExit(false);
-            SystemTray tray = SystemTray.getSystemTray();
+        Platform.setImplicitExit(false);
+        SystemTray tray = SystemTray.getSystemTray();
 
-            trayPopupMenu = new PopupMenu();
-            addMenuItemsToMenu(trayPopupMenu);
+        trayPopupMenu = new PopupMenu();
+        addMenuItemsToMenu(trayPopupMenu);
 
-            trayIcon = new TrayIcon(
-                    createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), trayPopupMenu
-            );
-            trayIcon.addActionListener(showActionListener());
-            trayIcon.setImageAutoSize(true);
+        trayIcon = new TrayIcon(
+                createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), trayPopupMenu
+        );
+        trayIcon.addActionListener(showActionListener());
+        trayIcon.setImageAutoSize(true);
 
-            try {
-                tray.add(trayIcon);
-            } catch (AWTException e) {
-                logger.error("Error when creating tray.", e);
-            }
-        } else {
-            uiLauncher.setMainOnCloseRequest(AbstractController.regularOnCloseEventHandler());
+        try {
+            tray.add(trayIcon);
+        } catch (AWTException e) {
+            logger.error("Error when creating tray.", e);
         }
     }
 
