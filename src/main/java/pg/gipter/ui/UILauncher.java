@@ -144,7 +144,6 @@ public class UILauncher implements Launcher {
                     String workingDir = jarFile.getPath().replace(jarFile.getName(), "");
                     ShellLink shellLink = ShellLink.createLink(jarFile.getAbsolutePath())
                             .setWorkingDir(workingDir)
-                            .setIconLocation("img/chicken-tray.gif")
                             .setCMDArgs(ArgName.silentMode.name() + "=" + Boolean.TRUE)
                             .saveTo(shortcutLnkPath);
                     logger.info("Shortcut located in startup folder [{}].", shortcutLnkPath);
