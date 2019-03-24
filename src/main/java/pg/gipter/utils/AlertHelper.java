@@ -7,7 +7,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManagerFactory;
-import pg.gipter.ui.AbstractController;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -41,18 +40,16 @@ public final class AlertHelper {
         if (Platform.isFxApplicationThread()) {
             buildAndDisplayWindow(message, htmlLink, windowType, alertType);
         } else {
-            Platform.runLater(() -> {
-                buildAndDisplayWindow(message, htmlLink, windowType, alertType);
-            });
+            Platform.runLater(() -> buildAndDisplayWindow(message, htmlLink, windowType, alertType));
         }
     }
 
     private static void buildAndDisplayWindow(String message, String link, int windowType, Alert.AlertType alertType) {
         Alert alert = buildDefaultAlert(alertType);
         Hyperlink hyperLink = buildHyperlink(link, windowType, alert);
-        FlowPane fp = buildFlowPane(message, hyperLink);
+        FlowPane flowPane = buildFlowPane(message, hyperLink);
 
-        alert.getDialogPane().contentProperty().set(fp);
+        alert.getDialogPane().contentProperty().set(flowPane);
         alert.showAndWait();
 
     }
@@ -62,7 +59,7 @@ public final class AlertHelper {
         Alert alert = new Alert(alertType);
         alert.setTitle(BundleUtils.getMsg("popup.title"));
         alert.setHeaderText(BundleUtils.getMsg("popup.header.error"));
-        URL imgUrl = AbstractController.class.getClassLoader().getResource("img/chicken-face.jpg");
+        URL imgUrl = AlertHelper.class.getClassLoader().getResource("img/chicken-face.jpg");
         if (imgUrl != null) {
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image(imgUrl.toString()));
@@ -89,10 +86,10 @@ public final class AlertHelper {
 
     @NotNull
     private static FlowPane buildFlowPane(String message, Hyperlink hyperLink) {
-        FlowPane fp = new FlowPane();
+        FlowPane flowPane = new FlowPane();
         Label lbl = new Label(message);
-        fp.getChildren().addAll(lbl, hyperLink);
-        return fp;
+        flowPane.getChildren().addAll(lbl, hyperLink);
+        return flowPane;
     }
 
     public static boolean displayAddWindow(String addText, String replaceText, String message) {
