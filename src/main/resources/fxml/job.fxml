@@ -11,7 +11,7 @@
                <children>
                   <ComboBox fx:id="dayNameComboBox" layoutX="112.0" layoutY="85.0" prefWidth="130.0" />
                   <ComboBox fx:id="dayOfMonthComboBox" layoutX="112.0" layoutY="48.0" prefWidth="60.0" />
-                  <ComboBox fx:id="hourOfDayComboBox" layoutX="112.0" layoutY="11.0" prefWidth="60.0" />
+                  <ComboBox fx:id="hourOfDayComboBox" layoutX="112.0" layoutY="11.0" prefWidth="65.0" />
                   <Label layoutX="10.0" layoutY="54.0" text="%job.clickWay.dayOfMonth" />
                   <Label layoutX="10.0" layoutY="16.0" text="%job.clickWay.hourOfTheDay" />
                   <Label layoutX="10.0" layoutY="89.0" text="%job.clickWay.dayOfWeek" />
@@ -24,8 +24,8 @@
                   <RadioButton fx:id="everyWeekRadioButton" layoutX="255.0" layoutY="126.0" mnemonicParsing="false" selected="true" text="%job.clickWay.everyWeek" toggleGroup="$triggerOptionsToggleGroup" />
                   <Label layoutX="10.0" layoutY="126.0" text="%job.clickWay.startDate" />
                   <DatePicker fx:id="startDatePicker" layoutX="112.0" layoutY="121.0" prefWidth="130.0" />
-                  <ComboBox fx:id="minuteComboBox" layoutX="196.0" layoutY="10.0" prefWidth="60.0" />
-                  <Label layoutX="182.0" layoutY="11.0" text=":">
+                  <ComboBox fx:id="minuteComboBox" layoutX="196.0" layoutY="10.0" prefWidth="65.0" />
+                  <Label layoutX="183.0" layoutY="11.0" text=":">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>

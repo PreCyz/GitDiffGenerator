@@ -13,7 +13,9 @@ import java.util.Properties;
 
 import static org.quartz.TriggerBuilder.newTrigger;
 
-/** Created by Pawel Gawedzki on 12-Mar-2019. */
+/**
+ * Created by Pawel Gawedzki on 12-Mar-2019.
+ */
 public class JobCreator {
 
     private Properties data;
@@ -99,31 +101,50 @@ public class JobCreator {
                 .build();
     }
 
-    private Trigger createTriggerEveryWeek() {
-        //0 0 12 * * FRI - Every Friday at noon
+    private Trigger createTriggerEveryWeek() throws ParseException {
         String hourOfThDay = String.format("%s:%s", hourOfDay, minuteOfHour);
-        String scheduleStart = startDateTime.format(ApplicationProperties.yyyy_MM_dd);
 
         clearProperties();
         data.put(JobKey.TYPE.value(), JobType.EVERY_WEEK.name());
         data.put(JobKey.DAY_OF_WEEK.value(), dayOfWeek.name());
         data.put(JobKey.HOUR_OF_THE_DAY.value(), hourOfThDay);
-        data.put(JobKey.SCHEDULE_START.value(), scheduleStart);
+        data.put(JobKey.SCHEDULE_START.value(), LocalDate.now().format(ApplicationProperties.yyyy_MM_dd));
 
-        int second = 0;
-        Date startDate = DateBuilder.dateOf(
-                hourOfDay,
-                minuteOfHour,
-                second,
-                startDateTime.getDayOfMonth(),
-                startDateTime.getMonthValue(),
-                startDateTime.getYear()
-        );
+        //0 0 12 ? * FRI - Every Friday at noon
+        /*String cronExpr = "0" + " " +
+                minuteOfHour + " " +
+                hourOfDay + " " +
+                "? " +
+                "* " +
+                dayOfWeek.name().substring(0, 3);
+        CronExpression expression = new CronExpression(cronExpr);*/
         return newTrigger()
                 .withIdentity("everyWeekTrigger", "everyWeekTriggerGroup")
-                .startAt(startDate)
-                .withSchedule(CronScheduleBuilder.weeklyOnDayAndHourAndMinute(dayOfWeek.getValue(), hourOfDay, minuteOfHour))
+                .startNow()
+                //.withSchedule(CronScheduleBuilder.cronSchedule(expression))
+                .withSchedule(CronScheduleBuilder.weeklyOnDayAndHourAndMinute(
+                        convertToDateBuilder(dayOfWeek), hourOfDay, minuteOfHour)
+                )
                 .build();
+    }
+
+    private int convertToDateBuilder(DayOfWeek dayOfWeek) {
+        switch (dayOfWeek) {
+            case MONDAY:
+                return DateBuilder.MONDAY;
+            case TUESDAY:
+                return DateBuilder.TUESDAY;
+            case WEDNESDAY:
+                return DateBuilder.WEDNESDAY;
+            case THURSDAY:
+                return DateBuilder.THURSDAY;
+            case FRIDAY:
+                return DateBuilder.FRIDAY;
+            case SATURDAY:
+                return DateBuilder.SATURDAY;
+            default:
+                return DateBuilder.SUNDAY;
+        }
     }
 
     private Trigger createCronTrigger() throws ParseException {

@@ -115,20 +115,34 @@ public class JobController extends AbstractController {
             jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
             JobType jobType = JobType.valueOf(dataProp.getProperty(JobKey.TYPE.value()));
             jobTypeLabel.setText(jobType.name());
+            String details;
             if (jobType == JobType.CRON) {
-                jobDetailsLabel.setText(BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobKey.CRON.value())));
+                details = BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobKey.CRON.value()));
             } else {
-                String details = StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.SCHEDULE_START.value())) ? "" :
-                        (JobKey.SCHEDULE_START.name() + ": " + dataProp.getProperty(JobKey.SCHEDULE_START.value()));
-                details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.DAY_OF_MONTH.value())) ? "" :
-                        ("\n" + JobKey.DAY_OF_MONTH.name() + ": " + dataProp.getProperty(JobKey.DAY_OF_MONTH.value()));
-                details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.DAY_OF_WEEK.value())) ? "" :
-                        ("\n" + JobKey.DAY_OF_WEEK.name() + ": " + dataProp.getProperty(JobKey.DAY_OF_WEEK.value()));
-                details += StringUtils.nullOrEmpty(dataProp.getProperty(JobKey.HOUR_OF_THE_DAY.value())) ? "" :
-                        ("\n" + JobKey.HOUR_OF_THE_DAY.name() + ": " + dataProp.getProperty(JobKey.HOUR_OF_THE_DAY.value()));
-                jobDetailsLabel.setText(details);
+                details = buildLabel(dataProp, JobKey.SCHEDULE_START).map(value -> value + "\n").orElse("");
+                details += buildLabel(dataProp, JobKey.DAY_OF_MONTH).map(value -> value + "\n").orElse("");
+                details += buildLabel(dataProp, JobKey.DAY_OF_WEEK).map(value -> value + "\n").orElse("");
+                details += buildLabel(dataProp, JobKey.HOUR_OF_THE_DAY).orElse("");
             }
+            jobDetailsLabel.setText(details);
         }
+    }
+
+    public static Optional<String> buildLabel(Properties data, JobKey key) {
+        if (data.containsKey(key.value())) {
+            String value = data.getProperty(key.value());
+            if (key == JobKey.HOUR_OF_THE_DAY) {
+                String minuetOfHour = value.substring(value.indexOf(":") + 1);
+                if (minuetOfHour.length() == 1) {
+                    value = value.substring(0, value.indexOf(":") + 1) + "0" + minuetOfHour;
+                }
+            }
+            if (value.length() == 1 && Character.isDigit(value.charAt(0))) {
+                value = "0" + value;
+            }
+            return Optional.of(String.format("%s: %s", key, value));
+        }
+        return Optional.empty();
     }
 
     private void setActions(ResourceBundle resources) {
@@ -157,6 +171,7 @@ public class JobController extends AbstractController {
     private void setProperties() {
         startDatePicker.setConverter(startDateConverter());
         startDatePicker.setDayCellFactory(datePickerDateCellCallback());
+        startDatePicker.setDisable(true);
         dayOfMonthComboBox.setDisable(true);
     }
 
@@ -188,7 +203,7 @@ public class JobController extends AbstractController {
 
     private EventHandler<ActionEvent> everyWeekActionEvent() {
         return event -> {
-            startDatePicker.setDisable(false);
+            startDatePicker.setDisable(true);
             dayNameComboBox.setDisable(false);
             dayOfMonthComboBox.setDisable(true);
         };

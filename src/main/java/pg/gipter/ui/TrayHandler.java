@@ -10,6 +10,7 @@ import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.job.GipterJob;
+import pg.gipter.ui.job.JobController;
 import pg.gipter.ui.job.JobKey;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
@@ -88,11 +89,11 @@ class TrayHandler {
                 Menu jobMenu = new Menu(
                         String.format("%s %s", GipterJob.NAME, data.get().getProperty(JobKey.TYPE.value()))
                 );
-                buildMenuItem(data.get(), JobKey.DAY_OF_WEEK).ifPresent(jobMenu::add);
-                buildMenuItem(data.get(), JobKey.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);
-                buildMenuItem(data.get(), JobKey.DAY_OF_MONTH).ifPresent(jobMenu::add);
-                buildMenuItem(data.get(), JobKey.SCHEDULE_START).ifPresent(jobMenu::add);
-                buildMenuItem(data.get(), JobKey.CRON).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobKey.DAY_OF_WEEK).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobKey.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobKey.DAY_OF_MONTH).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobKey.SCHEDULE_START).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobKey.CRON).ifPresent(jobMenu::add);
                 jobMenu.addSeparator();
 
                 MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));
@@ -125,13 +126,6 @@ class TrayHandler {
         MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
         closeItem.addActionListener(closeActionListener());
         popupMenu.add(closeItem);
-    }
-
-    private Optional<String> buildMenuItem(Properties data, JobKey key) {
-        if (data.containsKey(key.value())) {
-            return Optional.of(String.format("%s: %s", key, data.getProperty(key.value())));
-        }
-        return Optional.empty();
     }
 
     private Image createTrayImage() {
