@@ -23,10 +23,7 @@ import pg.gipter.utils.PropertiesHelper;
 
 import java.io.File;
 import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ProjectsController extends AbstractController {
@@ -114,20 +111,45 @@ public class ProjectsController extends AbstractController {
     }
 
     private void setUpButtons(ResourceBundle resources) {
-        searchProjectsButton.setOnAction(searchButtonActionEventHandler());
+        searchProjectsButton.setOnAction(searchButtonActionEventHandler(resources));
         saveButton.setOnAction(saveButtonActionEventHandler());
         addProjectButton.setOnAction(addButtonActionEventHandler(resources));
         removeProjectButton.setOnAction(removeButtonActionEventHandler());
     }
 
     @NotNull
-    private EventHandler<ActionEvent> searchButtonActionEventHandler() {
-        return new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-
+    private EventHandler<ActionEvent> searchButtonActionEventHandler(ResourceBundle resources) {
+        return event -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setInitialDirectory(new File("."));
+            directoryChooser.setTitle(resources.getString("directory.item.title"));
+            File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
+            if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
+                ObservableList<ProjectDetails> projects = FXCollections.observableList(searchForProjects(itemPathDirectory));
+                if (!projects.isEmpty()) {
+                    if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+                        projectsTableView.setItems(projects);
+                    } else {
+                        projectsTableView.getItems().addAll(projects);
+                    }
+                }
             }
         };
+    }
+
+    List<ProjectDetails> searchForProjects(File directory) {
+        List<ProjectDetails> result = new ArrayList<>();
+        try {
+            VersionControlSystem vcs = VersionControlSystem.valueFrom(directory);
+            result.add(new ProjectDetails(directory.getName(), vcs.name(), directory.getAbsolutePath()));
+        } catch (IllegalArgumentException ex) {
+            for (File file : directory.listFiles()) {
+                if (file != null && file.isDirectory()) {
+                    result.addAll(searchForProjects(file));
+                }
+            }
+        }
+        return result;
     }
 
     @NotNull

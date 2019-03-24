@@ -60,4 +60,13 @@ public class ProjectDetails {
     public int hashCode() {
         return Objects.hash(getName(), getCvsType(), getPath());
     }
+
+    @Override
+    public String toString() {
+        return "ProjectDetails{" +
+                "name=" + name +
+                ", cvsType=" + cvsType +
+                ", path=" + path +
+                '}';
+    }
 }
