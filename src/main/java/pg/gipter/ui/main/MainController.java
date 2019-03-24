@@ -234,7 +234,7 @@ public class MainController extends AbstractController {
     }
 
     private void setActions(ResourceBundle resources) {
-        projectPathButton.setOnAction(projectPathActionEventHandler(resources));
+        projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         codeProtectionComboBox.setOnAction(codeProtectionActionEventHandler());
         executeButton.setOnAction(executeActionEventHandler());
@@ -243,26 +243,11 @@ public class MainController extends AbstractController {
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler(resources));
     }
 
-    private EventHandler<ActionEvent> projectPathActionEventHandler(final ResourceBundle resources) {
+    private EventHandler<ActionEvent> projectPathActionEventHandler() {
         return event -> {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(new File("."));
-            directoryChooser.setTitle(resources.getString("directory.item.title"));
-            File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
-            if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                String result = itemPathDirectory.getAbsolutePath();
-                boolean isAdd = AlertHelper.displayAddWindow(
-                        resources.getString("popup.addOrReplace.add"),
-                        resources.getString("popup.addOrReplace.replace"),
-                        resources.getString("popup.addOrReplace.message")
-                );
-                if (isAdd) {
-                    result = result + (StringUtils.nullOrEmpty(projectPathLabel.getText()) ? "" : ",") + projectPathLabel.getText();
-                }
-                projectPathLabel.setText(result);
-                projectPathButton.setText(resources.getString("button.change"));
-                projectPathLabel.setTooltip(buildProjectPathsTooltip(result));
-            }
+            propertiesHelper.saveToUIApplicationProperties(createProperties(createArgsFromUI()));
+            uiLauncher.hideMainWindow();
+            uiLauncher.showProjectsWindow();
         };
     }
 

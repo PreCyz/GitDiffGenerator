@@ -48,9 +48,10 @@ public class UILauncher implements Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
 
-    private final Stage primaryStage;
+    private final Stage mainWindow;
     private ApplicationProperties applicationProperties;
     private Stage jobWindow;
+    private Stage projectsWindow;
     private TrayHandler trayHandler;
     private Scheduler scheduler;
     private PropertiesHelper propertiesHelper;
@@ -58,8 +59,8 @@ public class UILauncher implements Launcher {
     private boolean upgradeChecked = false;
     private Executor executor;
 
-    public UILauncher(Stage primaryStage, ApplicationProperties applicationProperties) {
-        this.primaryStage = primaryStage;
+    public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
+        this.mainWindow = mainWindow;
         this.applicationProperties = applicationProperties;
         propertiesHelper = new PropertiesHelper();
         silentMode = applicationProperties.isSilentMode();
@@ -163,16 +164,16 @@ public class UILauncher implements Launcher {
         }
     }
 
-    void buildAndShowMainWindow() {
+    public void buildAndShowMainWindow() {
         buildScene(
-                primaryStage,
+                mainWindow,
                 WindowFactory.MAIN.createWindow(applicationProperties, this)
         );
         showMainWindow();
     }
 
     void showMainWindow() {
-        primaryStage.show();
+        mainWindow.show();
     }
 
     private void buildScene(Stage stage, AbstractWindow window) {
@@ -198,7 +199,7 @@ public class UILauncher implements Launcher {
     }
 
     public Stage currentWindow() {
-        return primaryStage;
+        return mainWindow;
     }
 
     private Image readImage(String imgPath) throws IOException {
@@ -208,7 +209,7 @@ public class UILauncher implements Launcher {
     }
 
     public void changeLanguage(String language) {
-        primaryStage.close();
+        mainWindow.close();
         BundleUtils.changeBundle(language);
         execute();
     }
@@ -337,10 +338,25 @@ public class UILauncher implements Launcher {
     }
 
     void setMainOnCloseRequest(EventHandler<WindowEvent> onCloseEventHandler) {
-        primaryStage.setOnCloseRequest(onCloseEventHandler);
+        mainWindow.setOnCloseRequest(onCloseEventHandler);
     }
 
-    void hideMainWindow() {
-        primaryStage.hide();
+    public void hideMainWindow() {
+        mainWindow.hide();
+    }
+
+    public void showProjectsWindow() {
+        projectsWindow = new Stage();
+        projectsWindow.initModality(Modality.WINDOW_MODAL);
+        buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
+        projectsWindow.setOnCloseRequest(event -> {
+            hideProjectsWindow();
+            execute();
+        });
+        projectsWindow.showAndWait();
+    }
+
+    public void hideProjectsWindow() {
+        projectsWindow.hide();
     }
 }

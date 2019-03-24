@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <TableView fx:id="projectsTableView" layoutX="14.0" layoutY="14.0" prefHeight="329.0" prefWidth="573.0">
+            <columns>
+                <TableColumn editable="false" prefWidth="135.0" sortable="false" text="%projects.column.name" />
+                <TableColumn editable="false" prefWidth="78.0" sortable="false" text="%projects.column.cvsType" />
+                <TableColumn editable="false" prefWidth="359.0" sortable="false" text="%projects.column.path" />
+            </columns>
+        </TableView>
+        <Button fx:id="searchProjectsButton" layoutX="14.0" layoutY="354.0" mnemonicParsing="false" text="%projects.button.search" textFill="BLUE">
+            <font>
+                <Font name="System Bold" size="13.0" />
+            </font>
+        </Button>
+        <Button fx:id="removeProjectButton" layoutX="545.0" layoutY="353.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="42.0" text="-" textFill="RED">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Button>
+        <Button fx:id="addProjectButton" layoutX="495.0" layoutY="353.0" mnemonicParsing="false" text="+" textFill="GREEN">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Button>
+      <Button fx:id="saveButton" layoutX="406.0" layoutY="354.0" mnemonicParsing="false" text="%projects.button.save" textFill="BLUE">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Button>
+    </children>
+</AnchorPane>
