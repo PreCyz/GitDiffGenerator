@@ -12,6 +12,7 @@ import pg.gipter.ui.AbstractController;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 
 /** Created by Pawel Gawedzki on 10-Mar-2019.*/
 public final class AlertHelper {
@@ -23,13 +24,17 @@ public final class AlertHelper {
 
     private AlertHelper() { }
 
-    public static String logsFolder() {
+    public static Optional<String> homeDirectoryPath() {
         try {
             File jarFile = new File(AlertHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            return jarFile.getPath().replace(jarFile.getName(), LOGS_FOLDER_NAME);
+            return Optional.of(jarFile.getPath().replace(jarFile.getName(), ""));
         } catch (URISyntaxException ex) {
-            return "";
+            return Optional.empty();
         }
+    }
+
+    public static String logsFolder() {
+        return homeDirectoryPath().map(s -> s + LOGS_FOLDER_NAME).orElse("");
     }
 
     public static void displayWindow(String message, String htmlLink, int windowType, Alert.AlertType alertType) {

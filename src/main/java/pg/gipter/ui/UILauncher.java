@@ -13,7 +13,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.Main;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.settings.ApplicationProperties;
@@ -31,7 +30,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -134,26 +132,31 @@ public class UILauncher implements Launcher {
         if (platform.startsWith("Windows")) {
             String systemUsername = System.getProperty("user.name");
 
-            String shortcutLnkPath = String.format("C:\\Users\\%s\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\" +
-                            "Programs\\Startup\\Gipter.lnk", systemUsername);
+            String shortcutLnkPath = String.format(
+                    "C:\\Users\\%s\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Gipter.lnk",
+                    systemUsername
+            );
 
             if (!new File(shortcutLnkPath).exists()) {
                 logger.info("Creating shortcut and placing it in startup folder.");
                 try {
-                    File jarFile = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-                    String workingDir = jarFile.getPath().replace(jarFile.getName(), "");
-                    ShellLink shellLink = ShellLink.createLink(jarFile.getAbsolutePath())
+                    String workingDir = AlertHelper.homeDirectoryPath().orElse("");
+
+                    int iconNumber = 130;
+                    ShellLink shellLink = ShellLink.createLink(workingDir)
                             .setWorkingDir(workingDir)
-                            .setCMDArgs(ArgName.silentMode.name() + "=" + Boolean.TRUE)
-                            .saveTo(shortcutLnkPath);
+                            .setIconLocation("%SystemRoot%\\system32\\SHELL32.dll")
+                            .setCMDArgs(ArgName.silentMode.name() + "=" + Boolean.TRUE);
+                    shellLink.getHeader().setIconIndex(iconNumber);
+                    shellLink.saveTo(shortcutLnkPath);
                     logger.info("Shortcut located in startup folder [{}].", shortcutLnkPath);
                     logger.info("Link working dir {}", shellLink.getWorkingDir());
                     logger.info("Link target {}", shellLink.resolveTarget());
                     logger.info("Link arguments [{}]", shellLink.getCMDArgs());
-                } catch (IOException | URISyntaxException e) {
+                    logger.info("Shortcut created and placed in Windows startup folder.");
+                } catch (IOException e) {
                     logger.warn("Can not create shortcut file and place it startup folder.", e);
                 }
-                logger.info("Shortcut created and placed in Windows startup folder.");
             } else {
                 logger.info("Gipter have already been set to start on startup. Shortcut already exists [{}]. ", shortcutLnkPath);
             }
