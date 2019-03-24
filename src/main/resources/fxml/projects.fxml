@@ -3,13 +3,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="400.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <TableView fx:id="projectsTableView" layoutX="14.0" layoutY="14.0" prefHeight="329.0" prefWidth="573.0">
+        <TableView fx:id="projectsTableView" layoutX="14.0" layoutY="14.0" prefHeight="330.0" prefWidth="649.0">
             <columns>
-                <TableColumn editable="false" prefWidth="135.0" sortable="false" text="%projects.column.name" />
-                <TableColumn editable="false" prefWidth="78.0" sortable="false" text="%projects.column.vcsType" />
-                <TableColumn editable="false" prefWidth="359.0" sortable="false" text="%projects.column.path" />
+                <TableColumn editable="false" prefWidth="161.0" sortable="false" text="%projects.column.name" />
+                <TableColumn editable="false" prefWidth="103.0" sortable="false" text="%projects.column.vcsType" />
+                <TableColumn editable="false" prefWidth="382.0" sortable="false" text="%projects.column.path" />
             </columns>
         </TableView>
         <Button fx:id="searchProjectsButton" layoutX="14.0" layoutY="354.0" mnemonicParsing="false" text="%projects.button.search" textFill="BLUE">
@@ -17,17 +17,17 @@
                 <Font name="System Bold" size="13.0" />
             </font>
         </Button>
-        <Button fx:id="removeProjectButton" layoutX="545.0" layoutY="353.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="42.0" text="-" textFill="RED">
+        <Button fx:id="removeProjectButton" layoutX="620.0" layoutY="355.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="42.0" text="-" textFill="RED">
             <font>
                 <Font name="System Bold" size="18.0" />
             </font>
         </Button>
-        <Button fx:id="addProjectButton" layoutX="495.0" layoutY="353.0" mnemonicParsing="false" text="+" textFill="GREEN">
+        <Button fx:id="addProjectButton" layoutX="570.0" layoutY="355.0" mnemonicParsing="false" text="+" textFill="GREEN">
             <font>
                 <Font name="System Bold" size="18.0" />
             </font>
         </Button>
-      <Button fx:id="saveButton" layoutX="406.0" layoutY="354.0" mnemonicParsing="false" text="%projects.button.save" textFill="BLUE">
+      <Button fx:id="saveButton" layoutX="481.0" layoutY="355.0" mnemonicParsing="false" text="%projects.button.save" textFill="BLUE">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
