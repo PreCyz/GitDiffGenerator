@@ -17,17 +17,17 @@
                 <Font name="System Bold" size="13.0" />
             </font>
         </Button>
-        <Button fx:id="removeProjectButton" layoutX="620.0" layoutY="355.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="42.0" text="-" textFill="RED">
+        <Button fx:id="removeProjectButton" layoutX="626.0" layoutY="355.0" mnemonicParsing="false" prefWidth="37.0" style="-fx-background-image: url('./img/red-minus.png'); -fx-background-size: 30px; -fx-background-repeat: no-repeat; -fx-background-position: 50%;">
             <font>
                 <Font name="System Bold" size="18.0" />
             </font>
         </Button>
-        <Button fx:id="addProjectButton" layoutX="570.0" layoutY="355.0" mnemonicParsing="false" text="+" textFill="GREEN">
+        <Button fx:id="addProjectButton" layoutX="578.0" layoutY="355.0" mnemonicParsing="false" prefWidth="40.0" style="-fx-background-image: url('./img/green-plus.png'); -fx-background-size: 30px; -fx-background-repeat: no-repeat; -fx-background-position: 50%;">
             <font>
                 <Font name="System Bold" size="18.0" />
             </font>
         </Button>
-      <Button fx:id="saveButton" layoutX="481.0" layoutY="355.0" mnemonicParsing="false" text="%projects.button.save" textFill="BLUE">
+      <Button fx:id="saveButton" layoutX="158.0" layoutY="354.0" mnemonicParsing="false" text="%projects.button.save" textFill="BLUE">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
