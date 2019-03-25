@@ -1,5 +1,6 @@
 package pg.gipter.ui.project;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -7,6 +8,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Disabled("It works only on Linux because of paths")
 class ProjectsControllerTest {
 
     @Test
