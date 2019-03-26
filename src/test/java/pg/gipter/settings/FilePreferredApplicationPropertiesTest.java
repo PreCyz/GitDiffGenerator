@@ -247,6 +247,15 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
+    void given_uploadTypeDocuments_whenFileName_thenReturnFileNameWithZip() {
+        appProps = new FilePreferredApplicationProperties(new String[]{"uploadType=documents"});
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).endsWith("zip");
+    }
+
+    @Test
     void given_periodInDaysAndStartDate_when_startDate_then_returnStartDate() {
         appProps = new FilePreferredApplicationProperties(new String[]{"periodInDays=16","startDate=2018-10-18"});
 

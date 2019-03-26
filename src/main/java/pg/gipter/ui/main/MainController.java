@@ -45,7 +45,7 @@ public class MainController extends AbstractController {
     @FXML
     private TextField svnAuthorTextField;
     @FXML
-    private ComboBox<UploadType> codeProtectionComboBox;
+    private ComboBox<UploadType> uploadTypeComboBox;
     @FXML
     private CheckBox skipRemoteCheckBox;
 
@@ -136,8 +136,8 @@ public class MainController extends AbstractController {
         gitAuthorTextField.setText(applicationProperties.gitAuthor());
         mercurialAuthorTextField.setText(applicationProperties.mercurialAuthor());
         svnAuthorTextField.setText(applicationProperties.svnAuthor());
-        codeProtectionComboBox.setItems(FXCollections.observableArrayList(UploadType.values()));
-        codeProtectionComboBox.setValue(applicationProperties.uploadType());
+        uploadTypeComboBox.setItems(FXCollections.observableArrayList(UploadType.values()));
+        uploadTypeComboBox.setValue(applicationProperties.uploadType());
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
 
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
@@ -236,7 +236,7 @@ public class MainController extends AbstractController {
     private void setActions(ResourceBundle resources) {
         projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
-        codeProtectionComboBox.setOnAction(codeProtectionActionEventHandler());
+        uploadTypeComboBox.setOnAction(uploadTypeActionEventHandler());
         executeButton.setOnAction(executeActionEventHandler());
         deamonButton.setOnAction(deamonActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
@@ -245,7 +245,9 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
         return event -> {
-            propertiesHelper.saveToUIApplicationProperties(createProperties(createArgsFromUI()));
+            String[] argsFromUI = createArgsFromUI();
+            propertiesHelper.saveToUIApplicationProperties(createProperties(argsFromUI));
+            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
             uiLauncher.hideMainWindow();
             uiLauncher.showProjectsWindow();
         };
@@ -263,7 +265,7 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
         return event -> {
-            if (codeProtectionComboBox.getValue() == UploadType.STATEMENT) {
+            if (uploadTypeComboBox.getValue() == UploadType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setInitialDirectory(new File("."));
                 fileChooser.setTitle(resources.getString("directory.item.statement.title"));
@@ -319,7 +321,7 @@ public class MainController extends AbstractController {
         if (!StringUtils.nullOrEmpty(svnAuthorTextField.getText())) {
             argList.add(ArgName.svnAuthor + "=" + svnAuthorTextField.getText());
         }
-        argList.add(ArgName.uploadType + "=" + codeProtectionComboBox.getValue());
+        argList.add(ArgName.uploadType + "=" + uploadTypeComboBox.getValue());
         argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
 
         argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
@@ -361,11 +363,13 @@ public class MainController extends AbstractController {
         infoLabel.textProperty().bind(task.messageProperty());
     }
 
-    private EventHandler<ActionEvent> codeProtectionActionEventHandler() {
+    private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             projectPathButton.setDisable(false);
-            if (codeProtectionComboBox.getValue() == UploadType.STATEMENT) {
+            if (uploadTypeComboBox.getValue() == UploadType.STATEMENT) {
                 projectPathButton.setDisable(true);
+            } else if (uploadTypeComboBox.getValue() == UploadType.DOCUMENTS) {
+
             }
         };
     }

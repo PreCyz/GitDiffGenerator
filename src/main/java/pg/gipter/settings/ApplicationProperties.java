@@ -98,7 +98,11 @@ public abstract class ApplicationProperties {
         if (!itemFileNamePrefix().isEmpty()) {
             fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
         }
-        return fileName + ".txt";
+        String extension = "txt";
+        if (uploadType() == UploadType.DOCUMENTS) {
+            extension = "zip";
+        }
+        return fileName + "." + extension;
     }
 
     public PreferredArgSource preferredArgSource() {

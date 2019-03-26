@@ -17,6 +17,8 @@ public final class DiffProducerFactory {
         logger.info("Running on platform [{}].", platform);
         if (applicationProperties.uploadType() == UploadType.STATEMENT) {
             return new StatementDiffProducer(applicationProperties);
+        } else if (applicationProperties.uploadType() == UploadType.DOCUMENTS) {
+            return new DocumentsDiffProducer(applicationProperties);
         } else if ("Linux".equalsIgnoreCase(platform)) {
             return new LinuxDiffProducer(applicationProperties);
         } else if (platform.startsWith("Windows")) {

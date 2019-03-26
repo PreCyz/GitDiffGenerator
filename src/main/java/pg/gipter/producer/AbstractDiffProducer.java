@@ -43,9 +43,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
                 writeItemToFile(fw, projectPath, cmd);
                 vcsSet.add(vcs);
             }
-
             appProps.setVcs(vcsSet);
-
             logger.info("Diff file generated and saved as: {}.", appProps.itemPath());
 
         } catch (Exception ex) {

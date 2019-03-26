@@ -9,8 +9,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import org.jetbrains.annotations.NotNull;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
@@ -52,7 +55,7 @@ public class ProjectsController extends AbstractController {
         super.initialize(location, resources);
         setUpColumns();
         initValues();
-        setUpButtons(resources);
+        setupButtons(resources);
     }
 
     private void setUpColumns() {
@@ -110,7 +113,14 @@ public class ProjectsController extends AbstractController {
         }
     }
 
-    private void setUpButtons(ResourceBundle resources) {
+    private void setupButtons(ResourceBundle resources) {
+        if (applicationProperties.uploadType() == UploadType.DOCUMENTS) {
+            searchProjectsButton.setDisable(true);
+            Tooltip tooltip = new Tooltip();
+            tooltip.setTextAlignment(TextAlignment.LEFT);
+            tooltip.setFont(Font.font("Courier New", 14));
+            tooltip.setText(resources.getString("projects.button.search.tooltip"));
+        }
         searchProjectsButton.setOnAction(searchButtonActionEventHandler(resources));
         saveButton.setOnAction(saveButtonActionEventHandler());
         addProjectButton.setOnAction(addButtonActionEventHandler(resources));
@@ -177,9 +187,13 @@ public class ProjectsController extends AbstractController {
             File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
             if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                 try {
+                    String vcsType = UploadType.DOCUMENTS.name();
+                    if (applicationProperties.uploadType() != UploadType.DOCUMENTS) {
+                        vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
+                    }
                     ProjectDetails project = new ProjectDetails(
                             itemPathDirectory.getName(),
-                            VersionControlSystem.valueFrom(itemPathDirectory).name(),
+                            vcsType,
                             itemPathDirectory.getAbsolutePath()
                     );
                     if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
