@@ -27,6 +27,8 @@
                         <ComboBox fx:id="uploadTypeComboBox" layoutX="129.0" layoutY="212.0" prefWidth="160.0" />
                         <CheckBox fx:id="skipRemoteCheckBox" layoutX="129.0" layoutY="185.0" mnemonicParsing="false" />
                         <Label layoutX="10.0" layoutY="183.0" text="%csv.panel.skipRemote" />
+                  <TextField fx:id="documentFiltersTextField" layoutX="129.0" layoutY="246.0" prefWidth="160.0" />
+                  <Label layoutX="10.0" layoutY="248.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.documentFilters" />
                     </children>
                 </AnchorPane>
             </content>

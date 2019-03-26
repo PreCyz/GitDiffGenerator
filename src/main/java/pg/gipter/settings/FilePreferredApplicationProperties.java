@@ -240,4 +240,15 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return false;
     }
 
+    @Override
+    public Set<String> documentFilters() {
+        if (hasProperties()) {
+            String[] projectPaths = properties.getProperty(
+                    ArgName.documentFilters.name(), ArgName.documentFilters.defaultValue()
+            ).split(",");
+            return new HashSet<>(Arrays.asList(projectPaths));
+        }
+        return argExtractor.documentFilters();
+    }
+
 }

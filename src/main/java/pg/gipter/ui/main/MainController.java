@@ -48,6 +48,8 @@ public class MainController extends AbstractController {
     private ComboBox<UploadType> uploadTypeComboBox;
     @FXML
     private CheckBox skipRemoteCheckBox;
+    @FXML
+    private TextField documentFiltersTextField;
 
     @FXML
     private TextField toolkitUsernameTextField;
@@ -198,6 +200,7 @@ public class MainController extends AbstractController {
         } else {
             projectPathButton.setText(resources.getString("button.change"));
         }
+        projectPathButton.setDisable(uploadTypeComboBox.getValue() == UploadType.STATEMENT);
 
         if (StringUtils.nullOrEmpty(applicationProperties.itemPath())) {
             itemPathButton.setText(resources.getString("button.add"));
@@ -217,6 +220,7 @@ public class MainController extends AbstractController {
         } else {
             deamonButton.setText(resources.getString("button.job"));
         }
+        documentFiltersTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.DOCUMENTS);
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -323,6 +327,9 @@ public class MainController extends AbstractController {
         }
         argList.add(ArgName.uploadType + "=" + uploadTypeComboBox.getValue());
         argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
+        if (!StringUtils.nullOrEmpty(documentFiltersTextField.getText())) {
+            argList.add(ArgName.documentFilters + "=" + documentFiltersTextField.getText());
+        }
 
         argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
         argList.add(ArgName.toolkitPassword + "=" + toolkitPasswordField.getText());
@@ -365,11 +372,10 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
-            projectPathButton.setDisable(false);
-            if (uploadTypeComboBox.getValue() == UploadType.STATEMENT) {
-                projectPathButton.setDisable(true);
-            } else if (uploadTypeComboBox.getValue() == UploadType.DOCUMENTS) {
-
+            projectPathButton.setDisable(uploadTypeComboBox.getValue() == UploadType.STATEMENT);
+            documentFiltersTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.DOCUMENTS);
+            if (uploadTypeComboBox.getValue() != UploadType.DOCUMENTS) {
+                documentFiltersTextField.clear();
             }
         };
     }

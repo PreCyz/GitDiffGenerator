@@ -1429,4 +1429,63 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).isEqualTo("AAA");
     }
+
+    @Test
+    void given_noDocumentFilters_whenDocumentFilters_thenReturnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        Set<String> actual = applicationProperties.documentFilters();
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void given_documentFiltersFromCLI_whenDocumentFilters_thenReturnCliDocumentFilters() {
+        applicationProperties = new CliPreferredApplicationProperties(
+                new String[]{"documentFilters=cliProjectPath1,cliProjectPath2"}
+        );
+
+        Set<String> actual = applicationProperties.documentFilters();
+
+        assertThat(actual).containsExactly("cliProjectPath1", "cliProjectPath2");
+    }
+
+    @Test
+    void givenDocumentFiltersFileAndCLI_whenDocumentFilters_thenReturnCliDocumentFilters() {
+        String[] args = {"documentFilters=cliProjectPath1,cliProjectPath2"};
+        Properties props = new Properties();
+        props.put("documentFilters", "propertiesProjectPath1,propertiesProjectPath2");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = applicationProperties.documentFilters();
+
+        assertThat(actual).containsExactly("cliProjectPath1", "cliProjectPath2");
+    }
+
+    @Test
+    void givenDocumentFiltersFromProperties_whenDocumentFilters_thenReturnDocumentFiltersFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("documentFilters", "propertiesProjectPath1,propertiesProjectPath2");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = applicationProperties.documentFilters();
+
+        assertThat(actual).containsExactly("propertiesProjectPath1", "propertiesProjectPath2");
+    }
+
+    @Test
+    void givenDocumentFiltersFromPropertiesAndOtherArgs_whenDocumentFilters_thenReturnDocumentFiltersFromProperties() {
+        String[] args = {"uploadType=statement"};
+        Properties props = new Properties();
+        props.put("documentFilters", "propertiesProjectPath1,propertiesProjectPath2");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = applicationProperties.documentFilters();
+
+        assertThat(actual).containsExactly("propertiesProjectPath1", "propertiesProjectPath2");
+    }
 }

@@ -261,4 +261,15 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         return false;
     }
 
+    @Override
+    public Set<String> documentFilters() {
+        Set<String> documentFilters = argExtractor.documentFilters();
+        String argName = ArgName.documentFilters.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            String[] documentFiltersArray = properties.getProperty(argName, String.join(",", documentFilters)).split(",");
+            documentFilters = new LinkedHashSet<>(Arrays.asList(documentFiltersArray));
+        }
+        return documentFilters;
+    }
+
 }

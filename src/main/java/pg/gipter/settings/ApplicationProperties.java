@@ -130,7 +130,7 @@ public abstract class ApplicationProperties {
 
     protected final String log() {
         return  "version='" + version() + '\'' +
-                ", authors='" + authors() + '\'' +
+                ", authors='" + String.join(",", authors()) + '\'' +
                 ", gitAuthor='" + gitAuthor() + '\'' +
                 ", mercurialAuthor='" + mercurialAuthor() + '\'' +
                 ", svnAuthor='" + svnAuthor() + '\'' +
@@ -142,6 +142,7 @@ public abstract class ApplicationProperties {
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
                 ", uploadType='" + uploadType() + '\'' +
+                ", documentFilters='" + String.join(",", documentFilters()) + '\'' +
                 ", preferredArgSource='" + preferredArgSource() + '\'' +
                 ", skipRemote='" + isSkipRemote() + '\'' +
                 ", useUI='" + isUseUI() + '\'' +
@@ -152,7 +153,8 @@ public abstract class ApplicationProperties {
                 ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                 ", toolkitDomain='" + toolkitDomain() + '\'' +
                 ", toolkitListName='" + toolkitListName() + '\'' +
-                ", toolkitUserFolder='" + toolkitUserFolder()+ '\''
+                ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
+                ", toolkitCustomUserFolder='" + toolkitCustomUserFolder() + '\''
                 ;
     }
 
@@ -179,4 +181,5 @@ public abstract class ApplicationProperties {
     public abstract boolean isSkipRemote();
     public abstract boolean isUseUI();
     public abstract boolean isActiveTray();
+    public abstract Set<String> documentFilters();
 }

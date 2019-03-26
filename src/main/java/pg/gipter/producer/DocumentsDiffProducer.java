@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -65,9 +66,16 @@ class DocumentsDiffProducer extends AbstractDiffProducer {
                 Instant.ofEpochMilli(document.lastModified()),
                 TimeZone.getDefault().toZoneId()
         ).toLocalDate();
+        Set<String> filters = appProps.documentFilters();
+        boolean filterIncluded = true;
+        if (!filters.isEmpty()) {
+            String extension = document.getName().substring(document.getName().lastIndexOf(".") + 1);
+            filterIncluded = filters.contains(extension);
+        }
         return document.isFile() &&
                 lastModifiedDate.isAfter(appProps.startDate()) &&
-                (lastModifiedDate.isBefore(appProps.endDate()) || lastModifiedDate.isEqual(appProps.endDate()));
+                (lastModifiedDate.isBefore(appProps.endDate()) || lastModifiedDate.isEqual(appProps.endDate())) &&
+                filterIncluded;
     }
 
     private void zipDocumentsAndWriteToFile(List<File> documents) {
