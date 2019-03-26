@@ -1,6 +1,6 @@
 package pg.gipter.settings;
 
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -72,7 +72,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         if (!containsArg(argName) && containsProperty(argName)) {
             itemPath = properties.getProperty(argName, argExtractor.itemPath());
         }
-        return codeProtection() == CodeProtection.STATEMENT ? itemPath : itemPath + File.separator + fileName();
+        return uploadType() == UploadType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
     }
 
     @Override
@@ -145,13 +145,13 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public CodeProtection codeProtection() {
-        CodeProtection codeProtection = argExtractor.codeProtection();
-        String argName = ArgName.codeProtection.name();
+    public UploadType uploadType() {
+        UploadType uploadType = argExtractor.uploadType();
+        String argName = ArgName.uploadType.name();
         if (!containsArg(argName) && containsProperty(argName)) {
-            codeProtection = CodeProtection.valueFor(properties.getProperty(argName, codeProtection.name()));
+            uploadType = UploadType.valueFor(properties.getProperty(argName, uploadType.name()));
         }
-        return codeProtection;
+        return uploadType;
     }
 
     @Override

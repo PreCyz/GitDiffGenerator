@@ -11,7 +11,7 @@ class DiffCommandFactoryTest {
     void given_codeProtectionSTATEMENT_when_getInstance_then_returnEmptyDiffCommand() {
         DiffCommand instance = DiffCommandFactory.getInstance(
                 VersionControlSystem.GIT,
-                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE", "codeProtection=statement"})
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE", "uploadType=statement"})
         );
         assertThat(instance).isInstanceOf(EmptyDiffCommand.class);
     }

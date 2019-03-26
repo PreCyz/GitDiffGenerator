@@ -1,7 +1,7 @@
 package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -285,36 +285,45 @@ class ArgExtractorTest {
     void given_noCodeProtection_when_codeProtection_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
-        CodeProtection actual = argExtractor.codeProtection();
+        UploadType actual = argExtractor.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.NONE);
+        assertThat(actual).isEqualTo(UploadType.SIMPLE);
     }
 
     @Test
-    void given_codeProtectedSetAsNone_when_codeProtection_then_returnEnum() {
-        argExtractor = new ArgExtractor(new String[]{"codeProtection=None"});
+    void given_uploadTypeSetAsNone_when_codeProtection_then_returnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"uploadType=simple"});
 
-        CodeProtection actual = argExtractor.codeProtection();
+        UploadType actual = argExtractor.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.NONE);
+        assertThat(actual).isEqualTo(UploadType.SIMPLE);
     }
 
     @Test
-    void given_codeProtectedSetAsSimple_when_codeProtection_then_returnEnum() {
-        argExtractor = new ArgExtractor(new String[]{"codeProtection=simple"});
+    void given_uploadTypeSetAsSimple_when_codeProtection_then_returnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"uploadType=protected"});
 
-        CodeProtection actual = argExtractor.codeProtection();
+        UploadType actual = argExtractor.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.SIMPLE);
+        assertThat(actual).isEqualTo(UploadType.PROTECTED);
     }
 
     @Test
-    void given_codeProtectedSetAsStatement_when_codeProtection_then_returnEnum() {
-        argExtractor = new ArgExtractor(new String[]{"codeProtection=STaTeMeNt"});
+    void given_uploadTypeSetAsStatement_when_codeProtection_then_returnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"uploadType=STaTeMeNt"});
 
-        CodeProtection actual = argExtractor.codeProtection();
+        UploadType actual = argExtractor.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.STATEMENT);
+        assertThat(actual).isEqualTo(UploadType.STATEMENT);
+    }
+
+    @Test
+    void given_uploadTypeSetAsDocuments_when_codeProtection_then_returnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"uploadType=documeNTS"});
+
+        UploadType actual = argExtractor.uploadType();
+
+        assertThat(actual).isEqualTo(UploadType.DOCUMENTS);
     }
 
     @Test

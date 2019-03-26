@@ -2,7 +2,7 @@ package pg.gipter.settings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.utils.PropertiesHelper;
 
@@ -137,7 +137,7 @@ public abstract class ApplicationProperties {
                 ", periodInDays='" + periodInDays() + '\'' +
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
-                ", codeProtection='" + codeProtection() + '\'' +
+                ", uploadType='" + uploadType() + '\'' +
                 ", preferredArgSource='" + preferredArgSource() + '\'' +
                 ", skipRemote='" + isSkipRemote() + '\'' +
                 ", useUI='" + isUseUI() + '\'' +
@@ -163,7 +163,7 @@ public abstract class ApplicationProperties {
     public abstract LocalDate startDate();
     public abstract LocalDate endDate();
     public abstract int periodInDays();
-    public abstract CodeProtection codeProtection();
+    public abstract UploadType uploadType();
     public abstract boolean isConfirmationWindow();
     public abstract String toolkitUsername();
     public abstract String toolkitPassword();

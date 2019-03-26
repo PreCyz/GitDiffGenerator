@@ -27,11 +27,11 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
     @Override
     List<String> getInitialCommand() {
         LinkedList<String> initialCommand = new LinkedList<>(Arrays.asList("hg", "log"));
-        switch (appProps.codeProtection()) {
-            case NONE:
+        switch (appProps.uploadType()) {
+            case SIMPLE:
                 initialCommand.add("--patch");
                 break;
-            case SIMPLE:
+            case PROTECTED:
                 initialCommand.add("--style");
                 initialCommand.add("changelog");
                 break;

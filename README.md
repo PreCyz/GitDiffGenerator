@@ -39,8 +39,8 @@ You can pass some parameters commandline way and other _application.properties_ 
 ### Params description
 **author** - comma separated users who committed the code.<br />
 **committerEmail** - email of the user who committed the code. For git user email from git config stored under key '_user.email_'.<br />
-**codeProtection** - possible values are `NONE`, `SIMPLE` and `STATEMENT`. Default value is `NONE`. Further explanation [here](https://github.com/PreCyz/GitDiffGenerator#explanation-of-codeprotection-parameter).<br />
-**itemPath** - path where file with git diff should be saved or if `codeProtection` is set as `STATEMENT` then full path to the file with statement.<br />
+**uploadType** - possible values are `SIMPLE`, `PROTECTED` and `STATEMENT`. Default value is `SIMPLE`. Further explanation [here](https://github.com/PreCyz/GitDiffGenerator#explanation-of-codeprotection-parameter).<br />
+**itemPath** - path where file with git diff should be saved or if `uploadType` is set as `STATEMENT` then full path to the file with statement.<br />
 **projectPath** - comma separated project paths containing _.git_, _.svn_ or _.hg_ folders.<br />
 **periodInDays** - integer number. Default value is 7. It helps define start date of diff calculations. Start date is `now - periodInDays`, end date is now.<br />
 **startDate** - start date of diff given in format `yyyy-MM-dd`.<br />
@@ -59,18 +59,19 @@ Below parameters are mandatory for toolkit:<br/>
 **toolkitPassword** - user password used to log in into SharePoint.<br /><br />
 
 _Note:_ When `periodInDays` is used together with `startDate` then **startDate** has higher priority.
-### Explanation of *codeProtection* parameter
-* `NONE` - no protection,
-* `SIMPLE` - no code can not be shared in anyway but diff can contain headers of changes, 
+### Explanation of *uploadType* parameter
+* `SIMPLE` - full git diff is generated and uploaded,
+* `PROTECTED` - no code can not be shared in anyway but diff can contain headers of changes, 
 * `STATEMENT` - not even headers of changes are allowed in diff. File with statement is uploaded to SharePoint instead.
+* `DOCUMENTS` - several documents zipped to one file and uploaded to SharePoint.
 ### Explanation of *preferredArgSource* parameter
 * `CLI` - commandLine arguments will be used as first then missing parameters will be read from _application.properties_,
 * `FILE` - arguments from _application.properties_ will be used as first then missing parameters will be read from commandLine arguments.
 #####
 **Case 1**<br />
 It may be that owner of the code forbids to share the code in anyway but you are allowed to put headers of the changes in the diff.
-In that case user should set parameter *codeProtection* to `SIMPLE`.
-For `GIT` the `SIMPLE` protection will contain entries as follows:<br />
+In that case user should set parameter *uploadType* to `PROTECTED`.
+For `GIT` the `PROTECTED` protection will contain entries as follows:<br />
 ```
 a42212890 Cleaning code.
 5cfc248ad Fixing that balck hole.
@@ -84,7 +85,7 @@ No code! Just:
 #####
 **Case 2**<br />
 It also may be that owner of the code forbids to share any kind of information about the code and changes, even headers.
-If so then user should upload to SharePoint file with the statement. Application can do it for user if only *codeProtection* parameter is set as `STATEMENT`.
+If so then user should upload to SharePoint file with the statement. Application can do it for user if only *uploadType* parameter is set as `STATEMENT`.
 ### Toolkit
 To setup toolkit details only two parameters has to be set: _toolkitUsername_ and _toolkitPassword_. If parameters are not set the application will generate diff file and report an error.
 Popup window will be displayed and in the logs there will be relevant entry. If parameters are set then new item in the toolkit will be created. New item will contain attachment, which is generated
@@ -144,14 +145,14 @@ create following setup in your _application.properties_:<br />
 svnAuthor=Kit Fisto
 itemPath=/home/Vader/Path/to/diff/item
 projectPath=/home/Vader/SVN/Project1
-codeProtection=SIMPLE
+uploadType=SIMPLE
 ```
 *Explanation:* Java + Linux == simple paths with slashes!<br />
 **Example 6**<br />
 If you want to create SVN diff for Project1 that is fully protected by the owner, then create following setup in your _application.properties_:<br />
 ```
 itemPath=/home/Vader/Path/to/statement/my-statement.docx
-codeProtection=STATEMENT
+uploadType=STATEMENT
 ```
 **To all above examples toolkit parameters (_toolkitUsername_ & _toolkitPassword_) has to be set up.** 
 ### Download

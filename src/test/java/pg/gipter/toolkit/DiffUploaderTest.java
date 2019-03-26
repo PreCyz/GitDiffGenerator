@@ -36,7 +36,7 @@ class DiffUploaderTest {
     @Test
     void given_applicationProperties_when_buildAttributesMap_then_return_properMap() {
         ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(new String[]{
-                "codeProtection=NONE",
+                "uploadType=SIMPLE",
                 "startDate=2018-10-18",
                 "endDate=2018-10-19",
                 "toolkitUsername=xxx",
@@ -66,7 +66,7 @@ class DiffUploaderTest {
     @Test
     void given_codeProtectionStatement_when_buildAttributesMap_then_return_properMap() {
         ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(new String[]{
-                "codeProtection=STATEMENT",
+                "uploadType=STATEMENT",
                 "startDate=2017-10-19",
                 "endDate=2017-12-20",
                 "itemFileNamePrefix=custom",

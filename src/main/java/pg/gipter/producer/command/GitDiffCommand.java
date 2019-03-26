@@ -32,11 +32,11 @@ final class GitDiffCommand extends AbstractDiffCommand {
         if (!appProps.isSkipRemote()) {
             initialCommand.add("--remotes=origin");
         }
-        switch (appProps.codeProtection()) {
-            case NONE:
+        switch (appProps.uploadType()) {
+            case SIMPLE:
                 initialCommand.add("--patch");
                 break;
-            case SIMPLE:
+            case PROTECTED:
                 initialCommand.add("--oneline");
                 break;
 

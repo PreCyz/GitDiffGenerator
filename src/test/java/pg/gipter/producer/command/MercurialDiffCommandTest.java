@@ -26,7 +26,7 @@ class MercurialDiffCommandTest {
 
     @Test
     void given_codeProtectionNONE_when_getInitialCommand_then_returnInitialCommandForProtectionNONE() {
-        when(applicationProperties.codeProtection()).thenReturn(CodeProtection.NONE);
+        when(applicationProperties.uploadType()).thenReturn(UploadType.SIMPLE);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -36,7 +36,7 @@ class MercurialDiffCommandTest {
 
     @Test
     void given_codeProtectionSIMPLE_when_getInitialCommand_then_returnInitialCommandForProtectionSIMPLE() {
-        when(applicationProperties.codeProtection()).thenReturn(CodeProtection.SIMPLE);
+        when(applicationProperties.uploadType()).thenReturn(UploadType.PROTECTED);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -50,13 +50,13 @@ class MercurialDiffCommandTest {
         String committerEmail="test@email.com";
         LocalDate startDate = LocalDate.now().minusDays(7);
         LocalDate endDate = LocalDate.now();
-        CodeProtection codeProtection = CodeProtection.NONE;
+        UploadType uploadType = UploadType.SIMPLE;
 
         when(applicationProperties.mercurialAuthor()).thenReturn(author);
         when(applicationProperties.committerEmail()).thenReturn(committerEmail);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
-        when(applicationProperties.codeProtection()).thenReturn(codeProtection);
+        when(applicationProperties.uploadType()).thenReturn(uploadType);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.commandAsList();
@@ -74,12 +74,12 @@ class MercurialDiffCommandTest {
         String author = "testAuthor";
         LocalDate startDate = LocalDate.now().minusDays(7);
         LocalDate endDate = LocalDate.now();
-        CodeProtection codeProtection = CodeProtection.NONE;
+        UploadType uploadType = UploadType.SIMPLE;
 
         when(applicationProperties.mercurialAuthor()).thenReturn(author);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
-        when(applicationProperties.codeProtection()).thenReturn(codeProtection);
+        when(applicationProperties.uploadType()).thenReturn(uploadType);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.commandAsList();

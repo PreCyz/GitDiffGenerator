@@ -1,6 +1,6 @@
 package pg.gipter.settings;
 
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
@@ -116,17 +116,17 @@ final class ArgExtractor {
         return ArgName.itemFileNamePrefix.defaultValue();
     }
 
-    CodeProtection codeProtection() {
-        if (containsArg(ArgName.codeProtection.name())) {
-            String codeProtection = getValue(ArgName.codeProtection, ArgName.codeProtection.defaultValue());
-            return CodeProtection.valueFor(codeProtection);
+    UploadType uploadType() {
+        if (containsArg(ArgName.uploadType.name())) {
+            String codeProtection = getValue(ArgName.uploadType, ArgName.uploadType.defaultValue());
+            return UploadType.valueFor(codeProtection);
         }
-        return CodeProtection.valueFor(ArgName.codeProtection.defaultValue());
+        return UploadType.valueFor(ArgName.uploadType.defaultValue());
     }
 
     boolean isConfirmationWindow() {
         if (containsArg(ArgName.confirmationWindow.name())) {
-            return StringUtils.getBoolean(getValue(ArgName.confirmationWindow, ArgName.codeProtection.defaultValue()));
+            return StringUtils.getBoolean(getValue(ArgName.confirmationWindow, ArgName.uploadType.defaultValue()));
         }
         return StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
     }

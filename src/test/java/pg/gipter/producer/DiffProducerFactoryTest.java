@@ -11,7 +11,7 @@ class DiffProducerFactoryTest {
     void given_codeProtectionStatement_when_getInstance_then_returnStatementDiffProducer() {
         DiffProducer instance = DiffProducerFactory.getInstance(ApplicationPropertiesFactory.getInstance(new String[]{
                 "preferredArgSource=FILE",
-                "codeProtection=statement"
+                "uploadType=statement"
         }));
 
         assertThat(instance).isInstanceOf(StatementDiffProducer.class);

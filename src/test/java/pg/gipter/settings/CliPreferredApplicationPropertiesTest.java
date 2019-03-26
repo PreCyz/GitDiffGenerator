@@ -1,7 +1,7 @@
 package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.utils.PropertiesHelper;
 
 import java.io.File;
@@ -307,7 +307,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_itemPathFromPropertiesAndOtherArgs_when_itemPath_then_returnItemPathFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("itemPath", "propertiesItemPath");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -366,7 +366,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_itemFileNamePrefixFromPropertiesAndOtherArgs_when_itemFileNamePrefix_then_returnItemPathFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("itemFileNamePrefix", "propertiesItemFileNamePrefix");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -425,7 +425,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_projectPathFromPropertiesAndOtherArgs_when_projectPaths_then_returnProjectPathFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("projectPath", "propertiesProjectPath1,propertiesProjectPath2");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -484,7 +484,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_committerEmailFromPropertiesAndOtherArgs_when_committerEmail_then_returnCommitterEmailFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("committerEmail", "test@email.properties");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -543,7 +543,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_startDateFromPropertiesAndOtherArgs_when_startDate_then_returnStartDateFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("startDate", "2019-02-09");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -638,7 +638,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_endDateFromPropertiesAndOtherArgs_when_endDate_then_returnEndDateFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("endDate", "2019-02-09");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -650,62 +650,62 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
-    void given_noCodeProtection_when_codeProtection_then_returnCodeProtection() {
+    void given_noCodeProtection_when_uploadType_then_returnCodeProtection() {
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
 
-        CodeProtection actual = applicationProperties.codeProtection();
+        UploadType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.NONE);
+        assertThat(actual).isEqualTo(UploadType.SIMPLE);
     }
 
     @Test
-    void given_codeProtectionFromCLI_when_codeProtection_then_returnCliCodeProtection() {
+    void given_uploadTypeFromCLI_when_uploadType_then_returnCliCodeProtection() {
         applicationProperties = new CliPreferredApplicationProperties(
-                new String[]{"codeProtection=simple"}
+                new String[]{"uploadType=protected"}
         );
 
-        CodeProtection actual = applicationProperties.codeProtection();
+        UploadType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.SIMPLE);
+        assertThat(actual).isEqualTo(UploadType.PROTECTED);
     }
 
     @Test
-    void given_codeProtectionFileAndCLI_when_codeProtection_then_returnCliCodeProtection() {
-        String[] args = {"codeProtection=SIMPLE"};
+    void given_uploadTypeFileAndCLI_when_uploadType_then_returnCliCodeProtection() {
+        String[] args = {"uploadType=PROTECTED"};
         Properties props = new Properties();
-        props.put("codeProtection", "statement");
+        props.put("uploadType", "statement");
         applicationProperties = new CliPreferredApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
-        CodeProtection actual = applicationProperties.codeProtection();
+        UploadType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.SIMPLE);
+        assertThat(actual).isEqualTo(UploadType.PROTECTED);
     }
 
     @Test
-    void given_codeProtectionFromProperties_when_codeProtection_then_returnCodeProtectionFromProperties() {
+    void given_uploadTypeFromProperties_when_uploadType_then_returnCodeProtectionFromProperties() {
         String[] args = {};
         Properties props = new Properties();
-        props.put("codeProtection", "STATEMENT");
+        props.put("uploadType", "STATEMENT");
         applicationProperties = new CliPreferredApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
-        CodeProtection actual = applicationProperties.codeProtection();
+        UploadType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.STATEMENT);
+        assertThat(actual).isEqualTo(UploadType.STATEMENT);
     }
 
     @Test
-    void given_codeProtectionFromPropertiesAndOtherArgs_when_codeProtection_then_returnCodeProtectionFromProperties() {
+    void given_uploadTypeFromPropertiesAndOtherArgs_when_uploadType_then_returnCodeProtectionFromProperties() {
         String[] args = {"author=test"};
         Properties props = new Properties();
-        props.put("codeProtection", "statement");
+        props.put("uploadType", "statement");
         applicationProperties = new CliPreferredApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
-        CodeProtection actual = applicationProperties.codeProtection();
+        UploadType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.STATEMENT);
+        assertThat(actual).isEqualTo(UploadType.STATEMENT);
     }
 
     @Test
@@ -815,7 +815,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitUsernameFromPropertiesAndOtherArgs_when_toolkitUsername_then_returnToolkitUsernameFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitUsername", "propertiesUserName");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -874,7 +874,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitPasswordFromPropertiesAndOtherArgs_when_toolkitPassword_then_returnToolkitPasswordFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitPassword", "propertiesPassword");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -933,7 +933,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitDomainFromPropertiesAndOtherArgs_when_toolkitDomain_then_returnToolkitDomainFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitDomain", "propertiesDomain");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -992,7 +992,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitUrlFromPropertiesAndOtherArgs_when_toolkitUrl_then_returnToolkitUrlFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitUrl", "propertiesUrl");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -1051,7 +1051,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitListNameFromPropertiesAndOtherArgs_when_toolkitListName_then_returnToolkitListNameFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitListName", "propertiesListName");
         applicationProperties = new CliPreferredApplicationProperties(args);
@@ -1110,7 +1110,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitUserNameFromPropertiesAndOtherArgs_when_toolkitUserFolder_then_returnProperWithUserNameFromProperties() {
-        String[] args = {"codeProtection=statement"};
+        String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitUsername", "propertiesUsername");
         applicationProperties = new CliPreferredApplicationProperties(args);

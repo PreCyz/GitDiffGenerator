@@ -1,7 +1,7 @@
 package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.utils.PropertiesHelper;
 
 import java.io.File;
@@ -173,7 +173,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void given_statement_when_fileName_then_returnFileNameForStatement() {
         appProps = new FilePreferredApplicationProperties(new String[]{
-                "codeProtection=statement"
+                "uploadType=statement"
         });
         LocalDate now = LocalDate.now();
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
@@ -200,7 +200,7 @@ class FilePreferredApplicationPropertiesTest {
     void given_propertiesFileAndEndDateFromDeepPast_when_fileName_then_returnWellBuildFileName() {
         String[] args = {};
         Properties props = new Properties();
-        props.put("codeProtection", "statement");
+        props.put("uploadType", "statement");
         props.put("startDate", "2017-10-19");
         props.put("endDate", "2017-12-20");
         props.put("itemFileNamePrefix", "custom");
@@ -215,7 +215,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void given_commandLinePropsAndEndDateFromDeepPast_when_fileName_then_returnWellBuildFileName() {
         String[] args = {
-                "codeProtection=STATEMENT",
+                "uploadType=STATEMENT",
                 "startDate=2017-10-19",
                 "endDate=2017-12-20",
                 "itemFileNamePrefix=custom",
@@ -477,34 +477,34 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void given_noCodeProtection_when_codeProtection_then_returnDefaultValueNONE() {
+    void given_noCodeProtection_when_uploadType_then_returnDefaultValueNONE() {
         appProps = new FilePreferredApplicationProperties(new String[]{});
 
-        CodeProtection actual = appProps.codeProtection();
+        UploadType actual = appProps.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.NONE);
+        assertThat(actual).isEqualTo(UploadType.SIMPLE);
     }
 
     @Test
-    void given_codeProtection_when_codeProtection_then_returnThatCodeProtection() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"codeProtection=simple"});
+    void given_uploadType_when_uploadType_then_returnThatCodeProtection() {
+        appProps = new FilePreferredApplicationProperties(new String[]{"uploadType=protected"});
 
-        CodeProtection actual = appProps.codeProtection();
+        UploadType actual = appProps.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.SIMPLE);
+        assertThat(actual).isEqualTo(UploadType.PROTECTED);
     }
 
     @Test
-    void given_codeProtectionFromPropertiesAndCommandLine_when_codeProtection_then_returnCodeProtectionFromProperties() {
-        String[] args = {"codeProtection=Simple"};
+    void given_uploadTypeFromPropertiesAndCommandLine_when_uploadType_then_returnCodeProtectionFromProperties() {
+        String[] args = {"uploadType=Simple"};
         Properties props = new Properties();
-        props.put("codeProtection", "statement");
+        props.put("uploadType", "statement");
         appProps = new FilePreferredApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
-        CodeProtection actual = appProps.codeProtection();
+        UploadType actual = appProps.uploadType();
 
-        assertThat(actual).isEqualTo(CodeProtection.STATEMENT);
+        assertThat(actual).isEqualTo(UploadType.STATEMENT);
     }
 
     @Test

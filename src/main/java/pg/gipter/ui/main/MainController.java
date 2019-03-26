@@ -11,7 +11,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -45,7 +45,7 @@ public class MainController extends AbstractController {
     @FXML
     private TextField svnAuthorTextField;
     @FXML
-    private ComboBox<CodeProtection> codeProtectionComboBox;
+    private ComboBox<UploadType> codeProtectionComboBox;
     @FXML
     private CheckBox skipRemoteCheckBox;
 
@@ -136,8 +136,8 @@ public class MainController extends AbstractController {
         gitAuthorTextField.setText(applicationProperties.gitAuthor());
         mercurialAuthorTextField.setText(applicationProperties.mercurialAuthor());
         svnAuthorTextField.setText(applicationProperties.svnAuthor());
-        codeProtectionComboBox.setItems(FXCollections.observableArrayList(CodeProtection.values()));
-        codeProtectionComboBox.setValue(applicationProperties.codeProtection());
+        codeProtectionComboBox.setItems(FXCollections.observableArrayList(UploadType.values()));
+        codeProtectionComboBox.setValue(applicationProperties.uploadType());
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
 
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
@@ -263,7 +263,7 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
         return event -> {
-            if (codeProtectionComboBox.getValue() == CodeProtection.STATEMENT) {
+            if (codeProtectionComboBox.getValue() == UploadType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setInitialDirectory(new File("."));
                 fileChooser.setTitle(resources.getString("directory.item.statement.title"));
@@ -319,7 +319,7 @@ public class MainController extends AbstractController {
         if (!StringUtils.nullOrEmpty(svnAuthorTextField.getText())) {
             argList.add(ArgName.svnAuthor + "=" + svnAuthorTextField.getText());
         }
-        argList.add(ArgName.codeProtection + "=" + codeProtectionComboBox.getValue());
+        argList.add(ArgName.uploadType + "=" + codeProtectionComboBox.getValue());
         argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
 
         argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
@@ -364,7 +364,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> codeProtectionActionEventHandler() {
         return event -> {
             projectPathButton.setDisable(false);
-            if (codeProtectionComboBox.getValue() == CodeProtection.STATEMENT) {
+            if (codeProtectionComboBox.getValue() == UploadType.STATEMENT) {
                 projectPathButton.setDisable(true);
             }
         };

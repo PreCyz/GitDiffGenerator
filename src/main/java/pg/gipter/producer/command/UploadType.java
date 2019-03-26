@@ -3,17 +3,17 @@ package pg.gipter.producer.command;
 import java.util.EnumSet;
 import java.util.stream.Collectors;
 
-public enum CodeProtection {
-    NONE, SIMPLE, STATEMENT;
+public enum UploadType {
+    SIMPLE, PROTECTED, STATEMENT, DOCUMENTS;
 
-    public static CodeProtection valueFor(String value) {
+    public static UploadType valueFor(String value) {
         String errMsg;
         try {
-            return CodeProtection.valueOf(value.toUpperCase());
+            return UploadType.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
-            String supportedValues = EnumSet.allOf(CodeProtection.class)
+            String supportedValues = EnumSet.allOf(UploadType.class)
                     .stream()
-                    .map(CodeProtection::name)
+                    .map(UploadType::name)
                     .collect(Collectors.joining(", "));
             errMsg = String.format("Given value [%s] is not supported. Supported values are: [%s]%n",
                     value, String.join(", ", supportedValues));

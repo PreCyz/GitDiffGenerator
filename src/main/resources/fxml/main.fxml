@@ -23,7 +23,7 @@
                         <Label layoutX="9.0" layoutY="118.0" text="%csv.panel.mercurialAuthor" />
                         <TextField fx:id="svnAuthorTextField" layoutX="129.0" layoutY="151.0" prefWidth="160.0" />
                         <Label layoutX="9.0" layoutY="153.0" text="%csv.panel.svnAuthor" />
-                        <Label layoutX="10.0" layoutY="214.0" text="%csv.panel.codeProtection" />
+                        <Label layoutX="10.0" layoutY="214.0" text="%csv.panel.uploadType" />
                         <ComboBox fx:id="codeProtectionComboBox" layoutX="129.0" layoutY="212.0" prefWidth="160.0" />
                         <CheckBox fx:id="skipRemoteCheckBox" layoutX="129.0" layoutY="185.0" mnemonicParsing="false" />
                         <Label layoutX="10.0" layoutY="183.0" text="%csv.panel.skipRemote" />

@@ -1,6 +1,6 @@
 package pg.gipter.settings;
 
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 
 import java.time.LocalDate;
 
@@ -13,7 +13,7 @@ public enum ArgName {
     mercurialAuthor(""),
     svnAuthor(""),
     committerEmail(""),
-    codeProtection(CodeProtection.NONE.name()),
+    uploadType(UploadType.SIMPLE.name()),
     skipRemote("Y"),
 
     itemPath("NO_ITEM_PATH_GIVEN"),

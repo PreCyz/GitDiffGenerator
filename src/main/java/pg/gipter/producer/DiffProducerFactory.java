@@ -2,7 +2,7 @@ package pg.gipter.producer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
 
 /**Created by Pawel Gawedzki on 20-Sep-2018.*/
@@ -15,7 +15,7 @@ public final class DiffProducerFactory {
     public static DiffProducer getInstance(ApplicationProperties applicationProperties) {
         String platform = System.getProperty("os.name");
         logger.info("Running on platform [{}].", platform);
-        if (applicationProperties.codeProtection() == CodeProtection.STATEMENT) {
+        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
             return new StatementDiffProducer(applicationProperties);
         } else if ("Linux".equalsIgnoreCase(platform)) {
             return new LinuxDiffProducer(applicationProperties);

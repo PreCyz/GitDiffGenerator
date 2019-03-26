@@ -7,7 +7,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.ws.soap.client.SoapFaultClientException;
-import pg.gipter.producer.command.CodeProtection;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
@@ -87,8 +87,8 @@ public class DiffUploader {
         String title = fileName.substring(0, fileName.indexOf("."));
         String allVcs = applicationProperties.vcsSet().stream().map(Enum::name).collect(joining(","));
         String description = String.format("%s diff file.", allVcs);
-        if (applicationProperties.codeProtection() == CodeProtection.STATEMENT) {
-            description = String.format("%s file.", CodeProtection.STATEMENT);
+        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
+            description = String.format("%s file.", UploadType.STATEMENT);
         }
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 
