@@ -74,7 +74,7 @@ public class JobController extends AbstractController {
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
         setInitValues();
-        setActions(resources);
+        setActions();
         setProperties();
         scheduler = uiLauncher.getScheduler();
     }
@@ -145,8 +145,8 @@ public class JobController extends AbstractController {
         return Optional.empty();
     }
 
-    private void setActions(ResourceBundle resources) {
-        scheduleButton.setOnAction(scheduleJobActionEvent(resources));
+    private void setActions() {
+        scheduleButton.setOnAction(scheduleJobActionEvent());
         everyMonthRadioButton.setOnAction(everyMonthAction());
         every2WeeksRadioButton.setOnAction(every2WeeksActionEvent());
         everyWeekRadioButton.setOnAction(everyWeekActionEvent());
@@ -223,7 +223,7 @@ public class JobController extends AbstractController {
         };
     }
 
-    private EventHandler<ActionEvent> scheduleJobActionEvent(ResourceBundle resource) {
+    private EventHandler<ActionEvent> scheduleJobActionEvent() {
         return event -> {
             try {
                 JobType jobType = JobType.EVERY_WEEK;
@@ -251,7 +251,7 @@ public class JobController extends AbstractController {
 
             } catch (SchedulerException | ParseException se) {
                 logger.error("Error when creating a job.", se);
-                String errorMsg = resource.getString("popup.job.errorMsg");
+                String errorMsg = BundleUtils.getMsg("popup.job.errorMsg", se.getMessage());
                 AlertHelper.displayWindow(errorMsg, AlertHelper.logsFolder(), AlertHelper.LOG_WINDOW, Alert.AlertType.ERROR);
             }
         };

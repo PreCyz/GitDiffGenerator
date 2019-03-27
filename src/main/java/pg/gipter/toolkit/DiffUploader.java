@@ -71,11 +71,12 @@ public class DiffUploader {
             String listItemId = sharePointSoapClient.updateListItems(listViewId, buildAttributesMap(listViewId.viewId()));
             sharePointSoapClient.addAttachment(listItemId, applicationProperties.fileName(), applicationProperties.itemPath());
         } catch (SoapFaultClientException ex) {
-            String errorMsg = XmlHelper.extractErrorMessage(ex.getSoapFault().getSource());
-            logger.error("Error during upload diff. {}", errorMsg);
+            String wsMsg = XmlHelper.extractErrorMessage(ex.getSoapFault().getSource());
+            String errorMsg = String.format("Error during upload diff. %s", wsMsg);
+            logger.error(errorMsg, ex);
             throw new RuntimeException(errorMsg, ex);
         } catch (Exception ex) {
-            String errorMsg = "Error during upload diff.";
+            String errorMsg = String.format("Error during upload diff. %s", ex.getMessage());
             logger.error(errorMsg, ex);
             throw new RuntimeException(errorMsg, ex);
         }

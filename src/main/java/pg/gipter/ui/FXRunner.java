@@ -45,8 +45,9 @@ public class FXRunner extends Task<Void> implements Starter {
             updateMessage(BundleUtils.getMsg("progress.diffGenerated"));
 
             if (!applicationProperties.isToolkitCredentialsSet()) {
-                logger.error("Toolkit details not set. Check your settings.");
-                throw new IllegalArgumentException();
+                String errorMessage = "Toolkit details not set. Check your settings.";
+                logger.error(errorMessage);
+                throw new IllegalArgumentException(errorMessage);
             }
 
             DiffUploader diffUploader = new DiffUploader(applicationProperties);
@@ -58,10 +59,10 @@ public class FXRunner extends Task<Void> implements Starter {
 
             logger.info("Diff upload complete.");
         } catch (Exception ex) {
-            logger.error("Diff upload failure. Program is terminated.");
+            logger.error("Diff upload failure.", ex);
             error = true;
             AlertHelper.displayWindow(
-                    BundleUtils.getMsg("popup.error.messageWithLog"),
+                    BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()),
                     AlertHelper.logsFolder(),
                     AlertHelper.LOG_WINDOW,
                     Alert.AlertType.ERROR

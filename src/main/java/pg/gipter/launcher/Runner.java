@@ -31,8 +31,9 @@ class Runner implements Starter {
             diffProducer.produceDiff();
 
             if (!applicationProperties.isToolkitCredentialsSet()) {
-                logger.error("Toolkit details not set. Check your settings.");
-                throw new IllegalArgumentException();
+                String errorMsg = "Toolkit credentials not set. Check your settings.";
+                logger.error(errorMsg);
+                throw new IllegalArgumentException(errorMsg);
             }
 
             DiffUploader diffUploader = new DiffUploader(applicationProperties);
@@ -40,10 +41,10 @@ class Runner implements Starter {
 
             logger.info("Diff upload complete.");
         } catch (Exception ex) {
-            logger.error("Diff upload failure. Program is terminated.");
+            logger.error("Diff upload failure. Program will be terminated.", ex);
             error = true;
             AlertHelper.displayWindow(
-                    BundleUtils.getMsg("popup.error.messageWithLog"),
+                    BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()),
                     AlertHelper.logsFolder(),
                     AlertHelper.LOG_WINDOW,
                     Alert.AlertType.ERROR
