@@ -102,14 +102,36 @@ public class ProjectsController extends AbstractController {
             ObservableList<ProjectDetails> projectsPaths = FXCollections.observableArrayList();
             for (String path : projects) {
                 File project = new File(path);
-                ProjectDetails pd = new ProjectDetails(
-                        project.getName(),
-                        VersionControlSystem.valueFrom(project).name(),
-                        path
-                );
-                projectsPaths.add(pd);
+                Optional<String> supportedVcs = getSupportedVcs(project);
+                if (supportedVcs.isPresent() && applicationProperties.uploadType() != UploadType.DOCUMENTS) {
+                    ProjectDetails pd = new ProjectDetails(
+                            project.getName(),
+                            supportedVcs.get(),
+                            path
+                    );
+                    projectsPaths.add(pd);
+                } else if(!supportedVcs.isPresent() && applicationProperties.uploadType() == UploadType.DOCUMENTS) {
+                    ProjectDetails pd = new ProjectDetails(
+                            project.getName(),
+                            UploadType.DOCUMENTS.name(),
+                            path
+                    );
+                    projectsPaths.add(pd);
+                }
+            }
+            if (projectsPaths.isEmpty()) {
+                projectsPaths.add(ProjectDetails.DEFAULT);
             }
             projectsTableView.setItems(projectsPaths);
+        }
+    }
+
+    @NotNull
+    private Optional<String> getSupportedVcs(File project) {
+        try {
+            return Optional.of(VersionControlSystem.valueFrom(project).name());
+        } catch (IllegalArgumentException ex) {
+            return Optional.empty();
         }
     }
 
