@@ -1,6 +1,6 @@
 package pg.gipter.ui.job;
 
-public enum JobKey {
+public enum JobProperty {
 
     HOUR_OF_THE_DAY("job.hourOfTheDay"),
     DAY_OF_MONTH("job.dayOfMonth"),
@@ -11,7 +11,7 @@ public enum JobKey {
 
     private String value;
 
-    JobKey(String value) {
+    JobProperty(String value) {
         this.value = value;
     }
 

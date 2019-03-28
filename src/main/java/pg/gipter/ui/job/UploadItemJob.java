@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-public class GipterJob implements Job {
+public class UploadItemJob implements Job {
 
-    private static final Logger logger = LoggerFactory.getLogger(GipterJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(UploadItemJob.class);
     public static final String NAME = "Gipter-job";
-    static final String GROUP = "GipterJobGroup";
+    public static final String GROUP = "GipterJobGroup";
 
-    public GipterJob() {
+    public UploadItemJob() {
         // Instances of Job must have a public no-argument constructor.
     }
 
@@ -31,7 +31,7 @@ public class GipterJob implements Job {
         LocalDate startDate = LocalDate.now();
 
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
-        JobType jobType = JobType.valueOf(jobDataMap.getString(JobKey.TYPE.value()));
+        JobType jobType = JobType.valueOf(jobDataMap.getString(JobProperty.TYPE.value()));
         switch (jobType) {
             case EVERY_WEEK:
                 startDate = startDate.minusDays(7);
@@ -44,7 +44,7 @@ public class GipterJob implements Job {
                 break;
             case CRON:
                 CronExpression cronExpression;
-                String cronString = jobDataMap.getString(JobKey.CRON.value());
+                String cronString = jobDataMap.getString(JobProperty.CRON.value());
                 try {
                     cronExpression = new CronExpression(cronString);
                 } catch (ParseException e) {

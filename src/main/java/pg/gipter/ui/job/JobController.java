@@ -76,7 +76,6 @@ public class JobController extends AbstractController {
         setInitValues();
         setActions();
         setProperties();
-        scheduler = uiLauncher.getScheduler();
     }
 
     private void setInitValues() {
@@ -110,28 +109,28 @@ public class JobController extends AbstractController {
     }
 
     private void setDefinedJobDetails(Properties dataProp) {
-        if (dataProp.containsKey(JobKey.TYPE.value())) {
+        if (dataProp.containsKey(JobProperty.TYPE.value())) {
             cancelJobButton.setVisible(true);
             jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
-            JobType jobType = JobType.valueOf(dataProp.getProperty(JobKey.TYPE.value()));
+            JobType jobType = JobType.valueOf(dataProp.getProperty(JobProperty.TYPE.value()));
             jobTypeLabel.setText(jobType.name());
             String details;
             if (jobType == JobType.CRON) {
-                details = BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobKey.CRON.value()));
+                details = BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobProperty.CRON.value()));
             } else {
-                details = buildLabel(dataProp, JobKey.SCHEDULE_START).map(value -> value + "\n").orElse("");
-                details += buildLabel(dataProp, JobKey.DAY_OF_MONTH).map(value -> value + "\n").orElse("");
-                details += buildLabel(dataProp, JobKey.DAY_OF_WEEK).map(value -> value + "\n").orElse("");
-                details += buildLabel(dataProp, JobKey.HOUR_OF_THE_DAY).orElse("");
+                details = buildLabel(dataProp, JobProperty.SCHEDULE_START).map(value -> value + "\n").orElse("");
+                details += buildLabel(dataProp, JobProperty.DAY_OF_MONTH).map(value -> value + "\n").orElse("");
+                details += buildLabel(dataProp, JobProperty.DAY_OF_WEEK).map(value -> value + "\n").orElse("");
+                details += buildLabel(dataProp, JobProperty.HOUR_OF_THE_DAY).orElse("");
             }
             jobDetailsLabel.setText(details);
         }
     }
 
-    public static Optional<String> buildLabel(Properties data, JobKey key) {
+    public static Optional<String> buildLabel(Properties data, JobProperty key) {
         if (data.containsKey(key.value())) {
             String value = data.getProperty(key.value());
-            if (key == JobKey.HOUR_OF_THE_DAY) {
+            if (key == JobProperty.HOUR_OF_THE_DAY) {
                 String minuetOfHour = value.substring(value.indexOf(":") + 1);
                 if (minuetOfHour.length() == 1) {
                     value = value.substring(0, value.indexOf(":") + 1) + "0" + minuetOfHour;
@@ -235,17 +234,22 @@ public class JobController extends AbstractController {
                     jobType = JobType.EVERY_2_WEEKS;
                 }
 
-                Properties data = propertiesHelper.loadDataProperties().orElseGet(Properties::new);
-                JobCreator jobCreator = new JobCreator(data, jobType, startDatePicker.getValue(),
-                        dayOfMonthComboBox.getValue(), hourOfDayComboBox.getValue(), minuteComboBox.getValue(),
-                        dayNameComboBox.getValue(), cronExpressionTextField.getText(), scheduler);
-
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), uiLauncher);
-                scheduler = jobCreator.scheduleJob(additionalJobParams);
-                propertiesHelper.saveDataProperties(jobCreator.getDataProperties());
+                Properties data = propertiesHelper.loadDataProperties().orElseGet(Properties::new);
+                new JobCreatorBuilder()
+                        .withData(data)
+                        .withJobType(jobType)
+                        .withStartDateTime(startDatePicker.getValue())
+                        .withDayOfMonth(dayOfMonthComboBox.getValue())
+                        .withHourOfDay(hourOfDayComboBox.getValue())
+                        .withMinuteOfHour(minuteComboBox.getValue())
+                        .withDayOfWeek(dayNameComboBox.getValue())
+                        .withCronExpression(cronExpressionTextField.getText())
+                        .createJobCreator()
+                        .scheduleUploadJob(additionalJobParams);
+                propertiesHelper.saveDataProperties(JobCreator.getDataProperties());
 
-                uiLauncher.setScheduler(scheduler);
                 uiLauncher.hideJobWindow();
                 uiLauncher.updateTray();
 

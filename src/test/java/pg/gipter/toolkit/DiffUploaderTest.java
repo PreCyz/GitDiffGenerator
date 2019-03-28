@@ -139,7 +139,7 @@ class DiffUploaderTest {
             uploader.uploadDiff();
             fail("Should throw RuntimeException with relevant message.");
         } catch (RuntimeException ex) {
-            assertThat(ex.getMessage()).isEqualTo("Data at the root level is invalid. Line 1, position 1.");
+            assertThat(ex.getMessage()).isEqualTo("Error during upload diff. Data at the root level is invalid. Line 1, position 1.");
             verify(soapException, times(1)).getSoapFault();
             verify(soapFault, times(1)).getSource();
         }
@@ -158,7 +158,7 @@ class DiffUploaderTest {
             uploader.uploadDiff();
             fail("Should throw RuntimeException with relevant message.");
         } catch (RuntimeException ex) {
-            assertThat(ex.getMessage()).isEqualTo("Error during upload diff.");
+            assertThat(ex.getMessage()).isEqualTo("Error during upload diff. null");
         }
     }
 

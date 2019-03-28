@@ -9,9 +9,10 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
-import pg.gipter.ui.job.GipterJob;
 import pg.gipter.ui.job.JobController;
-import pg.gipter.ui.job.JobKey;
+import pg.gipter.ui.job.JobCreator;
+import pg.gipter.ui.job.JobProperty;
+import pg.gipter.ui.job.UploadItemJob;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
 
@@ -85,15 +86,15 @@ class TrayHandler {
                 addSeparator = true;
             }
 
-            if (data.get().containsKey(JobKey.TYPE.value())) {
+            if (data.get().containsKey(JobProperty.TYPE.value())) {
                 Menu jobMenu = new Menu(
-                        String.format("%s %s", GipterJob.NAME, data.get().getProperty(JobKey.TYPE.value()))
+                        String.format("%s %s", UploadItemJob.NAME, data.get().getProperty(JobProperty.TYPE.value()))
                 );
-                JobController.buildLabel(data.get(), JobKey.DAY_OF_WEEK).ifPresent(jobMenu::add);
-                JobController.buildLabel(data.get(), JobKey.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);
-                JobController.buildLabel(data.get(), JobKey.DAY_OF_MONTH).ifPresent(jobMenu::add);
-                JobController.buildLabel(data.get(), JobKey.SCHEDULE_START).ifPresent(jobMenu::add);
-                JobController.buildLabel(data.get(), JobKey.CRON).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobProperty.DAY_OF_WEEK).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobProperty.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobProperty.DAY_OF_MONTH).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobProperty.SCHEDULE_START).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobProperty.CRON).ifPresent(jobMenu::add);
                 jobMenu.addSeparator();
 
                 MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));
@@ -121,11 +122,26 @@ class TrayHandler {
         MenuItem createJobItem = new MenuItem(BundleUtils.getMsg("tray.item.createJob"));
         createJobItem.addActionListener(createJobActionListener());
         popupMenu.add(createJobItem);
+
+        MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(JobCreator.isUpgradeJobExists() ? "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
+        upgradeItem.addActionListener(upgradeJobActionListener());
+        popupMenu.add(upgradeItem);
         popupMenu.addSeparator();
 
         MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
         closeItem.addActionListener(closeActionListener());
         popupMenu.add(closeItem);
+    }
+
+    private ActionListener upgradeJobActionListener() {
+        return e -> {
+            if (JobCreator.isUpgradeJobExists()) {
+                JobCreator.deleteUpgradeJob();
+            } else {
+                JobCreator.scheduleCheckUpgradeJob();
+            }
+            updateTrayLabels();
+        };
     }
 
     private Image createTrayImage() {

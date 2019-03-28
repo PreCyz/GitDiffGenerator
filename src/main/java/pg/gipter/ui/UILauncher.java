@@ -9,7 +9,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import mslinks.ShellLink;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +16,7 @@ import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
-import pg.gipter.ui.job.GipterJob;
-import pg.gipter.ui.job.JobCreator;
-import pg.gipter.ui.job.JobKey;
-import pg.gipter.ui.job.JobType;
+import pg.gipter.ui.job.*;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
@@ -53,7 +49,6 @@ public class UILauncher implements Launcher {
     private Stage jobWindow;
     private Stage projectsWindow;
     private TrayHandler trayHandler;
-    private Scheduler scheduler;
     private PropertiesHelper propertiesHelper;
     private boolean silentMode;
     private boolean upgradeChecked = false;
@@ -69,10 +64,6 @@ public class UILauncher implements Launcher {
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-    }
-
-    public Scheduler getScheduler() {
-        return scheduler;
     }
 
     boolean isSilentMode() {
@@ -96,6 +87,7 @@ public class UILauncher implements Launcher {
             logger.info("Initializing tray icon.", silentMode);
             trayHandler.createTrayIcon();
             scheduleJobIfExists();
+            JobCreator.scheduleCheckUpgradeJob();
         }
     }
 
@@ -253,70 +245,79 @@ public class UILauncher implements Launcher {
         return trayHandler.trayOnCloseEventHandler();
     }
 
-    public void setScheduler(Scheduler scheduler) {
-        this.scheduler = scheduler;
-    }
-
     public void cancelJob() {
         try {
-            if (scheduler != null) {
-                scheduler.shutdown();
+            if (JobCreator.isSchedulerInitiated()) {
+                JobCreator.cancelUploadJob();
             }
         } catch (SchedulerException e) {
-            String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", scheduler.getClass().getName(), e.getMessage());
+            String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", JobCreator.schedulerClassName(), e.getMessage());
             logger.error(errorMessage);
             AlertHelper.displayWindow(errorMessage, AlertHelper.logsFolder(), AlertHelper.LOG_WINDOW, Alert.AlertType.ERROR);
         } finally {
             Optional<Properties> data = propertiesHelper.loadDataProperties();
             if (data.isPresent()) {
-                data.ifPresent(properties -> Stream.of(JobKey.values()).forEach(jobKey -> properties.remove(jobKey.value())));
+                data.ifPresent(properties -> Stream.of(JobProperty.values()).forEach(jobKey -> properties.remove(jobKey.value())));
                 propertiesHelper.saveDataProperties(data.get());
             }
 
-            logger.info("{} canceled.", GipterJob.NAME);
+            logger.info("{} canceled.", UploadItemJob.NAME);
             updateTray();
         }
     }
 
     private void scheduleJobIfExists() {
         Optional<Properties> data = propertiesHelper.loadDataProperties();
-        if (data.isPresent() && scheduler == null && data.get().containsKey(JobKey.TYPE.value())) {
+        if (data.isPresent() && !JobCreator.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.value())) {
             try {
-                JobType jobType = JobType.valueOf(data.get().getProperty(JobKey.TYPE.value()));
+                JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.value()));
 
                 LocalDate scheduleStart = null;
-                if (data.get().containsKey(JobKey.SCHEDULE_START.value())) {
+                if (data.get().containsKey(JobProperty.SCHEDULE_START.value())) {
                     scheduleStart = LocalDate.parse(
-                            data.get().getProperty(JobKey.SCHEDULE_START.value()),
+                            data.get().getProperty(JobProperty.SCHEDULE_START.value()),
                             ApplicationProperties.yyyy_MM_dd
                     );
                 }
                 int dayOfMonth = 0;
-                if (data.get().containsKey(JobKey.DAY_OF_MONTH.value())) {
-                    dayOfMonth = Integer.valueOf(data.get().getProperty(JobKey.DAY_OF_MONTH.value()));
+                if (data.get().containsKey(JobProperty.DAY_OF_MONTH.value())) {
+                    dayOfMonth = Integer.valueOf(data.get().getProperty(JobProperty.DAY_OF_MONTH.value()));
                 }
                 int hourOfDay = 0;
                 int minuteOfHour = 0;
-                if (data.get().containsKey(JobKey.HOUR_OF_THE_DAY.value())) {
-                    String hourOfDayString = data.get().getProperty(JobKey.HOUR_OF_THE_DAY.value());
+                if (data.get().containsKey(JobProperty.HOUR_OF_THE_DAY.value())) {
+                    String hourOfDayString = data.get().getProperty(JobProperty.HOUR_OF_THE_DAY.value());
                     hourOfDay = Integer.valueOf(hourOfDayString.substring(0, hourOfDayString.lastIndexOf(":")));
                     minuteOfHour = Integer.valueOf(hourOfDayString.substring(hourOfDayString.lastIndexOf(":") + 1));
                 }
                 DayOfWeek dayOfWeek = null;
-                if (data.get().containsKey(JobKey.DAY_OF_WEEK.value())) {
-                    dayOfWeek = DayOfWeek.valueOf(data.get().getProperty(JobKey.DAY_OF_WEEK.value()));
+                if (data.get().containsKey(JobProperty.DAY_OF_WEEK.value())) {
+                    dayOfWeek = DayOfWeek.valueOf(data.get().getProperty(JobProperty.DAY_OF_WEEK.value()));
                 }
-                String cronExpression = data.get().getProperty(JobKey.CRON.value());
+                String cronExpression = data.get().getProperty(JobProperty.CRON.value());
 
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), this);
 
-                JobCreator jobCreator = new JobCreator(data.get(), jobType, scheduleStart, dayOfMonth,
-                        hourOfDay, minuteOfHour, dayOfWeek, cronExpression, scheduler);
-
-                scheduler = jobCreator.scheduleJob(additionalJobParams);
+                new JobCreatorBuilder()
+                        .withData(data.get())
+                        .withJobType(jobType)
+                        .withStartDateTime(scheduleStart)
+                        .withDayOfMonth(dayOfMonth)
+                        .withHourOfDay(hourOfDay)
+                        .withMinuteOfHour(minuteOfHour)
+                        .withDayOfWeek(dayOfWeek)
+                        .withCronExpression(cronExpression)
+                        .createJobCreator()
+                        .scheduleUploadJob(additionalJobParams);
             } catch (ParseException | SchedulerException e) {
                 logger.warn("Can not restart the scheduler.", e);
+                AlertHelper.displayWindow(
+                        BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()),
+                        AlertHelper.logsFolder(),
+                        AlertHelper.LOG_WINDOW,
+                        Alert.AlertType.ERROR
+                );
             }
         }
     }
