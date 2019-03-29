@@ -144,7 +144,7 @@ public class UILauncher implements Launcher {
                     String workingDir = AlertHelper.homeDirectoryPath().orElse("");
 
                     int iconNumber = 130;
-                    ShellLink shellLink = ShellLink.createLink(workingDir)
+                    ShellLink shellLink = ShellLink.createLink(AlertHelper.getJarFile().map(File::getAbsolutePath).orElse(""))
                             .setWorkingDir(workingDir)
                             .setIconLocation("%SystemRoot%\\system32\\SHELL32.dll")
                             .setCMDArgs(ArgName.silentMode.name() + "=" + Boolean.TRUE);

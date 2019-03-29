@@ -21,13 +21,18 @@ public final class AlertHelper {
 
     private static final String LOGS_FOLDER_NAME = "logs";
 
-    private AlertHelper() { }
+    private AlertHelper() {
+    }
 
     public static Optional<String> homeDirectoryPath() {
+        Optional<File> jarFile = getJarFile();
+        return jarFile.map(file -> file.getPath().replace(file.getName(), ""));
+    }
+
+    public static Optional<File> getJarFile() {
         try {
-            File jarFile = new File(AlertHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            return Optional.of(jarFile.getPath().replace(jarFile.getName(), ""));
-        } catch (URISyntaxException ex) {
+            return Optional.of(new File(AlertHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+        } catch (URISyntaxException e) {
             return Optional.empty();
         }
     }
@@ -92,20 +97,6 @@ public final class AlertHelper {
         return flowPane;
     }
 
-    public static boolean displayAddWindow(String addText, String replaceText, String message) {
-        Alert alert = buildDefaultAlert(Alert.AlertType.CONFIRMATION);
-        alert.getButtonTypes().removeAll(ButtonType.OK, ButtonType.CANCEL);
-
-        ButtonType addButton = new ButtonType(addText, ButtonBar.ButtonData.OK_DONE);
-        ButtonType replaceButton = new ButtonType(replaceText, ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().addAll(addButton, replaceButton);
-
-        FlowPane fp = buildFlowPane(message, new Hyperlink(""));
-        alert.getDialogPane().contentProperty().set(fp);
-
-        return alert.showAndWait().orElse(replaceButton) == addButton;
-    }
-
     public static boolean displayOverrideWindow(String createText, String overrideText, String message) {
         Alert alert = buildDefaultAlert(Alert.AlertType.CONFIRMATION);
         alert.getButtonTypes().removeAll(ButtonType.OK, ButtonType.CANCEL);
@@ -117,6 +108,6 @@ public final class AlertHelper {
         FlowPane fp = buildFlowPane(message, new Hyperlink(""));
         alert.getDialogPane().contentProperty().set(fp);
 
-        return alert.showAndWait().orElse(createButton) == overrideButton ;
+        return alert.showAndWait().orElse(createButton) == overrideButton;
     }
 }

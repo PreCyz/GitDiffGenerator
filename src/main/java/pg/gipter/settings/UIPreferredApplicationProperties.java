@@ -14,6 +14,7 @@ class UIPreferredApplicationProperties extends CliPreferredApplicationProperties
         super(args);
     }
 
+    @Override
     protected void init(String[] args, PropertiesHelper propertiesHelper) {
         Optional<Properties> propsFromFile = propertiesHelper.loadUIApplicationProperties();
         if (propsFromFile.isPresent()) {
