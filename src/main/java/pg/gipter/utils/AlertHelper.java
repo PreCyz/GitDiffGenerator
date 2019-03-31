@@ -3,6 +3,7 @@ package pg.gipter.utils;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,7 @@ public final class AlertHelper {
 
     public static int LOG_WINDOW = 0;
     public static int BROWSER_WINDOW = 1;
+    private static int OVERRIDE_WINDOW = 2;
 
     private static final String LOGS_FOLDER_NAME = "logs";
 
@@ -52,7 +54,7 @@ public final class AlertHelper {
     private static void buildAndDisplayWindow(String message, String link, int windowType, Alert.AlertType alertType) {
         Alert alert = buildDefaultAlert(alertType);
         Hyperlink hyperLink = buildHyperlink(link, windowType, alert);
-        FlowPane flowPane = buildFlowPane(message, hyperLink);
+        FlowPane flowPane = buildFlowPane(message, hyperLink, windowType);
 
         alert.getDialogPane().contentProperty().set(flowPane);
         alert.showAndWait();
@@ -90,10 +92,19 @@ public final class AlertHelper {
     }
 
     @NotNull
-    private static FlowPane buildFlowPane(String message, Hyperlink hyperLink) {
+    private static FlowPane buildFlowPane(String message, Hyperlink hyperLink, int windowType) {
         FlowPane flowPane = new FlowPane();
+        String imgResource = "";
+        if (windowType == LOG_WINDOW) {
+            imgResource = "img/error-chicken.png";
+        } else if (windowType == BROWSER_WINDOW) {
+            imgResource = "img/good-job.png";
+        }
+        URL imgUrl = AlertHelper.class.getClassLoader().getResource(imgResource);
+        Image image = new Image(imgUrl.toString());
+        ImageView imageView = new ImageView(image);
         Label lbl = new Label(message);
-        flowPane.getChildren().addAll(lbl, hyperLink);
+        flowPane.getChildren().addAll(lbl, hyperLink, imageView);
         return flowPane;
     }
 
@@ -105,7 +116,7 @@ public final class AlertHelper {
         ButtonType overrideButton = new ButtonType(overrideText, ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().addAll(createButton, overrideButton);
 
-        FlowPane fp = buildFlowPane(message, new Hyperlink(""));
+        FlowPane fp = buildFlowPane(message, new Hyperlink(""), OVERRIDE_WINDOW);
         alert.getDialogPane().contentProperty().set(fp);
 
         return alert.showAndWait().orElse(createButton) == overrideButton;
