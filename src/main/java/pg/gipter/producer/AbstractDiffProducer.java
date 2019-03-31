@@ -17,6 +17,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
     protected final ApplicationProperties appProps;
     protected final Logger logger;
+    private boolean noDiff;
 
     AbstractDiffProducer(ApplicationProperties applicationProperties) {
         appProps = applicationProperties;
@@ -25,6 +26,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
     @Override
     public void produceDiff() {
+        noDiff = true;
         try (FileWriter fw = new FileWriter(Paths.get(appProps.itemPath()).toFile())) {
 
             Set<VersionControlSystem> vcsSet = new HashSet<>();
@@ -44,11 +46,18 @@ abstract class AbstractDiffProducer implements DiffProducer {
                 vcsSet.add(vcs);
             }
             appProps.setVcs(vcsSet);
+            if (noDiff) {
+                String errMsg = String.format("For given repositories within time period [from %s to %s] I couldn't produce any diff.",
+                        appProps.startDate().format(ApplicationProperties.yyyy_MM_dd),
+                        appProps.endDate().format(ApplicationProperties.yyyy_MM_dd)
+                );
+                logger.warn(errMsg);
+                throw new IllegalArgumentException(errMsg);
+            }
             logger.info("Diff file generated and saved as: {}.", appProps.itemPath());
-
         } catch (Exception ex) {
             logger.error("Error when producing diff.", ex);
-            throw new RuntimeException();
+            throw new IllegalArgumentException(ex.getMessage(), ex);
         }
     }
 
@@ -64,10 +73,18 @@ abstract class AbstractDiffProducer implements DiffProducer {
             String line;
             while ((line = br.readLine()) != null) {
                 fw.write(String.format("%s%n", line));
-                System.out.println(line);
+                noDiff = false;
             }
-            fw.write(String.format("%nEnd-of-diff-for-%s%n%n%n", projectPath));
 
+            if (noDiff) {
+                fw.write(String.format("For repository [%s] within period [from %s to %s] diff is unavailable!%n",
+                        projectPath,
+                        appProps.startDate().format(ApplicationProperties.yyyy_MM_dd),
+                        appProps.endDate().format(ApplicationProperties.yyyy_MM_dd)
+                ));
+            } else {
+                fw.write(String.format("%nEnd-of-diff-for-%s%n%n%n", projectPath));
+            }
         } catch (Exception ex) {
             logger.error(ex.getMessage());
             throw new IOException(ex);
