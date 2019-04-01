@@ -89,7 +89,7 @@ public class GithubService {
 
             if (showUpgradeWindow) {
                 Platform.runLater(() -> new AlertWindowBuilder()
-                        .withMessage(BundleUtils.getMsg("upgrade.message", strippedVersion))
+                        .withHeaderText(BundleUtils.getMsg("upgrade.message", strippedVersion))
                         .withLink("https://github.com/PreCyz/GitDiffGenerator/releases/latest")
                         .withWindowType(WindowType.BROWSER_WINDOW)
                         .withAlertType(Alert.AlertType.INFORMATION)
