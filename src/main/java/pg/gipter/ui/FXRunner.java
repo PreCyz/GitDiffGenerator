@@ -82,7 +82,6 @@ public class FXRunner extends Task<Void> implements Starter {
         if (!error && applicationProperties.isConfirmationWindow()) {
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.confirmation.message"))
-                    //.withMessage(BundleUtils.getMsg("popup.confirmation.message"))
                     .withLink(applicationProperties.toolkitUserFolder())
                     .withWindowType(WindowType.BROWSER_WINDOW)
                     .withAlertType(Alert.AlertType.INFORMATION)

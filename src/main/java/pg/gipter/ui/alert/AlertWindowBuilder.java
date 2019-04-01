@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManagerFactory;
@@ -112,6 +113,7 @@ public class AlertWindowBuilder {
                 AppManagerFactory.getInstance().launchDefaultBrowser(link);
             });
         }
+        hyperLink.setFont(Font.font("Verdana", 12));
         return hyperLink;
     }
 
