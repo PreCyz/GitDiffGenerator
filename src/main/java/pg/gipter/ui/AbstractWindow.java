@@ -3,9 +3,11 @@ package pg.gipter.ui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.ResourceUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 
 /**Created by Gawa 2017-10-04*/
 public abstract class AbstractWindow {
@@ -23,13 +25,11 @@ public abstract class AbstractWindow {
     }
 
     private URL url() {
-        return getClass()
-                .getClassLoader()
-                .getResource(String.format("fxml/%s", fxmlFileName()));
+        return ResourceUtils.getFxmlResource(fxmlFileName()).orElseThrow(IllegalArgumentException::new);
     }
 
     String windowImgFilePath() {
-        return String.format("img/%s", windowImgFileName());
+        return ResourceUtils.getImgResourcePath(windowImgFileName());
     }
 
     boolean resizable() {
@@ -37,12 +37,10 @@ public abstract class AbstractWindow {
     }
 
     String css() {
-        URL css = getClass()
-                .getClassLoader()
-                .getResource(String.format("css/%s", cssFileName()));
+        Optional<URL> css = ResourceUtils.getCssResource(cssFileName());
         String result = "";
-        if (css != null) {
-            result = css.toExternalForm();
+        if (css.isPresent()) {
+            result = css.get().toExternalForm();
         }
         return result;
     }

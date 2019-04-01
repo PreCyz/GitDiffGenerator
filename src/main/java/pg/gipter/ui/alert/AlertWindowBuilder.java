@@ -11,12 +11,13 @@ import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.ResourceUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /** Created by Pawel Gawedzki on 01-Apr-2019. */
 public class AlertWindowBuilder {
@@ -80,7 +81,7 @@ public class AlertWindowBuilder {
     public void buildAndDisplayWindow() {
         Alert alert = buildDefaultAlert();
         Hyperlink hyperLink = buildHyperlink(alert);
-        FlowPane flowPane = buildFlowPane(message, hyperLink, windowType);
+        FlowPane flowPane = buildFlowPane(hyperLink, windowType);
 
         alert.getDialogPane().contentProperty().set(flowPane);
         alert.showAndWait();
@@ -91,10 +92,10 @@ public class AlertWindowBuilder {
         Alert alert = new Alert(alertType);
         alert.setTitle(StringUtils.nullOrEmpty(title) ? BundleUtils.getMsg("popup.title") : title);
         alert.setHeaderText(StringUtils.nullOrEmpty(headerText) ? BundleUtils.getMsg("popup.header.error") : headerText);
-        URL imgUrl = AlertWindowBuilder.class.getClassLoader().getResource("img/chicken-face.png");
-        if (imgUrl != null) {
+        Optional<URL> imgUrl = ResourceUtils.getImgResource("chicken-face.png");
+        if (imgUrl.isPresent()) {
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(imgUrl.toString()));
+            stage.getIcons().add(new Image(imgUrl.get().toString()));
         }
         return alert;
     }
@@ -113,35 +114,47 @@ public class AlertWindowBuilder {
                 AppManagerFactory.getInstance().launchDefaultBrowser(link);
             });
         }
-        hyperLink.setFont(Font.font("Verdana", 12));
+        hyperLink.setFont(Font.font("Verdana", 14));
         return hyperLink;
     }
 
     @NotNull
-    private FlowPane buildFlowPane(String message, Hyperlink hyperLink, WindowType windowType) {
+    private FlowPane buildFlowPane(Hyperlink hyperLink, WindowType windowType) {
         FlowPane flowPane = new FlowPane();
         flowPane.setAlignment(Pos.TOP_CENTER);
+        flowPane.setVgap(10);
+        flowPane.setHgap(100);
 
         ImageView imageView = null;
         if (useImage) {
-            String imgResource = "";
+            String imgName = "";
             if (windowType == WindowType.LOG_WINDOW) {
-                imgResource = "img/error-chicken.png";
+                imgName = "error-chicken.png";
             } else if (windowType == WindowType.BROWSER_WINDOW) {
-                imgResource = "img/good-job.png";
+                imgName = "good-job.png";
             } else if (windowType == WindowType.OVERRIDE_WINDOW) {
-                imgResource = "img/override.png";
+                imgName = "override.png";
             }
-            URL imgUrl = AlertWindowBuilder.class.getClassLoader().getResource(imgResource);
-            Image image = new Image(imgUrl.toString());
-            imageView = new ImageView(image);
+            imageView = ResourceUtils.getImgResource(imgName)
+                    .map(url -> new ImageView(new Image(url.toString())))
+                    .orElseGet(ImageView::new);
+            flowPane.setPrefWrapLength(imageView.getImage().getWidth());
         }
 
-        Label lbl = new Label(message);
+        List<Node> nodes = new LinkedList<>();
 
-        List<Node> nodes = useImage ?
-                new LinkedList<>(Arrays.asList(lbl, hyperLink, imageView)) :
-                new LinkedList<>(Arrays.asList(lbl, hyperLink));
+        if (!StringUtils.nullOrEmpty(message)) {
+            Label lbl = new Label(message);
+            nodes.add(lbl);
+        }
+
+        if (hyperLink != null && !StringUtils.nullOrEmpty(hyperLink.getText())) {
+            nodes.add(hyperLink);
+        }
+
+        if (imageView != null && imageView.getImage() != null) {
+            nodes.add(imageView);
+        }
 
         flowPane.getChildren().addAll(nodes);
         return flowPane;
@@ -155,7 +168,7 @@ public class AlertWindowBuilder {
         ButtonType overrideButton = new ButtonType(overrideText, ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().addAll(createButton, overrideButton);
 
-        FlowPane fp = buildFlowPane(message, new Hyperlink(""), WindowType.OVERRIDE_WINDOW);
+        FlowPane fp = buildFlowPane(new Hyperlink(""), WindowType.OVERRIDE_WINDOW);
         alert.getDialogPane().contentProperty().set(fp);
 
         return alert.showAndWait().orElse(createButton) == overrideButton;
