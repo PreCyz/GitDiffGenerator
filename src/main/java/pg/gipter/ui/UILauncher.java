@@ -256,7 +256,7 @@ public class UILauncher implements Launcher {
             String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", JobCreator.schedulerClassName(), e.getMessage());
             logger.error(errorMessage);
             Platform.runLater(() -> new AlertWindowBuilder()
-                    .withMessage(errorMessage)
+                    .withHeaderText(errorMessage)
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
@@ -322,7 +322,7 @@ public class UILauncher implements Launcher {
             } catch (ParseException | SchedulerException e) {
                 logger.warn("Can not restart the scheduler.", e);
                 Platform.runLater(() -> new AlertWindowBuilder()
-                        .withMessage(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
+                        .withHeaderText(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)

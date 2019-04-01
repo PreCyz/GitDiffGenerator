@@ -17,7 +17,7 @@ public class JobWindow extends AbstractWindow {
 
     @Override
     protected String windowImgFileName() {
-        return "chicken-face.jpg";
+        return "chicken-face.png";
     }
 
     @Override

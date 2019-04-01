@@ -20,6 +20,7 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
@@ -281,7 +282,7 @@ public class MainController extends AbstractController {
             } else {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
                 directoryChooser.setInitialDirectory(new File("."));
-                directoryChooser.setTitle(resources.getString("directory.project.title"));
+                directoryChooser.setTitle(resources.getString("directory.item.store"));
                 File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
                 if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                     itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
@@ -382,10 +383,12 @@ public class MainController extends AbstractController {
 
     private void saveCurrentConfiguration(ResourceBundle resource, Properties properties) {
         boolean isOverride = new AlertWindowBuilder()
-                .withMessage(resource.getString("popup.overrideProperties.message"))
+                .withHeaderText(resource.getString("popup.overrideProperties.message"))
                 .withOverrideText(resource.getString("popup.overrideProperties.buttonOverride"))
                 .withCreateText(resource.getString("popup.overrideProperties.buttonUIProperties"))
                 .withAlertType(Alert.AlertType.CONFIRMATION)
+                .withWindowType(WindowType.OVERRIDE_WINDOW)
+                .withImage()
                 .buildAndDisplayOverrideWindow();
 
         if (isOverride) {

@@ -47,7 +47,7 @@ class Runner implements Starter {
             logger.error("Diff upload failure. Program will be terminated.", ex);
             error = true;
             Platform.runLater(() -> new AlertWindowBuilder()
-                    .withMessage(BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()))
+                    .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()))
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
@@ -60,7 +60,7 @@ class Runner implements Starter {
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
             Platform.runLater(() -> new AlertWindowBuilder()
-                    .withMessage(BundleUtils.getMsg("popup.confirmation.message"))
+                    .withHeaderText(BundleUtils.getMsg("popup.confirmation.message"))
                     .withLink(applicationProperties.toolkitUserFolder())
                     .withWindowType(WindowType.BROWSER_WINDOW)
                     .withAlertType(Alert.AlertType.INFORMATION)

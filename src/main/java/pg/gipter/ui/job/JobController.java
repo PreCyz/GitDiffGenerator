@@ -260,10 +260,10 @@ public class JobController extends AbstractController {
                 logger.error("Error when creating a job.", se);
                 String errorMsg = BundleUtils.getMsg("popup.job.errorMsg", se.getMessage());
                 Platform.runLater(() -> new AlertWindowBuilder()
+                        .withHeaderText(errorMsg)
+                        .withLink(AlertHelper.logsFolder())
                         .withAlertType(Alert.AlertType.ERROR)
                         .withWindowType(WindowType.LOG_WINDOW)
-                        .withMessage(errorMsg)
-                        .withLink(AlertHelper.logsFolder())
                         .withImage()
                         .buildAndDisplayWindow()
                 );

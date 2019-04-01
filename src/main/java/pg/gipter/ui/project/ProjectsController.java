@@ -157,7 +157,7 @@ public class ProjectsController extends AbstractController {
         return event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(new File("."));
-            directoryChooser.setTitle(resources.getString("directory.item.title"));
+            directoryChooser.setTitle(resources.getString("directory.search.title"));
             File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
             if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                 ObservableList<ProjectDetails> projects = FXCollections.observableList(searchForProjects(itemPathDirectory));
@@ -229,7 +229,7 @@ public class ProjectsController extends AbstractController {
                     projectsTableView.refresh();
                 } catch (IllegalArgumentException ex) {
                     Platform.runLater(() -> new AlertWindowBuilder()
-                            .withMessage(ex.getMessage())
+                            .withHeaderText(ex.getMessage())
                             .withLink(AlertHelper.logsFolder())
                             .withWindowType(WindowType.LOG_WINDOW)
                             .withAlertType(Alert.AlertType.ERROR)

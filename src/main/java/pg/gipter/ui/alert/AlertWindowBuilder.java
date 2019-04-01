@@ -1,5 +1,6 @@
 package pg.gipter.ui.alert;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -8,7 +9,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManagerFactory;
-import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
@@ -90,7 +90,7 @@ public class AlertWindowBuilder {
         Alert alert = new Alert(alertType);
         alert.setTitle(StringUtils.nullOrEmpty(title) ? BundleUtils.getMsg("popup.title") : title);
         alert.setHeaderText(StringUtils.nullOrEmpty(headerText) ? BundleUtils.getMsg("popup.header.error") : headerText);
-        URL imgUrl = AlertHelper.class.getClassLoader().getResource("img/chicken-face.jpg");
+        URL imgUrl = AlertWindowBuilder.class.getClassLoader().getResource("img/chicken-face.png");
         if (imgUrl != null) {
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             stage.getIcons().add(new Image(imgUrl.toString()));
@@ -118,6 +118,7 @@ public class AlertWindowBuilder {
     @NotNull
     private FlowPane buildFlowPane(String message, Hyperlink hyperLink, WindowType windowType) {
         FlowPane flowPane = new FlowPane();
+        flowPane.setAlignment(Pos.TOP_CENTER);
 
         ImageView imageView = null;
         if (useImage) {
@@ -126,8 +127,10 @@ public class AlertWindowBuilder {
                 imgResource = "img/error-chicken.png";
             } else if (windowType == WindowType.BROWSER_WINDOW) {
                 imgResource = "img/good-job.png";
+            } else if (windowType == WindowType.OVERRIDE_WINDOW) {
+                imgResource = "img/override.png";
             }
-            URL imgUrl = AlertHelper.class.getClassLoader().getResource(imgResource);
+            URL imgUrl = AlertWindowBuilder.class.getClassLoader().getResource(imgResource);
             Image image = new Image(imgUrl.toString());
             imageView = new ImageView(image);
         }
