@@ -1,5 +1,6 @@
 package pg.gipter.ui.alert;
 
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,6 +13,9 @@ import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /** Created by Pawel Gawedzki on 01-Apr-2019. */
 public class AlertWindowBuilder {
@@ -114,19 +118,27 @@ public class AlertWindowBuilder {
     @NotNull
     private FlowPane buildFlowPane(String message, Hyperlink hyperLink, WindowType windowType) {
         FlowPane flowPane = new FlowPane();
-        String imgResource = "";
+
+        ImageView imageView = null;
         if (useImage) {
+            String imgResource = "";
             if (windowType == WindowType.LOG_WINDOW) {
                 imgResource = "img/error-chicken.png";
             } else if (windowType == WindowType.BROWSER_WINDOW) {
                 imgResource = "img/good-job.png";
             }
+            URL imgUrl = AlertHelper.class.getClassLoader().getResource(imgResource);
+            Image image = new Image(imgUrl.toString());
+            imageView = new ImageView(image);
         }
-        URL imgUrl = AlertHelper.class.getClassLoader().getResource(imgResource);
-        Image image = new Image(imgUrl.toString());
-        ImageView imageView = new ImageView(image);
+
         Label lbl = new Label(message);
-        flowPane.getChildren().addAll(lbl, hyperLink, imageView);
+
+        List<Node> nodes = useImage ?
+                new LinkedList<>(Arrays.asList(lbl, hyperLink, imageView)) :
+                new LinkedList<>(Arrays.asList(lbl, hyperLink));
+
+        flowPane.getChildren().addAll(nodes);
         return flowPane;
     }
 
