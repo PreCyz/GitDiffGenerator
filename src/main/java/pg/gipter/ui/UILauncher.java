@@ -16,6 +16,8 @@ import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.job.*;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
@@ -253,7 +255,14 @@ public class UILauncher implements Launcher {
         } catch (SchedulerException e) {
             String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", JobCreator.schedulerClassName(), e.getMessage());
             logger.error(errorMessage);
-            AlertHelper.displayWindow(errorMessage, AlertHelper.logsFolder(), AlertHelper.LOG_WINDOW, Alert.AlertType.ERROR);
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withMessage(errorMessage)
+                    .withLink(AlertHelper.logsFolder())
+                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withAlertType(Alert.AlertType.ERROR)
+                    .withImage()
+                    .buildAndDisplayWindow()
+            );
         } finally {
             Optional<Properties> data = propertiesHelper.loadDataProperties();
             if (data.isPresent()) {
@@ -312,12 +321,13 @@ public class UILauncher implements Launcher {
                         .scheduleUploadJob(additionalJobParams);
             } catch (ParseException | SchedulerException e) {
                 logger.warn("Can not restart the scheduler.", e);
-                AlertHelper.displayWindow(
-                        BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()),
-                        AlertHelper.logsFolder(),
-                        AlertHelper.LOG_WINDOW,
-                        Alert.AlertType.ERROR
-                );
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withMessage(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
+                        .withLink(AlertHelper.logsFolder())
+                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withAlertType(Alert.AlertType.ERROR)
+                        .withImage()
+                        .buildAndDisplayWindow());
             }
         }
     }

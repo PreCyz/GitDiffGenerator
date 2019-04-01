@@ -1,5 +1,6 @@
 package pg.gipter.ui.project;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,6 +22,8 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.PropertiesHelper;
 
@@ -225,7 +228,14 @@ public class ProjectsController extends AbstractController {
                     }
                     projectsTableView.refresh();
                 } catch (IllegalArgumentException ex) {
-                    AlertHelper.displayWindow(ex.getMessage(), AlertHelper.logsFolder(), AlertHelper.LOG_WINDOW, Alert.AlertType.ERROR);
+                    Platform.runLater(() -> new AlertWindowBuilder()
+                            .withMessage(ex.getMessage())
+                            .withLink(AlertHelper.logsFolder())
+                            .withWindowType(WindowType.LOG_WINDOW)
+                            .withAlertType(Alert.AlertType.ERROR)
+                            .withImage()
+                            .buildAndDisplayWindow()
+                    );
                 }
             }
         };

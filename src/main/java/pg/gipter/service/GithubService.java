@@ -2,6 +2,7 @@ package pg.gipter.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -12,7 +13,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.utils.AlertHelper;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.BundleUtils;
 
 import java.io.BufferedReader;
@@ -86,11 +88,12 @@ public class GithubService {
             }
 
             if (showUpgradeWindow) {
-                AlertHelper.displayWindow(
-                        BundleUtils.getMsg("upgrade.message", strippedVersion),
-                        "https://github.com/PreCyz/GitDiffGenerator/releases/latest",
-                        AlertHelper.BROWSER_WINDOW,
-                        Alert.AlertType.INFORMATION
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withMessage(BundleUtils.getMsg("upgrade.message", strippedVersion))
+                        .withLink("https://github.com/PreCyz/GitDiffGenerator/releases/latest")
+                        .withWindowType(WindowType.BROWSER_WINDOW)
+                        .withAlertType(Alert.AlertType.INFORMATION)
+                        .buildAndDisplayWindow()
                 );
             }
         }

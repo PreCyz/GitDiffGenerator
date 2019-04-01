@@ -1,5 +1,6 @@
 package pg.gipter.launcher;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +8,8 @@ import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.DiffUploader;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
@@ -43,22 +46,26 @@ class Runner implements Starter {
         } catch (Exception ex) {
             logger.error("Diff upload failure. Program will be terminated.", ex);
             error = true;
-            AlertHelper.displayWindow(
-                    BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()),
-                    AlertHelper.logsFolder(),
-                    AlertHelper.LOG_WINDOW,
-                    Alert.AlertType.ERROR
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withMessage(BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()))
+                    .withLink(AlertHelper.logsFolder())
+                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withAlertType(Alert.AlertType.ERROR)
+                    .withImage()
+                    .buildAndDisplayWindow()
             );
         } finally {
             propertiesHelper.saveUploadInfo(error ? "FAIL" : "SUCCESS");
             logger.info("{} ended.", this.getClass().getName());
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
-            AlertHelper.displayWindow(
-                    BundleUtils.getMsg("popup.confirmation.message"),
-                    applicationProperties.toolkitUserFolder(),
-                    AlertHelper.BROWSER_WINDOW,
-                    Alert.AlertType.INFORMATION
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withMessage(BundleUtils.getMsg("popup.confirmation.message"))
+                    .withLink(applicationProperties.toolkitUserFolder())
+                    .withWindowType(WindowType.BROWSER_WINDOW)
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .withImage()
+                    .buildAndDisplayWindow()
             );
         }
     }

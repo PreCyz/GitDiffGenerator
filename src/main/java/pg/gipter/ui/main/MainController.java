@@ -19,7 +19,7 @@ import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.utils.AlertHelper;
+import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
@@ -381,11 +381,13 @@ public class MainController extends AbstractController {
     }
 
     private void saveCurrentConfiguration(ResourceBundle resource, Properties properties) {
-        boolean isOverride = AlertHelper.displayOverrideWindow(
-                resource.getString("popup.overrideProperties.buttonUIProperties"),
-                resource.getString("popup.overrideProperties.buttonOverride"),
-                resource.getString("popup.overrideProperties.message")
-        );
+        boolean isOverride = new AlertWindowBuilder()
+                .withMessage(resource.getString("popup.overrideProperties.message"))
+                .withOverrideText(resource.getString("popup.overrideProperties.buttonOverride"))
+                .withCreateText(resource.getString("popup.overrideProperties.buttonUIProperties"))
+                .withAlertType(Alert.AlertType.CONFIRMATION)
+                .buildAndDisplayOverrideWindow();
+
         if (isOverride) {
             properties.replace(ArgName.preferredArgSource.name(), PreferredArgSource.FILE.name());
             propertiesHelper.saveToApplicationProperties(properties);

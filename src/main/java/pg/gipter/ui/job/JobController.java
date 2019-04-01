@@ -1,5 +1,6 @@
 package pg.gipter.ui.job;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
@@ -256,7 +259,14 @@ public class JobController extends AbstractController {
             } catch (SchedulerException | ParseException se) {
                 logger.error("Error when creating a job.", se);
                 String errorMsg = BundleUtils.getMsg("popup.job.errorMsg", se.getMessage());
-                AlertHelper.displayWindow(errorMsg, AlertHelper.logsFolder(), AlertHelper.LOG_WINDOW, Alert.AlertType.ERROR);
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withAlertType(Alert.AlertType.ERROR)
+                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withMessage(errorMsg)
+                        .withLink(AlertHelper.logsFolder())
+                        .withImage()
+                        .buildAndDisplayWindow()
+                );
             }
         };
     }
