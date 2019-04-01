@@ -24,6 +24,7 @@ public class JobCreator {
     private static final TriggerKey EVERY_WEEK_TRIGGER_KEY = new TriggerKey("everyWeekTrigger", "everyWeekTriggerGroup");
     private static final TriggerKey EVERY_2_WEEKS_CRON_TRIGGER_KEY = new TriggerKey("every2WeeksTrigger", "every2WeeksTriggerGroup");
     private static final TriggerKey EVERY_MONTH_TRIGGER_KEY = new TriggerKey("everyMonthTrigger", "everyMonthTriggerGroup");
+    private static final String UPGRADE_CRON_EXPRESSION = "0 0 12 */14 * ?";
 
     private static Properties data;
     private JobType jobType;
@@ -259,7 +260,7 @@ public class JobCreator {
                 logger.info("New upgrade job scheduled and started.");
             } else if (!isUpgradeJobExists()) {
                 scheduler.scheduleJob(createCheckUpgradeJobDetail(), trigger);
-                logger.info("New upgrade job scheduled.");
+                logger.info("New upgrade job scheduled with following frequency [{}].", UPGRADE_CRON_EXPRESSION);
             }
         } catch (ParseException | SchedulerException ex) {
             logger.error("Can not schedule upgrade job.", ex);
@@ -267,8 +268,7 @@ public class JobCreator {
     }
 
     private static Trigger checkUpgradeTrigger() throws ParseException {
-        String cronExpr = "0 0 12 */14 * ?";
-        CronExpression expression = new CronExpression(cronExpr);
+        CronExpression expression = new CronExpression(UPGRADE_CRON_EXPRESSION);
         return newTrigger()
                 .withIdentity(UPGRADE_TRIGGER_KEY.getName(), UPGRADE_TRIGGER_KEY.getGroup())
                 .startNow()
