@@ -15,28 +15,28 @@ import java.util.Set;
 
 abstract class AbstractDiffProducer implements DiffProducer {
 
-    protected final ApplicationProperties appProps;
+    protected final ApplicationProperties applicationProperties;
     protected final Logger logger;
     private boolean noDiff;
 
     AbstractDiffProducer(ApplicationProperties applicationProperties) {
-        appProps = applicationProperties;
+        this.applicationProperties = applicationProperties;
         logger = LoggerFactory.getLogger(this.getClass());
     }
 
     @Override
     public void produceDiff() {
         noDiff = true;
-        try (FileWriter fw = new FileWriter(Paths.get(appProps.itemPath()).toFile())) {
+        try (FileWriter fw = new FileWriter(Paths.get(applicationProperties.itemPath()).toFile())) {
 
             Set<VersionControlSystem> vcsSet = new HashSet<>();
 
-            for (String projectPath : appProps.projectPaths()) {
+            for (String projectPath : applicationProperties.projectPaths()) {
                 logger.info("Project path: {}", projectPath);
                 VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath).toFile());
                 logger.info("Discovered '{}' version control system.", vcs);
 
-                final DiffCommand diffCommand = DiffCommandFactory.getInstance(vcs, appProps);
+                final DiffCommand diffCommand = DiffCommandFactory.getInstance(vcs, applicationProperties);
                 List<String> cmd = diffCommand.commandAsList();
                 logger.info("{} command: {}", vcs.name(), String.join(" ", cmd));
                 cmd = getFullCommand(cmd);
@@ -45,16 +45,16 @@ abstract class AbstractDiffProducer implements DiffProducer {
                 writeItemToFile(fw, projectPath, cmd);
                 vcsSet.add(vcs);
             }
-            appProps.setVcs(vcsSet);
+            applicationProperties.setVcs(vcsSet);
             if (noDiff) {
                 String errMsg = String.format("For given repositories within time period [from %s to %s] I couldn't produce any diff.",
-                        appProps.startDate().format(ApplicationProperties.yyyy_MM_dd),
-                        appProps.endDate().format(ApplicationProperties.yyyy_MM_dd)
+                        applicationProperties.startDate().format(ApplicationProperties.yyyy_MM_dd),
+                        applicationProperties.endDate().format(ApplicationProperties.yyyy_MM_dd)
                 );
                 logger.warn(errMsg);
                 throw new IllegalArgumentException(errMsg);
             }
-            logger.info("Diff file generated and saved as: {}.", appProps.itemPath());
+            logger.info("Diff file generated and saved as: {}.", applicationProperties.itemPath());
         } catch (Exception ex) {
             logger.error("Error when producing diff.", ex);
             throw new IllegalArgumentException(ex.getMessage(), ex);
@@ -79,8 +79,8 @@ abstract class AbstractDiffProducer implements DiffProducer {
             if (noDiff) {
                 fw.write(String.format("For repository [%s] within period [from %s to %s] diff is unavailable!%n",
                         projectPath,
-                        appProps.startDate().format(ApplicationProperties.yyyy_MM_dd),
-                        appProps.endDate().format(ApplicationProperties.yyyy_MM_dd)
+                        applicationProperties.startDate().format(ApplicationProperties.yyyy_MM_dd),
+                        applicationProperties.endDate().format(ApplicationProperties.yyyy_MM_dd)
                 ));
             } else {
                 fw.write(String.format("%nEnd-of-diff-for-%s%n%n%n", projectPath));

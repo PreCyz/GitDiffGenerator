@@ -8,10 +8,14 @@ import org.springframework.ws.soap.client.core.SoapActionCallback;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.ws.*;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -136,10 +140,10 @@ public class SharePointSoapClient {
 
     public void getListItems(String listName, String viewName, String title) {
         GetListItems.Query query = objectFactory.createGetListItemsQuery();
-        query.getContent().add(GetListItemsElement.query(title));
+        query.getContent().add(modificationQuery());
 
         GetListItems.QueryOptions queryOptions = objectFactory.createGetListItemsQueryOptions();
-        queryOptions.getContent().add(GetListItemsElement.queryOptions());
+        queryOptions.getContent().add(queryOptions());
 
         Set<String> fieldRefs = Stream.of(
                 "ColName", "Description", "DisplayName=", "FromBaseType", "ID", "Name", "Required", "Sealed", "SourceID",
@@ -150,11 +154,11 @@ public class SharePointSoapClient {
 
         GetListItems request = objectFactory.createGetListItems();
         request.setListName(listName);
-        request.setQuery(query);
-        request.setQueryOptions(queryOptions);
-        request.setViewFields(viewFields);
-        request.setRowLimit(null);
         request.setViewName(viewName);
+        request.setQuery(query);
+        request.setViewFields(viewFields);
+        request.setRowLimit("100");
+        request.setQueryOptions(queryOptions);
         request.setWebID(null);
 
         GetListItemsResponse response = (GetListItemsResponse) webServiceTemplate.marshalSendAndReceive(
@@ -169,7 +173,86 @@ public class SharePointSoapClient {
             Document document = element.getOwnerDocument();
             XmlHelper.documentToXmlFile(document, "GetListItemsResponse.xml");
         }
-        logger.error("Weird response from toolkit. Response is not a xml.");
-        throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
+        //logger.error("Weird response from toolkit. Response is not a xml.");
+        //throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
+
+    private static Document initNewDocument() throws ParserConfigurationException {
+        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+        return docBuilder.newDocument();
+    }
+
+    static Element modificationQuery() {
+        try {
+            Document document = initNewDocument();
+            Element query = document.createElement("Query");
+
+            Element where = document.createElement("Where");
+
+                Element and = document.createElement("And");
+                   /* Element eq = document.createElement("Eq");
+                        Element titleFieldRef = document.createElement("FieldRef");
+                        titleFieldRef.setAttribute("Name", "Title");
+                        Element title = document.createElement("Value");
+                        title.setAttribute("Type", "Text");
+                        Text titleNode = document.createTextNode("D0180 - Integration Design - Topdanmark integrations - Party Master");
+*/
+                    Element geq = document.createElement("Geq");
+                        Element fieldRefStart = document.createElement("FieldRef");
+                        fieldRefStart.setAttribute("Name", "Modified");
+                        Element startDate = document.createElement("Value");
+                        startDate.setAttribute("Type", "DateTime");
+                        startDate.setAttribute("IncludeTimeValue", "True");
+                        Text startDateNode = document.createTextNode("2019-04-01T00:00:00Z");
+
+            Element leq = document.createElement("Leq");
+            Element endFieldRef = document.createElement("FieldRef");
+            endFieldRef.setAttribute("Name", "Modified");
+            Element endDate = document.createElement("Value");
+            endDate.setAttribute("Type", "DateTime");
+            endDate.setAttribute("IncludeTimeValue", "True");
+            Text endDateNode = document.createTextNode("2019-04-05T00:00:00Z");
+
+            //title.appendChild(titleNode);
+            //eq.appendChild(titleFieldRef);
+            //eq.appendChild(title);
+
+            endDate.appendChild(endDateNode);
+            leq.appendChild(endFieldRef);
+            leq.appendChild(endDate);
+
+            startDate.appendChild(startDateNode);
+            geq.appendChild(fieldRefStart);
+            geq.appendChild(startDate);
+
+            and.appendChild(leq);
+            and.appendChild(geq);
+
+            where.appendChild(and);
+            //where.appendChild(geq);
+            query.appendChild(where);
+
+            return query;
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static Element queryOptions() {
+        try {
+            Document document = initNewDocument();
+            Element queryOptions = document.createElement("QueryOptions");
+            Element viewAttributes = document.createElement("ViewAttributes");
+            viewAttributes.setAttribute("Scope", "Recursive");
+            Text textNode = document.createTextNode("");
+            viewAttributes.appendChild(textNode);
+            queryOptions.appendChild(viewAttributes);
+
+            return queryOptions;
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

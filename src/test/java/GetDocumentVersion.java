@@ -21,6 +21,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import pg.gipter.MockitoExtension;
+import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.sharepoint.SharePointConfiguration;
 import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
@@ -31,11 +32,9 @@ import pg.gipter.toolkit.ws.ObjectFactory;
 import java.io.File;
 import java.util.Properties;
 
-/**
- * Created by Pawel Gawedzki on 02-Apr-2019.
- */
+/** Created by Pawel Gawedzki on 02-Apr-2019. */
 @ExtendWith(MockitoExtension.class)
-public class GetDocumentVersion {
+class GetDocumentVersion {
 
     private final ObjectFactory objectFactory = new ObjectFactory();
     private ApplicationContext springContext;
@@ -56,7 +55,7 @@ public class GetDocumentVersion {
     void setToolkitProperties(ConfigurableEnvironment environment) {
         Properties toolkitProperties = new Properties();
         toolkitProperties.put("toolkit.username", "PAWG");
-        toolkitProperties.put("toolkit.password", "");
+        toolkitProperties.put("toolkit.password", "JanuarY12!@");
         toolkitProperties.put("toolkit.domain", "NCDMZ");
         toolkitProperties.put("toolkit.WSUrl", "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_bin/lists.asmx");
         toolkitProperties.put("toolkit.listName", "Deliverables");
@@ -72,13 +71,16 @@ public class GetDocumentVersion {
     @Test
     void versionControl() {
         SharePointSoapClient bean = springContext.getBean(SharePointSoapClient.class);
-        //ListViewId listAndView = bean.getListAndView();
+        ListViewId listAndView = bean.getListAndView();
+        bean.getListItems(listAndView.listId(), listAndView.viewId(), "");
 
-        //bean.getListItems(listAndView.listId(), listAndView.viewId(), "");
+        getVersionCollection();
+    }
 
+    private void getVersionCollection() {
         GetVersionCollection request = objectFactory.createGetVersionCollection();
         request.setStrlistID("Deliverables");
-        request.setStrlistItemID("1");
+        request.setStrlistItemID("1416");
         request.setStrFieldName("Version");
 
         WebServiceTemplate webServiceTemplate = springContext.getBean(WebServiceTemplate.class);
@@ -92,8 +94,7 @@ public class GetDocumentVersion {
         if (content instanceof Element) {
             Element element = (Element) content;
             Document document = element.getOwnerDocument();
-            String xml = XmlHelper.documentToString(document);
-            System.out.println(xml);
+            XmlHelper.documentToXmlFile(document, "GetVersionCollectionResponse.xml");
 
             Node listAndViewNode = document.getChildNodes().item(0);
             /*String listId = listAndViewNode.getChildNodes().item(0).getAttributes().getNamedItem("Name").getNodeValue();

@@ -14,7 +14,7 @@ class GetListItemsElement {
 
     private GetListItemsElement() {}
 
-    static Element query(String title) {
+    static Element titleQuery(String title) {
         try {
             Document document = initNewDocument();
             Element query = document.createElement("Query");

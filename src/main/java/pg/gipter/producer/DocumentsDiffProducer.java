@@ -33,18 +33,18 @@ class DocumentsDiffProducer extends AbstractDiffProducer {
 
     @Override
     public void produceDiff() {
-        List<File> itemFiles = appProps.projectPaths().stream()
+        List<File> projectPaths = applicationProperties.projectPaths().stream()
                 .map(File::new)
                 .filter(file -> file.exists() && file.isDirectory())
                 .collect(toList());
 
-        if (itemFiles.isEmpty()) {
+        if (projectPaths.isEmpty()) {
             logger.error("Given projects do not contains any items.");
             throw new IllegalArgumentException("Given projects do not contain any items.");
         }
 
         logger.info("Upload type set as {}. Documents will be zipped and uploaded.", UploadType.DOCUMENTS);
-        List<File> documents = findFiles(itemFiles);
+        List<File> documents = findFiles(projectPaths);
         if (documents.isEmpty()) {
             logger.warn("No documents to zip is no item to upload.", UploadType.DOCUMENTS);
             throw new IllegalArgumentException("Given projects do not contain any items.");
@@ -66,20 +66,20 @@ class DocumentsDiffProducer extends AbstractDiffProducer {
                 Instant.ofEpochMilli(document.lastModified()),
                 TimeZone.getDefault().toZoneId()
         ).toLocalDate();
-        Set<String> filters = appProps.documentFilters();
+        Set<String> filters = applicationProperties.documentFilters();
         boolean filterIncluded = true;
         if (!filters.isEmpty()) {
             String extension = document.getName().substring(document.getName().lastIndexOf(".") + 1);
             filterIncluded = filters.contains(extension);
         }
         return document.isFile() &&
-                lastModifiedDate.isAfter(appProps.startDate()) &&
-                (lastModifiedDate.isBefore(appProps.endDate()) || lastModifiedDate.isEqual(appProps.endDate())) &&
+                lastModifiedDate.isAfter(applicationProperties.startDate()) &&
+                (lastModifiedDate.isBefore(applicationProperties.endDate()) || lastModifiedDate.isEqual(applicationProperties.endDate())) &&
                 filterIncluded;
     }
 
     private void zipDocumentsAndWriteToFile(List<File> documents) {
-        try (FileOutputStream fos = new FileOutputStream(appProps.itemPath());
+        try (FileOutputStream fos = new FileOutputStream(applicationProperties.itemPath());
              ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
             for (File document : documents) {
