@@ -23,16 +23,19 @@ import org.w3c.dom.Node;
 import pg.gipter.MockitoExtension;
 import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
-import pg.gipter.toolkit.sharepoint.SharePointConfiguration;
-import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
+import pg.gipter.toolkit.sharepoint.soap.SharePointConfiguration;
+import pg.gipter.toolkit.sharepoint.soap.SharePointSoapClient;
 import pg.gipter.toolkit.ws.GetVersionCollection;
 import pg.gipter.toolkit.ws.GetVersionCollectionResponse;
 import pg.gipter.toolkit.ws.ObjectFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
-/** Created by Pawel Gawedzki on 02-Apr-2019. */
+/**
+ * Created by Pawel Gawedzki on 02-Apr-2019.
+ */
 @ExtendWith(MockitoExtension.class)
 class GetDocumentVersion {
 
@@ -108,7 +111,7 @@ class GetDocumentVersion {
     }
 
     @Test
-    void download() throws Exception {
+    void downloadSpecificVersion() throws Exception {
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
                 new AuthScope(AuthScope.ANY),
@@ -125,6 +128,78 @@ class GetDocumentVersion {
                 System.out.println("----------------------------------------");
                 System.out.println(response.getStatusLine());
                 FileUtils.copyInputStreamToFile(response.getEntity().getContent(), new File("tmp.docx"));
+                EntityUtils.consume(response.getEntity());
+            } finally {
+                response.close();
+            }
+        } finally {
+            httpclient.close();
+        }
+    }
+
+    @Test
+    void restApiTest_items() throws IOException {
+        String url = "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items";
+        String select = "$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
+                "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
+                "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +
+                "File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email," +
+                "File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel" +
+                "File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email,File/Versions/VersionLabel";
+        //String select = "$select=*";
+        String filter = "$filter=Modified+gt+datetime'2019-04-01T00:00:00Z'+and+Modified+lt+datetime'2019-04-06T00:00:00Z'";
+        String expand = "$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy";
+
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(
+                new AuthScope(AuthScope.ANY),
+                new NTCredentials("pawg", "JanuarY12!@", "https://goto.netcompany.com", "NCDMZ"));
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setDefaultCredentialsProvider(credsProvider)
+                .build();
+        try {
+            HttpGet httpget = new HttpGet(url + "?" + select + "&" + filter + "&" + expand);
+            httpget.addHeader("accept", "application/json;odata=verbose");
+
+            System.out.println("Executing request " + httpget.getRequestLine());
+            CloseableHttpResponse response = httpclient.execute(httpget);
+            try {
+                System.out.println("----------------------------------------");
+                System.out.println(response.getStatusLine());
+                FileUtils.copyInputStreamToFile(response.getEntity().getContent(), new File("items.json"));
+                EntityUtils.consume(response.getEntity());
+            } finally {
+                response.close();
+            }
+        } finally {
+            httpclient.close();
+        }
+    }
+
+    @Test
+    void restVersion() throws IOException {
+        String url = "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/GetFileByServerRelativeUrl('/cases/GTE440/TOEDNLD/Deliverables/D0180%20-%20Integration%20design/Topdanmark%20integrations/D0180%20-%20Integration%20Design%20-%20Topdanmark%20integrations%20-%20Party%20Master.docx')/Versions";
+        String expand = "$expand=CreatedBy";
+        String select = "$select=ModifiedBy,Modified,CheckInComment,Created,ID,IsCurrentVersion,Size,Url,VersionLabel,CreatedBy/Editor,CreatedBy/Id,CreatedBy/Email,CreatedBy/Title,CreatedBy/LoginName";
+        String orderBy = "$orderby=Created+desc";
+
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(
+                new AuthScope(AuthScope.ANY),
+                new NTCredentials("pawg", "JanuarY12!@", "https://goto.netcompany.com", "NCDMZ"));
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setDefaultCredentialsProvider(credsProvider)
+                .build();
+        try {
+            HttpGet httpget = new HttpGet(url + "?" + expand + "&" + select + "&" + orderBy);
+            httpget.addHeader("accept", "application/json;odata=verbose");
+
+            System.out.println("Executing request " + httpget.getRequestLine());
+            CloseableHttpResponse response = httpclient.execute(httpget);
+            try {
+                System.out.println("----------------------------------------");
+                System.out.println(response.getStatusLine());
+                FileUtils.copyInputStreamToFile(response.getEntity().getContent(), new File("versions.json"));
                 EntityUtils.consume(response.getEntity());
             } finally {
                 response.close();
