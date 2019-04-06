@@ -9,25 +9,17 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static pg.gipter.TestUtils.mockPropertiesLoader;
 import static pg.gipter.settings.FilePreferredApplicationProperties.yyyy_MM_dd;
 
 class FilePreferredApplicationPropertiesTest {
 
     private FilePreferredApplicationProperties appProps;
-
-    private PropertiesHelper mockPropertiesLoader(Properties properties) {
-        PropertiesHelper loader = mock(PropertiesHelper.class);
-        when(loader.loadApplicationProperties()).thenReturn(Optional.of(properties));
-        return loader;
-    }
 
     @Test
     void given_propertiesFromFile_when_hasProperties_then_returnTrue() {

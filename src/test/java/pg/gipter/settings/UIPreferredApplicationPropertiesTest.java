@@ -1,25 +1,16 @@
 package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.utils.PropertiesHelper;
 
-import java.util.Optional;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static pg.gipter.TestUtils.mockPropertiesLoader;
 
 /**Created by Pawel Gawedzki on 06-Mar-2019.*/
 public class UIPreferredApplicationPropertiesTest {
 
     private UIPreferredApplicationProperties appProps;
-
-    private PropertiesHelper mockPropertiesLoader(Properties properties) {
-        PropertiesHelper loader = mock(PropertiesHelper.class);
-        when(loader.loadApplicationProperties()).thenReturn(Optional.of(properties));
-        return loader;
-    }
 
     @Test
     void given_emptyActiveTray_when_isActiveTray_then_returnTrue() {

@@ -7,23 +7,15 @@ import pg.gipter.utils.PropertiesHelper;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static pg.gipter.TestUtils.mockPropertiesLoader;
 
 class CliPreferredApplicationPropertiesTest {
 
     private CliPreferredApplicationProperties applicationProperties;
-
-    private PropertiesHelper mockPropertiesLoader(Properties properties) {
-        PropertiesHelper loader = mock(PropertiesHelper.class);
-        when(loader.loadApplicationProperties()).thenReturn(Optional.of(properties));
-        return loader;
-    }
 
     @Test
     void given_noAuthor_when_author_then_returnDefault() {
