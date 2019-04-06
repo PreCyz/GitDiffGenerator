@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.sharepoint;
+package pg.gipter.toolkit.sharepoint.soap;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**Created by Pawel Gawedzki on 12-Oct-2018.*/
+/** Created by Pawel Gawedzki on 12-Oct-2018. */
 public class SharePointSoapClient {
 
     private static final Logger logger = LoggerFactory.getLogger(SharePointSoapClient.class);
@@ -173,8 +173,8 @@ public class SharePointSoapClient {
             Document document = element.getOwnerDocument();
             XmlHelper.documentToXmlFile(document, "GetListItemsResponse.xml");
         }
-        //logger.error("Weird response from toolkit. Response is not a xml.");
-        //throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
+        logger.error("Weird response from toolkit. Response is not a xml.");
+        throw new IllegalArgumentException("Weird response from toolkit. Response is not a xml.");
     }
 
     private static Document initNewDocument() throws ParserConfigurationException {
@@ -190,21 +190,15 @@ public class SharePointSoapClient {
 
             Element where = document.createElement("Where");
 
-                Element and = document.createElement("And");
-                   /* Element eq = document.createElement("Eq");
-                        Element titleFieldRef = document.createElement("FieldRef");
-                        titleFieldRef.setAttribute("Name", "Title");
-                        Element title = document.createElement("Value");
-                        title.setAttribute("Type", "Text");
-                        Text titleNode = document.createTextNode("D0180 - Integration Design - Topdanmark integrations - Party Master");
-*/
-                    Element geq = document.createElement("Geq");
-                        Element fieldRefStart = document.createElement("FieldRef");
-                        fieldRefStart.setAttribute("Name", "Modified");
-                        Element startDate = document.createElement("Value");
-                        startDate.setAttribute("Type", "DateTime");
-                        startDate.setAttribute("IncludeTimeValue", "True");
-                        Text startDateNode = document.createTextNode("2019-04-01T00:00:00Z");
+            Element and = document.createElement("And");
+
+            Element geq = document.createElement("Geq");
+            Element fieldRefStart = document.createElement("FieldRef");
+            fieldRefStart.setAttribute("Name", "Modified");
+            Element startDate = document.createElement("Value");
+            startDate.setAttribute("Type", "DateTime");
+            startDate.setAttribute("IncludeTimeValue", "True");
+            Text startDateNode = document.createTextNode("2019-04-01T00:00:00Z");
 
             Element leq = document.createElement("Leq");
             Element endFieldRef = document.createElement("FieldRef");

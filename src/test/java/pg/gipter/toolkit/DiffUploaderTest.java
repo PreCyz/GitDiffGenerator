@@ -14,7 +14,7 @@ import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.toolkit.helper.XmlHelper;
-import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
+import pg.gipter.toolkit.sharepoint.soap.SharePointSoapClient;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;

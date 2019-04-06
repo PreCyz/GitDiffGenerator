@@ -1,4 +1,4 @@
-package pg.gipter.service;
+package pg.gipter.toolkit.sharepoint.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -22,11 +22,11 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ToolkitServiceRestTest {
+class SharepointRestServiceTest {
 
     @Test
     void givenItemsJson_whenExtractItemDetails_thenReturnListOfItemDetails() throws FileNotFoundException {
-        ToolkitServiceRest service = new ToolkitServiceRest(null);
+        SharepointRestService service = new SharepointRestService(null);
         String path = XmlHelper.getFullXmlPath("items.json");
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
@@ -49,7 +49,7 @@ class ToolkitServiceRestTest {
                 new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.FILE.name()
                 });
         applicationProperties.init(new String[]{}, loader);
-        ToolkitServiceRest service = new ToolkitServiceRest(applicationProperties);
+        SharepointRestService service = new SharepointRestService(applicationProperties);
         String path = XmlHelper.getFullXmlPath("items.json");
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
@@ -73,7 +73,7 @@ class ToolkitServiceRestTest {
                 new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.FILE.name()
                 });
         applicationProperties.init(new String[]{}, loader);
-        ToolkitServiceRest service = new ToolkitServiceRest(applicationProperties);
+        SharepointRestService service = new SharepointRestService(applicationProperties);
         String path = XmlHelper.getFullXmlPath("customItem.json");
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
@@ -102,7 +102,7 @@ class ToolkitServiceRestTest {
                 new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.FILE.name()}
         );
         applicationProperties.init(new String[]{}, loader);
-        ToolkitServiceRest service = new ToolkitServiceRest(applicationProperties);
+        SharepointRestService service = new SharepointRestService(applicationProperties);
         String path = XmlHelper.getFullXmlPath("customItem.json");
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();

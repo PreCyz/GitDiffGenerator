@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.sharepoint;
+package pg.gipter.toolkit.sharepoint.soap;
 
 import org.apache.http.auth.NTCredentials;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package pg.gipter.service;
+package pg.gipter.toolkit.sharepoint.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -33,12 +33,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class ToolkitServiceRest {
+public class SharepointRestService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ToolkitServiceRest.class);
+    private static final Logger logger = LoggerFactory.getLogger(SharepointRestService.class);
     private final ApplicationProperties applicationProperties;
 
-    public ToolkitServiceRest(ApplicationProperties applicationProperties) {
+    public SharepointRestService(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }
 

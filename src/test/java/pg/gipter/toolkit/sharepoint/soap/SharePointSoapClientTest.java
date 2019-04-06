@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.sharepoint;
+package pg.gipter.toolkit.sharepoint.soap;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

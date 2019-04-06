@@ -11,8 +11,8 @@ import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
-import pg.gipter.toolkit.sharepoint.SharePointConfiguration;
-import pg.gipter.toolkit.sharepoint.SharePointSoapClient;
+import pg.gipter.toolkit.sharepoint.soap.SharePointConfiguration;
+import pg.gipter.toolkit.sharepoint.soap.SharePointSoapClient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
