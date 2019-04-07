@@ -205,9 +205,9 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitListName() {
+    public String toolkitCopyListName() {
         String toolkitListName = argExtractor.toolkitListName();
-        String argName = ArgName.toolkitListName.name();
+        String argName = ArgName.toolkitCopyListName.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             toolkitListName = properties.getProperty(argName, toolkitListName);
         }
@@ -270,6 +270,17 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
             documentFilters = new LinkedHashSet<>(Arrays.asList(documentFiltersArray));
         }
         return documentFilters;
+    }
+
+    @Override
+    public Set<String> toolkitProjectListNames() {
+        Set<String> toolkitProjectListNames = argExtractor.toolkitProjectListNames();
+        String argName = ArgName.toolkitProjectListNames.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            String[] array = properties.getProperty(argName, String.join(",", toolkitProjectListNames)).split(",");
+            toolkitProjectListNames = new LinkedHashSet<>(Arrays.asList(array));
+        }
+        return toolkitProjectListNames;
     }
 
 }

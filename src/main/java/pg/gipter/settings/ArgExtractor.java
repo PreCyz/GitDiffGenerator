@@ -154,7 +154,7 @@ final class ArgExtractor {
     }
 
     String toolkitListName() {
-        return ArgName.toolkitListName.defaultValue();
+        return ArgName.toolkitCopyListName.defaultValue();
     }
 
     String toolkitWSUrl() {
@@ -220,5 +220,13 @@ final class ArgExtractor {
         return Arrays.stream(documentFilters)
                 .filter(value -> !value.isEmpty())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    Set<String> toolkitProjectListNames() {
+        String[] projectPaths = new String[]{ArgName.toolkitProjectListNames.defaultValue()};
+        if (containsArg(ArgName.toolkitProjectListNames.name())) {
+            projectPaths = getValue(ArgName.toolkitProjectListNames, ArgName.toolkitProjectListNames.defaultValue()).split(",");
+        }
+        return new LinkedHashSet<>(Arrays.asList(projectPaths));
     }
 }

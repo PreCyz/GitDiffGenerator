@@ -38,8 +38,8 @@ public class SharePointConfiguration {
     @Bean
     public SharePointSoapClient sharePointSoapClient(WebServiceMessageSender messageSender,
                                                  @Value("${toolkit.WSUrl}") String wsUrl,
-                                                 @Value("${toolkit.listName}") String listName) {
-        return new SharePointSoapClient(webServiceTemplate(marshaller(), messageSender), wsUrl, listName);
+                                                 @Value("${toolkit.copyListName}") String copyListName) {
+        return new SharePointSoapClient(webServiceTemplate(marshaller(), messageSender), wsUrl, copyListName);
     }
 
 }

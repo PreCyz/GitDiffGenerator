@@ -43,7 +43,7 @@ class SpringInitializerTest {
         assertThat(actualEnv.getProperty("toolkit.password")).isEqualTo("password");
         assertThat(actualEnv.getProperty("toolkit.domain")).isEqualTo("NCDMZ");
         assertThat(actualEnv.getProperty("toolkit.WSUrl")).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
-        assertThat(actualEnv.getProperty("toolkit.listName")).isEqualTo("WorkItems");
+        assertThat(actualEnv.getProperty("toolkit.copyListName")).isEqualTo("WorkItems");
     }
 
     @Test
@@ -68,7 +68,7 @@ class SpringInitializerTest {
             assertThat(propertySource.getProperty("toolkit.domain")).isEqualTo("NCDMZ");
             assertThat(propertySource.getProperty("toolkit.WSUrl"))
                     .isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
-            assertThat(propertySource.getProperty("toolkit.listName")).isEqualTo("WorkItems");
+            assertThat(propertySource.getProperty("toolkit.copyListName")).isEqualTo("WorkItems");
             return true;
         }));
     }

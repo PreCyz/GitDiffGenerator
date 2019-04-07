@@ -432,7 +432,7 @@ class ArgExtractorTest {
 
     @Test
     void given_toolkitListNameFromCommandLine_when_toolkitListName_then_returnDefaultListName() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitListName=sthElse"});
+        argExtractor = new ArgExtractor(new String[]{"toolkitCopyListName=sthElse"});
 
         String actual = argExtractor.toolkitListName();
 

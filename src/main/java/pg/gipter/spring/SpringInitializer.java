@@ -36,7 +36,7 @@ public final class SpringInitializer {
         toolkitProperties.put("toolkit.password", applicationProperties.toolkitPassword());
         toolkitProperties.put("toolkit.domain", applicationProperties.toolkitDomain());
         toolkitProperties.put("toolkit.WSUrl", applicationProperties.toolkitWSUrl());
-        toolkitProperties.put("toolkit.listName", applicationProperties.toolkitListName());
+        toolkitProperties.put("toolkit.copyListName", applicationProperties.toolkitCopyListName());
         environment.getPropertySources().addLast(new PropertiesPropertySource("toolkit", toolkitProperties));
     }
 

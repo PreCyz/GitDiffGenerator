@@ -182,9 +182,9 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitListName() {
+    public String toolkitCopyListName() {
         if (hasProperties()) {
-            return properties.getProperty(ArgName.toolkitListName.name(), argExtractor.toolkitListName());
+            return properties.getProperty(ArgName.toolkitCopyListName.name(), argExtractor.toolkitListName());
         }
         return argExtractor.toolkitListName();
     }
@@ -249,6 +249,17 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
             return new HashSet<>(Arrays.asList(projectPaths));
         }
         return argExtractor.documentFilters();
+    }
+
+    @Override
+    public Set<String> toolkitProjectListNames() {
+        if (hasProperties()) {
+            String[] toolkitProjectListNames = properties.getProperty(
+                    ArgName.toolkitProjectListNames.name(), ArgName.toolkitProjectListNames.defaultValue()
+            ).split(",");
+            return new HashSet<>(Arrays.asList(toolkitProjectListNames));
+        }
+        return argExtractor.toolkitProjectListNames();
     }
 
 }

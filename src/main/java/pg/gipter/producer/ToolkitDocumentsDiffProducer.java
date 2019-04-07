@@ -22,16 +22,17 @@ import pg.gipter.toolkit.dto.DocumentDetailsBuilder;
 import pg.gipter.toolkit.dto.User;
 import pg.gipter.toolkit.dto.VersionDetails;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
+class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
 
     ToolkitDocumentsDiffProducer(ApplicationProperties applicationProperties) {
         super(applicationProperties);
@@ -61,8 +62,15 @@ class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
 
     List<File> findFiles(Set<String> projects) {
         try {
-            List<DocumentDetails> documentDetails = extractDocumentDetails(getItemsWithVersions());
-            Map<String, String> filesToDownload = getFilesToDownload(documentDetails);
+            Map<String, String> filesToDownload = new HashMap<>();
+            for (String project : projects) {
+                Set<String> listTitles = applicationProperties.toolkitProjectListNames();
+                for (String listTitle : listTitles) {
+                    JsonObject itemsWithVersions = getItemsWithVersions(project, listTitle);
+                    List<DocumentDetails> documentDetails = extractDocumentDetails(itemsWithVersions);
+                    filesToDownload.putAll(getFilesToDownload(documentDetails));
+                }
+            }
             return downloadFiles(filesToDownload);
         } catch (IOException ex) {
             logger.warn("Can not find items to upload.", UploadType.TOOLKIT_DOCUMENTS);
@@ -126,9 +134,11 @@ class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
         );
     }
 
-    private JsonObject getItemsWithVersions() throws IOException {
-        String listTitle = "Deliverables";
-        String url = String.format("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('%s')/items", listTitle);
+    private JsonObject getItemsWithVersions(String project, String listTitle) throws IOException {
+        String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items",
+                applicationProperties.toolkitUrl(),
+                project,
+                listTitle);
         String select = "$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
                 "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
                 "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +
@@ -140,8 +150,8 @@ class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
                 LocalDateTime.of(applicationProperties.endDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME)
         );
         String expand = "$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy";
-
         String fullUrl = String.format("%s?%s&%s&%s", url, select, filter, expand);
+
         HttpGet httpget = new HttpGet(fullUrl);
         httpget.addHeader("accept", "application/json;odata=verbose");
         logger.info("Executing request {}", httpget.getRequestLine());
@@ -283,29 +293,6 @@ class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
             }
         }
         return downloadedFiles;
-    }
-
-    private void zipDocumentsAndWriteToFile(List<File> documents) {
-        try (FileOutputStream fos = new FileOutputStream(applicationProperties.itemPath());
-             ZipOutputStream zipOut = new ZipOutputStream(fos)) {
-
-            for (File document : documents) {
-                FileInputStream fis = new FileInputStream(document);
-                ZipEntry zipEntry = new ZipEntry(document.getName());
-                zipOut.putNextEntry(zipEntry);
-
-                byte[] bytes = new byte[1024];
-                int length;
-                while ((length = fis.read(bytes)) >= 0) {
-                    zipOut.write(bytes, 0, length);
-                }
-                fis.close();
-            }
-        } catch (IOException ex) {
-            String errMsg = "Statement does not exists or it is not a file. Can not produce diff.";
-            logger.error(errMsg);
-            throw new IllegalArgumentException(errMsg, ex);
-        }
     }
 
 }

@@ -146,7 +146,7 @@ public class MainController extends AbstractController {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
         toolkitPasswordField.setText(applicationProperties.toolkitPassword());
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
-        toolkitListNameTextField.setText(applicationProperties.toolkitListName());
+        toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
         toolkitUrlTextField.setText(applicationProperties.toolkitUrl());
         toolkitWSTextField.setText(applicationProperties.toolkitWSUrl());
         toolkitUserFolderTextField.setText(applicationProperties.toolkitUserFolder());

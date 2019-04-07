@@ -152,9 +152,10 @@ public abstract class ApplicationProperties {
                 ", toolkitUrl='" + toolkitUrl() + '\'' +
                 ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                 ", toolkitDomain='" + toolkitDomain() + '\'' +
-                ", toolkitListName='" + toolkitListName() + '\'' +
+                ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
                 ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
-                ", toolkitCustomUserFolder='" + toolkitCustomUserFolder() + '\''
+                ", toolkitCustomUserFolder='" + toolkitCustomUserFolder() + '\'' +
+                ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\''
                 ;
     }
 
@@ -176,7 +177,8 @@ public abstract class ApplicationProperties {
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
     public abstract String toolkitCustomUserFolder();
-    public abstract String toolkitListName();
+    public abstract String toolkitCopyListName();
+    public abstract Set<String> toolkitProjectListNames();
     public abstract String toolkitUrl();
     public abstract boolean isSkipRemote();
     public abstract boolean isUseUI();

@@ -821,4 +821,26 @@ class FilePreferredApplicationPropertiesTest {
 
         assertThat(actual).containsExactly("Proj3");
     }
+
+    @Test
+    void givenToolkitProjectListNames_whenToolkitProjectListNames_thenReturnSetWithThatToolkitProjectListNames() {
+        appProps = new FilePreferredApplicationProperties(new String[]{"toolkitProjectListNames=name1"});
+
+        Set<String> actual = appProps.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("name1");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFromPropertiesAndCLI_whenToolkitProjectListNames_thenReturnToolkitProjectListNamesFromProperties() {
+        String[] args = {"toolkitProjectListNames=Proj1,Proj2"};
+        Properties props = new Properties();
+        props.put("toolkitProjectListNames", "Proj3");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = appProps.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("Proj3");
+    }
 }

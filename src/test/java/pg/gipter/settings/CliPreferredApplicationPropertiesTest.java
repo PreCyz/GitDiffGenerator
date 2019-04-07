@@ -999,7 +999,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_noToolkitListName_when_toolkitListName_then_returnDefault() {
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("WorkItems");
     }
@@ -1007,23 +1007,23 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void given_toolkitListNameFromCLI_when_toolkitListName_then_returnDefault() {
         applicationProperties = new CliPreferredApplicationProperties(
-                new String[]{"toolkitListName=cliListName"}
+                new String[]{"toolkitCopyListName=cliListName"}
         );
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("WorkItems");
     }
 
     @Test
     void given_toolkitListNameFileAndCLI_when_toolkitListName_then_returnDefault() {
-        String[] args = {"toolkitListName=cliListName"};
+        String[] args = {"toolkitCopyListName=cliListName"};
         Properties props = new Properties();
-        props.put("toolkitListName", "propertiesListName");
+        props.put("toolkitCopyListName", "propertiesListName");
         applicationProperties = new CliPreferredApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("WorkItems");
     }
@@ -1032,11 +1032,11 @@ class CliPreferredApplicationPropertiesTest {
     void given_toolkitListNameFromProperties_when_toolkitListName_then_returnToolkitListNameFromProperties() {
         String[] args = {};
         Properties props = new Properties();
-        props.put("toolkitListName", "propertiesListName");
+        props.put("toolkitCopyListName", "propertiesListName");
         applicationProperties = new CliPreferredApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("propertiesListName");
     }
@@ -1045,11 +1045,11 @@ class CliPreferredApplicationPropertiesTest {
     void given_toolkitListNameFromPropertiesAndOtherArgs_when_toolkitListName_then_returnToolkitListNameFromProperties() {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
-        props.put("toolkitListName", "propertiesListName");
+        props.put("toolkitCopyListName", "propertiesListName");
         applicationProperties = new CliPreferredApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("propertiesListName");
     }
@@ -1479,5 +1479,64 @@ class CliPreferredApplicationPropertiesTest {
         Set<String> actual = applicationProperties.documentFilters();
 
         assertThat(actual).containsExactly("propertiesProjectPath1", "propertiesProjectPath2");
+    }
+
+    @Test
+    void givenNoProjectPaths_whenToolkitProjectListNames_thenReturnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsOnly("Deliverables");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFromCLI_whenToolkitProjectListNames_thenReturnCliToolkitProjectListNames() {
+        applicationProperties = new CliPreferredApplicationProperties(
+                new String[]{"toolkitProjectListNames=name1,name2"}
+        );
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("name1", "name2");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFileAndCLI_whenToolkitProjectListNames_thenReturnCliToolkitProjectListNames() {
+        String[] args = {"toolkitProjectListNames=cli1,cli2"};
+        Properties props = new Properties();
+        props.put("toolkitProjectListNames", "properties1,properties2");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("cli1", "cli2");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFromProperties_whenToolkitProjectListNames_thenReturnPropertiesToolkitProjectListNames() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("toolkitProjectListNames", "properties1,properties2");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("properties1", "properties2");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFromPropertiesAndOtherArgs_whenToolkitProjectListNames_thenReturnPropertiesToolkitProjectListNames() {
+        String[] args = {"uploadType=statement"};
+        Properties props = new Properties();
+        props.put("toolkitProjectListNames", "properties1,properties2");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("properties1", "properties2");
     }
 }

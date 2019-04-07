@@ -34,12 +34,13 @@ public enum ArgName {
     toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
     toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
     toolkitDomain("NCDMZ"),
-    toolkitListName("WorkItems"),
+    toolkitCopyListName("WorkItems"),
     toolkitUrl("https://goto.netcompany.com"),
     toolkitCopyCase("/cases/GTE106/NCSCOPY"),
     toolkitWSUrl(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/_vti_bin/lists.asmx"),
-    toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/"),
-    toolkitCustomUserFolder("");
+    toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitCopyListName.defaultValue + "/"),
+    toolkitCustomUserFolder(""),
+    toolkitProjectListNames("Deliverables");
 
     private String defaultValue;
 
