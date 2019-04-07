@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 public enum UploadType {
-    SIMPLE, PROTECTED, STATEMENT, DOCUMENTS, TOOLKIT_DOCUMENTS;
+    SIMPLE, PROTECTED, STATEMENT, DOCUMENTS, TOOLKIT_DOCS;
 
     public static UploadType valueFor(String value) {
         String errMsg;

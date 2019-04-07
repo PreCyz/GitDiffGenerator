@@ -185,7 +185,7 @@ public class MainController extends AbstractController {
         toolkitUrlTextField.setEditable(false);
         toolkitWSTextField.setEditable(false);
         toolkitUserFolderTextField.setEditable(false);
-        toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCUMENTS);
+        toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
 
         if (applicationProperties.projectPaths().isEmpty()) {
             projectPathButton.setText(resources.getString("button.add"));
@@ -369,7 +369,7 @@ public class MainController extends AbstractController {
             if (uploadTypeComboBox.getValue() != UploadType.DOCUMENTS) {
                 documentFiltersTextField.clear();
             }
-            toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCUMENTS);
+            toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
         };
     }
 

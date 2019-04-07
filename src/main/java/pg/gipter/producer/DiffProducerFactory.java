@@ -19,7 +19,7 @@ public final class DiffProducerFactory {
             return new StatementDiffProducer(applicationProperties);
         } else if (applicationProperties.uploadType() == UploadType.DOCUMENTS) {
             return new DocumentsDiffProducer(applicationProperties);
-        } else if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCUMENTS) {
+        } else if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
             return new ToolkitDocumentsDiffProducer(applicationProperties);
         } else if ("Linux".equalsIgnoreCase(platform)) {
             return new LinuxDiffProducer(applicationProperties);

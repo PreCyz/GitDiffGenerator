@@ -50,10 +50,10 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
             throw new IllegalArgumentException("Given projects do not contain any items.");
         }
 
-        logger.info("Upload type set as {}. Documents will be zipped and uploaded.", UploadType.TOOLKIT_DOCUMENTS);
+        logger.info("Upload type set as {}. Documents will be zipped and uploaded.", UploadType.TOOLKIT_DOCS);
         List<File> documents = findFiles(applicationProperties.projectPaths());
         if (documents.isEmpty()) {
-            logger.warn("No documents to zip is no item to upload.", UploadType.TOOLKIT_DOCUMENTS);
+            logger.warn("No documents to zip is no item to upload.", UploadType.TOOLKIT_DOCS);
             throw new IllegalArgumentException("Given projects do not contain any items.");
         } else {
             zipDocumentsAndWriteToFile(documents);
@@ -73,7 +73,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
             }
             return downloadFiles(filesToDownload);
         } catch (IOException ex) {
-            logger.warn("Can not find items to upload.", UploadType.TOOLKIT_DOCUMENTS);
+            logger.warn("Can not find items to upload.", UploadType.TOOLKIT_DOCS);
             throw new IllegalArgumentException("Can not find items to upload.");
         }
     }
