@@ -103,7 +103,7 @@ class ToolkitDocumentsDiffProducerTest {
         List<DocumentDetails> documentDetails = producer.extractDocumentDetails(js);
         Map<String, String> filesToDownload = producer.getFilesToDownload(new ArrayList<>(applicationProperties.projectPaths()).get(0), documentDetails);
 
-        List<File> actual = producer.downloadFiles(filesToDownload);
+        List<File> actual = producer.downloadFilesFast(filesToDownload);
 
         assertThat(actual).hasSize(2);
     }

@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.*;
 
 class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
 
@@ -61,7 +62,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
         }
     }
 
-    List<File> findFiles(Set<String> projects) {
+    private List<File> findFiles(Set<String> projects) {
         try {
             Map<String, String> filesToDownload = new HashMap<>();
             for (String project : projects) {
@@ -72,7 +73,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
                     filesToDownload.putAll(getFilesToDownload(project, documentDetails));
                 }
             }
-            return downloadFiles(filesToDownload);
+            return downloadFilesFast(filesToDownload);
         } catch (IOException ex) {
             logger.warn("Can not find items to upload.", UploadType.TOOLKIT_DOCS);
             throw new IllegalArgumentException("Can not find items to upload.");
@@ -210,7 +211,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
             String serverRelativeUrl = file.get("ServerRelativeUrl").getAsString();
             LocalDateTime timeLastModified = LocalDateTime.parse(file.get("TimeLastModified").getAsString(), DateTimeFormatter.ISO_DATE_TIME);
             String fileTitle = file.get("Title").getAsString();
-            String fileCurrentVersion = file.get("UIVersionLabel").getAsString();
+            //String fileCurrentVersion = file.get("UIVersionLabel").getAsString();
 
             JsonObject versions = file.getAsJsonObject("Versions");
             List<VersionDetails> versionList = new ArrayList<>();
@@ -241,7 +242,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
         return result;
     }
 
-    User getUser(JsonObject object) {
+    private User getUser(JsonObject object) {
         int id = -1;
         JsonElement idElement = object.get("Id");
         if (idElement != null) {
@@ -254,7 +255,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
         return new User(id, loginName, fullName, email);
     }
 
-    List<VersionDetails> getVersions(JsonObject jsonObject) {
+    private List<VersionDetails> getVersions(JsonObject jsonObject) {
         JsonArray results = jsonObject.getAsJsonArray("results");
         List<VersionDetails> result = new ArrayList<>(results.size());
         for (int i = 0; i < results.size(); i++) {
@@ -273,27 +274,53 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
         return result;
     }
 
-    List<File> downloadFiles(Map<String, String> filesToDownload) throws IOException {
-        List<File> downloadedFiles = new ArrayList<>(filesToDownload.size());
+    List<File> downloadFilesFast(Map<String, String> filesToDownload) {
+        if (filesToDownload.isEmpty()) {
+            throw new IllegalArgumentException("No files to download.");
+        }
+        ExecutorService executor = Executors.newFixedThreadPool(filesToDownload.size());
+        CompletionService<File> ecs = new ExecutorCompletionService<>(executor);
+        filesToDownload.entrySet().forEach(entry -> ecs.submit(new DownloadFileCall(entry)));
 
-        for (Map.Entry<String, String> entry: filesToDownload.entrySet()) {
+        int numberOfCalls = filesToDownload.size();
+        List<File> result = new ArrayList<>(numberOfCalls);
+        for (int i = 0; i < numberOfCalls; i++) {
+            try {
+                result.add(ecs.take().get());
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("Error when getting torrents.", e);
+            }
+        }
+        return result;
+    }
+
+    private class DownloadFileCall implements Callable<File> {
+
+        private Map.Entry<String, String> entry;
+
+        DownloadFileCall(Map.Entry<String, String> entry) {
+            this.entry = entry;
+        }
+
+        @Override
+        public File call() throws Exception {
             HttpGet httpget = new HttpGet(entry.getValue());
-            logger.info("Executing request {}", httpget.getRequestLine());
+            String callId = this.toString().substring(this.toString().lastIndexOf("@") + 1);
+            logger.info("Executing request {} {}", callId, httpget.getRequestLine());
 
             try (CloseableHttpClient httpclient = HttpClients.custom()
                     .setDefaultCredentialsProvider(getCredentialsProvider())
                     .build();
                  CloseableHttpResponse response = httpclient.execute(httpget)
             ) {
-                logger.info("Response {}", response.getStatusLine());
+                logger.info("Response {} {}", callId, response.getStatusLine());
                 String downloadFilePath = applicationProperties.itemPath().substring(0, applicationProperties.itemPath().lastIndexOf(File.separator));
                 File downloadedFile = new File(downloadFilePath + File.separator + entry.getKey());
                 FileUtils.copyInputStreamToFile(response.getEntity().getContent(), downloadedFile);
                 EntityUtils.consume(response.getEntity());
-                downloadedFiles.add(downloadedFile);
+                return downloadedFile;
             }
         }
-        return downloadedFiles;
     }
 
     private void deleteFiles(List<File> documents) {

@@ -53,7 +53,7 @@ class DocumentsDiffProducer extends AbstractDiffProducer {
         }
     }
 
-    protected List<File> findFiles(List<File> documentDirs) {
+    private List<File> findFiles(List<File> documentDirs) {
         return documentDirs.stream()
                 .map(File::listFiles)
                 .flatMap(Stream::of)
@@ -78,7 +78,7 @@ class DocumentsDiffProducer extends AbstractDiffProducer {
                 filterIncluded;
     }
 
-    protected void zipDocumentsAndWriteToFile(List<File> documents) {
+    void zipDocumentsAndWriteToFile(List<File> documents) {
         try (FileOutputStream fos = new FileOutputStream(applicationProperties.itemPath());
              ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
