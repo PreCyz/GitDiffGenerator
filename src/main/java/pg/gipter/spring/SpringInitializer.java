@@ -30,7 +30,7 @@ public final class SpringInitializer {
         return springContext;
     }
 
-    private static void setToolkitProperties(ConfigurableEnvironment environment, ApplicationProperties applicationProperties) {
+    public static void setToolkitProperties(ConfigurableEnvironment environment, ApplicationProperties applicationProperties) {
         Properties toolkitProperties = new Properties();
         toolkitProperties.put("toolkit.username", applicationProperties.toolkitUsername());
         toolkitProperties.put("toolkit.password", applicationProperties.toolkitPassword());
@@ -38,5 +38,9 @@ public final class SpringInitializer {
         toolkitProperties.put("toolkit.WSUrl", applicationProperties.toolkitWSUrl());
         toolkitProperties.put("toolkit.listName", applicationProperties.toolkitListName());
         environment.getPropertySources().addLast(new PropertiesPropertySource("toolkit", toolkitProperties));
+    }
+
+    static void destroyContext() {
+        springContext = null;
     }
 }

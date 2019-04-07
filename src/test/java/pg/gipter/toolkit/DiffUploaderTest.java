@@ -3,10 +3,6 @@ package pg.gipter.toolkit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.ws.soap.SoapFault;
 import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.MockitoExtension;
@@ -94,33 +90,6 @@ class DiffUploaderTest {
     }
 
     @Test
-    void given_springEnvironment_when_setToolkitProperties_then_addPropertiesToEnvironment() {
-        ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(new String[]{
-                "toolkitUsername=xxx",
-                "toolkitPassword=pass",
-        });
-        ConfigurableEnvironment env = mock(ConfigurableEnvironment.class);
-        MutablePropertySources mps = spy(new MutablePropertySources());
-        when(env.getPropertySources()).thenReturn(mps);
-
-        uploader = new DiffUploader(properties);
-        uploader.setToolkitProperties(env);
-
-        verify(env, times(1)).getPropertySources();
-        verify(mps, times(1)).addLast(argThat(propertySource -> {
-            assertThat(propertySource).isInstanceOf(PropertiesPropertySource.class);
-            assertThat(propertySource.getName()).isEqualTo("toolkit");
-            assertThat(propertySource.getProperty("toolkit.username")).isEqualTo("XXX");
-            assertThat(propertySource.getProperty("toolkit.password")).isEqualTo("pass");
-            assertThat(propertySource.getProperty("toolkit.domain")).isEqualTo("NCDMZ");
-            assertThat(propertySource.getProperty("toolkit.WSUrl"))
-                    .isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
-            assertThat(propertySource.getProperty("toolkit.listName")).isEqualTo("WorkItems");
-            return true;
-        }));
-    }
-
-    @Test
     void when_uploadDiff_then_throwSoapException() throws Exception {
         String xml = XmlHelper.documentToString(XmlHelper.getDocument(XmlHelper.getFullXmlPath("wsErrorSoap.xml")));
         Source xmlSource = new StreamSource(new StringReader(xml));
@@ -162,29 +131,4 @@ class DiffUploaderTest {
         }
     }
 
-    @Test
-    void when_initSpringApplicationContext_then_returnApplicationContext() {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{"toolkitUsername=userName", "toolkitPassword=password"}
-        );
-        uploader = new DiffUploader(applicationProperties);
-
-        ApplicationContext actual = uploader.initSpringApplicationContext();
-
-        assertThat(actual).isNotNull();
-        assertThat(actual.getBeanDefinitionNames()).contains(
-                "sharePointConfiguration",
-                "httpComponentsMessageSender",
-                "marshaller",
-                "webServiceTemplate",
-                "sharePointSoapClient"
-        );
-        Environment actualEnv = actual.getEnvironment();
-        assertThat(actualEnv).isNotNull();
-        assertThat(actualEnv.getProperty("toolkit.username")).isEqualTo("USERNAME");
-        assertThat(actualEnv.getProperty("toolkit.password")).isEqualTo("password");
-        assertThat(actualEnv.getProperty("toolkit.domain")).isEqualTo("NCDMZ");
-        assertThat(actualEnv.getProperty("toolkit.WSUrl")).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
-        assertThat(actualEnv.getProperty("toolkit.listName")).isEqualTo("WorkItems");
-    }
 }

@@ -88,7 +88,8 @@ class ToolkitDocumentsDiffProducerTest {
                         ArgName.endDate + "=2019-04-06",
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.toolkitPassword + "=JanuarY12!@",
-                        ArgName.itemPath + "=/home/gawa/IdeaProjects/GitDiffGenerator/src/test/java/resources/xml"
+                        ArgName.itemPath + "=/home/gawa/IdeaProjects/GitDiffGenerator/src/test/java/resources/xml",
+                        ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 }
         );
         producer = new ToolkitDocumentsDiffProducer(applicationProperties);
