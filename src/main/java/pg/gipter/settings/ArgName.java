@@ -35,9 +35,10 @@ public enum ArgName {
     toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
     toolkitDomain("NCDMZ"),
     toolkitListName("WorkItems"),
-    toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY"),
-    toolkitWSUrl(toolkitUrl.defaultValue + "/_vti_bin/lists.asmx"),
-    toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/"),
+    toolkitUrl("https://goto.netcompany.com"),
+    toolkitCopyCase("/cases/GTE106/NCSCOPY"),
+    toolkitWSUrl(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/_vti_bin/lists.asmx"),
+    toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/"),
     toolkitCustomUserFolder("");
 
     private String defaultValue;

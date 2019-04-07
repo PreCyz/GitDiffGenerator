@@ -386,7 +386,12 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+    }
+
+    @Test
+    void whenToolkitCopyCaseDefaultValue_thenReturnNCopyCase() {
+        assertThat(ArgName.toolkitCopyCase.defaultValue()).isEqualTo("/cases/GTE106/NCSCOPY");
     }
 
     @Test
@@ -395,7 +400,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
     }
 
     @Test

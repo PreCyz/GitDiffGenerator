@@ -942,7 +942,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
     }
 
     @Test
@@ -953,7 +953,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
     }
 
     @Test
@@ -966,7 +966,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
     }
 
     @Test
