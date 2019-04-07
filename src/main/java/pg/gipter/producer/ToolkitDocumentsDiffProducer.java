@@ -15,10 +15,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.context.ApplicationContext;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.spring.SpringInitializer;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.dto.DocumentDetailsBuilder;
 import pg.gipter.toolkit.dto.User;
@@ -35,8 +33,6 @@ import java.util.zip.ZipOutputStream;
 
 class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
 
-    private ApplicationContext springContext;
-
     ToolkitDocumentsDiffProducer(ApplicationProperties applicationProperties) {
         super(applicationProperties);
     }
@@ -46,15 +42,12 @@ class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
         return diffCmd;
     }
 
-
     @Override
     public void produceDiff() {
         if (applicationProperties.projectPaths().isEmpty()) {
             logger.error("Given projects do not contains any items.");
             throw new IllegalArgumentException("Given projects do not contain any items.");
         }
-
-        springContext = SpringInitializer.getSpringContext(applicationProperties);
 
         logger.info("Upload type set as {}. Documents will be zipped and uploaded.", UploadType.TOOLKIT_DOCUMENTS);
         List<File> documents = findFiles(applicationProperties.projectPaths());

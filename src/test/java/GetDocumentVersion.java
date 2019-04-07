@@ -9,6 +9,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.ApplicationContext;
@@ -33,9 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * Created by Pawel Gawedzki on 02-Apr-2019.
- */
+/** Created by Pawel Gawedzki on 02-Apr-2019. */
 @ExtendWith(MockitoExtension.class)
 class GetDocumentVersion {
 
@@ -72,6 +71,7 @@ class GetDocumentVersion {
     }
 
     @Test
+    @Disabled
     void versionControl() {
         SharePointSoapClient bean = springContext.getBean(SharePointSoapClient.class);
         ListViewId listAndView = bean.getListAndView();
@@ -111,6 +111,7 @@ class GetDocumentVersion {
     }
 
     @Test
+    @Disabled
     void downloadSpecificVersion() throws Exception {
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
@@ -138,6 +139,7 @@ class GetDocumentVersion {
     }
 
     @Test
+    @Disabled
     void restApiTest_items() throws IOException {
         String url = "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items";
         String select = "$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
@@ -147,7 +149,8 @@ class GetDocumentVersion {
                 "File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel" +
                 "File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email,File/Versions/VersionLabel";
         //String select = "$select=*";
-        String filter = "$filter=Modified+gt+datetime'2019-04-01T00:00:00Z'+and+Modified+lt+datetime'2019-04-06T00:00:00Z'";
+        String filter = "$filter=(Modified gt datetime'2019-04-01T00:00:00Z' and Modified lt datetime'2019-04-06T00:00:00Z')".replaceAll(" ", "%20");
+                //"or+(File/Versions/Created gt datetime'2019-04-01T00:00:00Z' and File/Versions/Created+lt+datetime'2019-04-06T00:00:00Z')";
         String expand = "$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy";
 
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -177,6 +180,7 @@ class GetDocumentVersion {
     }
 
     @Test
+    @Disabled
     void restVersion() throws IOException {
         String url = "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/GetFileByServerRelativeUrl('/cases/GTE440/TOEDNLD/Deliverables/D0180%20-%20Integration%20design/Topdanmark%20integrations/D0180%20-%20Integration%20Design%20-%20Topdanmark%20integrations%20-%20Party%20Master.docx')/Versions";
         String expand = "$expand=CreatedBy";

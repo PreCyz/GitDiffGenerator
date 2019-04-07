@@ -3,15 +3,12 @@ package pg.gipter.toolkit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.spring.SpringInitializer;
 import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
-import pg.gipter.toolkit.sharepoint.soap.SharePointConfiguration;
 import pg.gipter.toolkit.sharepoint.soap.SharePointSoapClient;
 
 import java.time.LocalDate;
@@ -20,7 +17,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import static java.util.stream.Collectors.joining;
 
@@ -37,30 +33,12 @@ public class DiffUploader {
 
     public DiffUploader(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.springContext = initSpringApplicationContext();
+        this.springContext = SpringInitializer.getSpringContext(applicationProperties);
     }
 
     /**For test purposes only*/
     void setSpringContext(ApplicationContext springContext) {
         this.springContext = springContext;
-    }
-
-    ApplicationContext initSpringApplicationContext() {
-        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
-        setToolkitProperties(applicationContext.getEnvironment());
-        applicationContext.register(SharePointConfiguration.class);
-        applicationContext.refresh();
-        return applicationContext;
-    }
-
-    void setToolkitProperties(ConfigurableEnvironment environment) {
-        Properties toolkitProperties = new Properties();
-        toolkitProperties.put("toolkit.username", applicationProperties.toolkitUsername());
-        toolkitProperties.put("toolkit.password", applicationProperties.toolkitPassword());
-        toolkitProperties.put("toolkit.domain", applicationProperties.toolkitDomain());
-        toolkitProperties.put("toolkit.WSUrl", applicationProperties.toolkitWSUrl());
-        toolkitProperties.put("toolkit.listName", applicationProperties.toolkitListName());
-        environment.getPropertySources().addLast(new PropertiesPropertySource("toolkit", toolkitProperties));
     }
 
     public void uploadDiff() {
