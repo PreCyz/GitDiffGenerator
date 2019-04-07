@@ -1,0 +1,119 @@
+{
+  "d": {
+    "__metadata": {
+      "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')",
+      "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')",
+      "etag": "\"43\"",
+      "type": "SP.List"
+    },
+    "FirstUniqueAncestorSecurableObject": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/FirstUniqueAncestorSecurableObject"
+      }
+    },
+    "RoleAssignments": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/RoleAssignments"
+      }
+    },
+    "ContentTypes": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/ContentTypes"
+      }
+    },
+    "DefaultView": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/DefaultView"
+      }
+    },
+    "EventReceivers": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/EventReceivers"
+      }
+    },
+    "Fields": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/Fields"
+      }
+    },
+    "Forms": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/Forms"
+      }
+    },
+    "InformationRightsManagementSettings": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/InformationRightsManagementSettings"
+      }
+    },
+    "Items": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/Items"
+      }
+    },
+    "ParentWeb": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/ParentWeb"
+      }
+    },
+    "RootFolder": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/RootFolder"
+      }
+    },
+    "UserCustomActions": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/UserCustomActions"
+      }
+    },
+    "Views": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/Views"
+      }
+    },
+    "WorkflowAssociations": {
+      "__deferred": {
+        "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/Lists(guid'c6b0bf9c-5fad-4991-aa5a-376f0bbd9729')/WorkflowAssociations"
+      }
+    },
+    "AllowContentTypes": true,
+    "BaseTemplate": 101,
+    "BaseType": 1,
+    "ContentTypesEnabled": false,
+    "Created": "2018-05-25T07:35:11Z",
+    "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+    "Description": "",
+    "Direction": "none",
+    "DocumentTemplateUrl": "/cases/GTE440/TOEDNLD/Deliverables/Forms/template.doc",
+    "DraftVersionVisibility": 0,
+    "EnableAttachments": false,
+    "EnableFolderCreation": true,
+    "EnableMinorVersions": false,
+    "EnableModeration": false,
+    "EnableVersioning": true,
+    "EntityTypeName": "Deliverables",
+    "ForceCheckout": false,
+    "HasExternalDataSource": false,
+    "Hidden": false,
+    "Id": "c6b0bf9c-5fad-4991-aa5a-376f0bbd9729",
+    "ImageUrl": "/_layouts/15/images/ccm/ic_go_lib.png",
+    "IrmEnabled": false,
+    "IrmExpire": false,
+    "IrmReject": false,
+    "IsApplicationList": false,
+    "IsCatalog": false,
+    "IsPrivate": false,
+    "ItemCount": 1194,
+    "LastItemDeletedDate": "2019-02-19T09:22:27Z",
+    "LastItemModifiedDate": "2019-04-05T13:56:31Z",
+    "ListItemEntityTypeFullName": "SP.Data.DeliverablesItem",
+    "MajorVersionLimit": 0,
+    "MajorWithMinorVersionsLimit": 0,
+    "MultipleDataList": false,
+    "NoCrawl": false,
+    "ParentWebUrl": "/cases/GTE440/TOEDNLD",
+    "ServerTemplateCanCreateFolders": true,
+    "TemplateFeatureId": "4273cece-2402-413c-a73e-ccbbedd91442",
+    "Title": "Deliverables"
+  }
+}

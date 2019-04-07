@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.sharepoint.rest;
+package pg.gipter.producer;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -12,27 +12,26 @@ import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.utils.PropertiesHelper;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SharepointRestServiceTest {
+class ToolkitDocumentsDiffProducerTest {
+
+    private ToolkitDocumentsDiffProducer producer;
 
     @Test
     void givenItemsJson_whenExtractItemDetails_thenReturnListOfItemDetails() throws FileNotFoundException {
-        SharepointRestService service = new SharepointRestService(null);
+        producer = new ToolkitDocumentsDiffProducer(null);
         String path = XmlHelper.getFullXmlPath("items.json");
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
 
-        List<DocumentDetails> actual = service.extractDocumentDetails(js);
+        List<DocumentDetails> actual = producer.extractDocumentDetails(js);
 
         assertThat(actual).hasSize(9);
     }
@@ -49,14 +48,14 @@ class SharepointRestServiceTest {
                 new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.FILE.name()
                 });
         applicationProperties.init(new String[]{}, loader);
-        SharepointRestService service = new SharepointRestService(applicationProperties);
+        producer = new ToolkitDocumentsDiffProducer(applicationProperties);
         String path = XmlHelper.getFullXmlPath("items.json");
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
-        List<DocumentDetails> documentDetails = service.extractDocumentDetails(js);
+        List<DocumentDetails> documentDetails = producer.extractDocumentDetails(js);
 
-        Map<String, String> filesToDownload = service.getFilesToDownload(documentDetails);
+        Map<String, String> filesToDownload = producer.getFilesToDownload(documentDetails);
 
         assertThat(filesToDownload).hasSize(3);
     }
@@ -73,14 +72,14 @@ class SharepointRestServiceTest {
                 new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.FILE.name()
                 });
         applicationProperties.init(new String[]{}, loader);
-        SharepointRestService service = new SharepointRestService(applicationProperties);
+        producer = new ToolkitDocumentsDiffProducer(applicationProperties);
         String path = XmlHelper.getFullXmlPath("customItem.json");
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
-        List<DocumentDetails> documentDetails = service.extractDocumentDetails(js);
+        List<DocumentDetails> documentDetails = producer.extractDocumentDetails(js);
 
-        Map<String, String> filesToDownload = service.getFilesToDownload(documentDetails);
+        Map<String, String> filesToDownload = producer.getFilesToDownload(documentDetails);
 
         assertThat(filesToDownload).hasSize(2);
         assertThat(filesToDownload.get("after_change-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
@@ -102,14 +101,17 @@ class SharepointRestServiceTest {
                 new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.FILE.name()}
         );
         applicationProperties.init(new String[]{}, loader);
-        SharepointRestService service = new SharepointRestService(applicationProperties);
+        producer = new ToolkitDocumentsDiffProducer(applicationProperties);
         String path = XmlHelper.getFullXmlPath("customItem.json");
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
-        List<DocumentDetails> documentDetails = service.extractDocumentDetails(js);
-        Map<String, String> filesToDownload = service.getFilesToDownload(documentDetails);
+        List<DocumentDetails> documentDetails = producer.extractDocumentDetails(js);
+        Map<String, String> filesToDownload = producer.getFilesToDownload(documentDetails);
 
-        service.downloadFiles(filesToDownload);
+        List<File> actual = producer.downloadFiles(filesToDownload);
+
+        assertThat(actual).hasSize(2);
     }
+
 }

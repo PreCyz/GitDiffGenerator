@@ -5,7 +5,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
 import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.toolkit.sharepoint.SharePointConfiguration;
+import pg.gipter.toolkit.sharepoint.soap.SharePointConfiguration;
 
 import java.util.Properties;
 
