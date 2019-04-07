@@ -68,7 +68,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
                 for (String listTitle : listTitles) {
                     JsonObject itemsWithVersions = getItemsWithVersions(project, listTitle);
                     List<DocumentDetails> documentDetails = extractDocumentDetails(itemsWithVersions);
-                    filesToDownload.putAll(getFilesToDownload(documentDetails));
+                    filesToDownload.putAll(getFilesToDownload(project, documentDetails));
                 }
             }
             return downloadFiles(filesToDownload);
@@ -78,19 +78,19 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
         }
     }
 
-    Map<String, String> getFilesToDownload(List<DocumentDetails> documentDetails) {
+    Map<String, String> getFilesToDownload(String project, List<DocumentDetails> documentDetails) {
         final int firstMajorVersion = 1;
         Map<String, String> filesToDownloadMap = new HashMap<>();
         for (DocumentDetails dd : documentDetails) {
             if (dd.getLastModifier().getLoginName().equalsIgnoreCase(applicationProperties.toolkitUsername())) {
-                filesToDownloadMap.put("after_change-" + dd.getFileLeafRef(), getFullDownloadUrl(dd.getFileRef()));
+                filesToDownloadMap.put("after_change-" + dd.getFileLeafRef(), getFullDownloadUrl(dd.getFileRef(), project));
                 if (dd.getMajorVersion() > firstMajorVersion && !dd.getVersions().isEmpty()) {
                     dd.getVersions().stream()
                             .filter(vd -> !vd.getCreator().getLoginName().equalsIgnoreCase(applicationProperties.toolkitUsername()))
                             .max(Comparator.comparingDouble(VersionDetails::getVersionLabel))
                             .ifPresent(vd -> filesToDownloadMap.put(
                                     "before_change-" + dd.getFileLeafRef(),
-                                    getFullDownloadUrl(vd.getDownloadUrl())
+                                    getFullDownloadUrl(vd.getDownloadUrl(), project)
                             ));
 
                 }
@@ -103,7 +103,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
                 if (versionAfter.isPresent()) {
                     filesToDownloadMap.put(
                             "after_change-" + dd.getFileLeafRef(),
-                            getFullDownloadUrl(versionAfter.get().getDownloadUrl())
+                            getFullDownloadUrl(versionAfter.get().getDownloadUrl(), project)
                     );
                     dd.getVersions().stream()
                             .filter(vd -> !vd.getCreator().getLoginName().equalsIgnoreCase(applicationProperties.toolkitUsername()))
@@ -111,7 +111,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
                             .max(Comparator.comparingDouble(VersionDetails::getVersionLabel))
                             .ifPresent(versionDetails -> filesToDownloadMap.put(
                                     "before_change-" + dd.getFileLeafRef(),
-                                    getFullDownloadUrl(versionDetails.getDownloadUrl())
+                                    getFullDownloadUrl(versionDetails.getDownloadUrl(), project)
                             ));
                 }
             }
@@ -119,8 +119,8 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
         return filesToDownloadMap;
     }
 
-    private String getFullDownloadUrl(String fileReference) {
-        String projectCase = "/cases/GTE440/TOEDNLD";
+    private String getFullDownloadUrl(String fileReference, String projectCase) {
+        //String projectCase = "/cases/GTE440/TOEDNLD";
         if (fileReference.startsWith(projectCase)) {
             return String.format("%s%s",
                     applicationProperties.toolkitUrl(),
