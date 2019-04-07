@@ -656,52 +656,6 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenCliCustomUserFolder_whenToolkitCustomUserFolder_thenReturnCLICustomUserFolder() {
-        String[] args = {"toolkitCustomUserFolder=qqq"};
-        appProps = new FilePreferredApplicationProperties(args);
-
-        String actual = appProps.toolkitCustomUserFolder();
-
-        assertThat(actual).isEqualTo("QQQ");
-    }
-
-    @Test
-    void givenNoCliCustomUserFolder_whenToolkitCustomUserFolder_thenReturnEmptyString() {
-        String[] args = {};
-        appProps = new FilePreferredApplicationProperties(args);
-
-        String actual = appProps.toolkitCustomUserFolder();
-
-        assertThat(actual).isEmpty();
-    }
-
-    @Test
-    void givenCliCustomUserFolderAndFileCustomUserFolder_whenToolkitCustomUserFolder_thenReturnFileCustomFolder() {
-        String[] args = {"toolkitCustomUserFolder=eee"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitCustomUserFolder();
-
-        assertThat(actual).isEqualTo("AAA");
-    }
-
-    @Test
-    void givenNoCliCustomUserFolderAndFileCustomUserFolder_whenToolkitCustomUserFolder_thenReturnFileCustomFolder() {
-        String[] args = {};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitCustomUserFolder();
-
-        assertThat(actual).isEqualTo("AAA");
-    }
-
-    @Test
     void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnDefault() {
         String[] args = {};
         appProps = new FilePreferredApplicationProperties(args);
@@ -739,46 +693,6 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitUsername", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
-    void givenToolkitUserCliAndCliCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomFolder() {
-        String[] args = {"toolkitCustomUserFolder=zzz", "toolkitUsername=bbb"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "qqq");
-        props.put("toolkitUsername", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "QQQ");
-    }
-
-    @Test
-    void givenNoToolkitUserCliAndCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithFileCustomUserFolder() {
-        String[] args = {"toolkitCustomUserFolder=qqq"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
-    void givenToolkitUserCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithFileCustomUserFolder() {
-        String[] args = {"toolkitUsername=qqq"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
         appProps = new FilePreferredApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 

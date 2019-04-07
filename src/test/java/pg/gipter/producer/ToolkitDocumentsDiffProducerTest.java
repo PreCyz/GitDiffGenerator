@@ -11,6 +11,7 @@ import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helper.XmlHelper;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ class ToolkitDocumentsDiffProducerTest {
                         ArgName.startDate + "=2019-04-03",
                         ArgName.endDate + "=2019-04-06",
                         ArgName.toolkitUsername + "=pawg",
+                        ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
         producer = new ToolkitDocumentsDiffProducer(applicationProperties);
         String path = XmlHelper.getFullXmlPath("items.json");
@@ -49,7 +51,7 @@ class ToolkitDocumentsDiffProducerTest {
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = producer.extractDocumentDetails(js);
 
-        Map<String, String> filesToDownload = producer.getFilesToDownload(documentDetails);
+        Map<String, String> filesToDownload = producer.getFilesToDownload(new ArrayList<>(applicationProperties.projectPaths()).get(0), documentDetails);
 
         assertThat(filesToDownload).hasSize(3);
     }
@@ -62,6 +64,7 @@ class ToolkitDocumentsDiffProducerTest {
                         ArgName.startDate + "=2019-02-25",
                         ArgName.endDate + "=2019-04-06",
                         ArgName.toolkitUsername + "=pawg",
+                        ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
         producer = new ToolkitDocumentsDiffProducer(applicationProperties);
         String path = XmlHelper.getFullXmlPath("customItem.json");
@@ -70,7 +73,7 @@ class ToolkitDocumentsDiffProducerTest {
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = producer.extractDocumentDetails(js);
 
-        Map<String, String> filesToDownload = producer.getFilesToDownload(documentDetails);
+        Map<String, String> filesToDownload = producer.getFilesToDownload(new ArrayList<>(applicationProperties.projectPaths()).get(0), documentDetails);
 
         assertThat(filesToDownload).hasSize(2);
         assertThat(filesToDownload.get("after_change-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
@@ -98,7 +101,7 @@ class ToolkitDocumentsDiffProducerTest {
         Gson gson = new Gson();
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = producer.extractDocumentDetails(js);
-        Map<String, String> filesToDownload = producer.getFilesToDownload(documentDetails);
+        Map<String, String> filesToDownload = producer.getFilesToDownload(new ArrayList<>(applicationProperties.projectPaths()).get(0), documentDetails);
 
         List<File> actual = producer.downloadFiles(filesToDownload);
 

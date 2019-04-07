@@ -39,7 +39,6 @@ public enum ArgName {
     toolkitCopyCase("/cases/GTE106/NCSCOPY"),
     toolkitWSUrl(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/_vti_bin/lists.asmx"),
     toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitCopyListName.defaultValue + "/"),
-    toolkitCustomUserFolder(""),
     toolkitProjectListNames("Deliverables");
 
     private String defaultValue;

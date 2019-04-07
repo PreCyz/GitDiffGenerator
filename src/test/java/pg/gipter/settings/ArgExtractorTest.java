@@ -550,15 +550,6 @@ class ArgExtractorTest {
     }
 
     @Test
-    void givenCustomUserFolderAndToolkitUserName_whenToolkitUserFolder_thenReturnDefault() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitUsername=XXX", "toolkitCustomUserFolder=aaa"});
-
-        String actual = argExtractor.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
     void givenNoSilentMode_whenIsSilentMode_thenReturnFalse() {
         argExtractor = new ArgExtractor(new String[]{});
 

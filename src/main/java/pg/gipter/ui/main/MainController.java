@@ -67,9 +67,7 @@ public class MainController extends AbstractController {
     @FXML
     private TextField toolkitUserFolderTextField;
     @FXML
-    private CheckBox customFolderCheckBox;
-    @FXML
-    private TextField toolkitCustomFolderTextField;
+    private TextField toolkitProjectListNamesTextField;
 
     @FXML
     private Label projectPathLabel;
@@ -150,8 +148,7 @@ public class MainController extends AbstractController {
         toolkitUrlTextField.setText(applicationProperties.toolkitUrl());
         toolkitWSTextField.setText(applicationProperties.toolkitWSUrl());
         toolkitUserFolderTextField.setText(applicationProperties.toolkitUserFolder());
-        toolkitCustomFolderTextField.setText(applicationProperties.toolkitCustomUserFolder());
-        customFolderCheckBox.setSelected(!StringUtils.nullOrEmpty(applicationProperties.toolkitCustomUserFolder()));
+        toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
 
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
@@ -188,13 +185,7 @@ public class MainController extends AbstractController {
         toolkitUrlTextField.setEditable(false);
         toolkitWSTextField.setEditable(false);
         toolkitUserFolderTextField.setEditable(false);
-        toolkitCustomFolderTextField.setDisable(StringUtils.nullOrEmpty(applicationProperties.toolkitCustomUserFolder()));
-        Tooltip tooltip = new Tooltip();
-        tooltip.setTextAlignment(TextAlignment.LEFT);
-        tooltip.setFont(Font.font("Courier New", 14));
-        tooltip.setText(resources.getString("toolkit.panel.customUserFolderToolitp"));
-        toolkitCustomFolderTextField.setTooltip(tooltip);
-        customFolderCheckBox.setTooltip(tooltip);
+        toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCUMENTS);
 
         if (applicationProperties.projectPaths().isEmpty()) {
             projectPathButton.setText(resources.getString("button.add"));
@@ -334,8 +325,8 @@ public class MainController extends AbstractController {
 
         argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
         argList.add(ArgName.toolkitPassword + "=" + toolkitPasswordField.getText());
-        if (!StringUtils.nullOrEmpty(toolkitCustomFolderTextField.getText())) {
-            argList.add(ArgName.toolkitCustomUserFolder + "=" + toolkitCustomFolderTextField.getText());
+        if (!StringUtils.nullOrEmpty(toolkitProjectListNamesTextField.getText())) {
+            argList.add(ArgName.toolkitProjectListNames + "=" + toolkitProjectListNamesTextField.getText());
         }
 
         argList.add(ArgName.projectPath + "=" + projectPathLabel.getText());
@@ -378,6 +369,7 @@ public class MainController extends AbstractController {
             if (uploadTypeComboBox.getValue() != UploadType.DOCUMENTS) {
                 documentFiltersTextField.clear();
             }
+            toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCUMENTS);
         };
     }
 
@@ -463,35 +455,6 @@ public class MainController extends AbstractController {
                 uiLauncher.removeTray();
             }
         });
-
-        toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (StringUtils.nullOrEmpty(toolkitCustomFolderTextField.getText())) {
-                setToolkitUserFolder(newValue);
-            }
-        });
-
-        toolkitCustomFolderTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            setToolkitUserFolder(toolkitUsernameTextField.getText());
-            if (!StringUtils.nullOrEmpty(newValue)) {
-                setToolkitUserFolder(newValue);
-            }
-        });
-
-        customFolderCheckBox.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (!newValue) {
-                        setToolkitUserFolder(toolkitUsernameTextField.getText());
-                        toolkitCustomFolderTextField.setText("");
-                    }
-                    toolkitCustomFolderTextField.setDisable(oldValue);
-                }
-        );
-    }
-
-    private void setToolkitUserFolder(String newValue) {
-        String userFolder = toolkitUserFolderTextField.getText();
-        userFolder = userFolder.substring(0, userFolder.lastIndexOf("/") + 1) + newValue;
-        toolkitUserFolderTextField.setText(userFolder);
     }
 
 }

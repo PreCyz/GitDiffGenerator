@@ -154,7 +154,6 @@ public abstract class ApplicationProperties {
                 ", toolkitDomain='" + toolkitDomain() + '\'' +
                 ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
                 ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
-                ", toolkitCustomUserFolder='" + toolkitCustomUserFolder() + '\'' +
                 ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\''
                 ;
     }
@@ -176,7 +175,6 @@ public abstract class ApplicationProperties {
     public abstract String toolkitPassword();
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
-    public abstract String toolkitCustomUserFolder();
     public abstract String toolkitCopyListName();
     public abstract Set<String> toolkitProjectListNames();
     public abstract String toolkitUrl();
