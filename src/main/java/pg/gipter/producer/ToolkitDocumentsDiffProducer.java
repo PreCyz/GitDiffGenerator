@@ -57,6 +57,7 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
             throw new IllegalArgumentException("Given projects do not contain any items.");
         } else {
             zipDocumentsAndWriteToFile(documents);
+            deleteFiles(documents);
         }
     }
 
@@ -293,6 +294,17 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
             }
         }
         return downloadedFiles;
+    }
+
+    private void deleteFiles(List<File> documents) {
+        for (File doc : documents) {
+            try {
+                FileUtils.forceDelete(doc);
+                logger.info("File [{}] deleted.", doc.getName());
+            } catch (IOException e) {
+                logger.warn("Can not delete file [{}].", doc.getName());
+            }
+        }
     }
 
 }
