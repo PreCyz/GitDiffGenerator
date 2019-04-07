@@ -156,8 +156,8 @@ public class MainController extends AbstractController {
         itemPathLabel.setText(itemPath);
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
 
-        startDatePicker.setValue(applicationProperties.startDate());
-        endDatePicker.setValue(applicationProperties.endDate());
+        startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
+        endDatePicker.setValue(LocalDate.now());
         periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
 
         confirmationWindowCheckBox.setSelected(applicationProperties.isConfirmationWindow());
