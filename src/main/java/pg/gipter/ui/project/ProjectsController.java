@@ -26,11 +26,15 @@ import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.PropertiesHelper;
+import pg.gipter.utils.StringUtils;
 
 import java.io.File;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 public class ProjectsController extends AbstractController {
 
@@ -113,10 +117,11 @@ public class ProjectsController extends AbstractController {
                             path
                     );
                     projectsPaths.add(pd);
-                } else if(!supportedVcs.isPresent() && applicationProperties.uploadType() == UploadType.DOCUMENTS) {
+                } else if (!supportedVcs.isPresent() &&
+                        EnumSet.of(UploadType.DOCUMENTS, UploadType.TOOLKIT_DOCS).contains(applicationProperties.uploadType())) {
                     ProjectDetails pd = new ProjectDetails(
                             project.getName(),
-                            UploadType.DOCUMENTS.name(),
+                            applicationProperties.uploadType().name(),
                             path
                     );
                     projectsPaths.add(pd);
@@ -139,7 +144,7 @@ public class ProjectsController extends AbstractController {
     }
 
     private void setupButtons(ResourceBundle resources) {
-        if (applicationProperties.uploadType() == UploadType.DOCUMENTS) {
+        if (EnumSet.of(UploadType.DOCUMENTS, UploadType.TOOLKIT_DOCS).contains(applicationProperties.uploadType())) {
             searchProjectsButton.setDisable(true);
             Tooltip tooltip = new Tooltip();
             tooltip.setTextAlignment(TextAlignment.LEFT);
@@ -206,36 +211,60 @@ public class ProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> addButtonActionEventHandler(ResourceBundle resources) {
         return event -> {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(new File("."));
-            directoryChooser.setTitle(resources.getString("directory.item.title"));
-            File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
-            if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                try {
-                    String vcsType = UploadType.DOCUMENTS.name();
-                    if (applicationProperties.uploadType() != UploadType.DOCUMENTS) {
-                        vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
+            if (applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS) {
+                DirectoryChooser directoryChooser = new DirectoryChooser();
+                directoryChooser.setInitialDirectory(new File("."));
+                directoryChooser.setTitle(resources.getString("directory.item.title"));
+                File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
+                if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
+                    try {
+                        String vcsType = UploadType.DOCUMENTS.name();
+                        if (applicationProperties.uploadType() != UploadType.DOCUMENTS) {
+                            vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
+                        }
+                        ProjectDetails project = new ProjectDetails(
+                                itemPathDirectory.getName(),
+                                vcsType,
+                                itemPathDirectory.getAbsolutePath()
+                        );
+                        if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+                            projectsTableView.setItems(FXCollections.observableArrayList(project));
+                        } else {
+                            projectsTableView.getItems().add(project);
+                        }
+                        projectsTableView.refresh();
+                    } catch (IllegalArgumentException ex) {
+                        Platform.runLater(() -> new AlertWindowBuilder()
+                                .withHeaderText(ex.getMessage())
+                                .withLink(AlertHelper.logsFolder())
+                                .withWindowType(WindowType.LOG_WINDOW)
+                                .withAlertType(Alert.AlertType.ERROR)
+                                .withImage()
+                                .buildAndDisplayWindow()
+                        );
                     }
-                    ProjectDetails project = new ProjectDetails(
-                            itemPathDirectory.getName(),
-                            vcsType,
-                            itemPathDirectory.getAbsolutePath()
-                    );
-                    if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
-                        projectsTableView.setItems(FXCollections.observableArrayList(project));
-                    } else {
-                        projectsTableView.getItems().add(project);
+                }
+            } else {
+                TextInputDialog dialog = new TextInputDialog("");
+                dialog.setTitle(resources.getString("projects.tooltip.title"));
+                dialog.setHeaderText(resources.getString("projects.tooltip.header"));
+
+                Optional<String> result = dialog.showAndWait();
+                if (result.isPresent() && !StringUtils.nullOrEmpty(result.get().trim())) {
+                    Set<String> projects = Stream.of(result.get().split(",")).collect(toSet());
+                    for (String project : projects) {
+                        ProjectDetails pd = new ProjectDetails(
+                                project.replace("/cases/", ""),
+                                UploadType.TOOLKIT_DOCS.name(),
+                                project
+                        );
+                        if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+                            projectsTableView.setItems(FXCollections.observableArrayList(pd));
+                        } else {
+                            projectsTableView.getItems().add(pd);
+                        }
                     }
                     projectsTableView.refresh();
-                } catch (IllegalArgumentException ex) {
-                    Platform.runLater(() -> new AlertWindowBuilder()
-                            .withHeaderText(ex.getMessage())
-                            .withLink(AlertHelper.logsFolder())
-                            .withWindowType(WindowType.LOG_WINDOW)
-                            .withAlertType(Alert.AlertType.ERROR)
-                            .withImage()
-                            .buildAndDisplayWindow()
-                    );
                 }
             }
         };
