@@ -29,7 +29,7 @@ class SimpleDocumentFinderTest {
         Gson gson = new Gson();
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
 
-        List<DocumentDetails> actual = finder.extractDocumentDetails(js);
+        List<DocumentDetails> actual = finder.convertToDocumentDetails(js);
 
         assertThat(actual).hasSize(9);
     }
@@ -49,7 +49,7 @@ class SimpleDocumentFinderTest {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
-        List<DocumentDetails> documentDetails = finder.extractDocumentDetails(js);
+        List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
         Map<String, String> filesToDownload = finder.getFilesToDownload(new ArrayList<>(applicationProperties.projectPaths()).get(0), documentDetails);
 
@@ -71,15 +71,15 @@ class SimpleDocumentFinderTest {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
-        List<DocumentDetails> documentDetails = finder.extractDocumentDetails(js);
+        List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
         Map<String, String> filesToDownload = finder.getFilesToDownload(new ArrayList<>(applicationProperties.projectPaths()).get(0), documentDetails);
 
         assertThat(filesToDownload).hasSize(2);
         assertThat(filesToDownload.get("after_change-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180%20-%20Integration%20design/Topdanmark%20integrations/D0180%20-%20Integration%20Design%20-%20Topdanmark%20integrations%20-%20Party%20Master.docx");
+                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
         assertThat(filesToDownload.get("before_change-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180%20-%20Integration%20design/Topdanmark%20integrations/D0180%20-%20Integration%20Design%20-%20Topdanmark%20integrations%20-%20Party%20Master.docx");
+                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
@@ -100,10 +100,10 @@ class SimpleDocumentFinderTest {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
         JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
-        List<DocumentDetails> documentDetails = finder.extractDocumentDetails(js);
+        List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
         Map<String, String> filesToDownload = finder.getFilesToDownload(new ArrayList<>(applicationProperties.projectPaths()).get(0), documentDetails);
 
-        List<File> actual = finder.downloadFilesFast(filesToDownload);
+        List<File> actual = finder.downloadDocuments(filesToDownload);
 
         assertThat(actual).hasSize(2);
     }

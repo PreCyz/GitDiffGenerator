@@ -1,14 +1,7 @@
 package pg.gipter.producer.processor;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.dto.DocumentDetails;
@@ -18,9 +11,6 @@ import pg.gipter.toolkit.dto.VersionDetails;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -40,13 +30,13 @@ class SimpleDocumentFinder extends AbstractDocumentFinder {
                 Set<String> listTitles = applicationProperties.toolkitProjectListNames();
                 for (String listTitle : listTitles) {
                     JsonObject itemsWithVersions = getItemsWithVersions(project, listTitle);
-                    List<DocumentDetails> documentDetails = extractDocumentDetails(itemsWithVersions);
+                    List<DocumentDetails> documentDetails = convertToDocumentDetails(itemsWithVersions);
                     filesToDownload.putAll(getFilesToDownload(project, documentDetails));
                 }
             }
-            return downloadFilesFast(filesToDownload);
+            return downloadDocuments(filesToDownload);
         } catch (IOException ex) {
-            logger.warn("Can not find items to upload.", UploadType.TOOLKIT_DOCS);
+            logger.error("Can not find [{}] to upload as your copyright items.", UploadType.TOOLKIT_DOCS);
             throw new IllegalArgumentException("Can not find items to upload.");
         }
     }
@@ -110,24 +100,11 @@ class SimpleDocumentFinder extends AbstractDocumentFinder {
         String expand = "$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy";
         String fullUrl = String.format("%s?%s&%s&%s", url, select, filter, expand);
 
-        HttpGet httpget = new HttpGet(fullUrl);
-        httpget.addHeader("accept", "application/json;odata=verbose");
-        logger.info("Executing request {}", httpget.getRequestLine());
-
-        try (CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(getCredentialsProvider())
-                .build();
-             CloseableHttpResponse response = httpclient.execute(httpget)
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-            EntityUtils.consume(response.getEntity());
-            return result;
-        }
+        return httpRequester.executeGET(fullUrl);
     }
 
-    List<DocumentDetails> extractDocumentDetails(JsonObject object) {
+    @Override
+    List<DocumentDetails> convertToDocumentDetails(JsonObject object) {
         JsonObject d = object.getAsJsonObject("d");
         JsonArray results = d.getAsJsonArray("results");
         List<DocumentDetails> result = new ArrayList<>(results.size());
@@ -144,8 +121,8 @@ class SimpleDocumentFinder extends AbstractDocumentFinder {
             String title = jsonObject.get("Title").getAsString();
 
             JsonObject file = jsonObject.get("File").getAsJsonObject();
-            User author = getUser(file.get("Author").getAsJsonObject());
-            User modifier = getUser(file.get("ModifiedBy").getAsJsonObject());
+            User author = convertToUser(file.get("Author").getAsJsonObject());
+            User modifier = convertToUser(file.get("ModifiedBy").getAsJsonObject());
             int majorVersion = file.get("MajorVersion").getAsInt();
             int minorVersion = file.get("MinorVersion").getAsInt();
             String name = file.get("Name").getAsString();
@@ -157,7 +134,7 @@ class SimpleDocumentFinder extends AbstractDocumentFinder {
             JsonObject versions = file.getAsJsonObject("Versions");
             List<VersionDetails> versionList = new ArrayList<>();
             if (versions != null) {
-                versionList = getVersions(versions);
+                versionList = convertToVersions(versions);
             }
             DocumentDetails dd = new DocumentDetailsBuilder()
                     .withCreated(created)
@@ -179,38 +156,6 @@ class SimpleDocumentFinder extends AbstractDocumentFinder {
                     .withVersions(versionList)
                     .create();
             result.add(dd);
-        }
-        return result;
-    }
-
-    private User getUser(JsonObject object) {
-        int id = -1;
-        JsonElement idElement = object.get("Id");
-        if (idElement != null) {
-            id = idElement.getAsInt();
-        }
-        String fullLoginName = object.get("LoginName").getAsString();
-        String loginName = fullLoginName.substring(fullLoginName.lastIndexOf("\\") + 1);
-        String fullName = object.get("Title").getAsString();
-        String email = object.get("Email").getAsString();
-        return new User(id, loginName, fullName, email);
-    }
-
-    private List<VersionDetails> getVersions(JsonObject jsonObject) {
-        JsonArray results = jsonObject.getAsJsonArray("results");
-        List<VersionDetails> result = new ArrayList<>(results.size());
-        for (int i = 0; i < results.size(); i++) {
-            JsonObject object = results.get(i).getAsJsonObject();
-            User createdBy = getUser(object.get("CreatedBy").getAsJsonObject());
-            String checkInComment = object.get("CheckInComment").getAsString();
-            LocalDateTime created = LocalDateTime.parse(object.get("Created").getAsString(), DateTimeFormatter.ISO_DATE_TIME);
-            int id = object.get("ID").getAsInt();
-            boolean isCurrentVersion = object.get("IsCurrentVersion").getAsBoolean();
-            long size = object.get("Size").getAsLong();
-            String downloadUrl = object.get("Url").getAsString();
-            double versionLabel = object.get("VersionLabel").getAsDouble();
-            VersionDetails vd = new VersionDetails(createdBy, checkInComment, created, id, isCurrentVersion, size, downloadUrl, versionLabel);
-            result.add(vd);
         }
         return result;
     }

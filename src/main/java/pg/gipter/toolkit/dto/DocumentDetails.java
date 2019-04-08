@@ -108,4 +108,8 @@ public class DocumentDetails {
     public String getGuid() {
         return guid;
     }
+
+    public void setVersions(List<VersionDetails> versions) {
+        this.versions = versions;
+    }
 }
