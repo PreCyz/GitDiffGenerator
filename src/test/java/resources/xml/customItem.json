@@ -40,102 +40,6 @@
             "results": [
               {
                 "__metadata": {
-                  "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion4b40fa82-4a9e-4edd-b61b-0dc1416ed196",
-                  "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion4b40fa82-4a9e-4edd-b61b-0dc1416ed196",
-                  "type": "SP.FileVersion"
-                },
-                "CreatedBy": {
-                  "__metadata": {
-                    "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion4b40fa82-4a9e-4edd-b61b-0dc1416ed196/CreatedBy",
-                    "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion4b40fa82-4a9e-4edd-b61b-0dc1416ed196/CreatedBy",
-                    "type": "SP.User"
-                  },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
-                  "Title": "Marek Wysocki",
-                  "Email": "mawy@netcompany.com"
-                },
-                "CheckInComment": "",
-                "Created": "2019-02-26T11:16:36Z",
-                "ID": 512,
-                "IsCurrentVersion": false,
-                "Size": 55386,
-                "Url": "_vti_history/512/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "1.0"
-              },
-              {
-                "__metadata": {
-                  "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersione0765407-8227-4be5-bb6a-dd6a176fa266",
-                  "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersione0765407-8227-4be5-bb6a-dd6a176fa266",
-                  "type": "SP.FileVersion"
-                },
-                "CreatedBy": {
-                  "__metadata": {
-                    "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersione0765407-8227-4be5-bb6a-dd6a176fa266/CreatedBy",
-                    "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersione0765407-8227-4be5-bb6a-dd6a176fa266/CreatedBy",
-                    "type": "SP.User"
-                  },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
-                  "Title": "Marek Wysocki",
-                  "Email": "mawy@netcompany.com"
-                },
-                "CheckInComment": "",
-                "Created": "2019-02-26T11:17:50Z",
-                "ID": 1024,
-                "IsCurrentVersion": false,
-                "Size": 55890,
-                "Url": "_vti_history/1024/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "2.0"
-              },
-              {
-                "__metadata": {
-                  "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion4c1dffaa-1848-4ac0-80ed-9b93a666e641",
-                  "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion4c1dffaa-1848-4ac0-80ed-9b93a666e641",
-                  "type": "SP.FileVersion"
-                },
-                "CreatedBy": {
-                  "__metadata": {
-                    "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion4c1dffaa-1848-4ac0-80ed-9b93a666e641/CreatedBy",
-                    "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion4c1dffaa-1848-4ac0-80ed-9b93a666e641/CreatedBy",
-                    "type": "SP.User"
-                  },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
-                  "Title": "Marek Wysocki",
-                  "Email": "mawy@netcompany.com"
-                },
-                "CheckInComment": "",
-                "Created": "2019-02-26T12:47:24Z",
-                "ID": 1536,
-                "IsCurrentVersion": false,
-                "Size": 184348,
-                "Url": "_vti_history/1536/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "3.0"
-              },
-              {
-                "__metadata": {
-                  "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion6aa91b8e-bba6-4bdc-a151-cb5cf32052c8",
-                  "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion6aa91b8e-bba6-4bdc-a151-cb5cf32052c8",
-                  "type": "SP.FileVersion"
-                },
-                "CreatedBy": {
-                  "__metadata": {
-                    "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion6aa91b8e-bba6-4bdc-a151-cb5cf32052c8/CreatedBy",
-                    "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion6aa91b8e-bba6-4bdc-a151-cb5cf32052c8/CreatedBy",
-                    "type": "SP.User"
-                  },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
-                  "Title": "Marek Wysocki",
-                  "Email": "mawy@netcompany.com"
-                },
-                "CheckInComment": "",
-                "Created": "2019-02-26T13:17:28Z",
-                "ID": 2048,
-                "IsCurrentVersion": false,
-                "Size": 186536,
-                "Url": "_vti_history/2048/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "4.0"
-              },
-              {
-                "__metadata": {
                   "id": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion75d76d13-f91f-42e5-9ded-fa81b3246c85",
                   "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion75d76d13-f91f-42e5-9ded-fa81b3246c85",
                   "type": "SP.FileVersion"
@@ -156,7 +60,7 @@
                 "IsCurrentVersion": false,
                 "Size": 160292,
                 "Url": "_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "5.0"
+                "VersionLabel": "1.0"
               },
               {
                 "__metadata": {
@@ -180,7 +84,7 @@
                 "IsCurrentVersion": false,
                 "Size": 163742,
                 "Url": "_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "6.0"
+                "VersionLabel": "2.0"
               },
               {
                 "__metadata": {
@@ -204,7 +108,7 @@
                 "IsCurrentVersion": false,
                 "Size": 163819,
                 "Url": "_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "7.0"
+                "VersionLabel": "3.0"
               },
               {
                 "__metadata": {
@@ -228,7 +132,7 @@
                 "IsCurrentVersion": false,
                 "Size": 163829,
                 "Url": "_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "8.0"
+                "VersionLabel": "4.0"
               },
               {
                 "__metadata": {
@@ -252,7 +156,7 @@
                 "IsCurrentVersion": false,
                 "Size": 157939,
                 "Url": "_vti_history/4608/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "9.0"
+                "VersionLabel": "5.0"
               },
               {
                 "__metadata": {
@@ -276,24 +180,24 @@
                 "IsCurrentVersion": false,
                 "Size": 94348,
                 "Url": "_vti_history/5120/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
-                "VersionLabel": "10.0"
+                "VersionLabel": "6.0"
               }
             ]
           },
-          "MajorVersion": 39,
+          "MajorVersion": 6,
           "MinorVersion": 0,
           "Name": "D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
           "ServerRelativeUrl": "/cases/GTE440/TOEDNLD/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
           "TimeLastModified": "2019-04-05T13:56:31Z",
           "Title": "D0180 - Integration Design - Topdanmark integrations - Party Master",
-          "UIVersionLabel": "39.0"
+          "UIVersionLabel": "6.0"
         },
         "Created": "2019-02-26T11:14:51Z",
         "Modified": "2019-04-05T13:56:31Z",
         "FileRef": "/cases/GTE440/TOEDNLD/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
         "FileLeafRef": "D0180 - Integration Design - Topdanmark integrations - Party Master.docx",
         "DocIcon": "docx",
-        "OData__UIVersionString": "39.0",
+        "OData__UIVersionString": "6.0",
         "GUID": "4cdcfd2c-8759-42ad-9888-61e6a49e11fd",
         "Title": "D0180 - Integration Design - Topdanmark integrations - Party Master"
       }
