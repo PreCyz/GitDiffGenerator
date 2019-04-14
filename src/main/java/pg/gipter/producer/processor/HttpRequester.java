@@ -47,7 +47,6 @@ public class HttpRequester {
              CloseableHttpResponse response = httpclient.execute(httpget)
         ) {
             logger.info("Response {}", response.getStatusLine());
-            FileUtils.copyInputStreamToFile(response.getEntity().getContent(), new File("itemsee.json"));
             Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
             JsonObject result = new Gson().fromJson(reader, JsonObject.class);
             EntityUtils.consume(response.getEntity());
