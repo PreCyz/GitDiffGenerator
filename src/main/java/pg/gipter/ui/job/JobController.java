@@ -64,6 +64,8 @@ public class JobController extends AbstractController {
     private Button cancelJobButton;
     @FXML
     private Label lastExecutionLabel;
+    @FXML
+    private Label nextExecutionLabel;
 
     private static Scheduler scheduler;
     private final PropertiesHelper propertiesHelper;
@@ -95,19 +97,27 @@ public class JobController extends AbstractController {
         Optional<Properties> data = propertiesHelper.loadDataProperties();
         if (data.isPresent()) {
             setDefinedJobDetails(data.get());
-            setLastExecutionDetails(data.get());
+            setExecutionDetails(data.get());
         } else {
             lastExecutionLabel.setText("");
+            nextExecutionLabel.setText("");
         }
     }
 
-    private void setLastExecutionDetails(Properties data) {
+    private void setExecutionDetails(Properties data) {
         if (data.containsKey(PropertiesHelper.UPLOAD_STATUS_KEY) && data.containsKey(PropertiesHelper.UPLOAD_DATE_TIME_KEY)) {
             String uploadInfo = String.format("%s [%s]",
                     data.getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
                     data.getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
             );
             lastExecutionLabel.setText(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+        }
+        if (data.containsKey(JobProperty.NEXT_FIRE_DATE.value()) &&
+                !StringUtils.nullOrEmpty(data.getProperty(JobProperty.NEXT_FIRE_DATE.value(), ""))) {
+            nextExecutionLabel.setText(BundleUtils.getMsg(
+                    "tray.item.nextUpdate",
+                    data.getProperty(JobProperty.NEXT_FIRE_DATE.value())
+            ));
         }
     }
 
@@ -168,6 +178,7 @@ public class JobController extends AbstractController {
         jobDetailsLabel.setText("N/A");
         jobDetailsLabel.setAlignment(Pos.TOP_CENTER);
         cancelJobButton.setVisible(false);
+        nextExecutionLabel.setText("");
     }
 
     private void setProperties() {

@@ -55,7 +55,7 @@ class Runner implements Starter {
                     .buildAndDisplayWindow()
             );
         } finally {
-            propertiesHelper.saveUploadInfo(error ? "FAIL" : "SUCCESS");
+            propertiesHelper.saveUploadStatus(error ? "FAIL" : "SUCCESS");
             logger.info("{} ended.", this.getClass().getName());
         }
         if (!error && applicationProperties.isConfirmationWindow()) {
