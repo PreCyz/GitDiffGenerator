@@ -246,4 +246,14 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return argExtractor.toolkitProjectListNames();
     }
 
+    @Override
+    public boolean isDeleteDownloadedFiles() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgName.deleteDownloadedFiles.name(), ArgName.deleteDownloadedFiles.defaultValue()
+            ));
+        }
+        return argExtractor.isDeleteDownloadedFiles();
+    }
+
 }

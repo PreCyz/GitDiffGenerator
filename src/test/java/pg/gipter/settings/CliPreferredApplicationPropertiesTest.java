@@ -1470,4 +1470,63 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).containsExactly("properties1", "properties2");
     }
+
+    @Test
+    void givenNoDeleteDownloadedFiles_whenIsDeleteDownloadedFiles_thenReturnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesFromCLI_whenIsDeleteDownloadedFiles_thenReturnCliDeleteDownloadedFiles() {
+        applicationProperties = new CliPreferredApplicationProperties(
+                new String[]{"deleteDownloadedFiles=y"}
+        );
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesFileAndCLI_whenIsDeleteDownloadedFiles_thenReturnClideleteDownloadedFiles() {
+        String[] args = {"deleteDownloadedFiles=y"};
+        Properties props = new Properties();
+        props.put("deleteDownloadedFiles", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesFromProperties_whenIsDeleteDownloadedFiles_thenReturnDeleteDownloadedFilesFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("deleteDownloadedFiles", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesFromPropertiesAndOtherArgs_whenIsDeleteDownloadedFiles_thenReturnDeleteDownloadedFilesFromProperties() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("deleteDownloadedFiles", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isFalse();
+    }
 }

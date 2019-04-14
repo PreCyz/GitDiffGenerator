@@ -32,11 +32,13 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
         DocumentFinder documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
         List<File> documents = documentFinder.find();
         if (documents.isEmpty()) {
-            logger.warn("No documents to zip is no item to upload.", UploadType.TOOLKIT_DOCS);
+            logger.warn("No documents to zip is no item to upload. [{}].", UploadType.TOOLKIT_DOCS);
             throw new IllegalArgumentException("Given projects do not contain any items.");
         } else {
             zipDocumentsAndWriteToFile(documents);
-            deleteFiles(documents);
+            if (applicationProperties.isDeleteDownloadedFiles()) {
+                deleteFiles(documents);
+            }
         }
     }
 

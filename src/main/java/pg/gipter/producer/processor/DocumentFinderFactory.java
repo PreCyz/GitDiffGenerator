@@ -9,9 +9,9 @@ public final class DocumentFinderFactory {
     private DocumentFinderFactory() { }
 
     public static DocumentFinder getInstance(ApplicationProperties applicationProperties) {
-        if (LocalDate.now().isEqual(applicationProperties.endDate())) {
-            return new SimpleDocumentFinder(applicationProperties);
+        if (LocalDate.now().isAfter(applicationProperties.endDate())) {
+            //return new ComplexDocumentFinder(applicationProperties);
         }
-        return new ComplexDocumentFinder(applicationProperties);
+        return new SimpleDocumentFinder(applicationProperties);
     }
 }

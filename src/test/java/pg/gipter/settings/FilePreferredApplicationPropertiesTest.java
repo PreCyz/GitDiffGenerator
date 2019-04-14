@@ -757,4 +757,42 @@ class FilePreferredApplicationPropertiesTest {
 
         assertThat(actual).containsExactly("Proj3");
     }
+
+    @Test
+    void givenEmptyDeleteDownloadedFiles_whenIsDeleteDownloadedFiles_thenReturnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenIsDeleteDownloadedFilesSetN_whenIsDeleteDownloadedFiles_thenReturnFalse() {
+        String[] args = {"deleteDownloadedFiles=Y"};
+        Properties props = new Properties();
+        props.put("deleteDownloadedFiles", "N");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isDeleteDownloadedFiles();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesSetY_whenIsDeleteDownloadedFiles_thenReturnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("confirmationWindow", "Y");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isConfirmationWindow();
+
+        assertThat(actual).isTrue();
+    }
 }

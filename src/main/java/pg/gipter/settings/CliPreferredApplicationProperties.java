@@ -266,4 +266,14 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         return toolkitProjectListNames;
     }
 
+    @Override
+    public boolean isDeleteDownloadedFiles() {
+        boolean delete = argExtractor.isDeleteDownloadedFiles();
+        String argName = ArgName.deleteDownloadedFiles.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            delete = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(delete)));
+        }
+        return delete;
+    }
+
 }

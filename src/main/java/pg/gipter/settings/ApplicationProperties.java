@@ -182,4 +182,5 @@ public abstract class ApplicationProperties {
     public abstract boolean isUseUI();
     public abstract boolean isActiveTray();
     public abstract Set<String> documentFilters();
+    public abstract boolean isDeleteDownloadedFiles();
 }

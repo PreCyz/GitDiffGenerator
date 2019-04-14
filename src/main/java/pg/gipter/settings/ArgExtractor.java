@@ -218,4 +218,11 @@ final class ArgExtractor {
         }
         return new LinkedHashSet<>(Arrays.asList(projectPaths));
     }
+
+    boolean isDeleteDownloadedFiles() {
+        if (containsArg(ArgName.deleteDownloadedFiles.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.deleteDownloadedFiles, ArgName.deleteDownloadedFiles.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.deleteDownloadedFiles.defaultValue());
+    }
 }
