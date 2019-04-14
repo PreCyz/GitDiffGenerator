@@ -18,7 +18,7 @@ import static pg.gipter.utils.PropertiesHelper.APPLICATION_PROPERTIES;
 public abstract class ApplicationProperties {
 
     protected final Logger logger;
-    public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ISO_DATE;
 
     protected Properties properties;
     protected final ArgExtractor argExtractor;

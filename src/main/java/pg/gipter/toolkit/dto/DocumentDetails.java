@@ -13,6 +13,7 @@ public class DocumentDetails {
     private int minorVersion;
     private String fileName;
     private String serverRelativeUrl;
+    private String project;
     private LocalDateTime timeLastModified;
     private LocalDateTime created;
     private LocalDateTime modified;
@@ -24,7 +25,7 @@ public class DocumentDetails {
     private List<VersionDetails> versions;
 
     DocumentDetails(String docType, String fileLeafRef, String fileRef, String guid, int majorVersion, int minorVersion,
-                    String fileName, String serverRelativeUrl, LocalDateTime timeLastModified, LocalDateTime created,
+                    String fileName, String serverRelativeUrl, String project, LocalDateTime timeLastModified, LocalDateTime created,
                     LocalDateTime modified, String title, String currentVersion, User author, User lastModifier,
                     List<VersionDetails> versions) {
         this.docType = docType;
@@ -35,6 +36,7 @@ public class DocumentDetails {
         this.minorVersion = minorVersion;
         this.fileName = fileName;
         this.serverRelativeUrl = serverRelativeUrl;
+        this.project = project;
         this.timeLastModified = timeLastModified;
         this.created = created;
         this.modified = modified;
@@ -71,6 +73,10 @@ public class DocumentDetails {
 
     public String getServerRelativeUrl() {
         return serverRelativeUrl;
+    }
+
+    public String getProject() {
+        return project;
     }
 
     public LocalDateTime getTimeLastModified() {

@@ -7,14 +7,10 @@ import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -26,30 +22,22 @@ class SimpleDocumentFinder extends AbstractDocumentFinder {
 
     @Override
     public List<File> find() {
-        try {
-            Map<String, String> filesToDownload = new HashMap<>();
-            for (String project : applicationProperties.projectPaths()) {
-                Set<String> listTitles = applicationProperties.toolkitProjectListNames();
-                for (String listTitle : listTitles) {
-                    JsonObject itemsWithVersions = getItemsWithVersions(project, listTitle);
-                    List<DocumentDetails> documentDetails = convertToDocumentDetails(itemsWithVersions);
-                    documentDetails = documentDetails.stream()
-                            .filter(dd -> StringUtils.nullOrEmpty(dd.getDocType())).collect(toList());
-                    filesToDownload.putAll(getFilesToDownload(project, documentDetails));
-                }
-            }
-            return downloadDocuments(filesToDownload);
-        } catch (IOException ex) {
+        List<String> urls = buildFullUrls();
+        List<JsonObject> items = getItems(urls);
+        List<DocumentDetails> documentDetails = items.stream()
+                .map(this::convertToDocumentDetails)
+                .flatMap(List::stream)
+                .filter(dd -> !StringUtils.nullOrEmpty(dd.getDocType()))
+                .collect(toList());
+        if (documentDetails.isEmpty()) {
             logger.error("Can not find [{}] to upload as your copyright items.", UploadType.TOOLKIT_DOCS);
             throw new IllegalArgumentException("Can not find items to upload.");
         }
+        Map<String, String> filesToDownload = new HashMap<>(getFilesToDownload(documentDetails));
+        return downloadDocuments(filesToDownload);
     }
 
-    JsonObject getItemsWithVersions(String project, String listTitle) throws IOException {
-        String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items",
-                applicationProperties.toolkitUrl(),
-                project,
-                listTitle);
+    List<String> buildFullUrls() {
         String select = "$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
                 "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
                 "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +
@@ -61,9 +49,23 @@ class SimpleDocumentFinder extends AbstractDocumentFinder {
                 LocalDateTime.of(applicationProperties.endDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME)
         );
         String expand = "$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy";
-        String fullUrl = String.format("%s?%s&%s&%s", url, select, filter, expand);
 
-        return httpRequester.executeGET(fullUrl);
+        List<String> urls = new LinkedList<>();
+        for (String project : applicationProperties.projectPaths()) {
+            Set<String> listTitles = applicationProperties.toolkitProjectListNames();
+            for (String listTitle : listTitles) {
+                String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
+                        applicationProperties.toolkitUrl(),
+                        project,
+                        listTitle,
+                        select,
+                        filter,
+                        expand
+                );
+                urls.add(fullUrl);
+            }
+        }
+        return urls;
     }
 
 }

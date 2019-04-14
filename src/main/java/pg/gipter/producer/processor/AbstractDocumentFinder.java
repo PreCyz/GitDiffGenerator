@@ -2,6 +2,7 @@ package pg.gipter.producer.processor;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,60 +11,150 @@ import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.dto.DocumentDetailsBuilder;
 import pg.gipter.toolkit.dto.User;
 import pg.gipter.toolkit.dto.VersionDetails;
+import pg.gipter.utils.StringUtils;
 
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.*;
 
 abstract class AbstractDocumentFinder implements DocumentFinder {
 
-    private final int numberOfThreads = 10;
     protected static Logger logger;
     protected ApplicationProperties applicationProperties;
-    protected HttpRequester httpRequester;
-    ExecutorService executor;
+    protected final ParallelProcessor parallelProcessor;
 
     AbstractDocumentFinder(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         logger = LoggerFactory.getLogger(getClass());
-        this.httpRequester = new HttpRequester(applicationProperties);
-        this.executor = Executors.newFixedThreadPool(numberOfThreads);
+        parallelProcessor = new ParallelProcessor(applicationProperties);
     }
 
-    //for test purposes
-    void setHttpRequester(HttpRequester httpRequester) {
-        this.httpRequester = httpRequester;
+    List<JsonObject> getItems(List<String> urls) {
+        return parallelProcessor.processUrls(urls);
     }
 
-    private String getFullDownloadUrl(String fileReference, String projectCase) {
-        if (fileReference.startsWith(projectCase)) {
-            return String.format("%s%s", applicationProperties.toolkitUrl(), fileReference);
-        }
-        return String.format("%s%s/%s", applicationProperties.toolkitUrl(), projectCase, fileReference);
-    }
+    List<DocumentDetails> convertToDocumentDetails(JsonObject object) {
+        JsonObject d = object.getAsJsonObject("d");
+        JsonArray results = d.getAsJsonArray("results");
+        List<DocumentDetails> result = new ArrayList<>(results.size());
+        for (int i = 0; i < results.size(); i++) {
+            JsonObject jsonObject = results.get(i).getAsJsonObject();
 
-    List<File> downloadDocuments(Map<String, String> filesToDownload) {
-        if (filesToDownload.isEmpty()) {
-            throw new IllegalArgumentException("No files to download.");
-        }
-        CompletionService<File> ecs = new ExecutorCompletionService<>(executor);
-        filesToDownload.forEach((downloadedFileName, fullUrl) ->
-                ecs.submit(new DownloadFileCall(fullUrl, downloadedFileName, applicationProperties))
-        );
+            LocalDateTime created = LocalDateTime.parse(jsonObject.get("Created").getAsString(), DateTimeFormatter.ISO_DATE_TIME);
+            LocalDateTime modified = LocalDateTime.parse(jsonObject.get("Modified").getAsString(), DateTimeFormatter.ISO_DATE_TIME);
+            String fileRef = jsonObject.get("FileRef").getAsString();
+            String fileLeafRef = jsonObject.get("FileLeafRef").getAsString();
+            String docIcon = getNullForNull(jsonObject.get("DocIcon"), String.class);
+            String currentVersion = jsonObject.get("OData__UIVersionString").getAsString();
+            String guid = jsonObject.get("GUID").getAsString();
+            String title = getNullForNull(jsonObject.get("Title"), String.class);
 
-        int numberOfCalls = filesToDownload.size();
-        List<File> result = new ArrayList<>(numberOfCalls);
-        for (int i = 0; i < numberOfCalls; i++) {
-            try {
-                result.add(ecs.take().get());
-            } catch (InterruptedException | ExecutionException e) {
-                logger.error("Error when getting torrents.", e);
+            User author = null;
+            User modifier = null;
+            int majorVersion = -1;
+            int minorVersion = -1;
+            String name = null;
+            String serverRelativeUrl = null;
+            String project = null;
+            LocalDateTime timeLastModified = null;
+            String fileTitle = null;
+            List<VersionDetails> versionList = new LinkedList<>();
+
+            JsonObject file = getNullForNull(jsonObject.get("File"), JsonObject.class);
+            if (file != null) {
+                author = convertToUser(getNullForNull(file.get("Author"), JsonObject.class));
+                modifier = convertToUser(getNullForNull(file.get("ModifiedBy"), JsonObject.class));
+                majorVersion = getNullForNull(file.get("MajorVersion"), Integer.class);
+                minorVersion = getNullForNull(file.get("MinorVersion"), Integer.class);
+                name = getNullForNull(file.get("Name"), String.class);
+                serverRelativeUrl = getNullForNull(file.get("ServerRelativeUrl"), String.class);
+                project = getProject(serverRelativeUrl);
+
+                String lastModified = getNullForNull(file.get("TimeLastModified"), String.class);
+                timeLastModified = null;
+                if (!StringUtils.nullOrEmpty(lastModified)) {
+                    timeLastModified = LocalDateTime.parse(lastModified, DateTimeFormatter.ISO_DATE_TIME);
+
+                }
+                fileTitle = getNullForNull(file.get("Title"), String.class);
+
+                versionList = convertToVersions(getNullForNull(file.getAsJsonObject("Versions"), JsonObject.class));
+                if (modifier != null) {
+                    VersionDetails lastVersion = new VersionDetails(modifier, "", modified, -1, true, 0, fileRef, Double.valueOf(currentVersion));
+                    versionList.add(lastVersion);
+                }
             }
+
+            DocumentDetails dd = new DocumentDetailsBuilder()
+                    .withCreated(created)
+                    .withModified(modified)
+                    .withFileRef(fileRef)
+                    .withFileLeafRef(fileLeafRef)
+                    .withDocType(docIcon)
+                    .withCurrentVersion(currentVersion)
+                    .withGuid(guid)
+                    .withTitle(title)
+                    .withAuthor(author)
+                    .withModifier(modifier)
+                    .withMajorVersion(majorVersion)
+                    .withMinorVersion(minorVersion)
+                    .withFileName(name)
+                    .withServerRelativeUrl(serverRelativeUrl)
+                    .withProject(project)
+                    .withTimeLastModified(timeLastModified)
+                    .withFileName(fileTitle)
+                    .withVersions(versionList)
+                    .create();
+            result.add(dd);
         }
         return result;
+    }
+
+    String getProject(String serverRelativeUrl) {
+        if (StringUtils.nullOrEmpty(serverRelativeUrl)) {
+            return null;
+        }
+        for (String listName : applicationProperties.toolkitProjectListNames()) {
+            int index = serverRelativeUrl.indexOf(listName);
+            if (index > 0) {
+                return serverRelativeUrl.substring(0, index);
+            }
+        }
+        return null;
+    }
+
+    private <T> T getNullForNull(JsonElement element, Class<T> tClazz) {
+        if (element != null && !(element instanceof JsonNull)) {
+            if (tClazz == String.class) {
+                return (T) element.getAsString();
+            } else if (tClazz == JsonObject.class) {
+                return (T) element.getAsJsonObject();
+            } else if (tClazz == Integer.class) {
+                return (T) new Integer(0);
+            }
+        }
+        if (element == null && tClazz == Integer.class) {
+            return (T) new Integer(0);
+        }
+        return null;
+    }
+
+    private User convertToUser(JsonObject object) {
+        if (object == null) {
+            return null;
+        }
+        int id = -1;
+        JsonElement idElement = object.get("Id");
+        if (idElement != null) {
+            id = idElement.getAsInt();
+        }
+        String fullLoginName = object.get("LoginName").getAsString();
+        String loginName = fullLoginName.substring(fullLoginName.lastIndexOf("\\") + 1);
+        String fullName = object.get("Title").getAsString();
+        String email = object.get("Email").getAsString();
+        return new User(id, loginName, fullName, email);
     }
 
     List<VersionDetails> convertToVersions(JsonObject jsonObject) {
@@ -90,27 +181,11 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
         return result;
     }
 
-    private User convertToUser(JsonObject object) {
-        if (object == null) {
-            return null;
-        }
-        int id = -1;
-        JsonElement idElement = object.get("Id");
-        if (idElement != null) {
-            id = idElement.getAsInt();
-        }
-        String fullLoginName = object.get("LoginName").getAsString();
-        String loginName = fullLoginName.substring(fullLoginName.lastIndexOf("\\") + 1);
-        String fullName = object.get("Title").getAsString();
-        String email = object.get("Email").getAsString();
-        return new User(id, loginName, fullName, email);
-    }
-
-    Map<String, String> getFilesToDownload(String project, List<DocumentDetails> documentDetails) {
+    Map<String, String> getFilesToDownload(List<DocumentDetails> documentDetails) {
         Map<String, String> filesToDownloadMap = new HashMap<>();
         for (DocumentDetails dd : documentDetails) {
             if (dd.getVersions().isEmpty() && dd.getLastModifier().getLoginName().equals(applicationProperties.toolkitUsername())) {
-                filesToDownloadMap.put(dd.getCurrentVersion() + "v-" + dd.getFileLeafRef(), getFullDownloadUrl(dd.getFileRef(), project));
+                filesToDownloadMap.put(dd.getCurrentVersion() + "v-" + dd.getFileLeafRef(), getFullDownloadUrl(dd.getFileRef()));
             } else if (!dd.getVersions().isEmpty()) {
                 Optional<VersionDetails> minMe;
                 double minMeCurrentVersion = 0;
@@ -131,7 +206,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
                                 .max(Comparator.comparingDouble(VersionDetails::getVersionLabel))
                                 .ifPresent(versionDetails -> filesToDownloadMap.put(
                                         versionDetails.getVersionLabel() + "v-" + dd.getFileLeafRef(),
-                                        getFullDownloadUrl(versionDetails.getDownloadUrl(), project)
+                                        getFullDownloadUrl(dd.getProject() + versionDetails.getDownloadUrl())
                                 ));
                         double difference = 0.0;
                         Optional<VersionDetails> nextMinMe;
@@ -151,10 +226,12 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
                                 nextMinMe.get().getVersionLabel() < Double.valueOf(dd.getCurrentVersion())
                         );
 
-                        filesToDownloadMap.put(
-                                minMe.get().getVersionLabel() + "v-my-" + dd.getFileLeafRef(),
-                                getFullDownloadUrl(minMe.get().getDownloadUrl(), project)
-                        );
+                        String downloadUrl = getFullDownloadUrl(dd.getProject() + minMe.get().getDownloadUrl());
+                        if (minMe.get().getDownloadUrl().startsWith(dd.getProject())) {
+                            downloadUrl = getFullDownloadUrl(minMe.get().getDownloadUrl());
+                        }
+                        filesToDownloadMap.put(minMe.get().getVersionLabel() + "v-my-" + dd.getFileLeafRef(), downloadUrl);
+
                         minMeCurrentVersion = minMe.get().getVersionLabel();
                     }
                 } while (minMe.isPresent() && minMe.get().getVersionLabel() < Double.valueOf(dd.getCurrentVersion()));
@@ -163,70 +240,15 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
         return filesToDownloadMap;
     }
 
-    List<DocumentDetails> convertToDocumentDetails(JsonObject object) {
-        JsonObject d = object.getAsJsonObject("d");
-        JsonArray results = d.getAsJsonArray("results");
-        List<DocumentDetails> result = new ArrayList<>(results.size());
-        for (int i = 0; i < results.size(); i++) {
-            JsonObject jsonObject = results.get(i).getAsJsonObject();
-
-            LocalDateTime created = LocalDateTime.parse(jsonObject.get("Created").getAsString(), DateTimeFormatter.ISO_DATE_TIME);
-            LocalDateTime modified = LocalDateTime.parse(jsonObject.get("Modified").getAsString(), DateTimeFormatter.ISO_DATE_TIME);
-            String fileRef = jsonObject.get("FileRef").getAsString();
-            String fileLeafRef = jsonObject.get("FileLeafRef").getAsString();
-            String docIcon = getNullForNull(jsonObject.get("DocIcon"), String.class);
-            String currentVersion = jsonObject.get("OData__UIVersionString").getAsString();
-            String guid = jsonObject.get("GUID").getAsString();
-            String title = getNullForNull(jsonObject.get("Title"), String.class);
-
-            JsonObject file = getNullForNull(jsonObject.get("File"), JsonObject.class);
-            User author = convertToUser(getNullForNull(file.get("Author"), JsonObject.class));
-            User modifier = convertToUser(getNullForNull(file.get("ModifiedBy"), JsonObject.class));
-            int majorVersion = file.get("MajorVersion").getAsInt();
-            int minorVersion = file.get("MinorVersion").getAsInt();
-            String name = file.get("Name").getAsString();
-            String serverRelativeUrl = file.get("ServerRelativeUrl").getAsString();
-            LocalDateTime timeLastModified = LocalDateTime.parse(
-                    file.get("TimeLastModified").getAsString(), DateTimeFormatter.ISO_DATE_TIME
-            );
-            String fileTitle = getNullForNull(file.get("Title"), String.class);
-
-            List<VersionDetails> versionList = convertToVersions(
-                    getNullForNull(file.getAsJsonObject("Versions"), JsonObject.class)
-            );
-            DocumentDetails dd = new DocumentDetailsBuilder()
-                    .withCreated(created)
-                    .withModified(modified)
-                    .withFileRef(fileRef)
-                    .withFileLeafRef(fileLeafRef)
-                    .withDocType(docIcon)
-                    .withCurrentVersion(currentVersion)
-                    .withGuid(guid)
-                    .withTitle(title)
-                    .withAuthor(author)
-                    .withModifier(modifier)
-                    .withMajorVersion(majorVersion)
-                    .withMinorVersion(minorVersion)
-                    .withFileName(name)
-                    .withServerRelativeUrl(serverRelativeUrl)
-                    .withTimeLastModified(timeLastModified)
-                    .withFileName(fileTitle)
-                    .withVersions(versionList)
-                    .create();
-            result.add(dd);
-        }
-        return result;
+    private String getFullDownloadUrl(String fileReference) {
+        return String.format("%s%s", applicationProperties.toolkitUrl(), fileReference);
     }
 
-    private <T> T getNullForNull(JsonElement element, Class<T> tClazz) {
-        if (element != null) {
-            if (tClazz == String.class) {
-                return (T) element.getAsString();
-            } else if (tClazz == JsonObject.class) {
-                return (T) element.getAsJsonObject();
-            }
+    List<File> downloadDocuments(Map<String, String> filesToDownload) {
+        if (filesToDownload.isEmpty()) {
+            throw new IllegalArgumentException("No files to download.");
         }
-        return null;
+        return parallelProcessor.downloadFiles(filesToDownload);
     }
 
     public abstract List<File> find();

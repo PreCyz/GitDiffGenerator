@@ -2,7 +2,6 @@ package pg.gipter.producer.processor;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
@@ -10,99 +9,21 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helper.XmlHelper;
-import pg.gipter.utils.StringUtils;
 
-import java.io.*;
-import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
-class SimpleDocumentFinderTest {
+class ComplexDocumentFinderTest {
 
-    private SimpleDocumentFinder finder;
-
-    private JsonObject getJsonObject(String s) throws FileNotFoundException {
-        String path = XmlHelper.getFullXmlPath(s);
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
-        Gson gson = new Gson();
-        return gson.fromJson(bufferedReader, JsonObject.class);
-    }
-
-    @Test
-    void givenItemsJson_whenExtractItemDetails_thenReturnListOfItemDetails() throws FileNotFoundException {
-        finder = new SimpleDocumentFinder(ApplicationPropertiesFactory.getInstance(new String[]{}));
-        JsonObject js = getJsonObject("items.json");
-
-        List<DocumentDetails> actual = finder.convertToDocumentDetails(js);
-
-        assertThat(actual).hasSize(9);
-    }
-
-    @Test
-    void givenItemsJsonWithDatesInThePast_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{
-                        ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
-                        ArgName.startDate + "=2019-02-25",
-                        ArgName.endDate + "=2019-04-06",
-                        ArgName.toolkitUsername + "=pawg",
-                        ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
-                });
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("customItem.json");
-        List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
-
-        Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
-
-        assertThat(filesToDownload).hasSize(2);
-        assertThat(filesToDownload.get("1.0v-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(filesToDownload.get("3.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-    }
-
-    @Test
-    @Disabled
-    void givenCustomItems_whenDownload_thenReturnDownload() throws IOException {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{
-                        ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
-                        ArgName.startDate + "=2019-02-25",
-                        ArgName.endDate + "=2019-04-06",
-                        ArgName.toolkitUsername + "=pawg",
-                        ArgName.toolkitPassword + "=JanuarY12!@",
-                        ArgName.itemPath + "=/home/gawa/IdeaProjects/GitDiffGenerator/src/test/java/resources/xml",
-                        ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
-                }
-        );
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("customItem.json");
-        List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
-        Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
-
-        List<File> actual = finder.downloadDocuments(filesToDownload);
-
-        assertThat(actual).hasSize(2);
-    }
-
-    @Test
-    void givenEmptyMap_whenDownloadDocuments_thenThrowIllegalArgumentException() {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name()}
-        );
-        finder = new SimpleDocumentFinder(applicationProperties);
-
-        try {
-            finder.downloadDocuments(new HashMap<>());
-            fail("Should throw IllegalArgumentException");
-        }catch (IllegalArgumentException ex) {
-            assertThat(true).isTrue();
-        }
-    }
+    private ComplexDocumentFinder finder;
 
     @Test
     void givenItemsWithComplexHistory_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
@@ -114,8 +35,11 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("Item-case-1.json");
+        finder = new ComplexDocumentFinder(applicationProperties);
+        String path = XmlHelper.getFullXmlPath("Item-case-1.json");
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        Gson gson = new Gson();
+        JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
         Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
@@ -141,8 +65,11 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("Item-case-2.json");
+        finder = new ComplexDocumentFinder(applicationProperties);
+        String path = XmlHelper.getFullXmlPath("Item-case-2.json");
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        Gson gson = new Gson();
+        JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
         Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
@@ -162,8 +89,11 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("Item-case-3.json");
+        finder = new ComplexDocumentFinder(applicationProperties);
+        String path = XmlHelper.getFullXmlPath("Item-case-3.json");
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        Gson gson = new Gson();
+        JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
         Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
@@ -189,8 +119,11 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("Item-case-4.json");
+        finder = new ComplexDocumentFinder(applicationProperties);
+        String path = XmlHelper.getFullXmlPath("Item-case-4.json");
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        Gson gson = new Gson();
+        JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
         Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
@@ -210,8 +143,11 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("Item-case-5.json");
+        finder = new ComplexDocumentFinder(applicationProperties);
+        String path = XmlHelper.getFullXmlPath("Item-case-5.json");
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        Gson gson = new Gson();
+        JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
         Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
@@ -229,8 +165,11 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("Item-case-6.json");
+        finder = new ComplexDocumentFinder(applicationProperties);
+        String path = XmlHelper.getFullXmlPath("Item-case-6.json");
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        Gson gson = new Gson();
+        JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
         Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
@@ -250,8 +189,11 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("Item-case-7.json");
+        finder = new ComplexDocumentFinder(applicationProperties);
+        String path = XmlHelper.getFullXmlPath("Item-case-7.json");
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        Gson gson = new Gson();
+        JsonObject js = gson.fromJson(bufferedReader, JsonObject.class);
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
         Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
@@ -264,61 +206,72 @@ class SimpleDocumentFinderTest {
     }
 
     @Test
-    void givenItemsCase8_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenProperties_whenBuildPageableUrl_thenReturnUrls() {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
-                        ArgName.startDate + "=2019-04-01",
-                        ArgName.endDate + "=2019-04-13",
+                        ArgName.startDate + "=2019-02-24",
+                        ArgName.endDate + "=2019-03-02",
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("Item-case-8.json");
-        List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js).stream()
-                .filter(dd -> !StringUtils.nullOrEmpty(dd.getDocType()))
-                .collect(toList());
+        finder = new ComplexDocumentFinder(applicationProperties);
+        int documentId = 100;
 
-        Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
+        String actual = finder.buildPageableUrl(
+                applicationProperties.projectPaths().toArray(new String[1])[0],
+                applicationProperties.toolkitProjectListNames().toArray(new String[1])[0],
+                documentId
+        );
 
-        assertThat(filesToDownload).hasSize(4);
-        assertThat(filesToDownload.get("38.0v-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/19456/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(filesToDownload.get("39.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/19968/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(filesToDownload.get("42.0v-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/21504/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(filesToDownload.get("44.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(actual).startsWith("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items" +
+                "?$select=Id,Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
+                "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
+                "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +
+                "File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email," +
+                "File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size," +
+                "File/Versions/Url,File/Versions/VersionLabel," +
+                "File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email" +
+                "&$filter=");
+        assertThat(actual).contains("Created+lt+datetime'2019-03-02");
+        assertThat(actual).contains("+or+Modified+ge+datetime'2019-02-24");
+        assertThat(actual).contains("&$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy");
+        assertThat(actual).contains("&$top=100");
+        assertThat(actual).endsWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=" + documentId);
     }
 
     @Test
-    void givenProperties_whenBuildUrls_thenReturnUrls() {
+    void givenProperties_whenBuildUrls_thenReturnListOfUrls() throws FileNotFoundException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
-                        ArgName.startDate + "=2019-04-06",
-                        ArgName.endDate + "=2019-04-13",
+                        ArgName.startDate + "=2019-02-24",
+                        ArgName.endDate + "=2019-03-02",
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ComplexDocumentFinder(applicationProperties);
 
-        List<String> actual = finder.buildFullUrls();
+        String path = XmlHelper.getFullXmlPath("item-count.json");
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+        Gson gson = new Gson();
+        JsonObject itemCount = gson.fromJson(bufferedReader, JsonObject.class);
 
-        assertThat(actual).hasSize(1);
-        assertThat(actual.get(0)).startsWith("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items?$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString,File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel,File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email,File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email,File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel,File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email&$filter=Modified+ge+datetime'2019-04-06");
-        assertThat(actual.get(0)).contains("+and+Modified+le+datetime'2019-04-13");
-        assertThat(actual.get(0)).endsWith("&$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy");
-    }
+        List<ItemCountResponse> responses = Stream.of(new ItemCountResponse(
+                applicationProperties.projectPaths().toArray(new String[1])[0],
+                applicationProperties.toolkitProjectListNames().toArray(new String[1])[0],
+                itemCount
+        )).collect(Collectors.toList());
 
-    @Test
-    void givenValueWithListName_whenGetProject_thenReturnProject() {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(new String[]{});
-        finder = new SimpleDocumentFinder(applicationProperties);
+        List<String> actual = finder.buildUrls(responses);
 
-        String actual = finder.getProject("/cases/GTE440/TOEDNLD/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-
-        assertThat(actual).isEqualTo("/cases/GTE440/TOEDNLD/");
+        assertThat(actual).hasSize(12);
+        for (int i = 0; i < actual.size(); ++i) {
+            if (i == 0) {
+                assertThat(actual.get(i)).doesNotEndWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=");
+            } else {
+                assertThat(actual.get(i)).endsWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=" + 100 * i);
+            }
+        }
     }
 }

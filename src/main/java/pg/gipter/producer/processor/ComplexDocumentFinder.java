@@ -1,25 +1,25 @@
 package pg.gipter.producer.processor;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.dto.DocumentDetails;
-import pg.gipter.toolkit.dto.DocumentDetailsBuilder;
+import pg.gipter.utils.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 class ComplexDocumentFinder extends AbstractDocumentFinder {
+
+    private final int TOP_LIMIT = 100;
 
     ComplexDocumentFinder(ApplicationProperties applicationProperties) {
         super(applicationProperties);
@@ -27,127 +27,79 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
 
     @Override
     public List<File> find() {
-        try {
-            Map<String, List<DocumentDetails>> projectDocsMap = new HashMap<>();
-            for (String project : applicationProperties.projectPaths()) {
-                List<DocumentDetails> documentDetails = new LinkedList<>();
-                Set<String> listTitles = applicationProperties.toolkitProjectListNames();
-                for (String listTitle : listTitles) {
-                    JsonObject items = getItems(project, listTitle);
-                    documentDetails.addAll(convertToDocumentDetails(items));
+        List<ItemCountResponse> itemCounts = getItemCount();
+        List<String> urls = buildUrls(itemCounts);
+
+        List<JsonObject> items = getItems(urls);
+        List<DocumentDetails> documentDetails = items.stream()
+                .map(this::convertToDocumentDetails)
+                .flatMap(List::stream)
+                .filter(dd -> !StringUtils.nullOrEmpty(dd.getDocType()))
+                .collect(toList());
+        if (documentDetails.isEmpty()) {
+            logger.error("Can not find [{}] to upload as your copyright items.", UploadType.TOOLKIT_DOCS);
+            throw new IllegalArgumentException("Can not find items to upload.");
+        }
+        Map<String, String> filesToDownload = new HashMap<>(getFilesToDownload(documentDetails));
+        return downloadDocuments(filesToDownload);
+    }
+
+    List<ItemCountResponse> getItemCount() {
+        Map<CustomizedTuple, String> projectUrlsMap = new HashMap<>();
+        for (String project : applicationProperties.projectPaths()) {
+            for (String list : applicationProperties.toolkitProjectListNames()) {
+                String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/ItemCount",
+                        applicationProperties.toolkitUrl(),
+                        project,
+                        list
+                );
+                projectUrlsMap.put(new CustomizedTuple(project, list), fullUrl);
+            }
+        }
+
+        return parallelProcessor.processMap(projectUrlsMap);
+    }
+
+    List<String> buildUrls(List<ItemCountResponse> responses) {
+        List<String> urls = new LinkedList<>();
+        for (ItemCountResponse response : responses) {
+            if (response.getItemCount() > 0) {
+                int numberOfPages = response.getItemCount() / TOP_LIMIT;
+                if (response.getItemCount() % TOP_LIMIT > 0) {
+                    ++numberOfPages;
                 }
-                projectDocsMap.put(project, documentDetails);
-            }
-
-            if (projectDocsMap.isEmpty() || projectDocsMap.values().stream().mapToLong(Collection::size).sum() == 0) {
-                throw new IllegalArgumentException("Can not find any documents.");
-            }
-
-            projectDocsMap = downloadVersions(projectDocsMap);
-
-            Map<String, String> filesToDownload = getFilesToDownload(projectDocsMap);
-
-            return downloadDocuments(filesToDownload);
-        } catch (IOException ex) {
-            logger.error("Can not find [{}] to upload as your copyright items.", UploadType.TOOLKIT_DOCS, ex);
-            throw new IllegalArgumentException("Can not find items to upload.", ex);
-        }
-    }
-
-    private Map<String, String> getFilesToDownload(Map<String, List<DocumentDetails>> projectDocsMap) {
-        return new HashMap<>();
-    }
-
-    private Map<String, List<DocumentDetails>> downloadVersions(Map<String, List<DocumentDetails>> projectDocsMap) {
-        //String url = "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/Web/GetFileByServerRelativeUrl('%s')/Versions";
-        final String expand = "$expand=CreatedBy";
-        final String select = "$select=ModifiedBy,Modified,CheckInComment,Created,ID,IsCurrentVersion,Size,Url,VersionLabel," +
-                "CreatedBy/Editor,CreatedBy/Id,CreatedBy/Email,CreatedBy/Title,CreatedBy/LoginName";
-
-        List<DownloadVersionCall> downloadVersionCalls = Collections.emptyList();
-        for (Map.Entry<String, List<DocumentDetails>> entry : projectDocsMap.entrySet()) {
-            final String project = entry.getKey();
-            List<DocumentDetails> docs = entry.getValue();
-            downloadVersionCalls = docs.stream()
-                    .map(doc -> new DownloadVersionCall(
-                            project,
-                            String.format("%s%s_api/Web/GetFileByServerRelativeUrl('%s')/Versions?%s&%s",
-                                    applicationProperties.toolkitUrl(), project, doc.getFileRef(), select, expand),
-                            doc.getGuid(),
-                            applicationProperties
-                    ))
-                    .collect(toList());
-        }
-
-        List<DocumentDetails> docsWithoutVersions = projectDocsMap.values().stream().flatMap(Collection::stream).collect(toList());
-        Map<String, List<DocumentDetails>> resultProjectDocsMap = projectDocsMap.keySet()
-                .stream()
-                .collect(toMap(key -> key, value -> new LinkedList<>()));
-
-        CompletionService<CustomizedTriple> ecs = new ExecutorCompletionService<>(executor);
-        downloadVersionCalls.forEach(ecs::submit);
-
-        for (int i = 0; i < downloadVersionCalls.size(); i++) {
-            try {
-                CustomizedTriple customizedTriple = ecs.take().get();
-                Optional<DocumentDetails> documentWithoutVersion = docsWithoutVersions.stream()
-                        .filter(doc -> doc.getGuid().equals(customizedTriple.getGuid()))
-                        .findAny();
-                if (documentWithoutVersion.isPresent()) {
-                    documentWithoutVersion.get().setVersions(convertToVersions(customizedTriple.getVersions()));
-                    List<DocumentDetails> docsWithVersion = resultProjectDocsMap.get(customizedTriple.getProject());
-                    docsWithVersion.add(documentWithoutVersion.get());
+                for (int i = 0; i < numberOfPages; ++i) {
+                    urls.add(buildPageableUrl(response.getProject(), response.getListName(), TOP_LIMIT * i));
                 }
-
-            } catch (InterruptedException | ExecutionException e) {
-                logger.error("Error when getting torrents.", e);
             }
         }
-        return resultProjectDocsMap;
+        return urls;
     }
 
-    private JsonObject getItems(String project, String listTitle) throws IOException {
+    String buildPageableUrl(String project, String listTitle, int documentId) {
+        String select = "$select=Id,Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
+                "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
+                "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +
+                "File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email," +
+                "File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel," +
+                "File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email";
+        String filter = String.format("$filter=Created+lt+datetime'%s'+or+Modified+ge+datetime'%s'",
+                LocalDateTime.of(applicationProperties.endDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME),
+                LocalDateTime.of(applicationProperties.startDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME)
+        );
+        String top = "$top=" + TOP_LIMIT;
+        String expand = "$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy";
+
+
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items",
                 applicationProperties.toolkitUrl(),
                 project,
-                listTitle);
-        String select = "$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString";
-        String fullUrl = String.format("%s?%s", url, select);
-
-        return httpRequester.executeGET(fullUrl);
-    }
-
-    @Override
-    List<DocumentDetails> convertToDocumentDetails(JsonObject object) {
-        JsonObject d = object.getAsJsonObject("d");
-        JsonArray results = d.getAsJsonArray("results");
-        List<DocumentDetails> result = new ArrayList<>(results.size());
-        for (int i = 0; i < results.size(); i++) {
-            JsonObject jsonObject = results.get(i).getAsJsonObject();
-
-            LocalDateTime created = LocalDateTime.parse(jsonObject.get("Created").getAsString(), DateTimeFormatter.ISO_DATE_TIME);
-            LocalDateTime modified = LocalDateTime.parse(jsonObject.get("Modified").getAsString(), DateTimeFormatter.ISO_DATE_TIME);
-            String fileRef = jsonObject.get("FileRef").getAsString();
-            String fileLeafRef = jsonObject.get("FileLeafRef").getAsString();
-            String docIcon = jsonObject.get("DocIcon").getAsString();
-            String currentVersion = jsonObject.get("OData__UIVersionString").getAsString();
-            String guid = jsonObject.get("GUID").getAsString();
-            String title = jsonObject.get("Title").getAsString();
-
-            DocumentDetails dd = new DocumentDetailsBuilder()
-                    .withCreated(created)
-                    .withModified(modified)
-                    .withFileRef(fileRef)
-                    .withFileLeafRef(fileLeafRef)
-                    .withDocType(docIcon)
-                    .withCurrentVersion(currentVersion)
-                    .withGuid(guid)
-                    .withTitle(title)
-                    .withServerRelativeUrl(fileRef)
-                    .withVersions(new LinkedList<>())
-                    .create();
-            result.add(dd);
+                listTitle
+        );
+        String paging = "&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=" + documentId;
+        if (documentId == 0) {
+            paging = "";
         }
-        return result;
+        return String.format("%s?%s&%s&%s&%s%s", url, select, filter, expand, top, paging);
     }
 }

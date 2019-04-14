@@ -12,6 +12,7 @@ public class DocumentDetailsBuilder {
     private int minorVersion;
     private String fileName;
     private String serverRelativeUrl;
+    private String project;
     private LocalDateTime timeLastModified;
     private LocalDateTime created;
     private LocalDateTime modified;
@@ -103,6 +104,12 @@ public class DocumentDetailsBuilder {
 
     public DocumentDetails create() {
         return new DocumentDetails(docType, fileLeafRef, fileRef, guid, majorVersion, minorVersion, fileName,
-                serverRelativeUrl, timeLastModified, created, modified, title, currentVersion, author, modifier, versions);
+                serverRelativeUrl, project, timeLastModified, created, modified, title, currentVersion, author, modifier,
+                versions);
+    }
+
+    public DocumentDetailsBuilder withProject(String project) {
+        this.project = project;
+        return this;
     }
 }
