@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 
-/**Created by Pawel Gawedzki on 17-Sep-2018.*/
+/** Created by Pawel Gawedzki on 17-Sep-2018. */
 class CliPreferredApplicationProperties extends ApplicationProperties {
 
     CliPreferredApplicationProperties(String[] args) {
@@ -274,6 +274,11 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
             delete = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(delete)));
         }
         return delete;
+    }
+
+    @Override
+    public boolean isEnableOnStartup() {
+        return false;
     }
 
 }

@@ -1492,7 +1492,7 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenDeleteDownloadedFilesFileAndCLI_whenIsDeleteDownloadedFiles_thenReturnClideleteDownloadedFiles() {
+    void givenDeleteDownloadedFilesFileAndCLI_whenIsDeleteDownloadedFiles_thenReturnCliDeleteDownloadedFiles() {
         String[] args = {"deleteDownloadedFiles=y"};
         Properties props = new Properties();
         props.put("deleteDownloadedFiles", "n");

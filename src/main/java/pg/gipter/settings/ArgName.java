@@ -30,6 +30,7 @@ public enum ArgName {
     useUI("Y"),
     activeTray("Y"),
     silentMode("N"),
+    enableOnStartup("Y"),
 
     toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
     toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),

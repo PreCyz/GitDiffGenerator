@@ -12,6 +12,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import pg.gipter.producer.command.UploadType;
+import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -96,6 +97,8 @@ public class MainController extends AbstractController {
     @FXML
     private CheckBox activeteTrayCheckBox;
     @FXML
+    private CheckBox autostartCheckBox;
+    @FXML
     private Button saveConfigurationButton;
 
     @FXML
@@ -165,6 +168,7 @@ public class MainController extends AbstractController {
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
         activeteTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
+        autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
         if (StringUtils.nullOrEmpty(currentLanguage)) {
@@ -203,6 +207,7 @@ public class MainController extends AbstractController {
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
         activeteTrayCheckBox.setDisable(!uiLauncher.isTraySupported());
+        autostartCheckBox.setDisable(!uiLauncher.isTraySupported());
         progressIndicator.setVisible(false);
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
@@ -350,6 +355,7 @@ public class MainController extends AbstractController {
         argList.add(ArgName.preferredArgSource + "=" + PreferredArgSource.UI);
         argList.add(ArgName.useUI + "=" + useUICheckBox.isSelected());
         argList.add(ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected());
+        argList.add(ArgName.enableOnStartup + "=" + autostartCheckBox.isSelected());
 
         return argList.toArray(new String[0]);
     }
@@ -442,6 +448,7 @@ public class MainController extends AbstractController {
                         }
                 );
 
+        final StartupService startupService = new StartupService();
         activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 deamonButton.setText(resources.getString("button.deamon"));
@@ -449,10 +456,22 @@ public class MainController extends AbstractController {
                 uiLauncher.setApplicationProperties(uiAppProperties);
                 uiLauncher.initTrayHandler();
                 uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
+                autostartCheckBox.setDisable(false);
             } else {
                 deamonButton.setText(resources.getString("button.job"));
                 uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
                 uiLauncher.removeTray();
+                autostartCheckBox.setDisable(true);
+                autostartCheckBox.setSelected(false);
+                startupService.disableStartOnStartup();
+            }
+        });
+
+        autostartCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                startupService.startOnStartup();
+            } else {
+                startupService.disableStartOnStartup();
             }
         });
     }

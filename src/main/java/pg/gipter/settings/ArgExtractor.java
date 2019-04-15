@@ -225,4 +225,11 @@ final class ArgExtractor {
         }
         return StringUtils.getBoolean(ArgName.deleteDownloadedFiles.defaultValue());
     }
+
+    boolean isEnableOnStartup() {
+        if (containsArg(ArgName.enableOnStartup.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.enableOnStartup, ArgName.enableOnStartup.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.enableOnStartup.defaultValue());
+    }
 }

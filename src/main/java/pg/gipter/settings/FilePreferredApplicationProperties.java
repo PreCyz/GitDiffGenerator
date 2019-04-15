@@ -256,4 +256,14 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return argExtractor.isDeleteDownloadedFiles();
     }
 
+    @Override
+    public boolean isEnableOnStartup() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgName.enableOnStartup.name(), ArgName.enableOnStartup.defaultValue()
+            ));
+        }
+        return argExtractor.isEnableOnStartup();
+    }
+
 }

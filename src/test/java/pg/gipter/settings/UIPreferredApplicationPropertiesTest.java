@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static pg.gipter.TestUtils.mockPropertiesLoader;
 
 /**Created by Pawel Gawedzki on 06-Mar-2019.*/
-public class UIPreferredApplicationPropertiesTest {
+class UIPreferredApplicationPropertiesTest {
 
     private UIPreferredApplicationProperties appProps;
 
@@ -46,6 +46,65 @@ public class UIPreferredApplicationPropertiesTest {
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isActiveTray();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenNoEnableOnStartup_whenIsEnableOnStartup_thenReturnDefault() {
+        appProps = new UIPreferredApplicationProperties(new String[]{});
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenEnableOnStartupFromCLI_whenIsEnableOnStartup_thenReturnCliEnableOnStartup() {
+        appProps = new UIPreferredApplicationProperties(
+                new String[]{"enableOnStartup=n"}
+        );
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenEnableOnStartupFileAndCLI_whenIsEnableOnStartup_thenReturnCliEnableOnStartup() {
+        String[] args = {"enableOnStartup=n"};
+        Properties props = new Properties();
+        props.put("enableOnStartup", "t");
+        appProps = new UIPreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenEnableOnStartupFromProperties_whenIsEnableOnStartup_thenReturnEnableOnStartupFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("enableOnStartup", "n");
+        appProps = new UIPreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenEnableOnStartupFromPropertiesAndOtherArgs_whenIsEnableOnStartup_thenReturnEnableOnStartupFromProperties() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("enableOnStartup", "n");
+        appProps = new UIPreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isEnableOnStartup();
 
         assertThat(actual).isFalse();
     }

@@ -787,12 +787,50 @@ class FilePreferredApplicationPropertiesTest {
     void givenDeleteDownloadedFilesSetY_whenIsDeleteDownloadedFiles_thenReturnTrue() {
         String[] args = {""};
         Properties props = new Properties();
-        props.put("confirmationWindow", "Y");
+        props.put("deleteDownloadedFiles", "Y");
         appProps = new FilePreferredApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
-        boolean actual = appProps.isConfirmationWindow();
+        boolean actual = appProps.isDeleteDownloadedFiles();
 
         assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenEmptyEnableOnStartupFiles_whenIsEnableOnStartup_thenReturnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenEnableOnStartupSetN_whenIsEnableOnStartup_thenReturnFalse() {
+        String[] args = {"enableOnStartup=Y"};
+        Properties props = new Properties();
+        props.put("enableOnStartup", "N");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenEnableOnStartupSetY_whenIsEnableOnStartup_thenReturnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("enableOnStartup", "n");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isFalse();
     }
 }
