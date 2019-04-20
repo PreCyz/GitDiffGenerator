@@ -110,15 +110,7 @@ public class ProjectsController extends AbstractController {
             for (String path : projects) {
                 File project = new File(path);
                 Optional<String> supportedVcs = getSupportedVcs(project);
-                if (supportedVcs.isPresent() && applicationProperties.uploadType() != UploadType.DOCUMENTS) {
-                    ProjectDetails pd = new ProjectDetails(
-                            project.getName(),
-                            supportedVcs.get(),
-                            path
-                    );
-                    projectsPaths.add(pd);
-                } else if (!supportedVcs.isPresent() &&
-                        EnumSet.of(UploadType.DOCUMENTS, UploadType.TOOLKIT_DOCS).contains(applicationProperties.uploadType())) {
+                if (!supportedVcs.isPresent() && applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
                     ProjectDetails pd = new ProjectDetails(
                             project.getName(),
                             applicationProperties.uploadType().name(),
@@ -144,7 +136,7 @@ public class ProjectsController extends AbstractController {
     }
 
     private void setupButtons(ResourceBundle resources) {
-        if (EnumSet.of(UploadType.DOCUMENTS, UploadType.TOOLKIT_DOCS).contains(applicationProperties.uploadType())) {
+        if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
             searchProjectsButton.setDisable(true);
             Tooltip tooltip = new Tooltip();
             tooltip.setTextAlignment(TextAlignment.LEFT);
@@ -218,10 +210,7 @@ public class ProjectsController extends AbstractController {
                 File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
                 if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                     try {
-                        String vcsType = UploadType.DOCUMENTS.name();
-                        if (applicationProperties.uploadType() != UploadType.DOCUMENTS) {
-                            vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
-                        }
+                        String vcsType = vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();;
                         ProjectDetails project = new ProjectDetails(
                                 itemPathDirectory.getName(),
                                 vcsType,

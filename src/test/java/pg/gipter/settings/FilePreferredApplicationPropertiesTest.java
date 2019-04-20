@@ -239,8 +239,8 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void given_uploadTypeDocuments_whenFileName_thenReturnFileNameWithZip() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"uploadType=documents"});
+    void given_uploadTypeToolkitDocs_whenFileName_thenReturnFileNameWithZip() {
+        appProps = new FilePreferredApplicationProperties(new String[]{"uploadType=toolkit_docs"});
 
         String actual = appProps.fileName();
 

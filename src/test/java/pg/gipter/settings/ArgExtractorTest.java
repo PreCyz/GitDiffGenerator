@@ -318,15 +318,6 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_uploadTypeSetAsDocuments_when_codeProtection_then_returnEnum() {
-        argExtractor = new ArgExtractor(new String[]{"uploadType=documeNTS"});
-
-        UploadType actual = argExtractor.uploadType();
-
-        assertThat(actual).isEqualTo(UploadType.DOCUMENTS);
-    }
-
-    @Test
     void given_noToolkitUsername_when_toolkitUsername_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 

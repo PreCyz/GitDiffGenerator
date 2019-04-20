@@ -7,10 +7,14 @@ import pg.gipter.producer.processor.DocumentFinderFactory;
 import pg.gipter.settings.ApplicationProperties;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
-class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
+class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
 
     ToolkitDocumentsDiffProducer(ApplicationProperties applicationProperties) {
         super(applicationProperties);
@@ -39,6 +43,29 @@ class ToolkitDocumentsDiffProducer extends DocumentsDiffProducer {
             if (applicationProperties.isDeleteDownloadedFiles()) {
                 deleteFiles(documents);
             }
+        }
+    }
+
+    private void zipDocumentsAndWriteToFile(List<File> documents) {
+        try (FileOutputStream fos = new FileOutputStream(applicationProperties.itemPath());
+             ZipOutputStream zipOut = new ZipOutputStream(fos)) {
+
+            for (File document : documents) {
+                FileInputStream fis = new FileInputStream(document);
+                ZipEntry zipEntry = new ZipEntry(document.getName());
+                zipOut.putNextEntry(zipEntry);
+
+                byte[] bytes = new byte[1024];
+                int length;
+                while ((length = fis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+                fis.close();
+            }
+        } catch (IOException ex) {
+            String errMsg = "Statement does not exists or it is not a file. Can not produce diff.";
+            logger.error(errMsg);
+            throw new IllegalArgumentException(errMsg, ex);
         }
     }
 

@@ -50,8 +50,6 @@ public class MainController extends AbstractController {
     private ComboBox<UploadType> uploadTypeComboBox;
     @FXML
     private CheckBox skipRemoteCheckBox;
-    @FXML
-    private TextField documentFiltersTextField;
 
     @FXML
     private TextField toolkitUsernameTextField;
@@ -206,6 +204,7 @@ public class MainController extends AbstractController {
 
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
+        endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
         activeteTrayCheckBox.setDisable(!uiLauncher.isTraySupported());
         autostartCheckBox.setDisable(!uiLauncher.isTraySupported());
         progressIndicator.setVisible(false);
@@ -217,7 +216,6 @@ public class MainController extends AbstractController {
         } else {
             deamonButton.setText(resources.getString("button.job"));
         }
-        documentFiltersTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.DOCUMENTS);
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -324,9 +322,6 @@ public class MainController extends AbstractController {
         }
         argList.add(ArgName.uploadType + "=" + uploadTypeComboBox.getValue());
         argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
-        if (!StringUtils.nullOrEmpty(documentFiltersTextField.getText())) {
-            argList.add(ArgName.documentFilters + "=" + documentFiltersTextField.getText());
-        }
 
         argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
         argList.add(ArgName.toolkitPassword + "=" + toolkitPasswordField.getText());
@@ -371,16 +366,24 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             projectPathButton.setDisable(uploadTypeComboBox.getValue() == UploadType.STATEMENT);
-            documentFiltersTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.DOCUMENTS);
-            if (uploadTypeComboBox.getValue() != UploadType.DOCUMENTS) {
-                documentFiltersTextField.clear();
-            }
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
                 toolkitProjectListNamesTextField.setDisable(false);
                 endDatePicker.setValue(LocalDate.now());
                 endDatePicker.setDisable(true);
+                authorsTextField.setDisable(true);
+                committerEmailTextField.setDisable(true);
+                gitAuthorTextField.setDisable(true);
+                svnAuthorTextField.setDisable(true);
+                mercurialAuthorTextField.setDisable(true);
+                skipRemoteCheckBox.setDisable(true);
             } else {
                 endDatePicker.setDisable(false);
+                authorsTextField.setDisable(false);
+                committerEmailTextField.setDisable(false);
+                gitAuthorTextField.setDisable(false);
+                svnAuthorTextField.setDisable(false);
+                mercurialAuthorTextField.setDisable(false);
+                skipRemoteCheckBox.setDisable(false);
             }
         };
     }

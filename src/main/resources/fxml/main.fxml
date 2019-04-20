@@ -15,7 +15,7 @@
                     <children>
                         <Label layoutX="9.0" layoutY="13.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
                         <TextField fx:id="authorsTextField" layoutX="129.0" layoutY="11.0" prefWidth="160.0" />
-                        <Label layoutX="9.0" layoutY="48.0" prefHeight="15.0" prefWidth="110.0" text="%csv.panel.committerEmail" />
+                        <Label layoutX="9.0" layoutY="48.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
                         <TextField fx:id="committerEmailTextField" layoutX="129.0" layoutY="46.0" prefWidth="160.0" />
                         <Label layoutX="9.0" layoutY="83.0" text="%csv.panel.gitAuthor" />
                         <TextField fx:id="gitAuthorTextField" layoutX="129.0" layoutY="81.0" prefWidth="160.0" />
@@ -89,21 +89,21 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="105.0" prefWidth="300.0">
                     <children>
                         <Label layoutX="10.0" layoutY="45.0" text="%launch.panel.confirmationWindow" />
-                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="195.0" layoutY="47.0" mnemonicParsing="false" />
+                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="199.0" layoutY="47.0" mnemonicParsing="false" />
                         <Label layoutX="10.0" layoutY="13.0" text="%launch.panel.preferredArgSource" />
-                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="195.0" layoutY="11.0" prefHeight="25.0" prefWidth="90.0" />
+                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="199.0" layoutY="11.0" prefHeight="25.0" prefWidth="90.0" />
                         <Label layoutX="10.0" layoutY="73.0" text="%launch.panel.useUI" />
-                        <CheckBox fx:id="useUICheckBox" layoutX="195.0" layoutY="75.0" mnemonicParsing="false" />
-                  <Label layoutX="10.0" layoutY="157.0" prefHeight="17.0" prefWidth="174.0" text="%launch.panel.saveCurrentConfiguration" />
+                        <CheckBox fx:id="useUICheckBox" layoutX="199.0" layoutY="75.0" mnemonicParsing="false" />
+                  <Label layoutX="10.0" layoutY="157.0" prefHeight="17.0" prefWidth="175.0" text="%launch.panel.saveCurrentConfiguration" />
                   <Label layoutX="10.0" layoutY="101.0" text="%launch.panel.activateTray" />
-                  <CheckBox fx:id="activeteTrayCheckBox" layoutX="195.0" layoutY="103.0" mnemonicParsing="false" />
-                  <Button fx:id="saveConfigurationButton" layoutX="195.0" layoutY="155.0" mnemonicParsing="false" prefWidth="56.0" text="%button.save">
+                  <CheckBox fx:id="activeteTrayCheckBox" layoutX="199.0" layoutY="103.0" mnemonicParsing="false" />
+                  <Button fx:id="saveConfigurationButton" layoutX="199.0" layoutY="155.0" mnemonicParsing="false" prefWidth="56.0" text="%button.save">
                      <font>
                         <Font name="System Bold" size="11.0" />
                      </font>
                   </Button>
                   <Label layoutX="10.0" layoutY="129.0" text="%launch.panel.autoStart" />
-                  <CheckBox fx:id="autostartCheckBox" layoutX="195.0" layoutY="131.0" mnemonicParsing="false" />
+                  <CheckBox fx:id="autostartCheckBox" layoutX="199.0" layoutY="131.0" mnemonicParsing="false" />
                     </children>
                 </AnchorPane>
             </content>

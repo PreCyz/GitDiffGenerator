@@ -103,7 +103,7 @@ public abstract class ApplicationProperties {
             fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
         }
         String extension = "txt";
-        if (uploadType() == UploadType.DOCUMENTS) {
+        if (uploadType() == UploadType.TOOLKIT_DOCS) {
             extension = "zip";
         }
         return fileName + "." + extension;
