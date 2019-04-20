@@ -375,7 +375,13 @@ public class MainController extends AbstractController {
             if (uploadTypeComboBox.getValue() != UploadType.DOCUMENTS) {
                 documentFiltersTextField.clear();
             }
-            toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
+            if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
+                toolkitProjectListNamesTextField.setDisable(false);
+                endDatePicker.setValue(LocalDate.now());
+                endDatePicker.setDisable(true);
+            } else {
+                endDatePicker.setDisable(false);
+            }
         };
     }
 

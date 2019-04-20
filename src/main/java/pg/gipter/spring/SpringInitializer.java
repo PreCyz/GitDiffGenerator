@@ -30,7 +30,7 @@ public final class SpringInitializer {
         return springContext;
     }
 
-    public static void setToolkitProperties(ConfigurableEnvironment environment, ApplicationProperties applicationProperties) {
+    static void setToolkitProperties(ConfigurableEnvironment environment, ApplicationProperties applicationProperties) {
         Properties toolkitProperties = new Properties();
         toolkitProperties.put("toolkit.username", applicationProperties.toolkitUsername());
         toolkitProperties.put("toolkit.password", applicationProperties.toolkitPassword());

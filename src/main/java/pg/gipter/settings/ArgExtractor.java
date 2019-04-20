@@ -153,6 +153,10 @@ final class ArgExtractor {
         return ArgName.toolkitUrl.defaultValue();
     }
 
+    String toolkitCopyCase() {
+        return ArgName.toolkitCopyCase.defaultValue();
+    }
+
     String toolkitListName() {
         return ArgName.toolkitCopyListName.defaultValue();
     }

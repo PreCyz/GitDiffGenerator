@@ -73,6 +73,10 @@ public abstract class ApplicationProperties {
         return argExtractor.toolkitWSUrl();
     }
 
+    public final String toolkitCopyCase() {
+        return argExtractor.toolkitCopyCase();
+    }
+
     public final boolean isToolkitCredentialsSet() {
         return !toolkitUsername().isEmpty() && !ArgName.toolkitUsername.defaultValue().equals(toolkitUsername()) &&
                 !toolkitPassword().isEmpty() && !ArgName.toolkitPassword.defaultValue().equals(toolkitPassword());

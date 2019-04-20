@@ -1,6 +1,7 @@
 package pg.gipter.producer.processor;
 
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.util.concurrent.Callable;
 
