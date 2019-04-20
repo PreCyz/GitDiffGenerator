@@ -205,6 +205,12 @@ public class MainController extends AbstractController {
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
         endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        authorsTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        committerEmailTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        gitAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        svnAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        mercurialAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        skipRemoteCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
         activeteTrayCheckBox.setDisable(!uiLauncher.isTraySupported());
         autostartCheckBox.setDisable(!uiLauncher.isTraySupported());
         progressIndicator.setVisible(false);
