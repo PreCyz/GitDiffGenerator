@@ -8,8 +8,8 @@
         <TableView fx:id="projectsTableView" layoutX="14.0" layoutY="14.0" prefHeight="330.0" prefWidth="649.0">
             <columns>
                 <TableColumn editable="false" prefWidth="161.0" sortable="false" text="%projects.column.name" />
-                <TableColumn editable="false" prefWidth="103.0" sortable="false" text="%projects.column.vcsType" />
-                <TableColumn editable="false" prefWidth="382.0" sortable="false" text="%projects.column.path" />
+                <TableColumn editable="false" prefWidth="123.0" sortable="false" text="%projects.column.vcsType" />
+                <TableColumn editable="false" prefWidth="361.0" sortable="false" text="%projects.column.path" />
             </columns>
         </TableView>
         <Button fx:id="searchProjectsButton" layoutX="14.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" text="%projects.button.search" textFill="#32a1c9">
