@@ -15,20 +15,18 @@
                     <children>
                         <Label layoutX="9.0" layoutY="13.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
                         <TextField fx:id="authorsTextField" layoutX="129.0" layoutY="11.0" prefWidth="160.0" />
-                        <Label layoutX="9.0" layoutY="48.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
-                        <TextField fx:id="committerEmailTextField" layoutX="129.0" layoutY="46.0" prefWidth="160.0" />
-                        <Label layoutX="9.0" layoutY="83.0" text="%csv.panel.gitAuthor" />
-                        <TextField fx:id="gitAuthorTextField" layoutX="129.0" layoutY="81.0" prefWidth="160.0" />
-                        <TextField fx:id="mercurialAuthorTextField" layoutX="129.0" layoutY="116.0" prefWidth="160.0" />
-                        <Label layoutX="9.0" layoutY="118.0" text="%csv.panel.mercurialAuthor" />
-                        <TextField fx:id="svnAuthorTextField" layoutX="129.0" layoutY="151.0" prefWidth="160.0" />
-                        <Label layoutX="9.0" layoutY="153.0" text="%csv.panel.svnAuthor" />
-                        <Label layoutX="10.0" layoutY="214.0" text="%csv.panel.uploadType" />
-                        <ComboBox fx:id="uploadTypeComboBox" layoutX="129.0" layoutY="212.0" prefWidth="160.0" />
-                        <CheckBox fx:id="skipRemoteCheckBox" layoutX="129.0" layoutY="185.0" mnemonicParsing="false" />
-                        <Label layoutX="10.0" layoutY="183.0" text="%csv.panel.skipRemote" />
-                  <TextField fx:id="documentFiltersTextField" layoutX="129.0" layoutY="246.0" prefWidth="160.0" />
-                  <Label layoutX="10.0" layoutY="248.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.documentFilters" />
+                        <Label layoutX="9.0" layoutY="52.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
+                        <TextField fx:id="committerEmailTextField" layoutX="129.0" layoutY="49.0" prefWidth="160.0" />
+                        <Label layoutX="9.0" layoutY="90.0" text="%csv.panel.gitAuthor" />
+                        <TextField fx:id="gitAuthorTextField" layoutX="129.0" layoutY="87.0" prefWidth="160.0" />
+                        <TextField fx:id="mercurialAuthorTextField" layoutX="129.0" layoutY="125.0" prefWidth="160.0" />
+                        <Label layoutX="9.0" layoutY="128.0" text="%csv.panel.mercurialAuthor" />
+                        <TextField fx:id="svnAuthorTextField" layoutX="129.0" layoutY="163.0" prefWidth="160.0" />
+                        <Label layoutX="9.0" layoutY="166.0" text="%csv.panel.svnAuthor" />
+                        <Label layoutX="10.0" layoutY="233.0" text="%csv.panel.uploadType" />
+                        <ComboBox fx:id="uploadTypeComboBox" layoutX="129.0" layoutY="230.0" prefWidth="160.0" />
+                        <CheckBox fx:id="skipRemoteCheckBox" layoutX="129.0" layoutY="201.0" mnemonicParsing="false" />
+                        <Label layoutX="10.0" layoutY="200.0" text="%csv.panel.skipRemote" />
                     </children>
                 </AnchorPane>
             </content>
@@ -124,17 +122,17 @@
                         <Label layoutX="10.0" layoutY="220.0" text="%toolkit.panel.userFolder" />
                   <TextField fx:id="toolkitUsernameTextField" layoutX="107.0" layoutY="7.0" />
                   <PasswordField fx:id="toolkitPasswordField" layoutX="107.0" layoutY="42.0" />
-                  <TextField fx:id="toolkitDomainTextField" layoutX="107.0" layoutY="78.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
-                  <TextField fx:id="toolkitListNameTextField" layoutX="107.0" layoutY="113.0" style="-fx-background-color: #e5e5e5;" />
-                  <TextField fx:id="toolkitUrlTextField" layoutX="107.0" layoutY="148.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <TextField fx:id="toolkitDomainTextField" layoutX="107.0" layoutY="77.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitListNameTextField" layoutX="107.0" layoutY="112.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitUrlTextField" layoutX="107.0" layoutY="147.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
-                  <TextField fx:id="toolkitWSTextField" layoutX="107.0" layoutY="183.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <TextField fx:id="toolkitWSTextField" layoutX="107.0" layoutY="182.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
-                  <TextField fx:id="toolkitUserFolderTextField" layoutX="107.0" layoutY="218.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <TextField fx:id="toolkitUserFolderTextField" layoutX="107.0" layoutY="217.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
@@ -147,7 +145,7 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-      <ComboBox fx:id="languageComboBox" layoutX="11.0" layoutY="764.0" prefWidth="65.0" />
+      <ComboBox fx:id="languageComboBox" layoutX="11.0" layoutY="764.0" prefWidth="70.0" />
       <Button fx:id="deamonButton" layoutX="452.0" layoutY="764.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
          <font>
             <Font name="System Bold" size="13.0" />
