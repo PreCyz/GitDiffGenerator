@@ -35,7 +35,8 @@ If there are _application.properties_ file at the same location as your jar file
 If program is executed with commandline parameters and _application.properties_ file at the same time, then setup from commandline has higher priority. Unless `preferredArgSource` is set to `FILE`, then _application.properties_ has higher priority.<br />
 Generated file name by default is `year-monthName-week-weekNumber.txt`. If diff is generated with end date set in the past then diff file name is `year-monthName-startDate-endDate.txt`.
 If parameter _itemFileNamePrefix_ is set then its value is added at the front of the file name. File name (without extension) is used also as the title of the toolkit item, that is created.<br />
-You can pass some parameters commandline way and other _application.properties_ way. For instance if you do not want to set your password in _application.properties_, you can pass it as commandline param.
+You can pass some parameters commandline way and other _application.properties_ way. For instance if you do not want to set your password in _application.properties_, you can pass it as commandline param.<br/>
+When application is executed with `uploadType = TOOLKIT_DOCS', then item file is a _zip_ file. It is because there could be more then one document created or changed by the user. 
 ### Params description
 **author** - comma separated users who committed the code.<br />
 **committerEmail** - email of the user who committed the code. For git user email from git config stored under key '_user.email_'.<br />
@@ -53,20 +54,63 @@ You can pass some parameters commandline way and other _application.properties_ 
 **preferredArgSource** - if parameter set as `FILE` then arguments from _application.properties_ will be resolved as first. Default value is `CLI`. This parameter can be changed only from command line.<br />
 **skipRemote** - if parameter set as `N` then git diff will be generated only from origin (`--remotes=origin`). If set as `Y` then git diff will be generated only from local git repository. Default value is `Y`.<br />
 **useUI** - if parameter set as `N` application will be launched in command line mode. If set as `Y` then UI mode is launched. Default value is `Y`.<br />
+**activeTray** - used in UI, tells if tray icon should be active or not. Default value is `Y`.<br/>
+**silentMode** - used in UI, tells if application should be executed and located directly in tray icon. It is used by startup functionality. Default value is `N`.<br/>
+**enableOnStartup** - used in UI, enables application on system start up, if value on  is `Y` then application will be launched on system start.<br/>
 
 Below parameters are mandatory for toolkit:<br/>
 **toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
 **toolkitPassword** - user password used to log in into SharePoint.<br /><br />
+**toolkitProjectListNames** - comma separated names of the folders to scan on toolkit, when looking for changes in documents made by user. Default value is `Deliverables`.<br/>
+**deleteDownloadedFiles** - if `Y` then all downloaded files from toolkit will be downloaded afterwards. This parameter works together with upload type `TOOLKIT_DOCS`<br/>
 
 _Note:_ When `periodInDays` is used together with `startDate` then **startDate** has higher priority.
 ### Explanation of *uploadType* parameter
 * `SIMPLE` - full git diff is generated and uploaded,
 * `PROTECTED` - no code can not be shared in anyway but diff can contain headers of changes, 
 * `STATEMENT` - not even headers of changes are allowed in diff. File with statement is uploaded to SharePoint instead.
-* `DOCUMENTS` - several documents zipped to one file and uploaded to SharePoint.
+* `TOOLKIT_DOCS` - scanning given project documentation to find documents that were changed by the user.
 ### Explanation of *preferredArgSource* parameter
 * `CLI` - commandLine arguments will be used as first then missing parameters will be read from _application.properties_,
 * `FILE` - arguments from _application.properties_ will be used as first then missing parameters will be read from commandLine arguments.
+* `UI` - it is used by the UI. Arguments from _ui-application.properties_ will be used as first then missing parameters will be read from commandLine arguments.
+### Explanation of *TOOLKIT_DOCS* upload type
+This option should be used by the users that do not create code, but work with project documentation. If this is the case then copyright items are created from documentations produced by the user.<br/> 
+How the application handles such a case? Documentation of the project is kept on SharePoint in different folders. In order to extract the changes from these documents made by the user,<br/>
+application will scan the documents from given folders within given date range (_startDate and endDate_). Because of the nature of SharePoint, the produced item will consist pair of documents before and after the change made by the user.<br/>
+The example will explain what exactly item consists.
+#####
+**Toolkit docs Case**<br />
+The user is Yoda. Documents are located in 2 folders: _Deliverables_ and _DocumentLibrary_. We want to generate item for date range `now - 30 days` and `now`. The history of documents is as follows:<br/>
+<br/>Deliverable-doc:<br/>
+
+Modified by | Date | Version
+----------- | ---- | -------
+Yoda | now - 40 days | 1.0
+Kit Fisto | now - 35 days | 2.0
+Yoda | now - 25 days | 3.0
+Yoda | now - 15 days | 4.0
+Obi-Wan Kenobi | now - 13 days | 5.0
+Obi-Wan Kenobi | now - 12 days | 6.0
+Yoda | now - 2 days | 7.0
+Ashoka Tano | now - 1 days | 9.0
+
+<br/>DocumentLibrary-doc:<br/>
+
+Modified by | Date | Version
+----------- | ---- | -------
+Mace Windu | now - 15 days | 1.0
+Kit Fisto | now - 14 days | 2.0
+Ashoka Tano | now - 6 days | 3.0
+Anakin Skywalker| now - 5 days | 4.0
+Shak Ti | now - 4 days | 5.0
+Obi-Wan Kenobi | now - 3 days | 6.0
+Yoda | now - 2 days | 7.0
+
+The item will contains following documents:
+_Deliverable-doc-2.0, Deliverable-doc-4.0, Deliverable-doc-6.0, Deliverable-doc-7.0_ - all document before change and Yoda's last change.<br/>
+_DocumentLibrary-doc-6.0, DocumentLibrary-doc-7.0_ - document before Yoda's change and the last change made by Yoda.
+All this files will be zipped into one file and uploaded as one item. 
 #####
 **Case 1**<br />
 It may be that owner of the code forbids to share the code in anyway but you are allowed to put headers of the changes in the diff.
