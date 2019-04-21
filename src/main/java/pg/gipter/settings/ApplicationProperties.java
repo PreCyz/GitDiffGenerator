@@ -146,7 +146,6 @@ public abstract class ApplicationProperties {
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
                 ", uploadType='" + uploadType() + '\'' +
-                ", documentFilters='" + String.join(",", documentFilters()) + '\'' +
                 ", preferredArgSource='" + preferredArgSource() + '\'' +
                 ", skipRemote='" + isSkipRemote() + '\'' +
                 ", useUI='" + isUseUI() + '\'' +
@@ -185,7 +184,6 @@ public abstract class ApplicationProperties {
     public abstract boolean isSkipRemote();
     public abstract boolean isUseUI();
     public abstract boolean isActiveTray();
-    public abstract Set<String> documentFilters();
     public abstract boolean isDeleteDownloadedFiles();
     public abstract boolean isEnableOnStartup();
 }

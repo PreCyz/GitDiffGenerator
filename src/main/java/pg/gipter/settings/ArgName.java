@@ -15,7 +15,6 @@ public enum ArgName {
     committerEmail(""),
     uploadType(UploadType.SIMPLE.name()),
     skipRemote("Y"),
-    documentFilters(""),
 
     itemPath("NO_ITEM_PATH_GIVEN"),
     projectPath("NO_PROJECT_PATH_GIVEN"),

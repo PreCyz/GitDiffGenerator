@@ -715,28 +715,6 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenDocumentFilters_whenDocumentFilters_then_returnSetWithThatDocumentFilters() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"documentFilters=Proj1"});
-
-        Set<String> actual = appProps.documentFilters();
-
-        assertThat(actual).containsExactly("Proj1");
-    }
-
-    @Test
-    void givenDocumentFiltersFromPropertiesAndCommandLine_whenDocumentFilters_thenReturnSetWithDocumentFiltersFromProperties() {
-        String[] args = {"documentFilters=Proj1,Proj2"};
-        Properties props = new Properties();
-        props.put("documentFilters", "Proj3");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        Set<String> actual = appProps.documentFilters();
-
-        assertThat(actual).containsExactly("Proj3");
-    }
-
-    @Test
     void givenToolkitProjectListNames_whenToolkitProjectListNames_thenReturnSetWithThatToolkitProjectListNames() {
         appProps = new FilePreferredApplicationProperties(new String[]{"toolkitProjectListNames=name1"});
 

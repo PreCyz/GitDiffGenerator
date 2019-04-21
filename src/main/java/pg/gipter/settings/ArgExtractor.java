@@ -205,16 +205,6 @@ final class ArgExtractor {
         return StringUtils.getBoolean(ArgName.silentMode.defaultValue());
     }
 
-    Set<String> documentFilters() {
-        String[] documentFilters = new String[]{ArgName.documentFilters.defaultValue()};
-        if (containsArg(ArgName.documentFilters.name())) {
-            documentFilters = getValue(ArgName.documentFilters, ArgName.documentFilters.defaultValue()).split(",");
-        }
-        return Arrays.stream(documentFilters)
-                .filter(value -> !value.isEmpty())
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
     Set<String> toolkitProjectListNames() {
         String[] projectPaths = new String[]{ArgName.toolkitProjectListNames.defaultValue()};
         if (containsArg(ArgName.toolkitProjectListNames.name())) {
