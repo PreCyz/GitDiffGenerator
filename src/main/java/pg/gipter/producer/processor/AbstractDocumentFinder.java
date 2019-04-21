@@ -37,6 +37,9 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
 
     List<DocumentDetails> convertToDocumentDetails(JsonObject object) {
         JsonObject d = object.getAsJsonObject("d");
+        if (d == null) {
+            return Collections.emptyList();
+        }
         JsonArray results = d.getAsJsonArray("results");
         List<DocumentDetails> result = new ArrayList<>(results.size());
         for (int i = 0; i < results.size(); i++) {

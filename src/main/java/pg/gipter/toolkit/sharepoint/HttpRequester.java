@@ -52,6 +52,7 @@ public class HttpRequester {
             logger.info("Response {}", response.getStatusLine());
             Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
             JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+            logIfError(result);
             EntityUtils.consume(response.getEntity());
             return result;
         }
