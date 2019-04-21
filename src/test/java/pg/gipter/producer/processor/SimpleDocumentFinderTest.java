@@ -2,7 +2,6 @@ package pg.gipter.producer.processor;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
@@ -12,7 +11,10 @@ import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.utils.StringUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,30 +65,6 @@ class SimpleDocumentFinderTest {
                 .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
         assertThat(filesToDownload.get("3.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
                 .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-    }
-
-    @Test
-    @Disabled
-    void givenCustomItems_whenDownload_thenReturnDownload() throws IOException {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{
-                        ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
-                        ArgName.startDate + "=2019-02-25",
-                        ArgName.endDate + "=2019-04-06",
-                        ArgName.toolkitUsername + "=pawg",
-                        ArgName.toolkitPassword + "=JanuarY12!@",
-                        ArgName.itemPath + "=/home/gawa/IdeaProjects/GitDiffGenerator/src/test/java/resources/xml",
-                        ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
-                }
-        );
-        finder = new SimpleDocumentFinder(applicationProperties);
-        JsonObject js = getJsonObject("customItem.json");
-        List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
-        Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
-
-        List<File> actual = finder.downloadDocuments(filesToDownload);
-
-        assertThat(actual).hasSize(2);
     }
 
     @Test
