@@ -87,7 +87,7 @@ class TrayHandler {
                 addSeparator = true;
             }
             if (data.get().containsKey(JobProperty.NEXT_FIRE_DATE.value()) &&
-                    StringUtils.nullOrEmpty(data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value(), ""))) {
+                    !StringUtils.nullOrEmpty(data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value(), ""))) {
                 popupMenu.add(BundleUtils.getMsg(
                         "tray.item.nextUpdate",
                         data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value())
