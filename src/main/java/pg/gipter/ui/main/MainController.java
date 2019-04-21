@@ -12,6 +12,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import pg.gipter.producer.command.UploadType;
+import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -49,8 +50,6 @@ public class MainController extends AbstractController {
     private ComboBox<UploadType> uploadTypeComboBox;
     @FXML
     private CheckBox skipRemoteCheckBox;
-    @FXML
-    private TextField documentFiltersTextField;
 
     @FXML
     private TextField toolkitUsernameTextField;
@@ -67,9 +66,7 @@ public class MainController extends AbstractController {
     @FXML
     private TextField toolkitUserFolderTextField;
     @FXML
-    private CheckBox customFolderCheckBox;
-    @FXML
-    private TextField toolkitCustomFolderTextField;
+    private TextField toolkitProjectListNamesTextField;
 
     @FXML
     private Label projectPathLabel;
@@ -97,6 +94,8 @@ public class MainController extends AbstractController {
     private CheckBox useUICheckBox;
     @FXML
     private CheckBox activeteTrayCheckBox;
+    @FXML
+    private CheckBox autostartCheckBox;
     @FXML
     private Button saveConfigurationButton;
 
@@ -146,12 +145,11 @@ public class MainController extends AbstractController {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
         toolkitPasswordField.setText(applicationProperties.toolkitPassword());
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
-        toolkitListNameTextField.setText(applicationProperties.toolkitListName());
+        toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
         toolkitUrlTextField.setText(applicationProperties.toolkitUrl());
         toolkitWSTextField.setText(applicationProperties.toolkitWSUrl());
         toolkitUserFolderTextField.setText(applicationProperties.toolkitUserFolder());
-        toolkitCustomFolderTextField.setText(applicationProperties.toolkitCustomUserFolder());
-        customFolderCheckBox.setSelected(!StringUtils.nullOrEmpty(applicationProperties.toolkitCustomUserFolder()));
+        toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
 
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
@@ -159,8 +157,8 @@ public class MainController extends AbstractController {
         itemPathLabel.setText(itemPath);
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
 
-        startDatePicker.setValue(applicationProperties.startDate());
-        endDatePicker.setValue(applicationProperties.endDate());
+        startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
+        endDatePicker.setValue(LocalDate.now());
         periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
 
         confirmationWindowCheckBox.setSelected(applicationProperties.isConfirmationWindow());
@@ -168,6 +166,7 @@ public class MainController extends AbstractController {
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
         activeteTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
+        autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
 
         languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
         if (StringUtils.nullOrEmpty(currentLanguage)) {
@@ -188,13 +187,7 @@ public class MainController extends AbstractController {
         toolkitUrlTextField.setEditable(false);
         toolkitWSTextField.setEditable(false);
         toolkitUserFolderTextField.setEditable(false);
-        toolkitCustomFolderTextField.setDisable(StringUtils.nullOrEmpty(applicationProperties.toolkitCustomUserFolder()));
-        Tooltip tooltip = new Tooltip();
-        tooltip.setTextAlignment(TextAlignment.LEFT);
-        tooltip.setFont(Font.font("Courier New", 14));
-        tooltip.setText(resources.getString("toolkit.panel.customUserFolderToolitp"));
-        toolkitCustomFolderTextField.setTooltip(tooltip);
-        customFolderCheckBox.setTooltip(tooltip);
+        toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
 
         if (applicationProperties.projectPaths().isEmpty()) {
             projectPathButton.setText(resources.getString("button.add"));
@@ -211,7 +204,15 @@ public class MainController extends AbstractController {
 
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
+        endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        authorsTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        committerEmailTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        gitAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        svnAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        mercurialAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+        skipRemoteCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
         activeteTrayCheckBox.setDisable(!uiLauncher.isTraySupported());
+        autostartCheckBox.setDisable(!uiLauncher.isTraySupported());
         progressIndicator.setVisible(false);
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
@@ -221,7 +222,6 @@ public class MainController extends AbstractController {
         } else {
             deamonButton.setText(resources.getString("button.job"));
         }
-        documentFiltersTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.DOCUMENTS);
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -328,14 +328,11 @@ public class MainController extends AbstractController {
         }
         argList.add(ArgName.uploadType + "=" + uploadTypeComboBox.getValue());
         argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
-        if (!StringUtils.nullOrEmpty(documentFiltersTextField.getText())) {
-            argList.add(ArgName.documentFilters + "=" + documentFiltersTextField.getText());
-        }
 
         argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
         argList.add(ArgName.toolkitPassword + "=" + toolkitPasswordField.getText());
-        if (!StringUtils.nullOrEmpty(toolkitCustomFolderTextField.getText())) {
-            argList.add(ArgName.toolkitCustomUserFolder + "=" + toolkitCustomFolderTextField.getText());
+        if (!StringUtils.nullOrEmpty(toolkitProjectListNamesTextField.getText())) {
+            argList.add(ArgName.toolkitProjectListNames + "=" + toolkitProjectListNamesTextField.getText());
         }
 
         argList.add(ArgName.projectPath + "=" + projectPathLabel.getText());
@@ -359,6 +356,7 @@ public class MainController extends AbstractController {
         argList.add(ArgName.preferredArgSource + "=" + PreferredArgSource.UI);
         argList.add(ArgName.useUI + "=" + useUICheckBox.isSelected());
         argList.add(ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected());
+        argList.add(ArgName.enableOnStartup + "=" + autostartCheckBox.isSelected());
 
         return argList.toArray(new String[0]);
     }
@@ -374,9 +372,24 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             projectPathButton.setDisable(uploadTypeComboBox.getValue() == UploadType.STATEMENT);
-            documentFiltersTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.DOCUMENTS);
-            if (uploadTypeComboBox.getValue() != UploadType.DOCUMENTS) {
-                documentFiltersTextField.clear();
+            if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
+                toolkitProjectListNamesTextField.setDisable(false);
+                endDatePicker.setValue(LocalDate.now());
+                endDatePicker.setDisable(true);
+                authorsTextField.setDisable(true);
+                committerEmailTextField.setDisable(true);
+                gitAuthorTextField.setDisable(true);
+                svnAuthorTextField.setDisable(true);
+                mercurialAuthorTextField.setDisable(true);
+                skipRemoteCheckBox.setDisable(true);
+            } else {
+                endDatePicker.setDisable(false);
+                authorsTextField.setDisable(false);
+                committerEmailTextField.setDisable(false);
+                gitAuthorTextField.setDisable(false);
+                svnAuthorTextField.setDisable(false);
+                mercurialAuthorTextField.setDisable(false);
+                skipRemoteCheckBox.setDisable(false);
             }
         };
     }
@@ -450,6 +463,7 @@ public class MainController extends AbstractController {
                         }
                 );
 
+        final StartupService startupService = new StartupService();
         activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 deamonButton.setText(resources.getString("button.deamon"));
@@ -457,41 +471,24 @@ public class MainController extends AbstractController {
                 uiLauncher.setApplicationProperties(uiAppProperties);
                 uiLauncher.initTrayHandler();
                 uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
+                autostartCheckBox.setDisable(false);
             } else {
                 deamonButton.setText(resources.getString("button.job"));
                 uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
                 uiLauncher.removeTray();
+                autostartCheckBox.setDisable(true);
+                autostartCheckBox.setSelected(false);
+                startupService.disableStartOnStartup();
             }
         });
 
-        toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (StringUtils.nullOrEmpty(toolkitCustomFolderTextField.getText())) {
-                setToolkitUserFolder(newValue);
+        autostartCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                startupService.startOnStartup();
+            } else {
+                startupService.disableStartOnStartup();
             }
         });
-
-        toolkitCustomFolderTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            setToolkitUserFolder(toolkitUsernameTextField.getText());
-            if (!StringUtils.nullOrEmpty(newValue)) {
-                setToolkitUserFolder(newValue);
-            }
-        });
-
-        customFolderCheckBox.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (!newValue) {
-                        setToolkitUserFolder(toolkitUsernameTextField.getText());
-                        toolkitCustomFolderTextField.setText("");
-                    }
-                    toolkitCustomFolderTextField.setDisable(oldValue);
-                }
-        );
-    }
-
-    private void setToolkitUserFolder(String newValue) {
-        String userFolder = toolkitUserFolderTextField.getText();
-        userFolder = userFolder.substring(0, userFolder.lastIndexOf("/") + 1) + newValue;
-        toolkitUserFolderTextField.setText(userFolder);
     }
 
 }

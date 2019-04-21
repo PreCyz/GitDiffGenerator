@@ -50,4 +50,14 @@ class UIPreferredApplicationProperties extends CliPreferredApplicationProperties
         return activeTray;
     }
 
+    @Override
+    public boolean isEnableOnStartup() {
+        boolean enableOnStartup = argExtractor.isEnableOnStartup();
+        String argName = ArgName.enableOnStartup.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            enableOnStartup = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(enableOnStartup)));
+        }
+        return enableOnStartup;
+    }
+
 }

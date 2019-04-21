@@ -18,7 +18,7 @@ import static pg.gipter.utils.PropertiesHelper.APPLICATION_PROPERTIES;
 public abstract class ApplicationProperties {
 
     protected final Logger logger;
-    public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ISO_DATE;
 
     protected Properties properties;
     protected final ArgExtractor argExtractor;
@@ -73,6 +73,10 @@ public abstract class ApplicationProperties {
         return argExtractor.toolkitWSUrl();
     }
 
+    public final String toolkitCopyCase() {
+        return argExtractor.toolkitCopyCase();
+    }
+
     public final boolean isToolkitCredentialsSet() {
         return !toolkitUsername().isEmpty() && !ArgName.toolkitUsername.defaultValue().equals(toolkitUsername()) &&
                 !toolkitPassword().isEmpty() && !ArgName.toolkitPassword.defaultValue().equals(toolkitPassword());
@@ -99,7 +103,7 @@ public abstract class ApplicationProperties {
             fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
         }
         String extension = "txt";
-        if (uploadType() == UploadType.DOCUMENTS) {
+        if (uploadType() == UploadType.TOOLKIT_DOCS) {
             extension = "zip";
         }
         return fileName + "." + extension;
@@ -152,9 +156,9 @@ public abstract class ApplicationProperties {
                 ", toolkitUrl='" + toolkitUrl() + '\'' +
                 ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                 ", toolkitDomain='" + toolkitDomain() + '\'' +
-                ", toolkitListName='" + toolkitListName() + '\'' +
+                ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
                 ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
-                ", toolkitCustomUserFolder='" + toolkitCustomUserFolder() + '\''
+                ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\''
                 ;
     }
 
@@ -175,11 +179,13 @@ public abstract class ApplicationProperties {
     public abstract String toolkitPassword();
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
-    public abstract String toolkitCustomUserFolder();
-    public abstract String toolkitListName();
+    public abstract String toolkitCopyListName();
+    public abstract Set<String> toolkitProjectListNames();
     public abstract String toolkitUrl();
     public abstract boolean isSkipRemote();
     public abstract boolean isUseUI();
     public abstract boolean isActiveTray();
     public abstract Set<String> documentFilters();
+    public abstract boolean isDeleteDownloadedFiles();
+    public abstract boolean isEnableOnStartup();
 }

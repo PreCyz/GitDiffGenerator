@@ -318,15 +318,6 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_uploadTypeSetAsDocuments_when_codeProtection_then_returnEnum() {
-        argExtractor = new ArgExtractor(new String[]{"uploadType=documeNTS"});
-
-        UploadType actual = argExtractor.uploadType();
-
-        assertThat(actual).isEqualTo(UploadType.DOCUMENTS);
-    }
-
-    @Test
     void given_noToolkitUsername_when_toolkitUsername_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
@@ -386,7 +377,12 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+    }
+
+    @Test
+    void whenToolkitCopyCaseDefaultValue_thenReturnNCopyCase() {
+        assertThat(ArgName.toolkitCopyCase.defaultValue()).isEqualTo("/cases/GTE106/NCSCOPY");
     }
 
     @Test
@@ -395,7 +391,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
     }
 
     @Test
@@ -427,7 +423,7 @@ class ArgExtractorTest {
 
     @Test
     void given_toolkitListNameFromCommandLine_when_toolkitListName_then_returnDefaultListName() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitListName=sthElse"});
+        argExtractor = new ArgExtractor(new String[]{"toolkitCopyListName=sthElse"});
 
         String actual = argExtractor.toolkitListName();
 
@@ -542,15 +538,6 @@ class ArgExtractorTest {
         String actual = argExtractor.toolkitUserFolder();
 
         assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "XXX");
-    }
-
-    @Test
-    void givenCustomUserFolderAndToolkitUserName_whenToolkitUserFolder_thenReturnDefault() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitUsername=XXX", "toolkitCustomUserFolder=aaa"});
-
-        String actual = argExtractor.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
     }
 
     @Test

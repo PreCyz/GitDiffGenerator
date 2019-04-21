@@ -153,8 +153,12 @@ final class ArgExtractor {
         return ArgName.toolkitUrl.defaultValue();
     }
 
+    String toolkitCopyCase() {
+        return ArgName.toolkitCopyCase.defaultValue();
+    }
+
     String toolkitListName() {
-        return ArgName.toolkitListName.defaultValue();
+        return ArgName.toolkitCopyListName.defaultValue();
     }
 
     String toolkitWSUrl() {
@@ -162,18 +166,7 @@ final class ArgExtractor {
     }
 
     String toolkitUserFolder() {
-        String userFolder = toolkitCustomUserFolder();
-        if (StringUtils.nullOrEmpty(userFolder)) {
-            userFolder = toolkitUsername();
-        }
-        return ArgName.toolkitUserFolder.defaultValue() + userFolder;
-    }
-
-    String toolkitCustomUserFolder() {
-        if (containsArg(ArgName.toolkitCustomUserFolder.name())) {
-            return getValue(ArgName.toolkitCustomUserFolder, ArgName.toolkitCustomUserFolder.defaultValue()).toUpperCase();
-        }
-        return ArgName.toolkitCustomUserFolder.defaultValue();
+        return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
     }
 
     PreferredArgSource preferredArgSource() {
@@ -220,5 +213,27 @@ final class ArgExtractor {
         return Arrays.stream(documentFilters)
                 .filter(value -> !value.isEmpty())
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    Set<String> toolkitProjectListNames() {
+        String[] projectPaths = new String[]{ArgName.toolkitProjectListNames.defaultValue()};
+        if (containsArg(ArgName.toolkitProjectListNames.name())) {
+            projectPaths = getValue(ArgName.toolkitProjectListNames, ArgName.toolkitProjectListNames.defaultValue()).split(",");
+        }
+        return new LinkedHashSet<>(Arrays.asList(projectPaths));
+    }
+
+    boolean isDeleteDownloadedFiles() {
+        if (containsArg(ArgName.deleteDownloadedFiles.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.deleteDownloadedFiles, ArgName.deleteDownloadedFiles.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.deleteDownloadedFiles.defaultValue());
+    }
+
+    boolean isEnableOnStartup() {
+        if (containsArg(ArgName.enableOnStartup.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.enableOnStartup, ArgName.enableOnStartup.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.enableOnStartup.defaultValue());
     }
 }

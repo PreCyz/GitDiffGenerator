@@ -7,23 +7,15 @@ import pg.gipter.utils.PropertiesHelper;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static pg.gipter.TestUtils.mockPropertiesLoader;
 
 class CliPreferredApplicationPropertiesTest {
 
     private CliPreferredApplicationProperties applicationProperties;
-
-    private PropertiesHelper mockPropertiesLoader(Properties properties) {
-        PropertiesHelper loader = mock(PropertiesHelper.class);
-        when(loader.loadApplicationProperties()).thenReturn(Optional.of(properties));
-        return loader;
-    }
 
     @Test
     void given_noAuthor_when_author_then_returnDefault() {
@@ -950,7 +942,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
     }
 
     @Test
@@ -961,7 +953,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
     }
 
     @Test
@@ -974,7 +966,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
     }
 
     @Test
@@ -1007,7 +999,7 @@ class CliPreferredApplicationPropertiesTest {
     void given_noToolkitListName_when_toolkitListName_then_returnDefault() {
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("WorkItems");
     }
@@ -1015,23 +1007,23 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void given_toolkitListNameFromCLI_when_toolkitListName_then_returnDefault() {
         applicationProperties = new CliPreferredApplicationProperties(
-                new String[]{"toolkitListName=cliListName"}
+                new String[]{"toolkitCopyListName=cliListName"}
         );
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("WorkItems");
     }
 
     @Test
     void given_toolkitListNameFileAndCLI_when_toolkitListName_then_returnDefault() {
-        String[] args = {"toolkitListName=cliListName"};
+        String[] args = {"toolkitCopyListName=cliListName"};
         Properties props = new Properties();
-        props.put("toolkitListName", "propertiesListName");
+        props.put("toolkitCopyListName", "propertiesListName");
         applicationProperties = new CliPreferredApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("WorkItems");
     }
@@ -1040,11 +1032,11 @@ class CliPreferredApplicationPropertiesTest {
     void given_toolkitListNameFromProperties_when_toolkitListName_then_returnToolkitListNameFromProperties() {
         String[] args = {};
         Properties props = new Properties();
-        props.put("toolkitListName", "propertiesListName");
+        props.put("toolkitCopyListName", "propertiesListName");
         applicationProperties = new CliPreferredApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("propertiesListName");
     }
@@ -1053,11 +1045,11 @@ class CliPreferredApplicationPropertiesTest {
     void given_toolkitListNameFromPropertiesAndOtherArgs_when_toolkitListName_then_returnToolkitListNameFromProperties() {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
-        props.put("toolkitListName", "propertiesListName");
+        props.put("toolkitCopyListName", "propertiesListName");
         applicationProperties = new CliPreferredApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
-        String actual = applicationProperties.toolkitListName();
+        String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("propertiesListName");
     }
@@ -1349,29 +1341,6 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenToolkitUserCliAndCliCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomFolder() {
-        String[] args = {"toolkitCustomUserFolder=qqq", "toolkitUsername=aaa"};
-        applicationProperties = new CliPreferredApplicationProperties(args);
-
-        String actual = applicationProperties.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "QQQ");
-    }
-
-    @Test
-    void givenNoToolkitUserCliAndCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomUserFolder() {
-        String[] args = {"toolkitCustomUserFolder=qqq"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        applicationProperties = new CliPreferredApplicationProperties(args);
-        applicationProperties.init(args, mockPropertiesLoader(props));
-
-        String actual = applicationProperties.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "QQQ");
-    }
-
-    @Test
     void givenToolkitUserCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomUserFolder() {
         String[] args = {"toolkitUsername=qqq"};
         Properties props = new Properties();
@@ -1382,52 +1351,6 @@ class CliPreferredApplicationPropertiesTest {
         String actual = applicationProperties.toolkitUserFolder();
 
         assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "QQQ");
-    }
-
-    @Test
-    void givenCliCustomUserFolder_whenToolkitCustomUserFolder_thenReturnCLICustomUserFolder() {
-        String[] args = {"toolkitCustomUserFolder=qqq"};
-        applicationProperties = new CliPreferredApplicationProperties(args);
-
-        String actual = applicationProperties.toolkitCustomUserFolder();
-
-        assertThat(actual).isEqualTo("QQQ");
-    }
-
-    @Test
-    void givenNoCliCustomUserFolder_whenToolkitCustomUserFolder_thenReturnEmptyString() {
-        String[] args = {};
-        applicationProperties = new CliPreferredApplicationProperties(args);
-
-        String actual = applicationProperties.toolkitCustomUserFolder();
-
-        assertThat(actual).isEmpty();
-    }
-
-    @Test
-    void givenCliCustomUserFolderAndFileCustomUserFolder_whenToolkitCustomUserFolder_thenReturnCliCustomUserFolder() {
-        String[] args = {"toolkitCustomUserFolder=eee"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        applicationProperties = new CliPreferredApplicationProperties(args);
-        applicationProperties.init(args, mockPropertiesLoader(props));
-
-        String actual = applicationProperties.toolkitCustomUserFolder();
-
-        assertThat(actual).isEqualTo("EEE");
-    }
-
-    @Test
-    void givenNoCliCustomUserFolderAndFileCustomUserFolder_whenToolkitCustomUserFolder_thenReturnFileCustomUserFolder() {
-        String[] args = {};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        applicationProperties = new CliPreferredApplicationProperties(args);
-        applicationProperties.init(args, mockPropertiesLoader(props));
-
-        String actual = applicationProperties.toolkitCustomUserFolder();
-
-        assertThat(actual).isEqualTo("AAA");
     }
 
     @Test
@@ -1487,5 +1410,123 @@ class CliPreferredApplicationPropertiesTest {
         Set<String> actual = applicationProperties.documentFilters();
 
         assertThat(actual).containsExactly("propertiesProjectPath1", "propertiesProjectPath2");
+    }
+
+    @Test
+    void givenNoProjectPaths_whenToolkitProjectListNames_thenReturnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsOnly("Deliverables");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFromCLI_whenToolkitProjectListNames_thenReturnCliToolkitProjectListNames() {
+        applicationProperties = new CliPreferredApplicationProperties(
+                new String[]{"toolkitProjectListNames=name1,name2"}
+        );
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("name1", "name2");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFileAndCLI_whenToolkitProjectListNames_thenReturnCliToolkitProjectListNames() {
+        String[] args = {"toolkitProjectListNames=cli1,cli2"};
+        Properties props = new Properties();
+        props.put("toolkitProjectListNames", "properties1,properties2");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("cli1", "cli2");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFromProperties_whenToolkitProjectListNames_thenReturnPropertiesToolkitProjectListNames() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("toolkitProjectListNames", "properties1,properties2");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("properties1", "properties2");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFromPropertiesAndOtherArgs_whenToolkitProjectListNames_thenReturnPropertiesToolkitProjectListNames() {
+        String[] args = {"uploadType=statement"};
+        Properties props = new Properties();
+        props.put("toolkitProjectListNames", "properties1,properties2");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = applicationProperties.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("properties1", "properties2");
+    }
+
+    @Test
+    void givenNoDeleteDownloadedFiles_whenIsDeleteDownloadedFiles_thenReturnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesFromCLI_whenIsDeleteDownloadedFiles_thenReturnCliDeleteDownloadedFiles() {
+        applicationProperties = new CliPreferredApplicationProperties(
+                new String[]{"deleteDownloadedFiles=y"}
+        );
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesFileAndCLI_whenIsDeleteDownloadedFiles_thenReturnCliDeleteDownloadedFiles() {
+        String[] args = {"deleteDownloadedFiles=y"};
+        Properties props = new Properties();
+        props.put("deleteDownloadedFiles", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesFromProperties_whenIsDeleteDownloadedFiles_thenReturnDeleteDownloadedFilesFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("deleteDownloadedFiles", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesFromPropertiesAndOtherArgs_whenIsDeleteDownloadedFiles_thenReturnDeleteDownloadedFilesFromProperties() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("deleteDownloadedFiles", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isDeleteDownloadedFiles();
+
+        assertThat(actual).isFalse();
     }
 }

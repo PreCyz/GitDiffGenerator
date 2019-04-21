@@ -2,6 +2,7 @@ package pg.gipter.ui.job;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.triggers.CronTriggerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
@@ -9,8 +10,12 @@ import pg.gipter.settings.ApplicationProperties;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -79,6 +84,7 @@ public class JobCreator {
         data.remove(JobProperty.CRON.value());
         data.remove(JobProperty.HOUR_OF_THE_DAY.value());
         data.remove(JobProperty.DAY_OF_WEEK.value());
+        data.remove(JobProperty.NEXT_FIRE_DATE.value());
     }
 
     private Trigger createTriggerEveryMonth() {
@@ -222,7 +228,6 @@ public class JobCreator {
             default:
                 trigger = createTriggerEveryWeek();
                 jobDetail = createJobDetail();
-
         }
         return trigger;
     }
@@ -232,8 +237,8 @@ public class JobCreator {
     }
 
     public void scheduleUploadJob(Map<String, Object> additionalJobParameters) throws ParseException, SchedulerException {
-
         Trigger trigger = createTrigger();
+        getNextFireTime(trigger).ifPresent(nextFireTime -> data.put(JobProperty.NEXT_FIRE_DATE.value(), nextFireTime));
 
         if (additionalJobParameters != null && !additionalJobParameters.isEmpty()) {
             jobDetail.getJobDataMap().putAll(additionalJobParameters);
@@ -247,6 +252,17 @@ public class JobCreator {
         }
 
         scheduler.scheduleJob(jobDetail, trigger);
+    }
+
+    private Optional<String> getNextFireTime(Trigger trigger) {
+        try {
+            CronExpression cronExpression = new CronExpression(((CronTriggerImpl) trigger).getCronExpression());
+            Date nextValidTimeAfter = cronExpression.getNextValidTimeAfter(trigger.getStartTime());
+            return Optional.of(LocalDateTime.ofInstant(nextValidTimeAfter.toInstant(), ZoneId.systemDefault())
+                    .format(DateTimeFormatter.ISO_DATE_TIME));
+        } catch (ParseException e) {
+            return Optional.empty();
+        }
     }
 
     public static void scheduleCheckUpgradeJob() {

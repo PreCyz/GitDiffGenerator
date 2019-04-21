@@ -182,9 +182,9 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitListName() {
+    public String toolkitCopyListName() {
         if (hasProperties()) {
-            return properties.getProperty(ArgName.toolkitListName.name(), argExtractor.toolkitListName());
+            return properties.getProperty(ArgName.toolkitCopyListName.name(), argExtractor.toolkitListName());
         }
         return argExtractor.toolkitListName();
     }
@@ -202,26 +202,10 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
 
     @Override
     public String toolkitUserFolder() {
-        if (containsProperty(ArgName.toolkitUsername.name()) && !containsProperty(ArgName.toolkitCustomUserFolder.name())) {
-            return ArgName.toolkitUserFolder.defaultValue() + properties.getProperty(ArgName.toolkitUsername.name()).toUpperCase();
-        }
-        String userFolder = toolkitCustomUserFolder();
-        if (!StringUtils.nullOrEmpty(userFolder)) {
-            return ArgName.toolkitUserFolder.defaultValue() + userFolder;
-        }
         if (hasProperties()) {
             return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
         }
         return argExtractor.toolkitUserFolder();
-    }
-
-    @Override
-    public String toolkitCustomUserFolder() {
-        String propertyName = ArgName.toolkitCustomUserFolder.name();
-        if (containsProperty(propertyName)) {
-            return properties.getProperty(propertyName, ArgName.toolkitCustomUserFolder.defaultValue()).toUpperCase();
-        }
-        return argExtractor.toolkitCustomUserFolder().toUpperCase();
     }
 
     @Override
@@ -249,6 +233,37 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
             return new HashSet<>(Arrays.asList(projectPaths));
         }
         return argExtractor.documentFilters();
+    }
+
+    @Override
+    public Set<String> toolkitProjectListNames() {
+        if (hasProperties()) {
+            String[] toolkitProjectListNames = properties.getProperty(
+                    ArgName.toolkitProjectListNames.name(), ArgName.toolkitProjectListNames.defaultValue()
+            ).split(",");
+            return new HashSet<>(Arrays.asList(toolkitProjectListNames));
+        }
+        return argExtractor.toolkitProjectListNames();
+    }
+
+    @Override
+    public boolean isDeleteDownloadedFiles() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgName.deleteDownloadedFiles.name(), ArgName.deleteDownloadedFiles.defaultValue()
+            ));
+        }
+        return argExtractor.isDeleteDownloadedFiles();
+    }
+
+    @Override
+    public boolean isEnableOnStartup() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgName.enableOnStartup.name(), ArgName.enableOnStartup.defaultValue()
+            ));
+        }
+        return argExtractor.isEnableOnStartup();
     }
 
 }

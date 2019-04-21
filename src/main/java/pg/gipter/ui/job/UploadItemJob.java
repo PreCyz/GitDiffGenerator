@@ -9,10 +9,12 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.utils.PropertiesHelper;
 
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -20,7 +22,7 @@ public class UploadItemJob implements Job {
 
     private static final Logger logger = LoggerFactory.getLogger(UploadItemJob.class);
     public static final String NAME = "Gipter-job";
-    public static final String GROUP = "GipterJobGroup";
+    static final String GROUP = "GipterJobGroup";
 
     public UploadItemJob() {
         // Instances of Job must have a public no-argument constructor.
@@ -29,18 +31,22 @@ public class UploadItemJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         LocalDate startDate = LocalDate.now();
+        LocalDateTime nextUploadDate = LocalDateTime.now();
 
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
         JobType jobType = JobType.valueOf(jobDataMap.getString(JobProperty.TYPE.value()));
         switch (jobType) {
             case EVERY_WEEK:
                 startDate = startDate.minusDays(7);
+                nextUploadDate = nextUploadDate.plusDays(7);
                 break;
             case EVERY_MONTH:
                 startDate = startDate.minusMonths(startDate.getMonth().length(startDate.isLeapYear()));
+                nextUploadDate = nextUploadDate.plusMonths(1);
                 break;
             case EVERY_2_WEEKS:
                 startDate = startDate.minusDays(14);
+                nextUploadDate = nextUploadDate.plusDays(14);
                 break;
             case CRON:
                 CronExpression cronExpression;
@@ -55,6 +61,7 @@ public class UploadItemJob implements Job {
                 int daysInMillis = 1000 * 60 * 60 * 24;
                 int differenceInDays = (int) (nextValidTimeAfter.getTime() - now.getTime()) / daysInMillis;
                 startDate = startDate.minusDays(differenceInDays);
+                nextUploadDate = LocalDateTime.ofInstant(nextValidTimeAfter.toInstant(), ZoneId.systemDefault());
                 break;
         }
 
@@ -70,6 +77,7 @@ public class UploadItemJob implements Job {
         );
         new FXRunner(uiAppProps).start();
         logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        new PropertiesHelper().saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
         uiLauncher.updateTray(uiAppProps);
     }

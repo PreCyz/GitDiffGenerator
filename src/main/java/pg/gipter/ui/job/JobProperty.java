@@ -7,7 +7,8 @@ public enum JobProperty {
     DAY_OF_WEEK("job.dayOfWeek"),
     CRON("job.cron"),
     TYPE("job.type"),
-    SCHEDULE_START("job.scheduleStart");
+    SCHEDULE_START("job.scheduleStart"),
+    NEXT_FIRE_DATE("job.nextUploadDateTime");
 
     private String value;
 

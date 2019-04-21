@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.sharepoint;
+package pg.gipter.toolkit.sharepoint.soap;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Element;

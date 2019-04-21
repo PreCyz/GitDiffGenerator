@@ -30,15 +30,18 @@ public enum ArgName {
     useUI("Y"),
     activeTray("Y"),
     silentMode("N"),
+    enableOnStartup("Y"),
 
     toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
     toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
     toolkitDomain("NCDMZ"),
-    toolkitListName("WorkItems"),
-    toolkitUrl("https://goto.netcompany.com/cases/GTE106/NCSCOPY"),
-    toolkitWSUrl(toolkitUrl.defaultValue + "/_vti_bin/lists.asmx"),
-    toolkitUserFolder(toolkitUrl.defaultValue + "/Lists/" + toolkitListName.defaultValue + "/"),
-    toolkitCustomUserFolder("");
+    toolkitCopyListName("WorkItems"),
+    toolkitUrl("https://goto.netcompany.com"),
+    toolkitCopyCase("/cases/GTE106/NCSCOPY"),
+    toolkitWSUrl(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/_vti_bin/lists.asmx"),
+    toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitCopyListName.defaultValue + "/"),
+    toolkitProjectListNames("Deliverables"),
+    deleteDownloadedFiles("Y");
 
     private String defaultValue;
 

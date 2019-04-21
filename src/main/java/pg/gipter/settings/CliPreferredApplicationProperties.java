@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 
-/**Created by Pawel Gawedzki on 17-Sep-2018.*/
+/** Created by Pawel Gawedzki on 17-Sep-2018. */
 class CliPreferredApplicationProperties extends ApplicationProperties {
 
     CliPreferredApplicationProperties(String[] args) {
@@ -205,9 +205,9 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitListName() {
+    public String toolkitCopyListName() {
         String toolkitListName = argExtractor.toolkitListName();
-        String argName = ArgName.toolkitListName.name();
+        String argName = ArgName.toolkitCopyListName.name();
         if (!containsArg(argName) && containsProperty(argName)) {
             toolkitListName = properties.getProperty(argName, toolkitListName);
         }
@@ -226,24 +226,7 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
 
     @Override
     public String toolkitUserFolder() {
-        if (containsArg(ArgName.toolkitUsername.name()) && !containsArg(ArgName.toolkitCustomUserFolder.name())) {
-            return ArgName.toolkitUserFolder.defaultValue() + argExtractor.toolkitUsername();
-        }
-        String userFolder = toolkitCustomUserFolder();
-        if (StringUtils.nullOrEmpty(userFolder)) {
-            userFolder = toolkitUsername();
-        }
-        return ArgName.toolkitUserFolder.defaultValue() + userFolder;
-    }
-
-    @Override
-    public String toolkitCustomUserFolder() {
-        String toolkitCustomUserFolder = argExtractor.toolkitCustomUserFolder();
-        String argName = ArgName.toolkitCustomUserFolder.name();
-        if (!containsArg(argName) && containsProperty(argName)) {
-            toolkitCustomUserFolder = properties.getProperty(argName, toolkitCustomUserFolder);
-        }
-        return toolkitCustomUserFolder.toUpperCase();
+        return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
     }
 
     @Override
@@ -270,6 +253,32 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
             documentFilters = new LinkedHashSet<>(Arrays.asList(documentFiltersArray));
         }
         return documentFilters;
+    }
+
+    @Override
+    public Set<String> toolkitProjectListNames() {
+        Set<String> toolkitProjectListNames = argExtractor.toolkitProjectListNames();
+        String argName = ArgName.toolkitProjectListNames.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            String[] array = properties.getProperty(argName, String.join(",", toolkitProjectListNames)).split(",");
+            toolkitProjectListNames = new LinkedHashSet<>(Arrays.asList(array));
+        }
+        return toolkitProjectListNames;
+    }
+
+    @Override
+    public boolean isDeleteDownloadedFiles() {
+        boolean delete = argExtractor.isDeleteDownloadedFiles();
+        String argName = ArgName.deleteDownloadedFiles.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            delete = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(delete)));
+        }
+        return delete;
+    }
+
+    @Override
+    public boolean isEnableOnStartup() {
+        return false;
     }
 
 }

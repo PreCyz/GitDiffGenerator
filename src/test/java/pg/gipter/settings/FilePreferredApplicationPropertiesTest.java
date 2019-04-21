@@ -9,25 +9,17 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static pg.gipter.TestUtils.mockPropertiesLoader;
 import static pg.gipter.settings.FilePreferredApplicationProperties.yyyy_MM_dd;
 
 class FilePreferredApplicationPropertiesTest {
 
     private FilePreferredApplicationProperties appProps;
-
-    private PropertiesHelper mockPropertiesLoader(Properties properties) {
-        PropertiesHelper loader = mock(PropertiesHelper.class);
-        when(loader.loadApplicationProperties()).thenReturn(Optional.of(properties));
-        return loader;
-    }
 
     @Test
     void given_propertiesFromFile_when_hasProperties_then_returnTrue() {
@@ -247,8 +239,8 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void given_uploadTypeDocuments_whenFileName_thenReturnFileNameWithZip() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"uploadType=documents"});
+    void given_uploadTypeToolkitDocs_whenFileName_thenReturnFileNameWithZip() {
+        appProps = new FilePreferredApplicationProperties(new String[]{"uploadType=toolkit_docs"});
 
         String actual = appProps.fileName();
 
@@ -664,52 +656,6 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenCliCustomUserFolder_whenToolkitCustomUserFolder_thenReturnCLICustomUserFolder() {
-        String[] args = {"toolkitCustomUserFolder=qqq"};
-        appProps = new FilePreferredApplicationProperties(args);
-
-        String actual = appProps.toolkitCustomUserFolder();
-
-        assertThat(actual).isEqualTo("QQQ");
-    }
-
-    @Test
-    void givenNoCliCustomUserFolder_whenToolkitCustomUserFolder_thenReturnEmptyString() {
-        String[] args = {};
-        appProps = new FilePreferredApplicationProperties(args);
-
-        String actual = appProps.toolkitCustomUserFolder();
-
-        assertThat(actual).isEmpty();
-    }
-
-    @Test
-    void givenCliCustomUserFolderAndFileCustomUserFolder_whenToolkitCustomUserFolder_thenReturnFileCustomFolder() {
-        String[] args = {"toolkitCustomUserFolder=eee"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitCustomUserFolder();
-
-        assertThat(actual).isEqualTo("AAA");
-    }
-
-    @Test
-    void givenNoCliCustomUserFolderAndFileCustomUserFolder_whenToolkitCustomUserFolder_thenReturnFileCustomFolder() {
-        String[] args = {};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitCustomUserFolder();
-
-        assertThat(actual).isEqualTo("AAA");
-    }
-
-    @Test
     void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnDefault() {
         String[] args = {};
         appProps = new FilePreferredApplicationProperties(args);
@@ -756,46 +702,6 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenToolkitUserCliAndCliCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomFolder() {
-        String[] args = {"toolkitCustomUserFolder=zzz", "toolkitUsername=bbb"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "qqq");
-        props.put("toolkitUsername", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "QQQ");
-    }
-
-    @Test
-    void givenNoToolkitUserCliAndCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithFileCustomUserFolder() {
-        String[] args = {"toolkitCustomUserFolder=qqq"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
-    void givenToolkitUserCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithFileCustomUserFolder() {
-        String[] args = {"toolkitUsername=qqq"};
-        Properties props = new Properties();
-        props.put("toolkitCustomUserFolder", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        String actual = appProps.toolkitUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
     void givenToolkitCustomUserFolderCliAndFileToolkitUsername_whenToolkitUserFolder_then_returnUserFolderWithFileToolkitUsername() {
         String[] args = {"toolkitCustomUserFolder=qqq"};
         Properties props = new Properties();
@@ -828,5 +734,103 @@ class FilePreferredApplicationPropertiesTest {
         Set<String> actual = appProps.documentFilters();
 
         assertThat(actual).containsExactly("Proj3");
+    }
+
+    @Test
+    void givenToolkitProjectListNames_whenToolkitProjectListNames_thenReturnSetWithThatToolkitProjectListNames() {
+        appProps = new FilePreferredApplicationProperties(new String[]{"toolkitProjectListNames=name1"});
+
+        Set<String> actual = appProps.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("name1");
+    }
+
+    @Test
+    void givenToolkitProjectListNamesFromPropertiesAndCLI_whenToolkitProjectListNames_thenReturnToolkitProjectListNamesFromProperties() {
+        String[] args = {"toolkitProjectListNames=Proj1,Proj2"};
+        Properties props = new Properties();
+        props.put("toolkitProjectListNames", "Proj3");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = appProps.toolkitProjectListNames();
+
+        assertThat(actual).containsExactly("Proj3");
+    }
+
+    @Test
+    void givenEmptyDeleteDownloadedFiles_whenIsDeleteDownloadedFiles_thenReturnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenIsDeleteDownloadedFilesSetN_whenIsDeleteDownloadedFiles_thenReturnFalse() {
+        String[] args = {"deleteDownloadedFiles=Y"};
+        Properties props = new Properties();
+        props.put("deleteDownloadedFiles", "N");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isDeleteDownloadedFiles();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenDeleteDownloadedFilesSetY_whenIsDeleteDownloadedFiles_thenReturnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("deleteDownloadedFiles", "Y");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenEmptyEnableOnStartupFiles_whenIsEnableOnStartup_thenReturnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenEnableOnStartupSetN_whenIsEnableOnStartup_thenReturnFalse() {
+        String[] args = {"enableOnStartup=Y"};
+        Properties props = new Properties();
+        props.put("enableOnStartup", "N");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenEnableOnStartupSetY_whenIsEnableOnStartup_thenReturnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("enableOnStartup", "n");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isFalse();
     }
 }

@@ -74,7 +74,7 @@ public class FXRunner extends Task<Void> implements Starter {
             );
         } finally {
             String status = error ? "FAIL" : "SUCCESS";
-            propertiesHelper.saveUploadInfo(status);
+            propertiesHelper.saveUploadStatus(status);
             updateProgress(5, 5);
             updateMessage(BundleUtils.getMsg("progress.finished", status));
             logger.info("{} ended.", this.getClass().getName());

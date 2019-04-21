@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.sharepoint;
+package pg.gipter.toolkit.sharepoint.soap;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,7 +14,7 @@ class GetListItemsElement {
 
     private GetListItemsElement() {}
 
-    static Element query(String title) {
+    static Element titleQuery(String title) {
         try {
             Document document = initNewDocument();
             Element query = document.createElement("Query");

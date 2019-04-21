@@ -3,32 +3,30 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="795.0" prefWidth="625.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="820.0" prefWidth="625.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Button fx:id="executeButton" layoutX="87.0" layoutY="743.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="130.0" text="%button.execute" textFill="#1eb235">
+        <Button fx:id="executeButton" layoutX="87.0" layoutY="764.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="130.0" text="%button.execute" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="15.0" />
          </font></Button>
         <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="14.0" text="%csv.panel.title">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="292.0" prefWidth="300.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="315.0" prefWidth="300.0">
                     <children>
                         <Label layoutX="9.0" layoutY="13.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
                         <TextField fx:id="authorsTextField" layoutX="129.0" layoutY="11.0" prefWidth="160.0" />
-                        <Label layoutX="9.0" layoutY="48.0" prefHeight="15.0" prefWidth="110.0" text="%csv.panel.committerEmail" />
-                        <TextField fx:id="committerEmailTextField" layoutX="129.0" layoutY="46.0" prefWidth="160.0" />
-                        <Label layoutX="9.0" layoutY="83.0" text="%csv.panel.gitAuthor" />
-                        <TextField fx:id="gitAuthorTextField" layoutX="129.0" layoutY="81.0" prefWidth="160.0" />
-                        <TextField fx:id="mercurialAuthorTextField" layoutX="129.0" layoutY="116.0" prefWidth="160.0" />
-                        <Label layoutX="9.0" layoutY="118.0" text="%csv.panel.mercurialAuthor" />
-                        <TextField fx:id="svnAuthorTextField" layoutX="129.0" layoutY="151.0" prefWidth="160.0" />
-                        <Label layoutX="9.0" layoutY="153.0" text="%csv.panel.svnAuthor" />
-                        <Label layoutX="10.0" layoutY="214.0" text="%csv.panel.uploadType" />
-                        <ComboBox fx:id="uploadTypeComboBox" layoutX="129.0" layoutY="212.0" prefWidth="160.0" />
-                        <CheckBox fx:id="skipRemoteCheckBox" layoutX="129.0" layoutY="185.0" mnemonicParsing="false" />
-                        <Label layoutX="10.0" layoutY="183.0" text="%csv.panel.skipRemote" />
-                  <TextField fx:id="documentFiltersTextField" layoutX="129.0" layoutY="246.0" prefWidth="160.0" />
-                  <Label layoutX="10.0" layoutY="248.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.documentFilters" />
+                        <Label layoutX="9.0" layoutY="52.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
+                        <TextField fx:id="committerEmailTextField" layoutX="129.0" layoutY="49.0" prefWidth="160.0" />
+                        <Label layoutX="9.0" layoutY="90.0" text="%csv.panel.gitAuthor" />
+                        <TextField fx:id="gitAuthorTextField" layoutX="129.0" layoutY="87.0" prefWidth="160.0" />
+                        <TextField fx:id="mercurialAuthorTextField" layoutX="129.0" layoutY="125.0" prefWidth="160.0" />
+                        <Label layoutX="9.0" layoutY="128.0" text="%csv.panel.mercurialAuthor" />
+                        <TextField fx:id="svnAuthorTextField" layoutX="129.0" layoutY="163.0" prefWidth="160.0" />
+                        <Label layoutX="9.0" layoutY="166.0" text="%csv.panel.svnAuthor" />
+                        <Label layoutX="10.0" layoutY="233.0" text="%csv.panel.uploadType" />
+                        <ComboBox fx:id="uploadTypeComboBox" layoutX="129.0" layoutY="230.0" prefWidth="160.0" />
+                        <CheckBox fx:id="skipRemoteCheckBox" layoutX="129.0" layoutY="201.0" mnemonicParsing="false" />
+                        <Label layoutX="10.0" layoutY="200.0" text="%csv.panel.skipRemote" />
                     </children>
                 </AnchorPane>
             </content>
@@ -36,7 +34,7 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="612.0" text="%paths.panel.title">
+        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="633.0" text="%paths.panel.title">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="95.0" prefWidth="604.0">
                     <children>
@@ -67,7 +65,7 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="315.0" layoutY="201.0" prefWidth="300.0" text="%timeFrame.panel.title">
+        <TitledPane animated="false" collapsible="false" layoutX="315.0" layoutY="224.0" prefWidth="300.0" text="%timeFrame.panel.title">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="105.0" prefWidth="300.0">
                     <children>
@@ -84,24 +82,26 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="315.0" layoutY="14.0" prefHeight="185.0" prefWidth="300.0" text="%launch.panel.title">
+        <TitledPane animated="false" collapsible="false" layoutX="315.0" layoutY="14.0" prefHeight="207.0" prefWidth="300.0" text="%launch.panel.title">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="105.0" prefWidth="300.0">
                     <children>
                         <Label layoutX="10.0" layoutY="45.0" text="%launch.panel.confirmationWindow" />
-                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="195.0" layoutY="47.0" mnemonicParsing="false" />
+                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="199.0" layoutY="47.0" mnemonicParsing="false" />
                         <Label layoutX="10.0" layoutY="13.0" text="%launch.panel.preferredArgSource" />
-                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="195.0" layoutY="11.0" prefHeight="25.0" prefWidth="90.0" />
+                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="199.0" layoutY="11.0" prefHeight="25.0" prefWidth="90.0" />
                         <Label layoutX="10.0" layoutY="73.0" text="%launch.panel.useUI" />
-                        <CheckBox fx:id="useUICheckBox" layoutX="195.0" layoutY="75.0" mnemonicParsing="false" />
-                  <Label layoutX="10.0" layoutY="129.0" prefHeight="17.0" prefWidth="174.0" text="%launch.panel.saveCurrentConfiguration" />
+                        <CheckBox fx:id="useUICheckBox" layoutX="199.0" layoutY="75.0" mnemonicParsing="false" />
+                  <Label layoutX="10.0" layoutY="157.0" prefHeight="17.0" prefWidth="175.0" text="%launch.panel.saveCurrentConfiguration" />
                   <Label layoutX="10.0" layoutY="101.0" text="%launch.panel.activateTray" />
-                  <CheckBox fx:id="activeteTrayCheckBox" layoutX="195.0" layoutY="103.0" mnemonicParsing="false" />
-                  <Button fx:id="saveConfigurationButton" layoutX="195.0" layoutY="127.0" mnemonicParsing="false" prefWidth="56.0" text="%button.save">
+                  <CheckBox fx:id="activeteTrayCheckBox" layoutX="199.0" layoutY="103.0" mnemonicParsing="false" />
+                  <Button fx:id="saveConfigurationButton" layoutX="199.0" layoutY="155.0" mnemonicParsing="false" prefWidth="56.0" text="%button.save">
                      <font>
                         <Font name="System Bold" size="11.0" />
                      </font>
                   </Button>
+                  <Label layoutX="10.0" layoutY="129.0" text="%launch.panel.autoStart" />
+                  <CheckBox fx:id="autostartCheckBox" layoutX="199.0" layoutY="131.0" mnemonicParsing="false" />
                     </children>
                 </AnchorPane>
             </content>
@@ -109,7 +109,7 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="334.0" text="%toolkit.panel.title">
+        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="355.0" text="%toolkit.panel.title">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="250.0" prefWidth="603.0">
                     <children>
@@ -122,22 +122,22 @@
                         <Label layoutX="10.0" layoutY="220.0" text="%toolkit.panel.userFolder" />
                   <TextField fx:id="toolkitUsernameTextField" layoutX="107.0" layoutY="7.0" />
                   <PasswordField fx:id="toolkitPasswordField" layoutX="107.0" layoutY="42.0" />
-                  <TextField fx:id="toolkitDomainTextField" layoutX="107.0" layoutY="78.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
-                  <TextField fx:id="toolkitListNameTextField" layoutX="107.0" layoutY="113.0" style="-fx-background-color: #e5e5e5;" />
-                  <TextField fx:id="toolkitUrlTextField" layoutX="107.0" layoutY="148.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <TextField fx:id="toolkitDomainTextField" layoutX="107.0" layoutY="77.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitListNameTextField" layoutX="107.0" layoutY="112.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitUrlTextField" layoutX="107.0" layoutY="147.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
-                  <TextField fx:id="toolkitWSTextField" layoutX="107.0" layoutY="183.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <TextField fx:id="toolkitWSTextField" layoutX="107.0" layoutY="182.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
-                  <TextField fx:id="toolkitUserFolderTextField" layoutX="107.0" layoutY="218.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <TextField fx:id="toolkitUserFolderTextField" layoutX="107.0" layoutY="217.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font></TextField>
-                  <TextField fx:id="toolkitCustomFolderTextField" layoutX="422.0" layoutY="7.0" />
-                  <CheckBox fx:id="customFolderCheckBox" layoutX="298.0" layoutY="11.0" mnemonicParsing="false" text="%toolkit.panel.customUserFolder" />
+                  <TextField fx:id="toolkitProjectListNamesTextField" layoutX="399.0" layoutY="7.0" />
+                  <Label layoutX="312.0" layoutY="9.0" text="%toolkit.panel.projectListNames" />
                     </children>
                 </AnchorPane>
             </content>
@@ -145,18 +145,18 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-      <ComboBox fx:id="languageComboBox" layoutX="11.0" layoutY="743.0" prefWidth="65.0" />
-      <Button fx:id="deamonButton" layoutX="452.0" layoutY="743.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
+      <ComboBox fx:id="languageComboBox" layoutX="11.0" layoutY="764.0" prefWidth="70.0" />
+      <Button fx:id="deamonButton" layoutX="452.0" layoutY="764.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Button>
-      <Button fx:id="exitButton" layoutX="541.0" layoutY="743.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="77.0" text="%button.exit" textFill="#0d0d0d">
+      <Button fx:id="exitButton" layoutX="541.0" layoutY="764.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="77.0" text="%button.exit" textFill="#0d0d0d">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Button>
-      <ProgressIndicator fx:id="progressIndicator" layoutX="228.0" layoutY="744.0" progress="0.0" />
-      <Label fx:id="infoLabel" layoutX="271.0" layoutY="747.0" prefHeight="17.0" prefWidth="177.0" />
+      <ProgressIndicator fx:id="progressIndicator" layoutX="228.0" layoutY="765.0" progress="0.0" />
+      <Label fx:id="infoLabel" layoutX="271.0" layoutY="768.0" prefHeight="17.0" prefWidth="177.0" />
     </children>
 </AnchorPane>

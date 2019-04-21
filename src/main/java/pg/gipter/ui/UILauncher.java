@@ -8,14 +8,13 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import mslinks.ShellLink;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
+import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ArgName;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.job.*;
@@ -25,7 +24,6 @@ import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -122,39 +120,8 @@ public class UILauncher implements Launcher {
             logger.info("Tray not supported. Can not set start on startup.");
             return;
         }
-
-        String platform = System.getProperty("os.name");
-        if (platform.startsWith("Windows")) {
-            String systemUsername = System.getProperty("user.name");
-
-            String shortcutLnkPath = String.format(
-                    "C:\\Users\\%s\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Gipter.lnk",
-                    systemUsername
-            );
-
-            if (!new File(shortcutLnkPath).exists()) {
-                logger.info("Creating shortcut and placing it in startup folder.");
-                try {
-                    String workingDir = AlertHelper.homeDirectoryPath().orElse("");
-
-                    int iconNumber = 130;
-                    ShellLink shellLink = ShellLink.createLink(AlertHelper.getJarFile().map(File::getAbsolutePath).orElse(""))
-                            .setWorkingDir(workingDir)
-                            .setIconLocation("%SystemRoot%\\system32\\SHELL32.dll")
-                            .setCMDArgs(ArgName.silentMode.name() + "=" + Boolean.TRUE);
-                    shellLink.getHeader().setIconIndex(iconNumber);
-                    shellLink.saveTo(shortcutLnkPath);
-                    logger.info("Shortcut located in startup folder [{}].", shortcutLnkPath);
-                    logger.info("Link working dir {}", shellLink.getWorkingDir());
-                    logger.info("Link target {}", shellLink.resolveTarget());
-                    logger.info("Link arguments [{}]", shellLink.getCMDArgs());
-                    logger.info("Shortcut created and placed in Windows startup folder.");
-                } catch (IOException e) {
-                    logger.warn("Can not create shortcut file and place it startup folder.", e);
-                }
-            } else {
-                logger.info("Gipter have already been set to start on startup. Shortcut already exists [{}]. ", shortcutLnkPath);
-            }
+        if (applicationProperties.isEnableOnStartup()) {
+            new StartupService().startOnStartup();
         }
     }
 

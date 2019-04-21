@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.sharepoint;
+package pg.gipter.toolkit.sharepoint.soap;
 
 import org.apache.http.auth.NTCredentials;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,9 +37,9 @@ public class SharePointConfiguration {
 
     @Bean
     public SharePointSoapClient sharePointSoapClient(WebServiceMessageSender messageSender,
-                                                 @Value("${toolkit.WSUrl}") String wsUrl,
-                                                 @Value("${toolkit.listName}") String listName) {
-        return new SharePointSoapClient(webServiceTemplate(marshaller(), messageSender), wsUrl, listName);
+                                                     @Value("${toolkit.WSUrl}") String wsUrl,
+                                                     @Value("${toolkit.copyListName}") String copyListName) {
+        return new SharePointSoapClient(webServiceTemplate(marshaller(), messageSender), wsUrl, copyListName);
     }
 
 }

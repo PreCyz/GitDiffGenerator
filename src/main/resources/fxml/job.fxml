@@ -83,7 +83,12 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </Button>
-      <Label fx:id="lastExecutionLabel" layoutX="10.0" layoutY="217.0">
+      <Label fx:id="lastExecutionLabel" layoutX="10.0" layoutY="205.0">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
+      <Label fx:id="nextExecutionLabel" layoutX="10.0" layoutY="230.0">
          <font>
             <Font size="11.0" />
          </font>

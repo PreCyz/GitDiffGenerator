@@ -15,6 +15,7 @@ import pg.gipter.ui.job.JobProperty;
 import pg.gipter.ui.job.UploadItemJob;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
+import pg.gipter.utils.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -83,6 +84,14 @@ class TrayHandler {
                         data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
                 );
                 popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+                addSeparator = true;
+            }
+            if (data.get().containsKey(JobProperty.NEXT_FIRE_DATE.value()) &&
+                    StringUtils.nullOrEmpty(data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value(), ""))) {
+                popupMenu.add(BundleUtils.getMsg(
+                        "tray.item.nextUpdate",
+                        data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value())
+                ));
                 addSeparator = true;
             }
 

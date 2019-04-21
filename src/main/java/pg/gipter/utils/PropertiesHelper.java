@@ -3,6 +3,7 @@ package pg.gipter.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ArgName;
+import pg.gipter.ui.job.JobProperty;
 
 import java.io.*;
 import java.security.GeneralSecurityException;
@@ -36,7 +37,7 @@ public class PropertiesHelper {
                         CryptoUtils.decrypt(properties.getProperty(ArgName.toolkitPassword.name()))
                 );
             } catch (GeneralSecurityException e) {
-                logger.warn("Can not decode property.", e.getMessage());
+                logger.warn("Can not decode property. {}", e.getMessage(), e);
             }
         }
     }
@@ -85,15 +86,21 @@ public class PropertiesHelper {
                         CryptoUtils.encrypt(properties.getProperty(ArgName.toolkitPassword.name()))
                 );
             } catch (GeneralSecurityException e) {
-                logger.warn("Can not decode property.", e.getMessage());
+                logger.warn("Can not decode property. {}", e.getMessage());
             }
         }
     }
 
-    public void saveUploadInfo(String status) {
+    public void saveUploadStatus(String status) {
         Properties data = loadDataProperties().orElseGet(Properties::new);
         data.put(PropertiesHelper.UPLOAD_DATE_TIME_KEY, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         data.put(PropertiesHelper.UPLOAD_STATUS_KEY, status);
+        saveProperties(data, DATA_PROPERTIES);
+    }
+
+    public void saveNextUpload(String nextUploadDateTime) {
+        Properties data = loadDataProperties().orElseGet(Properties::new);
+        data.put(JobProperty.NEXT_FIRE_DATE.value(), nextUploadDateTime);
         saveProperties(data, DATA_PROPERTIES);
     }
 
