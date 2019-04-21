@@ -67,6 +67,8 @@ public class MainController extends AbstractController {
     private TextField toolkitUserFolderTextField;
     @FXML
     private TextField toolkitProjectListNamesTextField;
+    @FXML
+    private CheckBox deleteDownloadedFilesCheckBox;
 
     @FXML
     private Label projectPathLabel;
@@ -150,6 +152,7 @@ public class MainController extends AbstractController {
         toolkitWSTextField.setText(applicationProperties.toolkitWSUrl());
         toolkitUserFolderTextField.setText(applicationProperties.toolkitUserFolder());
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
+        deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
 
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
@@ -188,6 +191,7 @@ public class MainController extends AbstractController {
         toolkitWSTextField.setEditable(false);
         toolkitUserFolderTextField.setEditable(false);
         toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
+        deleteDownloadedFilesCheckBox.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
 
         if (applicationProperties.projectPaths().isEmpty()) {
             projectPathButton.setText(resources.getString("button.add"));
@@ -334,6 +338,7 @@ public class MainController extends AbstractController {
         if (!StringUtils.nullOrEmpty(toolkitProjectListNamesTextField.getText())) {
             argList.add(ArgName.toolkitProjectListNames + "=" + toolkitProjectListNamesTextField.getText());
         }
+        argList.add(ArgName.deleteDownloadedFiles + "=" + deleteDownloadedFilesCheckBox.isSelected());
 
         argList.add(ArgName.projectPath + "=" + projectPathLabel.getText());
         argList.add(ArgName.itemPath + "=" + itemPathLabel.getText());
@@ -373,24 +378,17 @@ public class MainController extends AbstractController {
         return event -> {
             projectPathButton.setDisable(uploadTypeComboBox.getValue() == UploadType.STATEMENT);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
-                toolkitProjectListNamesTextField.setDisable(false);
                 endDatePicker.setValue(LocalDate.now());
-                endDatePicker.setDisable(true);
-                authorsTextField.setDisable(true);
-                committerEmailTextField.setDisable(true);
-                gitAuthorTextField.setDisable(true);
-                svnAuthorTextField.setDisable(true);
-                mercurialAuthorTextField.setDisable(true);
-                skipRemoteCheckBox.setDisable(true);
-            } else {
-                endDatePicker.setDisable(false);
-                authorsTextField.setDisable(false);
-                committerEmailTextField.setDisable(false);
-                gitAuthorTextField.setDisable(false);
-                svnAuthorTextField.setDisable(false);
-                mercurialAuthorTextField.setDisable(false);
-                skipRemoteCheckBox.setDisable(false);
             }
+            toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
+            deleteDownloadedFilesCheckBox.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
+            endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+            authorsTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+            committerEmailTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+            gitAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+            svnAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+            mercurialAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+            skipRemoteCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
         };
     }
 
@@ -462,6 +460,12 @@ public class MainController extends AbstractController {
                             uiLauncher.changeLanguage(languageComboBox.getValue());
                         }
                 );
+
+        toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            String userFolder = toolkitUserFolderTextField.getText();
+            userFolder = userFolder.substring(0, userFolder.lastIndexOf("/") + 1) + newValue;
+            toolkitUserFolderTextField.setText(userFolder);
+        });
 
         final StartupService startupService = new StartupService();
         activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
