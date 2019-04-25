@@ -123,6 +123,9 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
             int index = serverRelativeUrl.indexOf(listName);
             if (index > 0) {
                 return serverRelativeUrl.substring(0, index);
+            } else {
+                String[] pathArray = serverRelativeUrl.split("/");
+                return String.format("/%s/%s/%s/", pathArray[1], pathArray[2], pathArray[3]);
             }
         }
         return null;

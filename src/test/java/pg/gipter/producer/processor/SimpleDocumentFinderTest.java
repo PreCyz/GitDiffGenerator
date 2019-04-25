@@ -299,4 +299,16 @@ class SimpleDocumentFinderTest {
 
         assertThat(actual).isEqualTo("/cases/GTE440/TOEDNLD/");
     }
+
+    @Test
+    void givenDifferentValueWithListName_whenGetProject_thenReturnProject() {
+        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(new String[]{
+                ArgName.toolkitProjectListNames + "=SlutProdukter"
+        });
+        finder = new SimpleDocumentFinder(applicationProperties);
+
+        String actual = finder.getProject("/cases/GTE440/TOEDNLD/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+
+        assertThat(actual).isEqualTo("/cases/GTE440/TOEDNLD/");
+    }
 }
