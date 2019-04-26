@@ -1470,4 +1470,63 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).isFalse();
     }
+
+    @Test
+    void givenNoUseAsFileName_whenIsUseAsFileName_thenReturnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isUseAsFileName();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUseAsFileNameFromCLI_whenIsUseAsFileName_thenReturnCliUseAsFileName() {
+        applicationProperties = new CliPreferredApplicationProperties(
+                new String[]{"useAsFileName=y"}
+        );
+
+        boolean actual = applicationProperties.isUseAsFileName();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUseAsFileNameFileAndCLI_whenIsUseAsFileName_thenReturnCliUseAsFileName() {
+        String[] args = {"useAsFileName=y"};
+        Properties props = new Properties();
+        props.put("useAsFileName", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUseAsFileName();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUseAsFileNameFromProperties_whenIsUseAsFileName_thenReturnUseAsFileNameFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("useAsFileName", "y");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUseAsFileName();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUseAsFileNameFromPropertiesAndOtherArgs_whenIsUseAsFileName_thenReturnUseAsFileNameFromProperties() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("useAsFileName", "y");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUseAsFileName();
+
+        assertThat(actual).isTrue();
+    }
 }

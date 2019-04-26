@@ -100,7 +100,11 @@ public abstract class ApplicationProperties {
             ).toLowerCase();
         }
         if (!itemFileNamePrefix().isEmpty()) {
-            fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
+            if (isUseAsFileName()) {
+                fileName = itemFileNamePrefix();
+            } else {
+                fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
+            }
         }
         String extension = "txt";
         if (uploadType() == UploadType.TOOLKIT_DOCS) {
@@ -142,6 +146,7 @@ public abstract class ApplicationProperties {
                 ", itemPath='" + itemPath() + '\'' +
                 ", fileName='" + fileName() + '\'' +
                 ", projectPath='" + String.join(",", projectPaths()) + '\'' +
+                ", useAsFileName='" + isUseAsFileName() + '\'' +
                 ", periodInDays='" + periodInDays() + '\'' +
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
@@ -168,6 +173,7 @@ public abstract class ApplicationProperties {
     public abstract String itemPath();
     public abstract Set<String> projectPaths();
     public abstract String itemFileNamePrefix();
+    public abstract boolean isUseAsFileName();
     public abstract String committerEmail();
     public abstract LocalDate startDate();
     public abstract LocalDate endDate();

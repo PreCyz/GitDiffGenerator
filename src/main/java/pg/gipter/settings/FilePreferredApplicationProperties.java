@@ -255,4 +255,14 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return argExtractor.isEnableOnStartup();
     }
 
+    @Override
+    public boolean isUseAsFileName() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgName.useAsFileName.name(), ArgName.useAsFileName.defaultValue()
+            ));
+        }
+        return argExtractor.isUseAsFileName();
+    }
+
 }

@@ -58,6 +58,7 @@
                      <font>
                         <Font name="System Bold" size="11.0" />
                      </font></Button>
+                  <CheckBox fx:id="useAsFileNameCheckBox" layoutX="302.0" layoutY="13.0" mnemonicParsing="false" text="%paths.panel.useAsFileName" />
                     </children>
                 </AnchorPane>
             </content>

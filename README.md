@@ -47,6 +47,7 @@ When application is executed with `uploadType = TOOLKIT_DOCS', then item file is
 **startDate** - start date of diff given in format `yyyy-MM-dd`.<br />
 **endDate** - end date of diff given in format `yyyy-MM-dd`. By default it is set as now.<br />
 **itemFileNamePrefix** - if given then this value will be used as prefix of the diff file name.<br />
+**useAsFileName** - when set as `Y` then `itemFileNamePrefix` is used as file name for produced item. Default value is `N`.<br />
 **gitAuthor** - author specific for git repository stored at git config under key '_user.name_'. When used together with _author_, this parameter has higher priority.<br />
 **mercurialAuthor** - author specific for mercurial repository. When used together with _author_, this parameter has higher priority.<br />
 **svnAuthor** - author specific for svn repository. When used together with _author_, this parameter has higher priority.<br />

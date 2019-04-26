@@ -248,6 +248,31 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
+    void givenUseAsFileNameYAndFileNamePrefixAndToolkitDocs_whenFileName_thenReturnFileNamePrefixAsNameWithZip() {
+        appProps = new FilePreferredApplicationProperties(new String[]{
+                ArgName.uploadType.name() + "=" + UploadType.TOOLKIT_DOCS.name(),
+                ArgName.itemFileNamePrefix + "=my_custom_name",
+                ArgName.useAsFileName + "=Y",
+        });
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).endsWith("my_custom_name.zip");
+    }
+
+    @Test
+    void givenUseAsFileNameYAndFileNamePrefix_whenFileName_thenReturnFileNamePrefixAsNameWithTxt() {
+        appProps = new FilePreferredApplicationProperties(new String[]{
+                ArgName.itemFileNamePrefix + "=my_custom_name",
+                ArgName.useAsFileName + "=Y",
+        });
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).endsWith("my_custom_name.txt");
+    }
+
+    @Test
     void given_periodInDaysAndStartDate_when_startDate_then_returnStartDate() {
         appProps = new FilePreferredApplicationProperties(new String[]{"periodInDays=16","startDate=2018-10-18"});
 
@@ -808,6 +833,44 @@ class FilePreferredApplicationPropertiesTest {
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenEmptyUseAsFileNameFiles_whenIsUseAsFileName_thenReturnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUseAsFileName();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUseAsFileNameSetY_whenIsUseAsFileName_thenReturnTrue() {
+        String[] args = {"useAsFileName=N"};
+        Properties props = new Properties();
+        props.put("useAsFileName", "Y");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUseAsFileName();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUseAsFileNameN_whenIsUseAsFileName_thenReturnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("useAsFileName", "n");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUseAsFileName();
 
         assertThat(actual).isFalse();
     }

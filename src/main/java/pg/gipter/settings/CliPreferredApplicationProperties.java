@@ -270,4 +270,14 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         return false;
     }
 
+    @Override
+    public boolean isUseAsFileName() {
+        boolean useAsFileName = argExtractor.isUseAsFileName();
+        String argName = ArgName.useAsFileName.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            useAsFileName = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(useAsFileName)));
+        }
+        return useAsFileName;
+    }
+
 }
