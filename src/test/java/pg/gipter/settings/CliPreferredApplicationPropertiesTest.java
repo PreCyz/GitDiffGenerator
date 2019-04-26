@@ -1529,4 +1529,63 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void givenNoUploadAsHtml_whenIsUploadAsHtml_thenReturnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isUploadAsHtml();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUploadAsHtmlFromCLI_whenIsUploadAsHtml_thenReturnCliUploadAsHtml() {
+        applicationProperties = new CliPreferredApplicationProperties(
+                new String[]{"uploadAsHtml=y"}
+        );
+
+        boolean actual = applicationProperties.isUploadAsHtml();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUploadAsHtmlFileAndCLI_whenIsUploadAsHtml_thenReturnCliUploadAsHtml() {
+        String[] args = {"uploadAsHtml=y"};
+        Properties props = new Properties();
+        props.put("uploadAsHtml", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUploadAsHtml();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUploadAsHtmlFromProperties_whenIsUploadAsHtml_thenReturnUploadAsHtmlFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("uploadAsHtml", "y");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUploadAsHtml();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUploadAsHtmlFromPropertiesAndOtherArgs_whenIsUploadAsHtml_thenReturnUploadAsHtmlFromProperties() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("uploadAsHtml", "y");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUploadAsHtml();
+
+        assertThat(actual).isTrue();
+    }
 }

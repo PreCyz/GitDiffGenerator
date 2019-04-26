@@ -64,6 +64,7 @@ Below parameters are mandatory for toolkit:<br/>
 **toolkitPassword** - user password used to log in into SharePoint.<br /><br />
 **toolkitProjectListNames** - comma separated names of the folders to scan on toolkit, when looking for changes in documents made by user. Default value is `Deliverables`.<br/>
 **deleteDownloadedFiles** - if `Y` then all downloaded files from toolkit will be downloaded afterwards. This parameter works together with upload type `TOOLKIT_DOCS`<br/>
+**uploadAsHtml** - if `Y` then item will be produced as html file with links to actual documents. This option is recommended when fat in size documents has bean changed. This parameter works together with upload type `TOOLKIT_DOCS` and default value is `N`.<br/>
 
 _Note:_ When `periodInDays` is used together with `startDate` then **startDate** has higher priority.
 ### Explanation of *uploadType* parameter

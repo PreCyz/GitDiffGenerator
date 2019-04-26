@@ -106,11 +106,19 @@ public abstract class ApplicationProperties {
                 fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
             }
         }
+        String extension = getFileExtension();
+        return fileName + "." + extension;
+    }
+
+    String getFileExtension() {
         String extension = "txt";
         if (uploadType() == UploadType.TOOLKIT_DOCS) {
             extension = "zip";
+            if (isUploadAsHtml()) {
+                extension = "html";
+            }
         }
-        return fileName + "." + extension;
+        return extension;
     }
 
     public PreferredArgSource preferredArgSource() {
@@ -162,8 +170,11 @@ public abstract class ApplicationProperties {
                 ", toolkitDomain='" + toolkitDomain() + '\'' +
                 ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
                 ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
-                ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\''
-                ;
+                ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\'' +
+                ", deleteDownloadedFiles='" + isDeleteDownloadedFiles() + '\'' +
+                ", enableOnStartup='" + isEnableOnStartup() + '\'' +
+                ", uploadAsHtml='" + isUploadAsHtml() + '\''
+        ;
     }
 
     public abstract Set<String> authors();
@@ -192,4 +203,5 @@ public abstract class ApplicationProperties {
     public abstract boolean isActiveTray();
     public abstract boolean isDeleteDownloadedFiles();
     public abstract boolean isEnableOnStartup();
+    public abstract boolean isUploadAsHtml();
 }

@@ -280,4 +280,14 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         return useAsFileName;
     }
 
+    @Override
+    public boolean isUploadAsHtml() {
+        boolean uploadAsHtml = argExtractor.isUploadAsHtml();
+        String argName = ArgName.uploadAsHtml.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            uploadAsHtml = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(uploadAsHtml)));
+        }
+        return uploadAsHtml;
+    }
+
 }

@@ -41,7 +41,8 @@ public enum ArgName {
     toolkitWSUrl(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/_vti_bin/lists.asmx"),
     toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitCopyListName.defaultValue + "/"),
     toolkitProjectListNames("Deliverables"),
-    deleteDownloadedFiles("Y");
+    deleteDownloadedFiles("Y"),
+    uploadAsHtml("N");
 
     private String defaultValue;
 

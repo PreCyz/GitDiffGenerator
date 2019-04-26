@@ -265,4 +265,14 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return argExtractor.isUseAsFileName();
     }
 
+    @Override
+    public boolean isUploadAsHtml() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgName.uploadAsHtml.name(), ArgName.uploadAsHtml.defaultValue()
+            ));
+        }
+        return argExtractor.isUploadAsHtml();
+    }
+
 }

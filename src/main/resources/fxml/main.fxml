@@ -139,8 +139,10 @@
                      </font></TextField>
                   <TextField fx:id="toolkitProjectListNamesTextField" layoutX="359.0" layoutY="7.0" prefHeight="25.0" prefWidth="233.0" />
                   <Label layoutX="284.0" layoutY="11.0" text="%toolkit.panel.projectListNames" />
-                  <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="423.0" layoutY="42.0" mnemonicParsing="false" />
+                  <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="422.0" layoutY="42.0" mnemonicParsing="false" />
                   <Label layoutX="284.0" layoutY="42.0" text="%toolkit.panel.deleteFiles" />
+                  <Label layoutX="284.0" layoutY="69.0" text="%toolkit.panel.uploadAsHtml" />
+                  <CheckBox fx:id="uploadAsHtmlCheckBox" layoutX="422.0" layoutY="69.0" mnemonicParsing="false" />
                     </children>
                 </AnchorPane>
             </content>
