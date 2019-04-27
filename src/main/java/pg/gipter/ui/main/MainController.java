@@ -418,6 +418,8 @@ public class MainController extends AbstractController {
             properties.replace(ArgName.preferredArgSource.name(), PreferredArgSource.FILE.name());
             propertiesHelper.saveToApplicationProperties(properties);
         } else {
+            properties.remove(ArgName.startDate.name());
+            properties.remove(ArgName.endDate.name());
             propertiesHelper.saveToUIApplicationProperties(properties);
         }
     }

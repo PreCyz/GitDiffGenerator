@@ -33,7 +33,7 @@ class HtmlDocumentFinderTest {
     }
 
     @Test
-    void givenItemsJsonWithDatesInThePast_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenItemsJsonWithDatesInThePast_whenGetFilesToDownload_thenReturnListOfHtmlDocs() throws IOException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -49,11 +49,13 @@ class HtmlDocumentFinderTest {
         List<HtmlDocument> htmlDocuments = finder.getHtmlDocuments(documentDetails);
 
         assertThat(htmlDocuments).hasSize(2);
-        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(0).getVersion()).isEqualTo(1.0);
         assertThat(htmlDocuments.get(0).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 26, 13, 51, 27));
         assertThat(htmlDocuments.get(0).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(1).getVersion()).isEqualTo(3.0);
         assertThat(htmlDocuments.get(1).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 26, 14, 31, 07));
         assertThat(htmlDocuments.get(1).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
@@ -61,7 +63,7 @@ class HtmlDocumentFinderTest {
 
 
     @Test
-    void givenItemsWithComplexHistory_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenItemsWithComplexHistory_whenGetFilesToDownload_thenReturnListOfHtmlDocs() throws IOException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -78,26 +80,30 @@ class HtmlDocumentFinderTest {
 
         assertThat(htmlDocuments).hasSize(4);
 
-        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(0).getVersion()).isEqualTo(1.0);
         assertThat(htmlDocuments.get(0).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 26, 13, 51, 27));
         assertThat(htmlDocuments.get(0).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(1).getVersion()).isEqualTo(2.0);
         assertThat(htmlDocuments.get(1).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 26, 14, 22, 7));
         assertThat(htmlDocuments.get(1).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(2).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(2).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(2).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(2).getVersion()).isEqualTo(3.0);
         assertThat(htmlDocuments.get(2).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 27, 7, 36, 38));
         assertThat(htmlDocuments.get(2).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(3).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(3).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(3).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(3).getVersion()).isEqualTo(5.0);
         assertThat(htmlDocuments.get(3).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 28, 14, 31, 7));
         assertThat(htmlDocuments.get(3).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
-    void givenItemsCase2_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenItemsCase2_whenGetFilesToDownload_thenReturnListOfHtmlDocs() throws IOException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -113,14 +119,15 @@ class HtmlDocumentFinderTest {
         List<HtmlDocument> htmlDocuments = finder.getHtmlDocuments(documentDetails);
 
         assertThat(htmlDocuments).hasSize(1);
-        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(0).getVersion()).isEqualTo(1.0);
         assertThat(htmlDocuments.get(0).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 26, 14, 22, 7));
         assertThat(htmlDocuments.get(0).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
-    void givenItemsCase3_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenItemsCase3_whenGetFilesToDownload_thenReturnListOfHtmlDocs() throws IOException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -136,26 +143,30 @@ class HtmlDocumentFinderTest {
         List<HtmlDocument> htmlDocuments = finder.getHtmlDocuments(documentDetails);
 
         assertThat(htmlDocuments).hasSize(4);
-        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(0).getVersion()).isEqualTo(1.0);
         assertThat(htmlDocuments.get(0).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 26, 13, 51, 27));
         assertThat(htmlDocuments.get(0).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(1).getVersion()).isEqualTo(2.0);
         assertThat(htmlDocuments.get(1).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 26, 14, 22, 7));
         assertThat(htmlDocuments.get(1).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(2).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(2).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(2).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(2).getVersion()).isEqualTo(3.0);
         assertThat(htmlDocuments.get(2).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 27, 7, 36, 38));
         assertThat(htmlDocuments.get(2).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(3).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(3).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(3).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(3).getVersion()).isEqualTo(4.0);
         assertThat(htmlDocuments.get(3).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 27, 14, 31, 7));
         assertThat(htmlDocuments.get(3).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
-    void givenItemsCase4_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenItemsCase4_whenGetFilesToDownload_thenReturnListOfHtmlDocs() throws IOException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -171,14 +182,15 @@ class HtmlDocumentFinderTest {
         List<HtmlDocument> htmlDocuments = finder.getHtmlDocuments(documentDetails);
 
         assertThat(htmlDocuments).hasSize(1);
-        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(0).getVersion()).isEqualTo(4.0);
         assertThat(htmlDocuments.get(0).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 27, 14, 31, 7));
         assertThat(htmlDocuments.get(0).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
-    void givenItemsCase5_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenItemsCase5_whenGetFilesToDownload_thenReturnListOfHtmlDocs() throws IOException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -197,7 +209,7 @@ class HtmlDocumentFinderTest {
     }
 
     @Test
-    void givenItemsCase6_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenItemsCase6_whenGetFilesToDownload_thenReturnListOfHtmlDocs() throws IOException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -213,14 +225,15 @@ class HtmlDocumentFinderTest {
         List<HtmlDocument> htmlDocuments = finder.getHtmlDocuments(documentDetails);
 
         assertThat(htmlDocuments).hasSize(1);
-        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(0).getVersion()).isEqualTo(3.0);
         assertThat(htmlDocuments.get(0).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 27, 7, 36, 38));
         assertThat(htmlDocuments.get(0).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
-    void givenItemsCase7_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenItemsCase7_whenGetFilesToDownload_thenReturnListOfHtmlDocs() throws IOException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -236,18 +249,20 @@ class HtmlDocumentFinderTest {
         List<HtmlDocument> htmlDocuments = finder.getHtmlDocuments(documentDetails);
 
         assertThat(htmlDocuments).hasSize(2);
-        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(0).getVersion()).isEqualTo(1.0);
         assertThat(htmlDocuments.get(0).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 26, 13, 51, 27));
         assertThat(htmlDocuments.get(0).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(1).getVersion()).isEqualTo(4.0);
         assertThat(htmlDocuments.get(1).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 2, 27, 14, 31, 7));
         assertThat(htmlDocuments.get(1).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
-    void givenItemsCase8_whenGetFilesToDownload_thenReturnMapWithFilesToDownload() throws IOException {
+    void givenItemsCase8_whenGetFilesToDownload_thenReturnListOfHtmlDocs() throws IOException {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{
                         ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -265,19 +280,23 @@ class HtmlDocumentFinderTest {
         List<HtmlDocument> htmlDocuments = finder.getHtmlDocuments(documentDetails);
 
         assertThat(htmlDocuments).hasSize(4);
-        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(0).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(0).getVersion()).isEqualTo(38.0);
         assertThat(htmlDocuments.get(0).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 3, 29, 12, 29, 38));
         assertThat(htmlDocuments.get(0).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/19456/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(1).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(1).getVersion()).isEqualTo(39.0);
         assertThat(htmlDocuments.get(1).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 4, 5, 13, 56, 31));
         assertThat(htmlDocuments.get(1).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/19968/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(2).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(2).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(2).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(2).getVersion()).isEqualTo(42.0);
         assertThat(htmlDocuments.get(2).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 4, 9, 9, 16, 28));
         assertThat(htmlDocuments.get(2).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/21504/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
-        assertThat(htmlDocuments.get(3).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(3).getFileName()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+        assertThat(htmlDocuments.get(3).getTitle()).isEqualTo("D0180 - Integration Design - Topdanmark integrations - Party Master");
         assertThat(htmlDocuments.get(3).getVersion()).isEqualTo(44.0);
         assertThat(htmlDocuments.get(3).getModificationDate()).isEqualTo(LocalDateTime.of(2019, 4, 12, 10, 01, 29));
         assertThat(htmlDocuments.get(3).getLink()).isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
