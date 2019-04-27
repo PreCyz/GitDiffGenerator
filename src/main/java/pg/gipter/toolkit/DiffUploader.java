@@ -65,10 +65,7 @@ public class DiffUploader {
         String fileName = applicationProperties.fileName();
         String title = fileName.substring(0, fileName.indexOf("."));
         String allVcs = applicationProperties.vcsSet().stream().map(Enum::name).collect(joining(","));
-        String description = String.format("%s diff file.", allVcs);
-        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
-            description = String.format("%s file.", UploadType.STATEMENT);
-        }
+        String description = description(allVcs);
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 
         Map<String, String> attributes = new HashMap<>();
@@ -83,5 +80,19 @@ public class DiffUploader {
         attributes.put("Cmd", "New");
 
         return attributes;
+    }
+
+    private String description(String allVcs) {
+        String description = String.format("%s diff file.", allVcs);
+        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
+            description = String.format("%s file.", UploadType.STATEMENT);
+        } else if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
+            if (applicationProperties.isUploadAsHtml()) {
+                description = "Item as html page containing links to documents.";
+            } else {
+                description = "Item as zipped file with changed documents.";
+            }
+        }
+        return description;
     }
 }
