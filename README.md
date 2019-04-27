@@ -112,7 +112,7 @@ Yoda | now - 2 days | 7.0
 The item will contains following documents:
 _Deliverable-doc-2.0, Deliverable-doc-4.0, Deliverable-doc-6.0, Deliverable-doc-7.0_ - all document before change and Yoda's last change.<br/>
 _DocumentLibrary-doc-6.0, DocumentLibrary-doc-7.0_ - document before Yoda's change and the last change made by Yoda.
-All this files will be zipped into one file and uploaded as one item. 
+All these files will be zipped into one file and uploaded as one item unless option `uploadAsHtml` is set as `Y`. If this is the case then the HTML file will be generated. This file will contain links to documents changed by Yoda.
 #####
 **Case 1**<br />
 It may be that owner of the code forbids to share the code in anyway but you are allowed to put headers of the changes in the diff.
