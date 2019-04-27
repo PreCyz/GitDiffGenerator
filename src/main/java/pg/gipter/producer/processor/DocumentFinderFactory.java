@@ -12,6 +12,9 @@ public final class DocumentFinderFactory {
         if (LocalDate.now().isAfter(applicationProperties.endDate())) {
             //return new ComplexDocumentFinder(applicationProperties);
         }
+        if (applicationProperties.isUploadAsHtml()) {
+            return new HtmlDocumentFinder(applicationProperties);
+        }
         return new SimpleDocumentFinder(applicationProperties);
     }
 }
