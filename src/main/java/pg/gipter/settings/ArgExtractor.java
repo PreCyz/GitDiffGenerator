@@ -226,4 +226,18 @@ final class ArgExtractor {
         }
         return StringUtils.getBoolean(ArgName.enableOnStartup.defaultValue());
     }
+
+    boolean isUseAsFileName() {
+        if (containsArg(ArgName.useAsFileName.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.useAsFileName, ArgName.useAsFileName.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.useAsFileName.defaultValue());
+    }
+
+    boolean isUploadAsHtml() {
+        if (containsArg(ArgName.uploadAsHtml.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.uploadAsHtml, ArgName.uploadAsHtml.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.uploadAsHtml.defaultValue());
+    }
 }

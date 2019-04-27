@@ -248,6 +248,58 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
+    void givenUseAsFileNameYAndFileNamePrefixAndToolkitDocs_whenFileName_thenReturnFileNamePrefixAsNameWithZip() {
+        appProps = new FilePreferredApplicationProperties(new String[]{
+                ArgName.uploadType.name() + "=" + UploadType.TOOLKIT_DOCS.name(),
+                ArgName.itemFileNamePrefix + "=my_custom_name",
+                ArgName.useAsFileName + "=Y",
+        });
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).isEqualTo("my_custom_name.zip");
+    }
+
+    @Test
+    void givenUseAsFileNameYAndFileNamePrefix_whenFileName_thenReturnFileNamePrefixAsNameWithTxt() {
+        appProps = new FilePreferredApplicationProperties(new String[]{
+                ArgName.itemFileNamePrefix + "=my_custom_name",
+                ArgName.useAsFileName + "=Y",
+        });
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).isEqualTo("my_custom_name.txt");
+    }
+
+    @Test
+    void givenUseAsFileNameYAndFileNamePrefixAndUploadAsHtml_whenFileName_thenReturnFileNamePrefixAsNameWithTxt() {
+        appProps = new FilePreferredApplicationProperties(new String[]{
+                ArgName.itemFileNamePrefix + "=my_custom_name",
+                ArgName.useAsFileName + "=Y",
+                ArgName.uploadAsHtml + "=Y",
+        });
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).isEqualTo("my_custom_name.txt");
+    }
+
+    @Test
+    void givenUseAsFileNameYAndFileNamePrefixAndUploadAsHtmlAndUploadTypeToolkitDocs_whenFileName_thenReturnFileNamePrefixAsNameWithHtml() {
+        appProps = new FilePreferredApplicationProperties(new String[]{
+                ArgName.uploadType.name() + "=" + UploadType.TOOLKIT_DOCS.name(),
+                ArgName.itemFileNamePrefix + "=my_custom_name",
+                ArgName.useAsFileName + "=Y",
+                ArgName.uploadAsHtml + "=Y",
+        });
+
+        String actual = appProps.fileName();
+
+        assertThat(actual).isEqualTo("my_custom_name.html");
+    }
+
+    @Test
     void given_periodInDaysAndStartDate_when_startDate_then_returnStartDate() {
         appProps = new FilePreferredApplicationProperties(new String[]{"periodInDays=16","startDate=2018-10-18"});
 
@@ -737,6 +789,16 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
+    void givenNoProperties_whenIsDeleteDownloadedFiles_thenReturnTrue() {
+        String[] args = {""};
+        appProps = new FilePreferredApplicationProperties(args);
+
+        boolean actual = appProps.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
     void givenEmptyDeleteDownloadedFiles_whenIsDeleteDownloadedFiles_thenReturnTrue() {
         String[] args = {""};
         Properties props = new Properties();
@@ -770,6 +832,16 @@ class FilePreferredApplicationPropertiesTest {
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isDeleteDownloadedFiles();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenNoProperties_whenIsEnableOnStartup_thenReturnTrue() {
+        String[] args = {""};
+        appProps = new FilePreferredApplicationProperties(args);
+
+        boolean actual = appProps.isEnableOnStartup();
 
         assertThat(actual).isTrue();
     }
@@ -810,5 +882,136 @@ class FilePreferredApplicationPropertiesTest {
         boolean actual = appProps.isEnableOnStartup();
 
         assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenNoProperties_whenIsUseAsFileName_thenReturnFalse() {
+        String[] args = {""};
+        appProps = new FilePreferredApplicationProperties(args);
+
+        boolean actual = appProps.isUseAsFileName();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenEmptyUseAsFileNameFiles_whenIsUseAsFileName_thenReturnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUseAsFileName();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUseAsFileNameSetY_whenIsUseAsFileName_thenReturnTrue() {
+        String[] args = {"useAsFileName=N"};
+        Properties props = new Properties();
+        props.put("useAsFileName", "Y");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUseAsFileName();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUseAsFileNameN_whenIsUseAsFileName_thenReturnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("useAsFileName", "n");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUseAsFileName();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenNoProperties_whenIsUploadAsHtml_thenReturnFalse() {
+        String[] args = {""};
+        appProps = new FilePreferredApplicationProperties(args);
+
+        boolean actual = appProps.isUploadAsHtml();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUploadAsHtmlFiles_whenIsUploadAsHtml_thenReturnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUploadAsHtml();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUploadAsHtmlSetY_whenIsUploadAsHtml_thenReturnTrue() {
+        String[] args = {"uploadAsHtml=N"};
+        Properties props = new Properties();
+        props.put("uploadAsHtml", "Y");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUploadAsHtml();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUploadAsHtmlSetN_whenIsUploadAsHtml_thenReturnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("uploadAsHtml", "y");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUploadAsHtml();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUploadAsHtmlAndUploadTypeToolkitDocs_whenGetFileExtension_thenReturnHtml() {
+        appProps = new FilePreferredApplicationProperties(new String[]{
+                ArgName.uploadType.name() + "=" + UploadType.TOOLKIT_DOCS.name(),
+                ArgName.uploadAsHtml + "=Y",
+        });
+
+        String actual = appProps.getFileExtension();
+
+        assertThat(actual).isEqualTo("html");
+    }
+
+    @Test
+    void givenUploadAsHtmlSetNAndUploadTypeToolkitDocs_whenGetFileExtension_thenReturnZip() {
+        appProps = new FilePreferredApplicationProperties(new String[]{
+                ArgName.uploadType.name() + "=" + UploadType.TOOLKIT_DOCS.name(),
+                ArgName.uploadAsHtml + "=N",
+        });
+
+        String actual = appProps.getFileExtension();
+
+        assertThat(actual).isEqualTo("zip");
+    }
+
+    @Test
+    void givenUploadAsHtmlSetY_whenGetFileExtension_thenReturnTxt() {
+        appProps = new FilePreferredApplicationProperties(new String[]{
+                ArgName.uploadAsHtml + "=Y",
+        });
+
+        String actual = appProps.getFileExtension();
+
+        assertThat(actual).isEqualTo("txt");
     }
 }

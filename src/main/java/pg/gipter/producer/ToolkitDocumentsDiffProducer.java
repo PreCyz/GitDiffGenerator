@@ -38,7 +38,9 @@ class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
         if (documents.isEmpty()) {
             logger.warn("No documents to zip is no item to upload. [{}].", UploadType.TOOLKIT_DOCS);
             throw new IllegalArgumentException("Given projects do not contain any items.");
-        } else {
+        }
+
+        if (!applicationProperties.isUploadAsHtml()) {
             zipDocumentsAndWriteToFile(documents);
             if (applicationProperties.isDeleteDownloadedFiles()) {
                 deleteFiles(documents);

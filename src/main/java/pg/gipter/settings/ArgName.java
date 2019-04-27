@@ -19,6 +19,7 @@ public enum ArgName {
     itemPath("NO_ITEM_PATH_GIVEN"),
     projectPath("NO_PROJECT_PATH_GIVEN"),
     itemFileNamePrefix(""),
+    useAsFileName("N"),
 
     periodInDays("7"),
     startDate(LocalDate.now().minusDays(Integer.parseInt(periodInDays.defaultValue)).format(yyyy_MM_dd)),
@@ -40,7 +41,8 @@ public enum ArgName {
     toolkitWSUrl(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/_vti_bin/lists.asmx"),
     toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitCopyListName.defaultValue + "/"),
     toolkitProjectListNames("Deliverables"),
-    deleteDownloadedFiles("Y");
+    deleteDownloadedFiles("Y"),
+    uploadAsHtml("N");
 
     private String defaultValue;
 

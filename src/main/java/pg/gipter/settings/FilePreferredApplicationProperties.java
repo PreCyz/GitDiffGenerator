@@ -255,4 +255,24 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return argExtractor.isEnableOnStartup();
     }
 
+    @Override
+    public boolean isUseAsFileName() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgName.useAsFileName.name(), ArgName.useAsFileName.defaultValue()
+            ));
+        }
+        return argExtractor.isUseAsFileName();
+    }
+
+    @Override
+    public boolean isUploadAsHtml() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgName.uploadAsHtml.name(), ArgName.uploadAsHtml.defaultValue()
+            ));
+        }
+        return argExtractor.isUploadAsHtml();
+    }
+
 }

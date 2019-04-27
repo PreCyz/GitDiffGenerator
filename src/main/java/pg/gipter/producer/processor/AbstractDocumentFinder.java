@@ -187,7 +187,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
         return result;
     }
 
-    Map<String, String> getFilesToDownload(List<DocumentDetails> documentDetails) {
+    final Map<String, String> getFilesToDownload(List<DocumentDetails> documentDetails) {
         Map<String, String> filesToDownloadMap = new HashMap<>();
         for (DocumentDetails dd : documentDetails) {
             if (dd.getVersions().isEmpty() && dd.getLastModifier().getLoginName().equals(applicationProperties.toolkitUsername())) {
@@ -246,7 +246,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
         return filesToDownloadMap;
     }
 
-    private String getFullDownloadUrl(String fileReference) {
+    String getFullDownloadUrl(String fileReference) {
         return String.format("%s%s", applicationProperties.toolkitUrl(), fileReference);
     }
 

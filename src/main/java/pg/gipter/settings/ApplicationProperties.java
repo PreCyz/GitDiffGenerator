@@ -100,13 +100,25 @@ public abstract class ApplicationProperties {
             ).toLowerCase();
         }
         if (!itemFileNamePrefix().isEmpty()) {
-            fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
+            if (isUseAsFileName()) {
+                fileName = itemFileNamePrefix();
+            } else {
+                fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
+            }
         }
+        String extension = getFileExtension();
+        return fileName + "." + extension;
+    }
+
+    String getFileExtension() {
         String extension = "txt";
         if (uploadType() == UploadType.TOOLKIT_DOCS) {
             extension = "zip";
+            if (isUploadAsHtml()) {
+                extension = "html";
+            }
         }
-        return fileName + "." + extension;
+        return extension;
     }
 
     public PreferredArgSource preferredArgSource() {
@@ -142,6 +154,7 @@ public abstract class ApplicationProperties {
                 ", itemPath='" + itemPath() + '\'' +
                 ", fileName='" + fileName() + '\'' +
                 ", projectPath='" + String.join(",", projectPaths()) + '\'' +
+                ", useAsFileName='" + isUseAsFileName() + '\'' +
                 ", periodInDays='" + periodInDays() + '\'' +
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
@@ -157,8 +170,11 @@ public abstract class ApplicationProperties {
                 ", toolkitDomain='" + toolkitDomain() + '\'' +
                 ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
                 ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
-                ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\''
-                ;
+                ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\'' +
+                ", deleteDownloadedFiles='" + isDeleteDownloadedFiles() + '\'' +
+                ", enableOnStartup='" + isEnableOnStartup() + '\'' +
+                ", uploadAsHtml='" + isUploadAsHtml() + '\''
+        ;
     }
 
     public abstract Set<String> authors();
@@ -168,6 +184,7 @@ public abstract class ApplicationProperties {
     public abstract String itemPath();
     public abstract Set<String> projectPaths();
     public abstract String itemFileNamePrefix();
+    public abstract boolean isUseAsFileName();
     public abstract String committerEmail();
     public abstract LocalDate startDate();
     public abstract LocalDate endDate();
@@ -186,4 +203,5 @@ public abstract class ApplicationProperties {
     public abstract boolean isActiveTray();
     public abstract boolean isDeleteDownloadedFiles();
     public abstract boolean isEnableOnStartup();
+    public abstract boolean isUploadAsHtml();
 }
