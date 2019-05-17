@@ -117,6 +117,13 @@ public class ProjectsController extends AbstractController {
                             path
                     );
                     projectsPaths.add(pd);
+                } else if (supportedVcs.isPresent() && applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS) {
+                    ProjectDetails pd = new ProjectDetails(
+                            project.getName(),
+                            supportedVcs.get(),
+                            path
+                    );
+                    projectsPaths.add(pd);
                 }
             }
             if (projectsPaths.isEmpty()) {
