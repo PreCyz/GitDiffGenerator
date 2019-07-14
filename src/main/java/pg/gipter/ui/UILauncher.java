@@ -37,9 +37,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
-/**
- * Created by Gawa 2017-10-04
- */
+/** Created by Gawa 2017-10-04 */
 public class UILauncher implements Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
@@ -81,10 +79,10 @@ public class UILauncher implements Launcher {
     public void initTrayHandler() {
         trayHandler = new TrayHandler(this, applicationProperties);
         if (trayHandler.tryIconExists()) {
-            logger.info("Updating tray icon.", silentMode);
+            logger.info("Updating tray icon. Silent mode [{}].", silentMode);
             trayHandler.updateTrayLabels();
         } else {
-            logger.info("Initializing tray icon.", silentMode);
+            logger.info("Initializing tray icon. Silent mode [{}].", silentMode);
             trayHandler.createTrayIcon();
             scheduleJobIfExists();
             JobCreator.scheduleCheckUpgradeJob();
@@ -99,7 +97,7 @@ public class UILauncher implements Launcher {
         }
         checkUpgrades();
         setStartOnStartup();
-        logger.info("Launching UI in silent mode: [{}].", silentMode);
+        logger.info("Launching UI. Silent mode: [{}].", silentMode);
         initTray();
         if (!silentMode) {
             buildAndShowMainWindow();
