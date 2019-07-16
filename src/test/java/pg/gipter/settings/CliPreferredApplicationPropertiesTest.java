@@ -1588,4 +1588,63 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void givenNoConfigurationName_whenConfigurationName_thenReturnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.configurationName();
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void givenCliConfigurationName_whenConfigurationName_thenReturnCliConfigurationName() {
+        applicationProperties = new CliPreferredApplicationProperties(
+                new String[]{"configurationName=cliAuthor"}
+        );
+
+        String actual = applicationProperties.configurationName();
+
+        assertThat(actual).isEqualTo("cliAuthor");
+    }
+
+    @Test
+    void givenCliConfigurationNameAndFileConfigurationName_whenConfigurationName_then_returnCliConfigurationName() {
+        Properties properties = new Properties();
+        properties.setProperty("configurationName", "fileAuthor");
+        PropertiesHelper loader = mockPropertiesLoader(properties);
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"configurationName=cliAuthor"});
+        applicationProperties.init(new String[]{"configurationName=fileAuthor"}, loader);
+
+        String actual = applicationProperties.configurationName();
+
+        assertThat(actual).isEqualTo("cliAuthor");
+    }
+
+    @Test
+    void givenNoCliConfigurationNameAndFileConfigurationName_whenConfigurationName_thenReturnFileConfigurationName() {
+        Properties properties = new Properties();
+        properties.setProperty("configurationName", "fileAuthor");
+        PropertiesHelper loader = mockPropertiesLoader(properties);
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties.init(new String[]{"configurationName=fileAuthor"}, loader);
+
+        String actual = applicationProperties.configurationName();
+
+        assertThat(actual).isEqualTo("fileAuthor");
+    }
+
+    @Test
+    void givenFileConfigurationNameAndOtherArgs_whenConfigurationName_thenReturnFileConfigurationName() {
+        Properties properties = new Properties();
+        properties.setProperty("configurationName", "fileAuthor");
+        PropertiesHelper loader = mockPropertiesLoader(properties);
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=test"});
+        applicationProperties.init(new String[]{"configurationName=fileAuthor"}, loader);
+
+        String actual = applicationProperties.configurationName();
+
+        assertThat(actual).isEqualTo("fileAuthor");
+    }
 }

@@ -290,4 +290,14 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         return uploadAsHtml;
     }
 
+    @Override
+    public String configurationName() {
+        String configurationName = argExtractor.configurationName();
+        String argName = ArgName.configurationName.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            configurationName = properties.getProperty(argName, configurationName);
+        }
+        return configurationName;
+    }
+
 }

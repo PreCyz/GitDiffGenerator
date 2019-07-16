@@ -1014,4 +1014,26 @@ class FilePreferredApplicationPropertiesTest {
 
         assertThat(actual).isEqualTo("txt");
     }
+
+    @Test
+    void givenConfigurationNameFromCommandLine_whenConfigurationName_thenReturnThatConfigurationName() {
+        appProps = new FilePreferredApplicationProperties(new String[]{"configurationName=testAuthor"});
+
+        String actual = appProps.configurationName();
+
+        assertThat(actual).isEqualTo("testAuthor");
+    }
+
+    @Test
+    void givenConfigurationNameFromPropertiesAndCommandLine_whenConfigurationName_thenReturnConfigurationNameFromProperties() {
+        String[] args = {"configurationName=testAuthor"};
+        Properties props = new Properties();
+        props.put("configurationName", "propsAuthor");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        String actual = appProps.configurationName();
+
+        assertThat(actual).isEqualTo("propsAuthor");
+    }
 }

@@ -42,7 +42,9 @@ public enum ArgName {
     toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitCopyListName.defaultValue + "/"),
     toolkitProjectListNames("Deliverables"),
     deleteDownloadedFiles("Y"),
-    uploadAsHtml("N");
+    uploadAsHtml("N"),
+
+    configurationName("");
 
     private String defaultValue;
 

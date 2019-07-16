@@ -146,6 +146,7 @@ public abstract class ApplicationProperties {
 
     protected final String log() {
         return  "version='" + version() + '\'' +
+                ", configurationName='" + configurationName() + '\'' +
                 ", authors='" + String.join(",", authors()) + '\'' +
                 ", gitAuthor='" + gitAuthor() + '\'' +
                 ", mercurialAuthor='" + mercurialAuthor() + '\'' +
@@ -204,4 +205,5 @@ public abstract class ApplicationProperties {
     public abstract boolean isDeleteDownloadedFiles();
     public abstract boolean isEnableOnStartup();
     public abstract boolean isUploadAsHtml();
+    public abstract String configurationName();
 }

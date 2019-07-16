@@ -240,4 +240,11 @@ final class ArgExtractor {
         }
         return StringUtils.getBoolean(ArgName.uploadAsHtml.defaultValue());
     }
+
+    public String configurationName() {
+        if (containsArg(ArgName.configurationName.name())) {
+            return getValue(ArgName.configurationName, ArgName.configurationName.defaultValue());
+        }
+        return ArgName.configurationName.defaultValue();
+    }
 }

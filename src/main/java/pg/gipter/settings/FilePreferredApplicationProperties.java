@@ -275,4 +275,12 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return argExtractor.isUploadAsHtml();
     }
 
+    @Override
+    public String configurationName() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgName.configurationName.name(), argExtractor.configurationName());
+        }
+        return argExtractor.configurationName();
+    }
+
 }
