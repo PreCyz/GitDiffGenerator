@@ -12,8 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
-import static pg.gipter.utils.PropertiesHelper.APPLICATION_PROPERTIES;
-
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public abstract class ApplicationProperties {
 
@@ -46,12 +44,12 @@ public abstract class ApplicationProperties {
     }
 
     protected void init(String[] args, PropertiesHelper propertiesHelper) {
-        Optional<Properties> propsFromFile = propertiesHelper.loadApplicationProperties();
+        Optional<Properties> propsFromFile = propertiesHelper.loadApplicationProperties(argExtractor.configurationName());
         if (propsFromFile.isPresent()) {
             properties = propsFromFile.get();
-            logger.info("Properties from [{}] file loaded.", APPLICATION_PROPERTIES);
+            logger.info("Configuration [{}] loaded.", argExtractor.configurationName());
         } else {
-            logger.warn("Can not load [{}].", APPLICATION_PROPERTIES);
+            logger.warn("Can not load  configuration [{}].", argExtractor.configurationName());
             logger.info("Command line argument loaded: {}.", Arrays.toString(args));
         }
         logger.info("Application properties loaded: {}.", log());

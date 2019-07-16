@@ -264,7 +264,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
         return event -> {
             String[] argsFromUI = createArgsFromUI();
-            propertiesHelper.saveToUIApplicationProperties(createProperties(argsFromUI));
+            propertiesHelper.addAndSaveApplicationProperties(createProperties(argsFromUI));
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
             uiLauncher.hideMainWindow();
             uiLauncher.showProjectsWindow();
@@ -411,11 +411,11 @@ public class MainController extends AbstractController {
 
         if (isOverride) {
             properties.replace(ArgName.preferredArgSource.name(), PreferredArgSource.FILE.name());
-            propertiesHelper.saveToApplicationProperties(properties);
+            propertiesHelper.addAndSaveApplicationProperties(properties);
         } else {
             properties.remove(ArgName.startDate.name());
             properties.remove(ArgName.endDate.name());
-            propertiesHelper.saveToUIApplicationProperties(properties);
+            propertiesHelper.addAndSaveApplicationProperties(properties);
         }
     }
 
@@ -433,7 +433,7 @@ public class MainController extends AbstractController {
         return event -> {
             if (uiLauncher.isTraySupported()) {
                 String[] argsFromUI = createArgsFromUI();
-                propertiesHelper.saveToUIApplicationProperties(createProperties(argsFromUI));
+                propertiesHelper.addAndSaveApplicationProperties(createProperties(argsFromUI));
                 ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(argsFromUI);
                 if (uiAppProperties.isActiveTray()) {
                     uiLauncher.updateTray(uiAppProperties);

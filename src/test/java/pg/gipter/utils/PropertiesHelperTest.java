@@ -67,4 +67,22 @@ class PropertiesHelperTest {
 
         assertThat(actual).hasSize(2);
     }
+
+    @Test
+    void givenBothApplicationProperties_whenConvertPropertiesToJson_thenCreateJsonConfigFile() {
+        Properties properties = generateProperty();
+        propertiesHelper.encryptPassword(properties);
+        propertiesHelper.saveProperties(properties, PropertiesHelper.APPLICATION_PROPERTIES);
+        propertiesHelper.saveProperties(properties, PropertiesHelper.UI_APPLICATION_PROPERTIES);
+        assertThat(Files.exists(Paths.get(PropertiesHelper.APPLICATION_PROPERTIES))).isTrue();
+        assertThat(Files.exists(Paths.get(PropertiesHelper.UI_APPLICATION_PROPERTIES))).isTrue();
+
+        propertiesHelper.convertPropertiesToNewFormat();
+
+        assertThat(Files.exists(Paths.get(PropertiesHelper.APPLICATION_PROPERTIES))).isFalse();
+        assertThat(Files.exists(Paths.get(PropertiesHelper.UI_APPLICATION_PROPERTIES))).isFalse();
+        Map<String, Properties> actual = propertiesHelper.loadAllApplicationProperties();
+        assertThat(actual).hasSize(2);
+        assertThat(actual.keySet()).containsExactly(PropertiesHelper.APPLICATION_PROPERTIES, PropertiesHelper.UI_APPLICATION_PROPERTIES);
+    }
 }

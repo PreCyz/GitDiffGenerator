@@ -7,6 +7,8 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.ui.job.JobProperty;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,13 +29,13 @@ public class PropertiesHelper {
     public static final String UPLOAD_STATUS_KEY = "lastUploadStatus";
     public static final String UPLOAD_DATE_TIME_KEY = "lastUploadDateTime";
 
-    public Optional<Properties> loadApplicationProperties() {
+    private Optional<Properties> loadApplicationProperties() {
         Optional<Properties> properties = loadProperties(APPLICATION_PROPERTIES);
         properties.ifPresent(this::decryptPassword);
         return properties;
     }
 
-    private void decryptPassword(Properties properties) {
+    void decryptPassword(Properties properties) {
         if (properties.containsKey(ArgName.toolkitPassword.name())) {
             try {
                 properties.replace(
@@ -46,7 +48,7 @@ public class PropertiesHelper {
         }
     }
 
-    public Optional<Properties> loadUIApplicationProperties() {
+    private Optional<Properties> loadUIApplicationProperties() {
         Optional<Properties> properties = loadProperties(UI_APPLICATION_PROPERTIES);
         properties.ifPresent(this::decryptPassword);
         return properties;
@@ -68,7 +70,7 @@ public class PropertiesHelper {
         return loadProperties(DATA_PROPERTIES);
     }
 
-    private void saveProperties(Properties properties, String file) {
+    void saveProperties(Properties properties, String file) {
         try (OutputStream os = new FileOutputStream(file)) {
             properties.store(os, null);
             logger.info("File {} saved.", file);
@@ -77,12 +79,7 @@ public class PropertiesHelper {
         }
     }
 
-    public void saveToApplicationProperties(Properties properties) {
-        encryptPassword(properties);
-        saveProperties(properties, APPLICATION_PROPERTIES);
-    }
-
-    private void encryptPassword(Properties properties) {
+    void encryptPassword(Properties properties) {
         if (properties.containsKey(ArgName.toolkitPassword.name())) {
             try {
                 properties.replace(
@@ -108,13 +105,16 @@ public class PropertiesHelper {
         saveProperties(data, DATA_PROPERTIES);
     }
 
-    public void saveToUIApplicationProperties(Properties properties) {
-        encryptPassword(properties);
-        saveProperties(properties, UI_APPLICATION_PROPERTIES);
-    }
-
     public void saveDataProperties(Properties properties) {
         saveProperties(properties, DATA_PROPERTIES);
+    }
+
+    public Optional<Properties> loadApplicationProperties(String configurationName) {
+        Map<String, Properties> propertiesMap = loadAllApplicationProperties();
+        if (StringUtils.nullOrEmpty(configurationName)) {
+            configurationName = PropertiesHelper.APPLICATION_PROPERTIES;
+        }
+        return Optional.ofNullable(propertiesMap.get(configurationName));
     }
 
     public Map<String, Properties> loadAllApplicationProperties() {
@@ -130,6 +130,7 @@ public class PropertiesHelper {
                         properties.put(argName.name(), value);
                     }
                 }
+                decryptPassword(properties);
                 result.put(properties.getProperty(ArgName.configurationName.name()), properties);
             }
         }
@@ -142,6 +143,7 @@ public class PropertiesHelper {
             throw new IllegalArgumentException("Properties does not contain any values.");
         }
 
+        encryptPassword(properties);
         JsonObject jsonObject = new JsonObject();
         for (Object key : properties.keySet()) {
             String keyStr = String.valueOf(key);
@@ -155,7 +157,7 @@ public class PropertiesHelper {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(jsonArray);
-        try (FileWriter writer = new FileWriter(APPLICATION_PROPERTIES_JSON)){
+        try (FileWriter writer = new FileWriter(APPLICATION_PROPERTIES_JSON)) {
             writer.write(json);
         } catch (IOException e) {
             logger.error("Error when writing {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());
@@ -172,5 +174,42 @@ public class PropertiesHelper {
             logger.warn("Warning when loading {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());
         }
         return null;
+    }
+
+    public void convertPropertiesToNewFormat() {
+        convertPropertiesToJson();
+        deleteProperties(APPLICATION_PROPERTIES);
+        deleteProperties(UI_APPLICATION_PROPERTIES);
+    }
+
+    private void convertPropertiesToJson() {
+        boolean nothingToConvert = true;
+        Optional<Properties> properties = loadApplicationProperties();
+        if (properties.isPresent()) {
+            Properties oldProperties = properties.get();
+            oldProperties.put(ArgName.configurationName.name(), APPLICATION_PROPERTIES);
+            addAndSaveApplicationProperties(oldProperties);
+            nothingToConvert = false;
+            logger.info("{} converted to JSON format.", APPLICATION_PROPERTIES);
+        }
+        properties = loadUIApplicationProperties();
+        if (properties.isPresent()) {
+            Properties oldProperties = properties.get();
+            oldProperties.put(ArgName.configurationName.name(), UI_APPLICATION_PROPERTIES);
+            addAndSaveApplicationProperties(oldProperties);
+            nothingToConvert = false;
+            logger.info("{} converted to JSON format.", UI_APPLICATION_PROPERTIES);
+        }
+        if (nothingToConvert) {
+            logger.info("There is no old properties to convert to JSON format.");
+        }
+    }
+
+    private void deleteProperties(String propertyFile) {
+        try {
+            Files.deleteIfExists(Paths.get(propertyFile));
+        } catch (IOException e) {
+            logger.warn("Can not delete {} file. {}", propertyFile, e.getMessage());
+        }
     }
 }

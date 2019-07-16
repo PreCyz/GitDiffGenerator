@@ -195,10 +195,10 @@ public class ProjectsController extends AbstractController {
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
             PropertiesHelper helper = new PropertiesHelper();
-            Properties uiApplications = helper.loadUIApplicationProperties().orElseGet(Properties::new);
+            Properties uiApplications = helper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
             uiApplications.setProperty(ArgName.projectPath.name(), projects);
-            helper.saveToUIApplicationProperties(uiApplications);
+            helper.addAndSaveApplicationProperties(uiApplications);
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
                     new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.UI}
             ));
