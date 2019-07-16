@@ -1,5 +1,6 @@
 package pg.gipter.utils;
 
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ArgName;
@@ -9,6 +10,8 @@ import java.io.*;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -19,6 +22,7 @@ public class PropertiesHelper {
     public static final String APPLICATION_PROPERTIES = "application.properties";
     public static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
     private static final String DATA_PROPERTIES = "data.properties";
+    static final String APPLICATION_PROPERTIES_JSON = "applicationProperties.json";
 
     public static final String UPLOAD_STATUS_KEY = "lastUploadStatus";
     public static final String UPLOAD_DATE_TIME_KEY = "lastUploadDateTime";
@@ -113,4 +117,60 @@ public class PropertiesHelper {
         saveProperties(properties, DATA_PROPERTIES);
     }
 
+    public Map<String, Properties> loadAllApplicationProperties() {
+        Map<String, Properties> result = new HashMap<>();
+        JsonArray jsonArray = readJsonConfig();
+        if (jsonArray != null) {
+            for (int i = 0; i < jsonArray.size(); ++i) {
+                Properties properties = new Properties();
+                JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
+                for (ArgName argName : ArgName.values()) {
+                    String value = jsonObject.get(argName.name()).getAsString();
+                    if (!StringUtils.nullOrEmpty(value)) {
+                        properties.put(argName.name(), value);
+                    }
+                }
+                result.put(properties.getProperty(ArgName.configurationName.name()), properties);
+            }
+        }
+        return result;
+    }
+
+    public void addAndSaveApplicationProperties(Properties properties) {
+        if (properties == null || properties.keySet().isEmpty()) {
+            logger.error("Properties does not contain any values.");
+            throw new IllegalArgumentException("Properties does not contain any values.");
+        }
+
+        JsonObject jsonObject = new JsonObject();
+        for (Object key : properties.keySet()) {
+            String keyStr = String.valueOf(key);
+            jsonObject.add(keyStr, new JsonPrimitive(properties.getProperty(keyStr)));
+        }
+        JsonArray jsonArray = readJsonConfig();
+        if (jsonArray == null) {
+            jsonArray = new JsonArray();
+        }
+        jsonArray.add(jsonObject);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(jsonArray);
+        try (FileWriter writer = new FileWriter(APPLICATION_PROPERTIES_JSON)){
+            writer.write(json);
+        } catch (IOException e) {
+            logger.error("Error when writing {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());
+            throw new IllegalArgumentException("Error when writing configuration into json.");
+        }
+
+    }
+
+    JsonArray readJsonConfig() {
+        try (FileReader fr = new FileReader(APPLICATION_PROPERTIES_JSON);
+             BufferedReader reader = new BufferedReader(fr)) {
+            return new Gson().fromJson(reader, JsonArray.class);
+        } catch (IOException | NullPointerException e) {
+            logger.warn("Warning when loading {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());
+        }
+        return null;
+    }
 }
