@@ -57,6 +57,23 @@ class PropertiesHelperTest {
     }
 
     @Test
+    void givenTwoPropertiesWithTheSameConfiguration_whenAddAndSaveApplicationProperties_thenCreateOnlyLastJsonConfig() {
+        Properties properties = generateProperty();
+        final String confName = properties.getProperty(ArgName.configurationName.name());
+        propertiesHelper.encryptPassword(properties);
+        propertiesHelper.addAndSaveApplicationProperties(properties);
+        final String lastPeriodInDays = "1";
+        properties.put(ArgName.periodInDays.name(), lastPeriodInDays);
+
+        propertiesHelper.addAndSaveApplicationProperties(properties);
+
+        Map<String, Properties> actual = propertiesHelper.loadAllApplicationProperties();
+        assertThat(actual).hasSize(1);
+        assertThat(actual.keySet()).containsExactly(confName);
+        actual.forEach((k, v) -> assertThat(v.getProperty(ArgName.periodInDays.name())).isEqualTo(lastPeriodInDays));
+    }
+
+    @Test
     void givenJsonFile_whenLoadAllApplicationProperties_thenReturnMap() {
         Properties properties = generateProperty();
         propertiesHelper.addAndSaveApplicationProperties(properties);

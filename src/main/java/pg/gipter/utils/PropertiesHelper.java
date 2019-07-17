@@ -21,8 +21,8 @@ public class PropertiesHelper {
 
     private final Logger logger = LoggerFactory.getLogger(PropertiesHelper.class);
 
-    public static final String APPLICATION_PROPERTIES = "application.properties";
-    public static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
+    static final String APPLICATION_PROPERTIES = "application.properties";
+    static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
     private static final String DATA_PROPERTIES = "data.properties";
     static final String APPLICATION_PROPERTIES_JSON = "applicationProperties.json";
 
@@ -35,7 +35,7 @@ public class PropertiesHelper {
         return properties;
     }
 
-    void decryptPassword(Properties properties) {
+    private void decryptPassword(Properties properties) {
         if (properties.containsKey(ArgName.toolkitPassword.name())) {
             try {
                 properties.replace(
@@ -150,8 +150,23 @@ public class PropertiesHelper {
             jsonObject.add(keyStr, new JsonPrimitive(properties.getProperty(keyStr)));
         }
         JsonArray jsonArray = readJsonConfig();
+        int existingConfIdx = -1;
         if (jsonArray == null) {
             jsonArray = new JsonArray();
+        } else {
+
+            for (int i = 0; i < jsonArray.size(); ++i) {
+                JsonObject jObj = jsonArray.get(i).getAsJsonObject();
+                String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
+                String newConfName = properties.getProperty(ArgName.configurationName.name());
+                if (!StringUtils.nullOrEmpty(existingConfName) && existingConfName.equals(newConfName)) {
+                    existingConfIdx = i;
+                    break;
+                }
+            }
+        }
+        if (existingConfIdx > -1) {
+            jsonArray.remove(existingConfIdx);
         }
         jsonArray.add(jsonObject);
 
