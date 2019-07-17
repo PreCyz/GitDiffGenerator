@@ -125,7 +125,11 @@ public class PropertiesHelper {
                 Properties properties = new Properties();
                 JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
                 for (ArgName argName : ArgName.values()) {
-                    String value = jsonObject.get(argName.name()).getAsString();
+                    JsonElement jsonElement = jsonObject.get(argName.name());
+                    if (jsonElement == null) {
+                        continue;
+                    }
+                    String value = jsonElement.getAsString();
                     if (!StringUtils.nullOrEmpty(value)) {
                         properties.put(argName.name(), value);
                     }
