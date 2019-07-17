@@ -117,6 +117,10 @@ public class MainController extends AbstractController {
     private ProgressIndicator progressIndicator;
     @FXML
     private Label infoLabel;
+    @FXML
+    private ComboBox<String> configurationName;
+    @FXML
+    private Button addConfigurationButton;
 
     private ApplicationProperties applicationProperties;
     private PropertiesHelper propertiesHelper;
@@ -188,6 +192,13 @@ public class MainController extends AbstractController {
             }
         }
         languageComboBox.setValue(currentLanguage);
+
+        Set<String> confNames = propertiesHelper.loadAllApplicationProperties().keySet();
+        if (!StringUtils.nullOrEmpty(configurationName.getValue())) {
+            confNames.add(configurationName.getValue());
+        }
+        configurationName.setItems(FXCollections.observableList(new ArrayList<>(confNames)));
+        configurationName.setValue(applicationProperties.configurationName());
     }
 
     private void setProperties(ResourceBundle resources) {
@@ -259,6 +270,7 @@ public class MainController extends AbstractController {
         deamonButton.setOnAction(deamonActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler(resources));
+        addConfigurationButton.setOnAction(addConfigurationEventHandler());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
@@ -368,6 +380,7 @@ public class MainController extends AbstractController {
         argList.add(ArgName.useUI + "=" + useUICheckBox.isSelected());
         argList.add(ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected());
         argList.add(ArgName.enableOnStartup + "=" + autostartCheckBox.isSelected());
+        argList.add(ArgName.configurationName + "=" + configurationName.getValue());
 
         return argList.toArray(new String[0]);
     }
@@ -457,6 +470,23 @@ public class MainController extends AbstractController {
             saveCurrentConfiguration(resources, createProperties(args));
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
             uiLauncher.updateTray(uiAppProperties);
+        };
+    }
+
+    private EventHandler<ActionEvent> addConfigurationEventHandler() {
+        return event -> {
+            String[] args = new String[ArgName.values().length];
+            int idx = 0;
+            for (ArgName argName : ArgName.values()) {
+                String value = argName.defaultValue();
+                if (argName == ArgName.preferredArgSource) {
+                    value = PreferredArgSource.UI.name();
+                }
+                args[idx++] = String.format("%s=%s", argName.name(), value);
+            }
+            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(args));
+            uiLauncher.hideMainWindow();
+            uiLauncher.showNewConfigurationWindow();
         };
     }
 

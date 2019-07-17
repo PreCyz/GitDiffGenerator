@@ -46,6 +46,7 @@ public class UILauncher implements Launcher {
     private ApplicationProperties applicationProperties;
     private Stage jobWindow;
     private Stage projectsWindow;
+    private Stage newConfigurationWindow;
     private TrayHandler trayHandler;
     private PropertiesHelper propertiesHelper;
     private boolean silentMode;
@@ -334,5 +335,24 @@ public class UILauncher implements Launcher {
 
     public void hideProjectsWindow() {
         projectsWindow.hide();
+    }
+
+    public String getConfigurationName() {
+        return applicationProperties.configurationName();
+    }
+
+    public void showNewConfigurationWindow() {
+        newConfigurationWindow = new Stage();
+        newConfigurationWindow.initModality(Modality.WINDOW_MODAL);
+        buildScene(newConfigurationWindow, WindowFactory.NEW_CONFIGURATION.createWindow(applicationProperties, this));
+        newConfigurationWindow.setOnCloseRequest(event -> {
+            hideNewConfigurationWindow();
+            execute();
+        });
+        newConfigurationWindow.showAndWait();
+    }
+
+    public void hideNewConfigurationWindow() {
+        newConfigurationWindow.hide();
     }
 }
