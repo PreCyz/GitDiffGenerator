@@ -1,8 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            prefHeight="400.0" prefWidth="600.0">
 
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.*?>
+<AnchorPane prefHeight="656.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="7.0" prefWidth="300.0" text="%timeFrame.panel.title">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="105.0" prefWidth="300.0">
+               <children>
+                  <DatePicker fx:id="startDatePicker" layoutX="124.0" layoutY="9.0" prefHeight="25.0" prefWidth="160.0" />
+                  <Label layoutX="10.0" layoutY="11.0" text="%timeFrame.panel.startDate" />
+                  <Label layoutX="10.0" layoutY="44.0" text="%timeFrame.panel.endDate" />
+                  <DatePicker fx:id="endDatePicker" layoutX="124.0" layoutY="42.0" prefHeight="25.0" prefWidth="160.0" />
+                  <Label layoutX="10.0" layoutY="76.0" text="%timeFrame.panel.periodInDays" />
+                  <TextField fx:id="periodInDaysTextField" layoutX="124.0" layoutY="74.0" prefWidth="160.0" />
+               </children>
+            </AnchorPane>
+         </content>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </TitledPane>
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="432.0" prefHeight="146.0" prefWidth="300.0" text="%paths.panel.title">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="95.0" prefWidth="300.0">
+               <children>
+                  <Label layoutX="10.0" layoutY="44.0" text="%paths.panel.projectPath" />
+                  <Label layoutX="10.0" layoutY="69.0" text="%paths.panel.itemPath" />
+                  <Label layoutX="10.0" layoutY="13.0" text="%paths.panel.fileNamePrefix" />
+                  <TextField fx:id="itemFileNamePrefixTextField" layoutX="122.0" layoutY="11.0" prefHeight="25.0" prefWidth="153.0" />
+                  <Label fx:id="projectPathLabel" layoutX="105.0" layoutY="44.0" prefHeight="17.0" prefWidth="80.0" text="need set up">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="itemPathLabel" layoutX="105.0" layoutY="69.0" prefHeight="17.0" prefWidth="80.0" text="need set up">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Label>
+                  <Button fx:id="projectPathButton" layoutX="197.0" layoutY="40.0" mnemonicParsing="false" text="Add">
+                     <font>
+                        <Font name="System Bold" size="11.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="itemPathButton" layoutX="197.0" layoutY="65.0" mnemonicParsing="false" text="Change">
+                     <font>
+                        <Font name="System Bold" size="11.0" />
+                     </font>
+                  </Button>
+                  <CheckBox fx:id="useAsFileNameCheckBox" layoutX="10.0" layoutY="94.0" mnemonicParsing="false" text="%paths.panel.useAsFileName" />
+               </children>
+            </AnchorPane>
+         </content>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </TitledPane>
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="139.0" prefHeight="292.0" prefWidth="300.0" text="%csv.panel.title">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="315.0" prefWidth="300.0">
+               <children>
+                  <Label layoutX="9.0" layoutY="13.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
+                  <TextField fx:id="authorsTextField" layoutX="129.0" layoutY="11.0" prefWidth="160.0" />
+                  <Label layoutX="9.0" layoutY="52.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
+                  <TextField fx:id="committerEmailTextField" layoutX="129.0" layoutY="49.0" prefWidth="160.0" />
+                  <Label layoutX="9.0" layoutY="90.0" text="%csv.panel.gitAuthor" />
+                  <TextField fx:id="gitAuthorTextField" layoutX="129.0" layoutY="87.0" prefWidth="160.0" />
+                  <TextField fx:id="mercurialAuthorTextField" layoutX="129.0" layoutY="125.0" prefWidth="160.0" />
+                  <Label layoutX="9.0" layoutY="128.0" text="%csv.panel.mercurialAuthor" />
+                  <TextField fx:id="svnAuthorTextField" layoutX="129.0" layoutY="163.0" prefWidth="160.0" />
+                  <Label layoutX="9.0" layoutY="166.0" text="%csv.panel.svnAuthor" />
+                  <Label layoutX="10.0" layoutY="233.0" text="%csv.panel.uploadType" />
+                  <ComboBox fx:id="uploadTypeComboBox" layoutX="129.0" layoutY="230.0" prefWidth="160.0" />
+                  <CheckBox fx:id="skipRemoteCheckBox" layoutX="129.0" layoutY="201.0" mnemonicParsing="false" />
+                  <Label layoutX="10.0" layoutY="200.0" text="%csv.panel.skipRemote" />
+               </children>
+            </AnchorPane>
+         </content>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </TitledPane>
+      <Button fx:id="addConfigButton" layoutX="73.0" layoutY="619.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="180.0" text="Add" textFill="#1eb235">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Button>
+      <Label layoutX="11.0" layoutY="588.0" text="%main.configurationName" />
+      <TextField fx:id="configurationNameText" layoutX="124.0" layoutY="584.0" prefHeight="25.0" prefWidth="188.0" />
+   </children>
 </AnchorPane>
