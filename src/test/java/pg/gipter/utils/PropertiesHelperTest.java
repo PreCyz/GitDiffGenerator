@@ -1,7 +1,6 @@
 package pg.gipter.utils;
 
-import com.google.gson.JsonArray;
-import org.jetbrains.annotations.NotNull;
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static pg.gipter.utils.PropertiesHelper.APPLICATION_PROPERTIES_JSON;
@@ -35,30 +33,22 @@ class PropertiesHelperTest {
         }
     }
 
-    @NotNull
-    private Properties generateProperty() {
-        Properties properties = new Properties();
-        for (ArgName argName : ArgName.values()) {
-            properties.put(argName.name(), argName.defaultValue());
-        }
-        properties.put(ArgName.configurationName.name(), String.valueOf(new Random().nextInt(100)));
-        return properties;
-    }
-
     @Test
     void givenGeneratedProperty_whenAddAndSave_thenCreateNewJsonFile() {
-        Properties properties = generateProperty();
+        Properties properties = TestDataFactory.generateProperty();
 
         propertiesHelper.addAndSaveApplicationProperties(properties);
 
-        JsonArray actual = propertiesHelper.readJsonConfig();
+        JsonObject actual = propertiesHelper.readJsonConfig();
         assertThat(actual).isNotNull();
-        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.getAsJsonObject(ConfigHelper.APP_CONFIG)).isNotNull();
+        assertThat(actual.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG)).isNotNull();
+        assertThat(actual.getAsJsonArray(ConfigHelper.RUN_CONFIGS)).hasSize(1);
     }
 
     @Test
     void givenTwoPropertiesWithTheSameConfiguration_whenAddAndSaveApplicationProperties_thenCreateOnlyLastJsonConfig() {
-        Properties properties = generateProperty();
+        Properties properties = TestDataFactory.generateProperty();
         final String confName = properties.getProperty(ArgName.configurationName.name());
         propertiesHelper.encryptPassword(properties);
         propertiesHelper.addAndSaveApplicationProperties(properties);
@@ -75,9 +65,9 @@ class PropertiesHelperTest {
 
     @Test
     void givenJsonFile_whenLoadAllApplicationProperties_thenReturnMap() {
-        Properties properties = generateProperty();
+        Properties properties = TestDataFactory.generateProperty();
         propertiesHelper.addAndSaveApplicationProperties(properties);
-        properties = generateProperty();
+        properties = TestDataFactory.generateProperty();
         propertiesHelper.addAndSaveApplicationProperties(properties);
 
         Map<String, Properties> actual = propertiesHelper.loadAllApplicationProperties();
@@ -87,7 +77,7 @@ class PropertiesHelperTest {
 
     @Test
     void givenBothApplicationProperties_whenConvertPropertiesToJson_thenCreateJsonConfigFile() {
-        Properties properties = generateProperty();
+        Properties properties = TestDataFactory.generateProperty();
         propertiesHelper.encryptPassword(properties);
         propertiesHelper.saveProperties(properties, PropertiesHelper.APPLICATION_PROPERTIES);
         propertiesHelper.saveProperties(properties, PropertiesHelper.UI_APPLICATION_PROPERTIES);

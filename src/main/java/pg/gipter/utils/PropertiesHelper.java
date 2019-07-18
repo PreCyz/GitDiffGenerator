@@ -12,10 +12,7 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 public class PropertiesHelper {
 
@@ -28,6 +25,12 @@ public class PropertiesHelper {
 
     public static final String UPLOAD_STATUS_KEY = "lastUploadStatus";
     public static final String UPLOAD_DATE_TIME_KEY = "lastUploadDateTime";
+
+    private final ConfigHelper configHelper;
+
+    public PropertiesHelper() {
+        this.configHelper = new ConfigHelper();
+    }
 
     private Optional<Properties> loadApplicationProperties() {
         Optional<Properties> properties = loadProperties(APPLICATION_PROPERTIES);
@@ -119,21 +122,17 @@ public class PropertiesHelper {
 
     public Map<String, Properties> loadAllApplicationProperties() {
         Map<String, Properties> result = new HashMap<>();
-        JsonArray jsonArray = readJsonConfig();
-        if (jsonArray != null) {
-            for (int i = 0; i < jsonArray.size(); ++i) {
+        JsonObject config = readJsonConfig();
+        if (config != null) {
+            JsonObject appConfig = config.getAsJsonObject(ConfigHelper.APP_CONFIG);
+            JsonObject toolkitConfig = config.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG);
+            JsonArray runConfigs = config.getAsJsonArray(ConfigHelper.RUN_CONFIGS);
+            for (int i = 0; i < runConfigs.size(); ++i) {
                 Properties properties = new Properties();
-                JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
-                for (ArgName argName : ArgName.values()) {
-                    JsonElement jsonElement = jsonObject.get(argName.name());
-                    if (jsonElement == null) {
-                        continue;
-                    }
-                    String value = jsonElement.getAsString();
-                    if (!StringUtils.nullOrEmpty(value)) {
-                        properties.put(argName.name(), value);
-                    }
-                }
+                setProperties(appConfig, properties, ConfigHelper.APP_CONFIG_PROPERTIES);
+                setProperties(toolkitConfig, properties, ConfigHelper.TOOLKIT_CONFIG_PROPERTIES);
+                JsonObject runConfig = runConfigs.get(i).getAsJsonObject();
+                setProperties(runConfig, properties, ConfigHelper.RUN_CONFIG_PROPERTIES);
                 decryptPassword(properties);
                 result.put(properties.getProperty(ArgName.configurationName.name()), properties);
             }
@@ -141,54 +140,76 @@ public class PropertiesHelper {
         return result;
     }
 
+    private void setProperties(JsonObject jsonObject, Properties properties, Set<String> propertiesNameSet) {
+        for (String propertyName : propertiesNameSet) {
+            JsonElement jsonElement = jsonObject.get(propertyName);
+            if (jsonElement != null) {
+                properties.put(propertyName, jsonElement.getAsString());
+            }
+        }
+    }
+
     public void addAndSaveApplicationProperties(Properties properties) {
         if (properties == null || properties.keySet().isEmpty()) {
             logger.error("Properties does not contain any values.");
             throw new IllegalArgumentException("Properties does not contain any values.");
         }
-
         encryptPassword(properties);
-        JsonObject jsonObject = new JsonObject();
-        for (Object key : properties.keySet()) {
-            String keyStr = String.valueOf(key);
-            jsonObject.add(keyStr, new JsonPrimitive(properties.getProperty(keyStr)));
-        }
-        JsonArray jsonArray = readJsonConfig();
-        int existingConfIdx = -1;
-        if (jsonArray == null) {
-            jsonArray = new JsonArray();
-        } else {
 
-            for (int i = 0; i < jsonArray.size(); ++i) {
-                JsonObject jObj = jsonArray.get(i).getAsJsonObject();
-                String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
-                String newConfName = properties.getProperty(ArgName.configurationName.name());
-                if (!StringUtils.nullOrEmpty(existingConfName) && existingConfName.equals(newConfName)) {
-                    existingConfIdx = i;
-                    break;
+        JsonObject jsonObject = buildJsonConfig(properties);
+
+        writeJsonConfig(jsonObject);
+    }
+
+    private JsonObject buildJsonConfig(Properties properties) {
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            jsonObject = configHelper.buildFullJson(properties);
+        } else {
+            jsonObject.add(ConfigHelper.APP_CONFIG, configHelper.buildAppConfig(properties));
+            jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));
+
+            JsonElement jsonElement = jsonObject.get(ConfigHelper.RUN_CONFIGS);
+            if (jsonElement == null) {
+                jsonObject.add(ConfigHelper.RUN_CONFIGS, configHelper.buildRunConfigs(properties));
+            } else {
+                JsonArray runConfigs = jsonElement.getAsJsonArray();
+                int existingConfIdx = -1;
+                for (int i = 0; i < runConfigs.size(); ++i) {
+                    JsonObject jObj = runConfigs.get(i).getAsJsonObject();
+                    String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
+                    String newConfName = properties.getProperty(ArgName.configurationName.name());
+                    if (!StringUtils.nullOrEmpty(existingConfName) && existingConfName.equals(newConfName)) {
+                        existingConfIdx = i;
+                        break;
+                    }
                 }
+
+                if (existingConfIdx > -1) {
+                    runConfigs.remove(existingConfIdx);
+                }
+                runConfigs.add(configHelper.buildRunConfig(properties));
+                jsonObject.add(ConfigHelper.RUN_CONFIGS, runConfigs);
             }
         }
-        if (existingConfIdx > -1) {
-            jsonArray.remove(existingConfIdx);
-        }
-        jsonArray.add(jsonObject);
+        return jsonObject;
+    }
 
+    private void writeJsonConfig(JsonObject jsonObject) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(jsonArray);
+        String json = gson.toJson(jsonObject);
         try (FileWriter writer = new FileWriter(APPLICATION_PROPERTIES_JSON)) {
             writer.write(json);
         } catch (IOException e) {
             logger.error("Error when writing {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());
             throw new IllegalArgumentException("Error when writing configuration into json.");
         }
-
     }
 
-    JsonArray readJsonConfig() {
+    JsonObject readJsonConfig() {
         try (FileReader fr = new FileReader(APPLICATION_PROPERTIES_JSON);
              BufferedReader reader = new BufferedReader(fr)) {
-            return new Gson().fromJson(reader, JsonArray.class);
+            return new Gson().fromJson(reader, JsonObject.class);
         } catch (IOException | NullPointerException e) {
             logger.warn("Warning when loading {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());
         }
@@ -197,8 +218,8 @@ public class PropertiesHelper {
 
     public void convertPropertiesToNewFormat() {
         convertPropertiesToJson();
-        deleteProperties(APPLICATION_PROPERTIES);
-        deleteProperties(UI_APPLICATION_PROPERTIES);
+        deletePropertyFile(APPLICATION_PROPERTIES);
+        deletePropertyFile(UI_APPLICATION_PROPERTIES);
     }
 
     private void convertPropertiesToJson() {
@@ -224,7 +245,7 @@ public class PropertiesHelper {
         }
     }
 
-    private void deleteProperties(String propertyFile) {
+    private void deletePropertyFile(String propertyFile) {
         try {
             Files.deleteIfExists(Paths.get(propertyFile));
         } catch (IOException e) {

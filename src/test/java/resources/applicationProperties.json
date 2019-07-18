@@ -1,0 +1,74 @@
+{
+  "appConfig" : {
+    "confirmationWindow" : "N",
+    "preferredArgSource" : "UI",
+    "useUI" : "Y",
+    "activeTray" : "Y",
+    "silentMode" : "N",
+    "enableOnStartup" : "Y"
+  },
+  "toolkitConfig" : {
+    "toolkitUsername" : "NO_TOOLKIT_USERNAME_GIVEN",
+    "toolkitPassword" : "NO_TOOLKIT_PASSWORD_GIVEN",
+    "toolkitDomain" : "NCDMZ",
+    "toolkitCopyListName" : "WorkItems",
+    "toolkitUrl" : "https://goto.netcompany.com",
+    "toolkitCopyCase" : "/cases/GTE106/NCSCOPY",
+    "toolkitWSUrl" :  "https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx",
+    "toolkitUserFolder" : "https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/",
+    "toolkitProjectListNames" : "Deliverables"
+  },
+  "runConfigs" : [
+    {
+      "author" : "NO_AUTHORS_GIVEN",
+      "gitAuthor" : "",
+      "mercurialAuthor" : "",
+      "svnAuthor" : "",
+      "committerEmail" : "",
+      "uploadType" : "SIMPLE",
+      "skipRemote" : "Y",
+      "itemPath" : "NO_ITEM_PATH_GIVEN",
+      "projectPath" : "NO_PROJECT_PATH_GIVEN",
+      "itemFileNamePrefix" : "",
+      "useAsFileName" : "N",
+      "periodInDays" : "7",
+      "startDate" : "2019-07-17",
+      "endDate" : "2019-07-18",
+      "configurationName" : "config1"
+    },
+    {
+      "author" : "NO_AUTHORS_GIVEN",
+      "gitAuthor" : "",
+      "mercurialAuthor" : "",
+      "svnAuthor" : "",
+      "committerEmail" : "",
+      "uploadType" : "SIMPLE",
+      "skipRemote" : "Y",
+      "itemPath" : "NO_ITEM_PATH_GIVEN",
+      "projectPath" : "NO_PROJECT_PATH_GIVEN",
+      "itemFileNamePrefix" : "",
+      "useAsFileName" : "N",
+      "periodInDays" : "7",
+      "startDate" : "2019-07-17",
+      "endDate" : "2019-07-18",
+      "configurationName" : "config2"
+    },
+    {
+      "author" : "NO_AUTHORS_GIVEN",
+      "gitAuthor" : "",
+      "mercurialAuthor" : "",
+      "svnAuthor" : "",
+      "committerEmail" : "",
+      "uploadType" : "SIMPLE",
+      "skipRemote" : "Y",
+      "itemPath" : "NO_ITEM_PATH_GIVEN",
+      "projectPath" : "NO_PROJECT_PATH_GIVEN",
+      "itemFileNamePrefix" : "",
+      "useAsFileName" : "N",
+      "periodInDays" : "7",
+      "startDate" : "2019-07-17",
+      "endDate" : "2019-07-18",
+      "configurationName" : "config3"
+    }
+  ]
+}
