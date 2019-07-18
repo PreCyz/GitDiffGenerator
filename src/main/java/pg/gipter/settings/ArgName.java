@@ -44,7 +44,7 @@ public enum ArgName {
     deleteDownloadedFiles("Y"),
     uploadAsHtml("N"),
 
-    configurationName("");
+    configurationName("DEFAULT");
 
     private String defaultValue;
 
