@@ -121,6 +121,8 @@ public class MainController extends AbstractController {
     private ComboBox<String> configurationName;
     @FXML
     private Button addConfigurationButton;
+    @FXML
+    private Button deleteConfigurationButton;
 
     private ApplicationProperties applicationProperties;
     private PropertiesHelper propertiesHelper;
