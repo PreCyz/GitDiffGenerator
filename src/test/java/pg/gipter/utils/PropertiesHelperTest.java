@@ -92,4 +92,17 @@ class PropertiesHelperTest {
         assertThat(actual).hasSize(2);
         assertThat(actual.keySet()).containsExactly(PropertiesHelper.APPLICATION_PROPERTIES, PropertiesHelper.UI_APPLICATION_PROPERTIES);
     }
+
+    @Test
+    void givenApplicationProperties_whenRemoveConfig_thenRemoveThatConfigFromFile() {
+        Properties properties = TestDataFactory.generateProperty();
+        propertiesHelper.addAndSaveApplicationProperties(properties);
+
+        propertiesHelper.removeConfig(properties.getProperty(ArgName.configurationName.name()));
+
+        JsonObject actual = propertiesHelper.readJsonConfig();
+        assertThat(actual.getAsJsonArray(ConfigHelper.RUN_CONFIGS)).hasSize(0);
+        assertThat(actual.getAsJsonObject(ConfigHelper.APP_CONFIG)).isNotNull();
+        assertThat(actual.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG)).isNotNull();
+    }
 }

@@ -169,7 +169,7 @@
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Button>
-      <Button fx:id="deleteConfigurationButton" layoutX="426.0" layoutY="723.0" mnemonicParsing="false" prefWidth="110.0" text="%main.deleteConfiguration" textFill="#f41b63">
+      <Button fx:id="removeConfigurationButton" layoutX="426.0" layoutY="723.0" mnemonicParsing="false" prefWidth="110.0" text="%main.deleteConfiguration" textFill="#f41b63">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
@@ -179,8 +179,8 @@
             <Font name="System Bold" size="15.0" />
          </font>
       </Button>
-      <TextField fx:id="configurationNameText" layoutX="315.0" layoutY="429.0" prefHeight="25.0" prefWidth="180.0" />
-      <Button fx:id="saveConfigurationButton" layoutX="314.0" layoutY="756.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="302.0" text="%button.save" textFill="#32a1c9">
+      <TextField fx:id="configurationNameTextField" layoutX="315.0" layoutY="429.0" prefHeight="25.0" prefWidth="180.0" />
+      <Button fx:id="saveConfigurationButton" layoutX="314.0" layoutY="756.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="303.0" text="%button.save" textFill="#32a1c9">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>

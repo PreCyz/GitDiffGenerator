@@ -216,6 +216,36 @@ public class PropertiesHelper {
         return null;
     }
 
+    public void removeConfig(String configurationName) {
+        final String errMsg = "Can not remove the configuration, because it does not exists!";
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            logger.error(errMsg);
+            throw new IllegalStateException(errMsg);
+        } else {
+            JsonElement jsonElement = jsonObject.get(ConfigHelper.RUN_CONFIGS);
+            JsonArray runConfigs = jsonElement.getAsJsonArray();
+            int existingConfIdx = -1;
+            for (int i = 0; i < runConfigs.size(); ++i) {
+                JsonObject jObj = runConfigs.get(i).getAsJsonObject();
+                String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
+                if (!StringUtils.nullOrEmpty(existingConfName) && existingConfName.equals(configurationName)) {
+                    existingConfIdx = i;
+                    break;
+                }
+            }
+
+            if (existingConfIdx > -1) {
+                runConfigs.remove(existingConfIdx);
+                jsonObject.add(ConfigHelper.RUN_CONFIGS, runConfigs);
+                writeJsonConfig(jsonObject);
+            } else {
+                logger.error(errMsg);
+                throw new IllegalStateException(errMsg);
+            }
+        }
+    }
+
     public void convertPropertiesToNewFormat() {
         convertPropertiesToJson();
         deletePropertyFile(APPLICATION_PROPERTIES);

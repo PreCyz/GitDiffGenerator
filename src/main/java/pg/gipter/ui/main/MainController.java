@@ -1,5 +1,6 @@
 package pg.gipter.ui.main;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -22,6 +23,7 @@ import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
+import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
@@ -124,7 +126,7 @@ public class MainController extends AbstractController {
     @FXML
     private Button addConfigurationButton;
     @FXML
-    private Button deleteConfigurationButton;
+    private Button removeConfigurationButton;
 
     private ApplicationProperties applicationProperties;
     private PropertiesHelper propertiesHelper;
@@ -203,6 +205,7 @@ public class MainController extends AbstractController {
         }
         configurationNameComboBox.setItems(FXCollections.observableList(new ArrayList<>(confNames)));
         configurationNameComboBox.setValue(applicationProperties.configurationName());
+        configurationNameTextField.setText(applicationProperties.configurationName());
     }
 
     private void setProperties(ResourceBundle resources) {
@@ -275,6 +278,7 @@ public class MainController extends AbstractController {
         exitButton.setOnAction(exitActionEventHandler());
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler(resources));
         addConfigurationButton.setOnAction(addConfigurationEventHandler());
+        removeConfigurationButton.setOnAction(addConfigurationEventHandler());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
@@ -478,6 +482,23 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
+        return event -> {
+            try {
+                propertiesHelper.removeConfig(configurationNameComboBox.getValue());
+            } catch (IllegalStateException ex) {
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withHeaderText(ex.getMessage())
+                        .withLink(AlertHelper.logsFolder())
+                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withAlertType(Alert.AlertType.ERROR)
+                        .withImage()
+                        .buildAndDisplayWindow()
+                );
+            }
+        };
+    }
+
+    private EventHandler<ActionEvent> removeConfigurationEventHandler() {
         return event -> {
             String[] args = new String[ArgName.values().length];
             int idx = 0;
