@@ -134,6 +134,8 @@ public class AlertWindowBuilder {
                 imgName = "good-job.png";
             } else if (windowType == WindowType.OVERRIDE_WINDOW) {
                 imgName = "override.png";
+            } else if (windowType == WindowType.CONFIRMATION_WINDOW) {
+                imgName = "finger-up.png";
             }
             imageView = ResourceUtils.getImgResource(imgName)
                     .map(url -> new ImageView(new Image(url.toString())))

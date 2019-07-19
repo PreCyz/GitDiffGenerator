@@ -19,7 +19,6 @@ import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
-import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
@@ -200,7 +199,7 @@ public class ProjectsController extends AbstractController {
             uiApplications.setProperty(ArgName.projectPath.name(), projects);
             helper.addAndSaveApplicationProperties(uiApplications);
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
-                    new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.UI}
+                    new String[]{ArgName.configurationName + "=" + uiLauncher.getConfigurationName()}
             ));
             uiLauncher.hideProjectsWindow();
             uiLauncher.buildAndShowMainWindow();

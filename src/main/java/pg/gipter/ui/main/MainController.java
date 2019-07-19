@@ -1,17 +1,22 @@
 package pg.gipter.ui.main;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
+import org.jetbrains.annotations.NotNull;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
@@ -132,6 +137,8 @@ public class MainController extends AbstractController {
     private PropertiesHelper propertiesHelper;
 
     private static String currentLanguage;
+    private static String newConfigurationName = "";
+    private static boolean useComboBoxValueChangeListener = true;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -143,6 +150,7 @@ public class MainController extends AbstractController {
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
         setInitValues(resources);
+        initConfigurationName();
         setProperties(resources);
         setActions(resources);
         setListeners(resources);
@@ -187,7 +195,9 @@ public class MainController extends AbstractController {
         activeteTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
         autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
 
-        languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
+        if (languageComboBox.getItems().isEmpty()) {
+            languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
+        }
         if (StringUtils.nullOrEmpty(currentLanguage)) {
             if (StringUtils.nullOrEmpty(resources.getLocale().getLanguage())
                     || BundleUtils.SUPPORTED_LANGUAGES[0].equals(resources.getLocale().getLanguage())) {
@@ -198,7 +208,9 @@ public class MainController extends AbstractController {
             }
         }
         languageComboBox.setValue(currentLanguage);
+    }
 
+    private void initConfigurationName() {
         Set<String> confNames = propertiesHelper.loadAllApplicationProperties().keySet();
         if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
             confNames.add(configurationNameComboBox.getValue());
@@ -276,15 +288,16 @@ public class MainController extends AbstractController {
         executeButton.setOnAction(executeActionEventHandler());
         deamonButton.setOnAction(deamonActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
-        saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler(resources));
+        saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler());
         addConfigurationButton.setOnAction(addConfigurationEventHandler());
-        removeConfigurationButton.setOnAction(addConfigurationEventHandler());
+        removeConfigurationButton.setOnAction(removeConfigurationEventHandler(resources));
+        configurationNameTextField.setOnKeyReleased(keyReleasedEventHandler());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
         return event -> {
             String[] argsFromUI = createArgsFromUI();
-            propertiesHelper.addAndSaveApplicationProperties(createProperties(argsFromUI));
+            propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(argsFromUI));
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
             uiLauncher.hideMainWindow();
             uiLauncher.showProjectsWindow();
@@ -388,7 +401,7 @@ public class MainController extends AbstractController {
         argList.add(ArgName.useUI + "=" + useUICheckBox.isSelected());
         argList.add(ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected());
         argList.add(ArgName.enableOnStartup + "=" + autostartCheckBox.isSelected());
-        argList.add(ArgName.configurationName + "=" + configurationNameComboBox.getValue());
+        argList.add(ArgName.configurationName + "=" + configurationNameTextField.getText());
 
         return argList.toArray(new String[0]);
     }
@@ -420,41 +433,11 @@ public class MainController extends AbstractController {
         };
     }
 
-    private void saveCurrentConfiguration(ResourceBundle resource, Properties properties) {
-        boolean isOverride = new AlertWindowBuilder()
-                .withHeaderText(resource.getString("popup.overrideProperties.message"))
-                .withOverrideText(resource.getString("popup.overrideProperties.buttonOverride"))
-                .withCreateText(resource.getString("popup.overrideProperties.buttonUIProperties"))
-                .withAlertType(Alert.AlertType.CONFIRMATION)
-                .withWindowType(WindowType.OVERRIDE_WINDOW)
-                .withImage()
-                .buildAndDisplayOverrideWindow();
-
-        if (isOverride) {
-            properties.replace(ArgName.preferredArgSource.name(), PreferredArgSource.FILE.name());
-            propertiesHelper.addAndSaveApplicationProperties(properties);
-        } else {
-            properties.remove(ArgName.startDate.name());
-            properties.remove(ArgName.endDate.name());
-            propertiesHelper.addAndSaveApplicationProperties(properties);
-        }
-    }
-
-    private Properties createProperties(String[] args) {
-        Properties properties = new Properties();
-        for (String arg : args) {
-            String key = arg.substring(0, arg.indexOf("="));
-            String value = arg.substring(arg.indexOf("=") + 1);
-            properties.setProperty(key, value);
-        }
-        return properties;
-    }
-
     private EventHandler<ActionEvent> deamonActionEventHandler() {
         return event -> {
             if (uiLauncher.isTraySupported()) {
                 String[] argsFromUI = createArgsFromUI();
-                propertiesHelper.addAndSaveApplicationProperties(createProperties(argsFromUI));
+                propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(argsFromUI));
                 ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(argsFromUI);
                 if (uiAppProperties.isActiveTray()) {
                     uiLauncher.updateTray(uiAppProperties);
@@ -472,33 +455,25 @@ public class MainController extends AbstractController {
         return event -> UILauncher.platformExit();
     }
 
-    private EventHandler<ActionEvent> saveConfigurationActionEventHandler(ResourceBundle resources) {
+    private EventHandler<ActionEvent> saveConfigurationActionEventHandler() {
         return event -> {
             String[] args = createArgsFromUI();
-            saveCurrentConfiguration(resources, createProperties(args));
-            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
-            uiLauncher.updateTray(uiAppProperties);
+            Properties properties = propertiesHelper.createProperties(args);
+            properties.remove(ArgName.startDate.name());
+            properties.remove(ArgName.endDate.name());
+            propertiesHelper.addAndSaveApplicationProperties(properties);
+            applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+            uiLauncher.updateTray(applicationProperties);
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                    .withImage()
+                    .buildAndDisplayWindow()
+            );
         };
     }
 
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
-        return event -> {
-            try {
-                propertiesHelper.removeConfig(configurationNameComboBox.getValue());
-            } catch (IllegalStateException ex) {
-                Platform.runLater(() -> new AlertWindowBuilder()
-                        .withHeaderText(ex.getMessage())
-                        .withLink(AlertHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.ERROR)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
-            }
-        };
-    }
-
-    private EventHandler<ActionEvent> removeConfigurationEventHandler() {
         return event -> {
             String[] args = new String[ArgName.values().length];
             int idx = 0;
@@ -513,6 +488,76 @@ public class MainController extends AbstractController {
             uiLauncher.hideMainWindow();
             uiLauncher.showNewConfigurationWindow();
         };
+    }
+
+    private EventHandler<ActionEvent> removeConfigurationEventHandler(ResourceBundle resource) {
+        return event -> {
+            try {
+                propertiesHelper.removeConfig(configurationNameComboBox.getValue());
+                Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
+                String newConfiguration = ArgName.configurationName.defaultValue();
+                if (!propertiesMap.isEmpty()) {
+                    Properties currentConfig = new ArrayList<>(propertiesMap.entrySet()).get(0).getValue();
+                    newConfiguration = currentConfig.getProperty(ArgName.configurationName.name());
+                }
+                removeConfigurationNameFromComboBox(configurationNameComboBox.getValue(), newConfiguration);
+                String[] currentArgs = propertiesHelper.loadArgumentArray(newConfiguration);
+                applicationProperties = ApplicationPropertiesFactory.getInstance(currentArgs);
+                setInitValues(resource);
+                configurationNameTextField.setText(configurationNameComboBox.getValue());
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withAlertType(Alert.AlertType.INFORMATION)
+                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                        .withImage()
+                        .buildAndDisplayWindow()
+                );
+            } catch (IllegalStateException ex) {
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withHeaderText(ex.getMessage())
+                        .withLink(AlertHelper.logsFolder())
+                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withAlertType(Alert.AlertType.ERROR)
+                        .withImage()
+                        .buildAndDisplayWindow()
+                );
+            }
+        };
+    }
+
+    private EventHandler<KeyEvent> keyReleasedEventHandler() {
+        return event -> {
+            String oldValue = configurationNameComboBox.getValue();
+            if (event.getCode() == KeyCode.ENTER && !newConfigurationName.equalsIgnoreCase(oldValue)) {
+                Properties currentProperties = propertiesHelper.createProperties(createArgsFromUI());
+                Optional<Properties> properties = propertiesHelper.loadApplicationProperties(oldValue);
+                if (properties.isPresent()) {
+                    propertiesHelper.removeConfig(oldValue);
+                }
+                updateConfigurationNameComboBox(oldValue, newConfigurationName);
+                propertiesHelper.addAndSaveApplicationProperties(currentProperties);
+                newConfigurationName = "";
+            }
+        };
+    }
+
+    private void updateConfigurationNameComboBox(String oldValue, String newValue) {
+        List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
+        items.remove(oldValue);
+        items.add(newValue);
+        updateConfigComboBox(newValue, FXCollections.observableList(items));
+    }
+
+    private void updateConfigComboBox(String newValue, ObservableList<String> items) {
+        useComboBoxValueChangeListener = false;
+        configurationNameComboBox.setItems(items);
+        configurationNameComboBox.setValue(newValue);
+        useComboBoxValueChangeListener = true;
+    }
+
+    private void removeConfigurationNameFromComboBox(String oldValue, String newValue) {
+        List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
+        items.remove(oldValue);
+        updateConfigComboBox(newValue, FXCollections.observableList(items));
     }
 
     private void setListeners(final ResourceBundle resources) {
@@ -560,6 +605,24 @@ public class MainController extends AbstractController {
 
         uploadAsHtmlCheckBox.selectedProperty().addListener((observable, oldValue, newValue) ->
                 deleteDownloadedFilesCheckBox.setDisable(newValue));
+
+        configurationNameComboBox.getSelectionModel()
+                .selectedItemProperty()
+                .addListener(comboBoxValueChangeListener(resources));
+
+        configurationNameTextField.textProperty().addListener((observable, oldValue, newValue) -> newConfigurationName = newValue);
+    }
+
+    @NotNull
+    private ChangeListener<String> comboBoxValueChangeListener(ResourceBundle resources) {
+        return (options, oldValue, newValue) -> {
+            if (useComboBoxValueChangeListener) {
+                String[] args = propertiesHelper.loadArgumentArray(newValue);
+                applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+                setInitValues(resources);
+                configurationNameTextField.setText(newValue);
+            }
+        };
     }
 
 }

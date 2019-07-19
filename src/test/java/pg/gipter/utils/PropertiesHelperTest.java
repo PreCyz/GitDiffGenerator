@@ -105,4 +105,14 @@ class PropertiesHelperTest {
         assertThat(actual.getAsJsonObject(ConfigHelper.APP_CONFIG)).isNotNull();
         assertThat(actual.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG)).isNotNull();
     }
+
+    @Test
+    void givenApplicationProperties_whenLoadArgumentArray_thenRemoveThatConfigFromFile() {
+        Properties properties = TestDataFactory.generateProperty();
+        propertiesHelper.addAndSaveApplicationProperties(properties);
+
+        String[] actual = propertiesHelper.loadArgumentArray(properties.getProperty(ArgName.configurationName.name()));
+
+        assertThat(actual).isNotNull();
+    }
 }

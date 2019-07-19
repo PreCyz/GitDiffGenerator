@@ -1595,7 +1595,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.configurationName();
 
-        assertThat(actual).isEmpty();
+        assertThat(actual).isEqualTo(ArgName.configurationName.defaultValue());
     }
 
     @Test

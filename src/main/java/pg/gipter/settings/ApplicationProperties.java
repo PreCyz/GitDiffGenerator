@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.utils.PropertiesHelper;
+import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -44,12 +45,18 @@ public abstract class ApplicationProperties {
     }
 
     protected void init(String[] args, PropertiesHelper propertiesHelper) {
-        Optional<Properties> propsFromFile = propertiesHelper.loadApplicationProperties(argExtractor.configurationName());
+        Optional<Properties> propsFromFile;
+        Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
+        if (!propertiesMap.containsKey(argExtractor.configurationName()) || StringUtils.nullOrEmpty(argExtractor.configurationName())) {
+            propsFromFile = propertiesHelper.loadApplicationProperties(ArgName.configurationName.defaultValue());
+        } else {
+            propsFromFile = Optional.of(propertiesMap.get(argExtractor.configurationName()));
+        }
         if (propsFromFile.isPresent()) {
             properties = propsFromFile.get();
             logger.info("Configuration [{}] loaded.", argExtractor.configurationName());
         } else {
-            logger.warn("Can not load  configuration [{}].", argExtractor.configurationName());
+            logger.warn("Can not load configuration [{}].", argExtractor.configurationName());
             logger.info("Command line argument loaded: {}.", Arrays.toString(args));
         }
         logger.info("Application properties loaded: {}.", log());

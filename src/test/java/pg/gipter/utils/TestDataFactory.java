@@ -14,7 +14,9 @@ public class TestDataFactory {
     static Properties generateProperty() {
         Properties properties = new Properties();
         for (ArgName argName : ArgName.values()) {
-            properties.put(argName.name(), argName.defaultValue());
+            if (!StringUtils.nullOrEmpty(argName.defaultValue())) {
+                properties.put(argName.name(), argName.defaultValue());
+            }
         }
         properties.put(ArgName.configurationName.name(), String.valueOf(new Random().nextInt(100)));
         return properties;

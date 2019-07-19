@@ -120,6 +120,30 @@ public class PropertiesHelper {
         return Optional.ofNullable(propertiesMap.get(configurationName));
     }
 
+    public String[] loadArgumentArray(String configurationName) {
+        Optional<Properties> properties = loadApplicationProperties(configurationName);
+        String[] result = new String[0];
+        if (properties.isPresent()) {
+            result = new String[properties.get().size()];
+            int idx = 0;
+            for (Object keyObj : properties.get().keySet()) {
+                String key = String.valueOf(keyObj);
+                result[idx++] = String.format("%s=%s", key, properties.get().getProperty(key));
+            }
+        }
+        return result;
+    }
+
+    public Properties createProperties(String[] args) {
+        Properties properties = new Properties();
+        for (String arg : args) {
+            String key = arg.substring(0, arg.indexOf("="));
+            String value = arg.substring(arg.indexOf("=") + 1);
+            properties.setProperty(key, value);
+        }
+        return properties;
+    }
+
     public Map<String, Properties> loadAllApplicationProperties() {
         Map<String, Properties> result = new HashMap<>();
         JsonObject config = readJsonConfig();
