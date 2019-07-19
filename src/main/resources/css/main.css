@@ -1,0 +1,6 @@
+#picture-pane {
+    -fx-background-image: url('../img/ass-protector.png');
+    -fx-background-size: 100%;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 100%;
+}

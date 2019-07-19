@@ -3,13 +3,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="900.0" prefWidth="625.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="885.0" prefWidth="625.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Button fx:id="executeButton" layoutX="87.0" layoutY="854.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="130.0" text="%button.execute" textFill="#1eb235">
+        <Button fx:id="executeButton" layoutX="314.0" layoutY="791.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="110.0" text="%button.execute" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="15.0" />
          </font></Button>
-        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="153.0" prefHeight="292.0" prefWidth="302.0" text="%csv.panel.title">
+        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="587.0" prefHeight="292.0" prefWidth="302.0" text="%csv.panel.title">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="315.0" prefWidth="300.0">
                     <children>
@@ -34,14 +34,14 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="446.0" text="%paths.panel.title">
+        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="465.0" text="%paths.panel.title">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="95.0" prefWidth="604.0">
                     <children>
                         <Label layoutX="10.0" layoutY="44.0" text="%paths.panel.projectPath" />
                         <Label layoutX="10.0" layoutY="69.0" text="%paths.panel.itemPath" />
                         <Label layoutX="10.0" layoutY="13.0" text="%paths.panel.fileNamePrefix" />
-                        <TextField fx:id="itemFileNamePrefixTextField" layoutX="122.0" layoutY="11.0" prefHeight="25.0" prefWidth="153.0" />
+                        <TextField fx:id="itemFileNamePrefixTextField" layoutX="105.0" layoutY="11.0" prefHeight="25.0" prefWidth="186.0" />
                         <Label fx:id="projectPathLabel" layoutX="105.0" layoutY="44.0" prefHeight="17.0" prefWidth="430.0" text="need set up">
                      <font>
                         <Font size="12.0" />
@@ -66,7 +66,7 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="315.0" layoutY="314.0" prefWidth="300.0" text="%timeFrame.panel.title">
+        <TitledPane animated="false" collapsible="false" layoutX="315.0" layoutY="587.0" prefWidth="300.0" text="%timeFrame.panel.title">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="105.0" prefWidth="300.0">
                     <children>
@@ -88,23 +88,18 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="90.0" prefWidth="300.0">
                     <children>
                         <Label layoutX="10.0" layoutY="6.0" text="%launch.panel.confirmationWindow" />
-                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="199.0" layoutY="8.0" mnemonicParsing="false" />
-                        <Label layoutX="314.0" layoutY="50.0" text="%launch.panel.preferredArgSource" />
-                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="503.0" layoutY="46.0" prefHeight="25.0" prefWidth="90.0" />
+                        <CheckBox fx:id="confirmationWindowCheckBox" layoutX="133.0" layoutY="8.0" mnemonicParsing="false" />
+                        <Label layoutX="265.0" layoutY="48.0" text="%launch.panel.preferredArgSource" />
+                        <ComboBox fx:id="preferredArgSourceComboBox" layoutX="165.0" layoutY="44.0" prefHeight="25.0" prefWidth="90.0" />
                         <Label layoutX="10.0" layoutY="32.0" text="%launch.panel.useUI" />
-                        <CheckBox fx:id="useUICheckBox" layoutX="199.0" layoutY="34.0" mnemonicParsing="false" />
-                  <Label layoutX="314.0" layoutY="82.0" prefHeight="17.0" prefWidth="175.0" text="%launch.panel.saveCurrentConfiguration" />
+                        <CheckBox fx:id="useUICheckBox" layoutX="133.0" layoutY="34.0" mnemonicParsing="false" />
                   <Label layoutX="10.0" layoutY="58.0" text="%launch.panel.activateTray" />
-                  <CheckBox fx:id="activeteTrayCheckBox" layoutX="199.0" layoutY="60.0" mnemonicParsing="false" />
-                  <Button fx:id="saveConfigurationButton" layoutX="503.0" layoutY="80.0" mnemonicParsing="false" prefWidth="56.0" text="%button.save">
-                     <font>
-                        <Font name="System Bold" size="11.0" />
-                     </font>
-                  </Button>
+                  <CheckBox fx:id="activeteTrayCheckBox" layoutX="133.0" layoutY="60.0" mnemonicParsing="false" />
                   <Label layoutX="10.0" layoutY="84.0" text="%launch.panel.autoStart" />
-                  <CheckBox fx:id="autostartCheckBox" layoutX="199.0" layoutY="86.0" mnemonicParsing="false" />
-                  <ComboBox fx:id="languageComboBox" layoutX="503.0" layoutY="11.0" prefWidth="70.0" />
-                  <Label layoutX="314.0" layoutY="17.0" text="%launch.panel.language" />
+                  <CheckBox fx:id="autostartCheckBox" layoutX="133.0" layoutY="86.0" mnemonicParsing="false" />
+                  <ComboBox fx:id="languageComboBox" layoutX="165.0" layoutY="9.0" prefWidth="70.0" />
+                  <Label layoutX="265.0" layoutY="13.0" text="%launch.panel.language" />
+                  <Pane id="picture-pane" fx:id="picturePane" layoutX="494.0" layoutY="3.0" prefHeight="105.0" prefWidth="105.0" stylesheets="@../css/main.css" />
                     </children>
                 </AnchorPane>
             </content>
@@ -112,7 +107,7 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="568.0" text="%toolkit.panel.title">
+        <TitledPane animated="false" collapsible="false" layoutX="11.0" layoutY="143.0" text="%toolkit.panel.title">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="250.0" prefWidth="603.0">
                     <children>
@@ -152,29 +147,40 @@
                 <Font name="System Bold" size="12.0" />
             </font>
         </TitledPane>
-      <Button fx:id="deamonButton" layoutX="452.0" layoutY="854.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
+      <Button fx:id="deamonButton" layoutX="538.0" layoutY="723.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Button>
-      <Button fx:id="exitButton" layoutX="541.0" layoutY="854.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="77.0" text="%button.exit" textFill="#0d0d0d">
+      <Button fx:id="exitButton" layoutX="538.0" layoutY="791.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="79.0" text="%button.exit" textFill="#0d0d0d">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Button>
-      <ProgressIndicator fx:id="progressIndicator" layoutX="228.0" layoutY="855.0" progress="0.0" />
-      <Label fx:id="infoLabel" layoutX="271.0" layoutY="859.0" prefHeight="17.0" prefWidth="177.0" />
-      <Label layoutX="324.0" layoutY="198.0" text="%main.configurationName">
+      <ProgressIndicator fx:id="progressIndicator" layoutX="315.0" layoutY="832.0" progress="0.0" />
+      <Label fx:id="infoLabel" layoutX="351.0" layoutY="834.0" prefHeight="17.0" prefWidth="266.0" />
+      <Label layoutX="11.0" layoutY="433.0" text="%main.configurationName">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <ComboBox fx:id="configurationName" layoutX="446.0" layoutY="194.0" prefHeight="25.0" prefWidth="170.0" />
-      <Button fx:id="addConfigurationButton" layoutX="324.0" layoutY="154.0" mnemonicParsing="false" text="%main.addConfiguration" textFill="#32a1c9">
+      <ComboBox fx:id="configurationNameComboBox" layoutX="133.0" layoutY="429.0" prefHeight="25.0" prefWidth="180.0" />
+      <Button fx:id="addConfigurationButton" layoutX="314.0" layoutY="723.0" mnemonicParsing="false" prefWidth="110.0" text="%main.addConfiguration" textFill="#32a1c9">
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Button>
-      <Button fx:id="deleteConfigurationButton" layoutX="470.0" layoutY="154.0" mnemonicParsing="false" text="%main.deleteConfiguration" textFill="#f41b63">
+      <Button fx:id="deleteConfigurationButton" layoutX="426.0" layoutY="723.0" mnemonicParsing="false" prefWidth="110.0" text="%main.deleteConfiguration" textFill="#f41b63">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Button>
+      <Button fx:id="executeAllButton" layoutX="426.0" layoutY="791.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="110.0" text="%button.executeAll" textFill="#1eb235">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Button>
+      <TextField fx:id="configurationNameText" layoutX="315.0" layoutY="429.0" prefHeight="25.0" prefWidth="180.0" />
+      <Button fx:id="saveConfigurationButton" layoutX="314.0" layoutY="756.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="302.0" text="%button.save" textFill="#32a1c9">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>

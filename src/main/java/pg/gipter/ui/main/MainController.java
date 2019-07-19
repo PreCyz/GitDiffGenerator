@@ -118,7 +118,9 @@ public class MainController extends AbstractController {
     @FXML
     private Label infoLabel;
     @FXML
-    private ComboBox<String> configurationName;
+    private ComboBox<String> configurationNameComboBox;
+    @FXML
+    private TextField configurationNameTextField;
     @FXML
     private Button addConfigurationButton;
     @FXML
@@ -196,11 +198,11 @@ public class MainController extends AbstractController {
         languageComboBox.setValue(currentLanguage);
 
         Set<String> confNames = propertiesHelper.loadAllApplicationProperties().keySet();
-        if (!StringUtils.nullOrEmpty(configurationName.getValue())) {
-            confNames.add(configurationName.getValue());
+        if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
+            confNames.add(configurationNameComboBox.getValue());
         }
-        configurationName.setItems(FXCollections.observableList(new ArrayList<>(confNames)));
-        configurationName.setValue(applicationProperties.configurationName());
+        configurationNameComboBox.setItems(FXCollections.observableList(new ArrayList<>(confNames)));
+        configurationNameComboBox.setValue(applicationProperties.configurationName());
     }
 
     private void setProperties(ResourceBundle resources) {
@@ -382,7 +384,7 @@ public class MainController extends AbstractController {
         argList.add(ArgName.useUI + "=" + useUICheckBox.isSelected());
         argList.add(ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected());
         argList.add(ArgName.enableOnStartup + "=" + autostartCheckBox.isSelected());
-        argList.add(ArgName.configurationName + "=" + configurationName.getValue());
+        argList.add(ArgName.configurationName + "=" + configurationNameComboBox.getValue());
 
         return argList.toArray(new String[0]);
     }
