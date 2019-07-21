@@ -52,6 +52,7 @@ public class UILauncher implements Launcher {
     private boolean silentMode;
     private boolean upgradeChecked = false;
     private Executor executor;
+    private boolean newConfigSource;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
         this.mainWindow = mainWindow;
@@ -355,4 +356,13 @@ public class UILauncher implements Launcher {
     public void hideNewConfigurationWindow() {
         newConfigurationWindow.hide();
     }
+
+    public void setNewConfigSource(boolean newConfigSource) {
+        this.newConfigSource = newConfigSource;
+    }
+
+    public boolean isSourceNewConfig() {
+        return newConfigSource;
+    }
+
 }

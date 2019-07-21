@@ -192,31 +192,17 @@ public class PropertiesHelper {
         } else {
             jsonObject.add(ConfigHelper.APP_CONFIG, configHelper.buildAppConfig(properties));
             jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));
-
-            JsonElement jsonElement = jsonObject.get(ConfigHelper.RUN_CONFIGS);
-            if (jsonElement == null) {
-                jsonObject.add(ConfigHelper.RUN_CONFIGS, configHelper.buildRunConfigs(properties));
-            } else {
-                JsonArray runConfigs = jsonElement.getAsJsonArray();
-                int existingConfIdx = -1;
-                for (int i = 0; i < runConfigs.size(); ++i) {
-                    JsonObject jObj = runConfigs.get(i).getAsJsonObject();
-                    String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
-                    String newConfName = properties.getProperty(ArgName.configurationName.name());
-                    if (!StringUtils.nullOrEmpty(existingConfName) && existingConfName.equals(newConfName)) {
-                        existingConfIdx = i;
-                        break;
-                    }
-                }
-
-                if (existingConfIdx > -1) {
-                    runConfigs.remove(existingConfIdx);
-                }
-                runConfigs.add(configHelper.buildRunConfig(properties));
-                jsonObject.add(ConfigHelper.RUN_CONFIGS, runConfigs);
-            }
+            configHelper.addOrReplaceRunConfig(properties, jsonObject);
         }
         return jsonObject;
+    }
+
+    public void addNewRunConfig(Properties properties) {
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            jsonObject = configHelper.buildFullJson(properties);
+        }
+        configHelper.addOrReplaceRunConfig(properties, jsonObject);
     }
 
     private void writeJsonConfig(JsonObject jsonObject) {

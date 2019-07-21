@@ -24,7 +24,6 @@ import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -193,16 +192,20 @@ public class ProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            PropertiesHelper helper = new PropertiesHelper();
-            Properties uiApplications = helper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
+            Properties uiApplications = propertiesHelper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
             uiApplications.setProperty(ArgName.projectPath.name(), projects);
-            helper.addAndSaveApplicationProperties(uiApplications);
+            propertiesHelper.addAndSaveApplicationProperties(uiApplications);
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
                     new String[]{ArgName.configurationName + "=" + uiLauncher.getConfigurationName()}
             ));
             uiLauncher.hideProjectsWindow();
-            uiLauncher.buildAndShowMainWindow();
+            if (uiLauncher.isSourceNewConfig()) {
+                uiLauncher.setNewConfigSource(false);
+               uiLauncher.showNewConfigurationWindow();
+            } else {
+                uiLauncher.buildAndShowMainWindow();
+            }
         };
     }
 

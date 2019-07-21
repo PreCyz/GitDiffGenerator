@@ -89,7 +89,32 @@ class ConfigHelper {
         return jsonArray;
     }
 
-    JsonElement buildRunConfig(Properties properties) {
+    private JsonElement buildRunConfig(Properties properties) {
         return createJsonElement(properties, RUN_CONFIG_PROPERTIES);
+    }
+
+    void addOrReplaceRunConfig(Properties properties, JsonObject jsonObject) {
+        JsonElement jsonElement = jsonObject.get(RUN_CONFIGS);
+        if (jsonElement == null) {
+            jsonObject.add(RUN_CONFIGS, buildRunConfigs(properties));
+        } else {
+            JsonArray runConfigs = jsonElement.getAsJsonArray();
+            int existingConfIdx = -1;
+            for (int i = 0; i < runConfigs.size(); ++i) {
+                JsonObject jObj = runConfigs.get(i).getAsJsonObject();
+                String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
+                String newConfName = properties.getProperty(ArgName.configurationName.name());
+                if (!StringUtils.nullOrEmpty(existingConfName) && existingConfName.equals(newConfName)) {
+                    existingConfIdx = i;
+                    break;
+                }
+            }
+
+            if (existingConfIdx > -1) {
+                runConfigs.remove(existingConfIdx);
+            }
+            runConfigs.add(buildRunConfig(properties));
+            jsonObject.add(RUN_CONFIGS, runConfigs);
+        }
     }
 }

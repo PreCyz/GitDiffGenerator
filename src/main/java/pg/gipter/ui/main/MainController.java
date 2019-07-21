@@ -30,7 +30,6 @@ import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -134,7 +133,6 @@ public class MainController extends AbstractController {
     private Button removeConfigurationButton;
 
     private ApplicationProperties applicationProperties;
-    private PropertiesHelper propertiesHelper;
 
     private static String currentLanguage;
     private static String newConfigurationName = "";
@@ -143,7 +141,6 @@ public class MainController extends AbstractController {
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        propertiesHelper = new PropertiesHelper();
     }
 
     @Override

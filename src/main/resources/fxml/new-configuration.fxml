@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="656.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="665.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="7.0" prefWidth="300.0" text="%timeFrame.panel.title">
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="46.0" prefWidth="300.0" text="%timeFrame.panel.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="105.0" prefWidth="300.0">
                <children>
@@ -23,7 +22,7 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="432.0" prefHeight="146.0" prefWidth="300.0" text="%paths.panel.title">
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="471.0" prefHeight="146.0" prefWidth="300.0" text="%paths.panel.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="95.0" prefWidth="300.0">
                <children>
@@ -59,7 +58,7 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="139.0" prefHeight="292.0" prefWidth="300.0" text="%csv.panel.title">
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="178.0" prefHeight="292.0" prefWidth="300.0" text="%csv.panel.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="315.0" prefWidth="300.0">
                <children>
@@ -84,12 +83,12 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </TitledPane>
-      <Button fx:id="addConfigButton" layoutX="73.0" layoutY="619.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="180.0" text="Add" textFill="#1eb235">
+      <Button fx:id="addConfigurationButton" layoutX="73.0" layoutY="626.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="180.0" text="Add" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
       </Button>
-      <Label layoutX="11.0" layoutY="588.0" text="%main.configurationName" />
-      <TextField fx:id="configurationNameText" layoutX="124.0" layoutY="584.0" prefHeight="25.0" prefWidth="188.0" />
+      <Label layoutX="10.0" layoutY="15.0" text="%main.configurationName" />
+      <TextField fx:id="configurationNameTextField" layoutX="126.0" layoutY="11.0" prefHeight="25.0" prefWidth="186.0" />
    </children>
 </AnchorPane>

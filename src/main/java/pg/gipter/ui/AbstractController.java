@@ -3,6 +3,7 @@ package pg.gipter.ui;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.stage.WindowEvent;
+import pg.gipter.utils.PropertiesHelper;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -12,9 +13,11 @@ public abstract class AbstractController implements Initializable {
 
     protected final UILauncher uiLauncher;
     protected URL location;
+    protected PropertiesHelper propertiesHelper;
 
     protected AbstractController(UILauncher uiLauncher) {
         this.uiLauncher = uiLauncher;
+        this.propertiesHelper = new PropertiesHelper();
     }
 
     @Override
