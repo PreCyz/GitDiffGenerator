@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.utils.PropertiesHelper;
-import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -47,10 +46,12 @@ public abstract class ApplicationProperties {
     protected void init(String[] args, PropertiesHelper propertiesHelper) {
         Optional<Properties> propsFromFile;
         Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
-        if (!propertiesMap.containsKey(argExtractor.configurationName()) || StringUtils.nullOrEmpty(argExtractor.configurationName())) {
+        if (propertiesMap.isEmpty()) {
             propsFromFile = propertiesHelper.loadApplicationProperties(ArgName.configurationName.defaultValue());
-        } else {
+        } else if (propertiesMap.containsKey(argExtractor.configurationName())) {
             propsFromFile = Optional.of(propertiesMap.get(argExtractor.configurationName()));
+        } else {
+            propsFromFile = Optional.of(new ArrayList<>(propertiesMap.entrySet()).get(0).getValue());
         }
         if (propsFromFile.isPresent()) {
             properties = propsFromFile.get();
