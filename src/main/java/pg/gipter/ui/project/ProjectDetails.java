@@ -22,6 +22,18 @@ public class ProjectDetails {
         this.path = new SimpleStringProperty(path);
     }
 
+    public void setName(String name) {
+        this.name.set(name);
+    }
+
+    public void setCvsType(String cvsType) {
+        this.cvsType.set(cvsType);
+    }
+
+    public void setPath(String path) {
+        this.path.set(path);
+    }
+
     public String getName() {
         return name.get();
     }

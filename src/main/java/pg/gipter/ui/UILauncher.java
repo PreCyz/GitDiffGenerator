@@ -160,7 +160,15 @@ public class UILauncher implements Launcher {
     }
 
     public Stage currentWindow() {
-        return mainWindow;
+        if (projectsWindow != null) {
+            return projectsWindow;
+        } else if (newConfigurationWindow != null) {
+            return newConfigurationWindow;
+        } else if (jobWindow != null) {
+            return jobWindow;
+        } else {
+            return mainWindow;
+        }
     }
 
     private Image readImage(String imgPath) throws IOException {
@@ -189,6 +197,7 @@ public class UILauncher implements Launcher {
 
     public void hideJobWindow() {
         jobWindow.close();
+        jobWindow = null;
     }
 
     public void updateTray() {
@@ -329,13 +338,18 @@ public class UILauncher implements Launcher {
         buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
         projectsWindow.setOnCloseRequest(event -> {
             hideProjectsWindow();
-            execute();
+            if (isSourceNewConfig()) {
+                showNewConfigurationWindow();
+            } else {
+                execute();
+            }
         });
         projectsWindow.showAndWait();
     }
 
     public void hideProjectsWindow() {
         projectsWindow.hide();
+        projectsWindow = null;
     }
 
     public String getConfigurationName() {
@@ -355,6 +369,7 @@ public class UILauncher implements Launcher {
 
     public void hideNewConfigurationWindow() {
         newConfigurationWindow.hide();
+        newConfigurationWindow = null;
     }
 
     public void setNewConfigSource(boolean newConfigSource) {

@@ -86,6 +86,7 @@ public class ConfigurationController extends AbstractController {
     }
 
     private void setInitValues() {
+        configurationNameTextField.setText(applicationProperties.configurationName());
         authorsTextField.setText(String.join(",", applicationProperties.authors()));
         committerEmailTextField.setText(applicationProperties.committerEmail());
         gitAuthorTextField.setText(applicationProperties.gitAuthor());
@@ -183,7 +184,6 @@ public class ConfigurationController extends AbstractController {
         itemPathButton.setText(resources.getString("button.add"));
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
-
     }
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {

@@ -165,10 +165,15 @@ public class ProjectsController extends AbstractController {
                 ObservableList<ProjectDetails> projects = FXCollections.observableList(searchForProjects(itemPathDirectory));
                 if (!projects.isEmpty()) {
                     if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+                        projectsTableView.getItems().removeAll(ProjectDetails.DEFAULT);
                         projectsTableView.setItems(projects);
                     } else {
-                        projectsTableView.getItems().addAll(projects);
+                        List<ProjectDetails> items = new ArrayList<>(projectsTableView.getItems());
+                        projects.addAll(items);
+                        projectsTableView.getItems().removeAll(items);
+                        projectsTableView.setItems(projects);
                     }
+                    projectsTableView.refresh();
                 }
             }
         };
@@ -192,17 +197,30 @@ public class ProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            Properties uiApplications = propertiesHelper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
-            String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-            uiApplications.setProperty(ArgName.projectPath.name(), projects);
-            propertiesHelper.addAndSaveApplicationProperties(uiApplications);
-            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
-                    new String[]{ArgName.configurationName + "=" + uiLauncher.getConfigurationName()}
-            ));
+            if (uiLauncher.isSourceNewConfig()) {
+                String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
+                String[] args = applicationProperties.getArgs();
+                for (int i = 0; i < args.length; ++i) {
+                    if (args[i].startsWith(ArgName.projectPath.name())) {
+                        args[i] = ArgName.projectPath.name() + "=" + projects;
+                        break;
+                    }
+                }
+                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(args));
+            } else {
+                Properties uiApplications = propertiesHelper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
+                String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
+                uiApplications.setProperty(ArgName.projectPath.name(), projects);
+                propertiesHelper.addAndSaveApplicationProperties(uiApplications);
+                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
+                        new String[]{ArgName.configurationName + "=" + uiLauncher.getConfigurationName()}
+                ));
+            }
+
             uiLauncher.hideProjectsWindow();
             if (uiLauncher.isSourceNewConfig()) {
                 uiLauncher.setNewConfigSource(false);
-               uiLauncher.showNewConfigurationWindow();
+                uiLauncher.showNewConfigurationWindow();
             } else {
                 uiLauncher.buildAndShowMainWindow();
             }
@@ -219,16 +237,20 @@ public class ProjectsController extends AbstractController {
                 File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
                 if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                     try {
-                        String vcsType = vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();;
+                        String vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
                         ProjectDetails project = new ProjectDetails(
                                 itemPathDirectory.getName(),
                                 vcsType,
                                 itemPathDirectory.getAbsolutePath()
                         );
                         if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+                            projectsTableView.getItems().removeAll(ProjectDetails.DEFAULT);
                             projectsTableView.setItems(FXCollections.observableArrayList(project));
                         } else {
-                            projectsTableView.getItems().add(project);
+                            ObservableList<ProjectDetails> items = projectsTableView.getItems();
+                            projectsTableView.getItems().removeAll(items);
+                            items.add(project);
+                            projectsTableView.setItems(items);
                         }
                         projectsTableView.refresh();
                     } catch (IllegalArgumentException ex) {

@@ -203,6 +203,7 @@ public class PropertiesHelper {
             jsonObject = configHelper.buildFullJson(properties);
         }
         configHelper.addOrReplaceRunConfig(properties, jsonObject);
+        writeJsonConfig(jsonObject);
     }
 
     private void writeJsonConfig(JsonObject jsonObject) {

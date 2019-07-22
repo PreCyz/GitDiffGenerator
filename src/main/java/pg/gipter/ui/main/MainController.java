@@ -460,6 +460,9 @@ public class MainController extends AbstractController {
             properties.remove(ArgName.endDate.name());
             propertiesHelper.addAndSaveApplicationProperties(properties);
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+            if (!configurationNameTextField.getText().equals(configurationNameComboBox.getValue())) {
+                updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationNameTextField.getText());
+            }
             uiLauncher.updateTray(applicationProperties);
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
@@ -504,6 +507,7 @@ public class MainController extends AbstractController {
                 setInitValues(resource);
                 configurationNameTextField.setText(configurationNameComboBox.getValue());
                 Platform.runLater(() -> new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .withWindowType(WindowType.CONFIRMATION_WINDOW)
                         .withImage()
