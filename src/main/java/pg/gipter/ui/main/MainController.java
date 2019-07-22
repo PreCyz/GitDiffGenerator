@@ -462,6 +462,7 @@ public class MainController extends AbstractController {
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             uiLauncher.updateTray(applicationProperties);
             Platform.runLater(() -> new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withWindowType(WindowType.CONFIRMATION_WINDOW)
                     .withImage()
@@ -524,7 +525,7 @@ public class MainController extends AbstractController {
     private EventHandler<KeyEvent> keyReleasedEventHandler() {
         return event -> {
             String oldValue = configurationNameComboBox.getValue();
-            if (event.getCode() == KeyCode.ENTER && !newConfigurationName.equalsIgnoreCase(oldValue)) {
+            if (event.getCode() == KeyCode.ENTER && !newConfigurationName.isEmpty() && !newConfigurationName.equalsIgnoreCase(oldValue)) {
                 Properties currentProperties = propertiesHelper.createProperties(createArgsFromUI());
                 Optional<Properties> properties = propertiesHelper.loadApplicationProperties(oldValue);
                 if (properties.isPresent()) {
@@ -533,6 +534,13 @@ public class MainController extends AbstractController {
                 updateConfigurationNameComboBox(oldValue, newConfigurationName);
                 propertiesHelper.addAndSaveApplicationProperties(currentProperties);
                 newConfigurationName = "";
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("main.config.changed"))
+                        .withAlertType(Alert.AlertType.INFORMATION)
+                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                        .withImage()
+                        .buildAndDisplayWindow()
+                );
             }
         };
     }
