@@ -3,18 +3,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="665.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="608.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="46.0" prefWidth="300.0" text="%timeFrame.panel.title">
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="46.0" prefHeight="73.0" prefWidth="302.0" text="%timeFrame.panel.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="105.0" prefWidth="300.0">
                <children>
-                  <DatePicker fx:id="startDatePicker" layoutX="124.0" layoutY="9.0" prefHeight="25.0" prefWidth="160.0" />
-                  <Label layoutX="10.0" layoutY="11.0" text="%timeFrame.panel.startDate" />
-                  <Label layoutX="10.0" layoutY="44.0" text="%timeFrame.panel.endDate" />
-                  <DatePicker fx:id="endDatePicker" layoutX="124.0" layoutY="42.0" prefHeight="25.0" prefWidth="160.0" />
-                  <Label layoutX="10.0" layoutY="76.0" text="%timeFrame.panel.periodInDays" />
-                  <TextField fx:id="periodInDaysTextField" layoutX="124.0" layoutY="74.0" prefWidth="160.0" />
+                  <Label layoutX="10.0" layoutY="13.0" text="%timeFrame.panel.periodInDays" />
+                  <TextField fx:id="periodInDaysTextField" layoutX="124.0" layoutY="11.0" prefWidth="160.0" />
                </children>
             </AnchorPane>
          </content>
@@ -22,7 +18,7 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="471.0" prefHeight="146.0" prefWidth="300.0" text="%paths.panel.title">
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="413.0" prefHeight="146.0" prefWidth="300.0" text="%paths.panel.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="95.0" prefWidth="300.0">
                <children>
@@ -58,7 +54,7 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="178.0" prefHeight="292.0" prefWidth="300.0" text="%csv.panel.title">
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="120.0" prefHeight="292.0" prefWidth="300.0" text="%csv.panel.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="315.0" prefWidth="300.0">
                <children>
@@ -83,7 +79,7 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </TitledPane>
-      <Button fx:id="addConfigurationButton" layoutX="73.0" layoutY="626.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="180.0" text="Add" textFill="#1eb235">
+      <Button fx:id="addConfigurationButton" layoutX="73.0" layoutY="568.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="180.0" text="Add" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>

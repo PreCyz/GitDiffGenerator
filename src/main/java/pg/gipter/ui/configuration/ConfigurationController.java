@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.util.StringConverter;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
@@ -20,12 +19,9 @@ import pg.gipter.utils.StringUtils;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
-
-import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 public class ConfigurationController extends AbstractController {
 
@@ -60,10 +56,6 @@ public class ConfigurationController extends AbstractController {
     @FXML
     private CheckBox useAsFileNameCheckBox;
 
-    @FXML
-    private DatePicker startDatePicker;
-    @FXML
-    private DatePicker endDatePicker;
     @FXML
     private TextField periodInDaysTextField;
 
@@ -103,8 +95,6 @@ public class ConfigurationController extends AbstractController {
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
         useAsFileNameCheckBox.setSelected(applicationProperties.isUseAsFileName());
 
-        startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
-        endDatePicker.setValue(LocalDate.now());
         periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
     }
 
@@ -153,8 +143,6 @@ public class ConfigurationController extends AbstractController {
         }
         argList.add(ArgName.useAsFileName + "=" + useAsFileNameCheckBox.isSelected());
 
-        argList.add(ArgName.startDate + "=" + startDatePicker.getValue().format(yyyy_MM_dd));
-        argList.add(ArgName.endDate + "=" + endDatePicker.getValue().format(yyyy_MM_dd));
         if (!ArgName.periodInDays.defaultValue().equals(periodInDaysTextField.getText())) {
             argList.add(ArgName.periodInDays + "=" + periodInDaysTextField.getText());
         }
@@ -165,25 +153,15 @@ public class ConfigurationController extends AbstractController {
         return argList.toArray(new String[0]);
     }
 
-    private StringConverter<LocalDate> dateConverter() {
-        return new StringConverter<LocalDate>() {
-            @Override
-            public String toString(LocalDate object) {
-                return object.format(yyyy_MM_dd);
-            }
-
-            @Override
-            public LocalDate fromString(String string) {
-                return LocalDate.parse(string, yyyy_MM_dd);
-            }
-        };
-    }
-
     private void setProperties(ResourceBundle resources) {
-        projectPathButton.setText(resources.getString("button.add"));
-        itemPathButton.setText(resources.getString("button.add"));
-        startDatePicker.setConverter(dateConverter());
-        endDatePicker.setConverter(dateConverter());
+        projectPathButton.setText(
+                applicationProperties.projectPaths().contains(ArgName.projectPath.defaultValue())
+                        ? resources.getString("button.add") : resources.getString("button.change")
+        );
+        itemPathButton.setText(
+                applicationProperties.itemPath().startsWith(ArgName.itemPath.defaultValue())
+                        ? resources.getString("button.add") : resources.getString("button.change")
+        );
     }
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
@@ -213,10 +191,6 @@ public class ConfigurationController extends AbstractController {
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             projectPathButton.setDisable(uploadTypeComboBox.getValue() == UploadType.STATEMENT);
-            if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
-                endDatePicker.setValue(LocalDate.now());
-            }
-            endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             authorsTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             committerEmailTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             gitAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
