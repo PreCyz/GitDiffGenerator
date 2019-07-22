@@ -38,24 +38,12 @@ public class ProjectDetails {
         return name.get();
     }
 
-    public StringProperty nameProperty() {
-        return name;
-    }
-
     public String getCvsType() {
         return cvsType.get();
     }
 
-    public StringProperty cvsTypeProperty() {
-        return cvsType;
-    }
-
     public String getPath() {
         return path.get();
-    }
-
-    public StringProperty pathProperty() {
-        return path;
     }
 
     @Override

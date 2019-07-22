@@ -134,7 +134,7 @@ public class UILauncher implements Launcher {
     }
 
     void showMainWindow() {
-        mainWindow.show();
+        Platform.runLater(mainWindow::show);
     }
 
     private void buildScene(Stage stage, AbstractWindow window) {
@@ -189,10 +189,12 @@ public class UILauncher implements Launcher {
     }
 
     public void showJobWindow() {
-        jobWindow = new Stage();
-        jobWindow.initModality(Modality.WINDOW_MODAL);
-        buildScene(jobWindow, WindowFactory.JOB.createWindow(applicationProperties, this));
-        jobWindow.showAndWait();
+        Platform.runLater(() -> {
+            jobWindow = new Stage();
+            jobWindow.initModality(Modality.WINDOW_MODAL);
+            buildScene(jobWindow, WindowFactory.JOB.createWindow(applicationProperties, this));
+            jobWindow.showAndWait();
+        });
     }
 
     public void hideJobWindow() {
@@ -333,18 +335,20 @@ public class UILauncher implements Launcher {
     }
 
     public void showProjectsWindow() {
-        projectsWindow = new Stage();
-        projectsWindow.initModality(Modality.WINDOW_MODAL);
-        buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
-        projectsWindow.setOnCloseRequest(event -> {
-            hideProjectsWindow();
-            if (isSourceNewConfig()) {
-                showNewConfigurationWindow();
-            } else {
-                execute();
-            }
+        Platform.runLater(() -> {
+            projectsWindow = new Stage();
+            projectsWindow.initModality(Modality.WINDOW_MODAL);
+            buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
+            projectsWindow.setOnCloseRequest(event -> {
+                hideProjectsWindow();
+                if (isSourceNewConfig()) {
+                    showNewConfigurationWindow();
+                } else {
+                    execute();
+                }
+            });
+            projectsWindow.showAndWait();
         });
-        projectsWindow.showAndWait();
     }
 
     public void hideProjectsWindow() {
@@ -357,14 +361,16 @@ public class UILauncher implements Launcher {
     }
 
     public void showNewConfigurationWindow() {
-        newConfigurationWindow = new Stage();
-        newConfigurationWindow.initModality(Modality.WINDOW_MODAL);
-        buildScene(newConfigurationWindow, WindowFactory.NEW_CONFIGURATION.createWindow(applicationProperties, this));
-        newConfigurationWindow.setOnCloseRequest(event -> {
-            hideNewConfigurationWindow();
-            execute();
+        Platform.runLater(() -> {
+            newConfigurationWindow = new Stage();
+            newConfigurationWindow.initModality(Modality.WINDOW_MODAL);
+            buildScene(newConfigurationWindow, WindowFactory.NEW_CONFIGURATION.createWindow(applicationProperties, this));
+            newConfigurationWindow.setOnCloseRequest(event -> {
+                hideNewConfigurationWindow();
+                execute();
+            });
+            newConfigurationWindow.showAndWait();
         });
-        newConfigurationWindow.showAndWait();
     }
 
     public void hideNewConfigurationWindow() {

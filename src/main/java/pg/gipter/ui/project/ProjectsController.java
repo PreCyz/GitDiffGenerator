@@ -165,13 +165,9 @@ public class ProjectsController extends AbstractController {
                 ObservableList<ProjectDetails> projects = FXCollections.observableList(searchForProjects(itemPathDirectory));
                 if (!projects.isEmpty()) {
                     if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
-                        projectsTableView.getItems().removeAll(ProjectDetails.DEFAULT);
                         projectsTableView.setItems(projects);
                     } else {
-                        List<ProjectDetails> items = new ArrayList<>(projectsTableView.getItems());
-                        projects.addAll(items);
-                        projectsTableView.getItems().removeAll(items);
-                        projectsTableView.setItems(projects);
+                        projectsTableView.getItems().addAll(projects);
                     }
                     projectsTableView.refresh();
                 }
@@ -244,13 +240,9 @@ public class ProjectsController extends AbstractController {
                                 itemPathDirectory.getAbsolutePath()
                         );
                         if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
-                            projectsTableView.getItems().removeAll(ProjectDetails.DEFAULT);
                             projectsTableView.setItems(FXCollections.observableArrayList(project));
                         } else {
-                            ObservableList<ProjectDetails> items = projectsTableView.getItems();
-                            projectsTableView.getItems().removeAll(items);
-                            items.add(project);
-                            projectsTableView.setItems(items);
+                            projectsTableView.getItems().add(project);
                         }
                         projectsTableView.refresh();
                     } catch (IllegalArgumentException ex) {
