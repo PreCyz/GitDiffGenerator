@@ -104,6 +104,7 @@ class TrayHandler {
                 JobController.buildLabel(data.get(), JobProperty.DAY_OF_MONTH).ifPresent(jobMenu::add);
                 JobController.buildLabel(data.get(), JobProperty.SCHEDULE_START).ifPresent(jobMenu::add);
                 JobController.buildLabel(data.get(), JobProperty.CRON).ifPresent(jobMenu::add);
+                JobController.buildLabel(data.get(), JobProperty.CONFIGS).ifPresent(jobMenu::add);
                 jobMenu.addSeparator();
 
                 MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));

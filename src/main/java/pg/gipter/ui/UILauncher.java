@@ -284,6 +284,7 @@ public class UILauncher implements Launcher {
                     dayOfWeek = DayOfWeek.valueOf(data.get().getProperty(JobProperty.DAY_OF_WEEK.value()));
                 }
                 String cronExpression = data.get().getProperty(JobProperty.CRON.value());
+                String configs = data.get().getProperty(JobProperty.CONFIGS.value());
 
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), this);
@@ -297,6 +298,7 @@ public class UILauncher implements Launcher {
                         .withMinuteOfHour(minuteOfHour)
                         .withDayOfWeek(dayOfWeek)
                         .withCronExpression(cronExpression)
+                        .withConfigs(configs)
                         .createJobCreator()
                         .scheduleUploadJob(additionalJobParams);
             } catch (ParseException | SchedulerException e) {

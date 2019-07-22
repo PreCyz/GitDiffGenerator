@@ -8,7 +8,8 @@ public enum JobProperty {
     CRON("job.cron"),
     TYPE("job.type"),
     SCHEDULE_START("job.scheduleStart"),
-    NEXT_FIRE_DATE("job.nextUploadDateTime");
+    NEXT_FIRE_DATE("job.nextUploadDateTime"),
+    CONFIGS("job.configurationNames");
 
     private String value;
 

@@ -9,7 +9,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 public class JobController extends AbstractController {
 
@@ -55,6 +56,8 @@ public class JobController extends AbstractController {
     @FXML
     private DatePicker startDatePicker;
     @FXML
+    private ComboBox<String> configurationNameComboBox;
+    @FXML
     private Button scheduleButton;
     @FXML
     private Label jobTypeLabel;
@@ -66,13 +69,13 @@ public class JobController extends AbstractController {
     private Label lastExecutionLabel;
     @FXML
     private Label nextExecutionLabel;
+    @FXML
+    private Label configsLabel;
 
-    private static Scheduler scheduler;
-    private final PropertiesHelper propertiesHelper;
+    private Map<String, Properties> propertiesMap;
 
     public JobController(UILauncher uiLauncher) {
         super(uiLauncher);
-        propertiesHelper = new PropertiesHelper();
     }
 
     @Override
@@ -81,6 +84,7 @@ public class JobController extends AbstractController {
         setInitValues();
         setActions();
         setProperties();
+        setListeners();
     }
 
     private void setInitValues() {
@@ -93,6 +97,14 @@ public class JobController extends AbstractController {
         minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
         startDatePicker.setValue(LocalDate.now());
+        propertiesMap = propertiesHelper.loadAllApplicationProperties();
+        if (!propertiesMap.isEmpty()) {
+            configurationNameComboBox.setItems(FXCollections.observableArrayList(propertiesMap.keySet()));
+            configurationNameComboBox.setValue(configurationNameComboBox.getItems().get(0));
+            if (propertiesMap.size() == 1) {
+                configsLabel.setText(String.join(",", propertiesMap.keySet()));
+            }
+        }
         setDefaultsForJobDetailsControls();
         Optional<Properties> data = propertiesHelper.loadDataProperties();
         if (data.isPresent()) {
@@ -137,6 +149,7 @@ public class JobController extends AbstractController {
                 details += buildLabel(dataProp, JobProperty.HOUR_OF_THE_DAY).orElse("");
             }
             jobDetailsLabel.setText(details);
+            configsLabel.setText(dataProp.getProperty(JobProperty.CONFIGS.value()));
         }
     }
 
@@ -186,6 +199,7 @@ public class JobController extends AbstractController {
         startDatePicker.setDayCellFactory(datePickerDateCellCallback());
         startDatePicker.setDisable(true);
         dayOfMonthComboBox.setDisable(true);
+        scheduleButton.setDisable(propertiesMap.isEmpty());
     }
 
     private Callback<DatePicker, DateCell> datePickerDateCellCallback() {
@@ -260,6 +274,7 @@ public class JobController extends AbstractController {
                         .withMinuteOfHour(minuteComboBox.getValue())
                         .withDayOfWeek(dayNameComboBox.getValue())
                         .withCronExpression(cronExpressionTextField.getText())
+                        .withConfigs(configsLabel.getText())
                         .createJobCreator()
                         .scheduleUploadJob(additionalJobParams);
                 propertiesHelper.saveDataProperties(JobCreator.getDataProperties());
@@ -280,6 +295,22 @@ public class JobController extends AbstractController {
                 );
             }
         };
+    }
+
+    private void setListeners() {
+        configurationNameComboBox.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((options, oldValue, newValue) -> {
+                    Set<String> currentSelection = Stream.of(configsLabel.getText().split(","))
+                            .filter(v -> !v.isEmpty())
+                            .collect(toSet());
+                    if (currentSelection.contains(newValue)) {
+                        currentSelection.remove(newValue);
+                    } else {
+                        currentSelection.add(newValue);
+                    }
+                    configsLabel.setText(String.join(",", currentSelection));
+                });
     }
 
 }

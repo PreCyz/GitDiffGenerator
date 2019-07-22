@@ -39,13 +39,14 @@ public class JobCreator {
     private int minuteOfHour;
     private DayOfWeek dayOfWeek;
     private String cronExpression;
+    private String configs;
 
     private Trigger trigger;
     private JobDetail jobDetail;
     private static Scheduler scheduler;
 
     JobCreator(Properties data, JobType jobType, LocalDate startDateTime, int dayOfMonth, int hourOfDay, int minuteOfHour,
-               DayOfWeek dayOfWeek, String cronExpression) {
+               DayOfWeek dayOfWeek, String cronExpression, String configs) {
         JobCreator.data = data;
         this.jobType = jobType;
         this.startDateTime = startDateTime;
@@ -54,6 +55,7 @@ public class JobCreator {
         this.minuteOfHour = minuteOfHour;
         this.dayOfWeek = dayOfWeek;
         this.cronExpression = cronExpression;
+        this.configs = configs;
     }
 
     public static boolean isSchedulerInitiated() {
@@ -85,6 +87,7 @@ public class JobCreator {
         data.remove(JobProperty.HOUR_OF_THE_DAY.value());
         data.remove(JobProperty.DAY_OF_WEEK.value());
         data.remove(JobProperty.NEXT_FIRE_DATE.value());
+        data.remove(JobProperty.CONFIGS.value());
     }
 
     private Trigger createTriggerEveryMonth() {
@@ -96,6 +99,7 @@ public class JobCreator {
         data.put(JobProperty.DAY_OF_MONTH.value(), String.valueOf(dayOfMonth));
         data.put(JobProperty.SCHEDULE_START.value(), scheduleStart);
         data.put(JobProperty.HOUR_OF_THE_DAY.value(), String.format("%d:%d", hourOfDay, minuteOfHour));
+        data.put(JobProperty.CONFIGS.value(), configs);
 
         return newTrigger()
                 .withIdentity(EVERY_MONTH_TRIGGER_KEY)
@@ -110,6 +114,7 @@ public class JobCreator {
         data.put(JobProperty.TYPE.value(), JobType.EVERY_2_WEEKS.name());
         data.put(JobProperty.HOUR_OF_THE_DAY.value(), String.format("%d:%d", hourOfDay, minuteOfHour));
         data.put(JobProperty.SCHEDULE_START.value(), startDateTime.format(ApplicationProperties.yyyy_MM_dd));
+        data.put(JobProperty.CONFIGS.value(), configs);
 
         int second = 0;
         Date startDate = DateBuilder.dateOf(
@@ -143,6 +148,7 @@ public class JobCreator {
         data.put(JobProperty.DAY_OF_WEEK.value(), dayOfWeek.name());
         data.put(JobProperty.HOUR_OF_THE_DAY.value(), hourOfThDay);
         data.put(JobProperty.SCHEDULE_START.value(), LocalDate.now().format(ApplicationProperties.yyyy_MM_dd));
+        data.put(JobProperty.CONFIGS.value(), configs);
 
         //0 0 12 ? * FRI - Every Friday at noon
         /*String cronExpr = "0" + " " +
@@ -185,6 +191,7 @@ public class JobCreator {
         clearProperties();
         data.put(JobProperty.TYPE.value(), JobType.CRON.name());
         data.put(JobProperty.CRON.value(), cronExpression);
+        data.put(JobProperty.CONFIGS.value(), configs);
 
         CronExpression expression = new CronExpression(cronExpression);
         return newTrigger()

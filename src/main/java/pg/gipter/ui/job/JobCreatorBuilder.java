@@ -13,6 +13,7 @@ public class JobCreatorBuilder {
     private int minuteOfHour;
     private DayOfWeek dayOfWeek;
     private String cronExpression;
+    private String configs;
 
     public JobCreatorBuilder withData(Properties data) {
         this.data = data;
@@ -54,7 +55,12 @@ public class JobCreatorBuilder {
         return this;
     }
 
+    public JobCreatorBuilder withConfigs(String configs) {
+        this.configs = configs;
+        return this;
+    }
+
     public JobCreator createJobCreator() {
-        return new JobCreator(data, jobType, startDateTime, dayOfMonth, hourOfDay, minuteOfHour, dayOfWeek, cronExpression);
+        return new JobCreator(data, jobType, startDateTime, dayOfMonth, hourOfDay, minuteOfHour, dayOfWeek, cronExpression, configs);
     }
 }

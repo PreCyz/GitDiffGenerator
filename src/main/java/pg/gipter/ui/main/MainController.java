@@ -585,8 +585,7 @@ public class MainController extends AbstractController {
                             currentLanguage = languageComboBox.getValue();
                             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(createArgsFromUI()));
                             uiLauncher.changeLanguage(languageComboBox.getValue());
-                        }
-                );
+                });
 
         toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             String userFolder = toolkitUserFolderTextField.getText();
