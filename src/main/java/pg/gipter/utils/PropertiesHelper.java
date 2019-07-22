@@ -234,18 +234,10 @@ public class PropertiesHelper {
             throw new IllegalStateException(errMsg);
         } else {
             JsonElement jsonElement = jsonObject.get(ConfigHelper.RUN_CONFIGS);
-            JsonArray runConfigs = jsonElement.getAsJsonArray();
-            int existingConfIdx = -1;
-            for (int i = 0; i < runConfigs.size(); ++i) {
-                JsonObject jObj = runConfigs.get(i).getAsJsonObject();
-                String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
-                if (!StringUtils.nullOrEmpty(existingConfName) && existingConfName.equals(configurationName)) {
-                    existingConfIdx = i;
-                    break;
-                }
-            }
 
-            if (existingConfIdx > -1) {
+            int existingConfIdx = configHelper.getIndexOfExistingConfig(jsonElement, configurationName);
+            if (existingConfIdx > ConfigHelper.NO_CONFIGURATION_FOUND) {
+                JsonArray runConfigs = jsonElement.getAsJsonArray();
                 runConfigs.remove(existingConfIdx);
                 jsonObject.add(ConfigHelper.RUN_CONFIGS, runConfigs);
                 writeJsonConfig(jsonObject);

@@ -15,13 +15,14 @@ class ConfigHelper {
     final static String APP_CONFIG = "appConfig";
     final static String TOOLKIT_CONFIG = "toolkitConfig";
     final static String RUN_CONFIGS = "runConfigs";
+    final static int NO_CONFIGURATION_FOUND = -1;
 
     final static Set<String> APP_CONFIG_PROPERTIES = new HashSet<>();
     final static Set<String> TOOLKIT_CONFIG_PROPERTIES = new HashSet<>();
     final static Set<String> RUN_CONFIG_PROPERTIES = new HashSet<>();
 
     static {
-        APP_CONFIG_PROPERTIES.add(ArgName.configurationName.name());
+        APP_CONFIG_PROPERTIES.add(ArgName.confirmationWindow.name());
         APP_CONFIG_PROPERTIES.add(ArgName.preferredArgSource.name());
         APP_CONFIG_PROPERTIES.add(ArgName.useUI.name());
         APP_CONFIG_PROPERTIES.add(ArgName.activeTray.name());
@@ -99,22 +100,26 @@ class ConfigHelper {
             jsonObject.add(RUN_CONFIGS, buildRunConfigs(properties));
         } else {
             JsonArray runConfigs = jsonElement.getAsJsonArray();
-            int existingConfIdx = -1;
-            for (int i = 0; i < runConfigs.size(); ++i) {
-                JsonObject jObj = runConfigs.get(i).getAsJsonObject();
-                String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
-                String newConfName = properties.getProperty(ArgName.configurationName.name());
-                if (!StringUtils.nullOrEmpty(existingConfName) && existingConfName.equals(newConfName)) {
-                    existingConfIdx = i;
-                    break;
-                }
-            }
 
-            if (existingConfIdx > -1) {
+            int existingConfIdx = getIndexOfExistingConfig(jsonElement, properties.getProperty(ArgName.configurationName.name()));
+            if (existingConfIdx > NO_CONFIGURATION_FOUND) {
                 runConfigs.remove(existingConfIdx);
             }
+
             runConfigs.add(buildRunConfig(properties));
             jsonObject.add(RUN_CONFIGS, runConfigs);
         }
+    }
+
+    int getIndexOfExistingConfig(JsonElement jsonElement, String configurationName) {
+        JsonArray runConfigs = jsonElement.getAsJsonArray();
+        for (int i = 0; i < runConfigs.size(); ++i) {
+            JsonObject jObj = runConfigs.get(i).getAsJsonObject();
+            String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
+            if (!StringUtils.nullOrEmpty(existingConfName) && existingConfName.equals(configurationName)) {
+                return i;
+            }
+        }
+        return NO_CONFIGURATION_FOUND;
     }
 }
