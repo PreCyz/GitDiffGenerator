@@ -262,6 +262,12 @@ public class MainController extends AbstractController {
         } else {
             deamonButton.setText(resources.getString("button.job"));
         }
+        disableRemoveConfigurationButton();
+    }
+
+    private void disableRemoveConfigurationButton() {
+        Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
+        removeConfigurationButton.setDisable(propertiesMap.isEmpty());
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -462,6 +468,7 @@ public class MainController extends AbstractController {
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             if (!configurationNameTextField.getText().equals(configurationNameComboBox.getValue())) {
                 updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationNameTextField.getText());
+                removeConfigurationButton.setDisable(false);
             }
             uiLauncher.updateTray(applicationProperties);
             Platform.runLater(() -> new AlertWindowBuilder()
@@ -487,7 +494,7 @@ public class MainController extends AbstractController {
             }
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(args));
             uiLauncher.hideMainWindow();
-            uiLauncher.showNewConfigurationWindow();
+            uiLauncher.showNewConfigurationWindow(configurationNameComboBox.getValue());
         };
     }
 
@@ -506,6 +513,7 @@ public class MainController extends AbstractController {
                 applicationProperties = ApplicationPropertiesFactory.getInstance(currentArgs);
                 setInitValues(resource);
                 configurationNameTextField.setText(configurationNameComboBox.getValue());
+                disableRemoveConfigurationButton();
                 Platform.runLater(() -> new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
@@ -538,6 +546,7 @@ public class MainController extends AbstractController {
                 updateConfigurationNameComboBox(oldValue, newConfigurationName);
                 propertiesHelper.addAndSaveApplicationProperties(currentProperties);
                 newConfigurationName = "";
+                removeConfigurationButton.setDisable(false);
                 Platform.runLater(() -> new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                         .withAlertType(Alert.AlertType.INFORMATION)

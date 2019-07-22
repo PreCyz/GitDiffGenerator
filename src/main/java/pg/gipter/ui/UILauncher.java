@@ -15,6 +15,8 @@ import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.ApplicationPropertiesFactory;
+import pg.gipter.settings.ArgName;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.job.*;
@@ -361,12 +363,20 @@ public class UILauncher implements Launcher {
     }
 
     public void showNewConfigurationWindow() {
+        showNewConfigurationWindow(ArgName.configurationName.defaultValue());
+    }
+
+    public void showNewConfigurationWindow(final String lastActiveConfiguration) {
         Platform.runLater(() -> {
             newConfigurationWindow = new Stage();
             newConfigurationWindow.initModality(Modality.WINDOW_MODAL);
             buildScene(newConfigurationWindow, WindowFactory.NEW_CONFIGURATION.createWindow(applicationProperties, this));
             newConfigurationWindow.setOnCloseRequest(event -> {
                 hideNewConfigurationWindow();
+                if (!ArgName.configurationName.defaultValue().equals(lastActiveConfiguration)) {
+                    String[] args = propertiesHelper.loadArgumentArray(lastActiveConfiguration);
+                    applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+                }
                 execute();
             });
             newConfigurationWindow.showAndWait();

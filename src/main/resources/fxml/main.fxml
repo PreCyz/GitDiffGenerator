@@ -169,7 +169,7 @@
          <font>
             <Font name="System Bold" size="13.0" />
          </font></Button>
-      <Button fx:id="removeConfigurationButton" layoutX="426.0" layoutY="723.0" mnemonicParsing="false" prefWidth="110.0" text="%main.deleteConfiguration" textFill="#f41b63">
+      <Button fx:id="removeConfigurationButton" layoutX="506.0" layoutY="428.0" mnemonicParsing="false" prefWidth="110.0" text="%main.deleteConfiguration" textFill="#f41b63">
          <font>
             <Font name="System Bold" size="13.0" />
          </font>
