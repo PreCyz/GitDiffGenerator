@@ -162,6 +162,13 @@ public class ConfigurationController extends AbstractController {
                 applicationProperties.itemPath().startsWith(ArgName.itemPath.defaultValue())
                         ? resources.getString("button.add") : resources.getString("button.change")
         );
+        projectPathButton.setDisable(applicationProperties.uploadType() == UploadType.STATEMENT);
+        authorsTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
+        committerEmailTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
+        gitAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
+        svnAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
+        mercurialAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
+        skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
     }
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
