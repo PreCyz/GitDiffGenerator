@@ -1,5 +1,6 @@
 package pg.gipter.ui.configuration;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,6 +15,9 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.WindowType;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -172,7 +176,7 @@ public class ConfigurationController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
-        return event -> {
+        return event -> Platform.runLater(() -> {
             if (uploadTypeComboBox.getValue() == UploadType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setInitialDirectory(new File("."));
@@ -192,7 +196,7 @@ public class ConfigurationController extends AbstractController {
                     itemPathButton.setText(resources.getString("button.change"));
                 }
             }
-        };
+        });
     }
 
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
@@ -214,6 +218,13 @@ public class ConfigurationController extends AbstractController {
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(args));
             uiLauncher.hideNewConfigurationWindow();
             uiLauncher.buildAndShowMainWindow();
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("main.config.changed"))
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                    .withImage()
+                    .buildAndDisplayWindow()
+            );
         };
     }
 }
