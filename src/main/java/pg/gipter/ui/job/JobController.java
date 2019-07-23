@@ -73,6 +73,7 @@ public class JobController extends AbstractController {
     private Label configsLabel;
 
     private Map<String, Properties> propertiesMap;
+    private final String NOT_AVAILABLE = "N/A";
 
     public JobController(UILauncher uiLauncher) {
         super(uiLauncher);
@@ -186,12 +187,18 @@ public class JobController extends AbstractController {
     }
 
     private void setDefaultsForJobDetailsControls() {
-        jobTypeLabel.setText("N/A");
+        jobTypeLabel.setText(NOT_AVAILABLE);
         jobTypeLabel.setAlignment(Pos.CENTER);
-        jobDetailsLabel.setText("N/A");
+        jobDetailsLabel.setText(NOT_AVAILABLE);
         jobDetailsLabel.setAlignment(Pos.TOP_CENTER);
         cancelJobButton.setVisible(false);
         nextExecutionLabel.setText("");
+        configsLabel.setAlignment(Pos.CENTER);
+        if (propertiesMap.size() == 1) {
+            configsLabel.setText(String.join(",", propertiesMap.keySet()));
+        } else {
+            configsLabel.setText(NOT_AVAILABLE);
+        }
     }
 
     private void setProperties() {
@@ -304,9 +311,15 @@ public class JobController extends AbstractController {
                     Set<String> currentSelection = Stream.of(configsLabel.getText().split(","))
                             .filter(v -> !v.isEmpty())
                             .collect(toSet());
-                    if (currentSelection.contains(newValue)) {
+                    if (currentSelection.isEmpty()) {
+                        currentSelection.add(NOT_AVAILABLE);
+                    } else if (currentSelection.contains(newValue)) {
                         currentSelection.remove(newValue);
+                        if (currentSelection.isEmpty()) {
+                            currentSelection.add(NOT_AVAILABLE);
+                        }
                     } else {
+                        currentSelection.remove(NOT_AVAILABLE);
                         currentSelection.add(newValue);
                     }
                     configsLabel.setText(String.join(",", currentSelection));
