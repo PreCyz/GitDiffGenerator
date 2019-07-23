@@ -2,6 +2,7 @@ package pg.gipter.ui.job;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -74,6 +75,7 @@ public class JobController extends AbstractController {
 
     private Map<String, Properties> propertiesMap;
     private final String NOT_AVAILABLE = "N/A";
+    private final String ALL_CONFIGS = "all-configs";
 
     public JobController(UILauncher uiLauncher) {
         super(uiLauncher);
@@ -100,11 +102,11 @@ public class JobController extends AbstractController {
         startDatePicker.setValue(LocalDate.now());
         propertiesMap = propertiesHelper.loadAllApplicationProperties();
         if (!propertiesMap.isEmpty()) {
-            configurationNameComboBox.setItems(FXCollections.observableArrayList(propertiesMap.keySet()));
+            ObservableList<String> items = FXCollections.observableArrayList(propertiesMap.keySet());
+            items.add(0, ALL_CONFIGS);
+            configurationNameComboBox.setItems(items);
             configurationNameComboBox.setValue(configurationNameComboBox.getItems().get(0));
-            if (propertiesMap.size() == 1) {
-                configsLabel.setText(String.join(",", propertiesMap.keySet()));
-            }
+            configsLabel.setText(String.join(",", propertiesMap.keySet()));
         }
         setDefaultsForJobDetailsControls();
         Optional<Properties> data = propertiesHelper.loadDataProperties();
@@ -194,10 +196,10 @@ public class JobController extends AbstractController {
         cancelJobButton.setVisible(false);
         nextExecutionLabel.setText("");
         configsLabel.setAlignment(Pos.CENTER);
-        if (propertiesMap.size() == 1) {
-            configsLabel.setText(String.join(",", propertiesMap.keySet()));
-        } else {
+        if (propertiesMap.isEmpty()) {
             configsLabel.setText(NOT_AVAILABLE);
+        } else {
+            configsLabel.setText(String.join(",", propertiesMap.keySet()));
         }
     }
 
@@ -308,21 +310,25 @@ public class JobController extends AbstractController {
         configurationNameComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
-                    Set<String> currentSelection = Stream.of(configsLabel.getText().split(","))
-                            .filter(v -> !v.isEmpty())
-                            .collect(toSet());
-                    if (currentSelection.isEmpty()) {
-                        currentSelection.add(NOT_AVAILABLE);
-                    } else if (currentSelection.contains(newValue)) {
-                        currentSelection.remove(newValue);
+                    if (ALL_CONFIGS.equals(newValue)) {
+                        configsLabel.setText(String.join(",", propertiesMap.keySet()));
+                    } else {
+                        Set<String> currentSelection = Stream.of(configsLabel.getText().split(","))
+                                .filter(v -> !v.isEmpty())
+                                .collect(toSet());
                         if (currentSelection.isEmpty()) {
                             currentSelection.add(NOT_AVAILABLE);
+                        } else if (currentSelection.contains(newValue)) {
+                            currentSelection.remove(newValue);
+                            if (currentSelection.isEmpty()) {
+                                currentSelection.add(NOT_AVAILABLE);
+                            }
+                        } else {
+                            currentSelection.remove(NOT_AVAILABLE);
+                            currentSelection.add(newValue);
                         }
-                    } else {
-                        currentSelection.remove(NOT_AVAILABLE);
-                        currentSelection.add(newValue);
+                        configsLabel.setText(String.join(",", currentSelection));
                     }
-                    configsLabel.setText(String.join(",", currentSelection));
                 });
     }
 
