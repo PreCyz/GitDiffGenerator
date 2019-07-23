@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.producer.command.UploadType;
-import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -96,16 +95,6 @@ public class MainController extends AbstractController {
     private TextField periodInDaysTextField;
 
     @FXML
-    private CheckBox confirmationWindowCheckBox;
-    @FXML
-    private ComboBox<PreferredArgSource> preferredArgSourceComboBox;
-    @FXML
-    private CheckBox useUICheckBox;
-    @FXML
-    private CheckBox activeteTrayCheckBox;
-    @FXML
-    private CheckBox autostartCheckBox;
-    @FXML
     private Button saveConfigurationButton;
 
     @FXML
@@ -114,8 +103,6 @@ public class MainController extends AbstractController {
     private Button deamonButton;
     @FXML
     private Button exitButton;
-    @FXML
-    private ComboBox<String> languageComboBox;
     @FXML
     private ProgressIndicator progressIndicator;
     @FXML
@@ -177,27 +164,6 @@ public class MainController extends AbstractController {
         startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
         endDatePicker.setValue(LocalDate.now());
         periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
-
-        confirmationWindowCheckBox.setSelected(applicationProperties.isConfirmationWindow());
-        preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
-        preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
-        useUICheckBox.setSelected(applicationProperties.isUseUI());
-        activeteTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
-        autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
-
-        if (languageComboBox.getItems().isEmpty()) {
-            languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
-        }
-        if (StringUtils.nullOrEmpty(currentLanguage)) {
-            if (StringUtils.nullOrEmpty(resources.getLocale().getLanguage())
-                    || BundleUtils.SUPPORTED_LANGUAGES[0].equals(resources.getLocale().getLanguage())) {
-                currentLanguage = BundleUtils.SUPPORTED_LANGUAGES[0];
-
-            } else if (BundleUtils.SUPPORTED_LANGUAGES[1].equals(resources.getLocale().getLanguage())) {
-                currentLanguage = BundleUtils.SUPPORTED_LANGUAGES[1];
-            }
-        }
-        languageComboBox.setValue(currentLanguage);
     }
 
     private void initConfigurationName() {
@@ -240,11 +206,7 @@ public class MainController extends AbstractController {
         mercurialAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
         skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
 
-        activeteTrayCheckBox.setDisable(!uiLauncher.isTraySupported());
-        autostartCheckBox.setDisable(!uiLauncher.isTraySupported());
         progressIndicator.setVisible(false);
-        useUICheckBox.setDisable(true);
-        preferredArgSourceComboBox.setDisable(true);
         projectPathLabel.setTooltip(buildProjectPathsTooltip(projectPathLabel.getText()));
         if (uiLauncher.isTrayActivated()) {
             deamonButton.setText(resources.getString("button.deamon"));
@@ -389,11 +351,11 @@ public class MainController extends AbstractController {
             argList.add(ArgName.periodInDays + "=" + periodInDaysTextField.getText());
         }
 
-        argList.add(ArgName.confirmationWindow + "=" + confirmationWindowCheckBox.isSelected());
+        argList.add(ArgName.confirmationWindow + "=" + applicationProperties.isConfirmationWindow());
         argList.add(ArgName.preferredArgSource + "=" + PreferredArgSource.UI);
-        argList.add(ArgName.useUI + "=" + useUICheckBox.isSelected());
-        argList.add(ArgName.activeTray + "=" + activeteTrayCheckBox.isSelected());
-        argList.add(ArgName.enableOnStartup + "=" + autostartCheckBox.isSelected());
+        argList.add(ArgName.useUI + "=" + applicationProperties.isUseUI());
+        argList.add(ArgName.activeTray + "=" + applicationProperties.isActiveTray());
+        argList.add(ArgName.enableOnStartup + "=" + applicationProperties.isEnableOnStartup());
         argList.add(ArgName.configurationName + "=" + configurationNameTextField.getText());
 
         return argList.toArray(new String[0]);
@@ -569,45 +531,10 @@ public class MainController extends AbstractController {
     }
 
     private void setListeners(final ResourceBundle resources) {
-        languageComboBox.getSelectionModel()
-                .selectedItemProperty()
-                .addListener((options, oldValue, newValue) -> {
-                            currentLanguage = languageComboBox.getValue();
-                            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(createArgsFromUI()));
-                            uiLauncher.changeLanguage(languageComboBox.getValue());
-                });
-
         toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             String userFolder = toolkitUserFolderHyperlink.getText();
             userFolder = userFolder.substring(0, userFolder.lastIndexOf("/") + 1) + newValue;
             toolkitUserFolderHyperlink.setText(userFolder);
-        });
-
-        final StartupService startupService = new StartupService();
-        activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                deamonButton.setText(resources.getString("button.deamon"));
-                ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
-                uiLauncher.setApplicationProperties(uiAppProperties);
-                uiLauncher.initTrayHandler();
-                uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
-                autostartCheckBox.setDisable(false);
-            } else {
-                deamonButton.setText(resources.getString("button.job"));
-                uiLauncher.currentWindow().setOnCloseRequest(AbstractController.regularOnCloseEventHandler());
-                uiLauncher.removeTray();
-                autostartCheckBox.setDisable(true);
-                autostartCheckBox.setSelected(false);
-                startupService.disableStartOnStartup();
-            }
-        });
-
-        autostartCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                startupService.startOnStartup();
-            } else {
-                startupService.disableStartOnStartup();
-            }
         });
 
         uploadAsHtmlCheckBox.selectedProperty().addListener((observable, oldValue, newValue) ->

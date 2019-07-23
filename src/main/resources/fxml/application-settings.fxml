@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<AnchorPane prefHeight="121.0" prefWidth="430.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TitledPane animated="false" collapsible="false" prefHeight="121.0" prefWidth="430.0" text="%launch.panel.title">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="83.0" prefWidth="300.0">
+               <children>
+                  <Label layoutX="10.0" layoutY="8.0" text="%launch.panel.confirmationWindow" />
+                  <CheckBox fx:id="confirmationWindowCheckBox" layoutX="133.0" layoutY="8.0" mnemonicParsing="false" />
+                  <Label layoutX="265.0" layoutY="56.0" text="%launch.panel.preferredArgSource" />
+                  <ComboBox fx:id="preferredArgSourceComboBox" layoutX="165.0" layoutY="52.0" prefHeight="25.0" prefWidth="90.0" />
+                  <Label layoutX="10.0" layoutY="29.0" text="%launch.panel.useUI" />
+                  <CheckBox fx:id="useUICheckBox" layoutX="133.0" layoutY="29.0" mnemonicParsing="false" />
+                  <Label layoutX="10.0" layoutY="50.0" text="%launch.panel.activateTray" />
+                  <CheckBox fx:id="activeteTrayCheckBox" layoutX="133.0" layoutY="50.0" mnemonicParsing="false" />
+                  <Label layoutX="10.0" layoutY="71.0" text="%launch.panel.autoStart" />
+                  <CheckBox fx:id="autostartCheckBox" layoutX="133.0" layoutY="71.0" mnemonicParsing="false" />
+                  <ComboBox fx:id="languageComboBox" layoutX="165.0" layoutY="7.0" prefWidth="70.0" />
+                  <Label layoutX="265.0" layoutY="11.0" text="%launch.panel.language" />
+               </children>
+            </AnchorPane>
+         </content>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </TitledPane>
+   </children>
+</AnchorPane>

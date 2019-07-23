@@ -9,6 +9,8 @@ import pg.gipter.ui.main.MainController;
 import pg.gipter.ui.main.MainWindow;
 import pg.gipter.ui.project.ProjectsController;
 import pg.gipter.ui.project.ProjectsWindow;
+import pg.gipter.ui.settings.ApplicationSettingsController;
+import pg.gipter.ui.settings.ApplicationSettingsWindow;
 
 /**Created by Gawa 2017-10-04*/
 public enum WindowFactory {
@@ -29,10 +31,17 @@ public enum WindowFactory {
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
             return new ProjectsWindow(new ProjectsController(applicationProperties, uiLauncher));
         }
-    }, NEW_CONFIGURATION {
+    },
+    NEW_CONFIGURATION {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
             return new ConfigurationWindow(new ConfigurationController(applicationProperties, uiLauncher));
+        }
+    },
+    APPLICATION_SETTINGS {
+        @Override
+        public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+            return new ApplicationSettingsWindow(new ApplicationSettingsController(applicationProperties, uiLauncher));
         }
     };
 
