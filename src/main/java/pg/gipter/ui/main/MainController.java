@@ -11,12 +11,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import org.jetbrains.annotations.NotNull;
+import pg.gipter.platform.AppManager;
+import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
@@ -64,13 +67,7 @@ public class MainController extends AbstractController {
     @FXML
     private TextField toolkitDomainTextField;
     @FXML
-    private TextField toolkitListNameTextField;
-    @FXML
-    private TextField toolkitUrlTextField;
-    @FXML
-    private TextField toolkitWSTextField;
-    @FXML
-    private TextField toolkitUserFolderTextField;
+    private Hyperlink toolkitUserFolderHyperlink;
     @FXML
     private TextField toolkitProjectListNamesTextField;
     @FXML
@@ -166,10 +163,6 @@ public class MainController extends AbstractController {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
         toolkitPasswordField.setText(applicationProperties.toolkitPassword());
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
-        toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
-        toolkitUrlTextField.setText(applicationProperties.toolkitUrl());
-        toolkitWSTextField.setText(applicationProperties.toolkitWSUrl());
-        toolkitUserFolderTextField.setText(applicationProperties.toolkitUserFolder());
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
         deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
         uploadAsHtmlCheckBox.setSelected(applicationProperties.isUploadAsHtml());
@@ -219,10 +212,6 @@ public class MainController extends AbstractController {
 
     private void setProperties(ResourceBundle resources) {
         toolkitDomainTextField.setEditable(false);
-        toolkitListNameTextField.setEditable(false);
-        toolkitUrlTextField.setEditable(false);
-        toolkitWSTextField.setEditable(false);
-        toolkitUserFolderTextField.setEditable(false);
         toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
         deleteDownloadedFilesCheckBox.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS || applicationProperties.isUploadAsHtml());
         uploadAsHtmlCheckBox.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
@@ -295,6 +284,7 @@ public class MainController extends AbstractController {
         addConfigurationButton.setOnAction(addConfigurationEventHandler());
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler(resources));
         configurationNameTextField.setOnKeyReleased(keyReleasedEventHandler());
+        toolkitUserFolderHyperlink.setOnMouseClicked(mouseClickEventHandler());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
@@ -588,9 +578,9 @@ public class MainController extends AbstractController {
                 });
 
         toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            String userFolder = toolkitUserFolderTextField.getText();
+            String userFolder = toolkitUserFolderHyperlink.getText();
             userFolder = userFolder.substring(0, userFolder.lastIndexOf("/") + 1) + newValue;
-            toolkitUserFolderTextField.setText(userFolder);
+            toolkitUserFolderHyperlink.setText(userFolder);
         });
 
         final StartupService startupService = new StartupService();
@@ -640,6 +630,15 @@ public class MainController extends AbstractController {
                 configurationNameTextField.setText(newValue);
             }
         };
+    }
+
+    @NotNull
+    private EventHandler<MouseEvent> mouseClickEventHandler() {
+        return event -> Platform.runLater(() -> {
+            AppManager instance = AppManagerFactory.getInstance();
+            instance.launchDefaultBrowser(applicationProperties.toolkitUserFolder());
+            toolkitUserFolderHyperlink.setVisited(false);
+        });
     }
 
 }
