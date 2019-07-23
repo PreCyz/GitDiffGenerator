@@ -118,7 +118,6 @@ public class MainController extends AbstractController {
 
     private ApplicationProperties applicationProperties;
 
-    private static String currentLanguage;
     private static String newConfigurationName = "";
     private static boolean useComboBoxValueChangeListener = true;
 
