@@ -129,14 +129,14 @@ public class MainController extends AbstractController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
-        setInitValues(resources);
+        setInitValues();
         initConfigurationName();
         setProperties(resources);
         setActions(resources);
-        setListeners(resources);
+        setListeners();
     }
 
-    private void setInitValues(ResourceBundle resources) {
+    private void setInitValues() {
         authorsTextField.setText(String.join(",", applicationProperties.authors()));
         committerEmailTextField.setText(applicationProperties.committerEmail());
         gitAuthorTextField.setText(applicationProperties.gitAuthor());
@@ -462,7 +462,7 @@ public class MainController extends AbstractController {
                 removeConfigurationNameFromComboBox(configurationNameComboBox.getValue(), newConfiguration);
                 String[] currentArgs = propertiesHelper.loadArgumentArray(newConfiguration);
                 applicationProperties = ApplicationPropertiesFactory.getInstance(currentArgs);
-                setInitValues(resource);
+                setInitValues();
                 configurationNameTextField.setText(configurationNameComboBox.getValue());
                 disableRemoveConfigurationButton();
                 Platform.runLater(() -> new AlertWindowBuilder()
@@ -529,7 +529,7 @@ public class MainController extends AbstractController {
         updateConfigComboBox(newValue, FXCollections.observableList(items));
     }
 
-    private void setListeners(final ResourceBundle resources) {
+    private void setListeners() {
         toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             String userFolder = toolkitUserFolderHyperlink.getText();
             userFolder = userFolder.substring(0, userFolder.lastIndexOf("/") + 1) + newValue;
@@ -541,18 +541,18 @@ public class MainController extends AbstractController {
 
         configurationNameComboBox.getSelectionModel()
                 .selectedItemProperty()
-                .addListener(comboBoxValueChangeListener(resources));
+                .addListener(comboBoxValueChangeListener());
 
         configurationNameTextField.textProperty().addListener((observable, oldValue, newValue) -> newConfigurationName = newValue);
     }
 
     @NotNull
-    private ChangeListener<String> comboBoxValueChangeListener(ResourceBundle resources) {
+    private ChangeListener<String> comboBoxValueChangeListener() {
         return (options, oldValue, newValue) -> {
             if (useComboBoxValueChangeListener) {
                 String[] args = propertiesHelper.loadArgumentArray(newValue);
                 applicationProperties = ApplicationPropertiesFactory.getInstance(args);
-                setInitValues(resources);
+                setInitValues();
                 configurationNameTextField.setText(newValue);
             }
         };

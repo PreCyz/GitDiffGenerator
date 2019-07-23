@@ -37,7 +37,6 @@ class ConfigHelper {
         TOOLKIT_CONFIG_PROPERTIES.add(ArgName.toolkitCopyCase.name());
         TOOLKIT_CONFIG_PROPERTIES.add(ArgName.toolkitWSUrl.name());
         TOOLKIT_CONFIG_PROPERTIES.add(ArgName.toolkitUserFolder.name());
-        TOOLKIT_CONFIG_PROPERTIES.add(ArgName.toolkitProjectListNames.name());
 
         RUN_CONFIG_PROPERTIES.add(ArgName.author.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.gitAuthor.name());
@@ -54,6 +53,9 @@ class ConfigHelper {
         RUN_CONFIG_PROPERTIES.add(ArgName.startDate.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.endDate.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.configurationName.name());
+        RUN_CONFIG_PROPERTIES.add(ArgName.toolkitProjectListNames.name());
+        RUN_CONFIG_PROPERTIES.add(ArgName.deleteDownloadedFiles.name());
+        RUN_CONFIG_PROPERTIES.add(ArgName.uploadAsHtml.name());
     }
 
     @NotNull

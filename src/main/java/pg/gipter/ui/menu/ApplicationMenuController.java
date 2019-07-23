@@ -1,4 +1,4 @@
-package pg.gipter.ui.settings;
+package pg.gipter.ui.menu;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
-public class ApplicationSettingsController extends AbstractController {
+public class ApplicationMenuController extends AbstractController {
 
     @FXML
     private CheckBox confirmationWindowCheckBox;
@@ -37,7 +37,7 @@ public class ApplicationSettingsController extends AbstractController {
 
     private static String currentLanguage;
 
-    public ApplicationSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+    public ApplicationMenuController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
     }

@@ -1,18 +1,18 @@
-package pg.gipter.ui.settings;
+package pg.gipter.ui.menu;
 
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
-public class ApplicationSettingsWindow extends AbstractWindow {
+public class ApplicationMenuWindow extends AbstractWindow {
 
-    public ApplicationSettingsWindow(AbstractController controller) {
+    public ApplicationMenuWindow(AbstractController controller) {
         super(controller);
     }
 
     @Override
     protected String fxmlFileName() {
-        return "application-settings.fxml";
+        return "applicationMenu.fxml";
     }
 
     @Override
@@ -22,11 +22,11 @@ public class ApplicationSettingsWindow extends AbstractWindow {
 
     @Override
     protected String cssFileName() {
-        return "application-settings.css";
+        return "applicationMenu.css";
     }
 
     @Override
     public String windowTitleBundle() {
-        return "application.settings.title";
+        return "application.menu.title";
     }
 }
