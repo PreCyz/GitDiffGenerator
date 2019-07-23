@@ -18,6 +18,31 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </TitledPane>
+      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="120.0" prefHeight="292.0" prefWidth="300.0" text="%csv.panel.title">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="315.0" prefWidth="300.0">
+               <children>
+                  <Label layoutX="9.0" layoutY="13.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
+                  <TextField fx:id="authorsTextField" layoutX="129.0" layoutY="11.0" prefWidth="160.0" />
+                  <Label layoutX="9.0" layoutY="52.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
+                  <TextField fx:id="committerEmailTextField" layoutX="129.0" layoutY="49.0" prefWidth="160.0" />
+                  <Label layoutX="9.0" layoutY="90.0" text="%csv.panel.gitAuthor" />
+                  <TextField fx:id="gitAuthorTextField" layoutX="129.0" layoutY="87.0" prefWidth="160.0" />
+                  <TextField fx:id="mercurialAuthorTextField" layoutX="129.0" layoutY="125.0" prefWidth="160.0" />
+                  <Label layoutX="9.0" layoutY="128.0" text="%csv.panel.mercurialAuthor" />
+                  <TextField fx:id="svnAuthorTextField" layoutX="129.0" layoutY="163.0" prefWidth="160.0" />
+                  <Label layoutX="9.0" layoutY="166.0" text="%csv.panel.svnAuthor" />
+                  <Label layoutX="10.0" layoutY="233.0" text="%csv.panel.uploadType" />
+                  <ComboBox fx:id="uploadTypeComboBox" layoutX="129.0" layoutY="230.0" prefWidth="160.0" />
+                  <CheckBox fx:id="skipRemoteCheckBox" layoutX="129.0" layoutY="201.0" mnemonicParsing="false" />
+                  <Label layoutX="10.0" layoutY="200.0" text="%csv.panel.skipRemote" />
+               </children>
+            </AnchorPane>
+         </content>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </TitledPane>
       <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="413.0" prefHeight="146.0" prefWidth="300.0" text="%paths.panel.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="95.0" prefWidth="300.0">
@@ -47,31 +72,6 @@
                      </font>
                   </Button>
                   <CheckBox fx:id="useAsFileNameCheckBox" layoutX="10.0" layoutY="42.0" mnemonicParsing="false" text="%paths.panel.useAsFileName" />
-               </children>
-            </AnchorPane>
-         </content>
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="120.0" prefHeight="292.0" prefWidth="300.0" text="%csv.panel.title">
-         <content>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="315.0" prefWidth="300.0">
-               <children>
-                  <Label layoutX="9.0" layoutY="13.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
-                  <TextField fx:id="authorsTextField" layoutX="129.0" layoutY="11.0" prefWidth="160.0" />
-                  <Label layoutX="9.0" layoutY="52.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
-                  <TextField fx:id="committerEmailTextField" layoutX="129.0" layoutY="49.0" prefWidth="160.0" />
-                  <Label layoutX="9.0" layoutY="90.0" text="%csv.panel.gitAuthor" />
-                  <TextField fx:id="gitAuthorTextField" layoutX="129.0" layoutY="87.0" prefWidth="160.0" />
-                  <TextField fx:id="mercurialAuthorTextField" layoutX="129.0" layoutY="125.0" prefWidth="160.0" />
-                  <Label layoutX="9.0" layoutY="128.0" text="%csv.panel.mercurialAuthor" />
-                  <TextField fx:id="svnAuthorTextField" layoutX="129.0" layoutY="163.0" prefWidth="160.0" />
-                  <Label layoutX="9.0" layoutY="166.0" text="%csv.panel.svnAuthor" />
-                  <Label layoutX="10.0" layoutY="233.0" text="%csv.panel.uploadType" />
-                  <ComboBox fx:id="uploadTypeComboBox" layoutX="129.0" layoutY="230.0" prefWidth="160.0" />
-                  <CheckBox fx:id="skipRemoteCheckBox" layoutX="129.0" layoutY="201.0" mnemonicParsing="false" />
-                  <Label layoutX="10.0" layoutY="200.0" text="%csv.panel.skipRemote" />
                </children>
             </AnchorPane>
          </content>
