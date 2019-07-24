@@ -111,9 +111,6 @@ public class MainController extends AbstractController {
     private TextField periodInDaysTextField;
 
     @FXML
-    private Button saveConfigurationButton;
-
-    @FXML
     private Button executeButton;
     @FXML
     private Button deamonButton;
@@ -131,9 +128,12 @@ public class MainController extends AbstractController {
     private Button addConfigurationButton;
     @FXML
     private Button removeConfigurationButton;
+    @FXML
+    private Button saveConfigurationButton;
 
     private ApplicationProperties applicationProperties;
 
+    private String userFolderUrl;
     private static boolean useComboBoxValueChangeListener = true;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
@@ -164,9 +164,6 @@ public class MainController extends AbstractController {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
         toolkitPasswordField.setText(applicationProperties.toolkitPassword());
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
-        toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
-        deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
-        uploadAsHtmlCheckBox.setSelected(applicationProperties.isUploadAsHtml());
 
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
@@ -174,10 +171,18 @@ public class MainController extends AbstractController {
         itemPathLabel.setText(itemPath);
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
         useAsFileNameCheckBox.setSelected(applicationProperties.isUseAsFileName());
+        toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
+        deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
+        uploadAsHtmlCheckBox.setSelected(applicationProperties.isUploadAsHtml());
 
         startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
         endDatePicker.setValue(LocalDate.now());
         periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
+
+        userFolderUrl = applicationProperties.toolkitUserFolder();
+        if (applicationProperties.toolkitUserFolder().equals(ArgName.toolkitUserFolder.defaultValue())) {
+            userFolderUrl = "";
+        }
     }
 
     private void initConfigurationName() {
@@ -515,6 +520,10 @@ public class MainController extends AbstractController {
         return event -> {
             String[] args = createArgsFromUI();
             String currentConfigurationName = configurationNameTextField.getText();
+            if (ArgName.configurationName.defaultValue().equals(currentConfigurationName)) {
+                currentConfigurationName += " ";
+                configurationNameTextField.setText(currentConfigurationName);
+            }
             Optional<Properties> properties = propertiesHelper.loadApplicationProperties(currentConfigurationName);
             boolean operationDone = false;
             if (properties.isPresent()) {
@@ -539,6 +548,7 @@ public class MainController extends AbstractController {
                 operationDone = true;
             }
             if (operationDone) {
+                removeConfigurationButton.setDisable(false);
                 Platform.runLater(() -> new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
@@ -606,12 +616,10 @@ public class MainController extends AbstractController {
         items.remove(oldValue);
         updateConfigComboBox(newValue, FXCollections.observableList(items));
     }
-
     private void setListeners() {
         toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            String userFolder = toolkitUserFolderHyperlink.getText();
-            userFolder = userFolder.substring(0, userFolder.lastIndexOf("/") + 1) + newValue;
-            toolkitUserFolderHyperlink.setText(userFolder);
+            userFolderUrl = applicationProperties.toolkitUserFolder();
+            userFolderUrl = userFolderUrl.substring(0, userFolderUrl.lastIndexOf("/") + 1) + newValue;
         });
 
         uploadAsHtmlCheckBox.selectedProperty().addListener((observable, oldValue, newValue) ->
@@ -637,8 +645,12 @@ public class MainController extends AbstractController {
     @NotNull
     private EventHandler<MouseEvent> mouseClickEventHandler() {
         return event -> Platform.runLater(() -> {
+            String userFolder = applicationProperties.toolkitUserFolder();
+            if (!applicationProperties.toolkitUserFolder().equalsIgnoreCase(userFolderUrl)) {
+                userFolder = userFolderUrl;
+            }
             AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser(applicationProperties.toolkitUserFolder());
+            instance.launchDefaultBrowser(userFolder);
             toolkitUserFolderHyperlink.setVisited(false);
         });
     }
