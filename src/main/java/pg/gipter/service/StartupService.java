@@ -18,12 +18,12 @@ public class StartupService {
     private final String systemUsername;
 
     public StartupService() {
-        platform = System.getProperty("os.name");
+        platform = System.getProperty("os.name").toLowerCase();
         systemUsername = System.getProperty("user.name");
     }
 
     public void startOnStartup() {
-        if (platform.startsWith("Windows")) {
+        if (platform.contains("win")) {
             String shortcutLnkPath = String.format(
                     "C:\\Users\\%s\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Gipter.lnk",
                     systemUsername
@@ -56,7 +56,7 @@ public class StartupService {
     }
 
     public void disableStartOnStartup() {
-        if (platform.startsWith("Windows")) {
+        if (platform.contains("win")) {
             String shortcutLnkPath = String.format(
                     "C:\\Users\\%s\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Gipter.lnk",
                     systemUsername

@@ -39,6 +39,7 @@ import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -282,19 +283,35 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> instructionActionEventHandler() {
         return event -> {
+            String pdfFileName = "Gipter-ui-description.pdf";
             try {
-
-                File pdfFile = Paths.get("Gipter-ui-description.pdf").toFile();
+                File pdfFile = Paths.get(pdfFileName).toFile();
                 if (pdfFile.exists()) {
-
                     if (Desktop.isDesktopSupported()) {
                         Desktop.getDesktop().open(pdfFile);
                     } else {
-                        System.out.println("Awt Desktop is not supported!");
+                        logger.error("AWT Desktop is not supported by the platform.");
+                        Platform.runLater(() -> new AlertWindowBuilder()
+                                .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
+                                .withLink(applicationProperties.toolkitUserFolder())
+                                .withWindowType(WindowType.LOG_WINDOW)
+                                .withAlertType(Alert.AlertType.INFORMATION)
+                                .withImage()
+                                .buildAndDisplayWindow()
+                        );
                     }
-
                 }
-            } catch (Exception ex) {}
+            } catch (IOException e) {
+                logger.error("Could not find [{}] file with instructions.", pdfFileName, e);
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
+                        .withLink(applicationProperties.toolkitUserFolder())
+                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withAlertType(Alert.AlertType.INFORMATION)
+                        .withImage()
+                        .buildAndDisplayWindow()
+                );
+            }
         };
     }
 
@@ -303,7 +320,6 @@ public class MainController extends AbstractController {
             String[] argsFromUI = createArgsFromUI();
             propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(argsFromUI));
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
-            uiLauncher.hideMainWindow();
             uiLauncher.showProjectsWindow();
         };
     }

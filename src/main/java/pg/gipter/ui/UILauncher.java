@@ -46,7 +46,6 @@ public class UILauncher implements Launcher {
     private ApplicationProperties applicationProperties;
     private Stage jobWindow;
     private Stage projectsWindow;
-    private Stage newConfigurationWindow;
     private TrayHandler trayHandler;
     private PropertiesHelper propertiesHelper;
     private boolean silentMode;
@@ -160,15 +159,7 @@ public class UILauncher implements Launcher {
     }
 
     public Stage currentWindow() {
-        if (projectsWindow != null) {
-            return projectsWindow;
-        } else if (newConfigurationWindow != null) {
-            return newConfigurationWindow;
-        } else if (jobWindow != null) {
-            return jobWindow;
-        } else {
-            return mainWindow;
-        }
+        return mainWindow;
     }
 
     private Image readImage(String imgPath) throws IOException {
@@ -339,7 +330,7 @@ public class UILauncher implements Launcher {
     public void showProjectsWindow() {
         Platform.runLater(() -> {
             projectsWindow = new Stage();
-            projectsWindow.initModality(Modality.WINDOW_MODAL);
+            projectsWindow.initModality(Modality.APPLICATION_MODAL);
             buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
             projectsWindow.setOnCloseRequest(event -> {
                 hideProjectsWindow();
@@ -351,16 +342,10 @@ public class UILauncher implements Launcher {
 
     public void hideProjectsWindow() {
         projectsWindow.hide();
-        projectsWindow = null;
     }
 
     public String getConfigurationName() {
         return applicationProperties.configurationName();
-    }
-
-    public void hideNewConfigurationWindow() {
-        newConfigurationWindow.hide();
-        newConfigurationWindow = null;
     }
 
     public void setNewConfigSource(boolean newConfigSource) {

@@ -71,7 +71,7 @@
                               <Label layoutX="10.0" layoutY="17.0" text="%paths.panel.fileNamePrefix" />
                               <TextField fx:id="itemFileNamePrefixTextField" layoutX="101.0" layoutY="14.0" prefHeight="25.0" prefWidth="186.0" />
                               <CheckBox fx:id="useAsFileNameCheckBox" layoutX="302.0" layoutY="17.0" mnemonicParsing="false" text="%paths.panel.useAsFileName" />
-                              <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="50.0" prefHeight="17.0" prefWidth="280.0" text="need set up">
+                              <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="50.0" prefHeight="17.0" prefWidth="383.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
@@ -88,7 +88,7 @@
                                  </font>
                               </Button>
                               <Label layoutX="10.0" layoutY="83.0" text="%paths.panel.itemPath" />
-                              <Label fx:id="itemPathLabel" layoutX="164.0" layoutY="85.0" prefHeight="17.0" prefWidth="280.0" text="need set up">
+                              <Label fx:id="itemPathLabel" layoutX="164.0" layoutY="85.0" prefHeight="17.0" prefWidth="383.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
@@ -150,7 +150,7 @@
                   </TitledPane>
                   <Label fx:id="infoLabel" layoutX="341.0" layoutY="448.0" prefHeight="17.0" prefWidth="212.0" />
                   <ProgressIndicator fx:id="progressIndicator" layoutX="300.0" layoutY="443.0" progress="0.0" />
-                  <Button fx:id="deamonButton" layoutX="396.0" layoutY="404.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
+                  <Button fx:id="deamonButton" layoutX="300.0" layoutY="378.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
                      <font>
                         <Font name="System Bold" size="13.0" />
                      </font>
@@ -160,17 +160,17 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="executeButton" layoutX="292.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.execute" textFill="#1eb235">
+                  <Button fx:id="executeButton" layoutX="300.0" layoutY="343.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="126.0" text="%button.execute" textFill="#1eb235">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="exitButton" layoutX="472.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.exit" textFill="#0d0d0d">
+                  <Button fx:id="exitButton" layoutX="473.0" layoutY="377.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.exit" textFill="#0d0d0d">
                      <font>
                         <Font name="System Bold" size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="executeAllButton" layoutX="382.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.executeAll" textFill="#1eb235">
+                  <Button fx:id="executeAllButton" layoutX="436.0" layoutY="343.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="126.0" text="%button.executeAll" textFill="#1eb235">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>

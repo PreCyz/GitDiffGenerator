@@ -285,4 +285,13 @@ public class PropertiesHelper {
             logger.warn("Can not delete {} file. {}", propertyFile, e.getMessage());
         }
     }
+
+    public void saveAppSettings(Properties properties) {
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            jsonObject = configHelper.buildFullJson(properties);
+        }
+        jsonObject.add(ConfigHelper.APP_CONFIG, configHelper.buildAppConfig(properties));
+        writeJsonConfig(jsonObject);
+    }
 }

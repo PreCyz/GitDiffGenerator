@@ -19,7 +19,7 @@ import pg.gipter.utils.PropertiesHelper;
 /** Created by Pawel Gawedzki on 10-Mar-2019. */
 public class FXRunner extends Task<Void> implements Starter {
 
-    private static final Logger logger = LoggerFactory.getLogger(FXRunner .class);
+    private static final Logger logger = LoggerFactory.getLogger(FXRunner.class);
     private ApplicationProperties applicationProperties;
     private final PropertiesHelper propertiesHelper;
 

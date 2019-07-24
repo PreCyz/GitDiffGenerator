@@ -7,6 +7,7 @@ import javafx.scene.control.ComboBox;
 import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
+import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
@@ -14,7 +15,9 @@ import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
@@ -30,6 +33,8 @@ public class ApplicationMenuController extends AbstractController {
     private CheckBox activeteTrayCheckBox;
     @FXML
     private CheckBox autostartCheckBox;
+    @FXML
+    private CheckBox silentModeCheckBox;
     @FXML
     private ComboBox<String> languageComboBox;
 
@@ -47,8 +52,7 @@ public class ApplicationMenuController extends AbstractController {
         super.initialize(location, resources);
         setInitValues(resources);
         setProperties();
-        //setActions(resources);
-        setListeners(resources);
+        setListeners();
     }
 
     private void setInitValues(ResourceBundle resources) {
@@ -58,6 +62,7 @@ public class ApplicationMenuController extends AbstractController {
         useUICheckBox.setSelected(applicationProperties.isUseUI());
         activeteTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
         autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
+        silentModeCheckBox.setSelected(applicationProperties.isSilentMode());
 
         if (languageComboBox.getItems().isEmpty()) {
             languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
@@ -79,9 +84,10 @@ public class ApplicationMenuController extends AbstractController {
         autostartCheckBox.setDisable(!uiLauncher.isTraySupported());
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
+        silentModeCheckBox.setDisable(true);
     }
 
-    private void setListeners(final ResourceBundle resources) {
+    private void setListeners() {
         languageComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
@@ -106,6 +112,7 @@ public class ApplicationMenuController extends AbstractController {
                 autostartCheckBox.setSelected(false);
                 startupService.disableStartOnStartup();
             }
+            saveNewSettings();
         });
 
         autostartCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -114,6 +121,26 @@ public class ApplicationMenuController extends AbstractController {
             } else {
                 startupService.disableStartOnStartup();
             }
+            saveNewSettings();
         });
+
+        confirmationWindowCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+    }
+
+    private void saveNewSettings() {
+        String[] arguments = createArgsFromUI();
+        propertiesHelper.saveAppSettings(propertiesHelper.createProperties(arguments));
+        logger.info("New application settings saved. [{}]", String.join(",", arguments));
+    }
+
+    private String[] createArgsFromUI() {
+        List<String> list = new ArrayList<>();
+        list.add(ArgName.confirmationWindow.name() + "=" + confirmationWindowCheckBox.isSelected());
+        list.add(ArgName.preferredArgSource.name() + "=" + preferredArgSourceComboBox.getValue());
+        list.add(ArgName.useUI.name() + "=" + useUICheckBox.isSelected());
+        list.add(ArgName.activeTray.name() + "=" + activeteTrayCheckBox.isSelected());
+        list.add(ArgName.enableOnStartup.name() + "=" + autostartCheckBox.isSelected());
+        list.add(ArgName.silentMode.name() + "=" + silentModeCheckBox.isSelected());
+        return list.toArray(new String[0]);
     }
 }
