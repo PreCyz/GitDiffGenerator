@@ -12,7 +12,7 @@ public class ProjectDetails {
     private StringProperty cvsType;
     private StringProperty path;
 
-    static ProjectDetails DEFAULT = new ProjectDetails(
+    public static ProjectDetails DEFAULT = new ProjectDetails(
             ArgName.projectPath.defaultValue(), "N/A", ArgName.projectPath.defaultValue()
     );
 
