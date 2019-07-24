@@ -11,6 +11,8 @@ import pg.gipter.ui.menu.ToolkitMenuController;
 import pg.gipter.ui.menu.ToolkitMenuWindow;
 import pg.gipter.ui.project.ProjectsController;
 import pg.gipter.ui.project.ProjectsWindow;
+import pg.gipter.ui.project.toolkit.ToolkitProjectsController;
+import pg.gipter.ui.project.toolkit.ToolkitProjectsWindow;
 
 /**Created by Gawa 2017-10-04*/
 public enum WindowFactory {
@@ -42,6 +44,12 @@ public enum WindowFactory {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
             return new ToolkitMenuWindow(new ToolkitMenuController(applicationProperties, uiLauncher));
+        }
+    },
+    TOOLKIT_PROJECTS {
+        @Override
+        public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+            return new ToolkitProjectsWindow(new ToolkitProjectsController(applicationProperties, uiLauncher));
         }
     };
 

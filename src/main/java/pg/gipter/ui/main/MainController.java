@@ -332,7 +332,11 @@ public class MainController extends AbstractController {
             String[] argsFromUI = createArgsFromUI();
             propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(argsFromUI));
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
-            uiLauncher.showProjectsWindow();
+            if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
+                uiLauncher.showToolkitProjectsWindow();
+            } else {
+                uiLauncher.showProjectsWindow();
+            }
         };
     }
 

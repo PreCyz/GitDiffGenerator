@@ -46,6 +46,7 @@ public class UILauncher implements Launcher {
     private ApplicationProperties applicationProperties;
     private Stage jobWindow;
     private Stage projectsWindow;
+    private Stage toolkitProjectsWindow;
     private TrayHandler trayHandler;
     private PropertiesHelper propertiesHelper;
     private boolean silentMode;
@@ -370,6 +371,23 @@ public class UILauncher implements Launcher {
 
     public void showToolkitSettingsWindow() {
         createSettingsWindow(WindowFactory.TOOLKIT_MENU);
+    }
+
+    public void showToolkitProjectsWindow() {
+        Platform.runLater(() -> {
+            toolkitProjectsWindow = new Stage();
+            toolkitProjectsWindow.initModality(Modality.APPLICATION_MODAL);
+            buildScene(toolkitProjectsWindow, WindowFactory.TOOLKIT_PROJECTS.createWindow(applicationProperties, this));
+            toolkitProjectsWindow.setOnCloseRequest(event -> {
+                hideToolkitProjectsWindow();
+                execute();
+            });
+            toolkitProjectsWindow.showAndWait();
+        });
+    }
+
+    public void hideToolkitProjectsWindow() {
+        toolkitProjectsWindow.hide();
     }
 
 }
