@@ -30,6 +30,7 @@ public class GithubService {
     private final ApplicationProperties applicationProperties;
 
     private static final Logger logger = LoggerFactory.getLogger(GithubService.class);
+    private String strippedVersion;
 
     public GithubService(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -69,35 +70,59 @@ public class GithubService {
     }
 
     public void checkUpgrades() {
+        if (isNewVersion()) {
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", strippedVersion))
+                    .withLink(GITHUB_URL + "/releases/latest")
+                    .withWindowType(WindowType.BROWSER_WINDOW)
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .buildAndDisplayWindow()
+            );
+        }
+    }
+
+    private boolean isNewVersion() {
+        boolean result = false;
         Optional<String> latestVersion = getLatestVersion();
         if (latestVersion.isPresent()) {
             String version = latestVersion.get();
             String tagSuffix = "v";
-            String strippedVersion = version.substring(version.indexOf(tagSuffix) + 1);
+            strippedVersion = version.substring(version.indexOf(tagSuffix) + 1);
 
             String[] newVersion = strippedVersion.split("\\.");
             String[] currentVersion = applicationProperties.version().split("\\.");
 
-            boolean showUpgradeWindow = newVersion.length != currentVersion.length;
+            result = newVersion.length != currentVersion.length;
 
-            if (!showUpgradeWindow) {
+            if (!result) {
                 for (int i = 0; i < newVersion.length; i++) {
                     if (Integer.valueOf(newVersion[i]) > Integer.valueOf(currentVersion[i])) {
-                        showUpgradeWindow = true;
+                        result = true;
                         break;
                     }
                 }
             }
+        }
+        return result;
+    }
 
-            if (showUpgradeWindow) {
-                Platform.runLater(() -> new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("upgrade.message", strippedVersion))
-                        .withLink(GITHUB_URL + "/releases/latest")
-                        .withWindowType(WindowType.BROWSER_WINDOW)
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .buildAndDisplayWindow()
-                );
-            }
+    public void checkUpgradesWithPopups() {
+        if (isNewVersion()) {
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", strippedVersion))
+                    .withLink(GITHUB_URL + "/releases/latest")
+                    .withWindowType(WindowType.BROWSER_WINDOW)
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .buildAndDisplayWindow()
+            );
+        } else {
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
+                    .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .withImage()
+                    .buildAndDisplayWindow()
+            );
         }
     }
 }

@@ -57,6 +57,8 @@ public class MainController extends AbstractController {
     private MenuItem readMeMenuItem;
     @FXML
     private MenuItem instructionMenuItem;
+    @FXML
+    private MenuItem checkUpdatesMenuItem;
 
     @FXML
     private TextField authorsTextField;
@@ -253,6 +255,7 @@ public class MainController extends AbstractController {
         toolkitMenuItem.setOnAction(toolkitActionEventHandler());
         readMeMenuItem.setOnAction(readMeActionEventHandler());
         instructionMenuItem.setOnAction(instructionActionEventHandler());
+        checkUpdatesMenuItem.setOnAction(checkUpdatesActionEventHandler());
         projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         uploadTypeComboBox.setOnAction(uploadTypeActionEventHandler());
@@ -318,6 +321,10 @@ public class MainController extends AbstractController {
                 );
             }
         };
+    }
+
+    private EventHandler<ActionEvent> checkUpdatesActionEventHandler() {
+        return event -> new GithubService(applicationProperties).checkUpgradesWithPopups();
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
