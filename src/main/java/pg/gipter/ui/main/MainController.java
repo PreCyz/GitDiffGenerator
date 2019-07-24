@@ -13,8 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -134,7 +132,6 @@ public class MainController extends AbstractController {
 
     private ApplicationProperties applicationProperties;
 
-    private static String newConfigurationName = "";
     private static boolean useComboBoxValueChangeListener = true;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
@@ -264,8 +261,7 @@ public class MainController extends AbstractController {
         exitButton.setOnAction(exitActionEventHandler());
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler());
         addConfigurationButton.setOnAction(addConfigurationEventHandler());
-        removeConfigurationButton.setOnAction(removeConfigurationEventHandler(resources));
-        configurationNameTextField.setOnKeyReleased(keyReleasedEventHandler());
+        removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
         toolkitUserFolderHyperlink.setOnMouseClicked(mouseClickEventHandler());
     }
 
@@ -488,22 +484,46 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
         return event -> {
-            String[] args = new String[ArgName.values().length];
-            int idx = 0;
-            for (ArgName argName : ArgName.values()) {
-                String value = argName.defaultValue();
-                if (argName == ArgName.preferredArgSource) {
-                    value = PreferredArgSource.UI.name();
+            String[] args = createArgsFromUI();
+            String currentConfigurationName = configurationNameTextField.getText();
+            Optional<Properties> properties = propertiesHelper.loadApplicationProperties(currentConfigurationName);
+            boolean operationDone = false;
+            if (properties.isPresent()) {
+                boolean result = new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("popup.overrideProperties.message", currentConfigurationName))
+                        .withAlertType(Alert.AlertType.CONFIRMATION)
+                        .withWindowType(WindowType.OVERRIDE_WINDOW)
+                        .withImage()
+                        .withOkButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonOk"))
+                        .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
+                        .buildAndDisplayOverrideWindow();
+                if (result) {
+                    propertiesHelper.removeConfig(currentConfigurationName);
+                    propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(args));
+                    updateConfigurationNameComboBox(configurationNameComboBox.getValue(), currentConfigurationName);
+                    operationDone = true;
+                } else {
+                    configurationNameTextField.setText(configurationNameComboBox.getValue());
                 }
-                args[idx++] = String.format("%s=%s", argName.name(), value);
+            } else {
+                propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(args));
+                updateConfigurationNameComboBox(currentConfigurationName, currentConfigurationName);
+                operationDone = true;
             }
-            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(args));
-            uiLauncher.hideMainWindow();
-            uiLauncher.showNewConfigurationWindow(configurationNameComboBox.getValue());
+            if (operationDone) {
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("main.config.changed"))
+                        .withAlertType(Alert.AlertType.INFORMATION)
+                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                        .withImage()
+                        .buildAndDisplayWindow()
+                );
+            }
+
         };
     }
 
-    private EventHandler<ActionEvent> removeConfigurationEventHandler(ResourceBundle resource) {
+    private EventHandler<ActionEvent> removeConfigurationEventHandler() {
         return event -> {
             try {
                 propertiesHelper.removeConfig(configurationNameComboBox.getValue());
@@ -532,30 +552,6 @@ public class MainController extends AbstractController {
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
-            }
-        };
-    }
-
-    private EventHandler<KeyEvent> keyReleasedEventHandler() {
-        return event -> {
-            String oldValue = configurationNameComboBox.getValue();
-            if (event.getCode() == KeyCode.ENTER && !newConfigurationName.isEmpty() && !newConfigurationName.equalsIgnoreCase(oldValue)) {
-                Properties currentProperties = propertiesHelper.createProperties(createArgsFromUI());
-                Optional<Properties> properties = propertiesHelper.loadApplicationProperties(oldValue);
-                if (properties.isPresent()) {
-                    propertiesHelper.removeConfig(oldValue);
-                }
-                updateConfigurationNameComboBox(oldValue, newConfigurationName);
-                propertiesHelper.addAndSaveApplicationProperties(currentProperties);
-                newConfigurationName = "";
-                removeConfigurationButton.setDisable(false);
-                Platform.runLater(() -> new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("main.config.changed"))
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
                         .withImage()
                         .buildAndDisplayWindow()
                 );
@@ -596,8 +592,6 @@ public class MainController extends AbstractController {
         configurationNameComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener(comboBoxValueChangeListener());
-
-        configurationNameTextField.textProperty().addListener((observable, oldValue, newValue) -> newConfigurationName = newValue);
     }
 
     @NotNull

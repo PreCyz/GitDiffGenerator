@@ -119,7 +119,7 @@
                               <CheckBox fx:id="skipRemoteCheckBox" layoutX="149.0" layoutY="269.0" mnemonicParsing="false" />
                               <Label layoutX="10.0" layoutY="269.0" text="%csv.panel.skipRemote" />
                               <TextField fx:id="toolkitProjectListNamesTextField" layoutX="109.0" layoutY="191.0" prefHeight="25.0" prefWidth="160.0" />
-                              <Label layoutX="10.0" layoutY="195.0" text="%toolkit.panel.projectListNames" />
+                              <Label layoutX="9.0" layoutY="195.0" text="%toolkit.panel.projectListNames" />
                               <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="149.0" layoutY="227.0" mnemonicParsing="false" />
                               <Label layoutX="10.0" layoutY="227.0" text="%toolkit.panel.deleteFiles" />
                               <Label layoutX="10.0" layoutY="248.0" text="%toolkit.panel.uploadAsHtml" />
@@ -155,9 +155,9 @@
                         <Font name="System Bold" size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="saveConfigurationButton" layoutX="291.0" layoutY="338.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="270.0" text="%button.save" textFill="#32a1c9">
+                  <Button fx:id="saveConfigurationButton" layoutX="339.0" layoutY="9.0" mnemonicParsing="false" prefWidth="222.0" text="%button.save" textFill="#32a1c9">
                      <font>
-                        <Font name="System Bold" size="13.0" />
+                        <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
                   <Button fx:id="executeButton" layoutX="292.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.execute" textFill="#1eb235">

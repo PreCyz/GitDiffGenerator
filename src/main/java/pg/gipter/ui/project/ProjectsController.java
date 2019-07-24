@@ -216,7 +216,6 @@ public class ProjectsController extends AbstractController {
             uiLauncher.hideProjectsWindow();
             if (uiLauncher.isSourceNewConfig()) {
                 uiLauncher.setNewConfigSource(false);
-                uiLauncher.showNewConfigurationWindow();
             } else {
                 uiLauncher.buildAndShowMainWindow();
             }

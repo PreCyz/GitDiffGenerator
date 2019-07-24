@@ -28,8 +28,8 @@ public class AlertWindowBuilder {
     private WindowType windowType;
     private Alert.AlertType alertType;
     private boolean useImage;
-    private String createText;
-    private String overrideText;
+    private String cancelButtonText;
+    private String okButtonText;
 
     public AlertWindowBuilder() { }
 
@@ -68,13 +68,13 @@ public class AlertWindowBuilder {
         return this;
     }
 
-    public AlertWindowBuilder withCreateText(String createText) {
-        this.createText = createText;
+    public AlertWindowBuilder withCancelButtonText(String cancelButtonText) {
+        this.cancelButtonText = cancelButtonText;
         return this;
     }
 
-    public AlertWindowBuilder withOverrideText(String overrideText) {
-        this.overrideText = overrideText;
+    public AlertWindowBuilder withOkButtonText(String okButtonText) {
+        this.okButtonText = okButtonText;
         return this;
     }
 
@@ -166,13 +166,13 @@ public class AlertWindowBuilder {
         Alert alert = buildDefaultAlert();
         alert.getButtonTypes().removeAll(ButtonType.OK, ButtonType.CANCEL);
 
-        ButtonType createButton = new ButtonType(createText, ButtonBar.ButtonData.OK_DONE);
-        ButtonType overrideButton = new ButtonType(overrideText, ButtonBar.ButtonData.CANCEL_CLOSE);
-        alert.getButtonTypes().addAll(createButton, overrideButton);
+        ButtonType okButton = new ButtonType(okButtonText, ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType(cancelButtonText, ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().addAll(okButton, cancelButton);
 
         FlowPane fp = buildFlowPane(new Hyperlink(""), WindowType.OVERRIDE_WINDOW);
         alert.getDialogPane().contentProperty().set(fp);
 
-        return alert.showAndWait().orElse(createButton) == overrideButton;
+        return alert.showAndWait().orElse(cancelButton) == okButton;
     }
 }
