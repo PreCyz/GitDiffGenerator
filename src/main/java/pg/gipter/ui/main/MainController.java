@@ -27,7 +27,6 @@ import pg.gipter.service.GithubService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
-import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.UILauncher;
@@ -267,11 +266,17 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
-        return event -> uiLauncher.showApplicationSettingsWindow();
+        return event -> {
+            uiLauncher.setApplicationProperties(applicationProperties);
+            uiLauncher.showApplicationSettingsWindow();
+        };
     }
 
     private EventHandler<ActionEvent> toolkitActionEventHandler() {
-        return event -> uiLauncher.showToolkitSettingsWindow();
+        return event -> {
+            uiLauncher.setApplicationProperties(applicationProperties);
+            uiLauncher.showToolkitSettingsWindow();
+        };
     }
 
     private EventHandler<ActionEvent> readMeActionEventHandler() {
@@ -377,6 +382,9 @@ public class MainController extends AbstractController {
     private String[] createArgsFromUI() {
         List<String> argList = new LinkedList<>();
 
+        argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
+        argList.add(ArgName.toolkitPassword + "=" + toolkitPasswordField.getText());
+
         if (!StringUtils.nullOrEmpty(authorsTextField.getText())) {
             argList.add(ArgName.author + "=" + authorsTextField.getText());
         }
@@ -395,8 +403,6 @@ public class MainController extends AbstractController {
         argList.add(ArgName.uploadType + "=" + uploadTypeComboBox.getValue());
         argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
 
-        argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
-        argList.add(ArgName.toolkitPassword + "=" + toolkitPasswordField.getText());
         if (!StringUtils.nullOrEmpty(toolkitProjectListNamesTextField.getText())) {
             argList.add(ArgName.toolkitProjectListNames + "=" + toolkitProjectListNamesTextField.getText());
         }
@@ -416,11 +422,6 @@ public class MainController extends AbstractController {
             argList.add(ArgName.periodInDays + "=" + periodInDaysTextField.getText());
         }
 
-        argList.add(ArgName.confirmationWindow + "=" + applicationProperties.isConfirmationWindow());
-        argList.add(ArgName.preferredArgSource + "=" + PreferredArgSource.UI);
-        argList.add(ArgName.useUI + "=" + applicationProperties.isUseUI());
-        argList.add(ArgName.activeTray + "=" + applicationProperties.isActiveTray());
-        argList.add(ArgName.enableOnStartup + "=" + applicationProperties.isEnableOnStartup());
         argList.add(ArgName.configurationName + "=" + configurationNameTextField.getText());
 
         return argList.toArray(new String[0]);
@@ -481,7 +482,8 @@ public class MainController extends AbstractController {
             Properties properties = propertiesHelper.createProperties(args);
             properties.remove(ArgName.startDate.name());
             properties.remove(ArgName.endDate.name());
-            propertiesHelper.addAndSaveApplicationProperties(properties);
+            propertiesHelper.saveToolkitSettings(properties);
+            propertiesHelper.saveRunConfig(properties);
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             if (!configurationNameTextField.getText().equals(configurationNameComboBox.getValue())) {
                 updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationNameTextField.getText());
@@ -514,15 +516,14 @@ public class MainController extends AbstractController {
                         .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
                         .buildAndDisplayOverrideWindow();
                 if (result) {
-                    propertiesHelper.removeConfig(currentConfigurationName);
-                    propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(args));
+                    propertiesHelper.saveRunConfig(propertiesHelper.createProperties(args));
                     updateConfigurationNameComboBox(configurationNameComboBox.getValue(), currentConfigurationName);
                     operationDone = true;
                 } else {
                     configurationNameTextField.setText(configurationNameComboBox.getValue());
                 }
             } else {
-                propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(args));
+                propertiesHelper.saveRunConfig(propertiesHelper.createProperties(args));
                 updateConfigurationNameComboBox(currentConfigurationName, currentConfigurationName);
                 operationDone = true;
             }

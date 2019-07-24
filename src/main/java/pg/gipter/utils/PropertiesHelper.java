@@ -197,7 +197,7 @@ public class PropertiesHelper {
         return jsonObject;
     }
 
-    public void addNewRunConfig(Properties properties) {
+    public void saveRunConfig(Properties properties) {
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             jsonObject = configHelper.buildFullJson(properties);
@@ -292,6 +292,16 @@ public class PropertiesHelper {
             jsonObject = configHelper.buildFullJson(properties);
         }
         jsonObject.add(ConfigHelper.APP_CONFIG, configHelper.buildAppConfig(properties));
+        writeJsonConfig(jsonObject);
+    }
+
+    public void saveToolkitSettings(Properties properties) {
+        encryptPassword(properties);
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            jsonObject = configHelper.buildFullJson(properties);
+        }
+        jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));
         writeJsonConfig(jsonObject);
     }
 }
