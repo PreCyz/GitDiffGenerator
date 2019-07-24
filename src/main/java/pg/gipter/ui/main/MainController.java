@@ -8,6 +8,10 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -34,15 +38,26 @@ import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
+import java.awt.*;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.*;
 
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
+
+    @FXML
+    private MenuItem applicationMenuItem;
+    @FXML
+    private MenuItem toolkitMenuItem;
+    @FXML
+    private MenuItem readMeMenuItem;
+    @FXML
+    private MenuItem instructionMenuItem;
 
     @FXML
     private TextField authorsTextField;
@@ -213,6 +228,7 @@ public class MainController extends AbstractController {
             deamonButton.setText(resources.getString("button.job"));
         }
         disableRemoveConfigurationButton();
+        instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
     }
 
     private void disableRemoveConfigurationButton() {
@@ -235,6 +251,8 @@ public class MainController extends AbstractController {
     }
 
     private void setActions(ResourceBundle resources) {
+        readMeMenuItem.setOnAction(readMeActionEventHandler());
+        instructionMenuItem.setOnAction(instructionActionEventHandler());
         projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         uploadTypeComboBox.setOnAction(uploadTypeActionEventHandler());
@@ -246,6 +264,31 @@ public class MainController extends AbstractController {
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler(resources));
         configurationNameTextField.setOnKeyReleased(keyReleasedEventHandler());
         toolkitUserFolderHyperlink.setOnMouseClicked(mouseClickEventHandler());
+    }
+
+    private EventHandler<ActionEvent> readMeActionEventHandler() {
+        return event -> {
+            AppManager instance = AppManagerFactory.getInstance();
+            instance.launchDefaultBrowser("https://github.com/PreCyz/GitDiffGenerator#gitdiffgenerator");
+        };
+    }
+
+    private EventHandler<ActionEvent> instructionActionEventHandler() {
+        return event -> {
+            try {
+
+                File pdfFile = Paths.get("Gipter-ui-description.pdf").toFile();
+                if (pdfFile.exists()) {
+
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().open(pdfFile);
+                    } else {
+                        System.out.println("Awt Desktop is not supported!");
+                    }
+
+                }
+            } catch (Exception ex) {}
+        };
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {

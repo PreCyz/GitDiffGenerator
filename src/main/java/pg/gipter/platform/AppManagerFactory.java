@@ -10,10 +10,10 @@ public class AppManagerFactory {
     private AppManagerFactory() {}
 
     public static AppManager getInstance() {
-        String platform = System.getProperty("os.name");
-        if (platform.startsWith("Windows")) {
+        String platform = System.getProperty("os.name").toLowerCase();
+        if (platform.contains("win")) {
             return new WindowsAppManager();
-        } else if ("Linux".equalsIgnoreCase(platform)) {
+        } else if (platform.contains("nix") || platform.contains("nux") || platform.contains("aix")) {
             return new LinuxAppManager();
         }
         logger.warn("Platform {} not supported yet.", platform);

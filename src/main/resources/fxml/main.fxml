@@ -3,153 +3,75 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="734.0" prefWidth="590.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="733.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <MenuBar>
         <menus>
           <Menu mnemonicParsing="false" text="%main.menu.settings">
             <items>
-              <MenuItem mnemonicParsing="false" text="%main.menu.settings.apps" />
-                  <MenuItem mnemonicParsing="false" text="%main.menu.settings.toolkit" />
+              <MenuItem fx:id="applicationMenuItem" mnemonicParsing="false" text="%main.menu.settings.apps" />
+                  <MenuItem fx:id="toolkitMenuItem" mnemonicParsing="false" text="%main.menu.settings.toolkit" />
             </items>
           </Menu>
-            <Menu mnemonicParsing="false" text="%main.menu.settings">
+            <Menu mnemonicParsing="false" text="%main.menu.help">
                <items>
-                  <MenuItem mnemonicParsing="false" text="%main.menu.settings.apps" />
-                  <MenuItem mnemonicParsing="false" text="%main.menu.settings.toolkit" />
+                  <MenuItem fx:id="readMeMenuItem" mnemonicParsing="false" text="%main.menu.help.readMe" />
+                  <MenuItem fx:id="instructionMenuItem" mnemonicParsing="false" text="%main.menu.help.pdfInstruction" />
                </items>
             </Menu>
         </menus>
       </MenuBar>
-        <TitledPane animated="false" collapsible="false" layoutY="26.0" prefHeight="129.0" prefWidth="595.0" text="%toolkit.panel.title" textFill="#2302f8" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0">
-            <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="103.0">
-                    <children>
-                        <Label layoutX="10.0" layoutY="9.0" text="%toolkit.panel.username" />
-                        <Label layoutX="10.0" layoutY="39.0" text="%toolkit.panel.password" />
-                        <Label layoutX="10.0" layoutY="71.0" text="%toolkit.panel.domain" />
-                  <TextField fx:id="toolkitUsernameTextField" layoutX="107.0" layoutY="7.0" />
-                  <PasswordField fx:id="toolkitPasswordField" layoutX="107.0" layoutY="37.0" />
-                  <TextField fx:id="toolkitDomainTextField" layoutX="107.0" layoutY="67.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
+      <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="25.0" prefHeight="130.0" prefWidth="566.0" text="%toolkit.panel.title" textFill="#2302f8">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
                   <Hyperlink fx:id="toolkitUserFolderHyperlink" layoutX="273.0" layoutY="68.0" prefHeight="23.0" text="%toolkit.panel.link">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Hyperlink>
-                    </children>
-                </AnchorPane>
-            </content>
-            <font>
-                <Font name="System Bold" size="12.0" />
-            </font>
-        </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutY="154.0" prefHeight="580.0" prefWidth="595.0" text="Konfiguracja" textFill="#2302f8" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0">
+                  <TextField fx:id="toolkitDomainTextField" layoutX="107.0" layoutY="67.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
+                  <PasswordField fx:id="toolkitPasswordField" layoutX="107.0" layoutY="37.0" />
+                  <TextField fx:id="toolkitUsernameTextField" layoutX="107.0" layoutY="7.0" />
+                  <Label layoutX="10.0" layoutY="71.0" text="%toolkit.panel.domain" />
+                  <Label layoutX="10.0" layoutY="39.0" text="%toolkit.panel.password" />
+                  <Label layoutX="10.0" layoutY="9.0" text="%toolkit.panel.username" />
+               </children>
+            </AnchorPane>
+        </content>
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
-         <content>
-            <AnchorPane>
+      </TitledPane>
+      <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="154.0" prefHeight="578.0" prefWidth="566.0" text="%main.configuration" textFill="#2102f8">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="removeConfigurationButton" layoutX="222.0" layoutY="39.0" mnemonicParsing="false" prefWidth="110.0" text="%main.deleteConfiguration" textFill="#f41b63">
+                  <ComboBox fx:id="configurationNameComboBox" layoutX="57.0" layoutY="39.0" prefHeight="25.0" prefWidth="160.0" />
+                  <Button fx:id="addConfigurationButton" layoutX="219.0" layoutY="9.0" mnemonicParsing="false" prefWidth="110.0" text="%main.addConfiguration" textFill="#32a1c9">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
-                  <Label layoutX="11.0" layoutY="13.0" text="%main.configurationName">
+                  <TextField fx:id="configurationNameTextField" layoutX="57.0" layoutY="9.0" prefHeight="25.0" prefWidth="160.0" />
+                  <Label layoutX="8.0" layoutY="13.0" text="%main.configurationName">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <TextField fx:id="configurationNameTextField" layoutX="60.0" layoutY="9.0" prefHeight="25.0" prefWidth="160.0" />
-                  <Button fx:id="addConfigurationButton" layoutX="222.0" layoutY="9.0" mnemonicParsing="false" prefWidth="110.0" text="%main.addConfiguration" textFill="#32a1c9">
+                  <Button fx:id="removeConfigurationButton" layoutX="219.0" layoutY="39.0" mnemonicParsing="false" prefWidth="110.0" text="%main.deleteConfiguration" textFill="#f41b63">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="executeAllButton" layoutX="430.0" layoutY="377.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="110.0" text="%button.executeAll" textFill="#1eb235">
-                     <font>
-                        <Font name="System Bold" size="15.0" />
-                     </font>
-                  </Button>
-                  <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="213.0" text="%csv.panel.title" AnchorPane.leftAnchor="1.0">
+                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="71.0" prefHeight="140.0" prefWidth="560.0" text="%paths.panel.title">
                      <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="295.0" prefWidth="295.0">
-                           <children>
-                              <Label layoutX="9.0" layoutY="13.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
-                              <TextField fx:id="authorsTextField" layoutX="129.0" layoutY="11.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="44.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
-                              <TextField fx:id="committerEmailTextField" layoutX="129.0" layoutY="41.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="74.0" text="%csv.panel.gitAuthor" />
-                              <TextField fx:id="gitAuthorTextField" layoutX="129.0" layoutY="71.0" prefWidth="160.0" />
-                              <TextField fx:id="mercurialAuthorTextField" layoutX="129.0" layoutY="101.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="104.0" text="%csv.panel.mercurialAuthor" />
-                              <TextField fx:id="svnAuthorTextField" layoutX="129.0" layoutY="131.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="134.0" text="%csv.panel.svnAuthor" />
-                              <Label layoutX="10.0" layoutY="164.0" text="%csv.panel.uploadType" />
-                              <ComboBox fx:id="uploadTypeComboBox" layoutX="129.0" layoutY="161.0" prefWidth="160.0" />
-                              <CheckBox fx:id="skipRemoteCheckBox" layoutX="149.0" layoutY="269.0" mnemonicParsing="false" />
-                              <Label layoutX="10.0" layoutY="269.0" text="%csv.panel.skipRemote" />
-                              <TextField fx:id="toolkitProjectListNamesTextField" layoutX="129.0" layoutY="191.0" prefHeight="25.0" prefWidth="160.0" />
-                              <Label layoutX="10.0" layoutY="195.0" text="%toolkit.panel.projectListNames" />
-                              <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="149.0" layoutY="227.0" mnemonicParsing="false" />
-                              <Label layoutX="10.0" layoutY="227.0" text="%toolkit.panel.deleteFiles" />
-                              <Label layoutX="10.0" layoutY="248.0" text="%toolkit.panel.uploadAsHtml" />
-                              <CheckBox fx:id="uploadAsHtmlCheckBox" layoutX="149.0" layoutY="248.0" mnemonicParsing="false" />
-                           </children>
-                        </AnchorPane>
-                     </content>
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </TitledPane>
-                  <ComboBox fx:id="configurationNameComboBox" layoutX="60.0" layoutY="39.0" prefHeight="25.0" prefWidth="160.0" />
-                  <TitledPane animated="false" collapsible="false" layoutX="299.0" layoutY="214.0" text="%timeFrame.panel.title" AnchorPane.rightAnchor="1.0">
-                     <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="270.0">
-                           <children>
-                              <DatePicker fx:id="startDatePicker" layoutX="102.0" layoutY="7.0" prefHeight="25.0" prefWidth="160.0" />
-                              <Label layoutX="10.0" layoutY="13.0" text="%timeFrame.panel.startDate" />
-                              <Label layoutX="10.0" layoutY="39.0" text="%timeFrame.panel.endDate" />
-                              <DatePicker fx:id="endDatePicker" layoutX="102.0" layoutY="37.0" prefHeight="25.0" prefWidth="160.0" />
-                              <Label layoutX="10.0" layoutY="69.0" text="%timeFrame.panel.periodInDays" />
-                              <TextField fx:id="periodInDaysTextField" layoutX="102.0" layoutY="67.0" prefWidth="160.0" />
-                           </children>
-                        </AnchorPane>
-                     </content>
-                     <font>
-                        <Font name="System Bold" size="12.0" />
-                     </font>
-                  </TitledPane>
-                  <Button fx:id="exitButton" layoutX="461.0" layoutY="422.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="79.0" text="%button.exit" textFill="#0d0d0d">
-                     <font>
-                        <Font name="System Bold" size="13.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="executeButton" layoutX="318.0" layoutY="377.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="110.0" text="%button.execute" textFill="#1eb235">
-                     <font>
-                        <Font name="System Bold" size="15.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="saveConfigurationButton" layoutX="318.0" layoutY="344.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="221.0" text="%button.save" textFill="#32a1c9">
-                     <font>
-                        <Font name="System Bold" size="13.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="deamonButton" layoutX="372.0" layoutY="422.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
-                     <font>
-                        <Font name="System Bold" size="13.0" />
-                     </font>
-                  </Button>
-                  <ProgressIndicator fx:id="progressIndicator" layoutX="308.0" layoutY="476.0" progress="0.0" />
-                  <Label fx:id="infoLabel" layoutX="372.0" layoutY="478.0" prefHeight="17.0" prefWidth="187.0" />
-                  <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="71.0" prefHeight="140.0" text="%paths.panel.title" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0">
-                     <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0">
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="540.0">
                            <children>
                               <Label layoutX="10.0" layoutY="17.0" text="%paths.panel.fileNamePrefix" />
                               <TextField fx:id="itemFileNamePrefixTextField" layoutX="101.0" layoutY="14.0" prefHeight="25.0" prefWidth="186.0" />
                               <CheckBox fx:id="useAsFileNameCheckBox" layoutX="302.0" layoutY="17.0" mnemonicParsing="false" text="%paths.panel.useAsFileName" />
-                              <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="50.0" prefHeight="17.0" text="need set up">
+                              <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="50.0" prefHeight="17.0" prefWidth="280.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
@@ -166,7 +88,7 @@
                                  </font>
                               </Button>
                               <Label layoutX="10.0" layoutY="83.0" text="%paths.panel.itemPath" />
-                              <Label fx:id="itemPathLabel" layoutX="164.0" layoutY="85.0" prefHeight="17.0" text="need set up">
+                              <Label fx:id="itemPathLabel" layoutX="164.0" layoutY="85.0" prefHeight="17.0" prefWidth="280.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
@@ -178,9 +100,87 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </TitledPane>
+                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="210.0" prefHeight="321.0" prefWidth="288.0" text="%csv.panel.title">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="295.0" prefWidth="286.0">
+                           <children>
+                              <Label layoutX="9.0" layoutY="13.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
+                              <TextField fx:id="authorsTextField" layoutX="109.0" layoutY="11.0" prefWidth="160.0" />
+                              <Label layoutX="9.0" layoutY="44.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
+                              <TextField fx:id="committerEmailTextField" layoutX="109.0" layoutY="41.0" prefWidth="160.0" />
+                              <Label layoutX="9.0" layoutY="74.0" text="%csv.panel.gitAuthor" />
+                              <TextField fx:id="gitAuthorTextField" layoutX="109.0" layoutY="71.0" prefWidth="160.0" />
+                              <TextField fx:id="mercurialAuthorTextField" layoutX="109.0" layoutY="101.0" prefWidth="160.0" />
+                              <Label layoutX="9.0" layoutY="104.0" text="%csv.panel.mercurialAuthor" />
+                              <TextField fx:id="svnAuthorTextField" layoutX="109.0" layoutY="131.0" prefWidth="160.0" />
+                              <Label layoutX="9.0" layoutY="134.0" text="%csv.panel.svnAuthor" />
+                              <Label layoutX="10.0" layoutY="164.0" text="%csv.panel.uploadType" />
+                              <ComboBox fx:id="uploadTypeComboBox" layoutX="109.0" layoutY="161.0" prefWidth="160.0" />
+                              <CheckBox fx:id="skipRemoteCheckBox" layoutX="149.0" layoutY="269.0" mnemonicParsing="false" />
+                              <Label layoutX="10.0" layoutY="269.0" text="%csv.panel.skipRemote" />
+                              <TextField fx:id="toolkitProjectListNamesTextField" layoutX="109.0" layoutY="191.0" prefHeight="25.0" prefWidth="160.0" />
+                              <Label layoutX="10.0" layoutY="195.0" text="%toolkit.panel.projectListNames" />
+                              <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="149.0" layoutY="227.0" mnemonicParsing="false" />
+                              <Label layoutX="10.0" layoutY="227.0" text="%toolkit.panel.deleteFiles" />
+                              <Label layoutX="10.0" layoutY="248.0" text="%toolkit.panel.uploadAsHtml" />
+                              <CheckBox fx:id="uploadAsHtmlCheckBox" layoutX="149.0" layoutY="248.0" mnemonicParsing="false" />
+                           </children>
+                        </AnchorPane>
+                     </content>
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </TitledPane>
+                  <TitledPane animated="false" collapsible="false" layoutX="289.0" layoutY="210.0" prefHeight="126.0" prefWidth="272.0" text="%timeFrame.panel.title">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="272.0">
+                           <children>
+                              <DatePicker fx:id="startDatePicker" layoutX="102.0" layoutY="7.0" prefHeight="25.0" prefWidth="160.0" />
+                              <Label layoutX="10.0" layoutY="13.0" text="%timeFrame.panel.startDate" />
+                              <Label layoutX="10.0" layoutY="39.0" text="%timeFrame.panel.endDate" />
+                              <DatePicker fx:id="endDatePicker" layoutX="102.0" layoutY="37.0" prefHeight="25.0" prefWidth="160.0" />
+                              <Label layoutX="10.0" layoutY="69.0" text="%timeFrame.panel.periodInDays" />
+                              <TextField fx:id="periodInDaysTextField" layoutX="102.0" layoutY="67.0" prefWidth="160.0" />
+                           </children>
+                        </AnchorPane>
+                     </content>
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </TitledPane>
+                  <Label fx:id="infoLabel" layoutX="341.0" layoutY="448.0" prefHeight="17.0" prefWidth="212.0" />
+                  <ProgressIndicator fx:id="progressIndicator" layoutX="300.0" layoutY="443.0" progress="0.0" />
+                  <Button fx:id="deamonButton" layoutX="396.0" layoutY="404.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="79.0" text="%button.deamon" textFill="#32a1c9">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="saveConfigurationButton" layoutX="292.0" layoutY="338.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="271.0" text="%button.save" textFill="#32a1c9">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="executeButton" layoutX="292.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.execute" textFill="#1eb235">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="exitButton" layoutX="474.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.exit" textFill="#0d0d0d">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="executeAllButton" layoutX="383.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.executeAll" textFill="#1eb235">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Button>
                </children>
             </AnchorPane>
-         </content>
+        </content>
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
       </TitledPane>
     </children>
 </AnchorPane>
