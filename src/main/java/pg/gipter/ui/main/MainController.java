@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.producer.command.UploadType;
+import pg.gipter.service.GithubService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -251,6 +252,8 @@ public class MainController extends AbstractController {
     }
 
     private void setActions(ResourceBundle resources) {
+        applicationMenuItem.setOnAction(applicationActionEventHandler());
+        toolkitMenuItem.setOnAction(toolkitActionEventHandler());
         readMeMenuItem.setOnAction(readMeActionEventHandler());
         instructionMenuItem.setOnAction(instructionActionEventHandler());
         projectPathButton.setOnAction(projectPathActionEventHandler());
@@ -266,10 +269,18 @@ public class MainController extends AbstractController {
         toolkitUserFolderHyperlink.setOnMouseClicked(mouseClickEventHandler());
     }
 
+    private EventHandler<ActionEvent> applicationActionEventHandler() {
+        return event -> uiLauncher.showApplicationSettingsWindow();
+    }
+
+    private EventHandler<ActionEvent> toolkitActionEventHandler() {
+        return event -> uiLauncher.showToolkitSettingsWindow();
+    }
+
     private EventHandler<ActionEvent> readMeActionEventHandler() {
         return event -> {
             AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser("https://github.com/PreCyz/GitDiffGenerator#gitdiffgenerator");
+            instance.launchDefaultBrowser(GithubService.GITHUB_URL + "#gitdiffgenerator");
         };
     }
 

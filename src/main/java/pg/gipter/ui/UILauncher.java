@@ -398,4 +398,20 @@ public class UILauncher implements Launcher {
         return newConfigSource;
     }
 
+    public void showApplicationSettingsWindow() {
+        createSettingsWindow(WindowFactory.APPLICATION_MENU);
+    }
+
+    private void createSettingsWindow(WindowFactory windowFactory) {
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        buildScene(stage, windowFactory.createWindow(applicationProperties, this));
+        stage.setOnCloseRequest(event -> stage.close());
+        stage.showAndWait();
+    }
+
+    public void showToolkitSettingsWindow() {
+        createSettingsWindow(WindowFactory.TOOLKIT_MENU);
+    }
+
 }

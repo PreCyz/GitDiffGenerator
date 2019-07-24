@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="733.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="715.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <MenuBar>
         <menus>
@@ -43,9 +43,9 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="154.0" prefHeight="578.0" prefWidth="566.0" text="%main.configuration" textFill="#2102f8">
+      <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="154.0" prefHeight="559.0" prefWidth="566.0" text="%main.configuration" textFill="#2102f8">
         <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="176.0" prefWidth="200.0">
                <children>
                   <ComboBox fx:id="configurationNameComboBox" layoutX="57.0" layoutY="39.0" prefHeight="25.0" prefWidth="160.0" />
                   <Button fx:id="addConfigurationButton" layoutX="219.0" layoutY="9.0" mnemonicParsing="false" prefWidth="110.0" text="%main.addConfiguration" textFill="#32a1c9">
@@ -66,7 +66,7 @@
                   </Button>
                   <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="71.0" prefHeight="140.0" prefWidth="560.0" text="%paths.panel.title">
                      <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="540.0">
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="558.0">
                            <children>
                               <Label layoutX="10.0" layoutY="17.0" text="%paths.panel.fileNamePrefix" />
                               <TextField fx:id="itemFileNamePrefixTextField" layoutX="101.0" layoutY="14.0" prefHeight="25.0" prefWidth="186.0" />
@@ -155,7 +155,7 @@
                         <Font name="System Bold" size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="saveConfigurationButton" layoutX="292.0" layoutY="338.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="271.0" text="%button.save" textFill="#32a1c9">
+                  <Button fx:id="saveConfigurationButton" layoutX="291.0" layoutY="338.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="270.0" text="%button.save" textFill="#32a1c9">
                      <font>
                         <Font name="System Bold" size="13.0" />
                      </font>
@@ -165,12 +165,12 @@
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="exitButton" layoutX="474.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.exit" textFill="#0d0d0d">
+                  <Button fx:id="exitButton" layoutX="472.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.exit" textFill="#0d0d0d">
                      <font>
                         <Font name="System Bold" size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="executeAllButton" layoutX="383.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.executeAll" textFill="#1eb235">
+                  <Button fx:id="executeAllButton" layoutX="382.0" layoutY="371.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="89.0" text="%button.executeAll" textFill="#1eb235">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>

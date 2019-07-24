@@ -25,6 +25,8 @@ import java.util.Optional;
 
 public class GithubService {
 
+    public static final String GITHUB_URL= "https://github.com/PreCyz/GitDiffGenerator";
+
     private final ApplicationProperties applicationProperties;
 
     private static final Logger logger = LoggerFactory.getLogger(GithubService.class);
@@ -90,7 +92,7 @@ public class GithubService {
             if (showUpgradeWindow) {
                 Platform.runLater(() -> new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("upgrade.message", strippedVersion))
-                        .withLink("https://github.com/PreCyz/GitDiffGenerator/releases/latest")
+                        .withLink(GITHUB_URL + "/releases/latest")
                         .withWindowType(WindowType.BROWSER_WINDOW)
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .buildAndDisplayWindow()
