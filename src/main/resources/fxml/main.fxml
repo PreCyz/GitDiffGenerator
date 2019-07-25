@@ -158,7 +158,7 @@
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="deamonButton" layoutX="306.0" layoutY="378.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="126.0" text="%button.deamon" textFill="#32a1c9">
+                  <Button fx:id="jobButton" layoutX="306.0" layoutY="378.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="126.0" text="%button.job" textFill="#32a1c9">
                      <font>
                         <Font name="System Bold" size="13.0" />
                      </font>

@@ -111,7 +111,7 @@ public class MainController extends AbstractController {
     @FXML
     private Button executeButton;
     @FXML
-    private Button deamonButton;
+    private Button jobButton;
     @FXML
     private Button exitButton;
     @FXML
@@ -223,11 +223,6 @@ public class MainController extends AbstractController {
 
         progressIndicator.setVisible(false);
         projectPathLabel.setTooltip(buildProjectPathsTooltip(projectPathLabel.getText()));
-        if (uiLauncher.isTrayActivated()) {
-            deamonButton.setText(resources.getString("button.deamon"));
-        } else {
-            deamonButton.setText(resources.getString("button.job"));
-        }
         disableRemoveConfigurationButton();
         instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
         configurationNameComboBox.setDisable(isConfigComboDisabled());
@@ -268,7 +263,7 @@ public class MainController extends AbstractController {
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         uploadTypeComboBox.setOnAction(uploadTypeActionEventHandler());
         executeButton.setOnAction(executeActionEventHandler());
-        deamonButton.setOnAction(deamonActionEventHandler());
+        jobButton.setOnAction(jobActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler());
         addConfigurationButton.setOnAction(addConfigurationEventHandler());
@@ -472,22 +467,8 @@ public class MainController extends AbstractController {
         };
     }
 
-    private EventHandler<ActionEvent> deamonActionEventHandler() {
-        return event -> {
-            if (uiLauncher.isTraySupported()) {
-                String[] argsFromUI = createArgsFromUI();
-                propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(argsFromUI));
-                ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(argsFromUI);
-                if (uiAppProperties.isActiveTray()) {
-                    uiLauncher.updateTray(uiAppProperties);
-                    uiLauncher.hideToTray();
-                } else {
-                    uiLauncher.showJobWindow();
-                }
-            } else {
-                uiLauncher.showJobWindow();
-            }
-        };
+    private EventHandler<ActionEvent> jobActionEventHandler() {
+        return event -> uiLauncher.showJobWindow();
     }
 
     private EventHandler<ActionEvent> exitActionEventHandler() {
