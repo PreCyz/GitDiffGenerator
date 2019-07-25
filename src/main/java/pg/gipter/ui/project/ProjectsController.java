@@ -25,15 +25,11 @@ import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
 
 import java.io.File;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toSet;
 
 public class ProjectsController extends AbstractController {
 
@@ -61,7 +57,8 @@ public class ProjectsController extends AbstractController {
         super.initialize(location, resources);
         setUpColumns();
         initValues();
-        setupButtons(resources);
+        setupActions(resources);
+        setProperties(resources);
     }
 
     private void setUpColumns() {
@@ -141,7 +138,14 @@ public class ProjectsController extends AbstractController {
         }
     }
 
-    private void setupButtons(ResourceBundle resources) {
+    private void setupActions(ResourceBundle resources) {
+        searchProjectsButton.setOnAction(searchButtonActionEventHandler(resources));
+        saveButton.setOnAction(saveButtonActionEventHandler());
+        addProjectButton.setOnAction(addButtonActionEventHandler(resources));
+        removeProjectButton.setOnAction(removeButtonActionEventHandler());
+    }
+
+    private void setProperties(ResourceBundle resources) {
         if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
             searchProjectsButton.setDisable(true);
             Tooltip tooltip = new Tooltip();
@@ -149,10 +153,7 @@ public class ProjectsController extends AbstractController {
             tooltip.setFont(Font.font("Courier New", 14));
             tooltip.setText(resources.getString("projects.button.search.tooltip"));
         }
-        searchProjectsButton.setOnAction(searchButtonActionEventHandler(resources));
-        saveButton.setOnAction(saveButtonActionEventHandler());
-        addProjectButton.setOnAction(addButtonActionEventHandler(resources));
-        removeProjectButton.setOnAction(removeButtonActionEventHandler());
+        saveButton.setDisable(projectsTableView.getItems().contains(ProjectDetails.DEFAULT));
     }
 
     @NotNull
@@ -194,13 +195,16 @@ public class ProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            Properties uiApplications = propertiesHelper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
+            //String configurationName = uiLauncher.getConfigurationName();
+            String configurationName = applicationProperties.configurationName();
+            Properties properties = propertiesHelper.createProperties(applicationProperties.getArgs());
+            //properties.setProperty(ArgName.configurationName.name(), configurationName);
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-            uiApplications.setProperty(ArgName.projectPath.name(), projects);
-            propertiesHelper.saveRunConfig(uiApplications);
-            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
-                    propertiesHelper.loadArgumentArray(uiLauncher.getConfigurationName())
-            ));
+            properties.setProperty(ArgName.projectPath.name(), projects);
+            propertiesHelper.saveRunConfig(properties);
+
+            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(configurationName));
+            uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.hideProjectsWindow();
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
@@ -216,57 +220,34 @@ public class ProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> addButtonActionEventHandler(ResourceBundle resources) {
         return event -> {
-            if (applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS) {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setInitialDirectory(new File("."));
-                directoryChooser.setTitle(resources.getString("directory.item.title"));
-                File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
-                if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                    try {
-                        String vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
-                        ProjectDetails project = new ProjectDetails(
-                                itemPathDirectory.getName(),
-                                vcsType,
-                                itemPathDirectory.getAbsolutePath()
-                        );
-                        if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
-                            projectsTableView.setItems(FXCollections.observableArrayList(project));
-                        } else {
-                            projectsTableView.getItems().add(project);
-                        }
-                        projectsTableView.refresh();
-                    } catch (IllegalArgumentException ex) {
-                        Platform.runLater(() -> new AlertWindowBuilder()
-                                .withHeaderText(ex.getMessage())
-                                .withLink(AlertHelper.logsFolder())
-                                .withWindowType(WindowType.LOG_WINDOW)
-                                .withAlertType(Alert.AlertType.ERROR)
-                                .withImage()
-                                .buildAndDisplayWindow()
-                        );
-                    }
-                }
-            } else {
-                TextInputDialog dialog = new TextInputDialog("");
-                dialog.setTitle(resources.getString("projects.tooltip.title"));
-                dialog.setHeaderText(resources.getString("projects.tooltip.header"));
-
-                Optional<String> result = dialog.showAndWait();
-                if (result.isPresent() && !StringUtils.nullOrEmpty(result.get().trim())) {
-                    Set<String> projects = Stream.of(result.get().split(",")).collect(toSet());
-                    for (String project : projects) {
-                        ProjectDetails pd = new ProjectDetails(
-                                project.replace("/cases/", ""),
-                                UploadType.TOOLKIT_DOCS.name(),
-                                project
-                        );
-                        if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
-                            projectsTableView.setItems(FXCollections.observableArrayList(pd));
-                        } else {
-                            projectsTableView.getItems().add(pd);
-                        }
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setInitialDirectory(new File("."));
+            directoryChooser.setTitle(resources.getString("directory.item.title"));
+            File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
+            if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
+                try {
+                    String vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
+                    ProjectDetails project = new ProjectDetails(
+                            itemPathDirectory.getName(),
+                            vcsType,
+                            itemPathDirectory.getAbsolutePath()
+                    );
+                    if (projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+                        projectsTableView.setItems(FXCollections.observableArrayList(project));
+                        saveButton.setDisable(false);
+                    } else {
+                        projectsTableView.getItems().add(project);
                     }
                     projectsTableView.refresh();
+                } catch (IllegalArgumentException ex) {
+                    Platform.runLater(() -> new AlertWindowBuilder()
+                            .withHeaderText(ex.getMessage())
+                            .withLink(AlertHelper.logsFolder())
+                            .withWindowType(WindowType.LOG_WINDOW)
+                            .withAlertType(Alert.AlertType.ERROR)
+                            .withImage()
+                            .buildAndDisplayWindow()
+                    );
                 }
             }
         };
@@ -281,6 +262,7 @@ public class ProjectsController extends AbstractController {
                 projectsTableView.getItems().add(ProjectDetails.DEFAULT);
             }
             projectsTableView.refresh();
+            saveButton.setDisable(projectsTableView.getItems().contains(ProjectDetails.DEFAULT));
         };
     }
 }

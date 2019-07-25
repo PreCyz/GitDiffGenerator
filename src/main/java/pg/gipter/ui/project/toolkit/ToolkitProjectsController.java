@@ -25,7 +25,6 @@ import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.project.ProjectDetails;
 import pg.gipter.utils.BundleUtils;
 
-import java.io.File;
 import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.Properties;
@@ -52,6 +51,7 @@ public class ToolkitProjectsController extends AbstractController {
 
     private ApplicationProperties applicationProperties;
     private Set<ProjectDetails> projectsToDelete;
+    private final String CASES = "/cases/";
 
     public ToolkitProjectsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -64,6 +64,7 @@ public class ToolkitProjectsController extends AbstractController {
         setUpColumns();
         initValues();
         setupActions();
+        setProperties();
     }
 
     private void setUpColumns() {
@@ -114,9 +115,9 @@ public class ToolkitProjectsController extends AbstractController {
         } else {
             ObservableList<ProjectDetails> projectsPaths = FXCollections.observableArrayList();
             for (String path : projects) {
-                File project = new File(path);
-                if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
-                    projectsPaths.add(new ProjectDetails(project.getName(), UploadType.TOOLKIT_DOCS.name(), path));
+                if (path.startsWith(CASES)) {
+                    String name = path.replace(CASES, "");
+                    projectsPaths.add(new ProjectDetails(name, UploadType.TOOLKIT_DOCS.name(), path));
                 }
             }
             if (projectsPaths.isEmpty()) {
@@ -136,8 +137,9 @@ public class ToolkitProjectsController extends AbstractController {
     @NotNull
     private EventHandler<MouseEvent> mouseClickEventHandler() {
         return event -> Platform.runLater(() -> {
-            String projectUrl = String.format("%s/cases/%s/%s/default.aspx",
+            String projectUrl = String.format("%s%s%s/%s/default.aspx",
                     applicationProperties.toolkitUrl(),
+                    CASES,
                     projectIdTextField.getText(),
                     projectNameTextField.getText()
             );
@@ -151,9 +153,9 @@ public class ToolkitProjectsController extends AbstractController {
     private EventHandler<ActionEvent> addActionEventHandler() {
         return event -> {
             String name = projectIdTextField.getText() + "/" + projectNameTextField.getText();
-            String path = "/cases/" + name;
+            String path = CASES + name;
             ProjectDetails pd = new ProjectDetails(name, UploadType.TOOLKIT_DOCS.name(), path);
-            if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+            if (projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
                 projectsTableView.setItems(FXCollections.observableArrayList(pd));
             } else {
                 Set<ProjectDetails> projectDetails = new LinkedHashSet<>(projectsTableView.getItems());
@@ -161,6 +163,9 @@ public class ToolkitProjectsController extends AbstractController {
                 projectsTableView.setItems(FXCollections.observableArrayList(projectDetails));
             }
             projectsTableView.refresh();
+            saveButton.setDisable(false);
+            projectIdTextField.clear();
+            projectNameTextField.clear();
         };
     }
 
@@ -171,6 +176,7 @@ public class ToolkitProjectsController extends AbstractController {
             projectsTableView.getItems().removeAll(projectsToDelete);
             if (projectsTableView.getItems().isEmpty()) {
                 projectsTableView.getItems().add(ProjectDetails.DEFAULT);
+                saveButton.setDisable(true);
             }
             projectsTableView.refresh();
         };
@@ -179,13 +185,14 @@ public class ToolkitProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            Properties uiApplications = propertiesHelper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
+            String configurationName = applicationProperties.configurationName();
+            Properties properties = propertiesHelper.createProperties(applicationProperties.getArgs());
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-            uiApplications.setProperty(ArgName.projectPath.name(), projects);
-            propertiesHelper.saveRunConfig(uiApplications);
-            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
-                    propertiesHelper.loadArgumentArray(uiLauncher.getConfigurationName())
-            ));
+            properties.setProperty(ArgName.projectPath.name(), projects);
+            propertiesHelper.saveRunConfig(properties);
+
+            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(configurationName));
+            uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.hideToolkitProjectsWindow();
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
@@ -196,5 +203,9 @@ public class ToolkitProjectsController extends AbstractController {
             );
             uiLauncher.buildAndShowMainWindow();
         };
+    }
+
+    private void setProperties() {
+        saveButton.setDisable(projectsTableView.getItems().contains(ProjectDetails.DEFAULT));
     }
 }

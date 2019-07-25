@@ -160,6 +160,12 @@ public class PropertiesHelper {
                 decryptPassword(properties);
                 result.put(properties.getProperty(ArgName.configurationName.name()), properties);
             }
+            if (result.isEmpty()) {
+                Properties properties = new Properties();
+                setProperties(appConfig, properties, ConfigHelper.APP_CONFIG_PROPERTIES);
+                setProperties(toolkitConfig, properties, ConfigHelper.TOOLKIT_CONFIG_PROPERTIES);
+                result.put(ArgName.configurationName.defaultValue(), properties);
+            }
         }
         return result;
     }
@@ -198,9 +204,9 @@ public class PropertiesHelper {
     }
 
     public void saveRunConfig(Properties properties) {
+        encryptPassword(properties);
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
-            encryptPassword(properties);
             jsonObject = configHelper.buildFullJson(properties);
         }
         configHelper.addOrReplaceRunConfig(properties, jsonObject);
@@ -288,9 +294,9 @@ public class PropertiesHelper {
     }
 
     public void saveAppSettings(Properties properties) {
+        encryptPassword(properties);
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
-            encryptPassword(properties);
             jsonObject = configHelper.buildFullJson(properties);
         }
         jsonObject.add(ConfigHelper.APP_CONFIG, configHelper.buildAppConfig(properties));
@@ -298,12 +304,19 @@ public class PropertiesHelper {
     }
 
     public void saveToolkitSettings(Properties properties) {
+        encryptPassword(properties);
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
-            encryptPassword(properties);
             jsonObject = configHelper.buildFullJson(properties);
         }
         jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));
         writeJsonConfig(jsonObject);
+    }
+
+    public String getProperConfigName(String configName) {
+        if (ArgName.configurationName.defaultValue().equals(configName)) {
+            return configName + " ";
+        }
+        return configName;
     }
 }

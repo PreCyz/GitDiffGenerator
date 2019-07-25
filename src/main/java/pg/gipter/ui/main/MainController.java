@@ -338,22 +338,12 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
         return event -> {
             String[] argsFromUI = createArgsFromUI();
-            Properties properties = propertiesHelper.createProperties(argsFromUI);
+            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
+            String configurationName = propertiesHelper.getProperConfigName(configurationNameTextField.getText());
+            updateConfigurationNameComboBox(configurationName, configurationName);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
-                String currentConfigurationName = configurationNameTextField.getText();
-                if (ArgName.configurationName.defaultValue().equals(currentConfigurationName)) {
-                    currentConfigurationName += " ";
-                    properties.put(ArgName.configurationName.name(), currentConfigurationName);
-                }
-                if (!configurationNameComboBox.getValue().equals(currentConfigurationName)) {
-                    propertiesHelper.saveRunConfig(properties);
-                    updateConfigurationNameComboBox(currentConfigurationName, currentConfigurationName);
-                }
-                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
                 uiLauncher.showToolkitProjectsWindow();
             } else {
-                propertiesHelper.saveRunConfig(properties);
-                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
                 uiLauncher.showProjectsWindow();
             }
         };
@@ -451,7 +441,7 @@ public class MainController extends AbstractController {
             argList.add(ArgName.periodInDays + "=" + periodInDaysTextField.getText());
         }
 
-        argList.add(ArgName.configurationName + "=" + configurationNameTextField.getText());
+        argList.add(ArgName.configurationName + "=" + propertiesHelper.getProperConfigName(configurationNameTextField.getText()));
 
         return argList.toArray(new String[0]);
     }
@@ -513,8 +503,11 @@ public class MainController extends AbstractController {
             propertiesHelper.saveToolkitSettings(properties);
             propertiesHelper.saveRunConfig(properties);
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
-            if (!configurationNameTextField.getText().equals(configurationNameComboBox.getValue())) {
-                updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationNameTextField.getText());
+            String configurationName = propertiesHelper.getProperConfigName(configurationNameTextField.getText());
+            String comboConfigName = configurationNameComboBox.getValue();
+            if (!configurationName.equals(comboConfigName)) {
+                updateConfigurationNameComboBox(comboConfigName, configurationName);
+                propertiesHelper.removeConfig(comboConfigName);
                 removeConfigurationButton.setDisable(false);
             }
             uiLauncher.updateTray(applicationProperties);
@@ -531,16 +524,12 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
         return event -> {
             String[] args = createArgsFromUI();
-            String currentConfigurationName = configurationNameTextField.getText();
-            if (ArgName.configurationName.defaultValue().equals(currentConfigurationName)) {
-                currentConfigurationName += " ";
-                configurationNameTextField.setText(currentConfigurationName);
-            }
-            Optional<Properties> properties = propertiesHelper.loadApplicationProperties(currentConfigurationName);
+            String configurationName = propertiesHelper.getProperConfigName(configurationNameTextField.getText());
+            Optional<Properties> properties = propertiesHelper.loadApplicationProperties(configurationName);
             boolean operationDone = false;
             if (properties.isPresent()) {
                 boolean result = new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("popup.overrideProperties.message", currentConfigurationName))
+                        .withHeaderText(BundleUtils.getMsg("popup.overrideProperties.message", configurationName))
                         .withAlertType(Alert.AlertType.CONFIRMATION)
                         .withWindowType(WindowType.OVERRIDE_WINDOW)
                         .withImage()
@@ -548,15 +537,17 @@ public class MainController extends AbstractController {
                         .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
                         .buildAndDisplayOverrideWindow();
                 if (result) {
-                    propertiesHelper.saveRunConfig(propertiesHelper.createProperties(args));
-                    updateConfigurationNameComboBox(configurationNameComboBox.getValue(), currentConfigurationName);
+                    Properties currentProperties = propertiesHelper.createProperties(args);
+                    currentProperties.put(ArgName.configurationName.name(), configurationName);
+                    propertiesHelper.saveRunConfig(currentProperties);
+                    updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationName);
                     operationDone = true;
                 } else {
                     configurationNameTextField.setText(configurationNameComboBox.getValue());
                 }
             } else {
                 propertiesHelper.saveRunConfig(propertiesHelper.createProperties(args));
-                updateConfigurationNameComboBox(currentConfigurationName, currentConfigurationName);
+                updateConfigurationNameComboBox(configurationName, configurationName);
                 operationDone = true;
             }
             if (operationDone) {
@@ -613,6 +604,7 @@ public class MainController extends AbstractController {
         List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
         items.remove(oldValue);
         items.add(newValue);
+        updateItemsForConfigComboBox(newValue, FXCollections.observableArrayList(items));
         configurationNameComboBox.setDisable(isConfigComboDisabled());
     }
 
