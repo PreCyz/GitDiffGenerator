@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
@@ -17,16 +16,16 @@
                   <Label layoutX="10.0" layoutY="118.0" text="%toolkit.panel.url" />
                   <Label layoutX="10.0" layoutY="145.0" text="%toolkit.panel.wsUrl" />
                   <Label layoutX="10.0" layoutY="172.0" text="%toolkit.panel.userFolder" />
-                  <TextField fx:id="toolkitUsernameTextField" editable="false" layoutX="107.0" layoutY="7.0" />
-                  <PasswordField fx:id="toolkitPasswordField" editable="false" layoutX="107.0" layoutY="34.0" />
-                  <TextField fx:id="toolkitDomainTextField" layoutX="107.0" layoutY="61.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
-                  <TextField fx:id="toolkitListNameTextField" layoutX="107.0" layoutY="88.0" style="-fx-background-color: #e5e5e5;" />
-                  <TextField fx:id="toolkitUrlTextField" layoutX="107.0" layoutY="115.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <TextField fx:id="toolkitUsernameTextField" editable="false" layoutX="107.0" layoutY="7.0" style="-fx-background-color: #e5e5e5;" />
+                  <PasswordField fx:id="toolkitPasswordField" editable="false" layoutX="107.0" layoutY="34.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitDomainTextField" editable="false" layoutX="107.0" layoutY="61.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitListNameTextField" editable="false" layoutX="107.0" layoutY="88.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitUrlTextField" editable="false" layoutX="107.0" layoutY="115.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font>
                   </TextField>
-                  <TextField fx:id="toolkitWSTextField" layoutX="107.0" layoutY="142.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <TextField fx:id="toolkitWSTextField" editable="false" layoutX="107.0" layoutY="142.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font>
