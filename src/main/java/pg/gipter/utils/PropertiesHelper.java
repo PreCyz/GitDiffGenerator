@@ -145,7 +145,7 @@ public class PropertiesHelper {
     }
 
     public Map<String, Properties> loadAllApplicationProperties() {
-        Map<String, Properties> result = new HashMap<>();
+        Map<String, Properties> result = new LinkedHashMap<>();
         JsonObject config = readJsonConfig();
         if (config != null) {
             JsonObject appConfig = config.getAsJsonObject(ConfigHelper.APP_CONFIG);
@@ -200,6 +200,7 @@ public class PropertiesHelper {
     public void saveRunConfig(Properties properties) {
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
+            encryptPassword(properties);
             jsonObject = configHelper.buildFullJson(properties);
         }
         configHelper.addOrReplaceRunConfig(properties, jsonObject);
@@ -289,6 +290,7 @@ public class PropertiesHelper {
     public void saveAppSettings(Properties properties) {
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
+            encryptPassword(properties);
             jsonObject = configHelper.buildFullJson(properties);
         }
         jsonObject.add(ConfigHelper.APP_CONFIG, configHelper.buildAppConfig(properties));
@@ -296,9 +298,9 @@ public class PropertiesHelper {
     }
 
     public void saveToolkitSettings(Properties properties) {
-        encryptPassword(properties);
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
+            encryptPassword(properties);
             jsonObject = configHelper.buildFullJson(properties);
         }
         jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));

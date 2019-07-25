@@ -24,6 +24,7 @@ import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -193,32 +194,22 @@ public class ProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            if (uiLauncher.isSourceNewConfig()) {
-                String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-                String[] args = applicationProperties.getArgs();
-                for (int i = 0; i < args.length; ++i) {
-                    if (args[i].startsWith(ArgName.projectPath.name())) {
-                        args[i] = ArgName.projectPath.name() + "=" + projects;
-                        break;
-                    }
-                }
-                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(args));
-            } else {
-                Properties uiApplications = propertiesHelper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
-                String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-                uiApplications.setProperty(ArgName.projectPath.name(), projects);
-                propertiesHelper.addAndSaveApplicationProperties(uiApplications);
-                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
-                        new String[]{ArgName.configurationName + "=" + uiLauncher.getConfigurationName()}
-                ));
-            }
-
+            Properties uiApplications = propertiesHelper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
+            String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
+            uiApplications.setProperty(ArgName.projectPath.name(), projects);
+            propertiesHelper.saveRunConfig(uiApplications);
+            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
+                    propertiesHelper.loadArgumentArray(uiLauncher.getConfigurationName())
+            ));
             uiLauncher.hideProjectsWindow();
-            if (uiLauncher.isSourceNewConfig()) {
-                uiLauncher.setNewConfigSource(false);
-            } else {
-                uiLauncher.buildAndShowMainWindow();
-            }
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("main.config.changed"))
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                    .withImage()
+                    .buildAndDisplayWindow()
+            );
+            uiLauncher.buildAndShowMainWindow();
         };
     }
 

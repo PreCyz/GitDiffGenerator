@@ -230,6 +230,13 @@ public class MainController extends AbstractController {
         }
         disableRemoveConfigurationButton();
         instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
+        configurationNameComboBox.setDisable(isConfigComboDisabled());
+    }
+
+    private boolean isConfigComboDisabled() {
+        boolean result = configurationNameComboBox.getItems().isEmpty();
+        result |= configurationNameComboBox.getItems().size() == 1 && ArgName.configurationName.defaultValue().equals(configurationNameComboBox.getValue());
+        return result;
     }
 
     private void disableRemoveConfigurationButton() {
@@ -331,11 +338,22 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
         return event -> {
             String[] argsFromUI = createArgsFromUI();
-            propertiesHelper.addAndSaveApplicationProperties(propertiesHelper.createProperties(argsFromUI));
-            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
+            Properties properties = propertiesHelper.createProperties(argsFromUI);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
+                String currentConfigurationName = configurationNameTextField.getText();
+                if (ArgName.configurationName.defaultValue().equals(currentConfigurationName)) {
+                    currentConfigurationName += " ";
+                    properties.put(ArgName.configurationName.name(), currentConfigurationName);
+                }
+                if (!configurationNameComboBox.getValue().equals(currentConfigurationName)) {
+                    propertiesHelper.saveRunConfig(properties);
+                    updateConfigurationNameComboBox(currentConfigurationName, currentConfigurationName);
+                }
+                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
                 uiLauncher.showToolkitProjectsWindow();
             } else {
+                propertiesHelper.saveRunConfig(properties);
+                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
                 uiLauncher.showProjectsWindow();
             }
         };
@@ -460,6 +478,7 @@ public class MainController extends AbstractController {
             svnAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             mercurialAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             skipRemoteCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+            deleteDownloadedFilesCheckBox.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
         };
     }
 
@@ -594,20 +613,21 @@ public class MainController extends AbstractController {
         List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
         items.remove(oldValue);
         items.add(newValue);
-        updateConfigComboBox(newValue, FXCollections.observableList(items));
+        configurationNameComboBox.setDisable(isConfigComboDisabled());
     }
 
-    private void updateConfigComboBox(String newValue, ObservableList<String> items) {
+    private void updateItemsForConfigComboBox(String newValue, ObservableList<String> items) {
         useComboBoxValueChangeListener = false;
         configurationNameComboBox.setItems(items);
         configurationNameComboBox.setValue(newValue);
         useComboBoxValueChangeListener = true;
+        configurationNameComboBox.setDisable(isConfigComboDisabled());
     }
 
     private void removeConfigurationNameFromComboBox(String oldValue, String newValue) {
         List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
         items.remove(oldValue);
-        updateConfigComboBox(newValue, FXCollections.observableList(items));
+        updateItemsForConfigComboBox(newValue, FXCollections.observableList(items));
     }
     private void setListeners() {
         toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {

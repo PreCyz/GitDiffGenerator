@@ -20,7 +20,10 @@ import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.project.ProjectDetails;
+import pg.gipter.utils.BundleUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -101,6 +104,11 @@ public class ToolkitProjectsController extends AbstractController {
 
     private void initValues() {
         Set<String> projects = applicationProperties.projectPaths();
+        String[] args = propertiesHelper.loadArgumentArray(applicationProperties.configurationName());
+        if (args.length == 0) {
+            projects.clear();
+            projects.add(ProjectDetails.DEFAULT.getName());
+        }
         if (projects.size() == 1 && projects.contains(ProjectDetails.DEFAULT.getName())) {
             projectsTableView.setItems(FXCollections.observableArrayList(ProjectDetails.DEFAULT));
         } else {
@@ -174,11 +182,18 @@ public class ToolkitProjectsController extends AbstractController {
             Properties uiApplications = propertiesHelper.loadApplicationProperties(uiLauncher.getConfigurationName()).orElseGet(Properties::new);
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
             uiApplications.setProperty(ArgName.projectPath.name(), projects);
-            propertiesHelper.addAndSaveApplicationProperties(uiApplications);
+            propertiesHelper.saveRunConfig(uiApplications);
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(
                     propertiesHelper.loadArgumentArray(uiLauncher.getConfigurationName())
             ));
             uiLauncher.hideToolkitProjectsWindow();
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("main.config.changed"))
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                    .withImage()
+                    .buildAndDisplayWindow()
+            );
             uiLauncher.buildAndShowMainWindow();
         };
     }

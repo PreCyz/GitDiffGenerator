@@ -349,14 +349,6 @@ public class UILauncher implements Launcher {
         return applicationProperties.configurationName();
     }
 
-    public void setNewConfigSource(boolean newConfigSource) {
-        this.newConfigSource = newConfigSource;
-    }
-
-    public boolean isSourceNewConfig() {
-        return newConfigSource;
-    }
-
     public void showApplicationSettingsWindow() {
         createSettingsWindow(WindowFactory.APPLICATION_MENU);
     }

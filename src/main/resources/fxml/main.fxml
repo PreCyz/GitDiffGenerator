@@ -28,7 +28,7 @@
                <children>
                   <TextField fx:id="toolkitUsernameTextField" layoutX="107.0" layoutY="7.0" />
                   <PasswordField fx:id="toolkitPasswordField" layoutX="107.0" layoutY="37.0" />
-                  <Hyperlink fx:id="toolkitUserFolderHyperlink" layoutX="273.0" layoutY="68.0" prefHeight="23.0" text="%toolkit.panel.link">
+                  <Hyperlink fx:id="toolkitUserFolderHyperlink" layoutX="266.0" layoutY="68.0" prefHeight="23.0" text="%toolkit.panel.link">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
