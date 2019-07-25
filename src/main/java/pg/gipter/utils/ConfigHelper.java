@@ -55,7 +55,6 @@ class ConfigHelper {
         RUN_CONFIG_PROPERTIES.add(ArgName.configurationName.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.toolkitProjectListNames.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.deleteDownloadedFiles.name());
-        RUN_CONFIG_PROPERTIES.add(ArgName.uploadAsHtml.name());
     }
 
     @NotNull

@@ -15,6 +15,9 @@ public enum ArgName {
     committerEmail(""),
     uploadType(UploadType.SIMPLE.name()),
     skipRemote("Y"),
+    toolkitProjectListNames("Deliverables"),
+    deleteDownloadedFiles("Y"),
+    configurationName("DEFAULT"),
 
     itemPath("NO_ITEM_PATH_GIVEN"),
     projectPath("NO_PROJECT_PATH_GIVEN"),
@@ -39,12 +42,8 @@ public enum ArgName {
     toolkitUrl("https://goto.netcompany.com"),
     toolkitCopyCase("/cases/GTE106/NCSCOPY"),
     toolkitWSUrl(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/_vti_bin/lists.asmx"),
-    toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitCopyListName.defaultValue + "/"),
-    toolkitProjectListNames("Deliverables"),
-    deleteDownloadedFiles("Y"),
-    uploadAsHtml("N"),
-
-    configurationName("DEFAULT");
+    toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitCopyListName.defaultValue + "/")
+    ;
 
     private String defaultValue;
 

@@ -40,11 +40,9 @@ class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
             throw new IllegalArgumentException("Given projects do not contain any items.");
         }
 
-        if (!applicationProperties.isUploadAsHtml()) {
-            zipDocumentsAndWriteToFile(documents);
-            if (applicationProperties.isDeleteDownloadedFiles()) {
-                deleteFiles(documents);
-            }
+        zipDocumentsAndWriteToFile(documents);
+        if (applicationProperties.isDeleteDownloadedFiles()) {
+            deleteFiles(documents);
         }
     }
 

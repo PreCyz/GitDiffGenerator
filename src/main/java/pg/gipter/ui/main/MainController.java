@@ -87,8 +87,6 @@ public class MainController extends AbstractController {
     private TextField toolkitProjectListNamesTextField;
     @FXML
     private CheckBox deleteDownloadedFilesCheckBox;
-    @FXML
-    private CheckBox uploadAsHtmlCheckBox;
 
     @FXML
     private Label projectPathLabel;
@@ -173,7 +171,6 @@ public class MainController extends AbstractController {
         useAsFileNameCheckBox.setSelected(applicationProperties.isUseAsFileName());
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
         deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
-        uploadAsHtmlCheckBox.setSelected(applicationProperties.isUploadAsHtml());
 
         startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
         endDatePicker.setValue(LocalDate.now());
@@ -198,8 +195,7 @@ public class MainController extends AbstractController {
     private void setProperties(ResourceBundle resources) {
         toolkitDomainTextField.setEditable(false);
         toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
-        deleteDownloadedFilesCheckBox.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS || applicationProperties.isUploadAsHtml());
-        uploadAsHtmlCheckBox.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
+        deleteDownloadedFilesCheckBox.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
 
         if (applicationProperties.projectPaths().isEmpty()) {
             projectPathButton.setText(resources.getString("button.add"));
@@ -423,7 +419,6 @@ public class MainController extends AbstractController {
             argList.add(ArgName.toolkitProjectListNames + "=" + toolkitProjectListNamesTextField.getText());
         }
         argList.add(ArgName.deleteDownloadedFiles + "=" + deleteDownloadedFilesCheckBox.isSelected());
-        argList.add(ArgName.uploadAsHtml + "=" + uploadAsHtmlCheckBox.isSelected());
 
         argList.add(ArgName.projectPath + "=" + projectPathLabel.getText());
         argList.add(ArgName.itemPath + "=" + itemPathLabel.getText());
@@ -458,8 +453,6 @@ public class MainController extends AbstractController {
                 endDatePicker.setValue(LocalDate.now());
             }
             toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
-            deleteDownloadedFilesCheckBox.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS || uploadAsHtmlCheckBox.isSelected());
-            uploadAsHtmlCheckBox.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
             endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             authorsTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             committerEmailTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
@@ -621,9 +614,6 @@ public class MainController extends AbstractController {
             userFolderUrl = applicationProperties.toolkitUserFolder();
             userFolderUrl = userFolderUrl.substring(0, userFolderUrl.lastIndexOf("/") + 1) + newValue;
         });
-
-        uploadAsHtmlCheckBox.selectedProperty().addListener((observable, oldValue, newValue) ->
-                deleteDownloadedFilesCheckBox.setDisable(newValue));
 
         configurationNameComboBox.getSelectionModel()
                 .selectedItemProperty()

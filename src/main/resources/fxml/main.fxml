@@ -119,12 +119,10 @@
                               <ComboBox fx:id="uploadTypeComboBox" layoutX="109.0" layoutY="161.0" prefWidth="160.0" />
                               <TextField fx:id="toolkitProjectListNamesTextField" layoutX="109.0" layoutY="191.0" prefHeight="25.0" prefWidth="160.0" />
                               <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="149.0" layoutY="227.0" mnemonicParsing="false" />
-                              <CheckBox fx:id="uploadAsHtmlCheckBox" layoutX="149.0" layoutY="248.0" mnemonicParsing="false" />
-                              <CheckBox fx:id="skipRemoteCheckBox" layoutX="149.0" layoutY="269.0" mnemonicParsing="false" />
+                              <CheckBox fx:id="skipRemoteCheckBox" layoutX="149.0" layoutY="254.0" mnemonicParsing="false" />
                               <Label layoutX="9.0" layoutY="195.0" text="%toolkit.panel.projectListNames" />
-                              <Label layoutX="10.0" layoutY="269.0" text="%csv.panel.skipRemote" />
+                              <Label layoutX="10.0" layoutY="254.0" text="%csv.panel.skipRemote" />
                               <Label layoutX="10.0" layoutY="227.0" text="%toolkit.panel.deleteFiles" />
-                              <Label layoutX="10.0" layoutY="248.0" text="%toolkit.panel.uploadAsHtml" />
                            </children>
                         </AnchorPane>
                      </content>

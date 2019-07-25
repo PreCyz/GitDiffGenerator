@@ -27,20 +27,6 @@ class DocumentFinderFactoryTest {
     }
 
     @Test
-    void givenUploadAsHtmlSetY_whenGetInstance_thenReturnHtmlDocumentFinder() {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{
-                        ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
-                        ArgName.uploadAsHtml + "=" + true,
-                }
-        );
-
-        DocumentFinder documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
-
-        AssertionsForClassTypes.assertThat(documentFinder).isInstanceOf(HtmlDocumentFinder.class);
-    }
-
-    @Test
     @Disabled("Until ComplexDocumentFinder is ready.")
     void givenEndDateNotEqualNow_whenGetInstance_thenReturnSimpleDocumentFinder() {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(

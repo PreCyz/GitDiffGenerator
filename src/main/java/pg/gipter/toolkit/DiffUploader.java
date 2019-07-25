@@ -87,11 +87,7 @@ public class DiffUploader {
         if (applicationProperties.uploadType() == UploadType.STATEMENT) {
             description = String.format("%s file.", UploadType.STATEMENT);
         } else if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
-            if (applicationProperties.isUploadAsHtml()) {
-                description = "Item as html page containing links to changed documents.";
-            } else {
-                description = "Item as zipped file with changed documents.";
-            }
+            description = "Item as zipped file with changed documents.";
         }
         return description;
     }

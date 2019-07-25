@@ -120,9 +120,6 @@ public abstract class ApplicationProperties {
         String extension = "txt";
         if (uploadType() == UploadType.TOOLKIT_DOCS) {
             extension = "zip";
-            if (isUploadAsHtml()) {
-                extension = "html";
-            }
         }
         return extension;
     }
@@ -179,8 +176,7 @@ public abstract class ApplicationProperties {
                 ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
                 ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\'' +
                 ", deleteDownloadedFiles='" + isDeleteDownloadedFiles() + '\'' +
-                ", enableOnStartup='" + isEnableOnStartup() + '\'' +
-                ", uploadAsHtml='" + isUploadAsHtml() + '\''
+                ", enableOnStartup='" + isEnableOnStartup() + '\''
         ;
     }
 
@@ -210,6 +206,5 @@ public abstract class ApplicationProperties {
     public abstract boolean isActiveTray();
     public abstract boolean isDeleteDownloadedFiles();
     public abstract boolean isEnableOnStartup();
-    public abstract boolean isUploadAsHtml();
     public abstract String configurationName();
 }
