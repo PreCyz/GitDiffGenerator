@@ -164,6 +164,8 @@ public class PropertiesHelper {
                 Properties properties = new Properties();
                 setProperties(appConfig, properties, ConfigHelper.APP_CONFIG_PROPERTIES);
                 setProperties(toolkitConfig, properties, ConfigHelper.TOOLKIT_CONFIG_PROPERTIES);
+                decryptPassword(properties);
+                properties.setProperty(ArgName.configurationName.name(), ArgName.configurationName.defaultValue());
                 result.put(ArgName.configurationName.defaultValue(), properties);
             }
         }
