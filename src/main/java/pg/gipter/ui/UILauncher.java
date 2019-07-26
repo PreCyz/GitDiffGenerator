@@ -154,6 +154,7 @@ public class UILauncher implements Launcher {
                 scene.getStylesheets().add(window.css());
             }
             stage.setScene(scene);
+            stage.sizeToScene();
         } catch (IOException ex) {
             logger.error("Building scene error.", ex);
         }
