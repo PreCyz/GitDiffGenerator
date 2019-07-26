@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -51,6 +52,10 @@ public class ToolkitProjectsController extends AbstractController {
     private Button removeProjectButton;
     @FXML
     private TableView<ProjectDetails> projectsTableView;
+    @FXML
+    private ProgressIndicator downloadProgressIndicator;
+    @FXML
+    private Label downloadLabel;
 
     private ApplicationProperties applicationProperties;
     private Set<ProjectDetails> projectsToDelete;
@@ -115,7 +120,6 @@ public class ToolkitProjectsController extends AbstractController {
             projects.add(ProjectDetails.DEFAULT.getName());
         }
         if (projects.contains(ProjectDetails.DEFAULT.getName())) {
-
             projectsTableView.setItems(FXCollections.observableArrayList(ProjectDetails.DEFAULT));
         } else {
             ObservableList<ProjectDetails> projectsPaths = FXCollections.observableArrayList();
@@ -133,9 +137,11 @@ public class ToolkitProjectsController extends AbstractController {
     }
 
     private void downloadAvailableProjectNames() {
-        Platform.runLater(() -> {
-            if (applicationProperties.isToolkitCredentialsSet()) {
-                Set<String> links = new ToolkitService(applicationProperties).downloadUserProjects();
+        if (applicationProperties.isToolkitCredentialsSet()) {
+            final ToolkitService toolkitService = new ToolkitService(applicationProperties);
+            resetIndicatorProperties(toolkitService);
+            uiLauncher.execute(() -> {
+                Set<String> links = toolkitService.downloadUserProjects();
                 if (!links.isEmpty()) {
                     List<ProjectDetails> projects = links.stream()
                             .map(link -> link.substring(link.indexOf(CASES)))
@@ -144,24 +150,28 @@ public class ToolkitProjectsController extends AbstractController {
                     projectsTableView.setItems(FXCollections.observableArrayList(projects));
                     saveButton.setDisable(false);
                 } else {
-                    new AlertWindowBuilder()
-                            .withHeaderText(BundleUtils.getMsg("toolkit.projects.canNotDownload"))
-                            .withLink(AlertHelper.logsFolder())
-                            .withAlertType(Alert.AlertType.WARNING)
-                            .withWindowType(WindowType.LOG_WINDOW)
-                            .withImage()
-                            .buildAndDisplayWindow();
+                    Platform.runLater(() -> {
+                        new AlertWindowBuilder()
+                                .withHeaderText(BundleUtils.getMsg("toolkit.projects.canNotDownload"))
+                                .withLink(AlertHelper.logsFolder())
+                                .withAlertType(Alert.AlertType.WARNING)
+                                .withWindowType(WindowType.LOG_WINDOW)
+                                .withImage()
+                                .buildAndDisplayWindow();
+                        downloadProgressIndicator.setVisible(false);
+                        downloadLabel.setVisible(false);
+                    });
                 }
-            } else {
-                new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("toolkit.projects.credentialsNotSet"))
-                        .withAlertType(Alert.AlertType.WARNING)
-                        .withWindowType(WindowType.OVERRIDE_WINDOW)
-                        .withImage()
-                        .buildAndDisplayWindow();
+            });
 
-            }
-        });
+        } else {
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("toolkit.projects.credentialsNotSet"))
+                    .withAlertType(Alert.AlertType.WARNING)
+                    .withWindowType(WindowType.OVERRIDE_WINDOW)
+                    .withImage()
+                    .buildAndDisplayWindow());
+        }
     }
 
     private void setupActions() {
@@ -253,5 +263,14 @@ public class ToolkitProjectsController extends AbstractController {
 
     private void setProperties() {
         saveButton.setDisable(projectsTableView.getItems().contains(ProjectDetails.DEFAULT));
+    }
+
+    private void resetIndicatorProperties(Task task) {
+        downloadProgressIndicator.setVisible(true);
+        downloadProgressIndicator.progressProperty().unbind();
+        downloadProgressIndicator.progressProperty().bind(task.progressProperty());
+        downloadLabel.setVisible(true);
+        downloadLabel.textProperty().unbind();
+        downloadLabel.textProperty().bind(task.messageProperty());
     }
 }

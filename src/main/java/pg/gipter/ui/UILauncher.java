@@ -53,7 +53,6 @@ public class UILauncher implements Launcher {
     private boolean silentMode;
     private boolean upgradeChecked = false;
     private Executor executor;
-    private boolean newConfigSource;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
         this.mainWindow = mainWindow;
