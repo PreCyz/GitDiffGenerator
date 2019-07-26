@@ -24,6 +24,7 @@ import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.project.ProjectDetails;
+import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
@@ -142,10 +143,18 @@ public class ToolkitProjectsController extends AbstractController {
                             .collect(toList());
                     projectsTableView.setItems(FXCollections.observableArrayList(projects));
                     saveButton.setDisable(false);
+                } else {
+                    new AlertWindowBuilder()
+                            .withHeaderText(BundleUtils.getMsg("toolkit.projects.canNotDownload"))
+                            .withLink(AlertHelper.logsFolder())
+                            .withAlertType(Alert.AlertType.WARNING)
+                            .withWindowType(WindowType.LOG_WINDOW)
+                            .withImage()
+                            .buildAndDisplayWindow();
                 }
             } else {
                 new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("toolkit.projects.cantDownloadAvailableProjects"))
+                        .withHeaderText(BundleUtils.getMsg("toolkit.projects.credentialsNotSet"))
                         .withAlertType(Alert.AlertType.WARNING)
                         .withWindowType(WindowType.OVERRIDE_WINDOW)
                         .withImage()

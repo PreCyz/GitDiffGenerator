@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
+import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -31,13 +32,22 @@ public class ToolkitService {
         Set<String> result = new LinkedHashSet<>();
         try {
             String html = httpRequester.downloadPageSource(applicationProperties.toolkitUrl() + "/toolkit/default.aspx");
+            if (!StringUtils.notEmpty(html)) {
+                throw new IOException("Downloaded source page is empty.");
+            }
             Document document = Jsoup.parse(html);
             Element divWithId = document.selectFirst(divIdSelector);
+            if (divWithId == null) {
+                throw new IOException(String.format("Downloaded source page does not contain element [%s].", divIdSelector));
+            }
             Elements aElements = divWithId.select(aHrefSelector);
+            if (aElements == null) {
+                throw new IOException(String.format("Downloaded source page does not contain element [%s].", aHrefSelector));
+            }
             for (Element a : aElements) {
                 result.add(a.attr("href"));
             }
-            logger.info("For user [{}] downloaded following projects: [{}]", applicationProperties.toolkitUsername(), result);
+            logger.info("For user [{}] following projects were downloaded: [{}].", applicationProperties.toolkitUsername(), result);
         } catch (IOException ex) {
             logger.error("Could not download toolkit projects for user [{}]. ", applicationProperties.toolkitUsername(), ex);
         }
