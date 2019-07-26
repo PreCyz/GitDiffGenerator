@@ -216,10 +216,6 @@ public class UILauncher implements Launcher {
         }
     }
 
-    public void hideToTray() {
-        trayHandler.hide();
-    }
-
     public void removeTray() {
         trayHandler.removeTrayIcon();
     }
@@ -335,7 +331,7 @@ public class UILauncher implements Launcher {
         mainWindow.setOnCloseRequest(onCloseEventHandler);
     }
 
-    public void hideMainWindow() {
+    void hideMainWindow() {
         mainWindow.hide();
     }
 
