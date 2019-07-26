@@ -15,6 +15,7 @@ import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.ArgName;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.job.*;
@@ -182,10 +183,21 @@ public class UILauncher implements Launcher {
 
     public void showJobWindow() {
         Platform.runLater(() -> {
-            jobWindow = new Stage();
-            jobWindow.initModality(Modality.WINDOW_MODAL);
-            buildScene(jobWindow, WindowFactory.JOB.createWindow(applicationProperties, this));
-            jobWindow.showAndWait();
+            Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
+            if (propertiesMap.containsKey(ArgName.configurationName.defaultValue())) {
+                Platform.runLater(() -> new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("popup.job.window.canNotOpen"))
+                        .withWindowType(WindowType.OVERRIDE_WINDOW)
+                        .withAlertType(Alert.AlertType.WARNING)
+                        .withImage()
+                        .buildAndDisplayWindow()
+                );
+            } else {
+                jobWindow = new Stage();
+                jobWindow.initModality(Modality.WINDOW_MODAL);
+                buildScene(jobWindow, WindowFactory.JOB.createWindow(applicationProperties, this));
+                jobWindow.showAndWait();
+            }
         });
     }
 

@@ -14,6 +14,7 @@ import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.ArgName;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
@@ -101,7 +102,7 @@ public class JobController extends AbstractController {
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
         startDatePicker.setValue(LocalDate.now());
         propertiesMap = propertiesHelper.loadAllApplicationProperties();
-        if (!propertiesMap.isEmpty()) {
+        if (!propertiesMap.isEmpty() && !propertiesMap.containsKey(ArgName.configurationName.defaultValue())) {
             ObservableList<String> items = FXCollections.observableArrayList(propertiesMap.keySet());
             items.add(0, ALL_CONFIGS);
             configurationNameComboBox.setItems(items);
