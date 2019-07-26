@@ -3,62 +3,62 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="555.0" prefWidth="544.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="575.0" prefWidth="544.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label layoutX="10.0" layoutY="10.0" text="%toolkit.projects.instructions">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="10.0" layoutY="142.0" text="https://goto.netcompany.com/cases/">
+      <Label layoutX="10.0" layoutY="161.0" text="https://goto.netcompany.com/cases/">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <TextField fx:id="projectIdTextField" alignment="CENTER" layoutX="224.0" layoutY="138.0" prefHeight="25.0" prefWidth="70.0" />
-      <Label layoutX="10.0" layoutY="97.0" text="%toolkit.projects.example" />
-      <Label layoutX="296.0" layoutY="142.0" text="/">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <TextField fx:id="projectNameTextField" alignment="CENTER" layoutX="304.0" layoutY="138.0" prefHeight="25.0" prefWidth="80.0" />
-      <Label layoutX="386.0" layoutY="142.0" text="/default.aspx">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Label>
-      <Hyperlink fx:id="checkProjectHyperlink" layoutX="467.0" layoutY="139.0" text="%toolkit.projects.checkProject">
+      <Hyperlink fx:id="showMyProjectsHyperlink" layoutX="212.0" layoutY="123.0" text="%toolkit.projects.showMyProjects">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Hyperlink>
-      <TableView fx:id="projectsTableView" layoutX="10.0" layoutY="174.0" prefHeight="330.0" prefWidth="518.0">
+      <TextField fx:id="projectIdTextField" alignment="CENTER" layoutX="224.0" layoutY="157.0" prefHeight="25.0" prefWidth="70.0" />
+      <Label layoutX="10.0" layoutY="99.0" text="%toolkit.projects.example" />
+      <Label layoutX="296.0" layoutY="161.0" text="/">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <TextField fx:id="projectNameTextField" alignment="CENTER" layoutX="304.0" layoutY="157.0" prefHeight="25.0" prefWidth="80.0" />
+      <Label layoutX="386.0" layoutY="161.0" text="/default.aspx">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Hyperlink fx:id="checkProjectHyperlink" layoutX="467.0" layoutY="158.0" text="%toolkit.projects.checkProject">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Hyperlink>
+      <TableView fx:id="projectsTableView" layoutX="10.0" layoutY="192.0" prefHeight="330.0" prefWidth="518.0">
          <columns>
             <TableColumn editable="false" prefWidth="161.0" sortable="false" text="%projects.column.name" />
             <TableColumn editable="false" prefWidth="123.0" sortable="false" text="%projects.column.vcsType" />
             <TableColumn editable="false" prefWidth="231.0" sortable="false" text="%projects.column.path" />
          </columns>
       </TableView>
-      <Button fx:id="saveButton" layoutX="201.0" layoutY="515.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="142.0" text="%projects.button.save" textFill="#1eb235">
+      <Button fx:id="saveButton" layoutX="201.0" layoutY="533.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="142.0" text="%projects.button.save" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
       </Button>
-      <Button id="add-project-button" fx:id="addProjectButton" layoutX="457.0" layoutY="514.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/toolkitProjects.css">
+      <Button id="add-project-button" fx:id="addProjectButton" layoutX="457.0" layoutY="532.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/toolkitProjects.css">
          <font>
             <Font size="9.0" />
          </font>
       </Button>
-      <Button id="remove-project-button" fx:id="removeProjectButton" layoutX="497.0" layoutY="514.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/toolkitProjects.css">
+      <Button id="remove-project-button" fx:id="removeProjectButton" layoutX="497.0" layoutY="532.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/toolkitProjects.css">
          <font>
             <Font size="9.0" />
          </font>
       </Button>
-      <Hyperlink fx:id="showMyProjectsHyperlink" layoutX="212.0" layoutY="112.0" text="%toolkit.projects.showMyProjects">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font>
-      </Hyperlink>
    </children>
 </AnchorPane>

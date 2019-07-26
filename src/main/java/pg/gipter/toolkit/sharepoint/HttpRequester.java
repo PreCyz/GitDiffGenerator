@@ -19,10 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class HttpRequester {
@@ -170,6 +167,33 @@ public class HttpRequester {
             return result.get("d").getAsJsonObject()
                     .get("GetContextWebInformation").getAsJsonObject()
                     .get("FormDigestValue").getAsString();
+        }
+    }
+
+    public String downloadPageSource(String fullUrl) throws IOException {
+        HttpGet httpget = new HttpGet(replaceSpaces(fullUrl));
+        httpget.addHeader("accept", "application/json;odata=verbose");
+        logger.info("Executing request {}", httpget.getRequestLine());
+
+        try (CloseableHttpClient httpclient = HttpClients.custom()
+                .setDefaultCredentialsProvider(getCredentialsProvider(applicationProperties))
+                .build();
+             CloseableHttpResponse response = httpclient.execute(httpget)
+        ) {
+            logger.info("Response {}", response.getStatusLine());
+            InputStreamReader inputStreamReader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
+            BufferedReader reader = new BufferedReader(inputStreamReader);
+
+            String line;
+            StringBuilder sb = new StringBuilder();
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+                sb.append(System.lineSeparator());
+            }
+            inputStreamReader.close();
+            reader.close();
+            EntityUtils.consume(response.getEntity());
+            return sb.toString();
         }
     }
 }

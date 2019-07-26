@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.producer.command.UploadType;
+import pg.gipter.service.ToolkitService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -26,11 +27,10 @@ import pg.gipter.ui.project.ProjectDetails;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 public class ToolkitProjectsController extends AbstractController {
 
@@ -106,13 +106,15 @@ public class ToolkitProjectsController extends AbstractController {
     }
 
     private void initValues() {
+        downloadAvailableProjectNames();
         Set<String> projects = applicationProperties.projectPaths();
         String[] args = propertiesHelper.loadArgumentArray(applicationProperties.configurationName());
         if (args.length == 0) {
             projects.clear();
             projects.add(ProjectDetails.DEFAULT.getName());
         }
-        if (projects.size() == 1 && projects.contains(ProjectDetails.DEFAULT.getName())) {
+        if (projects.contains(ProjectDetails.DEFAULT.getName())) {
+
             projectsTableView.setItems(FXCollections.observableArrayList(ProjectDetails.DEFAULT));
         } else {
             ObservableList<ProjectDetails> projectsPaths = FXCollections.observableArrayList();
@@ -127,6 +129,30 @@ public class ToolkitProjectsController extends AbstractController {
             }
             projectsTableView.setItems(projectsPaths);
         }
+    }
+
+    private void downloadAvailableProjectNames() {
+        Platform.runLater(() -> {
+            if (applicationProperties.isToolkitCredentialsSet()) {
+                Set<String> links = new ToolkitService(applicationProperties).downloadUserProjects();
+                if (!links.isEmpty()) {
+                    List<ProjectDetails> projects = links.stream()
+                            .map(link -> link.substring(link.indexOf(CASES)))
+                            .map(p -> new ProjectDetails(p.replace(CASES, ""), UploadType.TOOLKIT_DOCS.name(), p))
+                            .collect(toList());
+                    projectsTableView.setItems(FXCollections.observableArrayList(projects));
+                    saveButton.setDisable(false);
+                }
+            } else {
+                new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("toolkit.projects.cantDownloadAvailableProjects"))
+                        .withAlertType(Alert.AlertType.WARNING)
+                        .withWindowType(WindowType.OVERRIDE_WINDOW)
+                        .withImage()
+                        .buildAndDisplayWindow();
+
+            }
+        });
     }
 
     private void setupActions() {
