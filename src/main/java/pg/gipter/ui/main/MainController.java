@@ -268,7 +268,7 @@ public class MainController extends AbstractController {
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler());
         addConfigurationButton.setOnAction(addConfigurationEventHandler());
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
-        toolkitUserFolderHyperlink.setOnMouseClicked(mouseClickEventHandler());
+        toolkitUserFolderHyperlink.setOnMouseClicked(toolkitUserFolderOnMouseClickEventHandler());
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
@@ -626,7 +626,7 @@ public class MainController extends AbstractController {
     }
 
     @NotNull
-    private EventHandler<MouseEvent> mouseClickEventHandler() {
+    private EventHandler<MouseEvent> toolkitUserFolderOnMouseClickEventHandler() {
         return event -> Platform.runLater(() -> {
             String userFolder = applicationProperties.toolkitUserFolder();
             if (!applicationProperties.toolkitUserFolder().equalsIgnoreCase(userFolderUrl)) {

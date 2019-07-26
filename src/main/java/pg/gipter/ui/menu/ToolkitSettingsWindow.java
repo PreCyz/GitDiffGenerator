@@ -4,15 +4,15 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
-public class ApplicationMenuWindow extends AbstractWindow {
+public class ToolkitSettingsWindow extends AbstractWindow {
 
-    public ApplicationMenuWindow(AbstractController controller) {
+    public ToolkitSettingsWindow(AbstractController controller) {
         super(controller);
     }
 
     @Override
     protected String fxmlFileName() {
-        return "applicationMenu.fxml";
+        return "toolkitSettings.fxml";
     }
 
     @Override
@@ -22,11 +22,11 @@ public class ApplicationMenuWindow extends AbstractWindow {
 
     @Override
     protected String cssFileName() {
-        return "applicationMenu.css";
+        return "toolkitSettings.css";
     }
 
     @Override
     public String windowTitleBundle() {
-        return "application.menu.title";
+        return "toolkit.settings.title";
     }
 }

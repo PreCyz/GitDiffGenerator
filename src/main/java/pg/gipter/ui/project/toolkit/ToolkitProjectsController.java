@@ -35,11 +35,13 @@ import java.util.stream.Collectors;
 public class ToolkitProjectsController extends AbstractController {
 
     @FXML
+    private Hyperlink showMyProjectsHyperlink;
+    @FXML
+    private Hyperlink checkProjectHyperlink;
+    @FXML
     private TextField projectIdTextField;
     @FXML
     private TextField projectNameTextField;
-    @FXML
-    private Hyperlink checkProjectHyperlink;
     @FXML
     private Button saveButton;
     @FXML
@@ -128,14 +130,23 @@ public class ToolkitProjectsController extends AbstractController {
     }
 
     private void setupActions() {
-        checkProjectHyperlink.setOnMouseClicked(mouseClickEventHandler());
+        showMyProjectsHyperlink.setOnMouseClicked(showMyProjectsMouseClickEventHandler());
+        checkProjectHyperlink.setOnMouseClicked(checkProjectsMouseClickEventHandler());
         addProjectButton.setOnAction(addActionEventHandler());
         removeProjectButton.setOnAction(removeButtonActionEventHandler());
         saveButton.setOnAction(saveButtonActionEventHandler());
     }
 
+    private EventHandler<? super MouseEvent> showMyProjectsMouseClickEventHandler() {
+        return event -> {
+            AppManager instance = AppManagerFactory.getInstance();
+            instance.launchDefaultBrowser(applicationProperties.toolkitUrl() + "/toolkit/default.aspx");
+            showMyProjectsHyperlink.setVisited(false);
+        };
+    }
+
     @NotNull
-    private EventHandler<MouseEvent> mouseClickEventHandler() {
+    private EventHandler<MouseEvent> checkProjectsMouseClickEventHandler() {
         return event -> Platform.runLater(() -> {
             String projectUrl = String.format("%s%s%s/%s/default.aspx",
                     applicationProperties.toolkitUrl(),

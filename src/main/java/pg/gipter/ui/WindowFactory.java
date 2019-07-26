@@ -5,10 +5,10 @@ import pg.gipter.ui.job.JobController;
 import pg.gipter.ui.job.JobWindow;
 import pg.gipter.ui.main.MainController;
 import pg.gipter.ui.main.MainWindow;
-import pg.gipter.ui.menu.ApplicationMenuController;
-import pg.gipter.ui.menu.ApplicationMenuWindow;
-import pg.gipter.ui.menu.ToolkitMenuController;
-import pg.gipter.ui.menu.ToolkitMenuWindow;
+import pg.gipter.ui.menu.ApplicationSettingsController;
+import pg.gipter.ui.menu.ApplicationSettingsWindow;
+import pg.gipter.ui.menu.ToolkitSettingsController;
+import pg.gipter.ui.menu.ToolkitSettingsWindow;
 import pg.gipter.ui.project.ProjectsController;
 import pg.gipter.ui.project.ProjectsWindow;
 import pg.gipter.ui.project.toolkit.ToolkitProjectsController;
@@ -37,13 +37,13 @@ public enum WindowFactory {
     APPLICATION_MENU {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new ApplicationMenuWindow(new ApplicationMenuController(applicationProperties, uiLauncher));
+            return new ApplicationSettingsWindow(new ApplicationSettingsController(applicationProperties, uiLauncher));
         }
     },
     TOOLKIT_MENU {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new ToolkitMenuWindow(new ToolkitMenuController(applicationProperties, uiLauncher));
+            return new ToolkitSettingsWindow(new ToolkitSettingsController(applicationProperties, uiLauncher));
         }
     },
     TOOLKIT_PROJECTS {

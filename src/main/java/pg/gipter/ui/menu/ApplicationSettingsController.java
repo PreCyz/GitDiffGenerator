@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
-public class ApplicationMenuController extends AbstractController {
+public class ApplicationSettingsController extends AbstractController {
 
     @FXML
     private CheckBox confirmationWindowCheckBox;
@@ -42,7 +42,7 @@ public class ApplicationMenuController extends AbstractController {
 
     private static String currentLanguage;
 
-    public ApplicationMenuController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+    public ApplicationSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
     }

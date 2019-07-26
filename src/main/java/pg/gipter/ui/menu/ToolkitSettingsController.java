@@ -18,7 +18,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
-public class ToolkitMenuController extends AbstractController {
+public class ToolkitSettingsController extends AbstractController {
 
     @FXML
     private TextField toolkitUsernameTextField;
@@ -39,7 +39,7 @@ public class ToolkitMenuController extends AbstractController {
 
     private ApplicationProperties applicationProperties;
 
-    public ToolkitMenuController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+    public ToolkitSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
     }
