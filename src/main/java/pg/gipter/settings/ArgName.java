@@ -17,7 +17,7 @@ public enum ArgName {
     skipRemote("Y"),
     toolkitProjectListNames("Deliverables"),
     deleteDownloadedFiles("Y"),
-    configurationName("DEFAULT"),
+    configurationName(""),
 
     itemPath("NO_ITEM_PATH_GIVEN"),
     projectPath("NO_PROJECT_PATH_GIVEN"),

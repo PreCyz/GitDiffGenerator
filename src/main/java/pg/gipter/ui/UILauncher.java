@@ -53,6 +53,7 @@ public class UILauncher implements Launcher {
     private boolean silentMode;
     private boolean upgradeChecked = false;
     private Executor executor;
+    private Executor uiThread;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
         this.mainWindow = mainWindow;
@@ -60,6 +61,7 @@ public class UILauncher implements Launcher {
         propertiesHelper = new PropertiesHelper();
         silentMode = applicationProperties.isSilentMode();
         this.executor = Executors.newFixedThreadPool(3);
+        uiThread = Platform::runLater;
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {

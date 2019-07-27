@@ -111,6 +111,8 @@ public class MainController extends AbstractController {
     @FXML
     private Button executeButton;
     @FXML
+    private Button executeAllButton;
+    @FXML
     private Button jobButton;
     @FXML
     private Button exitButton;
@@ -225,18 +227,18 @@ public class MainController extends AbstractController {
         progressIndicator.setVisible(false);
         projectPathLabel.setTooltip(buildProjectPathsTooltip(projectPathLabel.getText()));
         instructionMenuItem.setDisable(!(Paths.get(PDF_DESCRIPTION_FILE).toFile().exists() && Desktop.isDesktopSupported()));
-        setDisablePropertyOnRemoveConfigurationButton();
+        setDisableDependOnConfigurations();
     }
 
-    private boolean isConfigComboDisabled() {
-        boolean result = configurationNameComboBox.getItems().isEmpty();
-        result |= configurationNameComboBox.getItems().size() == 1 && ArgName.configurationName.defaultValue().equals(configurationNameComboBox.getValue());
-        return result;
-    }
-
-    private void setDisablePropertyOnRemoveConfigurationButton() {
-        removeConfigurationButton.setDisable(isConfigComboDisabled());
-        configurationNameComboBox.setDisable(isConfigComboDisabled());
+    private void setDisableDependOnConfigurations() {
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        addConfigurationButton.setDisable(map.isEmpty());
+        removeConfigurationButton.setDisable(map.isEmpty());
+        executeButton.setDisable(map.isEmpty());
+        executeAllButton.setDisable(map.isEmpty());
+        jobButton.setDisable(map.isEmpty());
+        configurationNameComboBox.setDisable(map.isEmpty());
+        projectPathButton.setDisable(map.isEmpty());
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -355,7 +357,7 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
-        return event -> {
+        return event -> uiLauncher.execute(() -> Platform.runLater(() -> {
             if (uploadTypeComboBox.getValue() == UploadType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setInitialDirectory(new File("."));
@@ -375,7 +377,7 @@ public class MainController extends AbstractController {
                     itemPathButton.setText(resources.getString("button.change"));
                 }
             }
-        };
+        }));
     }
 
     private EventHandler<ActionEvent> executeActionEventHandler() {
@@ -482,15 +484,17 @@ public class MainController extends AbstractController {
             properties.remove(ArgName.startDate.name());
             properties.remove(ArgName.endDate.name());
             propertiesHelper.saveToolkitSettings(properties);
-            propertiesHelper.saveRunConfig(properties);
+            if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
+                propertiesHelper.saveRunConfig(properties);
+                setDisableDependOnConfigurations();
+            }
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             String configurationName = configurationNameTextField.getText();
             String comboConfigName = configurationNameComboBox.getValue();
-            if (!configurationName.equals(comboConfigName)) {
-                updateConfigurationNameComboBox(comboConfigName, configurationName);
+            if (!StringUtils.nullOrEmpty(comboConfigName) && !configurationName.equals(comboConfigName)) {
                 propertiesHelper.removeConfig(comboConfigName);
-                removeConfigurationButton.setDisable(false);
             }
+            updateConfigurationNameComboBox(comboConfigName, configurationName);
             uiLauncher.updateTray(applicationProperties);
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
@@ -522,6 +526,7 @@ public class MainController extends AbstractController {
                     currentProperties.put(ArgName.configurationName.name(), configurationName);
                     propertiesHelper.saveRunConfig(currentProperties);
                     updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationName);
+                    setDisableDependOnConfigurations();
                     operationDone = true;
                 } else {
                     configurationNameTextField.setText(configurationNameComboBox.getValue());
@@ -529,6 +534,7 @@ public class MainController extends AbstractController {
             } else {
                 propertiesHelper.saveRunConfig(propertiesHelper.createProperties(args));
                 updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), configurationName);
+                setDisableDependOnConfigurations();
                 operationDone = true;
             }
             if (operationDone) {
@@ -559,7 +565,7 @@ public class MainController extends AbstractController {
                 applicationProperties = ApplicationPropertiesFactory.getInstance(currentArgs);
                 setInitValues();
                 configurationNameTextField.setText(configurationNameComboBox.getValue());
-                setDisablePropertyOnRemoveConfigurationButton();
+                setDisableDependOnConfigurations();
                 Platform.runLater(() -> new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
@@ -592,7 +598,7 @@ public class MainController extends AbstractController {
         configurationNameComboBox.setItems(items);
         configurationNameComboBox.setValue(newValue);
         useComboBoxValueChangeListener = true;
-        setDisablePropertyOnRemoveConfigurationButton();
+        setDisableDependOnConfigurations();
     }
 
     private void removeConfigurationNameFromComboBox(String oldValue, String newValue) {
@@ -600,6 +606,7 @@ public class MainController extends AbstractController {
         items.remove(oldValue);
         updateItemsForConfigComboBox(newValue, FXCollections.observableList(items));
     }
+
     private void setListeners() {
         toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             userFolderUrl = applicationProperties.toolkitUserFolder();
@@ -609,6 +616,16 @@ public class MainController extends AbstractController {
         configurationNameComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener(comboBoxValueChangeListener());
+
+        configurationNameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (StringUtils.nullOrEmpty(oldValue) && !StringUtils.nullOrEmpty(newValue)) {
+                addConfigurationButton.setDisable(false);
+                projectPathButton.setDisable(false);
+            } else if (StringUtils.nullOrEmpty(newValue)) {
+                addConfigurationButton.setDisable(true);
+                projectPathButton.setDisable(true);
+            }
+        });
     }
 
     @NotNull

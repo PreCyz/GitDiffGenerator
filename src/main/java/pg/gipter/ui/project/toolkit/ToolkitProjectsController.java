@@ -165,6 +165,7 @@ public class ToolkitProjectsController extends AbstractController {
             });
 
         } else {
+            downloadProgressIndicator.setVisible(false);
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("toolkit.projects.credentialsNotSet"))
                     .withAlertType(Alert.AlertType.WARNING)
