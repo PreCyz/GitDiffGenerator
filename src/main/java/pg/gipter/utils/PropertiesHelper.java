@@ -160,14 +160,6 @@ public class PropertiesHelper {
                 decryptPassword(properties);
                 result.put(properties.getProperty(ArgName.configurationName.name()), properties);
             }
-            if (result.isEmpty()) {
-                Properties properties = new Properties();
-                setProperties(appConfig, properties, ConfigHelper.APP_CONFIG_PROPERTIES);
-                setProperties(toolkitConfig, properties, ConfigHelper.TOOLKIT_CONFIG_PROPERTIES);
-                decryptPassword(properties);
-                properties.setProperty(ArgName.configurationName.name(), ArgName.configurationName.defaultValue());
-                result.put(ArgName.configurationName.defaultValue(), properties);
-            }
         }
         return result;
     }
@@ -179,18 +171,6 @@ public class PropertiesHelper {
                 properties.put(propertyName, jsonElement.getAsString());
             }
         }
-    }
-
-    public void addAndSaveApplicationProperties(Properties properties) {
-        if (properties == null || properties.keySet().isEmpty()) {
-            logger.error("Properties does not contain any values.");
-            throw new IllegalArgumentException("Properties does not contain any values.");
-        }
-        encryptPassword(properties);
-
-        JsonObject jsonObject = buildJsonConfig(properties);
-
-        writeJsonConfig(jsonObject);
     }
 
     private JsonObject buildJsonConfig(Properties properties) {
@@ -206,6 +186,10 @@ public class PropertiesHelper {
     }
 
     public void saveRunConfig(Properties properties) {
+        if (StringUtils.nullOrEmpty(properties.getProperty(ArgName.configurationName.name()))) {
+            logger.warn("empty configurationName. Can not save run config without configurationName.");
+            return;
+        }
         encryptPassword(properties);
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
@@ -268,23 +252,25 @@ public class PropertiesHelper {
         boolean nothingToConvert = true;
         Optional<Properties> properties = loadApplicationProperties();
         if (properties.isPresent()) {
-            Properties oldProperties = properties.get();
-            oldProperties.put(ArgName.configurationName.name(), APPLICATION_PROPERTIES);
-            addAndSaveApplicationProperties(oldProperties);
+            buildAndSaveJsonConfig(properties.get(), APPLICATION_PROPERTIES);
             nothingToConvert = false;
-            logger.info("{} converted to JSON format.", APPLICATION_PROPERTIES);
         }
         properties = loadUIApplicationProperties();
         if (properties.isPresent()) {
-            Properties oldProperties = properties.get();
-            oldProperties.put(ArgName.configurationName.name(), UI_APPLICATION_PROPERTIES);
-            addAndSaveApplicationProperties(oldProperties);
+            buildAndSaveJsonConfig(properties.get(), UI_APPLICATION_PROPERTIES);
             nothingToConvert = false;
-            logger.info("{} converted to JSON format.", UI_APPLICATION_PROPERTIES);
         }
         if (nothingToConvert) {
             logger.info("There is no old properties to convert to JSON format.");
         }
+    }
+
+    private void buildAndSaveJsonConfig(Properties properties, String applicationProperties) {
+        properties.put(ArgName.configurationName.name(), applicationProperties);
+        encryptPassword(properties);
+        JsonObject jsonObject = buildJsonConfig(properties);
+        writeJsonConfig(jsonObject);
+        logger.info("{} converted to JSON format.", applicationProperties);
     }
 
     private void deletePropertyFile(String propertyFile) {
@@ -313,12 +299,5 @@ public class PropertiesHelper {
         }
         jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));
         writeJsonConfig(jsonObject);
-    }
-
-    public String getProperConfigName(String configName) {
-        if (ArgName.configurationName.defaultValue().equals(configName)) {
-            return configName + " ";
-        }
-        return configName;
     }
 }

@@ -47,7 +47,7 @@ public abstract class ApplicationProperties {
         Optional<Properties> propsFromFile;
         Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
         if (propertiesMap.isEmpty()) {
-            propsFromFile = propertiesHelper.loadApplicationProperties(ArgName.configurationName.defaultValue());
+            propsFromFile = Optional.empty();
         } else if (propertiesMap.containsKey(argExtractor.configurationName())) {
             propsFromFile = Optional.of(propertiesMap.get(argExtractor.configurationName()));
         } else {

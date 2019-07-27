@@ -87,6 +87,9 @@ class ConfigHelper {
 
     JsonArray buildRunConfigs(Properties properties) {
         JsonArray jsonArray = new JsonArray();
+        if (StringUtils.nullOrEmpty(properties.getProperty(ArgName.configurationName.name()))) {
+            return jsonArray;
+        }
         jsonArray.add(createJsonElement(properties, RUN_CONFIG_PROPERTIES));
         return jsonArray;
     }

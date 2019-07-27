@@ -36,8 +36,7 @@ class PropertiesHelperTest {
     @Test
     void givenGeneratedProperty_whenAddAndSave_thenCreateNewJsonFile() {
         Properties properties = TestDataFactory.generateProperty();
-
-        propertiesHelper.addAndSaveApplicationProperties(properties);
+        createJsonConfig(properties);
 
         JsonObject actual = propertiesHelper.readJsonConfig();
         assertThat(actual).isNotNull();
@@ -46,29 +45,18 @@ class PropertiesHelperTest {
         assertThat(actual.getAsJsonArray(ConfigHelper.RUN_CONFIGS)).hasSize(1);
     }
 
-    @Test
-    void givenTwoPropertiesWithTheSameConfiguration_whenAddAndSaveApplicationProperties_thenCreateOnlyLastJsonConfig() {
-        Properties properties = TestDataFactory.generateProperty();
-        final String confName = properties.getProperty(ArgName.configurationName.name());
-        propertiesHelper.encryptPassword(properties);
-        propertiesHelper.addAndSaveApplicationProperties(properties);
-        final String lastPeriodInDays = "1";
-        properties.put(ArgName.periodInDays.name(), lastPeriodInDays);
-
-        propertiesHelper.addAndSaveApplicationProperties(properties);
-
-        Map<String, Properties> actual = propertiesHelper.loadAllApplicationProperties();
-        assertThat(actual).hasSize(1);
-        assertThat(actual.keySet()).containsExactly(confName);
-        actual.forEach((k, v) -> assertThat(v.getProperty(ArgName.periodInDays.name())).isEqualTo(lastPeriodInDays));
+    private void createJsonConfig(Properties properties) {
+        propertiesHelper.saveAppSettings(properties);
+        propertiesHelper.saveToolkitSettings(properties);
+        propertiesHelper.saveRunConfig(properties);
     }
 
     @Test
     void givenJsonFile_whenLoadAllApplicationProperties_thenReturnMap() {
         Properties properties = TestDataFactory.generateProperty();
-        propertiesHelper.addAndSaveApplicationProperties(properties);
-        properties = TestDataFactory.generateProperty();
-        propertiesHelper.addAndSaveApplicationProperties(properties);
+        createJsonConfig(properties);
+        properties.setProperty(ArgName.configurationName.name(), "other");
+        createJsonConfig(properties);
 
         Map<String, Properties> actual = propertiesHelper.loadAllApplicationProperties();
 
@@ -96,7 +84,7 @@ class PropertiesHelperTest {
     @Test
     void givenApplicationProperties_whenRemoveConfig_thenRemoveThatConfigFromFile() {
         Properties properties = TestDataFactory.generateProperty();
-        propertiesHelper.addAndSaveApplicationProperties(properties);
+        createJsonConfig(properties);
 
         propertiesHelper.removeConfig(properties.getProperty(ArgName.configurationName.name()));
 
@@ -109,10 +97,75 @@ class PropertiesHelperTest {
     @Test
     void givenApplicationProperties_whenLoadArgumentArray_thenRemoveThatConfigFromFile() {
         Properties properties = TestDataFactory.generateProperty();
-        propertiesHelper.addAndSaveApplicationProperties(properties);
+        createJsonConfig(properties);
 
         String[] actual = propertiesHelper.loadArgumentArray(properties.getProperty(ArgName.configurationName.name()));
 
         assertThat(actual).isNotNull();
+    }
+
+    @Test
+    void givenRunConfigWithoutName_whenSaveRunConfig_thenNoRunConfigSaved() {
+        Properties properties = TestDataFactory.generateProperty();
+        properties.remove(ArgName.configurationName.name());
+
+        propertiesHelper.saveRunConfig(properties);
+
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        assertThat(map).isEmpty();
+    }
+
+    @Test
+    void givenRunConfig_whenSaveRunConfig_thenRunConfigSaved() {
+        Properties properties = TestDataFactory.generateProperty();
+
+        propertiesHelper.saveRunConfig(properties);
+
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        assertThat(map).hasSize(1);
+        assertThat(map.keySet()).containsExactly(properties.getProperty(ArgName.configurationName.name()));
+    }
+
+    @Test
+    void given2SameRunConfig_whenSaveRunConfig_thenLastOneRunConfigSaved() {
+        Properties properties = TestDataFactory.generateProperty();
+        Properties last = TestDataFactory.generateProperty();
+        last.setProperty(ArgName.configurationName.name(), properties.getProperty(ArgName.configurationName.name()));
+        last.setProperty(ArgName.periodInDays.name(), "8");
+
+        propertiesHelper.saveRunConfig(properties);
+        propertiesHelper.saveRunConfig(last);
+
+
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        assertThat(map).hasSize(1);
+        assertThat(map.keySet()).containsExactly(properties.getProperty(ArgName.configurationName.name()));
+        assertThat(map.get(properties.getProperty(ArgName.configurationName.name())).getProperty(ArgName.periodInDays.name())).isEqualTo("8");
+    }
+
+    @Test
+    void givenPropertiesWithoutRunConfig_whenSaveAppConfig_thenSaveIt() {
+        Properties properties = TestDataFactory.generateProperty();
+        properties.remove(ArgName.configurationName.name());
+
+        propertiesHelper.saveAppSettings(properties);
+
+        JsonObject jsonObject = propertiesHelper.readJsonConfig();
+        assertThat(jsonObject).isNotNull();
+        assertThat(jsonObject.has(ConfigHelper.APP_CONFIG)).isTrue();
+        assertThat(jsonObject.get(ConfigHelper.APP_CONFIG).getAsJsonObject()).isNotNull();
+    }
+
+    @Test
+    void givenPropertiesWithoutRunConfig_whenSaveToolkitConfig_thenSaveIt() {
+        Properties properties = TestDataFactory.generateProperty();
+        properties.remove(ArgName.configurationName.name());
+
+        propertiesHelper.saveToolkitSettings(properties);
+
+        JsonObject jsonObject = propertiesHelper.readJsonConfig();
+        assertThat(jsonObject).isNotNull();
+        assertThat(jsonObject.has(ConfigHelper.TOOLKIT_CONFIG)).isTrue();
+        assertThat(jsonObject.get(ConfigHelper.TOOLKIT_CONFIG).getAsJsonObject()).isNotNull();
     }
 }

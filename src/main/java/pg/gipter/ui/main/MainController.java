@@ -334,7 +334,7 @@ public class MainController extends AbstractController {
         return event -> {
             String[] argsFromUI = createArgsFromUI();
             uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
-            String configurationName = propertiesHelper.getProperConfigName(configurationNameTextField.getText());
+            String configurationName = configurationNameTextField.getText();
             updateConfigurationNameComboBox(configurationName, configurationName);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
                 uiLauncher.showToolkitProjectsWindow();
@@ -436,7 +436,7 @@ public class MainController extends AbstractController {
             argList.add(ArgName.periodInDays + "=" + periodInDaysTextField.getText());
         }
 
-        argList.add(ArgName.configurationName + "=" + propertiesHelper.getProperConfigName(configurationNameTextField.getText()));
+        argList.add(ArgName.configurationName + "=" + configurationNameTextField.getText());
 
         return argList.toArray(new String[0]);
     }
@@ -484,7 +484,7 @@ public class MainController extends AbstractController {
             propertiesHelper.saveToolkitSettings(properties);
             propertiesHelper.saveRunConfig(properties);
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
-            String configurationName = propertiesHelper.getProperConfigName(configurationNameTextField.getText());
+            String configurationName = configurationNameTextField.getText();
             String comboConfigName = configurationNameComboBox.getValue();
             if (!configurationName.equals(comboConfigName)) {
                 updateConfigurationNameComboBox(comboConfigName, configurationName);
@@ -505,7 +505,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
         return event -> {
             String[] args = createArgsFromUI();
-            String configurationName = propertiesHelper.getProperConfigName(configurationNameTextField.getText());
+            String configurationName = configurationNameTextField.getText();
             Optional<Properties> properties = propertiesHelper.loadApplicationProperties(configurationName);
             boolean operationDone = false;
             if (properties.isPresent()) {
