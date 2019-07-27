@@ -168,4 +168,60 @@ class PropertiesHelperTest {
         assertThat(jsonObject.has(ConfigHelper.TOOLKIT_CONFIG)).isTrue();
         assertThat(jsonObject.get(ConfigHelper.TOOLKIT_CONFIG).getAsJsonObject()).isNotNull();
     }
+
+    @Test
+    void givenProperties_whenLoadAllApplicationProperties_thenReturnEmptyMap() {
+        Properties properties = TestDataFactory.generateProperty();
+        createJsonConfig(properties);
+        propertiesHelper.removeConfig(properties.getProperty(ArgName.configurationName.name()));
+
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+
+        assertThat(map).isEmpty();
+    }
+
+    @Test
+    void givenProperties_whenSaveRunConfig_thenReturnMap() {
+        Properties properties = TestDataFactory.generateProperty();
+
+        propertiesHelper.saveRunConfig(properties);
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+
+        assertThat(map).hasSize(1);
+    }
+
+    @Test
+    void given2sameRunConfig_whenSaveRunConfig_thenReturnMapWithOneConfig() {
+        Properties properties = TestDataFactory.generateProperty();
+        propertiesHelper.saveRunConfig(properties);
+        properties.put(ArgName.periodInDays.name(), "8");
+        propertiesHelper.saveRunConfig(properties);
+
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        assertThat(map).hasSize(1);
+        assertThat(map.get(properties.getProperty(ArgName.configurationName.name())).getProperty(ArgName.periodInDays.name())).isEqualTo("8");
+    }
+
+    @Test
+    void givenProperties_whenSaveAppSettings_thenReturnEmptyMap() {
+        propertiesHelper.writeJsonConfig(new ConfigHelper().buildFullJson(new Properties()));
+        Properties properties = TestDataFactory.generateProperty();
+        properties.remove(ArgName.configurationName.name());
+
+        propertiesHelper.saveAppSettings(properties);
+
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        assertThat(map).isEmpty();
+    }
+
+    @Test
+    void givenProperties_whenSaveToolkitSettings_thenReturnEmptyMap() {
+        Properties properties = TestDataFactory.generateProperty();
+        properties.remove(ArgName.configurationName.name());
+
+        propertiesHelper.saveToolkitSettings(properties);
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+
+        assertThat(map).isEmpty();
+    }
 }

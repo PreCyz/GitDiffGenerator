@@ -199,7 +199,7 @@ public class PropertiesHelper {
         writeJsonConfig(jsonObject);
     }
 
-    private void writeJsonConfig(JsonObject jsonObject) {
+    void writeJsonConfig(JsonObject jsonObject) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(jsonObject);
         try (FileWriter writer = new FileWriter(APPLICATION_PROPERTIES_JSON)) {

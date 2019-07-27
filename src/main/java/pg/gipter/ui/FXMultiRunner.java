@@ -4,18 +4,15 @@ import javafx.concurrent.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.launcher.Starter;
-import pg.gipter.settings.MultiApplicationProperties;
 import pg.gipter.utils.PropertiesHelper;
 
 /** Created by Pawel Gawedzki on 15-Jul-2019. */
 public class FXMultiRunner extends Task<Void> implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(FXMultiRunner.class);
-    private MultiApplicationProperties multiApplicationProperties;
     private final PropertiesHelper propertiesHelper;
 
-    public FXMultiRunner(MultiApplicationProperties multiApplicationProperties) {
-        this.multiApplicationProperties = multiApplicationProperties;
+    public FXMultiRunner() {
         this.propertiesHelper = new PropertiesHelper();
     }
 
