@@ -29,6 +29,7 @@ import pg.gipter.utils.BundleUtils;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class ProjectsController extends AbstractController {
@@ -162,20 +163,24 @@ public class ProjectsController extends AbstractController {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(new File("."));
             directoryChooser.setTitle(resources.getString("directory.search.title"));
-            File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
-            if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                ObservableList<ProjectDetails> projects = FXCollections.observableList(searchForProjects(itemPathDirectory));
-                if (!projects.isEmpty()) {
-                    if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
-                        projectsTableView.setItems(projects);
-                    } else {
-                        projectsTableView.getItems().addAll(projects);
-                    }
-                    projectsTableView.refresh();
-                    saveButton.setDisable(false);
-                }
+            File directory = directoryChooser.showDialog(uiLauncher.currentWindow());
+            if (directory != null && directory.exists() && directory.isDirectory()) {
+                CompletableFuture.supplyAsync(() -> FXCollections.observableList(searchForProjects(directory)), uiLauncher.nonUIExecutor())
+                        .thenAcceptAsync(this::refreshProjectTableView, Platform::runLater);
             }
         };
+    }
+
+    private void refreshProjectTableView(@NotNull ObservableList<ProjectDetails> observableList) {
+        if (!observableList.isEmpty()) {
+            if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+                projectsTableView.setItems(observableList);
+            } else {
+                projectsTableView.getItems().addAll(observableList);
+            }
+            projectsTableView.refresh();
+            saveButton.setDisable(false);
+        }
     }
 
     List<ProjectDetails> searchForProjects(File directory) {
@@ -196,10 +201,8 @@ public class ProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            //String configurationName = uiLauncher.getConfigurationName();
             String configurationName = applicationProperties.configurationName();
             Properties properties = propertiesHelper.createProperties(applicationProperties.getArgs());
-            //properties.setProperty(ArgName.configurationName.name(), configurationName);
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
             properties.setProperty(ArgName.projectPath.name(), projects);
             propertiesHelper.saveRunConfig(properties);
