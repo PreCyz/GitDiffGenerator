@@ -172,6 +172,7 @@ public class ProjectsController extends AbstractController {
                         projectsTableView.getItems().addAll(projects);
                     }
                     projectsTableView.refresh();
+                    saveButton.setDisable(false);
                 }
             }
         };

@@ -76,11 +76,15 @@ public class UILauncher implements Launcher {
         this.silentMode = silentMode;
     }
 
-    public void execute(Runnable runnable) {
+    public void executeOutsideUIThread(Runnable runnable) {
         executor.execute(runnable);
     }
 
-    public void executeInUI(Runnable runnable) {
+    public Executor nonUIExecutor() {
+        return executor;
+    }
+
+    public void executeInUIThread(Runnable runnable) {
         uiExecutor.execute(runnable);
     }
 

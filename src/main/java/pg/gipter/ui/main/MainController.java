@@ -191,8 +191,10 @@ public class MainController extends AbstractController {
             confNames.add(configurationNameComboBox.getValue());
         }
         configurationNameComboBox.setItems(FXCollections.observableList(new ArrayList<>(confNames)));
-        configurationNameComboBox.setValue(applicationProperties.configurationName());
-        configurationNameTextField.setText(applicationProperties.configurationName());
+        if (confNames.contains(applicationProperties.configurationName())) {
+            configurationNameComboBox.setValue(applicationProperties.configurationName());
+            configurationNameTextField.setText(applicationProperties.configurationName());
+        }
     }
 
     private void setProperties(ResourceBundle resources) {
@@ -205,7 +207,6 @@ public class MainController extends AbstractController {
         } else {
             projectPathButton.setText(resources.getString("button.change"));
         }
-        projectPathButton.setDisable(uploadTypeComboBox.getValue() == UploadType.STATEMENT);
 
         if (StringUtils.nullOrEmpty(applicationProperties.itemPath())) {
             itemPathButton.setText(resources.getString("button.add"));
@@ -238,7 +239,7 @@ public class MainController extends AbstractController {
         executeAllButton.setDisable(map.isEmpty());
         jobButton.setDisable(map.isEmpty());
         configurationNameComboBox.setDisable(map.isEmpty());
-        projectPathButton.setDisable(map.isEmpty());
+        projectPathButton.setDisable(map.isEmpty() || uploadTypeComboBox.getValue() == UploadType.STATEMENT);
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -357,7 +358,7 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
-        return event -> uiLauncher.execute(() -> Platform.runLater(() -> {
+        return event -> {
             if (uploadTypeComboBox.getValue() == UploadType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setInitialDirectory(new File("."));
@@ -377,7 +378,7 @@ public class MainController extends AbstractController {
                     itemPathButton.setText(resources.getString("button.change"));
                 }
             }
-        }));
+        };
     }
 
     private EventHandler<ActionEvent> executeActionEventHandler() {
@@ -387,7 +388,7 @@ public class MainController extends AbstractController {
 
             FXRunner runner = new FXRunner(uiAppProperties);
             resetIndicatorProperties(runner);
-            uiLauncher.execute(() -> {
+            uiLauncher.executeOutsideUIThread(() -> {
                 runner.call();
                 if (uiAppProperties.isActiveTray()) {
                     uiLauncher.updateTray(uiAppProperties);
@@ -453,7 +454,9 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
-            projectPathButton.setDisable(uploadTypeComboBox.getValue() == UploadType.STATEMENT);
+            boolean disableProjectButton = uploadTypeComboBox.getValue() == UploadType.STATEMENT;
+            disableProjectButton |= propertiesHelper.loadAllApplicationProperties().isEmpty() && configurationNameTextField.getText().isEmpty();
+            projectPathButton.setDisable(disableProjectButton);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
                 endDatePicker.setValue(LocalDate.now());
             }

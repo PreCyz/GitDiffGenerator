@@ -140,7 +140,7 @@ public class ToolkitProjectsController extends AbstractController {
         if (applicationProperties.isToolkitCredentialsSet()) {
             final ToolkitService toolkitService = new ToolkitService(applicationProperties);
             resetIndicatorProperties(toolkitService);
-            uiLauncher.execute(() -> {
+            uiLauncher.executeOutsideUIThread(() -> {
                 Set<String> links = toolkitService.downloadUserProjects();
                 if (!links.isEmpty()) {
                     List<ProjectDetails> projects = links.stream()
