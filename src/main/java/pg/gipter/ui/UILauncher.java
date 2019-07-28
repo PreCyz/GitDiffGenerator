@@ -60,7 +60,7 @@ public class UILauncher implements Launcher {
         this.applicationProperties = applicationProperties;
         propertiesHelper = new PropertiesHelper();
         silentMode = applicationProperties.isSilentMode();
-        this.executor = Executors.newFixedThreadPool(3);
+        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         uiExecutor = Platform::runLater;
     }
 

@@ -25,6 +25,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         logger.info("Version of application '{}'.", applicationProperties.version());
+        logger.info("Gipter will use '{}' threads.", Runtime.getRuntime().availableProcessors());
         new PropertiesHelper().convertPropertiesToNewFormat();
         Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
         launcher.execute();
