@@ -313,21 +313,13 @@ public class JobController extends AbstractController {
                 .addListener((options, oldValue, newValue) -> {
                     if (ALL_CONFIGS.equals(newValue)) {
                         configsLabel.setText(String.join(",", propertiesMap.keySet()));
+                    } else if (oldValue.equals(ALL_CONFIGS)) {
+                        configsLabel.setText(newValue);
                     } else {
                         Set<String> currentSelection = Stream.of(configsLabel.getText().split(","))
                                 .filter(v -> !v.isEmpty())
                                 .collect(toSet());
-                        if (currentSelection.isEmpty()) {
-                            currentSelection.add(NOT_AVAILABLE);
-                        } else if (currentSelection.contains(newValue)) {
-                            currentSelection.remove(newValue);
-                            if (currentSelection.isEmpty()) {
-                                currentSelection.add(NOT_AVAILABLE);
-                            }
-                        } else {
-                            currentSelection.remove(NOT_AVAILABLE);
-                            currentSelection.add(newValue);
-                        }
+                        currentSelection.add(newValue);
                         configsLabel.setText(String.join(",", currentSelection));
                     }
                 });
