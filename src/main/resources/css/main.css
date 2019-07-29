@@ -1,5 +1,12 @@
-#picture-pane {
-    -fx-background-image: url('../img/ass-protector.png');
+#minions-group {
+    -fx-background-image: url('../img/minions-group.png');
+    -fx-background-size: 100%;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 100%;
+}
+
+#minion {
+    -fx-background-image: url('../img/minion.png');
     -fx-background-size: 100%;
     -fx-background-repeat: no-repeat;
     -fx-background-position: 100%;
