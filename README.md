@@ -38,6 +38,7 @@ If parameter _itemFileNamePrefix_ is set then its value is added at the front of
 You can pass some parameters commandline way and other _application.properties_ way. For instance if you do not want to set your password in _application.properties_, you can pass it as commandline param.<br/>
 When application is executed with `uploadType = TOOLKIT_DOCS', then item file is a _zip_ file. It is because there could be more then one document created or changed by the user. 
 ### Params description
+**configurationName** - Each defined configuration has its own unique name. This parameter is the unique name of the configuration.<br/>
 **author** - comma separated users who committed the code.<br />
 **committerEmail** - email of the user who committed the code. For git user email from git config stored under key '_user.email_'.<br />
 **uploadType** - possible values are `SIMPLE`, `PROTECTED` and `STATEMENT`. Default value is `SIMPLE`. Further explanation [here](https://github.com/PreCyz/GitDiffGenerator#explanation-of-codeprotection-parameter).<br />
@@ -64,7 +65,6 @@ Below parameters are mandatory for toolkit:<br/>
 **toolkitPassword** - user password used to log in into SharePoint.<br /><br />
 **toolkitProjectListNames** - comma separated names of the folders to scan on toolkit, when looking for changes in documents made by user. Default value is `Deliverables`.<br/>
 **deleteDownloadedFiles** - if `Y` then all downloaded files from toolkit will be downloaded afterwards. This parameter works together with upload type `TOOLKIT_DOCS`<br/>
-**uploadAsHtml** - if `Y` then item will be produced as html file with links to actual documents. This option is recommended when fat in size documents has bean changed. This parameter works together with upload type `TOOLKIT_DOCS` and default value is `N`.<br/>
 
 _Note:_ When `periodInDays` is used together with `startDate` then **startDate** has higher priority.
 ### Explanation of *uploadType* parameter
@@ -112,7 +112,7 @@ Yoda | now - 2 days | 7.0
 The item will contains following documents:
 _Deliverable-doc-2.0, Deliverable-doc-4.0, Deliverable-doc-6.0, Deliverable-doc-7.0_ - all document before change and Yoda's last change.<br/>
 _DocumentLibrary-doc-6.0, DocumentLibrary-doc-7.0_ - document before Yoda's change and the last change made by Yoda.
-All these files will be zipped into one file and uploaded as one item unless option `uploadAsHtml` is set as `Y`. If this is the case then the HTML file will be generated. This file will contain links to documents changed by Yoda.
+All these files will be zipped into one file and uploaded as one item.
 #####
 **Case 1**<br />
 It may be that owner of the code forbids to share the code in anyway but you are allowed to put headers of the changes in the diff.
