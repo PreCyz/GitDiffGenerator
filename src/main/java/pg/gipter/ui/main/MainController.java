@@ -29,7 +29,6 @@ import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXMultiRunner;
-import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
@@ -45,7 +44,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
@@ -388,7 +389,7 @@ public class MainController extends AbstractController {
             String[] args = createArgsFromUI();
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
 
-            FXRunner runner = new FXRunner(uiAppProperties);
+            FXMultiRunner runner = new FXMultiRunner(Stream.of(uiAppProperties.configurationName()).collect(toList()), uiLauncher.nonUIExecutor());
             resetIndicatorProperties(runner);
             uiLauncher.executeOutsideUIThread(() -> {
                 runner.call();
