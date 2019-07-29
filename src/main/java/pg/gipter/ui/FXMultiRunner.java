@@ -202,7 +202,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()))
                 .withImage();
-        String detailedMessage = "";
+        String detailedMessage;
         switch (status) {
             case N_A:
             case FAIL:
