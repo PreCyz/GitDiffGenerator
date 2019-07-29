@@ -6,9 +6,6 @@ import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.settings.ArgName;
-import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.job.JobController;
 import pg.gipter.ui.job.JobCreator;
 import pg.gipter.ui.job.JobProperty;
@@ -21,9 +18,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 
 class TrayHandler {
 
@@ -34,10 +31,12 @@ class TrayHandler {
     private static TrayIcon trayIcon;
     private static PopupMenu trayPopupMenu;
     private PropertiesHelper propertiesHelper;
+    private Executor executor;
 
-    TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
+    TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties, Executor executor) {
         this.uiLauncher = uiLauncher;
         this.applicationProperties = applicationProperties;
+        this.executor = executor;
         this.propertiesHelper = new PropertiesHelper();
     }
 
@@ -72,75 +71,75 @@ class TrayHandler {
     }
 
     private void addMenuItemsToMenu(PopupMenu popupMenu) {
-        propertiesHelper = new PropertiesHelper();
-        Optional<Properties> data = propertiesHelper.loadDataProperties();
-        if (data.isPresent()) {
+        executor.execute(() -> {
+            propertiesHelper = new PropertiesHelper();
+            Optional<Properties> data = propertiesHelper.loadDataProperties();
+            if (data.isPresent()) {
 
-            boolean addSeparator = false;
+                boolean addSeparator = false;
 
-            if (data.get().containsKey(PropertiesHelper.UPLOAD_DATE_TIME_KEY) && data.get().containsKey(PropertiesHelper.UPLOAD_STATUS_KEY)) {
-                String uploadInfo = String.format("%s [%s]",
-                        data.get().getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
-                        data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
-                );
-                popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
-                addSeparator = true;
+                if (data.get().containsKey(PropertiesHelper.UPLOAD_DATE_TIME_KEY) && data.get().containsKey(PropertiesHelper.UPLOAD_STATUS_KEY)) {
+                    String uploadInfo = String.format("%s [%s]",
+                            data.get().getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
+                            data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
+                    );
+                    popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+                    addSeparator = true;
+                }
+                if (data.get().containsKey(JobProperty.NEXT_FIRE_DATE.value()) &&
+                        !StringUtils.nullOrEmpty(data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value(), ""))) {
+                    popupMenu.add(BundleUtils.getMsg(
+                            "tray.item.nextUpdate",
+                            data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value())
+                    ));
+                    addSeparator = true;
+                }
+
+                if (data.get().containsKey(JobProperty.TYPE.value())) {
+                    Menu jobMenu = new Menu(
+                            String.format("%s %s", UploadItemJob.NAME, data.get().getProperty(JobProperty.TYPE.value()))
+                    );
+                    JobController.buildLabel(data.get(), JobProperty.DAY_OF_WEEK).ifPresent(jobMenu::add);
+                    JobController.buildLabel(data.get(), JobProperty.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);
+                    JobController.buildLabel(data.get(), JobProperty.DAY_OF_MONTH).ifPresent(jobMenu::add);
+                    JobController.buildLabel(data.get(), JobProperty.SCHEDULE_START).ifPresent(jobMenu::add);
+                    JobController.buildLabel(data.get(), JobProperty.CRON).ifPresent(jobMenu::add);
+                    JobController.buildLabel(data.get(), JobProperty.CONFIGS).ifPresent(jobMenu::add);
+                    jobMenu.addSeparator();
+
+                    MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));
+                    cancelJobItem.addActionListener(cancelJobActionListener());
+                    jobMenu.add(cancelJobItem);
+
+                    popupMenu.add(jobMenu);
+                    addSeparator = true;
+                }
+                if (addSeparator) {
+                    popupMenu.addSeparator();
+                }
             }
-            if (data.get().containsKey(JobProperty.NEXT_FIRE_DATE.value()) &&
-                    !StringUtils.nullOrEmpty(data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value(), ""))) {
-                popupMenu.add(BundleUtils.getMsg(
-                        "tray.item.nextUpdate",
-                        data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value())
-                ));
-                addSeparator = true;
-            }
 
-            if (data.get().containsKey(JobProperty.TYPE.value())) {
-                Menu jobMenu = new Menu(
-                        String.format("%s %s", UploadItemJob.NAME, data.get().getProperty(JobProperty.TYPE.value()))
-                );
-                JobController.buildLabel(data.get(), JobProperty.DAY_OF_WEEK).ifPresent(jobMenu::add);
-                JobController.buildLabel(data.get(), JobProperty.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);
-                JobController.buildLabel(data.get(), JobProperty.DAY_OF_MONTH).ifPresent(jobMenu::add);
-                JobController.buildLabel(data.get(), JobProperty.SCHEDULE_START).ifPresent(jobMenu::add);
-                JobController.buildLabel(data.get(), JobProperty.CRON).ifPresent(jobMenu::add);
-                JobController.buildLabel(data.get(), JobProperty.CONFIGS).ifPresent(jobMenu::add);
-                jobMenu.addSeparator();
+            MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
+            showItem.addActionListener(showActionListener());
+            popupMenu.add(showItem);
 
-                MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));
-                cancelJobItem.addActionListener(cancelJobActionListener());
-                jobMenu.add(cancelJobItem);
+            MenuItem uploadItem = new MenuItem(BundleUtils.getMsg("tray.item.upload"));
+            uploadItem.addActionListener(uploadActionListener());
+            popupMenu.add(uploadItem);
 
-                popupMenu.add(jobMenu);
-                addSeparator = true;
-            }
-            if (addSeparator) {
-                popupMenu.addSeparator();
-            }
-        }
+            MenuItem createJobItem = new MenuItem(BundleUtils.getMsg("tray.item.createJob"));
+            createJobItem.addActionListener(createJobActionListener());
+            popupMenu.add(createJobItem);
 
-        MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
-        showItem.addActionListener(showActionListener());
-        popupMenu.add(showItem);
+            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(JobCreator.isUpgradeJobExists() ? "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
+            upgradeItem.addActionListener(upgradeJobActionListener());
+            popupMenu.add(upgradeItem);
+            popupMenu.addSeparator();
 
-        MenuItem uploadItem = new MenuItem(
-                BundleUtils.getMsg("tray.item.upload", String.valueOf(applicationProperties.periodInDays()))
-        );
-        uploadItem.addActionListener(uploadActionListener());
-        popupMenu.add(uploadItem);
-
-        MenuItem createJobItem = new MenuItem(BundleUtils.getMsg("tray.item.createJob"));
-        createJobItem.addActionListener(createJobActionListener());
-        popupMenu.add(createJobItem);
-
-        MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(JobCreator.isUpgradeJobExists() ? "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
-        upgradeItem.addActionListener(upgradeJobActionListener());
-        popupMenu.add(upgradeItem);
-        popupMenu.addSeparator();
-
-        MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
-        closeItem.addActionListener(closeActionListener());
-        popupMenu.add(closeItem);
+            MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
+            closeItem.addActionListener(closeActionListener());
+            popupMenu.add(closeItem);
+        });
     }
 
     private ActionListener upgradeJobActionListener() {
@@ -190,20 +189,7 @@ class TrayHandler {
     }
 
     private ActionListener uploadActionListener() {
-        return e -> Platform.runLater(() -> {
-            LocalDate startDate = LocalDate.now().minusDays(applicationProperties.periodInDays());
-            LocalDate endDate = LocalDate.now();
-
-            String[] args = {
-                    String.format("%s=%s", ArgName.startDate, startDate.format(ApplicationProperties.yyyy_MM_dd)),
-                    String.format("%s=%s", ArgName.endDate, endDate.format(ApplicationProperties.yyyy_MM_dd)),
-                    String.format("%s=%s", ArgName.preferredArgSource, PreferredArgSource.UI),
-            };
-
-            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
-            setApplicationProperties(uiAppProperties);
-            new FXRunner(uiAppProperties).start();
-        });
+        return e -> executor.execute(() -> new FXMultiRunner(propertiesHelper.loadAllApplicationProperties().keySet(), executor).start());
     }
 
     private ActionListener cancelJobActionListener() {

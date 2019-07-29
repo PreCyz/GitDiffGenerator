@@ -40,8 +40,11 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         }
 
         String logMsg() {
-            String cause = throwable.getMessage();
-            cause = cause.substring(cause.lastIndexOf(":") + 1);
+            String cause = "N/A";
+            if (throwable != null) {
+                cause = throwable.getMessage();
+                cause = cause.substring(cause.lastIndexOf(":") + 1);
+            }
             return String.format("configName: %s, success: %b, cause: %s", configName, success, cause);
         }
     }

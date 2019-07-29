@@ -545,6 +545,8 @@ public class MainController extends AbstractController {
                 if (result) {
                     Properties currentProperties = propertiesHelper.createProperties(args);
                     currentProperties.put(ArgName.configurationName.name(), configurationName);
+                    currentProperties.remove(ArgName.startDate.name());
+                    currentProperties.remove(ArgName.endDate.name());
                     propertiesHelper.saveRunConfig(currentProperties);
                     updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationName);
                     setDisableDependOnConfigurations();

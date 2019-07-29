@@ -83,7 +83,7 @@ public class UILauncher implements Launcher {
     }
 
     public void initTrayHandler() {
-        trayHandler = new TrayHandler(this, applicationProperties);
+        trayHandler = new TrayHandler(this, applicationProperties, executor);
         if (trayHandler.tryIconExists()) {
             logger.info("Updating tray icon. Silent mode [{}].", silentMode);
             trayHandler.updateTrayLabels();

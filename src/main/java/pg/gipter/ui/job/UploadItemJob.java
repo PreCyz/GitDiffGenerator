@@ -7,7 +7,7 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
-import pg.gipter.ui.FXRunner;
+import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.PropertiesHelper;
 
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.util.*;
 
 public class UploadItemJob implements Job {
 
@@ -30,11 +30,30 @@ public class UploadItemJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
+        LocalDateTime nextUploadDate = calculateAndSetDates(jobDataMap);
+
+        logger.info("{} initialized and triggered at {}.",
+                NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
+        );
+
+        String configNames = jobDataMap.getString(JobProperty.CONFIGS.value());
+        LinkedList<String> configurationNames = new LinkedList<>(Arrays.asList(configNames.split(",")));
+        UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
+
+        new FXMultiRunner(configurationNames, uiLauncher.nonUIExecutor()).start();
+
+        logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        PropertiesHelper propertiesHelper = new PropertiesHelper();
+        propertiesHelper.saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
+
+        uiLauncher.updateTray(ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(configurationNames.getFirst())));
+    }
+
+    private LocalDateTime calculateAndSetDates(JobDataMap jobDataMap) throws JobExecutionException {
+        JobType jobType = JobType.valueOf(jobDataMap.getString(JobProperty.TYPE.value()));
         LocalDate startDate = LocalDate.now();
         LocalDateTime nextUploadDate = LocalDateTime.now();
-
-        JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
-        JobType jobType = JobType.valueOf(jobDataMap.getString(JobProperty.TYPE.value()));
         switch (jobType) {
             case EVERY_WEEK:
                 startDate = startDate.minusDays(7);
@@ -65,20 +84,21 @@ public class UploadItemJob implements Job {
                 break;
         }
 
-        String[] args = {
-                String.format("%s=%s", ArgName.startDate, startDate.format(ApplicationProperties.yyyy_MM_dd)),
-                String.format("%s=%s", ArgName.endDate, LocalDate.now().format(ApplicationProperties.yyyy_MM_dd)),
-                String.format("%s=%s", ArgName.preferredArgSource, PreferredArgSource.UI),
-        };
+        setDatesOnConfigs(startDate);
 
-        ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(args);
-        logger.info("{} initialized and triggered at {}.",
-                NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
-        );
-        new FXRunner(uiAppProps).start();
-        logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        new PropertiesHelper().saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
-        UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
-        uiLauncher.updateTray(uiAppProps);
+        return nextUploadDate;
     }
+
+    private void setDatesOnConfigs(LocalDate startDate) {
+        PropertiesHelper propertiesHelper = new PropertiesHelper();
+        Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
+        for (Map.Entry<String, Properties> entry : propertiesMap.entrySet()) {
+            Properties runConfig = entry.getValue();
+            runConfig.setProperty(ArgName.startDate.name(), startDate.format(ApplicationProperties.yyyy_MM_dd));
+            runConfig.setProperty(ArgName.endDate.name(), LocalDate.now().format(ApplicationProperties.yyyy_MM_dd));
+            runConfig.setProperty(ArgName.preferredArgSource.name(), PreferredArgSource.UI.name());
+            propertiesHelper.saveRunConfig(runConfig);
+        }
+    }
+
 }
