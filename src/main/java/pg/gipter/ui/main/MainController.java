@@ -28,6 +28,7 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.ui.AbstractController;
+import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.FXRunner;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
@@ -266,6 +267,7 @@ public class MainController extends AbstractController {
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         uploadTypeComboBox.setOnAction(uploadTypeActionEventHandler());
         executeButton.setOnAction(executeActionEventHandler());
+        executeAllButton.setOnAction(executeAllActionEventHandler());
         jobButton.setOnAction(jobActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler());
@@ -392,6 +394,22 @@ public class MainController extends AbstractController {
                 runner.call();
                 if (uiAppProperties.isActiveTray()) {
                     uiLauncher.updateTray(uiAppProperties);
+                }
+            });
+        };
+    }
+
+    private EventHandler<ActionEvent> executeAllActionEventHandler() {
+        return event -> {
+            Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+            FXMultiRunner runner = new FXMultiRunner(map.keySet(), uiLauncher.nonUIExecutor());
+            resetIndicatorProperties(runner);
+            uiLauncher.executeOutsideUIThread(() -> {
+                runner.call();
+                String[] firstFromConfigs = propertiesHelper.loadArgumentArray(new LinkedList<>(map.keySet()).getFirst());
+                ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(firstFromConfigs);
+                if (instance.isActiveTray()) {
+                    uiLauncher.updateTray(instance);
                 }
             });
         };
@@ -569,6 +587,7 @@ public class MainController extends AbstractController {
                 setInitValues();
                 configurationNameTextField.setText(configurationNameComboBox.getValue());
                 setDisableDependOnConfigurations();
+                setToolkitCredentialsIfAvailable();
                 Platform.runLater(() -> new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)

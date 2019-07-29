@@ -3,7 +3,6 @@ package pg.gipter.ui;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.launcher.Starter;
@@ -21,23 +20,45 @@ import pg.gipter.utils.PropertiesHelper;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
-/**
- * Created by Pawel Gawedzki on 15-Jul-2019.
- */
+/** Created by Pawel Gawedzki on 15-Jul-2019. */
 public class FXMultiRunner extends Task<Void> implements Starter {
 
     private enum Status {SUCCESS, PARTIAL_SUCCESS, FAIL, N_A}
+
+    private static class UploadResult {
+        String configName;
+        Boolean success;
+        Throwable throwable;
+
+        UploadResult(String configName, Boolean success, Throwable throwable) {
+            this.configName = configName;
+            this.success = success;
+            this.throwable = throwable;
+        }
+
+        String logMsg() {
+            String cause = throwable.getMessage();
+            cause = cause.substring(cause.lastIndexOf(":") + 1);
+            return String.format("configName: %s, success: %b, cause: %s", configName, success, cause);
+        }
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(FXMultiRunner.class);
     private final LinkedList<String> configurationNames;
     private final Executor executor;
     private static Boolean toolkitCredentialsSet = null;
-    private Map<String, Boolean> resultMap = new LinkedHashMap<>();
+    private Map<String, UploadResult> resultMap = new LinkedHashMap<>();
+    private long totalProgress;
+    private AtomicLong workDone;
 
     public FXMultiRunner(Collection<String> configurationNames, Executor executor) {
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
+        this.totalProgress = configurationNames.size() * 5;
+        this.workDone = new AtomicLong(0);
     }
 
     @Override
@@ -47,17 +68,17 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     }
 
     public void start() {
+        Status status;
         logger.info("{} started.", this.getClass().getName());
         if (configurationNames.isEmpty()) {
             logger.info("There is no configuration to launch.");
-            Platform.runLater(() -> new AlertWindowBuilder()
+            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog"))
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage()
-                    .buildAndDisplayWindow()
-            );
+                    .withImage();
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {
                 List<CompletableFuture<Boolean>> tasks = new LinkedList<>();
@@ -65,12 +86,12 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                     if (isToolkitCredentialsSet()) {
                         CompletableFuture<Boolean> withUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
                                 .thenApply(this::produce).thenApply(this::upload)
-                                .handle((isUploaded, throwable) -> handleUploadResult(configName, isUploaded, throwable));
+                                .handle((isUploaded, throwable) -> handleUploadResult(configName, throwable == null, throwable));
                         tasks.add(withUpload);
                     } else {
                         CompletableFuture<Boolean> withoutUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
                                 .thenApply(this::produce)
-                                .handle((s, t) -> Boolean.FALSE);
+                                .handle((isUploaded, throwable) -> handleUploadResult(configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")));
 
                         tasks.add(withoutUpload);
                     }
@@ -78,54 +99,14 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 CompletableFuture.allOf(tasks.toArray(new CompletableFuture<?>[0])).get();
             } catch (Exception ex) {
                 logger.error("Diff upload failure.", ex);
-                Platform.runLater(() -> new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()))
-                        .withLink(AlertHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.ERROR)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
+                resultMap.put(ex.getClass().getName(), new UploadResult(ex.getClass().getName(), Boolean.FALSE, ex));
             } finally {
-                Status status = Status.N_A;
-                if (resultMap.entrySet().stream().allMatch(Map.Entry::getValue)) {
-                    status = Status.SUCCESS;
-                }
-                if (resultMap.entrySet().stream().anyMatch(entry -> !entry.getValue())) {
-                    status = Status.PARTIAL_SUCCESS;
-                }
-                if (resultMap.entrySet().stream().noneMatch(Map.Entry::getValue)) {
-                    status = Status.FAIL;
-                }
-                new PropertiesHelper().saveUploadStatus(status.name());
-                updateProgress(5, 5);
-                updateMessage(BundleUtils.getMsg("progress.finished", status.name()));
-                logger.info("{} ended.", this.getClass().getName());
-            }
-            if (!resultMap.entrySet().stream().allMatch(Map.Entry::getValue) && isConfirmationWindow()) {
-                Platform.runLater(() -> new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("popup.confirmation.message"))
-                        .withLink(toolkitUserFolder())
-                        .withWindowType(WindowType.BROWSER_WINDOW)
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
+                status = calculateFinalStatus();
+                saveUploadStatus(status);
+                displayAlertWindow(status);
             }
         }
     }
-
-    @NotNull
-    private Boolean handleUploadResult(String configName, Boolean isUploaded, Throwable throwable) {
-        if (!isUploaded) {
-            logger.error("Diff upload failure.", throwable);
-        } else {
-            logger.info("Diff upload for configuration {} ended.", configName);
-        }
-        resultMap.put(configName, isUploaded);
-        return isUploaded;
-    }
-
 
     private boolean isConfirmationWindow() {
         return ApplicationPropertiesFactory.getInstance(
@@ -153,38 +134,100 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     }
 
     private ApplicationProperties produce(ApplicationProperties applicationProperties) {
-        DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
-        updateProgress(1, 5);
-        updateMessage(BundleUtils.getMsg("progress.generatingDiff"));
-        diffProducer.produceDiff();
-        updateProgress(2, 5);
-        updateMessage(BundleUtils.getMsg("progress.diffGenerated"));
-        return applicationProperties;
-    }
-
-    private ApplicationProperties checkToolkitCredentials(ApplicationProperties applicationProperties) {
-        if (!applicationProperties.isToolkitCredentialsSet()) {
-            String errorMessage = "Toolkit details not set. Check your settings.";
-            logger.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+        try {
+            DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
+            updateProgress(workDone.incrementAndGet(), totalProgress);
+            updateMessage(BundleUtils.getMsg("progress.generatingDiff"));
+            diffProducer.produceDiff();
+            updateProgress(workDone.incrementAndGet(), totalProgress);
+            updateMessage(BundleUtils.getMsg("progress.diffGenerated"));
+            return applicationProperties;
+        } catch (Exception ex) {
+            logger.info("Diff not generated.", ex);
+            throw ex;
         }
-        return applicationProperties;
     }
 
     private boolean upload(ApplicationProperties applicationProperties) {
-        boolean done = true;
         try {
             DiffUploader diffUploader = new DiffUploader(applicationProperties);
-            updateProgress(3, 5);
+            updateProgress(workDone.incrementAndGet(), totalProgress);
             updateMessage(BundleUtils.getMsg("progress.uploadingToToolkit"));
             diffUploader.uploadDiff();
-            updateProgress(4, 5);
+            updateProgress(workDone.incrementAndGet(), totalProgress);
             updateMessage(BundleUtils.getMsg("progress.itemUploaded"));
             logger.info("Diff upload complete.");
+            return true;
         } catch (Exception ex) {
             logger.error("Diff upload failure.", ex);
-            done = false;
+            throw ex;
         }
-        return done;
+    }
+
+    private Boolean handleUploadResult(String configName, Boolean isUploaded, Throwable throwable) {
+        if (isUploaded == null || !isUploaded) {
+            logger.error("Diff upload for configuration name {} failed.", configName, throwable);
+        } else {
+            logger.info("Diff upload for configuration name {} uploaded.", configName);
+        }
+        resultMap.put(configName, new UploadResult(configName, isUploaded, throwable));
+        return isUploaded;
+    }
+
+    private Status calculateFinalStatus() {
+        Status status = Status.N_A;
+        if (resultMap.entrySet().stream().allMatch(entry -> entry.getValue().success)) {
+            status = Status.SUCCESS;
+        }
+        if (resultMap.entrySet().stream().anyMatch(entry -> !entry.getValue().success)) {
+            status = Status.PARTIAL_SUCCESS;
+        }
+        if (resultMap.entrySet().stream().noneMatch(entry -> entry.getValue().success)) {
+            status = Status.FAIL;
+        }
+        return status;
+    }
+
+    private void saveUploadStatus(Status status) {
+        new PropertiesHelper().saveUploadStatus(status.name());
+        updateProgress(totalProgress, totalProgress);
+        updateMessage(BundleUtils.getMsg("progress.finished", status.name()));
+        logger.info("{} ended.", this.getClass().getName());
+    }
+
+    private void displayAlertWindow(Status status) {
+        if (!isConfirmationWindow()) {
+            return;
+        }
+        AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()))
+                .withImage();
+        String detailedMessage = "";
+        switch (status) {
+            case N_A:
+            case FAIL:
+                detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
+                alertWindowBuilder
+                        .withMessage(detailedMessage)
+                        .withLink(AlertHelper.logsFolder())
+                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withAlertType(Alert.AlertType.ERROR);
+                break;
+            case PARTIAL_SUCCESS:
+                detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
+                alertWindowBuilder
+                        .withMessage(detailedMessage)
+                        .withLink(AlertHelper.logsFolder())
+                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withAlertType(Alert.AlertType.WARNING);
+                break;
+            default:
+                alertWindowBuilder
+                        .withLink(toolkitUserFolder())
+                        .withWindowType(WindowType.BROWSER_WINDOW)
+                        .withAlertType(Alert.AlertType.INFORMATION);
+
+        }
+        Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
     }
 }
