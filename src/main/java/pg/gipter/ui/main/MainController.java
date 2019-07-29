@@ -589,6 +589,12 @@ public class MainController extends AbstractController {
         };
     }
 
+    private void setToolkitCredentialsIfAvailable() {
+        Properties properties = propertiesHelper.loadToolkitCredentials();
+        toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
+        toolkitPasswordField.setText(properties.getProperty(ArgName.toolkitPassword.name()));
+    }
+
     private void updateConfigurationNameComboBox(String oldValue, String newValue) {
         List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
         items.remove(oldValue);

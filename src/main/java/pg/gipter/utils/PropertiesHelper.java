@@ -300,4 +300,24 @@ public class PropertiesHelper {
         jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));
         writeJsonConfig(jsonObject);
     }
+
+    public Properties loadToolkitCredentials() {
+        JsonObject jsonObject = readJsonConfig();
+        Properties result = new Properties();
+        if (jsonObject == null) {
+            result.setProperty(ArgName.toolkitUsername.name(), ArgName.toolkitUsername.defaultValue());
+            result.setProperty(ArgName.toolkitPassword.name(), ArgName.toolkitPassword.defaultValue());
+        } else {
+            JsonObject toolkitConfig = jsonObject.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG);
+            if (toolkitConfig == null) {
+                result.setProperty(ArgName.toolkitUsername.name(), ArgName.toolkitUsername.defaultValue());
+                result.setProperty(ArgName.toolkitPassword.name(), ArgName.toolkitPassword.defaultValue());
+            } else {
+                result.setProperty(ArgName.toolkitUsername.name(), toolkitConfig.get(ArgName.toolkitUsername.name()).getAsString());
+                result.setProperty(ArgName.toolkitPassword.name(), toolkitConfig.get(ArgName.toolkitPassword.name()).getAsString());
+                decryptPassword(result);
+            }
+        }
+        return result;
+    }
 }

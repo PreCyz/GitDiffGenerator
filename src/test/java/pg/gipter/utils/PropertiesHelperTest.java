@@ -224,4 +224,40 @@ class PropertiesHelperTest {
 
         assertThat(map).isEmpty();
     }
+
+    @Test
+    void givenNoConfig_whenLoadToolkitCredentials_thenReturnDefaults() {
+        Properties actual = propertiesHelper.loadToolkitCredentials();
+
+        assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(ArgName.toolkitUsername.defaultValue());
+        assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(ArgName.toolkitPassword.defaultValue());
+    }
+
+    @Test
+    void givenConfigWithoutToolkitConfig_whenLoadToolkitCredentials_thenReturnDefaults() {
+        Properties properties = TestDataFactory.generateProperty();
+        JsonObject jsonObject = new ConfigHelper().buildFullJson(properties);
+        jsonObject.remove(ConfigHelper.TOOLKIT_CONFIG);
+        propertiesHelper.writeJsonConfig(jsonObject);
+
+        Properties actual = propertiesHelper.loadToolkitCredentials();
+
+        assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(ArgName.toolkitUsername.defaultValue());
+        assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(ArgName.toolkitPassword.defaultValue());
+    }
+
+    @Test
+    void givenConfigWithToolkitConfig_whenLoadToolkitCredentials_thenReturnCredentialsFromConfig() {
+        String username = "username";
+        String password = "password";
+        Properties properties = TestDataFactory.generateProperty();
+        properties.setProperty(ArgName.toolkitUsername.name(), username);
+        properties.setProperty(ArgName.toolkitPassword.name(), password);
+        propertiesHelper.saveToolkitSettings(properties);
+
+        Properties actual = propertiesHelper.loadToolkitCredentials();
+
+        assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(username);
+        assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(password);
+    }
 }
