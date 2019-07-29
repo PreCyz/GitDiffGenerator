@@ -243,9 +243,22 @@ public class PropertiesHelper {
     }
 
     public void convertPropertiesToNewFormat() {
-        convertPropertiesToJson();
-        deletePropertyFile(APPLICATION_PROPERTIES);
-        deletePropertyFile(UI_APPLICATION_PROPERTIES);
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            convertPropertiesToJson();
+            deletePropertyFile(APPLICATION_PROPERTIES);
+            deletePropertyFile(UI_APPLICATION_PROPERTIES);
+            convertExistingJob();
+        }
+    }
+
+    private void convertExistingJob() {
+        Optional<Properties> properties = loadDataProperties();
+        if (properties.isPresent() && !properties.get().containsKey(JobProperty.CONFIGS.value())) {
+            Properties data = properties.get();
+            data.setProperty(JobProperty.CONFIGS.value(), String.join(",", loadAllApplicationProperties().keySet()));
+            saveDataProperties(data);
+        }
     }
 
     private void convertPropertiesToJson() {
