@@ -17,6 +17,7 @@ import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.job.*;
 import pg.gipter.utils.AlertHelper;
@@ -189,13 +190,12 @@ public class UILauncher implements Launcher {
         Platform.runLater(() -> {
             Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
             if (propertiesMap.containsKey(ArgName.configurationName.defaultValue())) {
-                Platform.runLater(() -> new AlertWindowBuilder()
+                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.window.canNotOpen"))
                         .withWindowType(WindowType.OVERRIDE_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
+                        .withImage(ImageFile.OVERRIDE);
+                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             } else {
                 jobWindow = new Stage();
                 jobWindow.initModality(Modality.WINDOW_MODAL);
@@ -237,14 +237,13 @@ public class UILauncher implements Launcher {
         } catch (SchedulerException e) {
             String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", JobCreator.schedulerClassName(), e.getMessage());
             logger.error(errorMessage);
-            Platform.runLater(() -> new AlertWindowBuilder()
+            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(errorMessage)
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage()
-                    .buildAndDisplayWindow()
-            );
+                    .withImage(ImageFile.ERROR_CHICKEN);
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } finally {
             Optional<Properties> data = propertiesHelper.loadDataProperties();
             if (data.isPresent()) {
@@ -305,13 +304,13 @@ public class UILauncher implements Launcher {
                         .scheduleUploadJob(additionalJobParams);
             } catch (ParseException | SchedulerException e) {
                 logger.warn("Can not restart the scheduler.", e);
-                Platform.runLater(() -> new AlertWindowBuilder()
+                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage()
-                        .buildAndDisplayWindow());
+                        .withImage(ImageFile.ERROR_CHICKEN);
+                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         }
     }

@@ -18,6 +18,7 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
@@ -295,14 +296,13 @@ public class JobController extends AbstractController {
             } catch (SchedulerException | ParseException se) {
                 logger.error("Error when creating a job.", se);
                 String errorMsg = BundleUtils.getMsg("popup.job.errorMsg", se.getMessage());
-                Platform.runLater(() -> new AlertWindowBuilder()
+                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(errorMsg)
                         .withLink(AlertHelper.logsFolder())
                         .withAlertType(Alert.AlertType.ERROR)
                         .withWindowType(WindowType.LOG_WINDOW)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
+                        .withImage(ImageFile.ERROR_CHICKEN);
+                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         };
     }

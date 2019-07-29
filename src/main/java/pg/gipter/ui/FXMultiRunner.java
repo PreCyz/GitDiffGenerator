@@ -12,6 +12,7 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
@@ -23,7 +24,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-/** Created by Pawel Gawedzki on 15-Jul-2019. */
+/**
+ * Created by Pawel Gawedzki on 15-Jul-2019.
+ */
 public class FXMultiRunner extends Task<Void> implements Starter {
 
     private enum Status {SUCCESS, PARTIAL_SUCCESS, FAIL, N_A}
@@ -80,7 +83,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage();
+                    .withImage(ImageFile.ERROR_CHICKEN);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {
@@ -203,8 +206,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             return;
         }
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()))
-                .withImage();
+                .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()));
         String detailedMessage;
         switch (status) {
             case N_A:
@@ -214,7 +216,8 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                         .withMessage(detailedMessage)
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.ERROR);
+                        .withAlertType(Alert.AlertType.ERROR)
+                        .withImage(ImageFile.ERROR_CHICKEN);
                 break;
             case PARTIAL_SUCCESS:
                 detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
@@ -222,13 +225,15 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                         .withMessage(detailedMessage)
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.WARNING);
+                        .withAlertType(Alert.AlertType.WARNING)
+                        .withImage(ImageFile.ALMOST_ALL);
                 break;
             default:
                 alertWindowBuilder
                         .withLink(toolkitUserFolder())
                         .withWindowType(WindowType.BROWSER_WINDOW)
-                        .withAlertType(Alert.AlertType.INFORMATION);
+                        .withAlertType(Alert.AlertType.INFORMATION)
+                        .withImage(ImageFile.GOOD_JOB);
 
         }
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);

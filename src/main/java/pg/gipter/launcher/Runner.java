@@ -9,6 +9,7 @@ import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
@@ -51,7 +52,7 @@ class Runner implements Starter {
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage()
+                    .withImage(ImageFile.ERROR_CHICKEN)
                     .buildAndDisplayWindow()
             );
         } finally {
@@ -64,7 +65,7 @@ class Runner implements Starter {
                     .withLink(applicationProperties.toolkitUserFolder())
                     .withWindowType(WindowType.BROWSER_WINDOW)
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImage()
+                    .withImage(ImageFile.GOOD_JOB)
                     .buildAndDisplayWindow()
             );
         }

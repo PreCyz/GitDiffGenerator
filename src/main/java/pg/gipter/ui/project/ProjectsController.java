@@ -22,6 +22,7 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
@@ -210,13 +211,12 @@ public class ProjectsController extends AbstractController {
             applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(configurationName));
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.hideProjectsWindow();
-            Platform.runLater(() -> new AlertWindowBuilder()
+            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                    .withImage()
-                    .buildAndDisplayWindow()
-            );
+                    .withImage(ImageFile.FINGER_UP);
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             uiLauncher.buildAndShowMainWindow();
         };
     }
@@ -244,14 +244,13 @@ public class ProjectsController extends AbstractController {
                     }
                     projectsTableView.refresh();
                 } catch (IllegalArgumentException ex) {
-                    Platform.runLater(() -> new AlertWindowBuilder()
+                    AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                             .withHeaderText(ex.getMessage())
                             .withLink(AlertHelper.logsFolder())
                             .withWindowType(WindowType.LOG_WINDOW)
                             .withAlertType(Alert.AlertType.ERROR)
-                            .withImage()
-                            .buildAndDisplayWindow()
-                    );
+                            .withImage(ImageFile.ERROR_CHICKEN);
+                    Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
                 }
             }
         };

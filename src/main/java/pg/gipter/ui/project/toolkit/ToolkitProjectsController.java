@@ -23,6 +23,7 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.project.ProjectDetails;
 import pg.gipter.utils.AlertHelper;
@@ -150,14 +151,14 @@ public class ToolkitProjectsController extends AbstractController {
                     projectsTableView.setItems(FXCollections.observableArrayList(projects));
                     saveButton.setDisable(false);
                 } else {
+                    AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                            .withHeaderText(BundleUtils.getMsg("toolkit.projects.canNotDownload"))
+                            .withLink(AlertHelper.logsFolder())
+                            .withAlertType(Alert.AlertType.WARNING)
+                            .withWindowType(WindowType.LOG_WINDOW)
+                            .withImage(ImageFile.ERROR_CHICKEN);
                     Platform.runLater(() -> {
-                        new AlertWindowBuilder()
-                                .withHeaderText(BundleUtils.getMsg("toolkit.projects.canNotDownload"))
-                                .withLink(AlertHelper.logsFolder())
-                                .withAlertType(Alert.AlertType.WARNING)
-                                .withWindowType(WindowType.LOG_WINDOW)
-                                .withImage()
-                                .buildAndDisplayWindow();
+                        alertWindowBuilder.buildAndDisplayWindow();
                         downloadProgressIndicator.setVisible(false);
                         downloadLabel.setVisible(false);
                     });
@@ -166,12 +167,12 @@ public class ToolkitProjectsController extends AbstractController {
 
         } else {
             downloadProgressIndicator.setVisible(false);
-            Platform.runLater(() -> new AlertWindowBuilder()
+            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("toolkit.projects.credentialsNotSet"))
                     .withAlertType(Alert.AlertType.WARNING)
                     .withWindowType(WindowType.OVERRIDE_WINDOW)
-                    .withImage()
-                    .buildAndDisplayWindow());
+                    .withImage(ImageFile.OVERRIDE);
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         }
     }
 
@@ -251,13 +252,12 @@ public class ToolkitProjectsController extends AbstractController {
             applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(configurationName));
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.hideToolkitProjectsWindow();
-            Platform.runLater(() -> new AlertWindowBuilder()
+            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                    .withImage()
-                    .buildAndDisplayWindow()
-            );
+                    .withImage(ImageFile.FINGER_UP);
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             uiLauncher.buildAndShowMainWindow();
         };
     }

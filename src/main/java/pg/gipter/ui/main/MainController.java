@@ -31,6 +31,7 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
@@ -301,6 +302,12 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> instructionActionEventHandler() {
         return event -> {
             String pdfFileName = "Gipter-ui-description.pdf";
+            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
+                    .withLink(applicationProperties.toolkitUserFolder())
+                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .withImage(ImageFile.ERROR_CHICKEN);
             try {
                 File pdfFile = Paths.get(pdfFileName).toFile();
                 if (pdfFile.exists()) {
@@ -308,26 +315,12 @@ public class MainController extends AbstractController {
                         Desktop.getDesktop().open(pdfFile);
                     } else {
                         logger.error("AWT Desktop is not supported by the platform.");
-                        Platform.runLater(() -> new AlertWindowBuilder()
-                                .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
-                                .withLink(applicationProperties.toolkitUserFolder())
-                                .withWindowType(WindowType.LOG_WINDOW)
-                                .withAlertType(Alert.AlertType.INFORMATION)
-                                .withImage()
-                                .buildAndDisplayWindow()
-                        );
+                        Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
                     }
                 }
             } catch (IOException e) {
                 logger.error("Could not find [{}] file with instructions.", pdfFileName, e);
-                Platform.runLater(() -> new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
-                        .withLink(applicationProperties.toolkitUserFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
+                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         };
     }
@@ -518,13 +511,12 @@ public class MainController extends AbstractController {
             }
             updateConfigurationNameComboBox(comboConfigName, configurationName);
             uiLauncher.updateTray(applicationProperties);
-            Platform.runLater(() -> new AlertWindowBuilder()
+            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                    .withImage()
-                    .buildAndDisplayWindow()
-            );
+                    .withImage(ImageFile.FINGER_UP);
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         };
     }
 
@@ -539,7 +531,7 @@ public class MainController extends AbstractController {
                         .withHeaderText(BundleUtils.getMsg("popup.overrideProperties.message", configurationName))
                         .withAlertType(Alert.AlertType.CONFIRMATION)
                         .withWindowType(WindowType.OVERRIDE_WINDOW)
-                        .withImage()
+                        .withImage(ImageFile.OVERRIDE)
                         .withOkButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonOk"))
                         .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
                         .buildAndDisplayOverrideWindow();
@@ -562,13 +554,12 @@ public class MainController extends AbstractController {
                 operationDone = true;
             }
             if (operationDone) {
-                Platform.runLater(() -> new AlertWindowBuilder()
+                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
+                        .withImage(ImageFile.FINGER_UP);
+                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
 
         };
@@ -591,22 +582,20 @@ public class MainController extends AbstractController {
                 configurationNameTextField.setText(configurationNameComboBox.getValue());
                 setDisableDependOnConfigurations();
                 setToolkitCredentialsIfAvailable();
-                Platform.runLater(() -> new AlertWindowBuilder()
+                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
+                        .withImage(ImageFile.FINGER_UP);
+                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             } catch (IllegalStateException ex) {
-                Platform.runLater(() -> new AlertWindowBuilder()
+                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(ex.getMessage())
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage()
-                        .buildAndDisplayWindow()
-                );
+                        .withImage(ImageFile.ERROR_CHICKEN);
+                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         };
     }

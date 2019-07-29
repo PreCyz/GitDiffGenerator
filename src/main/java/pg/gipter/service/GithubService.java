@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.BundleUtils;
 
@@ -120,7 +121,7 @@ public class GithubService {
                     .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
                     .withWindowType(WindowType.CONFIRMATION_WINDOW)
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImage()
+                    .withImage(ImageFile.FINGER_UP)
                     .buildAndDisplayWindow()
             );
         }

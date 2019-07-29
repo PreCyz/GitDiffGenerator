@@ -27,7 +27,7 @@ public class AlertWindowBuilder {
     private String link;
     private WindowType windowType;
     private Alert.AlertType alertType;
-    private boolean useImage;
+    private ImageFile imageFile;
     private String cancelButtonText;
     private String okButtonText;
 
@@ -63,8 +63,8 @@ public class AlertWindowBuilder {
         return this;
     }
 
-    public AlertWindowBuilder withImage() {
-        this.useImage = true;
+    public AlertWindowBuilder withImage(ImageFile imageFile) {
+        this.imageFile = imageFile;
         return this;
     }
 
@@ -126,18 +126,8 @@ public class AlertWindowBuilder {
         flowPane.setHgap(100);
 
         ImageView imageView = null;
-        if (useImage) {
-            String imgName = "";
-            if (windowType == WindowType.LOG_WINDOW) {
-                imgName = "error-chicken.png";
-            } else if (windowType == WindowType.BROWSER_WINDOW) {
-                imgName = "good-job.png";
-            } else if (windowType == WindowType.OVERRIDE_WINDOW) {
-                imgName = "override.png";
-            } else if (windowType == WindowType.CONFIRMATION_WINDOW) {
-                imgName = "finger-up.png";
-            }
-            imageView = ResourceUtils.getImgResource(imgName)
+        if (imageFile != null) {
+            imageView = ResourceUtils.getImgResource(imageFile.fileName())
                     .map(url -> new ImageView(new Image(url.toString())))
                     .orElseGet(ImageView::new);
             flowPane.setPrefWrapLength(imageView.getImage().getWidth());
