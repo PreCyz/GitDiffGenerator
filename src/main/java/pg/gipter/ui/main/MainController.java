@@ -35,6 +35,7 @@ import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.JobHelper;
 import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
@@ -494,22 +495,14 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> saveConfigurationActionEventHandler() {
         return event -> {
-            String[] args = createArgsFromUI();
-            Properties properties = propertiesHelper.createProperties(args);
-            properties.remove(ArgName.startDate.name());
-            properties.remove(ArgName.endDate.name());
-            propertiesHelper.saveToolkitSettings(properties);
-            if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
-                propertiesHelper.saveRunConfig(properties);
-                setDisableDependOnConfigurations();
-            }
-            applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             String configurationName = configurationNameTextField.getText();
             String comboConfigName = configurationNameComboBox.getValue();
-            if (!StringUtils.nullOrEmpty(comboConfigName) && !configurationName.equals(comboConfigName)) {
-                propertiesHelper.removeConfig(comboConfigName);
-            }
+
+            uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
+
             updateConfigurationNameComboBox(comboConfigName, configurationName);
+            String[] args = createArgsFromUI();
+            applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             uiLauncher.updateTray(applicationProperties);
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
@@ -520,9 +513,24 @@ public class MainController extends AbstractController {
         };
     }
 
+    private void updateRunConfig(String oldConfigName, String newConfigName) {
+        String[] args = createArgsFromUI();
+        Properties properties = propertiesHelper.createProperties(args);
+        properties.remove(ArgName.startDate.name());
+        properties.remove(ArgName.endDate.name());
+        propertiesHelper.saveToolkitSettings(properties);
+        if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
+            propertiesHelper.saveRunConfig(properties);
+            new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
+            setDisableDependOnConfigurations();
+        }
+        if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
+            propertiesHelper.removeConfig(oldConfigName);
+        }
+    }
+
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
         return event -> {
-            String[] args = createArgsFromUI();
             String configurationName = configurationNameTextField.getText();
             Optional<Properties> properties = propertiesHelper.loadApplicationProperties(configurationName);
             boolean operationDone = false;
@@ -536,11 +544,7 @@ public class MainController extends AbstractController {
                         .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
                         .buildAndDisplayOverrideWindow();
                 if (result) {
-                    Properties currentProperties = propertiesHelper.createProperties(args);
-                    currentProperties.put(ArgName.configurationName.name(), configurationName);
-                    currentProperties.remove(ArgName.startDate.name());
-                    currentProperties.remove(ArgName.endDate.name());
-                    propertiesHelper.saveRunConfig(currentProperties);
+                    uiLauncher.executeOutsideUIThread(() -> saveNewConfig(configurationName));
                     updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationName);
                     setDisableDependOnConfigurations();
                     operationDone = true;
@@ -548,7 +552,7 @@ public class MainController extends AbstractController {
                     configurationNameTextField.setText(configurationNameComboBox.getValue());
                 }
             } else {
-                propertiesHelper.saveRunConfig(propertiesHelper.createProperties(args));
+                uiLauncher.executeOutsideUIThread(() -> propertiesHelper.saveRunConfig(propertiesHelper.createProperties(createArgsFromUI())));
                 updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), configurationName);
                 setDisableDependOnConfigurations();
                 operationDone = true;
@@ -559,10 +563,18 @@ public class MainController extends AbstractController {
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .withWindowType(WindowType.CONFIRMATION_WINDOW)
                         .withImage(ImageFile.FINGER_UP);
-                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
+                alertWindowBuilder.buildAndDisplayWindow();
             }
 
         };
+    }
+
+    private void saveNewConfig(String configurationName) {
+        Properties currentProperties = propertiesHelper.createProperties(createArgsFromUI());
+        currentProperties.put(ArgName.configurationName.name(), configurationName);
+        currentProperties.remove(ArgName.startDate.name());
+        currentProperties.remove(ArgName.endDate.name());
+        propertiesHelper.saveRunConfig(currentProperties);
     }
 
     private EventHandler<ActionEvent> removeConfigurationEventHandler() {
