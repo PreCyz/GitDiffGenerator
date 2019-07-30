@@ -30,7 +30,7 @@ final class GitDiffCommand extends AbstractDiffCommand {
     List<String> getInitialCommand() {
         List<String> initialCommand = new LinkedList<>(Arrays.asList("git", "log"));
         if (!appProps.isSkipRemote()) {
-            initialCommand.add("--remotes=origin");
+            initialCommand.add("--remotes=origin*");
         }
         switch (appProps.uploadType()) {
             case SIMPLE:
@@ -41,6 +41,7 @@ final class GitDiffCommand extends AbstractDiffCommand {
                 break;
 
         }
+        initialCommand.add("--branches=*");
         return initialCommand;
     }
 
