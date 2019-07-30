@@ -252,12 +252,6 @@ public class ToolkitProjectsController extends AbstractController {
             applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(configurationName));
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.hideToolkitProjectsWindow();
-            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("main.config.changed"))
-                    .withAlertType(Alert.AlertType.INFORMATION)
-                    .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                    .withImage(ImageFile.FINGER_UP);
-            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             uiLauncher.buildAndShowMainWindow();
         };
     }

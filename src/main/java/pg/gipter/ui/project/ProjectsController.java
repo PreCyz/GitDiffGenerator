@@ -25,7 +25,6 @@ import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -211,12 +210,6 @@ public class ProjectsController extends AbstractController {
             applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(configurationName));
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.hideProjectsWindow();
-            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("main.config.changed"))
-                    .withAlertType(Alert.AlertType.INFORMATION)
-                    .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                    .withImage(ImageFile.FINGER_UP);
-            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             uiLauncher.buildAndShowMainWindow();
         };
     }
