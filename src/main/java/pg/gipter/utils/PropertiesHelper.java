@@ -242,14 +242,16 @@ public class PropertiesHelper {
         }
     }
 
-    public void convertPropertiesToNewFormat() {
+    public boolean convertPropertiesToNewFormat() {
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             convertPropertiesToJson();
             deletePropertyFile(APPLICATION_PROPERTIES);
             deletePropertyFile(UI_APPLICATION_PROPERTIES);
             convertExistingJob();
+            return true;
         }
+        return false;
     }
 
     private void convertExistingJob() {
