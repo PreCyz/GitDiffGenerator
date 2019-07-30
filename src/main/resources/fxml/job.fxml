@@ -73,9 +73,9 @@
                         <Font name="System Bold" size="10.0" />
                      </font>
                   </Label>
-                  <Label fx:id="configsLabel" layoutX="130.0" layoutY="72.0" prefHeight="45.0" prefWidth="175.0">
+                  <Label fx:id="configsLabel" layoutX="130.0" layoutY="72.0" prefHeight="51.0" prefWidth="175.0" wrapText="true">
                      <font>
-                        <Font name="System Bold" size="10.0" />
+                        <Font name="System Bold" size="11.0" />
                      </font>
                   </Label>
                   <Label layoutX="53.0" layoutY="84.0" text="%job.clickWay.configs" />
