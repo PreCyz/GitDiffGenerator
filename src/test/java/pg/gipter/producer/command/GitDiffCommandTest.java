@@ -31,7 +31,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.getInitialCommand();
 
-        assertThat(actual).containsExactly("git", "log", "--remotes=origin", "--patch");
+        assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--patch", "--branches=*");
     }
 
     @Test
@@ -41,7 +41,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.getInitialCommand();
 
-        assertThat(actual).containsExactly("git", "log", "--remotes=origin", "--oneline");
+        assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--oneline", "--branches=*");
     }
 
     @Test
@@ -52,7 +52,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.getInitialCommand();
 
-        assertThat(actual).containsExactly("git", "log", "--oneline");
+        assertThat(actual).containsExactly("git", "log", "--oneline", "--branches=*");
     }
 
     @Test
@@ -72,7 +72,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.commandAsList();
 
-        assertThat(actual).containsExactly("git", "log", "--remotes=origin", "--patch",
+        assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--patch", "--branches=*",
                 "--author=" + author,
                 "--author=" + committerEmail,
                 "--since", startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
@@ -97,7 +97,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.commandAsList();
 
-        assertThat(actual).containsExactly("git", "log", "--patch",
+        assertThat(actual).containsExactly("git", "log", "--patch", "--branches=*",
                 "--author=" + author,
                 "--since", startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 "--until", endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
