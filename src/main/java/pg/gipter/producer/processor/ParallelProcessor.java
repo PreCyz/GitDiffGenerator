@@ -15,14 +15,13 @@ import java.util.concurrent.*;
 class ParallelProcessor {
     private final static Logger logger = LoggerFactory.getLogger(ParallelProcessor.class);
 
-    private final int NUMBER_OF_THREADS = 10;
     private final ExecutorService executor;
     private final ApplicationProperties applicationProperties;
 
 
     public ParallelProcessor(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     List<File> downloadFiles(Map<String, String> filesToDownload) {

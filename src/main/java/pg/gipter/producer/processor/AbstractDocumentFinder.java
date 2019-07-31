@@ -85,7 +85,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
 
                 versionList = convertToVersions(getNullForNull(file.getAsJsonObject("Versions"), JsonObject.class));
                 if (modifier != null) {
-                    VersionDetails lastVersion = new VersionDetails(modifier, "", modified, -1, true, 0, fileRef, Double.valueOf(currentVersion));
+                    VersionDetails lastVersion = new VersionDetails(modifier, "", modified, -1, true, 0, fileRef, Double.parseDouble(currentVersion));
                     versionList.add(lastVersion);
                 }
             }
@@ -229,7 +229,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
                                 minMe = nextMinMe;
                             }
                         } while (nextMinMe.isPresent() &&
-                                nextMinMe.get().getVersionLabel() < Double.valueOf(dd.getCurrentVersion())
+                                nextMinMe.get().getVersionLabel() < Double.parseDouble(dd.getCurrentVersion())
                         );
 
                         String downloadUrl = getFullDownloadUrl(dd.getProject() + minMe.get().getDownloadUrl());
@@ -240,7 +240,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
 
                         minMeCurrentVersion = minMe.get().getVersionLabel();
                     }
-                } while (minMe.isPresent() && minMe.get().getVersionLabel() < Double.valueOf(dd.getCurrentVersion()));
+                } while (minMe.isPresent() && minMe.get().getVersionLabel() < Double.parseDouble(dd.getCurrentVersion()));
             }
         }
         return filesToDownloadMap;
