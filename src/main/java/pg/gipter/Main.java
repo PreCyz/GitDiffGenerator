@@ -41,12 +41,14 @@ public class Main extends Application {
         boolean isConverted = propertiesHelper.convertPropertiesToNewFormat();
         if (isConverted) {
             LinkedList<String> configs = new LinkedList<>(propertiesHelper.loadAllApplicationProperties().keySet());
-            logger.info("Old configuration converted to new format. [{}] run configs created.", String.join(",", configs));
-            String defaultConfigName = configs.getFirst();
-            String[] arguments = Arrays.copyOf(args, args.length + 1);
-            arguments[arguments.length - 1] = defaultConfigName;
-            applicationProperties = ApplicationPropertiesFactory.getInstance(arguments);
-            logger.info("Configuration '{}' is set as default one.", defaultConfigName);
+            if (!configs.isEmpty()) {
+                logger.info("Old configuration converted to new format. [{}] run configs created.", String.join(",", configs));
+                String defaultConfigName = configs.getFirst();
+                String[] arguments = Arrays.copyOf(args, args.length + 1);
+                arguments[arguments.length - 1] = defaultConfigName;
+                applicationProperties = ApplicationPropertiesFactory.getInstance(arguments);
+                logger.info("Configuration '{}' is set as default one.", defaultConfigName);
+            }
         }
     }
 }
