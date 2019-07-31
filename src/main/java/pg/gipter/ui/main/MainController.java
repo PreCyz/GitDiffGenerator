@@ -514,10 +514,7 @@ public class MainController extends AbstractController {
     }
 
     private void updateRunConfig(String oldConfigName, String newConfigName) {
-        String[] args = createArgsFromUI();
-        Properties properties = propertiesHelper.createProperties(args);
-        properties.remove(ArgName.startDate.name());
-        properties.remove(ArgName.endDate.name());
+        Properties properties = getPropertiesWithoutDates();
         propertiesHelper.saveToolkitSettings(properties);
         if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
             propertiesHelper.saveRunConfig(properties);
@@ -527,6 +524,15 @@ public class MainController extends AbstractController {
         if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
             propertiesHelper.removeConfig(oldConfigName);
         }
+    }
+
+    @NotNull
+    private Properties getPropertiesWithoutDates() {
+        String[] args = createArgsFromUI();
+        Properties properties = propertiesHelper.createProperties(args);
+        properties.remove(ArgName.startDate.name());
+        properties.remove(ArgName.endDate.name());
+        return properties;
     }
 
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
@@ -552,7 +558,7 @@ public class MainController extends AbstractController {
                     configurationNameTextField.setText(configurationNameComboBox.getValue());
                 }
             } else {
-                uiLauncher.executeOutsideUIThread(() -> propertiesHelper.saveRunConfig(propertiesHelper.createProperties(createArgsFromUI())));
+                uiLauncher.executeOutsideUIThread(() -> propertiesHelper.saveRunConfig(getPropertiesWithoutDates()));
                 updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), configurationName);
                 setDisableDependOnConfigurations();
                 operationDone = true;
@@ -570,10 +576,8 @@ public class MainController extends AbstractController {
     }
 
     private void saveNewConfig(String configurationName) {
-        Properties currentProperties = propertiesHelper.createProperties(createArgsFromUI());
+        Properties currentProperties = getPropertiesWithoutDates();
         currentProperties.put(ArgName.configurationName.name(), configurationName);
-        currentProperties.remove(ArgName.startDate.name());
-        currentProperties.remove(ArgName.endDate.name());
         propertiesHelper.saveRunConfig(currentProperties);
     }
 

@@ -7,6 +7,7 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.ui.job.JobProperty;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
@@ -57,11 +58,15 @@ public class PropertiesHelper {
         return properties;
     }
 
-    private Optional<Properties> loadProperties(String fileName) {
+    Optional<Properties> loadProperties(String fileName) {
         Properties properties;
-        try (InputStream is = new FileInputStream(fileName)) {
+
+        try (InputStream fis = new FileInputStream(fileName);
+             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(isr)
+        ) {
             properties = new Properties();
-            properties.load(is);
+            properties.load(reader);
         } catch (IOException | NullPointerException e) {
             logger.warn("Error when loading {}. Exception message is: {}", fileName, e.getMessage());
             properties = null;
@@ -74,8 +79,10 @@ public class PropertiesHelper {
     }
 
     void saveProperties(Properties properties, String file) {
-        try (OutputStream os = new FileOutputStream(file)) {
-            properties.store(os, null);
+        try (OutputStream os = new FileOutputStream(file);
+             Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
+        ) {
+            properties.store(writer, null);
             logger.info("File {} saved.", file);
         } catch (IOException | NullPointerException e) {
             logger.error("Error when saving {}.", file, e);
@@ -202,8 +209,11 @@ public class PropertiesHelper {
     void writeJsonConfig(JsonObject jsonObject) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(jsonObject);
-        try (FileWriter writer = new FileWriter(APPLICATION_PROPERTIES_JSON)) {
+        try (OutputStream os = new FileOutputStream(APPLICATION_PROPERTIES_JSON);
+             Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
+        ) {
             writer.write(json);
+            logger.info("File {} saved.", APPLICATION_PROPERTIES_JSON);
         } catch (IOException e) {
             logger.error("Error when writing {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());
             throw new IllegalArgumentException("Error when writing configuration into json.");
@@ -211,8 +221,10 @@ public class PropertiesHelper {
     }
 
     JsonObject readJsonConfig() {
-        try (FileReader fr = new FileReader(APPLICATION_PROPERTIES_JSON);
-             BufferedReader reader = new BufferedReader(fr)) {
+        try (InputStream fis = new FileInputStream(APPLICATION_PROPERTIES_JSON);
+             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(isr)
+        ) {
             return new Gson().fromJson(reader, JsonObject.class);
         } catch (IOException | NullPointerException e) {
             logger.warn("Warning when loading {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());

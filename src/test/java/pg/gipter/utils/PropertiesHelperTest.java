@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.settings.ArgName;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -260,4 +261,17 @@ class PropertiesHelperTest {
         assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(username);
         assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(password);
     }
+
+    @Test
+    void givenUserNameWithPolishSigns_whenLoadToolkitCredentials_thenReturnCredentialsWithProperCoding() throws UnsupportedEncodingException {
+        String username = "ęóąśłńćźż";
+        Properties properties = TestDataFactory.generateProperty();
+        properties.setProperty(ArgName.toolkitUsername.name(), username);
+        propertiesHelper.saveToolkitSettings(properties);
+
+        Properties actual = propertiesHelper.loadToolkitCredentials();
+
+        assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(username);
+    }
+
 }

@@ -1,5 +1,7 @@
 package pg.gipter.utils;
 
+import java.nio.charset.StandardCharsets;
+
 public final class StringUtils {
 
     private StringUtils() { }
@@ -14,10 +16,18 @@ public final class StringUtils {
 
     public static boolean getBoolean(String value) {
         String trimmedValue = value.trim();
-        boolean result = Boolean.valueOf(trimmedValue);
+        boolean result = Boolean.parseBoolean(trimmedValue);
         result |= "t".equalsIgnoreCase(trimmedValue);
         result |= "yes".equalsIgnoreCase(trimmedValue);
         result |= "y".equalsIgnoreCase(trimmedValue);
         return result;
+    }
+
+    public static String utf8(String value) {
+        try {
+            return new String(value.getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            return value;
+        }
     }
 }
