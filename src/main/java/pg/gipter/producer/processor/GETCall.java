@@ -6,12 +6,12 @@ import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.util.concurrent.Callable;
 
-class GETCall implements Callable<JsonObject> {
+public class GETCall implements Callable<JsonObject> {
 
     private String fullUrl;
     private HttpRequester httpRequester;
 
-    GETCall(String fullUrl, ApplicationProperties applicationProperties) {
+    public GETCall(String fullUrl, ApplicationProperties applicationProperties) {
         this.fullUrl = fullUrl;
         httpRequester = new HttpRequester(applicationProperties);
     }

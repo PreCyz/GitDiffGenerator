@@ -1,5 +1,6 @@
 package pg.gipter.service;
 
+import com.google.gson.JsonObject;
 import javafx.concurrent.Task;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -7,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.producer.processor.GETCall;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 import pg.gipter.utils.BundleUtils;
@@ -14,6 +16,7 @@ import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /** Created by Pawel Gawedzki on 26-Jul-2019. */
@@ -64,5 +67,30 @@ public class ToolkitService extends Task<Set<String>> {
 
     public Set<String> downloadUserProjects() {
         return call();
+    }
+
+    public Optional<String> lastItemSubmissionDate() {
+        Optional<String> submissionDate = Optional.empty();
+
+        String select = "$select=Body,SubmissionDate,GUID,Title";
+        String orderBy = "$orderby=SubmissionDate+desc";
+        String top = "$top=1";
+        String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
+                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitCopyCase(),
+                applicationProperties.toolkitCopyListName(),
+                select,
+                orderBy,
+                top
+        );
+        try {
+            JsonObject jsonObject = new GETCall(url, applicationProperties).call();
+            JsonObject actual = jsonObject.getAsJsonObject("d").getAsJsonArray("results").get(0).getAsJsonObject();
+            submissionDate = Optional.ofNullable(actual.get("SubmissionDate").getAsString());
+        } catch (Exception ex) {
+            logger.error("Can not download last item submission date. ", ex);
+        }
+        return submissionDate;
+        //LocalDateTime submissionDateTime = LocalDateTime.parse(submissionDate, DateTimeFormatter.ISO_DATE_TIME);
     }
 }
