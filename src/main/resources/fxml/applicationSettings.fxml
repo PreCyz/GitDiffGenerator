@@ -15,7 +15,7 @@
                   <ComboBox fx:id="preferredArgSourceComboBox" layoutX="165.0" layoutY="8.0" prefHeight="25.0" prefWidth="90.0" />
                   <CheckBox fx:id="useUICheckBox" layoutX="165.0" layoutY="43.0" mnemonicParsing="false" text="%launch.panel.useUI" />
                   <Label layoutX="10.0" layoutY="29.0" text="%launch.panel.activateTray" />
-                  <CheckBox fx:id="activeteTrayCheckBox" layoutX="133.0" layoutY="29.0" mnemonicParsing="false" />
+                  <CheckBox fx:id="activateTrayCheckBox" layoutX="133.0" layoutY="29.0" mnemonicParsing="false" />
                   <Label layoutX="10.0" layoutY="50.0" text="%launch.panel.autoStart" />
                   <CheckBox fx:id="autostartCheckBox" layoutX="133.0" layoutY="50.0" mnemonicParsing="false" />
                   <ComboBox fx:id="languageComboBox" layoutX="79.0" layoutY="72.0" prefWidth="70.0" />

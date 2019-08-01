@@ -24,19 +24,18 @@ import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.service.GithubService;
+import pg.gipter.service.ToolkitService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.UploadStatus;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JobHelper;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.File;
@@ -44,6 +43,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Stream;
@@ -134,6 +135,8 @@ public class MainController extends AbstractController {
     private Button removeConfigurationButton;
     @FXML
     private Button saveConfigurationButton;
+    @FXML
+    private CheckBox useLastItemDateCheckbox;
 
     private ApplicationProperties applicationProperties;
 
@@ -187,6 +190,39 @@ public class MainController extends AbstractController {
         if (applicationProperties.toolkitUserFolder().equals(ArgName.toolkitUserFolder.defaultValue())) {
             userFolderUrl = "";
         }
+        setLastItemSubmissionDate();
+    }
+
+    private void setLastItemSubmissionDate() {
+        uiLauncher.executeOutsideUIThread(() -> {
+            if (uiLauncher.getLastItemSubmissionDate() == null) {
+                Optional<String> submissionDate = new ToolkitService(applicationProperties).lastItemSubmissionDate();
+                if (submissionDate.isPresent()) {
+                    uiLauncher.setLastItemSubmissionDate(LocalDateTime.parse(submissionDate.get(), DateTimeFormatter.ISO_DATE_TIME));
+                    Platform.runLater(() -> {
+                        useLastItemDateCheckbox.setDisable(uiLauncher.getLastItemSubmissionDate() == null);
+                        useLastItemDateCheckbox.setText(BundleUtils.getMsg(
+                                "main.lastUploadDate",
+                                uiLauncher.getLastItemSubmissionDate().format(DateTimeFormatter.ISO_DATE)
+                        ));
+                    });
+                } else {
+                    uiLauncher.setLastItemSubmissionDate(null);
+                    Platform.runLater(() -> {
+                        useLastItemDateCheckbox.setDisable(uiLauncher.getLastItemSubmissionDate() == null);
+                        useLastItemDateCheckbox.setText(BundleUtils.getMsg("main.lastUploadDate.unavailable"));
+                    });
+                }
+            } else {
+                Platform.runLater(() -> {
+                    useLastItemDateCheckbox.setDisable(uiLauncher.getLastItemSubmissionDate() == null);
+                    useLastItemDateCheckbox.setText(BundleUtils.getMsg(
+                            "main.lastUploadDate",
+                            uiLauncher.getLastItemSubmissionDate().format(DateTimeFormatter.ISO_DATE)
+                    ));
+                });
+            }
+        });
     }
 
     private void initConfigurationName() {
@@ -390,8 +426,26 @@ public class MainController extends AbstractController {
                 if (uiAppProperties.isActiveTray()) {
                     uiLauncher.updateTray(uiAppProperties);
                 }
+                updateLastItemUploadDate();
             });
         };
+    }
+
+    private void updateLastItemUploadDate() {
+        try {
+            Optional<Properties> dataProperties = propertiesHelper.loadDataProperties();
+            if (dataProperties.isPresent() && dataProperties.get().containsKey(PropertiesHelper.UPLOAD_STATUS_KEY)) {
+                UploadStatus status = UploadStatus.valueOf(dataProperties.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY));
+                if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(status)) {
+                    uiLauncher.setLastItemSubmissionDate(null);
+                }
+            }
+        } catch (Exception ex) {
+            logger.warn("Could not determine the status of the upload. {}. Forcing to refresh last upload date.", ex.getMessage());
+            uiLauncher.setLastItemSubmissionDate(null);
+        } finally {
+            setLastItemSubmissionDate();
+        }
     }
 
     private EventHandler<ActionEvent> executeAllActionEventHandler() {
@@ -498,11 +552,12 @@ public class MainController extends AbstractController {
             String configurationName = configurationNameTextField.getText();
             String comboConfigName = configurationNameComboBox.getValue();
 
-            uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
-
-            updateConfigurationNameComboBox(comboConfigName, configurationName);
             String[] args = createArgsFromUI();
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+            uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
+            setLastItemSubmissionDate();
+
+            updateConfigurationNameComboBox(comboConfigName, configurationName);
             uiLauncher.updateTray(applicationProperties);
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
@@ -660,6 +715,16 @@ public class MainController extends AbstractController {
             } else if (StringUtils.nullOrEmpty(newValue)) {
                 addConfigurationButton.setDisable(true);
                 projectPathButton.setDisable(true);
+            }
+        });
+
+        useLastItemDateCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            startDatePicker.setDisable(newValue);
+            periodInDaysTextField.setDisable(newValue);
+            if (newValue) {
+                startDatePicker.setValue(uiLauncher.getLastItemSubmissionDate().toLocalDate());
+            } else {
+                startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
             }
         });
     }

@@ -15,6 +15,7 @@ import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
@@ -31,6 +32,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -53,6 +55,7 @@ public class UILauncher implements Launcher {
     private PropertiesHelper propertiesHelper;
     private boolean silentMode;
     private boolean upgradeChecked = false;
+    private LocalDateTime lastItemSubmissionDate;
     private Executor executor;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
@@ -73,6 +76,14 @@ public class UILauncher implements Launcher {
 
     void setSilentMode(boolean silentMode) {
         this.silentMode = silentMode;
+    }
+
+    public LocalDateTime getLastItemSubmissionDate() {
+        return lastItemSubmissionDate;
+    }
+
+    public void setLastItemSubmissionDate(LocalDateTime lastItemSubmissionDate) {
+        this.lastItemSubmissionDate = lastItemSubmissionDate;
     }
 
     public void executeOutsideUIThread(Runnable runnable) {
@@ -368,7 +379,11 @@ public class UILauncher implements Launcher {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         buildScene(stage, windowFactory.createWindow(applicationProperties, this));
-        stage.setOnCloseRequest(event -> stage.close());
+        stage.setOnCloseRequest(event -> {
+            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(applicationProperties.configurationName()));
+            stage.close();
+            execute();
+        });
         stage.showAndWait();
     }
 

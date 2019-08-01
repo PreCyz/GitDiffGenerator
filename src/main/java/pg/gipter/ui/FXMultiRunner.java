@@ -29,8 +29,6 @@ import java.util.stream.Collectors;
  */
 public class FXMultiRunner extends Task<Void> implements Starter {
 
-    private enum Status {SUCCESS, PARTIAL_SUCCESS, FAIL, N_A}
-
     private static class UploadResult {
         String configName;
         Boolean success;
@@ -74,7 +72,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     }
 
     public void start() {
-        Status status;
+        UploadStatus status;
         logger.info("{} started.", this.getClass().getName());
         if (configurationNames.isEmpty()) {
             logger.info("There is no configuration to launch.");
@@ -180,28 +178,28 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         return isUploaded;
     }
 
-    private Status calculateFinalStatus() {
-        Status status = Status.N_A;
+    private UploadStatus calculateFinalStatus() {
+        UploadStatus status = UploadStatus.N_A;
         if (resultMap.entrySet().stream().allMatch(entry -> entry.getValue().success)) {
-            status = Status.SUCCESS;
+            status = UploadStatus.SUCCESS;
         }
         if (resultMap.entrySet().stream().anyMatch(entry -> !entry.getValue().success)) {
-            status = Status.PARTIAL_SUCCESS;
+            status = UploadStatus.PARTIAL_SUCCESS;
         }
         if (resultMap.entrySet().stream().noneMatch(entry -> entry.getValue().success)) {
-            status = Status.FAIL;
+            status = UploadStatus.FAIL;
         }
         return status;
     }
 
-    private void saveUploadStatus(Status status) {
+    private void saveUploadStatus(UploadStatus status) {
         new PropertiesHelper().saveUploadStatus(status.name());
         updateProgress(totalProgress, totalProgress);
         updateMessage(BundleUtils.getMsg("progress.finished", status.name()));
         logger.info("{} ended.", this.getClass().getName());
     }
 
-    private void displayAlertWindow(Status status) {
+    private void displayAlertWindow(UploadStatus status) {
         if (!isConfirmationWindow()) {
             return;
         }

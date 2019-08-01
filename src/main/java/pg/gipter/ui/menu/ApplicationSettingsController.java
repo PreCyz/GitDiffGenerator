@@ -30,7 +30,7 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private CheckBox useUICheckBox;
     @FXML
-    private CheckBox activeteTrayCheckBox;
+    private CheckBox activateTrayCheckBox;
     @FXML
     private CheckBox autostartCheckBox;
     @FXML
@@ -60,7 +60,7 @@ public class ApplicationSettingsController extends AbstractController {
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
-        activeteTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
+        activateTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
         autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
         silentModeCheckBox.setSelected(applicationProperties.isSilentMode());
 
@@ -80,7 +80,7 @@ public class ApplicationSettingsController extends AbstractController {
     }
 
     private void setProperties() {
-        activeteTrayCheckBox.setDisable(!uiLauncher.isTraySupported());
+        activateTrayCheckBox.setDisable(!uiLauncher.isTraySupported());
         autostartCheckBox.setDisable(!uiLauncher.isTraySupported());
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
@@ -98,7 +98,7 @@ public class ApplicationSettingsController extends AbstractController {
                 });
 
         final StartupService startupService = new StartupService();
-        activeteTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        activateTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 String[] arguments = propertiesHelper.loadArgumentArray(uiLauncher.getConfigurationName());
                 uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(arguments));
@@ -138,7 +138,7 @@ public class ApplicationSettingsController extends AbstractController {
         list.add(ArgName.confirmationWindow.name() + "=" + confirmationWindowCheckBox.isSelected());
         list.add(ArgName.preferredArgSource.name() + "=" + preferredArgSourceComboBox.getValue());
         list.add(ArgName.useUI.name() + "=" + useUICheckBox.isSelected());
-        list.add(ArgName.activeTray.name() + "=" + activeteTrayCheckBox.isSelected());
+        list.add(ArgName.activeTray.name() + "=" + activateTrayCheckBox.isSelected());
         list.add(ArgName.enableOnStartup.name() + "=" + autostartCheckBox.isSelected());
         list.add(ArgName.silentMode.name() + "=" + silentModeCheckBox.isSelected());
         return list.toArray(new String[0]);
