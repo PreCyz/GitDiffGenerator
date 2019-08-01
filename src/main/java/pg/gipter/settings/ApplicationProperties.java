@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public abstract class ApplicationProperties {
@@ -58,7 +60,9 @@ public abstract class ApplicationProperties {
             logger.info("Configuration [{}] loaded.", argExtractor.configurationName());
         } else {
             logger.warn("Can not load configuration [{}].", argExtractor.configurationName());
-            logger.info("Command line argument loaded: {}.", Arrays.toString(args));
+            logger.info("Command line argument loaded: {}.",
+                    Stream.of(args).filter(arg -> !arg.startsWith(ArgName.toolkitPassword.name())).collect(Collectors.joining(" "))
+            );
         }
         logger.info("Application properties loaded: {}.", log());
     }
