@@ -196,7 +196,7 @@ public class MainController extends AbstractController {
     private void setLastItemSubmissionDate() {
         uiLauncher.executeOutsideUIThread(() -> {
             if (uiLauncher.getLastItemSubmissionDate() == null) {
-                Optional<String> submissionDate = new ToolkitService(applicationProperties).lastItemSubmissionDate();
+                Optional<String> submissionDate = new ToolkitService(applicationProperties).lastItemUploadDate();
                 if (submissionDate.isPresent()) {
                     uiLauncher.setLastItemSubmissionDate(LocalDateTime.parse(submissionDate.get(), DateTimeFormatter.ISO_DATE_TIME));
                     Platform.runLater(() -> {

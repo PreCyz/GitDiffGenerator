@@ -69,7 +69,7 @@ public class ToolkitService extends Task<Set<String>> {
         return call();
     }
 
-    public Optional<String> lastItemSubmissionDate() {
+    public Optional<String> lastItemUploadDate() {
         Optional<String> submissionDate = Optional.empty();
 
         String select = "$select=Body,SubmissionDate,GUID,Title";

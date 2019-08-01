@@ -3,6 +3,7 @@ package pg.gipter.ui.job;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.service.ToolkitService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -47,7 +48,14 @@ public class UploadItemJob implements Job {
         PropertiesHelper propertiesHelper = new PropertiesHelper();
         propertiesHelper.saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
-        uiLauncher.updateTray(ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(configurationNames.getFirst())));
+        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
+                propertiesHelper.loadArgumentArray(configurationNames.getFirst())
+        );
+        uiLauncher.updateTray(applicationProperties);
+        new ToolkitService(applicationProperties).lastItemUploadDate()
+                .ifPresent((lastUploadDate) -> uiLauncher.setLastItemSubmissionDate(
+                        LocalDateTime.parse(lastUploadDate, DateTimeFormatter.ISO_DATE_TIME)
+                ));
     }
 
     private LocalDateTime calculateAndSetDates(JobDataMap jobDataMap) throws JobExecutionException {
