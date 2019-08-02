@@ -286,7 +286,7 @@ public class JobController extends AbstractController {
                         .withMinuteOfHour(minuteComboBox.getValue())
                         .withDayOfWeek(dayNameComboBox.getValue())
                         .withCronExpression(cronExpressionTextField.getText())
-                        .withConfigs(configsLabel.getText())
+                        .withConfigs(configsLabel.getText().replaceAll(CONFIG_DELIMITER, ","))
                         .createJobCreator()
                         .scheduleUploadJob(additionalJobParams);
                 propertiesHelper.saveDataProperties(JobCreator.getDataProperties());
