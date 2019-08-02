@@ -65,4 +65,14 @@ class GithubServiceTest {
 
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void givenTheSameVersion_whenIsNewVersion_thenReturnFalse() {
+        doReturn(Optional.of("3.6.2")).when(spyGithubService).getLatestVersion();
+        when(mockAppProps.version()).thenReturn("3.6.2");
+
+        boolean actual = spyGithubService.isNewVersion();
+
+        assertThat(actual).isFalse();
+    }
 }

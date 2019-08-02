@@ -142,10 +142,14 @@ public class HttpRequester {
     }
 
     private void logIfError(JsonObject result) {
-        JsonElement error = result.get("error");
-        if (error != null) {
-            String errorMessage = error.getAsJsonObject().get("message").getAsJsonObject().get("value").getAsString();
-            logger.error("Error when creating item: {}", errorMessage);
+        if (result == null) {
+            logger.error("Could not get the response: response is null.");
+        } else {
+            JsonElement error = result.get("error");
+            if (error != null) {
+                String errorMessage = error.getAsJsonObject().get("message").getAsJsonObject().get("value").getAsString();
+                logger.error("Error when calling Sharepoint REST API: {}", errorMessage);
+            }
         }
     }
 
