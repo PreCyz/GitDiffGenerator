@@ -72,6 +72,7 @@ public class GithubService {
 
     public void checkUpgrades() {
         if (isNewVersion()) {
+            logger.info("New version available: {}.", strippedVersion);
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", strippedVersion))
                     .withLink(GITHUB_URL + "/releases/latest")
@@ -109,6 +110,7 @@ public class GithubService {
 
     public void checkUpgradesWithPopups() {
         if (isNewVersion()) {
+            logger.info("New version available: {}.", strippedVersion);
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", strippedVersion))
                     .withLink(GITHUB_URL + "/releases/latest")
@@ -117,6 +119,7 @@ public class GithubService {
                     .buildAndDisplayWindow()
             );
         } else {
+            logger.info("Your version is up to date: {}.", strippedVersion);
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
                     .withWindowType(WindowType.CONFIRMATION_WINDOW)
