@@ -37,7 +37,7 @@ public class GithubService {
         this.applicationProperties = applicationProperties;
     }
 
-    private Optional<String> getLatestVersion() {
+    Optional<String> getLatestVersion() {
         Optional<String> latestVersion = Optional.empty();
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet request = new HttpGet("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest");
@@ -82,7 +82,7 @@ public class GithubService {
         }
     }
 
-    private boolean isNewVersion() {
+    boolean isNewVersion() {
         boolean result = false;
         Optional<String> latestVersion = getLatestVersion();
         if (latestVersion.isPresent()) {
@@ -97,7 +97,7 @@ public class GithubService {
 
             if (!result) {
                 for (int i = 0; i < newVersion.length; i++) {
-                    if (Integer.valueOf(newVersion[i]) > Integer.valueOf(currentVersion[i])) {
+                    if (Integer.parseInt(newVersion[i]) > Integer.parseInt(currentVersion[i])) {
                         result = true;
                         break;
                     }
