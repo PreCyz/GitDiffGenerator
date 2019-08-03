@@ -3,8 +3,8 @@ package pg.gipter.utils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.job.upload.JobProperty;
 import pg.gipter.settings.ArgName;
-import pg.gipter.ui.job.JobProperty;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

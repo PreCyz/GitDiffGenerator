@@ -1,4 +1,4 @@
-package pg.gipter.ui.job;
+package pg.gipter.job.upgrade;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -12,17 +12,15 @@ import pg.gipter.settings.PreferredArgSource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class CheckUpgradeJob implements Job {
+public class UpgradeJob implements Job {
 
-    private static final Logger logger = LoggerFactory.getLogger(CheckUpgradeJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpgradeJob.class);
     private GithubService githubService;
-    static final String NAME = "CheckUpgradeJob";
-    static final String GROUP = "CheckUpgradeJobGroup";
+    static final String NAME = UpgradeJob.class.getName();
+    static final String GROUP = NAME + "Group";
 
-    public CheckUpgradeJob() {
-        String[] args = {
-                String.format("%s=%s", ArgName.preferredArgSource, PreferredArgSource.UI),
-        };
+    UpgradeJob() {
+        String[] args = {ArgName.preferredArgSource + "=" + PreferredArgSource.UI};
         githubService = new GithubService(ApplicationPropertiesFactory.getInstance(args));
     }
 

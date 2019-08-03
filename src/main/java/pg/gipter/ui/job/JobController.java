@@ -13,6 +13,11 @@ import javafx.util.StringConverter;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.job.JobHandler;
+import pg.gipter.job.upload.JobProperty;
+import pg.gipter.job.upload.JobType;
+import pg.gipter.job.upload.UploadItemJobBuilder;
+import pg.gipter.job.upload.UploadJobCreator;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
 import pg.gipter.ui.AbstractController;
@@ -78,7 +83,6 @@ public class JobController extends AbstractController {
     private Map<String, Properties> propertiesMap;
     private final String NOT_AVAILABLE = "N/A";
     private final String ALL_CONFIGS = "all-configs";
-    private final String CONFIG_DELIMITER = "\t";
 
     public JobController(UILauncher uiLauncher) {
         super(uiLauncher);
@@ -109,7 +113,7 @@ public class JobController extends AbstractController {
             items.add(0, ALL_CONFIGS);
             configurationNameComboBox.setItems(items);
             configurationNameComboBox.setValue(configurationNameComboBox.getItems().get(0));
-            configsLabel.setText(String.join(CONFIG_DELIMITER, propertiesMap.keySet()));
+            configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, propertiesMap.keySet()));
         }
         setDefaultsForJobDetailsControls();
         Optional<Properties> data = propertiesHelper.loadDataProperties();
@@ -202,7 +206,7 @@ public class JobController extends AbstractController {
         if (propertiesMap.isEmpty()) {
             configsLabel.setText(NOT_AVAILABLE);
         } else {
-            configsLabel.setText(String.join(CONFIG_DELIMITER, propertiesMap.keySet()));
+            configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, propertiesMap.keySet()));
         }
     }
 
@@ -277,7 +281,7 @@ public class JobController extends AbstractController {
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), uiLauncher);
                 Properties data = propertiesHelper.loadDataProperties().orElseGet(Properties::new);
-                new JobCreatorBuilder()
+                UploadItemJobBuilder builder = new UploadItemJobBuilder()
                         .withData(data)
                         .withJobType(jobType)
                         .withStartDateTime(startDatePicker.getValue())
@@ -286,10 +290,11 @@ public class JobController extends AbstractController {
                         .withMinuteOfHour(minuteComboBox.getValue())
                         .withDayOfWeek(dayNameComboBox.getValue())
                         .withCronExpression(cronExpressionTextField.getText())
-                        .withConfigs(configsLabel.getText().replaceAll(CONFIG_DELIMITER, ","))
-                        .createJobCreator()
-                        .scheduleUploadJob(additionalJobParams);
-                propertiesHelper.saveDataProperties(JobCreator.getDataProperties());
+                        .withConfigs(configsLabel.getText());
+
+                JobHandler jobHandler = uiLauncher.getJobHandler();
+                jobHandler.scheduleUploadJob(builder, additionalJobParams);
+                propertiesHelper.saveDataProperties(jobHandler.getDataProperties());
 
                 uiLauncher.hideJobWindow();
                 uiLauncher.updateTray();
@@ -313,15 +318,15 @@ public class JobController extends AbstractController {
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     if (ALL_CONFIGS.equals(newValue)) {
-                        configsLabel.setText(String.join(CONFIG_DELIMITER, propertiesMap.keySet()));
+                        configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, propertiesMap.keySet()));
                     } else if (oldValue.equals(ALL_CONFIGS)) {
                         configsLabel.setText(newValue);
                     } else {
-                        Set<String> currentSelection = Stream.of(configsLabel.getText().split("\\t"))
+                        Set<String> currentSelection = Stream.of(configsLabel.getText().split(UploadJobCreator.CONFIG_DELIMITER))
                                 .filter(v -> !v.isEmpty())
                                 .collect(toCollection(LinkedHashSet::new));
                         currentSelection.add(newValue);
-                        configsLabel.setText(String.join(CONFIG_DELIMITER, currentSelection));
+                        configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, currentSelection));
                     }
                 });
     }

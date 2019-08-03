@@ -5,11 +5,11 @@ import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.job.JobHandler;
+import pg.gipter.job.upload.JobProperty;
+import pg.gipter.job.upload.UploadItemJob;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.job.JobController;
-import pg.gipter.ui.job.JobCreator;
-import pg.gipter.ui.job.JobProperty;
-import pg.gipter.ui.job.UploadItemJob;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
@@ -72,6 +72,7 @@ class TrayHandler {
 
     private void addMenuItemsToMenu(PopupMenu popupMenu) {
         executor.execute(() -> {
+            JobHandler jobHandler = uiLauncher.getJobHandler();
             propertiesHelper = new PropertiesHelper();
             Optional<Properties> data = propertiesHelper.loadDataProperties();
             if (data.isPresent()) {
@@ -131,7 +132,7 @@ class TrayHandler {
             createJobItem.addActionListener(createJobActionListener());
             popupMenu.add(createJobItem);
 
-            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(JobCreator.isUpgradeJobExists() ? "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
+            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(jobHandler.isUpgradeJobExists() ? "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
             upgradeItem.addActionListener(upgradeJobActionListener());
             popupMenu.add(upgradeItem);
             popupMenu.addSeparator();
@@ -144,10 +145,11 @@ class TrayHandler {
 
     private ActionListener upgradeJobActionListener() {
         return e -> {
-            if (JobCreator.isUpgradeJobExists()) {
-                JobCreator.deleteUpgradeJob();
+            JobHandler jobHandler = uiLauncher.getJobHandler();
+            if (jobHandler.isUpgradeJobExists()) {
+                jobHandler.cancelUpgradeJob();
             } else {
-                JobCreator.scheduleCheckUpgradeJob();
+                jobHandler.scheduleUpgradeJob();
             }
             updateTrayLabels();
         };
@@ -196,7 +198,7 @@ class TrayHandler {
         return e -> uiLauncher.cancelJob();
     }
 
-    void hide() {
+    private void hide() {
         Platform.runLater(() -> {
             if (SystemTray.isSupported()) {
                 uiLauncher.hideMainWindow();

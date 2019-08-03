@@ -1,10 +1,7 @@
-package pg.gipter.ui.job;
+package pg.gipter.job.upload;
 
 import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.triggers.CronTriggerImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
 
 import java.text.ParseException;
@@ -21,15 +18,13 @@ import java.util.Properties;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 /** Created by Pawel Gawedzki on 12-Mar-2019. */
-public class JobCreator {
+public class UploadJobCreator {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobCreator.class);
-    private static final TriggerKey UPGRADE_TRIGGER_KEY = new TriggerKey("checkUpgradesTrigger", "checkUpgradesTriggerGroup");
+    public static final String CONFIG_DELIMITER = ",";
     private static final TriggerKey CRON_TRIGGER_KEY = new TriggerKey("cronTrigger", "cronTriggerGroup");
     private static final TriggerKey EVERY_WEEK_TRIGGER_KEY = new TriggerKey("everyWeekTrigger", "everyWeekTriggerGroup");
     private static final TriggerKey EVERY_2_WEEKS_CRON_TRIGGER_KEY = new TriggerKey("every2WeeksTrigger", "every2WeeksTriggerGroup");
     private static final TriggerKey EVERY_MONTH_TRIGGER_KEY = new TriggerKey("everyMonthTrigger", "everyMonthTriggerGroup");
-    private static final String UPGRADE_CRON_EXPRESSION = "0 0 12 */14 * ?";
 
     private static Properties data;
     private JobType jobType;
@@ -43,11 +38,10 @@ public class JobCreator {
 
     private Trigger trigger;
     private JobDetail jobDetail;
-    private static Scheduler scheduler;
 
-    JobCreator(Properties data, JobType jobType, LocalDate startDateTime, int dayOfMonth, int hourOfDay, int minuteOfHour,
-               DayOfWeek dayOfWeek, String cronExpression, String configs) {
-        JobCreator.data = data;
+    UploadJobCreator(Properties data, JobType jobType, LocalDate startDateTime, int dayOfMonth, int hourOfDay, int minuteOfHour,
+                     DayOfWeek dayOfWeek, String cronExpression, String configs) {
+        UploadJobCreator.data = data;
         this.jobType = jobType;
         this.startDateTime = startDateTime;
         this.dayOfMonth = dayOfMonth;
@@ -56,27 +50,6 @@ public class JobCreator {
         this.dayOfWeek = dayOfWeek;
         this.cronExpression = cronExpression;
         this.configs = configs;
-    }
-
-    public static boolean isSchedulerInitiated() {
-        return scheduler != null;
-    }
-
-    public static void cancelUploadJob() throws SchedulerException {
-        scheduler.deleteJob(new JobKey(UploadItemJob.NAME, UploadItemJob.GROUP));
-        logger.info("Upload job canceled.");
-    }
-
-    public static String schedulerClassName() {
-        return scheduler.getClass().getName();
-    }
-
-    public static boolean isUpgradeJobExists() {
-        try {
-            return isSchedulerInitiated() && scheduler.checkExists(UPGRADE_TRIGGER_KEY);
-        } catch (SchedulerException e) {
-            return false;
-        }
     }
 
     private void clearProperties() {
@@ -214,9 +187,9 @@ public class JobCreator {
                 .build();
     }
 
-    private Trigger createTrigger() throws ParseException {
+    public void createTrigger() throws ParseException {
         if (trigger != null) {
-            return trigger;
+            return;
         }
 
         switch (jobType) {
@@ -236,29 +209,10 @@ public class JobCreator {
                 trigger = createTriggerEveryWeek();
                 jobDetail = createJobDetail();
         }
-        return trigger;
     }
 
-    static Properties getDataProperties() {
+    public Properties getDataProperties() {
         return data;
-    }
-
-    public void scheduleUploadJob(Map<String, Object> additionalJobParameters) throws ParseException, SchedulerException {
-        Trigger trigger = createTrigger();
-        getNextFireTime(trigger).ifPresent(nextFireTime -> data.put(JobProperty.NEXT_FIRE_DATE.value(), nextFireTime));
-
-        if (additionalJobParameters != null && !additionalJobParameters.isEmpty()) {
-            jobDetail.getJobDataMap().putAll(additionalJobParameters);
-        }
-
-        if (!isSchedulerInitiated()) {
-            scheduler = StdSchedulerFactory.getDefaultScheduler();
-            scheduler.start();
-        } else if (scheduler.checkExists(new JobKey(UploadItemJob.NAME, UploadItemJob.GROUP))) {
-            scheduler.deleteJob(new JobKey(UploadItemJob.NAME, UploadItemJob.GROUP));
-        }
-
-        scheduler.scheduleJob(jobDetail, trigger);
     }
 
     private Optional<String> getNextFireTime(Trigger trigger) {
@@ -272,45 +226,25 @@ public class JobCreator {
         }
     }
 
-    public static void scheduleCheckUpgradeJob() {
-        try {
-            Trigger trigger = checkUpgradeTrigger();
-
-            if (!isSchedulerInitiated()) {
-                scheduler = StdSchedulerFactory.getDefaultScheduler();
-                scheduler.scheduleJob(createCheckUpgradeJobDetail(), trigger);
-                scheduler.start();
-                logger.info("New upgrade job scheduled and started.");
-            } else if (!isUpgradeJobExists()) {
-                scheduler.scheduleJob(createCheckUpgradeJobDetail(), trigger);
-                logger.info("New upgrade job scheduled with following frequency [{}].", UPGRADE_CRON_EXPRESSION);
-            }
-        } catch (ParseException | SchedulerException ex) {
-            logger.error("Can not schedule upgrade job.", ex);
+    public void addAdditionalParameters(Map<String, Object> additionalJobParameters) {
+        if (additionalJobParameters != null && !additionalJobParameters.isEmpty()) {
+            jobDetail.getJobDataMap().putAll(additionalJobParameters);
         }
     }
 
-    private static Trigger checkUpgradeTrigger() throws ParseException {
-        CronExpression expression = new CronExpression(UPGRADE_CRON_EXPRESSION);
-        return newTrigger()
-                .withIdentity(UPGRADE_TRIGGER_KEY.getName(), UPGRADE_TRIGGER_KEY.getGroup())
-                .startNow()
-                .withSchedule(CronScheduleBuilder.cronSchedule(expression))
-                .build();
+    public void setNextFireDate() {
+        getNextFireTime(trigger).ifPresent(nextFireTime -> data.put(JobProperty.NEXT_FIRE_DATE.value(), nextFireTime));
     }
 
-    private static JobDetail createCheckUpgradeJobDetail() {
-        return JobBuilder.newJob(CheckUpgradeJob.class)
-                .withIdentity(CheckUpgradeJob.NAME, CheckUpgradeJob.GROUP)
-                .build();
+    public JobDetail getJobDetail() {
+        return jobDetail;
     }
 
-    public static void deleteUpgradeJob() {
-        try {
-            scheduler.deleteJob(new JobKey(CheckUpgradeJob.NAME, CheckUpgradeJob.GROUP));
-            logger.info("Delete upgrade trigger.");
-        } catch (SchedulerException e) {
-            logger.error("Weird :( can not stop the upgrade job.", e);
-        }
+    public Trigger getTrigger() {
+        return trigger;
+    }
+
+    public JobKey getJobKey() {
+        return new JobKey(UploadItemJob.NAME, UploadItemJob.GROUP);
     }
 }

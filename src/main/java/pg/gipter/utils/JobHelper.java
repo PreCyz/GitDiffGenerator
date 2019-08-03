@@ -1,6 +1,6 @@
 package pg.gipter.utils;
 
-import pg.gipter.ui.job.JobProperty;
+import pg.gipter.job.upload.JobProperty;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;

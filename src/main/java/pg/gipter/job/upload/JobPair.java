@@ -1,6 +1,6 @@
-package pg.gipter.ui.job;
+package pg.gipter.job.upload;
 
-public class JobPair {
+class JobPair {
     private final String name;
     private final String group;
 

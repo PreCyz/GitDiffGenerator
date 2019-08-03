@@ -1,4 +1,4 @@
-package pg.gipter.ui.job;
+package pg.gipter.job.upload;
 
 import org.quartz.*;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ public class UploadItemJob implements Job {
 
     private static final Logger logger = LoggerFactory.getLogger(UploadItemJob.class);
     public static final String NAME = "Gipter-job";
-    static final String GROUP = "GipterJobGroup";
+    public static final String GROUP = "GipterJobGroup";
 
     public UploadItemJob() {
         // Instances of Job must have a public no-argument constructor.
@@ -39,7 +39,7 @@ public class UploadItemJob implements Job {
         );
 
         String configNames = jobDataMap.getString(JobProperty.CONFIGS.value());
-        LinkedList<String> configurationNames = new LinkedList<>(Arrays.asList(configNames.split(",")));
+        LinkedList<String> configurationNames = new LinkedList<>(Arrays.asList(configNames.split(UploadJobCreator.CONFIG_DELIMITER)));
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
 
         new FXMultiRunner(configurationNames, uiLauncher.nonUIExecutor()).start();
@@ -52,10 +52,12 @@ public class UploadItemJob implements Job {
                 propertiesHelper.loadArgumentArray(configurationNames.getFirst())
         );
         uiLauncher.updateTray(applicationProperties);
-        new ToolkitService(applicationProperties).lastItemUploadDate()
-                .ifPresent((lastUploadDate) -> uiLauncher.setLastItemSubmissionDate(
-                        LocalDateTime.parse(lastUploadDate, DateTimeFormatter.ISO_DATE_TIME)
-                ));
+        if (applicationProperties.isToolkitCredentialsSet()) {
+            new ToolkitService(applicationProperties).lastItemUploadDate()
+                    .ifPresent((lastUploadDate) -> uiLauncher.setLastItemSubmissionDate(
+                            LocalDateTime.parse(lastUploadDate, DateTimeFormatter.ISO_DATE_TIME)
+                    ));
+        }
     }
 
     private LocalDateTime calculateAndSetDates(JobDataMap jobDataMap) throws JobExecutionException {

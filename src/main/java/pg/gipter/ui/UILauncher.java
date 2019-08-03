@@ -11,6 +11,11 @@ import javafx.stage.WindowEvent;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.job.JobHandler;
+import pg.gipter.job.upload.JobProperty;
+import pg.gipter.job.upload.JobType;
+import pg.gipter.job.upload.UploadItemJob;
+import pg.gipter.job.upload.UploadItemJobBuilder;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.StartupService;
@@ -20,7 +25,6 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
-import pg.gipter.ui.job.*;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.PropertiesHelper;
@@ -57,6 +61,7 @@ public class UILauncher implements Launcher {
     private boolean upgradeChecked = false;
     private LocalDateTime lastItemSubmissionDate;
     private Executor executor;
+    private JobHandler jobHandler;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
         this.mainWindow = mainWindow;
@@ -64,6 +69,7 @@ public class UILauncher implements Launcher {
         propertiesHelper = new PropertiesHelper();
         silentMode = applicationProperties.isSilentMode();
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        jobHandler = new JobHandler();
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -103,7 +109,7 @@ public class UILauncher implements Launcher {
             logger.info("Initializing tray icon. Silent mode [{}].", silentMode);
             trayHandler.createTrayIcon();
             scheduleJobIfExists();
-            JobCreator.scheduleCheckUpgradeJob();
+            jobHandler.scheduleUpgradeJob();
         }
     }
 
@@ -242,11 +248,11 @@ public class UILauncher implements Launcher {
 
     public void cancelJob() {
         try {
-            if (JobCreator.isSchedulerInitiated()) {
-                JobCreator.cancelUploadJob();
+            if (jobHandler.isSchedulerInitiated()) {
+                jobHandler.cancelUploadJob();
             }
         } catch (SchedulerException e) {
-            String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", JobCreator.schedulerClassName(), e.getMessage());
+            String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", jobHandler.schedulerClassName(), e.getMessage());
             logger.error(errorMessage);
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(errorMessage)
@@ -269,7 +275,7 @@ public class UILauncher implements Launcher {
 
     private void scheduleJobIfExists() {
         Optional<Properties> data = propertiesHelper.loadDataProperties();
-        if (data.isPresent() && !JobCreator.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.value())) {
+        if (data.isPresent() && !jobHandler.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.value())) {
             try {
                 JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.value()));
 
@@ -282,14 +288,14 @@ public class UILauncher implements Launcher {
                 }
                 int dayOfMonth = 0;
                 if (data.get().containsKey(JobProperty.DAY_OF_MONTH.value())) {
-                    dayOfMonth = Integer.valueOf(data.get().getProperty(JobProperty.DAY_OF_MONTH.value()));
+                    dayOfMonth = Integer.parseInt(data.get().getProperty(JobProperty.DAY_OF_MONTH.value()));
                 }
                 int hourOfDay = 0;
                 int minuteOfHour = 0;
                 if (data.get().containsKey(JobProperty.HOUR_OF_THE_DAY.value())) {
                     String hourOfDayString = data.get().getProperty(JobProperty.HOUR_OF_THE_DAY.value());
-                    hourOfDay = Integer.valueOf(hourOfDayString.substring(0, hourOfDayString.lastIndexOf(":")));
-                    minuteOfHour = Integer.valueOf(hourOfDayString.substring(hourOfDayString.lastIndexOf(":") + 1));
+                    hourOfDay = Integer.parseInt(hourOfDayString.substring(0, hourOfDayString.lastIndexOf(":")));
+                    minuteOfHour = Integer.parseInt(hourOfDayString.substring(hourOfDayString.lastIndexOf(":") + 1));
                 }
                 DayOfWeek dayOfWeek = null;
                 if (data.get().containsKey(JobProperty.DAY_OF_WEEK.value())) {
@@ -301,7 +307,7 @@ public class UILauncher implements Launcher {
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), this);
 
-                new JobCreatorBuilder()
+                UploadItemJobBuilder builder = new UploadItemJobBuilder()
                         .withData(data.get())
                         .withJobType(jobType)
                         .withStartDateTime(scheduleStart)
@@ -310,9 +316,9 @@ public class UILauncher implements Launcher {
                         .withMinuteOfHour(minuteOfHour)
                         .withDayOfWeek(dayOfWeek)
                         .withCronExpression(cronExpression)
-                        .withConfigs(configs)
-                        .createJobCreator()
-                        .scheduleUploadJob(additionalJobParams);
+                        .withConfigs(configs);
+                jobHandler.scheduleUploadJob(builder, additionalJobParams);
+
             } catch (ParseException | SchedulerException e) {
                 logger.warn("Can not restart the scheduler.", e);
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
@@ -408,4 +414,7 @@ public class UILauncher implements Launcher {
         toolkitProjectsWindow.hide();
     }
 
+    public JobHandler getJobHandler() {
+        return jobHandler;
+    }
 }

@@ -1,10 +1,10 @@
-package pg.gipter.ui.job;
+package pg.gipter.job.upload;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Properties;
 
-public class JobCreatorBuilder {
+public class UploadItemJobBuilder {
     private Properties data;
     private JobType jobType;
     private LocalDate startDateTime;
@@ -15,52 +15,52 @@ public class JobCreatorBuilder {
     private String cronExpression;
     private String configs;
 
-    public JobCreatorBuilder withData(Properties data) {
+    public UploadItemJobBuilder withData(Properties data) {
         this.data = data;
         return this;
     }
 
-    public JobCreatorBuilder withJobType(JobType jobType) {
+    public UploadItemJobBuilder withJobType(JobType jobType) {
         this.jobType = jobType;
         return this;
     }
 
-    public JobCreatorBuilder withStartDateTime(LocalDate startDateTime) {
+    public UploadItemJobBuilder withStartDateTime(LocalDate startDateTime) {
         this.startDateTime = startDateTime;
         return this;
     }
 
-    public JobCreatorBuilder withDayOfMonth(int dayOfMonth) {
+    public UploadItemJobBuilder withDayOfMonth(int dayOfMonth) {
         this.dayOfMonth = dayOfMonth;
         return this;
     }
 
-    public JobCreatorBuilder withHourOfDay(int hourOfDay) {
+    public UploadItemJobBuilder withHourOfDay(int hourOfDay) {
         this.hourOfDay = hourOfDay;
         return this;
     }
 
-    public JobCreatorBuilder withMinuteOfHour(int minuteOfHour) {
+    public UploadItemJobBuilder withMinuteOfHour(int minuteOfHour) {
         this.minuteOfHour = minuteOfHour;
         return this;
     }
 
-    public JobCreatorBuilder withDayOfWeek(DayOfWeek dayOfWeek) {
+    public UploadItemJobBuilder withDayOfWeek(DayOfWeek dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
         return this;
     }
 
-    public JobCreatorBuilder withCronExpression(String cronExpression) {
+    public UploadItemJobBuilder withCronExpression(String cronExpression) {
         this.cronExpression = cronExpression;
         return this;
     }
 
-    public JobCreatorBuilder withConfigs(String configs) {
+    public UploadItemJobBuilder withConfigs(String configs) {
         this.configs = configs;
         return this;
     }
 
-    public JobCreator createJobCreator() {
-        return new JobCreator(data, jobType, startDateTime, dayOfMonth, hourOfDay, minuteOfHour, dayOfWeek, cronExpression, configs);
+    public UploadJobCreator createJobCreator() {
+        return new UploadJobCreator(data, jobType, startDateTime, dayOfMonth, hourOfDay, minuteOfHour, dayOfWeek, cronExpression, configs);
     }
 }
