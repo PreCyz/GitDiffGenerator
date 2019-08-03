@@ -73,7 +73,7 @@
                               <Label layoutX="10.0" layoutY="17.0" text="%paths.panel.fileNamePrefix" />
                               <TextField fx:id="itemFileNamePrefixTextField" layoutX="101.0" layoutY="14.0" prefHeight="25.0" prefWidth="186.0" />
                               <CheckBox fx:id="useAsFileNameCheckBox" layoutX="302.0" layoutY="17.0" mnemonicParsing="false" text="%paths.panel.useAsFileName" />
-                              <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="50.0" prefHeight="17.0" prefWidth="123.0" text="need set up">
+                              <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="50.0" prefHeight="17.0" prefWidth="127.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
@@ -90,12 +90,12 @@
                                  </font>
                               </Button>
                               <Label layoutX="10.0" layoutY="83.0" text="%paths.panel.itemPath" />
-                              <Label fx:id="itemPathLabel" layoutX="164.0" layoutY="85.0" prefHeight="17.0" prefWidth="123.0" text="need set up">
+                              <Label fx:id="itemPathLabel" layoutX="164.0" layoutY="85.0" prefHeight="17.0" prefWidth="127.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
                               </Label>
-                              <Pane id="minions-group" layoutX="289.0" layoutY="49.0" prefHeight="65.0" prefWidth="267.0" stylesheets="@../css/main.css" />
+                              <Pane id="minions-group" layoutX="291.0" layoutY="49.0" prefHeight="65.0" prefWidth="267.0" stylesheets="@../css/main.css" />
                            </children>
                         </AnchorPane>
                      </content>
