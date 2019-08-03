@@ -266,7 +266,8 @@ public class MainController extends AbstractController {
         skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
 
         progressIndicator.setVisible(false);
-        projectPathLabel.setTooltip(buildProjectPathsTooltip(projectPathLabel.getText()));
+        projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
+        itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
         instructionMenuItem.setDisable(!(Paths.get(PDF_DESCRIPTION_FILE).toFile().exists() && Desktop.isDesktopSupported()));
         setDisableDependOnConfigurations();
     }
@@ -380,7 +381,7 @@ public class MainController extends AbstractController {
         };
     }
 
-    private Tooltip buildProjectPathsTooltip(String result) {
+    private Tooltip buildPathTooltip(String result) {
         String[] paths = result.split(",");
         StringBuilder builder = new StringBuilder();
         Arrays.asList(paths).forEach(path -> builder.append(path).append("\n"));
