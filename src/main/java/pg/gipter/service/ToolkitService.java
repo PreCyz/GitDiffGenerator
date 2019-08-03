@@ -1,5 +1,7 @@
 package pg.gipter.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.concurrent.Task;
 import org.jsoup.Jsoup;
@@ -85,12 +87,26 @@ public class ToolkitService extends Task<Set<String>> {
         );
         try {
             JsonObject jsonObject = new GETCall(url, applicationProperties).call();
-            JsonObject actual = jsonObject.getAsJsonObject("d").getAsJsonArray("results").get(0).getAsJsonObject();
-            submissionDate = Optional.ofNullable(actual.get("SubmissionDate").getAsString());
+            if (jsonObject == null) {
+                throw new IllegalArgumentException("Null response from toolkit.");
+            }
+            JsonObject dElement = jsonObject.getAsJsonObject("d");
+            if (dElement == null) {
+                throw new IllegalArgumentException("Can not handle the response from toolkit.");
+            }
+            JsonArray results = dElement.getAsJsonArray("results");
+            if (results == null || results.size() == 0) {
+                throw new IllegalArgumentException("Can not handle the response from toolkit. Array is empty.");
+            }
+            JsonObject firstElement = results.get(0).getAsJsonObject();
+            JsonElement submissionDateElement = firstElement.get("SubmissionDate");
+            if (submissionDateElement == null) {
+                throw new IllegalArgumentException("Can not find submission date in the response from toolkit.");
+            }
+            submissionDate = Optional.ofNullable(submissionDateElement.getAsString());
         } catch (Exception ex) {
             logger.error("Can not download last item submission date. ", ex);
         }
         return submissionDate;
-        //LocalDateTime submissionDateTime = LocalDateTime.parse(submissionDate, DateTimeFormatter.ISO_DATE_TIME);
     }
 }
