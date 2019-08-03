@@ -46,7 +46,7 @@ public class JobHandler {
     public void cancelUpgradeJob() {
         try {
             scheduler.deleteJob(upgradeJob.getJobKey());
-            logger.info("Delete upgrade trigger.");
+            logger.info("Upgrade job deleted.");
         } catch (SchedulerException e) {
             logger.error("Weird :( can not stop the upgrade job.", e);
         }
@@ -68,7 +68,8 @@ public class JobHandler {
         return scheduler;
     }
 
-    public void scheduleUploadJob(UploadItemJobBuilder jobCreatorBuilder, Map<String, Object> additionalJobParameters) throws ParseException, SchedulerException {
+    public void scheduleUploadJob(UploadItemJobBuilder jobCreatorBuilder, Map<String, Object> additionalJobParameters)
+            throws ParseException, SchedulerException {
         uploadJobCreator = jobCreatorBuilder.createJobCreator();
         uploadJobCreator.createTrigger();
         uploadJobCreator.setNextFireDate();
@@ -77,9 +78,10 @@ public class JobHandler {
             scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
         } else if (scheduler.checkExists(uploadJobCreator.getJobKey())) {
-            scheduler.deleteJob(uploadJobCreator.getJobKey());
+            cancelUploadJob();
         }
         scheduler.scheduleJob(uploadJobCreator.getJobDetail(), uploadJobCreator.getTrigger());
+        logger.info("New upload items job scheduled and started.");
     }
 
     public void cancelUploadJob() throws SchedulerException {
