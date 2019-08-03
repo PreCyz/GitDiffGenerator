@@ -422,7 +422,7 @@ public class MainController extends AbstractController {
             FXMultiRunner runner = new FXMultiRunner(Stream.of(uiAppProperties.configurationName()).collect(toList()), uiLauncher.nonUIExecutor());
             resetIndicatorProperties(runner);
             uiLauncher.executeOutsideUIThread(() -> {
-                runner.call();
+                runner.start();
                 if (uiAppProperties.isActiveTray()) {
                     uiLauncher.updateTray(uiAppProperties);
                 }
@@ -723,7 +723,10 @@ public class MainController extends AbstractController {
             periodInDaysTextField.setDisable(newValue);
             if (newValue) {
                 startDatePicker.setValue(uiLauncher.getLastItemSubmissionDate().toLocalDate());
+                int newPeriodInDays = endDatePicker.getValue().getDayOfYear() - startDatePicker.getValue().getDayOfYear();
+                periodInDaysTextField.setText(String.valueOf(newPeriodInDays));
             } else {
+                periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
                 startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
             }
         });
@@ -737,6 +740,9 @@ public class MainController extends AbstractController {
                 applicationProperties = ApplicationPropertiesFactory.getInstance(args);
                 setInitValues();
                 configurationNameTextField.setText(newValue);
+                if (useLastItemDateCheckbox.isSelected()) {
+                    useLastItemDateCheckbox.setSelected(false);
+                }
             }
         };
     }
