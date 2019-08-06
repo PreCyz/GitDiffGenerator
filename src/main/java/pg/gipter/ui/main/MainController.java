@@ -177,6 +177,8 @@ public class MainController extends AbstractController {
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
         String itemPath = applicationProperties.itemPath().substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
         itemPathLabel.setText(itemPath);
+        projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
+        itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
         useAsFileNameCheckBox.setSelected(applicationProperties.isUseAsFileName());
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
@@ -266,8 +268,6 @@ public class MainController extends AbstractController {
         skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
 
         progressIndicator.setVisible(false);
-        projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
-        itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
         instructionMenuItem.setDisable(!(Paths.get(PDF_DESCRIPTION_FILE).toFile().exists() && Desktop.isDesktopSupported()));
         setDisableDependOnConfigurations();
     }
