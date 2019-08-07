@@ -13,7 +13,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
@@ -53,6 +56,9 @@ import static java.util.stream.Collectors.toList;
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
+
+    @FXML
+    private AnchorPane mainAnchorPane;
 
     @FXML
     private MenuItem applicationMenuItem;
@@ -729,6 +735,12 @@ public class MainController extends AbstractController {
             } else {
                 periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
                 startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
+            }
+        });
+
+        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
+                e.consume();
             }
         });
     }
