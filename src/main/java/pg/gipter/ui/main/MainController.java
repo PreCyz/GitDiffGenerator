@@ -612,17 +612,15 @@ public class MainController extends AbstractController {
                         .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
                         .buildAndDisplayOverrideWindow();
                 if (result) {
-                    uiLauncher.executeOutsideUIThread(() -> saveNewConfig(configurationName));
+                    saveNewConfig(configurationName);
                     updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationName);
-                    setDisableDependOnConfigurations();
                     operationDone = true;
                 } else {
                     configurationNameTextField.setText(configurationNameComboBox.getValue());
                 }
             } else {
-                uiLauncher.executeOutsideUIThread(() -> propertiesHelper.saveRunConfig(getPropertiesWithoutDates()));
+                propertiesHelper.saveRunConfig(getPropertiesWithoutDates());
                 updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), configurationName);
-                setDisableDependOnConfigurations();
                 operationDone = true;
             }
             if (operationDone) {
