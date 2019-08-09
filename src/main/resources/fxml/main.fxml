@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="714.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:id="mainAnchorPane">
+<AnchorPane fx:id="mainAnchorPane" prefHeight="714.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <MenuBar>
         <menus>
@@ -11,6 +11,7 @@
             <items>
               <MenuItem fx:id="applicationMenuItem" mnemonicParsing="false" text="%main.menu.settings.apps" />
                   <MenuItem fx:id="toolkitMenuItem" mnemonicParsing="false" text="%main.menu.settings.toolkit" />
+                  <MenuItem fx:id="fileNameMenuItem" mnemonicParsing="false" text="%main.menu.settings.fileName" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="%main.menu.help">

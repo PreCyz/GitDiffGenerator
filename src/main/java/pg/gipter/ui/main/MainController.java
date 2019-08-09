@@ -65,6 +65,8 @@ public class MainController extends AbstractController {
     @FXML
     private MenuItem toolkitMenuItem;
     @FXML
+    private MenuItem fileNameMenuItem;
+    @FXML
     private MenuItem readMeMenuItem;
     @FXML
     private MenuItem instructionMenuItem;
@@ -306,6 +308,7 @@ public class MainController extends AbstractController {
     private void setActions(ResourceBundle resources) {
         applicationMenuItem.setOnAction(applicationActionEventHandler());
         toolkitMenuItem.setOnAction(toolkitActionEventHandler());
+        fileNameMenuItem.setOnAction(fileNameActionEvent());
         readMeMenuItem.setOnAction(readMeActionEventHandler());
         instructionMenuItem.setOnAction(instructionActionEventHandler());
         checkUpdatesMenuItem.setOnAction(checkUpdatesActionEventHandler());
@@ -333,6 +336,13 @@ public class MainController extends AbstractController {
         return event -> {
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.showToolkitSettingsWindow();
+        };
+    }
+
+    private EventHandler<ActionEvent> fileNameActionEvent() {
+        return event -> {
+            uiLauncher.setApplicationProperties(applicationProperties);
+            uiLauncher.showFileNameSettingsWindow();
         };
     }
 

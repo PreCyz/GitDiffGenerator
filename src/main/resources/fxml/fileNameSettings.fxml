@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.*?>
+<AnchorPane prefHeight="270.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ComboBox fx:id="firstPercentComboBox" layoutX="50.0" layoutY="7.0" prefWidth="150.0" />
+      <ComboBox fx:id="secondPercentComboBox" layoutX="50.0" layoutY="47.0" prefWidth="150.0" />
+      <ComboBox fx:id="thirdPercentComboBox" layoutX="50.0" layoutY="87.0" prefWidth="150.0" />
+      <ComboBox fx:id="fourthPercentComboBox" layoutX="50.0" layoutY="127.0" prefWidth="150.0" />
+      <ComboBox fx:id="fifthPercentComboBox" layoutX="50.0" layoutY="167.0" prefWidth="150.0" />
+      <Button fx:id="saveButton" layoutX="214.0" layoutY="7.0" mnemonicParsing="false" text="%fileNameSettings.save" textFill="#1eb235">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
+      <Button fx:id="clearButton" layoutX="214.0" layoutY="42.0" mnemonicParsing="false" text="%fileNameSettings.clear" textFill="#2302f8">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font></Button>
+      <Label layoutX="10.0" layoutY="10.0" text="\%1">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="10.0" layoutY="50.0" text="\%2">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="10.0" layoutY="90.0" text="\%3">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="10.0" layoutY="130.0" text="\%4">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="11.0" layoutY="170.0" text="\%5">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Label layoutX="10.0" layoutY="211.0" text="%fileNameSettings.infoText" />
+      <Label fx:id="resultFileName" layoutX="10.0" layoutY="241.0" textFill="#2302f8">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Pane id="picturePane" layoutX="280.0" prefHeight="200.0" prefWidth="308.0" />
+   </children>
+</AnchorPane>

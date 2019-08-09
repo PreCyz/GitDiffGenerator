@@ -55,6 +55,7 @@ public class UILauncher implements Launcher {
     private Stage jobWindow;
     private Stage projectsWindow;
     private Stage toolkitProjectsWindow;
+    private Stage applicationSettingsWindow;
     private TrayHandler trayHandler;
     private PropertiesHelper propertiesHelper;
     private boolean silentMode;
@@ -193,6 +194,7 @@ public class UILauncher implements Launcher {
     }
 
     public void changeLanguage(String language) {
+        applicationSettingsWindow.close();
         mainWindow.close();
         BundleUtils.changeBundle(language);
         execute();
@@ -378,7 +380,15 @@ public class UILauncher implements Launcher {
     }
 
     public void showApplicationSettingsWindow() {
-        createSettingsWindow(WindowFactory.APPLICATION_MENU);
+        applicationSettingsWindow = new Stage();
+        applicationSettingsWindow.initModality(Modality.APPLICATION_MODAL);
+        buildScene(applicationSettingsWindow, WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this));
+        applicationSettingsWindow.setOnCloseRequest(event -> {
+            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(applicationProperties.configurationName()));
+            applicationSettingsWindow.close();
+            execute();
+        });
+        applicationSettingsWindow.showAndWait();
     }
 
     private void createSettingsWindow(WindowFactory windowFactory) {
@@ -416,5 +426,9 @@ public class UILauncher implements Launcher {
 
     public JobHandler getJobHandler() {
         return jobHandler;
+    }
+
+    public void showFileNameSettingsWindow() {
+        createSettingsWindow(WindowFactory.FILE_NAME_SETTINGS_MENU);
     }
 }

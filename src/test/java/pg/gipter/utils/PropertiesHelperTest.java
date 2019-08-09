@@ -1,16 +1,20 @@
 package pg.gipter.utils;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.settings.ArgName;
+import pg.gipter.settings.dto.FileNameSetting;
+import pg.gipter.settings.dto.NamePatternValue;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -274,4 +278,50 @@ class PropertiesHelperTest {
         assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(username);
     }
 
+    @Test
+    void givenFileNameSetting_whenSaveFileNameSetting_thenSettingsAreSaved() {
+        FileNameSetting fns = new FileNameSetting();
+        fns.setFirstPercent(NamePatternValue.CURRENT_MONTH_NAME);
+        fns.setSecondPercent(NamePatternValue.CURRENT_WEEK_NUMBER);
+        fns.setThirdPercent(NamePatternValue.CURRENT_YEAR);
+        fns.setFourthPercent(NamePatternValue.END_DATE);
+        fns.setFifthPercent(NamePatternValue.START_DATE);
+
+        propertiesHelper.saveFileNameSetting(fns);
+
+        JsonObject jsonObject = propertiesHelper.readJsonConfig();
+        FileNameSetting actual = new Gson().fromJson(jsonObject.get(ConfigHelper.FILE_NAME_SETTING), FileNameSetting.class);
+        assertThat(actual.getFirstPercent()).isEqualTo(fns.getFirstPercent());
+        assertThat(actual.getSecondPercent()).isEqualTo(fns.getSecondPercent());
+        assertThat(actual.getThirdPercent()).isEqualTo(fns.getThirdPercent());
+        assertThat(actual.getFourthPercent()).isEqualTo(fns.getFourthPercent());
+        assertThat(actual.getFifthPercent()).isEqualTo(fns.getFifthPercent());
+    }
+
+    @Test
+    void givenFileNameSetting_whenLoadFileNameSetting_thenReturnFileNameSettings() {
+        FileNameSetting fns = new FileNameSetting();
+        fns.setFirstPercent(NamePatternValue.CURRENT_MONTH_NAME);
+        fns.setSecondPercent(NamePatternValue.CURRENT_WEEK_NUMBER);
+        fns.setThirdPercent(NamePatternValue.CURRENT_YEAR);
+        fns.setFourthPercent(NamePatternValue.END_DATE);
+        fns.setFifthPercent(NamePatternValue.START_DATE);
+        propertiesHelper.saveFileNameSetting(fns);
+
+        Optional<FileNameSetting> actual = propertiesHelper.loadFileNameSetting();
+
+        assertThat(actual.isPresent()).isTrue();
+        assertThat(actual.get().getFirstPercent()).isEqualTo(fns.getFirstPercent());
+        assertThat(actual.get().getSecondPercent()).isEqualTo(fns.getSecondPercent());
+        assertThat(actual.get().getThirdPercent()).isEqualTo(fns.getThirdPercent());
+        assertThat(actual.get().getFourthPercent()).isEqualTo(fns.getFourthPercent());
+        assertThat(actual.get().getFifthPercent()).isEqualTo(fns.getFifthPercent());
+    }
+
+    @Test
+    void givenNoFileNameSetting_whenLoadFileNameSetting_thenReturnEmptyOptional() {
+        Optional<FileNameSetting> actual = propertiesHelper.loadFileNameSetting();
+
+        assertThat(actual.isPresent()).isFalse();
+    }
 }

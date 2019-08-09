@@ -4,7 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
+import pg.gipter.settings.dto.FileNameSetting;
+import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.utils.PropertiesHelper;
+import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -93,31 +96,79 @@ public abstract class ApplicationProperties {
     }
 
     public final String fileName() {
-        DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate now = LocalDate.now();
-        LocalDate endDate = endDate();
         String fileName;
-        if (now.isEqual(endDate)) {
-            WeekFields weekFields = WeekFields.of(Locale.getDefault());
-            int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
-            fileName = String.format("%d-%s-week-%d", now.getYear(), now.getMonth(), weekNumber).toLowerCase();
+        Optional<FileNameSetting> fileNameSetting = new PropertiesHelper().loadFileNameSetting();
+        if (fileNameSetting.isPresent() && !StringUtils.nullOrEmpty(itemFileNamePrefix())) {
+            fileName = itemFileNamePrefix().replaceAll("%1", valueFromPattern(fileNameSetting.get().getFirstPercent()))
+                    .replaceAll("%2", valueFromPattern(fileNameSetting.get().getSecondPercent()))
+                    .replaceAll("%3", valueFromPattern(fileNameSetting.get().getThirdPercent()))
+                    .replaceAll("%4", valueFromPattern(fileNameSetting.get().getFourthPercent()))
+                    .replaceAll("%5", valueFromPattern(fileNameSetting.get().getFifthPercent()));
         } else {
-            fileName = String.format("%d-%s-%s-%s",
-                    endDate.getYear(),
-                    endDate.getMonth(),
-                    startDate().format(yyyyMMdd),
-                    endDate.format(yyyyMMdd)
-            ).toLowerCase();
-        }
-        if (!itemFileNamePrefix().isEmpty()) {
-            if (isUseAsFileName()) {
-                fileName = itemFileNamePrefix();
+            DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
+            LocalDate now = LocalDate.now();
+            LocalDate endDate = endDate();
+            if (now.isEqual(endDate)) {
+                WeekFields weekFields = WeekFields.of(Locale.getDefault());
+                int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
+                fileName = String.format("%d-%s-week-%d", now.getYear(), now.getMonth(), weekNumber).toLowerCase();
             } else {
-                fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
+                fileName = String.format("%d-%s-%s-%s",
+                        endDate.getYear(),
+                        endDate.getMonth(),
+                        startDate().format(yyyyMMdd),
+                        endDate.format(yyyyMMdd)
+                ).toLowerCase();
+            }
+            if (!itemFileNamePrefix().isEmpty()) {
+                if (isUseAsFileName()) {
+                    fileName = itemFileNamePrefix();
+                } else {
+                    fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
+                }
             }
         }
         String extension = getFileExtension();
         return fileName + "." + extension;
+    }
+
+    public String valueFromPattern(NamePatternValue patternValue) {
+        if (patternValue == null) {
+            return "";
+        }
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        switch (patternValue) {
+            case CURRENT_YEAR:
+                return String.valueOf(LocalDate.now().getYear());
+            case CURRENT_MONTH_NAME:
+                return LocalDate.now().getMonth().name();
+            case CURRENT_MONTH_NUMBER:
+                return String.valueOf(LocalDate.now().getMonthValue());
+            case CURRENT_WEEK_NUMBER:
+                return String.valueOf(LocalDate.now().get(weekFields.weekOfWeekBasedYear()));
+            case START_DATE:
+                return startDate().format(yyyy_MM_dd);
+            case START_DATE_YEAR:
+                return String.valueOf(startDate().getYear());
+            case START_DATE_MONTH_NAME:
+                return startDate().getMonth().name();
+            case START_DATE_MONTH_NUMBER:
+                return String.valueOf(startDate().getMonthValue());
+            case START_DATE_WEEK_NUMBER:
+                return String.valueOf(startDate().get(weekFields.weekOfWeekBasedYear()));
+            case END_DATE:
+                return endDate().format(yyyy_MM_dd);
+            case END_DATE_YEAR:
+                return String.valueOf(endDate().getYear());
+            case END_DATE_MONTH_NAME:
+                return endDate().getMonth().name();
+            case END_DATE_MONTH_NUMBER:
+                return String.valueOf(endDate().getMonthValue());
+            case END_DATE_WEEK_NUMBER:
+                return String.valueOf(endDate().get(weekFields.weekOfWeekBasedYear()));
+            default:
+                return "";
+        }
     }
 
     String getFileExtension() {

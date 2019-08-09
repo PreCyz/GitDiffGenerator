@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.settings.ArgName;
+import pg.gipter.settings.dto.FileNameSetting;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -158,7 +159,7 @@ public class PropertiesHelper {
             JsonObject appConfig = config.getAsJsonObject(ConfigHelper.APP_CONFIG);
             JsonObject toolkitConfig = config.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG);
             JsonArray runConfigs = config.getAsJsonArray(ConfigHelper.RUN_CONFIGS);
-            for (int i = 0; i < runConfigs.size(); ++i) {
+            for (int i = 0; runConfigs != null && i < runConfigs.size(); ++i) {
                 Properties properties = new Properties();
                 setProperties(appConfig, properties, ConfigHelper.APP_CONFIG_PROPERTIES);
                 setProperties(toolkitConfig, properties, ConfigHelper.TOOLKIT_CONFIG_PROPERTIES);
@@ -346,5 +347,23 @@ public class PropertiesHelper {
             }
         }
         return result;
+    }
+
+    public void saveFileNameSetting(FileNameSetting fileNameSetting) {
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            jsonObject = new JsonObject();
+        }
+        jsonObject.add(ConfigHelper.FILE_NAME_SETTING, new Gson().toJsonTree(fileNameSetting));
+        writeJsonConfig(jsonObject);
+    }
+
+    public Optional<FileNameSetting> loadFileNameSetting() {
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            return Optional.empty();
+        }
+        JsonElement jsonElement = jsonObject.get(ConfigHelper.FILE_NAME_SETTING);
+        return Optional.ofNullable(new Gson().fromJson(jsonElement, FileNameSetting.class));
     }
 }

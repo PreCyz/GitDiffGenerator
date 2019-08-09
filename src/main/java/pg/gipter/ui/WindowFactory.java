@@ -1,6 +1,8 @@
 package pg.gipter.ui;
 
 import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.ui.fileName.FileNameController;
+import pg.gipter.ui.fileName.FileNameWindow;
 import pg.gipter.ui.job.JobController;
 import pg.gipter.ui.job.JobWindow;
 import pg.gipter.ui.main.MainController;
@@ -50,6 +52,12 @@ public enum WindowFactory {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
             return new ToolkitProjectsWindow(new ToolkitProjectsController(applicationProperties, uiLauncher));
+        }
+    },
+    FILE_NAME_SETTINGS_MENU {
+        @Override
+        public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+            return new FileNameWindow(new FileNameController(applicationProperties, uiLauncher));
         }
     };
 

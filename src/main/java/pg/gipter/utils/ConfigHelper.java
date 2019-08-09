@@ -15,6 +15,7 @@ class ConfigHelper {
     final static String APP_CONFIG = "appConfig";
     final static String TOOLKIT_CONFIG = "toolkitConfig";
     final static String RUN_CONFIGS = "runConfigs";
+    final static String FILE_NAME_SETTING = "fileNameSettings";
     final static int NO_CONFIGURATION_FOUND = -1;
 
     final static Set<String> APP_CONFIG_PROPERTIES = new HashSet<>();

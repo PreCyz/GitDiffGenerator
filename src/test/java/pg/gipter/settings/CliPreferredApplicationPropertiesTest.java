@@ -2,11 +2,16 @@ package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
 import pg.gipter.producer.command.UploadType;
+import pg.gipter.settings.dto.FileNameSetting;
+import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.utils.PropertiesHelper;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.WeekFields;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
@@ -1587,5 +1592,169 @@ class CliPreferredApplicationPropertiesTest {
         String actual = applicationProperties.configurationName();
 
         assertThat(actual).isEqualTo("fileAuthor");
+    }
+
+    @Test
+    void givenNoNamePatternValue_whenValueFromPattern_thenReturnEmptyString() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(null);
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void givenCURRENT_YEAR_whenValueFromPattern_thenReturnYear() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_YEAR);
+
+        assertThat(actual).isEqualTo(String.valueOf(LocalDate.now().getYear()));
+    }
+
+    @Test
+    void givenCURRENT_MONTH_whenValueFromPattern_thenReturnMonthName() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_MONTH_NAME);
+
+        assertThat(actual).isEqualTo(LocalDate.now().getMonth().name());
+    }
+
+    @Test
+    void givenCURRENT_MONTH_NUMBER_whenValueFromPattern_thenReturnMonthNumber() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_MONTH_NUMBER);
+
+        assertThat(actual).isEqualTo(String.valueOf(LocalDate.now().getMonthValue()));
+    }
+
+    @Test
+    void givenCURRENT_WEEK_NUMBER_whenValueFromPattern_thenReturnCurrentWeekNumber() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_WEEK_NUMBER);
+
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        assertThat(actual).isEqualTo(String.valueOf(LocalDate.now().get(weekFields.weekOfWeekBasedYear())));
+    }
+
+    @Test
+    void givenSTART_DATE_whenValueFromPattern_thenReturnStartDate() {
+        String startDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE);
+
+        assertThat(actual).isEqualTo(startDate);
+    }
+
+    @Test
+    void givenSTART_DATE_YEAR_whenValueFromPattern_thenReturnStartDateYear() {
+        String startDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_YEAR);
+
+        assertThat(actual).isEqualTo("2018");
+    }
+
+    @Test
+    void givenSTART_DATE_MONTH_NAME_whenValueFromPattern_thenReturnStartDateMonthName() {
+        String startDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_MONTH_NAME);
+
+        assertThat(actual).isEqualTo(Month.JUNE.name());
+    }
+
+    @Test
+    void givenSTART_DATE_MONTH_NUMBER_whenValueFromPattern_thenReturnStartDateMonthNumber() {
+        String startDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_MONTH_NUMBER);
+
+        assertThat(actual).isEqualTo(String.valueOf(Month.JUNE.getValue()));
+    }
+
+    @Test
+    void givenSTART_DATE_WEEK_NUMBER_whenValueFromPattern_thenReturnStartDateMonthName() {
+        String startDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_WEEK_NUMBER);
+
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        assertThat(actual).isEqualTo(String.valueOf(LocalDate.parse(startDate, ApplicationProperties.yyyy_MM_dd).get(weekFields.weekOfWeekBasedYear())));
+    }
+
+    @Test
+    void givenEND_DATE_whenValueFromPattern_thenReturnEndDate() {
+        String endDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE);
+
+        assertThat(actual).isEqualTo(endDate);
+    }
+
+    @Test
+    void givenEND_DATE_YEAR_whenValueFromPattern_thenReturnEndDateYear() {
+        String endDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_YEAR);
+
+        assertThat(actual).isEqualTo("2018");
+    }
+
+    @Test
+    void givenEND_DATE_MONTH_NAME_whenValueFromPattern_thenReturnEndDateMonthName() {
+        String endDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_MONTH_NAME);
+
+        assertThat(actual).isEqualTo(Month.JUNE.name());
+    }
+
+    @Test
+    void givenEND_DATE_MONTH_NUMBER_whenValueFromPattern_thenReturnEndDateMonthNumber() {
+        String endDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_MONTH_NUMBER);
+
+        assertThat(actual).isEqualTo(String.valueOf(Month.JUNE.getValue()));
+    }
+
+    @Test
+    void givenEND_DATE_WEEK_NUMBER_whenValueFromPattern_thenReturnEndDateMonthName() {
+        String endDate = "2018-06-12";
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_WEEK_NUMBER);
+
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        assertThat(actual).isEqualTo(String.valueOf(LocalDate.parse(endDate, ApplicationProperties.yyyy_MM_dd).get(weekFields.weekOfWeekBasedYear())));
+    }
+
+    @Test
+    void givenFileNameSettingsAndFileNamePrefix_whenFileName_thenReturnFileNameFromPattern() {
+        FileNameSetting fns = new FileNameSetting();
+        fns.setFirstPercent(NamePatternValue.START_DATE_MONTH_NAME);
+        fns.setSecondPercent(NamePatternValue.START_DATE_YEAR);
+        new PropertiesHelper().saveFileNameSetting(fns);
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{
+                ArgName.itemFileNamePrefix + "=" + "my-%1-%2-name",
+                ArgName.startDate + "=2018-06-12"
+        });
+
+        String actual = applicationProperties.fileName();
+
+        assertThat(actual).startsWith("my-JUNE-2018-name");
     }
 }

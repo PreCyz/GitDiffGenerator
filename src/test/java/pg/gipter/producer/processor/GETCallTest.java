@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GETCallTest {
 
     @Test
-    void name() throws Exception {
+    void pocForDownloadingTheLastUploadDate() throws Exception {
         String[] args = new String[]{
                 ArgName.toolkitUsername.name() + "=PAWG",
                 ArgName.toolkitPassword.name() + "=give-password-here",
