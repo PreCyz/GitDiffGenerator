@@ -30,7 +30,10 @@ import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -144,10 +147,14 @@ public class ToolkitProjectsController extends AbstractController {
             uiLauncher.executeOutsideUIThread(() -> {
                 Set<String> links = toolkitService.downloadUserProjects();
                 if (!links.isEmpty()) {
-                    List<ProjectDetails> projects = links.stream()
+                    Set<ProjectDetails> projects = new LinkedHashSet<>();
+                    if (!projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+                        projects.addAll(projectsTableView.getItems());
+                    }
+                    projects.addAll(links.stream()
                             .map(link -> link.substring(link.indexOf(CASES)))
                             .map(p -> new ProjectDetails(p.replace(CASES, ""), UploadType.TOOLKIT_DOCS.name(), p))
-                            .collect(toList());
+                            .collect(toList()));
                     projectsTableView.setItems(FXCollections.observableArrayList(projects));
                     saveButton.setDisable(false);
                 } else {
