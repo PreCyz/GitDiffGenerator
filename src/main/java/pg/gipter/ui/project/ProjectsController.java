@@ -79,15 +79,15 @@ public class ProjectsController extends AbstractController {
         cvsTypeColumn.setEditable(false);
 
         column = projectsTableView.getColumns().get(2);
-        TableColumn<ProjectDetails, String> baseWordsColumn = new TableColumn<>();
-        baseWordsColumn.setText(column.getText());
-        baseWordsColumn.setPrefWidth(column.getPrefWidth());
-        baseWordsColumn.setCellValueFactory(new PropertyValueFactory<>("path"));
-        baseWordsColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        baseWordsColumn.setEditable(false);
+        TableColumn<ProjectDetails, String> path = new TableColumn<>();
+        path.setText(column.getText());
+        path.setPrefWidth(column.getPrefWidth());
+        path.setCellValueFactory(new PropertyValueFactory<>("path"));
+        path.setCellFactory(TextFieldTableCell.forTableColumn());
+        path.setEditable(false);
 
         projectsTableView.getColumns().clear();
-        projectsTableView.getColumns().addAll(nameColumn, cvsTypeColumn, baseWordsColumn);
+        projectsTableView.getColumns().addAll(nameColumn, cvsTypeColumn, path);
 
         projectsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         projectsTableView.getSelectionModel().selectedItemProperty().addListener(toDeleteChangeListener());
@@ -214,7 +214,6 @@ public class ProjectsController extends AbstractController {
         };
     }
 
-    @NotNull
     private EventHandler<ActionEvent> addButtonActionEventHandler(ResourceBundle resources) {
         return event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -249,7 +248,6 @@ public class ProjectsController extends AbstractController {
         };
     }
 
-    @NotNull
     private EventHandler<ActionEvent> removeButtonActionEventHandler() {
         return event -> {
             projectsToDelete = new LinkedHashSet<>(projectsTableView.getSelectionModel().getSelectedItems());

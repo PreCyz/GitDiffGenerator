@@ -1,18 +1,18 @@
-package pg.gipter.ui.fileName;
+package pg.gipter.ui.menu.fileName;
 
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
 
 /**Created by Gawa 2019-03-02*/
-public class FileNameWindow extends AbstractWindow {
+public class NameSettingsWindow extends AbstractWindow {
 
-    public FileNameWindow(AbstractController controller) {
+    public NameSettingsWindow(AbstractController controller) {
         super(controller);
     }
 
     @Override
     protected String fxmlFileName() {
-        return "fileNameSettings.fxml";
+        return "nameSettings.fxml";
     }
 
     @Override
@@ -22,11 +22,11 @@ public class FileNameWindow extends AbstractWindow {
 
     @Override
     protected String cssFileName() {
-        return "fileNameSettings.css";
+        return "nameSettings.css";
     }
 
     @Override
     public String windowTitleBundle() {
-        return "fileNameSettings.title";
+        return "nameSettings.title";
     }
 }

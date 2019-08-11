@@ -6,8 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.settings.ArgName;
-import pg.gipter.settings.dto.FileNameSetting;
 import pg.gipter.settings.dto.NamePatternValue;
+import pg.gipter.settings.dto.NameSetting;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -280,47 +280,51 @@ class PropertiesHelperTest {
 
     @Test
     void givenFileNameSetting_whenSaveFileNameSetting_thenSettingsAreSaved() {
-        FileNameSetting fns = new FileNameSetting();
-        fns.setFirstPercent(NamePatternValue.CURRENT_MONTH_NAME);
-        fns.setSecondPercent(NamePatternValue.CURRENT_WEEK_NUMBER);
-        fns.setThirdPercent(NamePatternValue.CURRENT_YEAR);
-        fns.setFourthPercent(NamePatternValue.END_DATE);
-        fns.setFifthPercent(NamePatternValue.START_DATE);
+        NameSetting fns = new NameSetting();
+        fns.addSetting("{CURRENT_MONTH_NAME}", NamePatternValue.CURRENT_MONTH_NAME);
+        fns.addSetting("{CURRENT_WEEK_NUMBER}", NamePatternValue.CURRENT_WEEK_NUMBER);
+        fns.addSetting("{CURRENT_YEAR}", NamePatternValue.CURRENT_YEAR);
+        fns.addSetting("{END_DATE}", NamePatternValue.END_DATE);
+        fns.addSetting("{START_DATE}", NamePatternValue.START_DATE);
 
         propertiesHelper.saveFileNameSetting(fns);
 
         JsonObject jsonObject = propertiesHelper.readJsonConfig();
-        FileNameSetting actual = new Gson().fromJson(jsonObject.get(ConfigHelper.FILE_NAME_SETTING), FileNameSetting.class);
-        assertThat(actual.getFirstPercent()).isEqualTo(fns.getFirstPercent());
-        assertThat(actual.getSecondPercent()).isEqualTo(fns.getSecondPercent());
-        assertThat(actual.getThirdPercent()).isEqualTo(fns.getThirdPercent());
-        assertThat(actual.getFourthPercent()).isEqualTo(fns.getFourthPercent());
-        assertThat(actual.getFifthPercent()).isEqualTo(fns.getFifthPercent());
+        NameSetting actual = new Gson().fromJson(jsonObject.get(ConfigHelper.FILE_NAME_SETTING), NameSetting.class);
+        Map<String, NamePatternValue> nameSettings = actual.getNameSettings();
+        assertThat(nameSettings).isNotEmpty();
+        assertThat(nameSettings.get("{CURRENT_MONTH_NAME}")).isEqualTo(fns.getNameSettings().get("{CURRENT_MONTH_NAME}"));
+        assertThat(nameSettings.get("{CURRENT_WEEK_NUMBER}")).isEqualTo(fns.getNameSettings().get("{CURRENT_WEEK_NUMBER}"));
+        assertThat(nameSettings.get("{CURRENT_YEAR}")).isEqualTo(fns.getNameSettings().get("{CURRENT_YEAR}"));
+        assertThat(nameSettings.get("{END_DATE}")).isEqualTo(fns.getNameSettings().get("{END_DATE}"));
+        assertThat(nameSettings.get("{START_DATE}")).isEqualTo(fns.getNameSettings().get("{START_DATE}"));
     }
 
     @Test
     void givenFileNameSetting_whenLoadFileNameSetting_thenReturnFileNameSettings() {
-        FileNameSetting fns = new FileNameSetting();
-        fns.setFirstPercent(NamePatternValue.CURRENT_MONTH_NAME);
-        fns.setSecondPercent(NamePatternValue.CURRENT_WEEK_NUMBER);
-        fns.setThirdPercent(NamePatternValue.CURRENT_YEAR);
-        fns.setFourthPercent(NamePatternValue.END_DATE);
-        fns.setFifthPercent(NamePatternValue.START_DATE);
+        NameSetting fns = new NameSetting();
+        fns.addSetting("{CURRENT_MONTH_NAME}", NamePatternValue.CURRENT_MONTH_NAME);
+        fns.addSetting("{CURRENT_WEEK_NUMBER}", NamePatternValue.CURRENT_WEEK_NUMBER);
+        fns.addSetting("{CURRENT_YEAR}", NamePatternValue.CURRENT_YEAR);
+        fns.addSetting("{END_DATE}", NamePatternValue.END_DATE);
+        fns.addSetting("{START_DATE}", NamePatternValue.START_DATE);
         propertiesHelper.saveFileNameSetting(fns);
 
-        Optional<FileNameSetting> actual = propertiesHelper.loadFileNameSetting();
+        Optional<NameSetting> actual = propertiesHelper.loadFileNameSetting();
 
         assertThat(actual.isPresent()).isTrue();
-        assertThat(actual.get().getFirstPercent()).isEqualTo(fns.getFirstPercent());
-        assertThat(actual.get().getSecondPercent()).isEqualTo(fns.getSecondPercent());
-        assertThat(actual.get().getThirdPercent()).isEqualTo(fns.getThirdPercent());
-        assertThat(actual.get().getFourthPercent()).isEqualTo(fns.getFourthPercent());
-        assertThat(actual.get().getFifthPercent()).isEqualTo(fns.getFifthPercent());
+        Map<String, NamePatternValue> nameSettings = actual.get().getNameSettings();
+        assertThat(nameSettings).isNotEmpty();
+        assertThat(nameSettings.get("{CURRENT_MONTH_NAME}")).isEqualTo(fns.getNameSettings().get("{CURRENT_MONTH_NAME}"));
+        assertThat(nameSettings.get("{CURRENT_WEEK_NUMBER}")).isEqualTo(fns.getNameSettings().get("{CURRENT_WEEK_NUMBER}"));
+        assertThat(nameSettings.get("{CURRENT_YEAR}")).isEqualTo(fns.getNameSettings().get("{CURRENT_YEAR}"));
+        assertThat(nameSettings.get("{END_DATE}")).isEqualTo(fns.getNameSettings().get("{END_DATE}"));
+        assertThat(nameSettings.get("{START_DATE}")).isEqualTo(fns.getNameSettings().get("{START_DATE}"));
     }
 
     @Test
     void givenNoFileNameSetting_whenLoadFileNameSetting_thenReturnEmptyOptional() {
-        Optional<FileNameSetting> actual = propertiesHelper.loadFileNameSetting();
+        Optional<NameSetting> actual = propertiesHelper.loadFileNameSetting();
 
         assertThat(actual.isPresent()).isFalse();
     }

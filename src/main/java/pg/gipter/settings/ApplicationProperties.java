@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
-import pg.gipter.settings.dto.FileNameSetting;
 import pg.gipter.settings.dto.NamePatternValue;
+import pg.gipter.settings.dto.NameSetting;
 import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
 
@@ -97,13 +97,13 @@ public abstract class ApplicationProperties {
 
     public final String fileName() {
         String fileName;
-        Optional<FileNameSetting> fileNameSetting = new PropertiesHelper().loadFileNameSetting();
+        Optional<NameSetting> fileNameSetting = new PropertiesHelper().loadFileNameSetting();
         if (fileNameSetting.isPresent() && !StringUtils.nullOrEmpty(itemFileNamePrefix())) {
-            fileName = itemFileNamePrefix().replaceAll("%1", valueFromPattern(fileNameSetting.get().getFirstPercent()))
-                    .replaceAll("%2", valueFromPattern(fileNameSetting.get().getSecondPercent()))
-                    .replaceAll("%3", valueFromPattern(fileNameSetting.get().getThirdPercent()))
-                    .replaceAll("%4", valueFromPattern(fileNameSetting.get().getFourthPercent()))
-                    .replaceAll("%5", valueFromPattern(fileNameSetting.get().getFifthPercent()));
+            fileName = itemFileNamePrefix();
+            for (Map.Entry<String, NamePatternValue> entry : fileNameSetting.get().getNameSettings().entrySet()) {
+                String pattern = "\\" + entry.getKey().substring(0, entry.getKey().length() - 1) + "\\}";
+                fileName = fileName.replaceAll(pattern, valueFromPattern(entry.getValue()));
+            }
         } else {
             DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
             LocalDate now = LocalDate.now();

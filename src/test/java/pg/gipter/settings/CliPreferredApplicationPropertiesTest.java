@@ -1,12 +1,16 @@
 package pg.gipter.settings;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.producer.command.UploadType;
-import pg.gipter.settings.dto.FileNameSetting;
 import pg.gipter.settings.dto.NamePatternValue;
+import pg.gipter.settings.dto.NameSetting;
 import pg.gipter.utils.PropertiesHelper;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.WeekFields;
@@ -21,6 +25,15 @@ import static pg.gipter.TestUtils.mockPropertiesLoader;
 class CliPreferredApplicationPropertiesTest {
 
     private CliPreferredApplicationProperties applicationProperties;
+
+    @AfterEach
+    void tearDown() {
+        try {
+            Files.deleteIfExists(Paths.get(PropertiesHelper.APPLICATION_PROPERTIES_JSON));
+        } catch (IOException e) {
+            System.out.println("There is something weird going on.");
+        }
+    }
 
     @Test
     void given_noAuthor_when_author_then_returnDefault() {
@@ -1744,12 +1757,12 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenFileNameSettingsAndFileNamePrefix_whenFileName_thenReturnFileNameFromPattern() {
-        FileNameSetting fns = new FileNameSetting();
-        fns.setFirstPercent(NamePatternValue.START_DATE_MONTH_NAME);
-        fns.setSecondPercent(NamePatternValue.START_DATE_YEAR);
+        NameSetting fns = new NameSetting();
+        fns.addSetting("{%1}", NamePatternValue.START_DATE_MONTH_NAME);
+        fns.addSetting("{%2}", NamePatternValue.START_DATE_YEAR);
         new PropertiesHelper().saveFileNameSetting(fns);
         applicationProperties = new CliPreferredApplicationProperties(new String[]{
-                ArgName.itemFileNamePrefix + "=" + "my-%1-%2-name",
+                ArgName.itemFileNamePrefix + "=" + "my-{%1}-{%2}-name",
                 ArgName.startDate + "=2018-06-12"
         });
 

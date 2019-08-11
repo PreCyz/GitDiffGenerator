@@ -308,7 +308,7 @@ public class MainController extends AbstractController {
     private void setActions(ResourceBundle resources) {
         applicationMenuItem.setOnAction(applicationActionEventHandler());
         toolkitMenuItem.setOnAction(toolkitActionEventHandler());
-        fileNameMenuItem.setOnAction(fileNameActionEvent());
+        fileNameMenuItem.setOnAction(nameSettingsActionEvent());
         readMeMenuItem.setOnAction(readMeActionEventHandler());
         instructionMenuItem.setOnAction(instructionActionEventHandler());
         checkUpdatesMenuItem.setOnAction(checkUpdatesActionEventHandler());
@@ -339,10 +339,10 @@ public class MainController extends AbstractController {
         };
     }
 
-    private EventHandler<ActionEvent> fileNameActionEvent() {
+    private EventHandler<ActionEvent> nameSettingsActionEvent() {
         return event -> {
             uiLauncher.setApplicationProperties(applicationProperties);
-            uiLauncher.showFileNameSettingsWindow();
+            uiLauncher.showNameSettingsWindow();
         };
     }
 

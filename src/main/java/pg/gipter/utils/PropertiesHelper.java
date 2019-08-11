@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.settings.ArgName;
-import pg.gipter.settings.dto.FileNameSetting;
+import pg.gipter.settings.dto.NameSetting;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +23,7 @@ public class PropertiesHelper {
     static final String APPLICATION_PROPERTIES = "application.properties";
     static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
     private static final String DATA_PROPERTIES = "data.properties";
-    static final String APPLICATION_PROPERTIES_JSON = "applicationProperties.json";
+    public static final String APPLICATION_PROPERTIES_JSON = "applicationProperties.json";
 
     public static final String UPLOAD_STATUS_KEY = "lastUploadStatus";
     public static final String UPLOAD_DATE_TIME_KEY = "lastUploadDateTime";
@@ -161,8 +161,12 @@ public class PropertiesHelper {
             JsonArray runConfigs = config.getAsJsonArray(ConfigHelper.RUN_CONFIGS);
             for (int i = 0; runConfigs != null && i < runConfigs.size(); ++i) {
                 Properties properties = new Properties();
-                setProperties(appConfig, properties, ConfigHelper.APP_CONFIG_PROPERTIES);
-                setProperties(toolkitConfig, properties, ConfigHelper.TOOLKIT_CONFIG_PROPERTIES);
+                if (appConfig != null) {
+                    setProperties(appConfig, properties, ConfigHelper.APP_CONFIG_PROPERTIES);
+                }
+                if (toolkitConfig != null) {
+                    setProperties(toolkitConfig, properties, ConfigHelper.TOOLKIT_CONFIG_PROPERTIES);
+                }
                 JsonObject runConfig = runConfigs.get(i).getAsJsonObject();
                 setProperties(runConfig, properties, ConfigHelper.RUN_CONFIG_PROPERTIES);
                 decryptPassword(properties);
@@ -349,21 +353,22 @@ public class PropertiesHelper {
         return result;
     }
 
-    public void saveFileNameSetting(FileNameSetting fileNameSetting) {
+    public void saveFileNameSetting(NameSetting fileNameSetting) {
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             jsonObject = new JsonObject();
         }
         jsonObject.add(ConfigHelper.FILE_NAME_SETTING, new Gson().toJsonTree(fileNameSetting));
+        logger.info("Saving file name settings {}", fileNameSetting.getNameSettings());
         writeJsonConfig(jsonObject);
     }
 
-    public Optional<FileNameSetting> loadFileNameSetting() {
+    public Optional<NameSetting> loadFileNameSetting() {
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             return Optional.empty();
         }
         JsonElement jsonElement = jsonObject.get(ConfigHelper.FILE_NAME_SETTING);
-        return Optional.ofNullable(new Gson().fromJson(jsonElement, FileNameSetting.class));
+        return Optional.ofNullable(new Gson().fromJson(jsonElement, NameSetting.class));
     }
 }
