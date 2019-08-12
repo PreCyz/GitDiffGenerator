@@ -429,16 +429,7 @@ public class UILauncher implements Launcher {
     }
 
     public void showNameSettingsWindow() {
-        //createSettingsWindow(WindowFactory.NAME_SETTINGS_MENU);
-        Stage stage = new Stage();
-        stage.initModality(Modality.WINDOW_MODAL);
-        buildScene(stage, WindowFactory.NAME_SETTINGS_MENU.createWindow(applicationProperties, this));
-        stage.setOnCloseRequest(event -> {
-            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(applicationProperties.configurationName()));
-            stage.close();
-            execute();
-        });
-        stage.showAndWait();
+        createSettingsWindow(WindowFactory.NAME_SETTINGS_MENU);
     }
 
 }

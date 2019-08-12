@@ -285,6 +285,7 @@ public class MainController extends AbstractController {
 
         progressIndicator.setVisible(false);
         instructionMenuItem.setDisable(!(Paths.get(PDF_DESCRIPTION_FILE).toFile().exists() && Desktop.isDesktopSupported()));
+        useAsFileNameCheckBox.setDisable(!definedPatterns.isEmpty());
         setDisableDependOnConfigurations();
 
         TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
