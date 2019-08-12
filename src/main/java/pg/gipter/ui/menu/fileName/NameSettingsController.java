@@ -9,7 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyEvent;
-import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.settings.dto.NameSetting;
 import pg.gipter.ui.AbstractController;
@@ -44,15 +43,11 @@ public class NameSettingsController extends AbstractController {
 
     private Set<NameTableData> patternsToDelete;
     private NameSetting fileNameSetting;
-    private ApplicationProperties applicationProperties;
 
     private final String emptyString = "";
 
-    private final String SAMPLE = "how-%1-high-%2-can-%3-you-%4-go-%5-?";
-
-    public NameSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+    public NameSettingsController(UILauncher uiLauncher) {
         super(uiLauncher);
-        this.applicationProperties = applicationProperties;
         this.fileNameSetting = new NameSetting();
     }
 
@@ -94,9 +89,9 @@ public class NameSettingsController extends AbstractController {
     }
 
     private void setInitValues() {
-        Optional<NameSetting> fileNameSetting = propertiesHelper.loadFileNameSetting();
-        if (fileNameSetting.isPresent()) {
-            this.fileNameSetting = fileNameSetting.get();
+        Optional<NameSetting> fnsOpt = propertiesHelper.loadFileNameSetting();
+        if (fnsOpt.isPresent()) {
+            fileNameSetting = fnsOpt.get();
             setTableViewData();
         }
         replacementComboBox.setValue(emptyString);
@@ -191,6 +186,8 @@ public class NameSettingsController extends AbstractController {
                                 emptyString.equals(newValue) || emptyString.equals(wordToReplaceTextField.getText())
                         )
                 );
+
+
     }
 
 }

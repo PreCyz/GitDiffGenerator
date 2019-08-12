@@ -21,7 +21,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
@@ -149,12 +152,15 @@ public class MainController extends AbstractController {
     private ApplicationProperties applicationProperties;
 
     private String userFolderUrl;
+    private Set<String> definedPatterns;
+    private String currentItemName = "";
     private static boolean useComboBoxValueChangeListener = true;
     private final String PDF_DESCRIPTION_FILE = "Gipter-ui-description.pdf";
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
+        this.definedPatterns = new LinkedHashSet<>();
     }
 
     @Override
@@ -168,6 +174,8 @@ public class MainController extends AbstractController {
     }
 
     private void setInitValues() {
+        propertiesHelper.loadFileNameSetting().ifPresent(nameSetting -> definedPatterns.addAll(nameSetting.getNameSettings().keySet()));
+
         authorsTextField.setText(String.join(",", applicationProperties.authors()));
         committerEmailTextField.setText(applicationProperties.committerEmail());
         gitAuthorTextField.setText(applicationProperties.gitAuthor());
@@ -278,17 +286,8 @@ public class MainController extends AbstractController {
         progressIndicator.setVisible(false);
         instructionMenuItem.setDisable(!(Paths.get(PDF_DESCRIPTION_FILE).toFile().exists() && Desktop.isDesktopSupported()));
         setDisableDependOnConfigurations();
-    }
 
-    private void setDisableDependOnConfigurations() {
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
-        addConfigurationButton.setDisable(map.isEmpty());
-        removeConfigurationButton.setDisable(map.isEmpty());
-        executeButton.setDisable(map.isEmpty());
-        executeAllButton.setDisable(map.isEmpty());
-        jobButton.setDisable(map.isEmpty());
-        configurationNameComboBox.setDisable(map.isEmpty());
-        projectPathButton.setDisable(map.isEmpty() || uploadTypeComboBox.getValue() == UploadType.STATEMENT);
+        TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -302,6 +301,26 @@ public class MainController extends AbstractController {
             public LocalDate fromString(String string) {
                 return LocalDate.parse(string, yyyy_MM_dd);
             }
+        };
+    }
+
+    private void setDisableDependOnConfigurations() {
+        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        addConfigurationButton.setDisable(map.isEmpty());
+        removeConfigurationButton.setDisable(map.isEmpty());
+        executeButton.setDisable(map.isEmpty());
+        executeAllButton.setDisable(map.isEmpty());
+        jobButton.setDisable(map.isEmpty());
+        configurationNameComboBox.setDisable(map.isEmpty());
+        projectPathButton.setDisable(map.isEmpty() || uploadTypeComboBox.getValue() == UploadType.STATEMENT);
+    }
+
+    private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
+        return param -> {
+            if (itemFileNamePrefixTextField.getText().endsWith("{")) {
+                return definedPatterns;
+            }
+            return Collections.emptyList();
         };
     }
 
@@ -323,6 +342,7 @@ public class MainController extends AbstractController {
         addConfigurationButton.setOnAction(addConfigurationEventHandler());
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
         toolkitUserFolderHyperlink.setOnMouseClicked(toolkitUserFolderOnMouseClickEventHandler());
+        itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
@@ -686,6 +706,30 @@ public class MainController extends AbstractController {
         };
     }
 
+    private EventHandler<MouseEvent> toolkitUserFolderOnMouseClickEventHandler() {
+        return event -> Platform.runLater(() -> {
+            String userFolder = applicationProperties.toolkitUserFolder();
+            if (!applicationProperties.toolkitUserFolder().equalsIgnoreCase(userFolderUrl)) {
+                userFolder = userFolderUrl;
+            }
+            AppManager instance = AppManagerFactory.getInstance();
+            instance.launchDefaultBrowser(userFolder);
+            toolkitUserFolderHyperlink.setVisited(false);
+        });
+    }
+
+    private EventHandler<KeyEvent> itemNameKeyReleasedEventHandler() {
+        return event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                String newValue = currentItemName.substring(0, currentItemName.length() - 1) + itemFileNamePrefixTextField.getText();
+                itemFileNamePrefixTextField.setText(newValue);
+                itemFileNamePrefixTextField.positionCaret(newValue.length());
+            } else {
+                currentItemName = itemFileNamePrefixTextField.getText();
+            }
+        };
+    }
+
     private void setToolkitCredentialsIfAvailable() {
         Properties properties = propertiesHelper.loadToolkitCredentials();
         toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
@@ -753,7 +797,6 @@ public class MainController extends AbstractController {
         });
     }
 
-    @NotNull
     private ChangeListener<String> comboBoxValueChangeListener() {
         return (options, oldValue, newValue) -> {
             if (useComboBoxValueChangeListener) {
@@ -766,19 +809,6 @@ public class MainController extends AbstractController {
                 }
             }
         };
-    }
-
-    @NotNull
-    private EventHandler<MouseEvent> toolkitUserFolderOnMouseClickEventHandler() {
-        return event -> Platform.runLater(() -> {
-            String userFolder = applicationProperties.toolkitUserFolder();
-            if (!applicationProperties.toolkitUserFolder().equalsIgnoreCase(userFolderUrl)) {
-                userFolder = userFolderUrl;
-            }
-            AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser(userFolder);
-            toolkitUserFolderHyperlink.setVisited(false);
-        });
     }
 
 }

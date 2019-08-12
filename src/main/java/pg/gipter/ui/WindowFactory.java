@@ -57,7 +57,7 @@ public enum WindowFactory {
     NAME_SETTINGS_MENU {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new NameSettingsWindow(new NameSettingsController(applicationProperties, uiLauncher));
+            return new NameSettingsWindow(new NameSettingsController(uiLauncher));
         }
     };
 
