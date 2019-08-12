@@ -72,8 +72,8 @@
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="558.0">
                            <children>
                               <Label layoutX="10.0" layoutY="17.0" text="%paths.panel.fileNamePrefix" />
-                              <TextField fx:id="itemFileNamePrefixTextField" layoutX="101.0" layoutY="14.0" prefHeight="25.0" prefWidth="186.0" />
-                              <CheckBox fx:id="useAsFileNameCheckBox" layoutX="302.0" layoutY="17.0" mnemonicParsing="false" text="%paths.panel.useAsFileName" />
+                              <TextField fx:id="itemFileNamePrefixTextField" layoutX="101.0" layoutY="14.0" prefHeight="25.0" prefWidth="296.0" />
+                              <CheckBox fx:id="useAsFileNameCheckBox" layoutX="407.0" layoutY="17.0" mnemonicParsing="false" text="%paths.panel.useAsFileName" />
                               <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="50.0" prefHeight="17.0" prefWidth="127.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
