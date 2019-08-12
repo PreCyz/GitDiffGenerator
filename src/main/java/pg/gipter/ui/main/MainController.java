@@ -155,7 +155,6 @@ public class MainController extends AbstractController {
     private Set<String> definedPatterns;
     private String currentItemName = "";
     private static boolean useComboBoxValueChangeListener = true;
-    private final String PDF_DESCRIPTION_FILE = "Gipter-ui-description.pdf";
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -196,7 +195,7 @@ public class MainController extends AbstractController {
         projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
         itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
-        useAsFileNameCheckBox.setSelected(applicationProperties.isUseAsFileName());
+        useAsFileNameCheckBox.setSelected(applicationProperties.isUseAsFileName() && definedPatterns.isEmpty());
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
         deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
 
@@ -284,7 +283,7 @@ public class MainController extends AbstractController {
         skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
 
         progressIndicator.setVisible(false);
-        instructionMenuItem.setDisable(!(Paths.get(PDF_DESCRIPTION_FILE).toFile().exists() && Desktop.isDesktopSupported()));
+        instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
         useAsFileNameCheckBox.setDisable(!definedPatterns.isEmpty());
         setDisableDependOnConfigurations();
 

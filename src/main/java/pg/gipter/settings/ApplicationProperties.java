@@ -98,10 +98,11 @@ public abstract class ApplicationProperties {
     public final String fileName() {
         String fileName;
         Optional<NameSetting> fileNameSetting = new PropertiesHelper().loadFileNameSetting();
-        if (fileNameSetting.isPresent() && !StringUtils.nullOrEmpty(itemFileNamePrefix())) {
+        if (fileNameSetting.isPresent() && !fileNameSetting.get().getNameSettings().isEmpty()
+                && !StringUtils.nullOrEmpty(itemFileNamePrefix())) {
             fileName = itemFileNamePrefix();
             for (Map.Entry<String, NamePatternValue> entry : fileNameSetting.get().getNameSettings().entrySet()) {
-                String pattern = "\\" + entry.getKey().substring(0, entry.getKey().length() - 1) + "\\}";
+                String pattern = "\\{" + entry.getKey().substring(1, entry.getKey().length() - 1) + "\\}";
                 fileName = fileName.replaceAll(pattern, valueFromPattern(entry.getValue()));
             }
         } else {
