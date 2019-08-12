@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyEvent;
+import pg.gipter.settings.ArgName;
 import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.settings.dto.NameSetting;
 import pg.gipter.ui.AbstractController;
@@ -17,6 +18,7 @@ import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
 import java.util.*;
@@ -115,7 +117,11 @@ public class NameSettingsController extends AbstractController {
 
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            uiLauncher.executeOutsideUIThread(() -> propertiesHelper.saveFileNameSetting(fileNameSetting));
+            uiLauncher.executeOutsideUIThread(() -> {
+                propertiesHelper.saveFileNameSetting(fileNameSetting);
+                clearItemFileNamePrefix();
+            });
+            saveButton.setDisable(fileNameSetting.getNameSettings().isEmpty());
             new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("nameSettings.saved"))
                     .withAlertType(Alert.AlertType.INFORMATION)
@@ -123,6 +129,25 @@ public class NameSettingsController extends AbstractController {
                     .withImage(ImageFile.FINGER_UP)
                     .buildAndDisplayWindow();
         };
+    }
+
+    private void clearItemFileNamePrefix() {
+        if (fileNameSetting.getNameSettings().isEmpty()) {
+            Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+            if (!map.isEmpty()) {
+                for (Properties config : map.values()) {
+                    String property = config.getProperty(ArgName.itemFileNamePrefix.name());
+                        if (!StringUtils.nullOrEmpty(property)) {
+                            int openingBracket = property.indexOf("{", 0);
+                            int closingBracket = property.indexOf("}", openingBracket);
+                            if (openingBracket >= 0 && closingBracket > 0) {
+                                config.remove(ArgName.itemFileNamePrefix.name());
+                                propertiesHelper.saveRunConfig(config);
+                            }
+                        }
+                }
+            }
+        }
     }
 
     private EventHandler<ActionEvent> removeButtonActionEventHandler() {
@@ -172,7 +197,6 @@ public class NameSettingsController extends AbstractController {
         return event -> {
             fileNameSetting = new NameSetting();
             nameSettingsTableView.getItems().clear();
-            saveButton.setDisable(nameSettingsTableView.getItems().isEmpty());
             clearButton.setDisable(nameSettingsTableView.getItems().isEmpty());
             removeButton.setDisable(nameSettingsTableView.getItems().isEmpty());
         };
