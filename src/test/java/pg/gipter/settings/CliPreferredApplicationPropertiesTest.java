@@ -1617,6 +1617,15 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
+    void givenCURRENT_DATE_whenValueFromPattern_thenReturnNow() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_DATE);
+
+        assertThat(actual).isEqualTo(LocalDate.now().format(ApplicationProperties.yyyy_MM_dd));
+    }
+
+    @Test
     void givenCURRENT_YEAR_whenValueFromPattern_thenReturnYear() {
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
 

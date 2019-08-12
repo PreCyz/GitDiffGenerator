@@ -2,6 +2,7 @@ package pg.gipter.ui.main;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -55,6 +56,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
@@ -154,6 +156,8 @@ public class MainController extends AbstractController {
     private String userFolderUrl;
     private Set<String> definedPatterns;
     private String currentItemName = "";
+    private String inteliSense = "";
+    private boolean useInteliSense = false;
     private static boolean useComboBoxValueChangeListener = true;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
@@ -317,10 +321,21 @@ public class MainController extends AbstractController {
 
     private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
         return param -> {
-            if (itemFileNamePrefixTextField.getText().endsWith("{")) {
-                return definedPatterns;
+            Collection<String> result = new HashSet<>();
+            if (itemFileNamePrefixTextField.getText().endsWith("{") || !inteliSense.isEmpty()) {
+                useInteliSense = true;
+                if (inteliSense.isEmpty()) {
+                    result = definedPatterns;
+                } else {
+                    result = definedPatterns.stream()
+                            .filter(pattern -> pattern.substring(1).toLowerCase().startsWith(inteliSense))
+                            .collect(toCollection(LinkedHashSet::new));
+                }
+            } else if (itemFileNamePrefixTextField.getText().endsWith("}")) {
+                useInteliSense = false;
+                inteliSense = "";
             }
-            return Collections.emptyList();
+            return result;
         };
     }
 
@@ -343,6 +358,29 @@ public class MainController extends AbstractController {
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
         toolkitUserFolderHyperlink.setOnMouseClicked(toolkitUserFolderOnMouseClickEventHandler());
         itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
+        itemFileNamePrefixTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                String value = "";
+                if (definedPatterns.contains(newValue)) {
+                    value = oldValue.substring(0, oldValue.lastIndexOf("{") - 1) + newValue;
+                    System.out.println(value);
+                }
+                if (useInteliSense) {
+                    if (newValue.length() > oldValue.length()) {
+                        inteliSense += value = newValue.replace(oldValue, "");
+                        System.out.println(value);
+                    } else {
+                        inteliSense = value = oldValue.replace(newValue, "");
+                        inteliSense = inteliSense.substring(0, inteliSense.length() - 1);
+                    }
+                    System.out.println("inteliSense="+inteliSense);
+                }
+                System.out.println("oldvalue=" + oldValue);
+                System.out.println("newValue"  + newValue );
+                System.out.println("value="  + value );
+            }
+        });
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
@@ -721,11 +759,30 @@ public class MainController extends AbstractController {
     private EventHandler<KeyEvent> itemNameKeyReleasedEventHandler() {
         return event -> {
             if (event.getCode() == KeyCode.ENTER) {
-                String newValue = currentItemName.substring(0, currentItemName.length() - 1) + itemFileNamePrefixTextField.getText();
-                itemFileNamePrefixTextField.setText(newValue);
-                itemFileNamePrefixTextField.positionCaret(newValue.length());
+                String value = currentItemName.substring(0, currentItemName.length() - (inteliSense.length() + 1));
+                value += itemFileNamePrefixTextField.getText();
+                itemFileNamePrefixTextField.setText(value);
+                itemFileNamePrefixTextField.positionCaret(value.length());
+                inteliSense = "";
+                useInteliSense = false;
             } else {
                 currentItemName = itemFileNamePrefixTextField.getText();
+            }
+            if (useInteliSense) {
+                if (event.getCode() == KeyCode.BACK_SPACE) {
+                    if (!itemFileNamePrefixTextField.getText().contains("{")) {
+                        inteliSense = "";
+                        useInteliSense = false;
+                    } else if (itemFileNamePrefixTextField.getText().endsWith("{")) {
+                        inteliSense = "";
+                    } else {
+                        inteliSense = inteliSense.substring(0, inteliSense.length() - 1);
+                        System.out.println("odpali");
+                    }
+                } else {
+                    System.out.println("odpaliaaa");
+                    inteliSense += event.getText();
+                }
             }
         };
     }

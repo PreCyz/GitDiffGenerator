@@ -1,6 +1,7 @@
 package pg.gipter.settings.dto;
 
 public enum NamePatternValue {
+    CURRENT_DATE,
     CURRENT_YEAR,
     CURRENT_WEEK_NUMBER,
     CURRENT_MONTH_NAME,

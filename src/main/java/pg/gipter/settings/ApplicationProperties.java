@@ -133,12 +133,14 @@ public abstract class ApplicationProperties {
         return fileName + "." + extension;
     }
 
-    public String valueFromPattern(NamePatternValue patternValue) {
+    String valueFromPattern(NamePatternValue patternValue) {
         if (patternValue == null) {
             return "";
         }
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         switch (patternValue) {
+            case CURRENT_DATE:
+                return LocalDate.now().format(yyyy_MM_dd);
             case CURRENT_YEAR:
                 return String.valueOf(LocalDate.now().getYear());
             case CURRENT_MONTH_NAME:
