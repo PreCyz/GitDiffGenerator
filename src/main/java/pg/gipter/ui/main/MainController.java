@@ -2,7 +2,6 @@ package pg.gipter.ui.main;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -322,18 +321,13 @@ public class MainController extends AbstractController {
     private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
         return param -> {
             Collection<String> result = new HashSet<>();
-            if (itemFileNamePrefixTextField.getText().endsWith("{") || !inteliSense.isEmpty()) {
-                useInteliSense = true;
-                if (inteliSense.isEmpty()) {
-                    result = definedPatterns;
-                } else {
+            if (useInteliSense) {
+                result = definedPatterns;
+                if (!inteliSense.isEmpty()) {
                     result = definedPatterns.stream()
-                            .filter(pattern -> pattern.substring(1).toLowerCase().startsWith(inteliSense))
+                            .filter(pattern -> pattern.startsWith(inteliSense))
                             .collect(toCollection(LinkedHashSet::new));
                 }
-            } else if (itemFileNamePrefixTextField.getText().endsWith("}")) {
-                useInteliSense = false;
-                inteliSense = "";
             }
             return result;
         };
@@ -358,29 +352,6 @@ public class MainController extends AbstractController {
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
         toolkitUserFolderHyperlink.setOnMouseClicked(toolkitUserFolderOnMouseClickEventHandler());
         itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
-        itemFileNamePrefixTextField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                String value = "";
-                if (definedPatterns.contains(newValue)) {
-                    value = oldValue.substring(0, oldValue.lastIndexOf("{") - 1) + newValue;
-                    System.out.println(value);
-                }
-                if (useInteliSense) {
-                    if (newValue.length() > oldValue.length()) {
-                        inteliSense += value = newValue.replace(oldValue, "");
-                        System.out.println(value);
-                    } else {
-                        inteliSense = value = oldValue.replace(newValue, "");
-                        inteliSense = inteliSense.substring(0, inteliSense.length() - 1);
-                    }
-                    System.out.println("inteliSense="+inteliSense);
-                }
-                System.out.println("oldvalue=" + oldValue);
-                System.out.println("newValue"  + newValue );
-                System.out.println("value="  + value );
-            }
-        });
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
@@ -759,30 +730,8 @@ public class MainController extends AbstractController {
     private EventHandler<KeyEvent> itemNameKeyReleasedEventHandler() {
         return event -> {
             if (event.getCode() == KeyCode.ENTER) {
-                String value = currentItemName.substring(0, currentItemName.length() - (inteliSense.length() + 1));
-                value += itemFileNamePrefixTextField.getText();
-                itemFileNamePrefixTextField.setText(value);
-                itemFileNamePrefixTextField.positionCaret(value.length());
-                inteliSense = "";
-                useInteliSense = false;
-            } else {
-                currentItemName = itemFileNamePrefixTextField.getText();
-            }
-            if (useInteliSense) {
-                if (event.getCode() == KeyCode.BACK_SPACE) {
-                    if (!itemFileNamePrefixTextField.getText().contains("{")) {
-                        inteliSense = "";
-                        useInteliSense = false;
-                    } else if (itemFileNamePrefixTextField.getText().endsWith("{")) {
-                        inteliSense = "";
-                    } else {
-                        inteliSense = inteliSense.substring(0, inteliSense.length() - 1);
-                        System.out.println("odpali");
-                    }
-                } else {
-                    System.out.println("odpaliaaa");
-                    inteliSense += event.getText();
-                }
+                itemFileNamePrefixTextField.setText(currentItemName);
+                itemFileNamePrefixTextField.positionCaret(currentItemName.length());
             }
         };
     }
@@ -815,43 +764,23 @@ public class MainController extends AbstractController {
     }
 
     private void setListeners() {
-        toolkitUsernameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            userFolderUrl = applicationProperties.toolkitUserFolder();
-            userFolderUrl = userFolderUrl.substring(0, userFolderUrl.lastIndexOf("/") + 1) + newValue;
-        });
-
-        configurationNameComboBox.getSelectionModel()
-                .selectedItemProperty()
-                .addListener(comboBoxValueChangeListener());
-
-        configurationNameTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (StringUtils.nullOrEmpty(oldValue) && !StringUtils.nullOrEmpty(newValue)) {
-                addConfigurationButton.setDisable(false);
-                projectPathButton.setDisable(false);
-            } else if (StringUtils.nullOrEmpty(newValue)) {
-                addConfigurationButton.setDisable(true);
-                projectPathButton.setDisable(true);
-            }
-        });
-
-        useLastItemDateCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            startDatePicker.setDisable(newValue);
-            periodInDaysTextField.setDisable(newValue);
-            if (newValue) {
-                startDatePicker.setValue(uiLauncher.getLastItemSubmissionDate().toLocalDate());
-                int newPeriodInDays = endDatePicker.getValue().getDayOfYear() - startDatePicker.getValue().getDayOfYear();
-                periodInDaysTextField.setText(String.valueOf(newPeriodInDays));
-            } else {
-                periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
-                startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
-            }
-        });
-
+        toolkitUsernameTextField.textProperty().addListener(toolkitUsernameListener());
+        configurationNameComboBox.getSelectionModel().selectedItemProperty().addListener(comboBoxValueChangeListener());
+        configurationNameTextField.textProperty().addListener(configurationNameListener());
+        useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
+        itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
                 e.consume();
             }
         });
+    }
+
+    private ChangeListener<String> toolkitUsernameListener() {
+        return (observable, oldValue, newValue) -> {
+            userFolderUrl = applicationProperties.toolkitUserFolder();
+            userFolderUrl = userFolderUrl.substring(0, userFolderUrl.lastIndexOf("/") + 1) + newValue;
+        };
     }
 
     private ChangeListener<String> comboBoxValueChangeListener() {
@@ -863,6 +792,67 @@ public class MainController extends AbstractController {
                 configurationNameTextField.setText(newValue);
                 if (useLastItemDateCheckbox.isSelected()) {
                     useLastItemDateCheckbox.setSelected(false);
+                }
+            }
+        };
+    }
+
+    private ChangeListener<String> configurationNameListener() {
+        return (observable, oldValue, newValue) -> {
+            if (StringUtils.nullOrEmpty(oldValue) && !StringUtils.nullOrEmpty(newValue)) {
+                addConfigurationButton.setDisable(false);
+                projectPathButton.setDisable(false);
+            } else if (StringUtils.nullOrEmpty(newValue)) {
+                addConfigurationButton.setDisable(true);
+                projectPathButton.setDisable(true);
+            }
+        };
+    }
+
+    private ChangeListener<Boolean> useListItemCheckBoxListener() {
+        return (observable, oldValue, newValue) -> {
+            startDatePicker.setDisable(newValue);
+            periodInDaysTextField.setDisable(newValue);
+            if (newValue) {
+                startDatePicker.setValue(uiLauncher.getLastItemSubmissionDate().toLocalDate());
+                int newPeriodInDays = endDatePicker.getValue().getDayOfYear() - startDatePicker.getValue().getDayOfYear();
+                periodInDaysTextField.setText(String.valueOf(newPeriodInDays));
+            } else {
+                periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
+                startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
+            }
+        };
+    }
+
+    private ChangeListener<String> itemFileNameChangeListener() {
+        return (observable, oldValue, newValue) -> {
+            if (newValue.endsWith("{")) {
+                useInteliSense = true;
+                inteliSense = "";
+            } else if (newValue.endsWith("}") || newValue.isEmpty()) {
+                useInteliSense = false;
+            }
+            if (definedPatterns.contains(newValue)) {
+                useInteliSense = false;
+                inteliSense = "";
+                currentItemName = oldValue.substring(0, oldValue.lastIndexOf("{")) + newValue;
+                itemFileNamePrefixTextField.setText(currentItemName);
+                itemFileNamePrefixTextField.positionCaret(currentItemName.length());
+            } else {
+                currentItemName = newValue;
+            }
+
+            if (useInteliSense) {
+                //letter was added
+                if (newValue.length() > oldValue.length()) {
+                    inteliSense += newValue.replace(oldValue, "");
+                } else { //back space was pressed
+                    if (oldValue.endsWith("{")) {
+                        inteliSense = "";
+                        useInteliSense = false;
+                    } else {
+                        inteliSense = newValue.substring(newValue.lastIndexOf("{"));
+                    }
                 }
             }
         };
