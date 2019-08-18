@@ -59,7 +59,7 @@ public class PropertiesHelper {
         return properties;
     }
 
-    Optional<Properties> loadProperties(String fileName) {
+    private Optional<Properties> loadProperties(String fileName) {
         Properties properties;
 
         try (InputStream fis = new FileInputStream(fileName);
