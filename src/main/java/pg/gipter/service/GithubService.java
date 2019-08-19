@@ -98,8 +98,14 @@ public class GithubService {
 
             if (!result) {
                 for (int i = 0; i < newVersion.length; i++) {
-                    if (Integer.parseInt(newVersion[i]) > Integer.parseInt(currentVersion[i])) {
-                        result = true;
+                    try {
+                        if (Integer.parseInt(newVersion[i]) > Integer.parseInt(currentVersion[i])) {
+                            result = true;
+                            break;
+                        }
+                    } catch (NumberFormatException ex) {
+                        logger.warn("Versions contains more than only numbers. {}", ex.getMessage());
+                        result = false;
                         break;
                     }
                 }
