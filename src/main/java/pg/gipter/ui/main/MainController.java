@@ -26,6 +26,7 @@ import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
+import pg.gipter.dao.CacheManager;
 import pg.gipter.dao.DaoConstants;
 import pg.gipter.dao.DaoFactory;
 import pg.gipter.dao.DataDao;
@@ -608,6 +609,7 @@ public class MainController extends AbstractController {
 
             String[] args = createArgsFromUI();
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+            CacheManager.removeFromCache(applicationProperties.configurationName());
             uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
             setLastItemSubmissionDate();
 
@@ -796,6 +798,7 @@ public class MainController extends AbstractController {
             if (useComboBoxValueChangeListener) {
                 String[] args = propertiesDao.loadArgumentArray(newValue);
                 applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+                CacheManager.addToCache(applicationProperties.configurationName(), applicationProperties);
                 setInitValues();
                 configurationNameTextField.setText(newValue);
                 if (useLastItemDateCheckbox.isSelected()) {
