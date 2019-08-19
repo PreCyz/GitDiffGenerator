@@ -105,7 +105,7 @@ public class ToolkitService extends Task<Set<String>> {
             }
             submissionDate = Optional.ofNullable(submissionDateElement.getAsString());
         } catch (Exception ex) {
-            logger.error("Can not download last item submission date. ", ex);
+            logger.error("Can not download last item submission date. {}", ex.getMessage());
         }
         return submissionDate;
     }
