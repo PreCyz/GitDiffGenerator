@@ -34,6 +34,7 @@ import pg.gipter.service.ToolkitService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
+import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.UILauncher;
@@ -53,10 +54,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
@@ -465,7 +464,7 @@ public class MainController extends AbstractController {
             String[] args = createArgsFromUI();
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
 
-            FXMultiRunner runner = new FXMultiRunner(Stream.of(uiAppProperties.configurationName()).collect(toList()), uiLauncher.nonUIExecutor());
+            FXMultiRunner runner = new FXMultiRunner(uiAppProperties, uiLauncher.nonUIExecutor());
             resetIndicatorProperties(runner);
             uiLauncher.executeOutsideUIThread(() -> {
                 runner.start();
@@ -553,6 +552,7 @@ public class MainController extends AbstractController {
         }
 
         argList.add(ArgName.configurationName + "=" + configurationNameTextField.getText());
+        argList.add(ArgName.preferredArgSource + "=" + PreferredArgSource.UI);
 
         return argList.toArray(new String[0]);
     }

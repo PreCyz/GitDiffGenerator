@@ -57,12 +57,20 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private Map<String, UploadResult> resultMap = new LinkedHashMap<>();
     private long totalProgress;
     private AtomicLong workDone;
+    private ApplicationProperties applicationProperties;
 
     public FXMultiRunner(Collection<String> configurationNames, Executor executor) {
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
         this.totalProgress = configurationNames.size() * 5;
         this.workDone = new AtomicLong(0);
+        this.applicationProperties = null;
+    }
+
+    public FXMultiRunner(ApplicationProperties applicationProperties, Executor executor) {
+        this(Collections.emptyList(), executor);
+        this.applicationProperties = applicationProperties;
+        this.totalProgress = 5;
     }
 
     @Override
@@ -85,22 +93,11 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {
-                List<CompletableFuture<Boolean>> tasks = new LinkedList<>();
-                for (String configName : configurationNames) {
-                    if (isToolkitCredentialsSet()) {
-                        CompletableFuture<Boolean> withUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
-                                .thenApply(this::produce).thenApply(this::upload)
-                                .handle((isUploaded, throwable) -> handleUploadResult(configName, throwable == null, throwable));
-                        tasks.add(withUpload);
-                    } else {
-                        CompletableFuture<Boolean> withoutUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
-                                .thenApply(this::produce)
-                                .handle((isUploaded, throwable) -> handleUploadResult(configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")));
-
-                        tasks.add(withoutUpload);
-                    }
+                if (applicationProperties != null) {
+                    executeForApplicationProperties();
+                } else {
+                    executeForNames();
                 }
-                CompletableFuture.allOf(tasks.toArray(new CompletableFuture<?>[0])).get();
             } catch (Exception ex) {
                 logger.error("Diff upload failure.", ex);
                 resultMap.put(ex.getClass().getName(), new UploadResult(ex.getClass().getName(), Boolean.FALSE, ex));
@@ -110,6 +107,45 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 displayAlertWindow(status);
             }
         }
+    }
+
+    private void executeForNames() throws InterruptedException, java.util.concurrent.ExecutionException {
+        List<CompletableFuture<Boolean>> tasks = new LinkedList<>();
+        for (String configName : configurationNames) {
+            if (isToolkitCredentialsSet()) {
+                CompletableFuture<Boolean> withUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
+                        .thenApply(this::produce).thenApply(this::upload)
+                        .handle((isUploaded, throwable) -> handleUploadResult(configName, throwable == null, throwable));
+                tasks.add(withUpload);
+            } else {
+                CompletableFuture<Boolean> withoutUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
+                        .thenApply(this::produce)
+                        .handle((isUploaded, throwable) -> handleUploadResult(configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")));
+
+                tasks.add(withoutUpload);
+            }
+        }
+        CompletableFuture.allOf(tasks.toArray(new CompletableFuture<?>[0])).get();
+    }
+
+    private void executeForApplicationProperties() throws InterruptedException, java.util.concurrent.ExecutionException {
+        List<CompletableFuture<Boolean>> tasks = new LinkedList<>();
+
+        String configName = applicationProperties.configurationName();
+        if (applicationProperties.isToolkitCredentialsSet()) {
+                CompletableFuture<Boolean> withUpload = CompletableFuture.supplyAsync(() -> applicationProperties, executor)
+                        .thenApply(this::produce).thenApply(this::upload)
+                        .handle((isUploaded, throwable) -> handleUploadResult(configName, throwable == null, throwable));
+                tasks.add(withUpload);
+            } else {
+                CompletableFuture<Boolean> withoutUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
+                        .thenApply(this::produce)
+                        .handle((isUploaded, throwable) -> handleUploadResult(configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")));
+
+                tasks.add(withoutUpload);
+            }
+
+        CompletableFuture.allOf(tasks.toArray(new CompletableFuture<?>[0])).get();
     }
 
     private boolean isConfirmationWindow() {
