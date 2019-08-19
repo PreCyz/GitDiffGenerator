@@ -1,7 +1,8 @@
-package pg.gipter.utils;
+package pg.gipter.dao;
 
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.settings.ArgName;
+import pg.gipter.utils.StringUtils;
 
 import java.util.Properties;
 import java.util.Random;

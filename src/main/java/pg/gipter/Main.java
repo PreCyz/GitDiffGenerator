@@ -4,11 +4,13 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.PropertiesConverter;
+import pg.gipter.dao.PropertiesDao;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.launcher.LauncherFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.utils.PropertiesHelper;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -37,10 +39,11 @@ public class Main extends Application {
     }
 
     private void convertPropertiesToNewFormat() {
-        PropertiesHelper propertiesHelper = new PropertiesHelper();
-        boolean isConverted = propertiesHelper.convertPropertiesToNewFormat();
+        PropertiesConverter converter = DaoFactory.getPropertiesConverter();
+        boolean isConverted = converter.convertPropertiesToNewFormat();
         if (isConverted) {
-            LinkedList<String> configs = new LinkedList<>(propertiesHelper.loadAllApplicationProperties().keySet());
+            PropertiesDao propertiesDao = DaoFactory.getPropertiesDao();
+            LinkedList<String> configs = new LinkedList<>(propertiesDao.loadAllApplicationProperties().keySet());
             if (!configs.isEmpty()) {
                 logger.info("Old configuration converted to new format. [{}] run configs created.", String.join(",", configs));
                 String defaultConfigName = configs.getFirst();

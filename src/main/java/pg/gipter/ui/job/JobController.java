@@ -13,6 +13,9 @@ import javafx.util.StringConverter;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoConstants;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.DataDao;
 import pg.gipter.job.JobHandler;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.job.upload.JobType;
@@ -27,7 +30,6 @@ import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
@@ -81,11 +83,13 @@ public class JobController extends AbstractController {
     private Label configsLabel;
 
     private Map<String, Properties> propertiesMap;
+    private final DataDao dataDao;
     private final String NOT_AVAILABLE = "N/A";
     private final String ALL_CONFIGS = "all-configs";
 
     public JobController(UILauncher uiLauncher) {
         super(uiLauncher);
+        dataDao = DaoFactory.getDataDao();
     }
 
     @Override
@@ -107,7 +111,7 @@ public class JobController extends AbstractController {
         minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
         startDatePicker.setValue(LocalDate.now());
-        propertiesMap = propertiesHelper.loadAllApplicationProperties();
+        propertiesMap = propertiesDao.loadAllApplicationProperties();
         if (!propertiesMap.isEmpty() && !propertiesMap.containsKey(ArgName.configurationName.defaultValue())) {
             ObservableList<String> items = FXCollections.observableArrayList(propertiesMap.keySet());
             items.add(0, ALL_CONFIGS);
@@ -116,7 +120,7 @@ public class JobController extends AbstractController {
             configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, propertiesMap.keySet()));
         }
         setDefaultsForJobDetailsControls();
-        Optional<Properties> data = propertiesHelper.loadDataProperties();
+        Optional<Properties> data = dataDao.loadDataProperties();
         if (data.isPresent()) {
             setDefinedJobDetails(data.get());
             setExecutionDetails(data.get());
@@ -127,10 +131,10 @@ public class JobController extends AbstractController {
     }
 
     private void setExecutionDetails(Properties data) {
-        if (data.containsKey(PropertiesHelper.UPLOAD_STATUS_KEY) && data.containsKey(PropertiesHelper.UPLOAD_DATE_TIME_KEY)) {
+        if (data.containsKey(DaoConstants.UPLOAD_STATUS_KEY) && data.containsKey(DaoConstants.UPLOAD_DATE_TIME_KEY)) {
             String uploadInfo = String.format("%s [%s]",
-                    data.getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
-                    data.getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
+                    data.getProperty(DaoConstants.UPLOAD_DATE_TIME_KEY),
+                    data.getProperty(DaoConstants.UPLOAD_STATUS_KEY)
             );
             lastExecutionLabel.setText(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
         }
@@ -280,7 +284,7 @@ public class JobController extends AbstractController {
 
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), uiLauncher);
-                Properties data = propertiesHelper.loadDataProperties().orElseGet(Properties::new);
+                Properties data = dataDao.loadDataProperties().orElseGet(Properties::new);
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
                         .withData(data)
                         .withJobType(jobType)
@@ -294,7 +298,7 @@ public class JobController extends AbstractController {
 
                 JobHandler jobHandler = uiLauncher.getJobHandler();
                 jobHandler.scheduleUploadJob(builder, additionalJobParams);
-                propertiesHelper.saveDataProperties(jobHandler.getDataProperties());
+                dataDao.saveDataProperties(jobHandler.getDataProperties());
 
                 uiLauncher.hideJobWindow();
                 uiLauncher.updateTray();

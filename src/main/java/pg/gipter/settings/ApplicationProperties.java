@@ -2,11 +2,12 @@ package pg.gipter.settings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.PropertiesDao;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.settings.dto.NameSetting;
-import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
@@ -27,13 +28,15 @@ public abstract class ApplicationProperties {
     protected final ArgExtractor argExtractor;
     private Set<VersionControlSystem> vcs;
     private String[] args;
+    private PropertiesDao propertiesDao;
 
     public ApplicationProperties(String[] args) {
         this.args = args;
         argExtractor = new ArgExtractor(args);
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
-        init(args, new PropertiesHelper());
+        propertiesDao = DaoFactory.getPropertiesDao();
+        init(args, propertiesDao);
     }
 
     public String[] getArgs() {
@@ -48,9 +51,9 @@ public abstract class ApplicationProperties {
         return vcs;
     }
 
-    protected void init(String[] args, PropertiesHelper propertiesHelper) {
+    protected void init(String[] args, PropertiesDao propertiesDao) {
         Optional<Properties> propsFromFile;
-        Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
         if (propertiesMap.isEmpty()) {
             propsFromFile = Optional.empty();
         } else if (propertiesMap.containsKey(argExtractor.configurationName())) {
@@ -97,7 +100,7 @@ public abstract class ApplicationProperties {
 
     public final String fileName() {
         String fileName;
-        Optional<NameSetting> fileNameSetting = new PropertiesHelper().loadFileNameSetting();
+        Optional<NameSetting> fileNameSetting = propertiesDao.loadFileNameSetting();
         if (fileNameSetting.isPresent() && !fileNameSetting.get().getNameSettings().isEmpty()
                 && !StringUtils.nullOrEmpty(itemFileNamePrefix())) {
             fileName = itemFileNamePrefix();

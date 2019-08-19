@@ -1,4 +1,4 @@
-package pg.gipter.utils;
+package pg.gipter.dao;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -18,21 +18,20 @@ import java.util.Optional;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static pg.gipter.utils.PropertiesHelper.APPLICATION_PROPERTIES_JSON;
 
-class PropertiesHelperTest {
+class PropertiesDaoImplTest {
 
-    private PropertiesHelper propertiesHelper;
+    private PropertiesDaoImpl propertiesDao;
 
     @BeforeEach
     void setUp() {
-        propertiesHelper = new PropertiesHelper();
+        propertiesDao = new PropertiesDaoImpl();
     }
 
     @AfterEach
     void tearDown() {
         try {
-            Files.deleteIfExists(Paths.get(APPLICATION_PROPERTIES_JSON));
+            Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
         } catch (IOException e) {
             System.out.println("There is something weird going on.");
         }
@@ -43,7 +42,7 @@ class PropertiesHelperTest {
         Properties properties = TestDataFactory.generateProperty();
         createJsonConfig(properties);
 
-        JsonObject actual = propertiesHelper.readJsonConfig();
+        JsonObject actual = propertiesDao.readJsonConfig();
         assertThat(actual).isNotNull();
         assertThat(actual.getAsJsonObject(ConfigHelper.APP_CONFIG)).isNotNull();
         assertThat(actual.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG)).isNotNull();
@@ -51,9 +50,9 @@ class PropertiesHelperTest {
     }
 
     private void createJsonConfig(Properties properties) {
-        propertiesHelper.saveAppSettings(properties);
-        propertiesHelper.saveToolkitSettings(properties);
-        propertiesHelper.saveRunConfig(properties);
+        propertiesDao.saveAppSettings(properties);
+        propertiesDao.saveToolkitSettings(properties);
+        propertiesDao.saveRunConfig(properties);
     }
 
     @Test
@@ -63,27 +62,9 @@ class PropertiesHelperTest {
         properties.setProperty(ArgName.configurationName.name(), "other");
         createJsonConfig(properties);
 
-        Map<String, Properties> actual = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> actual = propertiesDao.loadAllApplicationProperties();
 
         assertThat(actual).hasSize(2);
-    }
-
-    @Test
-    void givenBothApplicationProperties_whenConvertPropertiesToJson_thenCreateJsonConfigFile() {
-        Properties properties = TestDataFactory.generateProperty();
-        propertiesHelper.encryptPassword(properties);
-        propertiesHelper.saveProperties(properties, PropertiesHelper.APPLICATION_PROPERTIES);
-        propertiesHelper.saveProperties(properties, PropertiesHelper.UI_APPLICATION_PROPERTIES);
-        assertThat(Files.exists(Paths.get(PropertiesHelper.APPLICATION_PROPERTIES))).isTrue();
-        assertThat(Files.exists(Paths.get(PropertiesHelper.UI_APPLICATION_PROPERTIES))).isTrue();
-
-        propertiesHelper.convertPropertiesToNewFormat();
-
-        assertThat(Files.exists(Paths.get(PropertiesHelper.APPLICATION_PROPERTIES))).isFalse();
-        assertThat(Files.exists(Paths.get(PropertiesHelper.UI_APPLICATION_PROPERTIES))).isFalse();
-        Map<String, Properties> actual = propertiesHelper.loadAllApplicationProperties();
-        assertThat(actual).hasSize(2);
-        assertThat(actual.keySet()).containsExactly(PropertiesHelper.APPLICATION_PROPERTIES, PropertiesHelper.UI_APPLICATION_PROPERTIES);
     }
 
     @Test
@@ -91,9 +72,9 @@ class PropertiesHelperTest {
         Properties properties = TestDataFactory.generateProperty();
         createJsonConfig(properties);
 
-        propertiesHelper.removeConfig(properties.getProperty(ArgName.configurationName.name()));
+        propertiesDao.removeConfig(properties.getProperty(ArgName.configurationName.name()));
 
-        JsonObject actual = propertiesHelper.readJsonConfig();
+        JsonObject actual = propertiesDao.readJsonConfig();
         assertThat(actual.getAsJsonArray(ConfigHelper.RUN_CONFIGS)).hasSize(0);
         assertThat(actual.getAsJsonObject(ConfigHelper.APP_CONFIG)).isNotNull();
         assertThat(actual.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG)).isNotNull();
@@ -104,7 +85,7 @@ class PropertiesHelperTest {
         Properties properties = TestDataFactory.generateProperty();
         createJsonConfig(properties);
 
-        String[] actual = propertiesHelper.loadArgumentArray(properties.getProperty(ArgName.configurationName.name()));
+        String[] actual = propertiesDao.loadArgumentArray(properties.getProperty(ArgName.configurationName.name()));
 
         assertThat(actual).isNotNull();
     }
@@ -114,9 +95,9 @@ class PropertiesHelperTest {
         Properties properties = TestDataFactory.generateProperty();
         properties.remove(ArgName.configurationName.name());
 
-        propertiesHelper.saveRunConfig(properties);
+        propertiesDao.saveRunConfig(properties);
 
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
         assertThat(map).isEmpty();
     }
 
@@ -124,9 +105,9 @@ class PropertiesHelperTest {
     void givenRunConfig_whenSaveRunConfig_thenRunConfigSaved() {
         Properties properties = TestDataFactory.generateProperty();
 
-        propertiesHelper.saveRunConfig(properties);
+        propertiesDao.saveRunConfig(properties);
 
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
         assertThat(map).hasSize(1);
         assertThat(map.keySet()).containsExactly(properties.getProperty(ArgName.configurationName.name()));
     }
@@ -138,11 +119,11 @@ class PropertiesHelperTest {
         last.setProperty(ArgName.configurationName.name(), properties.getProperty(ArgName.configurationName.name()));
         last.setProperty(ArgName.periodInDays.name(), "8");
 
-        propertiesHelper.saveRunConfig(properties);
-        propertiesHelper.saveRunConfig(last);
+        propertiesDao.saveRunConfig(properties);
+        propertiesDao.saveRunConfig(last);
 
 
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
         assertThat(map).hasSize(1);
         assertThat(map.keySet()).containsExactly(properties.getProperty(ArgName.configurationName.name()));
         assertThat(map.get(properties.getProperty(ArgName.configurationName.name())).getProperty(ArgName.periodInDays.name())).isEqualTo("8");
@@ -153,9 +134,9 @@ class PropertiesHelperTest {
         Properties properties = TestDataFactory.generateProperty();
         properties.remove(ArgName.configurationName.name());
 
-        propertiesHelper.saveAppSettings(properties);
+        propertiesDao.saveAppSettings(properties);
 
-        JsonObject jsonObject = propertiesHelper.readJsonConfig();
+        JsonObject jsonObject = propertiesDao.readJsonConfig();
         assertThat(jsonObject).isNotNull();
         assertThat(jsonObject.has(ConfigHelper.APP_CONFIG)).isTrue();
         assertThat(jsonObject.get(ConfigHelper.APP_CONFIG).getAsJsonObject()).isNotNull();
@@ -166,9 +147,9 @@ class PropertiesHelperTest {
         Properties properties = TestDataFactory.generateProperty();
         properties.remove(ArgName.configurationName.name());
 
-        propertiesHelper.saveToolkitSettings(properties);
+        propertiesDao.saveToolkitSettings(properties);
 
-        JsonObject jsonObject = propertiesHelper.readJsonConfig();
+        JsonObject jsonObject = propertiesDao.readJsonConfig();
         assertThat(jsonObject).isNotNull();
         assertThat(jsonObject.has(ConfigHelper.TOOLKIT_CONFIG)).isTrue();
         assertThat(jsonObject.get(ConfigHelper.TOOLKIT_CONFIG).getAsJsonObject()).isNotNull();
@@ -178,9 +159,9 @@ class PropertiesHelperTest {
     void givenProperties_whenLoadAllApplicationProperties_thenReturnEmptyMap() {
         Properties properties = TestDataFactory.generateProperty();
         createJsonConfig(properties);
-        propertiesHelper.removeConfig(properties.getProperty(ArgName.configurationName.name()));
+        propertiesDao.removeConfig(properties.getProperty(ArgName.configurationName.name()));
 
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
 
         assertThat(map).isEmpty();
     }
@@ -189,8 +170,8 @@ class PropertiesHelperTest {
     void givenProperties_whenSaveRunConfig_thenReturnMap() {
         Properties properties = TestDataFactory.generateProperty();
 
-        propertiesHelper.saveRunConfig(properties);
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        propertiesDao.saveRunConfig(properties);
+        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
 
         assertThat(map).hasSize(1);
     }
@@ -198,24 +179,24 @@ class PropertiesHelperTest {
     @Test
     void given2sameRunConfig_whenSaveRunConfig_thenReturnMapWithOneConfig() {
         Properties properties = TestDataFactory.generateProperty();
-        propertiesHelper.saveRunConfig(properties);
+        propertiesDao.saveRunConfig(properties);
         properties.put(ArgName.periodInDays.name(), "8");
-        propertiesHelper.saveRunConfig(properties);
+        propertiesDao.saveRunConfig(properties);
 
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
         assertThat(map).hasSize(1);
         assertThat(map.get(properties.getProperty(ArgName.configurationName.name())).getProperty(ArgName.periodInDays.name())).isEqualTo("8");
     }
 
     @Test
     void givenProperties_whenSaveAppSettings_thenReturnEmptyMap() {
-        propertiesHelper.writeJsonConfig(new ConfigHelper().buildFullJson(new Properties()));
+        propertiesDao.writeJsonConfig(new ConfigHelper().buildFullJson(new Properties()));
         Properties properties = TestDataFactory.generateProperty();
         properties.remove(ArgName.configurationName.name());
 
-        propertiesHelper.saveAppSettings(properties);
+        propertiesDao.saveAppSettings(properties);
 
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
         assertThat(map).isEmpty();
     }
 
@@ -224,15 +205,15 @@ class PropertiesHelperTest {
         Properties properties = TestDataFactory.generateProperty();
         properties.remove(ArgName.configurationName.name());
 
-        propertiesHelper.saveToolkitSettings(properties);
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        propertiesDao.saveToolkitSettings(properties);
+        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
 
         assertThat(map).isEmpty();
     }
 
     @Test
     void givenNoConfig_whenLoadToolkitCredentials_thenReturnDefaults() {
-        Properties actual = propertiesHelper.loadToolkitCredentials();
+        Properties actual = propertiesDao.loadToolkitCredentials();
 
         assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(ArgName.toolkitUsername.defaultValue());
         assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(ArgName.toolkitPassword.defaultValue());
@@ -243,9 +224,9 @@ class PropertiesHelperTest {
         Properties properties = TestDataFactory.generateProperty();
         JsonObject jsonObject = new ConfigHelper().buildFullJson(properties);
         jsonObject.remove(ConfigHelper.TOOLKIT_CONFIG);
-        propertiesHelper.writeJsonConfig(jsonObject);
+        propertiesDao.writeJsonConfig(jsonObject);
 
-        Properties actual = propertiesHelper.loadToolkitCredentials();
+        Properties actual = propertiesDao.loadToolkitCredentials();
 
         assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(ArgName.toolkitUsername.defaultValue());
         assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(ArgName.toolkitPassword.defaultValue());
@@ -258,9 +239,9 @@ class PropertiesHelperTest {
         Properties properties = TestDataFactory.generateProperty();
         properties.setProperty(ArgName.toolkitUsername.name(), username);
         properties.setProperty(ArgName.toolkitPassword.name(), password);
-        propertiesHelper.saveToolkitSettings(properties);
+        propertiesDao.saveToolkitSettings(properties);
 
-        Properties actual = propertiesHelper.loadToolkitCredentials();
+        Properties actual = propertiesDao.loadToolkitCredentials();
 
         assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(username);
         assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(password);
@@ -271,9 +252,9 @@ class PropertiesHelperTest {
         String username = "ęóąśłńćźż";
         Properties properties = TestDataFactory.generateProperty();
         properties.setProperty(ArgName.toolkitUsername.name(), username);
-        propertiesHelper.saveToolkitSettings(properties);
+        propertiesDao.saveToolkitSettings(properties);
 
-        Properties actual = propertiesHelper.loadToolkitCredentials();
+        Properties actual = propertiesDao.loadToolkitCredentials();
 
         assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(username);
     }
@@ -287,9 +268,9 @@ class PropertiesHelperTest {
         fns.addSetting("{END_DATE}", NamePatternValue.END_DATE);
         fns.addSetting("{START_DATE}", NamePatternValue.START_DATE);
 
-        propertiesHelper.saveFileNameSetting(fns);
+        propertiesDao.saveFileNameSetting(fns);
 
-        JsonObject jsonObject = propertiesHelper.readJsonConfig();
+        JsonObject jsonObject = propertiesDao.readJsonConfig();
         NameSetting actual = new Gson().fromJson(jsonObject.get(ConfigHelper.FILE_NAME_SETTING), NameSetting.class);
         Map<String, NamePatternValue> nameSettings = actual.getNameSettings();
         assertThat(nameSettings).isNotEmpty();
@@ -308,9 +289,9 @@ class PropertiesHelperTest {
         fns.addSetting("{CURRENT_YEAR}", NamePatternValue.CURRENT_YEAR);
         fns.addSetting("{END_DATE}", NamePatternValue.END_DATE);
         fns.addSetting("{START_DATE}", NamePatternValue.START_DATE);
-        propertiesHelper.saveFileNameSetting(fns);
+        propertiesDao.saveFileNameSetting(fns);
 
-        Optional<NameSetting> actual = propertiesHelper.loadFileNameSetting();
+        Optional<NameSetting> actual = propertiesDao.loadFileNameSetting();
 
         assertThat(actual.isPresent()).isTrue();
         Map<String, NamePatternValue> nameSettings = actual.get().getNameSettings();
@@ -324,7 +305,7 @@ class PropertiesHelperTest {
 
     @Test
     void givenNoFileNameSetting_whenLoadFileNameSetting_thenReturnEmptyOptional() {
-        Optional<NameSetting> actual = propertiesHelper.loadFileNameSetting();
+        Optional<NameSetting> actual = propertiesDao.loadFileNameSetting();
 
         assertThat(actual.isPresent()).isFalse();
     }

@@ -1,4 +1,4 @@
-package pg.gipter.utils;
+package pg.gipter.dao;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

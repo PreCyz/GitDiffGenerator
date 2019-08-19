@@ -92,7 +92,7 @@ public class ApplicationSettingsController extends AbstractController {
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     currentLanguage = languageComboBox.getValue();
-                    String[] arguments = propertiesHelper.loadArgumentArray(uiLauncher.getConfigurationName());
+                    String[] arguments = propertiesDao.loadArgumentArray(uiLauncher.getConfigurationName());
                     uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(arguments));
                     uiLauncher.changeLanguage(languageComboBox.getValue());
                 });
@@ -100,7 +100,7 @@ public class ApplicationSettingsController extends AbstractController {
         final StartupService startupService = new StartupService();
         activateTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                String[] arguments = propertiesHelper.loadArgumentArray(uiLauncher.getConfigurationName());
+                String[] arguments = propertiesDao.loadArgumentArray(uiLauncher.getConfigurationName());
                 uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(arguments));
                 uiLauncher.initTrayHandler();
                 uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
@@ -129,7 +129,7 @@ public class ApplicationSettingsController extends AbstractController {
 
     private void saveNewSettings() {
         String[] arguments = createArgsFromUI();
-        propertiesHelper.saveAppSettings(propertiesHelper.createProperties(arguments));
+        propertiesDao.saveAppSettings(propertiesDao.createProperties(arguments));
         logger.info("New application settings saved. [{}]", String.join(",", arguments));
     }
 

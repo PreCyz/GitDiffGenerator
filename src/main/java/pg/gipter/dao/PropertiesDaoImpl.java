@@ -1,40 +1,31 @@
-package pg.gipter.utils;
+package pg.gipter.dao;
 
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.job.upload.JobProperty;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.dto.NameSetting;
+import pg.gipter.utils.StringUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class PropertiesHelper {
+class PropertiesDaoImpl implements PropertiesDao {
 
-    private final Logger logger = LoggerFactory.getLogger(PropertiesHelper.class);
+    private final Logger logger = LoggerFactory.getLogger(PropertiesDaoImpl.class);
 
     static final String APPLICATION_PROPERTIES = "application.properties";
     static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
-    private static final String DATA_PROPERTIES = "data.properties";
-    public static final String APPLICATION_PROPERTIES_JSON = "applicationProperties.json";
-
-    public static final String UPLOAD_STATUS_KEY = "lastUploadStatus";
-    public static final String UPLOAD_DATE_TIME_KEY = "lastUploadDateTime";
 
     private final ConfigHelper configHelper;
 
-    public PropertiesHelper() {
+    PropertiesDaoImpl() {
         this.configHelper = new ConfigHelper();
     }
 
-    private Optional<Properties> loadApplicationProperties() {
+    Optional<Properties> loadApplicationProperties() {
         Optional<Properties> properties = loadProperties(APPLICATION_PROPERTIES);
         properties.ifPresent(this::decryptPassword);
         return properties;
@@ -53,7 +44,7 @@ public class PropertiesHelper {
         }
     }
 
-    private Optional<Properties> loadUIApplicationProperties() {
+    Optional<Properties> loadUIApplicationProperties() {
         Optional<Properties> properties = loadProperties(UI_APPLICATION_PROPERTIES);
         properties.ifPresent(this::decryptPassword);
         return properties;
@@ -73,10 +64,6 @@ public class PropertiesHelper {
             properties = null;
         }
         return Optional.ofNullable(properties);
-    }
-
-    public Optional<Properties> loadDataProperties() {
-        return loadProperties(DATA_PROPERTIES);
     }
 
     void saveProperties(Properties properties, String file) {
@@ -103,31 +90,16 @@ public class PropertiesHelper {
         }
     }
 
-    public void saveUploadStatus(String status) {
-        Properties data = loadDataProperties().orElseGet(Properties::new);
-        data.put(PropertiesHelper.UPLOAD_DATE_TIME_KEY, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        data.put(PropertiesHelper.UPLOAD_STATUS_KEY, status);
-        saveProperties(data, DATA_PROPERTIES);
-    }
-
-    public void saveNextUpload(String nextUploadDateTime) {
-        Properties data = loadDataProperties().orElseGet(Properties::new);
-        data.put(JobProperty.NEXT_FIRE_DATE.value(), nextUploadDateTime);
-        saveProperties(data, DATA_PROPERTIES);
-    }
-
-    public void saveDataProperties(Properties properties) {
-        saveProperties(properties, DATA_PROPERTIES);
-    }
-
+    @Override
     public Optional<Properties> loadApplicationProperties(String configurationName) {
         Map<String, Properties> propertiesMap = loadAllApplicationProperties();
         if (StringUtils.nullOrEmpty(configurationName)) {
-            configurationName = PropertiesHelper.APPLICATION_PROPERTIES;
+            configurationName = PropertiesDaoImpl.APPLICATION_PROPERTIES;
         }
         return Optional.ofNullable(propertiesMap.get(configurationName));
     }
 
+    @Override
     public String[] loadArgumentArray(String configurationName) {
         Optional<Properties> properties = loadApplicationProperties(configurationName);
         String[] result = new String[0];
@@ -142,6 +114,7 @@ public class PropertiesHelper {
         return result;
     }
 
+    @Override
     public Properties createProperties(String[] args) {
         Properties properties = new Properties();
         for (String arg : args) {
@@ -152,6 +125,7 @@ public class PropertiesHelper {
         return properties;
     }
 
+    @Override
     public Map<String, Properties> loadAllApplicationProperties() {
         Map<String, Properties> result = new LinkedHashMap<>();
         JsonObject config = readJsonConfig();
@@ -197,6 +171,7 @@ public class PropertiesHelper {
         return jsonObject;
     }
 
+    @Override
     public void saveRunConfig(Properties properties) {
         if (StringUtils.nullOrEmpty(properties.getProperty(ArgName.configurationName.name()))) {
             logger.warn("empty configurationName. Can not save run config without configurationName.");
@@ -214,29 +189,30 @@ public class PropertiesHelper {
     void writeJsonConfig(JsonObject jsonObject) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(jsonObject);
-        try (OutputStream os = new FileOutputStream(APPLICATION_PROPERTIES_JSON);
+        try (OutputStream os = new FileOutputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
              Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
         ) {
             writer.write(json);
-            logger.info("File {} saved.", APPLICATION_PROPERTIES_JSON);
+            logger.info("File {} saved.", DaoConstants.APPLICATION_PROPERTIES_JSON);
         } catch (IOException e) {
-            logger.error("Error when writing {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());
+            logger.error("Error when writing {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
             throw new IllegalArgumentException("Error when writing configuration into json.");
         }
     }
 
     JsonObject readJsonConfig() {
-        try (InputStream fis = new FileInputStream(APPLICATION_PROPERTIES_JSON);
+        try (InputStream fis = new FileInputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(isr)
         ) {
             return new Gson().fromJson(reader, JsonObject.class);
         } catch (IOException | NullPointerException e) {
-            logger.warn("Warning when loading {}. Exception message is: {}", APPLICATION_PROPERTIES_JSON, e.getMessage());
+            logger.warn("Warning when loading {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
         }
         return null;
     }
 
+    @Override
     public void removeConfig(String configurationName) {
         final String errMsg = "Can not remove the configuration, because it does not exists!";
         JsonObject jsonObject = readJsonConfig();
@@ -259,45 +235,7 @@ public class PropertiesHelper {
         }
     }
 
-    public boolean convertPropertiesToNewFormat() {
-        JsonObject jsonObject = readJsonConfig();
-        if (jsonObject == null) {
-            convertPropertiesToJson();
-            deletePropertyFile(APPLICATION_PROPERTIES);
-            deletePropertyFile(UI_APPLICATION_PROPERTIES);
-            convertExistingJob();
-            return true;
-        }
-        return false;
-    }
-
-    private void convertExistingJob() {
-        Optional<Properties> properties = loadDataProperties();
-        if (properties.isPresent() && !properties.get().containsKey(JobProperty.CONFIGS.value())) {
-            Properties data = properties.get();
-            data.setProperty(JobProperty.CONFIGS.value(), String.join(",", loadAllApplicationProperties().keySet()));
-            saveDataProperties(data);
-        }
-    }
-
-    private void convertPropertiesToJson() {
-        boolean nothingToConvert = true;
-        Optional<Properties> properties = loadApplicationProperties();
-        if (properties.isPresent()) {
-            buildAndSaveJsonConfig(properties.get(), APPLICATION_PROPERTIES);
-            nothingToConvert = false;
-        }
-        properties = loadUIApplicationProperties();
-        if (properties.isPresent()) {
-            buildAndSaveJsonConfig(properties.get(), UI_APPLICATION_PROPERTIES);
-            nothingToConvert = false;
-        }
-        if (nothingToConvert) {
-            logger.info("There is no old properties to convert to JSON format.");
-        }
-    }
-
-    private void buildAndSaveJsonConfig(Properties properties, String applicationProperties) {
+    void buildAndSaveJsonConfig(Properties properties, String applicationProperties) {
         properties.put(ArgName.configurationName.name(), applicationProperties);
         encryptPassword(properties);
         JsonObject jsonObject = buildJsonConfig(properties);
@@ -305,14 +243,7 @@ public class PropertiesHelper {
         logger.info("{} converted to JSON format.", applicationProperties);
     }
 
-    private void deletePropertyFile(String propertyFile) {
-        try {
-            Files.deleteIfExists(Paths.get(propertyFile));
-        } catch (IOException e) {
-            logger.warn("Can not delete {} file. {}", propertyFile, e.getMessage());
-        }
-    }
-
+    @Override
     public void saveAppSettings(Properties properties) {
         encryptPassword(properties);
         JsonObject jsonObject = readJsonConfig();
@@ -323,6 +254,7 @@ public class PropertiesHelper {
         writeJsonConfig(jsonObject);
     }
 
+    @Override
     public void saveToolkitSettings(Properties properties) {
         encryptPassword(properties);
         JsonObject jsonObject = readJsonConfig();
@@ -333,6 +265,7 @@ public class PropertiesHelper {
         writeJsonConfig(jsonObject);
     }
 
+    @Override
     public Properties loadToolkitCredentials() {
         JsonObject jsonObject = readJsonConfig();
         Properties result = new Properties();
@@ -353,6 +286,7 @@ public class PropertiesHelper {
         return result;
     }
 
+    @Override
     public void saveFileNameSetting(NameSetting fileNameSetting) {
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
@@ -363,6 +297,7 @@ public class PropertiesHelper {
         writeJsonConfig(jsonObject);
     }
 
+    @Override
     public Optional<NameSetting> loadFileNameSetting() {
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {

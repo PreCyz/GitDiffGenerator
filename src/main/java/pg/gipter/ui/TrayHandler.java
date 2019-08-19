@@ -5,13 +5,16 @@ import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoConstants;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.DataDao;
+import pg.gipter.dao.PropertiesDao;
 import pg.gipter.job.JobHandler;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.job.upload.UploadItemJob;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.job.JobController;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
 
 import javax.swing.*;
@@ -30,14 +33,16 @@ class TrayHandler {
     private UILauncher uiLauncher;
     private static TrayIcon trayIcon;
     private static PopupMenu trayPopupMenu;
-    private PropertiesHelper propertiesHelper;
+    private PropertiesDao propertiesDao;
+    private DataDao dataDao;
     private Executor executor;
 
     TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties, Executor executor) {
         this.uiLauncher = uiLauncher;
         this.applicationProperties = applicationProperties;
         this.executor = executor;
-        this.propertiesHelper = new PropertiesHelper();
+        this.propertiesDao = DaoFactory.getPropertiesDao();
+        this.dataDao = DaoFactory.getDataDao();
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -73,16 +78,15 @@ class TrayHandler {
     private void addMenuItemsToMenu(PopupMenu popupMenu) {
         executor.execute(() -> {
             JobHandler jobHandler = uiLauncher.getJobHandler();
-            propertiesHelper = new PropertiesHelper();
-            Optional<Properties> data = propertiesHelper.loadDataProperties();
+            Optional<Properties> data = dataDao.loadDataProperties();
             if (data.isPresent()) {
 
                 boolean addSeparator = false;
 
-                if (data.get().containsKey(PropertiesHelper.UPLOAD_DATE_TIME_KEY) && data.get().containsKey(PropertiesHelper.UPLOAD_STATUS_KEY)) {
+                if (data.get().containsKey(DaoConstants.UPLOAD_DATE_TIME_KEY) && data.get().containsKey(DaoConstants.UPLOAD_STATUS_KEY)) {
                     String uploadInfo = String.format("%s [%s]",
-                            data.get().getProperty(PropertiesHelper.UPLOAD_DATE_TIME_KEY),
-                            data.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY)
+                            data.get().getProperty(DaoConstants.UPLOAD_DATE_TIME_KEY),
+                            data.get().getProperty(DaoConstants.UPLOAD_STATUS_KEY)
                     );
                     popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
                     addSeparator = true;
@@ -191,7 +195,7 @@ class TrayHandler {
     }
 
     private ActionListener uploadActionListener() {
-        return e -> executor.execute(() -> new FXMultiRunner(propertiesHelper.loadAllApplicationProperties().keySet(), executor).start());
+        return e -> executor.execute(() -> new FXMultiRunner(propertiesDao.loadAllApplicationProperties().keySet(), executor).start());
     }
 
     private ActionListener cancelJobActionListener() {

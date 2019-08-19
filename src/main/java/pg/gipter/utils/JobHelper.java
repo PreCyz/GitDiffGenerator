@@ -1,5 +1,7 @@
 package pg.gipter.utils;
 
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.DataDao;
 import pg.gipter.job.upload.JobProperty;
 
 import java.util.LinkedHashSet;
@@ -11,14 +13,14 @@ import static java.util.stream.Collectors.toCollection;
 
 public class JobHelper {
 
-    private PropertiesHelper propertiesHelper;
+    private DataDao dataDao;
 
     public JobHelper() {
-        propertiesHelper = new PropertiesHelper();
+        dataDao = DaoFactory.getDataDao();
     }
 
     public void updateJobConfigs(String oldConfigName, String newConfigName) {
-        Optional<Properties> dataProperties = propertiesHelper.loadDataProperties();
+        Optional<Properties> dataProperties = dataDao.loadDataProperties();
         if (dataProperties.isPresent() && dataProperties.get().containsKey(JobProperty.CONFIGS.value())) {
             Properties data = dataProperties.get();
             LinkedHashSet<String> configs = Stream.of(data.getProperty(JobProperty.CONFIGS.value()).split(","))
@@ -29,7 +31,7 @@ public class JobHelper {
                         .collect(toCollection(LinkedHashSet::new));
                 configs.add(newConfigName);
                 data.put(JobProperty.CONFIGS.value(), String.join(",", configs));
-                propertiesHelper.saveDataProperties(data);
+                dataDao.saveDataProperties(data);
             }
         }
     }

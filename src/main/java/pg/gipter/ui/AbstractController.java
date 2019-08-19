@@ -5,7 +5,8 @@ import javafx.fxml.Initializable;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.utils.PropertiesHelper;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.PropertiesDao;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -16,12 +17,12 @@ public abstract class AbstractController implements Initializable {
     protected final UILauncher uiLauncher;
     protected final Logger logger;
     protected URL location;
-    protected PropertiesHelper propertiesHelper;
+    protected PropertiesDao propertiesDao;
 
     protected AbstractController(UILauncher uiLauncher) {
         this.uiLauncher = uiLauncher;
         this.logger = LoggerFactory.getLogger(getClass());
-        this.propertiesHelper = new PropertiesHelper();
+        this.propertiesDao = DaoFactory.getPropertiesDao();
     }
 
     @Override

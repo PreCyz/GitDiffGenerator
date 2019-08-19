@@ -4,6 +4,9 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.DataDao;
+import pg.gipter.dao.PropertiesDao;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
@@ -13,17 +16,18 @@ import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.PropertiesHelper;
 
 class Runner implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(Runner.class);
     private ApplicationProperties applicationProperties;
-    private final PropertiesHelper propertiesHelper;
+    private final PropertiesDao propertiesDao;
+    private final DataDao dataDao;
 
     Runner(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.propertiesHelper = new PropertiesHelper();
+        this.propertiesDao = DaoFactory.getPropertiesDao();
+        this.dataDao = DaoFactory.getDataDao();
     }
 
     @Override
@@ -56,7 +60,7 @@ class Runner implements Starter {
                     .buildAndDisplayWindow()
             );
         } finally {
-            propertiesHelper.saveUploadStatus(error ? "FAIL" : "SUCCESS");
+            dataDao.saveUploadStatus(error ? "FAIL" : "SUCCESS");
             logger.info("{} ended.", this.getClass().getName());
         }
         if (!error && applicationProperties.isConfirmationWindow()) {

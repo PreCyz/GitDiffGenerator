@@ -26,6 +26,9 @@ import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
+import pg.gipter.dao.DaoConstants;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.DataDao;
 import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.producer.command.UploadType;
@@ -42,7 +45,10 @@ import pg.gipter.ui.UploadStatus;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
-import pg.gipter.utils.*;
+import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.JobHelper;
+import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
 import java.io.File;
@@ -150,6 +156,7 @@ public class MainController extends AbstractController {
     private CheckBox useLastItemDateCheckbox;
 
     private ApplicationProperties applicationProperties;
+    private DataDao dataDao;
 
     private String userFolderUrl;
     private Set<String> definedPatterns;
@@ -161,6 +168,7 @@ public class MainController extends AbstractController {
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
+        this.dataDao = DaoFactory.getDataDao();
         this.definedPatterns = new LinkedHashSet<>();
     }
 
@@ -175,7 +183,7 @@ public class MainController extends AbstractController {
     }
 
     private void setInitValues() {
-        propertiesHelper.loadFileNameSetting().ifPresent(nameSetting -> definedPatterns.addAll(nameSetting.getNameSettings().keySet()));
+        propertiesDao.loadFileNameSetting().ifPresent(nameSetting -> definedPatterns.addAll(nameSetting.getNameSettings().keySet()));
 
         authorsTextField.setText(String.join(",", applicationProperties.authors()));
         committerEmailTextField.setText(applicationProperties.committerEmail());
@@ -245,7 +253,7 @@ public class MainController extends AbstractController {
     }
 
     private void initConfigurationName() {
-        Set<String> confNames = propertiesHelper.loadAllApplicationProperties().keySet();
+        Set<String> confNames = propertiesDao.loadAllApplicationProperties().keySet();
         if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
             confNames.add(configurationNameComboBox.getValue());
         }
@@ -307,7 +315,7 @@ public class MainController extends AbstractController {
     }
 
     private void setDisableDependOnConfigurations() {
-        Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
         addConfigurationButton.setDisable(map.isEmpty());
         removeConfigurationButton.setDisable(map.isEmpty());
         executeButton.setDisable(map.isEmpty());
@@ -478,9 +486,9 @@ public class MainController extends AbstractController {
 
     private void updateLastItemUploadDate() {
         try {
-            Optional<Properties> dataProperties = propertiesHelper.loadDataProperties();
-            if (dataProperties.isPresent() && dataProperties.get().containsKey(PropertiesHelper.UPLOAD_STATUS_KEY)) {
-                UploadStatus status = UploadStatus.valueOf(dataProperties.get().getProperty(PropertiesHelper.UPLOAD_STATUS_KEY));
+            Optional<Properties> dataProperties = dataDao.loadDataProperties();
+            if (dataProperties.isPresent() && dataProperties.get().containsKey(DaoConstants.UPLOAD_STATUS_KEY)) {
+                UploadStatus status = UploadStatus.valueOf(dataProperties.get().getProperty(DaoConstants.UPLOAD_STATUS_KEY));
                 if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(status)) {
                     uiLauncher.setLastItemSubmissionDate(null);
                 }
@@ -495,12 +503,12 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> executeAllActionEventHandler() {
         return event -> {
-            Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+            Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
             FXMultiRunner runner = new FXMultiRunner(map.keySet(), uiLauncher.nonUIExecutor());
             resetIndicatorProperties(runner);
             uiLauncher.executeOutsideUIThread(() -> {
                 runner.call();
-                String[] firstFromConfigs = propertiesHelper.loadArgumentArray(new LinkedList<>(map.keySet()).getFirst());
+                String[] firstFromConfigs = propertiesDao.loadArgumentArray(new LinkedList<>(map.keySet()).getFirst());
                 ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(firstFromConfigs);
                 if (instance.isActiveTray()) {
                     uiLauncher.updateTray(instance);
@@ -568,7 +576,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             boolean disableProjectButton = uploadTypeComboBox.getValue() == UploadType.STATEMENT;
-            disableProjectButton |= propertiesHelper.loadAllApplicationProperties().isEmpty() && configurationNameTextField.getText().isEmpty();
+            disableProjectButton |= propertiesDao.loadAllApplicationProperties().isEmpty() && configurationNameTextField.getText().isEmpty();
             projectPathButton.setDisable(disableProjectButton);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
                 endDatePicker.setValue(LocalDate.now());
@@ -616,21 +624,21 @@ public class MainController extends AbstractController {
 
     private void updateRunConfig(String oldConfigName, String newConfigName) {
         Properties properties = getPropertiesWithoutDates();
-        propertiesHelper.saveToolkitSettings(properties);
+        propertiesDao.saveToolkitSettings(properties);
         if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
-            propertiesHelper.saveRunConfig(properties);
+            propertiesDao.saveRunConfig(properties);
             new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
             setDisableDependOnConfigurations();
         }
         if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
-            propertiesHelper.removeConfig(oldConfigName);
+            propertiesDao.removeConfig(oldConfigName);
         }
     }
 
     @NotNull
     private Properties getPropertiesWithoutDates() {
         String[] args = createArgsFromUI();
-        Properties properties = propertiesHelper.createProperties(args);
+        Properties properties = propertiesDao.createProperties(args);
         properties.remove(ArgName.startDate.name());
         properties.remove(ArgName.endDate.name());
         return properties;
@@ -639,7 +647,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
         return event -> {
             String configurationName = configurationNameTextField.getText();
-            Optional<Properties> properties = propertiesHelper.loadApplicationProperties(configurationName);
+            Optional<Properties> properties = propertiesDao.loadApplicationProperties(configurationName);
             boolean operationDone = false;
             if (properties.isPresent()) {
                 boolean result = new AlertWindowBuilder()
@@ -658,7 +666,7 @@ public class MainController extends AbstractController {
                     configurationNameTextField.setText(configurationNameComboBox.getValue());
                 }
             } else {
-                propertiesHelper.saveRunConfig(getPropertiesWithoutDates());
+                propertiesDao.saveRunConfig(getPropertiesWithoutDates());
                 updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), configurationName);
                 operationDone = true;
             }
@@ -677,21 +685,21 @@ public class MainController extends AbstractController {
     private void saveNewConfig(String configurationName) {
         Properties currentProperties = getPropertiesWithoutDates();
         currentProperties.put(ArgName.configurationName.name(), configurationName);
-        propertiesHelper.saveRunConfig(currentProperties);
+        propertiesDao.saveRunConfig(currentProperties);
     }
 
     private EventHandler<ActionEvent> removeConfigurationEventHandler() {
         return event -> {
             try {
-                propertiesHelper.removeConfig(configurationNameComboBox.getValue());
-                Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
+                propertiesDao.removeConfig(configurationNameComboBox.getValue());
+                Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
                 String newConfiguration = ArgName.configurationName.defaultValue();
                 if (!propertiesMap.isEmpty()) {
                     Properties currentConfig = new ArrayList<>(propertiesMap.entrySet()).get(0).getValue();
                     newConfiguration = currentConfig.getProperty(ArgName.configurationName.name());
                 }
                 removeConfigurationNameFromComboBox(configurationNameComboBox.getValue(), newConfiguration);
-                String[] currentArgs = propertiesHelper.loadArgumentArray(newConfiguration);
+                String[] currentArgs = propertiesDao.loadArgumentArray(newConfiguration);
                 applicationProperties = ApplicationPropertiesFactory.getInstance(currentArgs);
                 setInitValues();
                 configurationNameTextField.setText(configurationNameComboBox.getValue());
@@ -737,7 +745,7 @@ public class MainController extends AbstractController {
     }
 
     private void setToolkitCredentialsIfAvailable() {
-        Properties properties = propertiesHelper.loadToolkitCredentials();
+        Properties properties = propertiesDao.loadToolkitCredentials();
         toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
         toolkitPasswordField.setText(properties.getProperty(ArgName.toolkitPassword.name()));
     }
@@ -786,7 +794,7 @@ public class MainController extends AbstractController {
     private ChangeListener<String> comboBoxValueChangeListener() {
         return (options, oldValue, newValue) -> {
             if (useComboBoxValueChangeListener) {
-                String[] args = propertiesHelper.loadArgumentArray(newValue);
+                String[] args = propertiesDao.loadArgumentArray(newValue);
                 applicationProperties = ApplicationPropertiesFactory.getInstance(args);
                 setInitValues();
                 configurationNameTextField.setText(newValue);

@@ -3,6 +3,9 @@ package pg.gipter.job.upload;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.DataDao;
+import pg.gipter.dao.PropertiesDao;
 import pg.gipter.service.ToolkitService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
@@ -10,7 +13,6 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.utils.PropertiesHelper;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -25,8 +27,13 @@ public class UploadItemJob implements Job {
     public static final String NAME = "Gipter-job";
     public static final String GROUP = "GipterJobGroup";
 
+    private final PropertiesDao propertiesDao;
+    private final DataDao dataDao;
+
+    // Instances of Job must have a public no-argument constructor.
     public UploadItemJob() {
-        // Instances of Job must have a public no-argument constructor.
+        propertiesDao = DaoFactory.getPropertiesDao();
+        dataDao = DaoFactory.getDataDao();
     }
 
     @Override
@@ -45,11 +52,10 @@ public class UploadItemJob implements Job {
         new FXMultiRunner(configurationNames, uiLauncher.nonUIExecutor()).start();
 
         logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        PropertiesHelper propertiesHelper = new PropertiesHelper();
-        propertiesHelper.saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
+        dataDao.saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                propertiesHelper.loadArgumentArray(configurationNames.getFirst())
+                propertiesDao.loadArgumentArray(configurationNames.getFirst())
         );
         uiLauncher.updateTray(applicationProperties);
         if (applicationProperties.isToolkitCredentialsSet()) {
@@ -100,14 +106,13 @@ public class UploadItemJob implements Job {
     }
 
     private void setDatesOnConfigs(LocalDate startDate) {
-        PropertiesHelper propertiesHelper = new PropertiesHelper();
-        Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
+        Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
         for (Map.Entry<String, Properties> entry : propertiesMap.entrySet()) {
             Properties runConfig = entry.getValue();
             runConfig.setProperty(ArgName.startDate.name(), startDate.format(ApplicationProperties.yyyy_MM_dd));
             runConfig.setProperty(ArgName.endDate.name(), LocalDate.now().format(ApplicationProperties.yyyy_MM_dd));
             runConfig.setProperty(ArgName.preferredArgSource.name(), PreferredArgSource.UI.name());
-            propertiesHelper.saveRunConfig(runConfig);
+            propertiesDao.saveRunConfig(runConfig);
         }
     }
 

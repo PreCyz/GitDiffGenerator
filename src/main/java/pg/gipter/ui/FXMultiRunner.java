@@ -5,6 +5,9 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.DataDao;
+import pg.gipter.dao.PropertiesDao;
 import pg.gipter.launcher.Starter;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
@@ -16,7 +19,6 @@ import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.PropertiesHelper;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -58,6 +60,8 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private long totalProgress;
     private AtomicLong workDone;
     private ApplicationProperties applicationProperties;
+    private PropertiesDao propertiesDao;
+    private DataDao dataDao;
 
     public FXMultiRunner(Collection<String> configurationNames, Executor executor) {
         this.configurationNames = new LinkedList<>(configurationNames);
@@ -65,6 +69,8 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.totalProgress = configurationNames.size() * 5;
         this.workDone = new AtomicLong(0);
         this.applicationProperties = null;
+        this.propertiesDao = DaoFactory.getPropertiesDao();
+        this.dataDao = DaoFactory.getDataDao();
     }
 
     public FXMultiRunner(ApplicationProperties applicationProperties, Executor executor) {
@@ -150,27 +156,26 @@ public class FXMultiRunner extends Task<Void> implements Starter {
 
     private boolean isConfirmationWindow() {
         return ApplicationPropertiesFactory.getInstance(
-                new PropertiesHelper().loadArgumentArray(configurationNames.getFirst())
+                propertiesDao.loadArgumentArray(configurationNames.getFirst())
         ).isConfirmationWindow();
     }
 
     private String toolkitUserFolder() {
-        return ApplicationPropertiesFactory.getInstance(
-                new PropertiesHelper().loadArgumentArray(configurationNames.getFirst())
-        ).toolkitUserFolder();
+        return ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationNames.getFirst()))
+                .toolkitUserFolder();
     }
 
     private boolean isToolkitCredentialsSet() {
         if (toolkitCredentialsSet == null) {
             toolkitCredentialsSet = ApplicationPropertiesFactory.getInstance(
-                    new PropertiesHelper().loadArgumentArray(configurationNames.getFirst())
+                    propertiesDao.loadArgumentArray(configurationNames.getFirst())
             ).isToolkitCredentialsSet();
         }
         return toolkitCredentialsSet;
     }
 
     private ApplicationProperties getApplicationProperties(String configurationName) {
-        return ApplicationPropertiesFactory.getInstance(new PropertiesHelper().loadArgumentArray(configurationName));
+        return ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationName));
     }
 
     private ApplicationProperties produce(ApplicationProperties applicationProperties) {
@@ -229,7 +234,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     }
 
     private void saveUploadStatus(UploadStatus status) {
-        new PropertiesHelper().saveUploadStatus(status.name());
+        dataDao.saveUploadStatus(status.name());
         updateProgress(totalProgress, totalProgress);
         updateMessage(BundleUtils.getMsg("progress.finished", status.name()));
         logger.info("{} ended.", this.getClass().getName());

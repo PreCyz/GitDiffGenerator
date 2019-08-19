@@ -11,6 +11,9 @@ import javafx.stage.WindowEvent;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.dao.DataDao;
+import pg.gipter.dao.PropertiesDao;
 import pg.gipter.job.JobHandler;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.job.upload.JobType;
@@ -27,7 +30,6 @@ import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.PropertiesHelper;
 import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
@@ -57,7 +59,8 @@ public class UILauncher implements Launcher {
     private Stage toolkitProjectsWindow;
     private Stage applicationSettingsWindow;
     private TrayHandler trayHandler;
-    private PropertiesHelper propertiesHelper;
+    private PropertiesDao propertiesDao;
+    private DataDao dataDao;
     private boolean silentMode;
     private boolean upgradeChecked = false;
     private LocalDateTime lastItemSubmissionDate;
@@ -67,7 +70,8 @@ public class UILauncher implements Launcher {
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
         this.mainWindow = mainWindow;
         this.applicationProperties = applicationProperties;
-        propertiesHelper = new PropertiesHelper();
+        propertiesDao = DaoFactory.getPropertiesDao();
+        dataDao = DaoFactory.getDataDao();
         silentMode = applicationProperties.isSilentMode();
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         jobHandler = new JobHandler();
@@ -207,7 +211,7 @@ public class UILauncher implements Launcher {
 
     public void showJobWindow() {
         Platform.runLater(() -> {
-            Map<String, Properties> propertiesMap = propertiesHelper.loadAllApplicationProperties();
+            Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
             if (propertiesMap.containsKey(ArgName.configurationName.defaultValue())) {
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.window.canNotOpen"))
@@ -264,10 +268,10 @@ public class UILauncher implements Launcher {
                     .withImage(ImageFile.ERROR_CHICKEN);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } finally {
-            Optional<Properties> data = propertiesHelper.loadDataProperties();
+            Optional<Properties> data = dataDao.loadDataProperties();
             if (data.isPresent()) {
                 data.ifPresent(properties -> Stream.of(JobProperty.values()).forEach(jobKey -> properties.remove(jobKey.value())));
-                propertiesHelper.saveDataProperties(data.get());
+                dataDao.saveDataProperties(data.get());
             }
 
             logger.info("{} canceled.", UploadItemJob.NAME);
@@ -276,7 +280,7 @@ public class UILauncher implements Launcher {
     }
 
     private void scheduleJobIfExists() {
-        Optional<Properties> data = propertiesHelper.loadDataProperties();
+        Optional<Properties> data = dataDao.loadDataProperties();
         if (data.isPresent() && !jobHandler.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.value())) {
             try {
                 JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.value()));
@@ -384,7 +388,7 @@ public class UILauncher implements Launcher {
         applicationSettingsWindow.initModality(Modality.APPLICATION_MODAL);
         buildScene(applicationSettingsWindow, WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this));
         applicationSettingsWindow.setOnCloseRequest(event -> {
-            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(applicationProperties.configurationName()));
+            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(applicationProperties.configurationName()));
             applicationSettingsWindow.close();
             execute();
         });
@@ -396,7 +400,7 @@ public class UILauncher implements Launcher {
         stage.initModality(Modality.APPLICATION_MODAL);
         buildScene(stage, windowFactory.createWindow(applicationProperties, this));
         stage.setOnCloseRequest(event -> {
-            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(applicationProperties.configurationName()));
+            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(applicationProperties.configurationName()));
             stage.close();
             execute();
         });

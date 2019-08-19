@@ -1,8 +1,8 @@
 package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
+import pg.gipter.dao.PropertiesDao;
 import pg.gipter.producer.command.UploadType;
-import pg.gipter.utils.PropertiesHelper;
 
 import java.io.File;
 import java.time.DateTimeException;
@@ -23,7 +23,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_propertiesFromFile_when_hasProperties_then_returnTrue() {
-        PropertiesHelper loader = mockPropertiesLoader(new Properties());
+        PropertiesDao loader = mockPropertiesLoader(new Properties());
         appProps = new FilePreferredApplicationProperties(new String[]{});
         appProps.init(new String[]{}, loader);
 

@@ -91,7 +91,7 @@ public class NameSettingsController extends AbstractController {
     }
 
     private void setInitValues() {
-        Optional<NameSetting> fnsOpt = propertiesHelper.loadFileNameSetting();
+        Optional<NameSetting> fnsOpt = propertiesDao.loadFileNameSetting();
         if (fnsOpt.isPresent()) {
             fileNameSetting = fnsOpt.get();
             setTableViewData();
@@ -118,7 +118,7 @@ public class NameSettingsController extends AbstractController {
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
             uiLauncher.executeOutsideUIThread(() -> {
-                propertiesHelper.saveFileNameSetting(fileNameSetting);
+                propertiesDao.saveFileNameSetting(fileNameSetting);
                 clearItemFileNamePrefix();
             });
             saveButton.setDisable(fileNameSetting.getNameSettings().isEmpty());
@@ -133,7 +133,7 @@ public class NameSettingsController extends AbstractController {
 
     private void clearItemFileNamePrefix() {
         if (fileNameSetting.getNameSettings().isEmpty()) {
-            Map<String, Properties> map = propertiesHelper.loadAllApplicationProperties();
+            Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
             if (!map.isEmpty()) {
                 for (Properties config : map.values()) {
                     String property = config.getProperty(ArgName.itemFileNamePrefix.name());
@@ -142,7 +142,7 @@ public class NameSettingsController extends AbstractController {
                             int closingBracket = property.indexOf("}", openingBracket);
                             if (openingBracket >= 0 && closingBracket > 0) {
                                 config.remove(ArgName.itemFileNamePrefix.name());
-                                propertiesHelper.saveRunConfig(config);
+                                propertiesDao.saveRunConfig(config);
                             }
                         }
                 }

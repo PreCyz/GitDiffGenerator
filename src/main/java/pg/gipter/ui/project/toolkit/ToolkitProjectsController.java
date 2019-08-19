@@ -118,7 +118,7 @@ public class ToolkitProjectsController extends AbstractController {
     private void initValues() {
         downloadAvailableProjectNames();
         Set<String> projects = applicationProperties.projectPaths();
-        String[] args = propertiesHelper.loadArgumentArray(applicationProperties.configurationName());
+        String[] args = propertiesDao.loadArgumentArray(applicationProperties.configurationName());
         if (args.length == 0) {
             projects.clear();
             projects.add(ProjectDetails.DEFAULT.getName());
@@ -251,12 +251,12 @@ public class ToolkitProjectsController extends AbstractController {
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
             String configurationName = applicationProperties.configurationName();
-            Properties properties = propertiesHelper.createProperties(applicationProperties.getArgs());
+            Properties properties = propertiesDao.createProperties(applicationProperties.getArgs());
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
             properties.setProperty(ArgName.projectPath.name(), projects);
-            propertiesHelper.saveRunConfig(properties);
+            propertiesDao.saveRunConfig(properties);
 
-            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesHelper.loadArgumentArray(configurationName));
+            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationName));
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.hideToolkitProjectsWindow();
             uiLauncher.buildAndShowMainWindow();
