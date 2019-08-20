@@ -1,8 +1,10 @@
 package pg.gipter.dao;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -19,6 +21,15 @@ class PropertiesConverterImplTest {
     void setUp() {
         propertiesDao = new PropertiesDaoImpl();
         propertiesConverter = new PropertiesConverterImpl();
+    }
+
+    @AfterEach
+    void tearDown() {
+        try {
+            Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
+        } catch (IOException e) {
+            System.out.println("There is something weird going on.");
+        }
     }
 
     @Test

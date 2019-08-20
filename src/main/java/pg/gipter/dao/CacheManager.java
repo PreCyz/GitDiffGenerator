@@ -18,7 +18,7 @@ public class CacheManager {
 
     private CacheManager() { }
 
-    public static ApplicationProperties getApplicationProperties(String configName) {
+    static ApplicationProperties getApplicationProperties(String configName) {
         if (cacheMap.containsKey(configName)) {
             logger.info("Configuration {} is taken from cache.", configName);
             return cacheMap.get(configName);
@@ -51,7 +51,7 @@ public class CacheManager {
         logger.info("Configuration {} removed from cache.", configName);
     }
 
-    public static void clearAllCache() {
+    static void clearAllCache() {
         int size = cacheMap.size();
         cacheMap.clear();
         logger.info("Cached cleared. {} entries removed.", size);
