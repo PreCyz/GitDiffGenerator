@@ -26,9 +26,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-/**
- * Created by Pawel Gawedzki on 15-Jul-2019.
- */
+import static java.util.stream.Collectors.toCollection;
+
+/** Created by Pawel Gawedzki on 15-Jul-2019. */
 public class FXMultiRunner extends Task<Void> implements Starter {
 
     private static class UploadResult {
@@ -59,24 +59,23 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private Map<String, UploadResult> resultMap = new LinkedHashMap<>();
     private long totalProgress;
     private AtomicLong workDone;
-    private ApplicationProperties applicationProperties;
+    private Collection<ApplicationProperties> applicationPropertiesCollection;
     private PropertiesDao propertiesDao;
     private DataDao dataDao;
 
-    public FXMultiRunner(Collection<String> configurationNames, Executor executor) {
+    public FXMultiRunner(Set<String> configurationNames, Executor executor) {
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
         this.totalProgress = configurationNames.size() * 5;
         this.workDone = new AtomicLong(0);
-        this.applicationProperties = null;
+        this.applicationPropertiesCollection = Collections.emptyList();
         this.propertiesDao = DaoFactory.getPropertiesDao();
         this.dataDao = DaoFactory.getDataDao();
     }
 
-    public FXMultiRunner(ApplicationProperties applicationProperties, Executor executor) {
-        this(Collections.emptyList(), executor);
-        this.applicationProperties = applicationProperties;
-        this.totalProgress = 5;
+    public FXMultiRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor) {
+        this(applicationPropertiesCollection.stream().map(ApplicationProperties::configurationName).collect(toCollection(LinkedHashSet::new)), executor);
+        this.applicationPropertiesCollection = applicationPropertiesCollection;
     }
 
     @Override
@@ -99,10 +98,10 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {
-                if (applicationProperties != null) {
-                    executeForApplicationProperties();
-                } else {
+                if (applicationPropertiesCollection.isEmpty()) {
                     executeForNames();
+                } else {
+                    executeForApplicationProperties();
                 }
             } catch (Exception ex) {
                 logger.error("Diff upload failure.", ex);
@@ -137,8 +136,9 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private void executeForApplicationProperties() throws InterruptedException, java.util.concurrent.ExecutionException {
         List<CompletableFuture<Boolean>> tasks = new LinkedList<>();
 
-        String configName = applicationProperties.configurationName();
-        if (applicationProperties.isToolkitCredentialsSet()) {
+        for (ApplicationProperties applicationProperties : applicationPropertiesCollection) {
+            String configName = applicationProperties.configurationName();
+            if (applicationProperties.isToolkitCredentialsSet()) {
                 CompletableFuture<Boolean> withUpload = CompletableFuture.supplyAsync(() -> applicationProperties, executor)
                         .thenApply(this::produce).thenApply(this::upload)
                         .handle((isUploaded, throwable) -> handleUploadResult(configName, throwable == null, throwable));
@@ -150,8 +150,8 @@ public class FXMultiRunner extends Task<Void> implements Starter {
 
                 tasks.add(withoutUpload);
             }
-
-        CompletableFuture.allOf(tasks.toArray(new CompletableFuture<?>[0])).get();
+            CompletableFuture.allOf(tasks.toArray(new CompletableFuture<?>[0])).get();
+        }
     }
 
     private boolean isConfirmationWindow() {

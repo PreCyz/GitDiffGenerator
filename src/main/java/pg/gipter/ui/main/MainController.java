@@ -61,6 +61,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
@@ -473,7 +475,7 @@ public class MainController extends AbstractController {
             String[] args = createArgsFromUI();
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
 
-            FXMultiRunner runner = new FXMultiRunner(uiAppProperties, uiLauncher.nonUIExecutor());
+            FXMultiRunner runner = new FXMultiRunner(Stream.of(uiAppProperties).collect(Collectors.toList()), uiLauncher.nonUIExecutor());
             resetIndicatorProperties(runner);
             uiLauncher.executeOutsideUIThread(() -> {
                 runner.start();
@@ -504,8 +506,8 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> executeAllActionEventHandler() {
         return event -> {
-            Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
-            FXMultiRunner runner = new FXMultiRunner(map.keySet(), uiLauncher.nonUIExecutor());
+            Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
+            FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor());
             resetIndicatorProperties(runner);
             uiLauncher.executeOutsideUIThread(() -> {
                 runner.call();
