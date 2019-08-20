@@ -18,9 +18,9 @@ public class CacheManager {
 
     private CacheManager() { }
 
-    static ApplicationProperties getApplicationProperties(String configName) {
+    public static ApplicationProperties getApplicationProperties(String configName) {
         if (cacheMap.containsKey(configName)) {
-            logger.info("Configuration {} is taken from cache.", configName);
+            logger.info("Configuration [{}] is taken from cache.", configName);
             return cacheMap.get(configName);
         }
         return ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configName));
@@ -32,7 +32,7 @@ public class CacheManager {
         Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
         for (Map.Entry<String, Properties> entry : map.entrySet()) {
             if (cacheMap.containsKey(entry.getKey())) {
-                logger.info("Configuration {} is taken from cache.", entry.getKey());
+                logger.info("Configuration [{}] is taken from cache.", entry.getKey());
                 result.put(entry.getKey(), cacheMap.get(entry.getKey()));
             } else {
                 result.put(entry.getKey(), getApplicationProperties(entry.getKey()));
@@ -43,18 +43,18 @@ public class CacheManager {
 
     public static void addToCache(String configName, ApplicationProperties applicationProperties) {
         cacheMap.put(configName, applicationProperties);
-        logger.info("Configuration {} added to cache.", configName);
+        logger.info("Configuration [{}] added to cache.", configName);
     }
 
     public static void removeFromCache(String configName) {
         cacheMap.remove(configName);
-        logger.info("Configuration {} removed from cache.", configName);
+        logger.info("Configuration [{}] removed from cache.", configName);
     }
 
     static void clearAllCache() {
         int size = cacheMap.size();
         cacheMap.clear();
-        logger.info("Cached cleared. {} entries removed.", size);
+        logger.info("Cached cleared. [{}] entries removed.", size);
     }
 
 

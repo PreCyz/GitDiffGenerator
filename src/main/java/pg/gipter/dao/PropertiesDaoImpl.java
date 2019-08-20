@@ -183,6 +183,7 @@ class PropertiesDaoImpl implements PropertiesDao {
             jsonObject = configHelper.buildFullJson(properties);
         }
         configHelper.addOrReplaceRunConfig(properties, jsonObject);
+        logger.info("Saving run config [{}].", properties.getProperty(ArgName.configurationName.name()));
         writeJsonConfig(jsonObject);
     }
 
@@ -227,6 +228,7 @@ class PropertiesDaoImpl implements PropertiesDao {
                 JsonArray runConfigs = jsonElement.getAsJsonArray();
                 runConfigs.remove(existingConfIdx);
                 jsonObject.add(ConfigHelper.RUN_CONFIGS, runConfigs);
+                logger.info("Removing run config [{}].", configurationName);
                 writeJsonConfig(jsonObject);
             } else {
                 logger.error(errMsg);
@@ -251,6 +253,7 @@ class PropertiesDaoImpl implements PropertiesDao {
             jsonObject = configHelper.buildFullJson(properties);
         }
         jsonObject.add(ConfigHelper.APP_CONFIG, configHelper.buildAppConfig(properties));
+        logger.info("Saving application settings.");
         writeJsonConfig(jsonObject);
     }
 
@@ -262,6 +265,7 @@ class PropertiesDaoImpl implements PropertiesDao {
             jsonObject = configHelper.buildFullJson(properties);
         }
         jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));
+        logger.info("Saving toolkit settings.");
         writeJsonConfig(jsonObject);
     }
 
