@@ -1,14 +1,23 @@
 package pg.gipter.dao;
 
 public final class DaoFactory {
+    private static PropertiesDao propertiesDao;
+    private static DataDao dataDao;
+
     private DaoFactory() {}
 
     public static PropertiesDao getPropertiesDao() {
-        return new PropertiesDaoImpl();
+        if (propertiesDao == null) {
+            propertiesDao = new PropertiesDaoImpl();
+        }
+        return propertiesDao;
     }
 
     public static DataDao getDataDao() {
-        return new DataDaoImpl();
+        if (dataDao == null) {
+            dataDao = new DataDaoImpl();
+        }
+        return dataDao;
     }
 
     public static PropertiesConverter getPropertiesConverter() {
