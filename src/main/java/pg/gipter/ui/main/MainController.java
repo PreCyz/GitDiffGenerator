@@ -212,8 +212,16 @@ public class MainController extends AbstractController {
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
         deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
 
-        startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
-        endDatePicker.setValue(LocalDate.now());
+        LocalDate now = LocalDate.now();
+        LocalDate initStartDate = now.minusDays(applicationProperties.periodInDays());
+        startDatePicker.setValue(initStartDate);
+        if (!initStartDate.isEqual(applicationProperties.startDate())) {
+            startDatePicker.setValue(applicationProperties.startDate());
+        }
+        endDatePicker.setValue(now);
+        if (!now.isEqual(applicationProperties.endDate())) {
+            endDatePicker.setValue(applicationProperties.endDate());
+        }
         periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
 
         userFolderUrl = applicationProperties.toolkitUserFolder();
@@ -506,7 +514,11 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> executeAllActionEventHandler() {
         return event -> {
+            String[] args = createArgsFromUI();
+            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
             Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
+            map.put(uiAppProperties.configurationName(), uiAppProperties);
+
             FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor());
             resetIndicatorProperties(runner);
             uiLauncher.executeOutsideUIThread(() -> {
@@ -777,7 +789,7 @@ public class MainController extends AbstractController {
 
     private void setListeners() {
         toolkitUsernameTextField.textProperty().addListener(toolkitUsernameListener());
-        configurationNameComboBox.getSelectionModel().selectedItemProperty().addListener(comboBoxValueChangeListener());
+        configurationNameComboBox.getSelectionModel().selectedItemProperty().addListener(configurationNameComboBoxListener());
         configurationNameTextField.textProperty().addListener(configurationNameListener());
         useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
         itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
@@ -795,12 +807,14 @@ public class MainController extends AbstractController {
         };
     }
 
-    private ChangeListener<String> comboBoxValueChangeListener() {
+    private ChangeListener<String> configurationNameComboBoxListener() {
         return (options, oldValue, newValue) -> {
             if (useComboBoxValueChangeListener) {
-                String[] args = propertiesDao.loadArgumentArray(newValue);
-                applicationProperties = ApplicationPropertiesFactory.getInstance(args);
-                CacheManager.addToCache(applicationProperties.configurationName(), applicationProperties);
+                String[] args = createArgsFromUI();
+                ApplicationProperties uiApplicationProperties = ApplicationPropertiesFactory.getInstance(args);
+                CacheManager.addToCache(oldValue, uiApplicationProperties);
+
+                applicationProperties = CacheManager.getApplicationProperties(newValue);
                 setInitValues();
                 configurationNameTextField.setText(newValue);
                 if (useLastItemDateCheckbox.isSelected()) {
