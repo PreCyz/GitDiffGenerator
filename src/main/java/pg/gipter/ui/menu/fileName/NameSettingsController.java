@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toSet;
 
 public class NameSettingsController extends AbstractController {
 
@@ -155,6 +156,7 @@ public class NameSettingsController extends AbstractController {
             patternsToDelete = new LinkedHashSet<>(nameSettingsTableView.getSelectionModel().getSelectedItems());
             nameSettingsTableView.getItems().removeAll(patternsToDelete);
             nameSettingsTableView.refresh();
+            fileNameSetting.removeSettings(patternsToDelete.stream().map(NameTableData::getWordToReplace).collect(toSet()));
             saveButton.setDisable(nameSettingsTableView.getItems().isEmpty());
             clearButton.setDisable(nameSettingsTableView.getItems().isEmpty());
             removeButton.setDisable(nameSettingsTableView.getItems().isEmpty());

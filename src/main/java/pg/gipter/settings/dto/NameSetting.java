@@ -2,6 +2,7 @@ package pg.gipter.settings.dto;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class NameSetting {
 
@@ -17,5 +18,11 @@ public class NameSetting {
 
     public void setNameSettings(Map<String, NamePatternValue> nameSettings) {
         this.nameSettings = nameSettings;
+    }
+
+    public void removeSettings(Set<String> keys) {
+        for (String key : keys) {
+            nameSettings.remove(key);
+        }
     }
 }
