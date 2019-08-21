@@ -17,7 +17,7 @@
             <Menu mnemonicParsing="false" text="%main.menu.help">
                <items>
                   <MenuItem fx:id="readMeMenuItem" mnemonicParsing="false" text="%main.menu.help.readMe" />
-                  <MenuItem fx:id="instructionMenuItem" mnemonicParsing="false" text="%main.menu.help.pdfInstruction" />
+                  <MenuItem fx:id="instructionMenuItem" mnemonicParsing="false" text="%main.menu.help.pdf" />
                   <MenuItem fx:id="checkUpdatesMenuItem" mnemonicParsing="false" text="%main.menu.help.checkUpdates" />
                </items>
             </Menu>
