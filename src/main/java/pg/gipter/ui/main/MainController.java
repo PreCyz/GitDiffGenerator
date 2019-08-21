@@ -706,7 +706,9 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> removeConfigurationEventHandler() {
         return event -> {
+            AlertWindowBuilder alertWindowBuilder;
             try {
+                CacheManager.removeFromCache(configurationNameComboBox.getValue());
                 propertiesDao.removeConfig(configurationNameComboBox.getValue());
                 Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
                 String newConfiguration = ArgName.configurationName.defaultValue();
@@ -715,27 +717,26 @@ public class MainController extends AbstractController {
                     newConfiguration = currentConfig.getProperty(ArgName.configurationName.name());
                 }
                 removeConfigurationNameFromComboBox(configurationNameComboBox.getValue(), newConfiguration);
-                String[] currentArgs = propertiesDao.loadArgumentArray(newConfiguration);
-                applicationProperties = ApplicationPropertiesFactory.getInstance(currentArgs);
+
+                applicationProperties = CacheManager.getApplicationProperties(newConfiguration);
                 setInitValues();
                 configurationNameTextField.setText(configurationNameComboBox.getValue());
                 setDisableDependOnConfigurations();
                 setToolkitCredentialsIfAvailable();
-                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .withWindowType(WindowType.CONFIRMATION_WINDOW)
                         .withImage(ImageFile.FINGER_UP);
-                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             } catch (IllegalStateException ex) {
-                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(ex.getMessage())
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
                         .withImage(ImageFile.ERROR_CHICKEN);
-                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         };
     }
 
