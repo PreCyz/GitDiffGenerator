@@ -65,7 +65,6 @@ public class UpgradeService {
 
     private void decompress(File sevenZSourceFile, File destination) {
         try (SevenZFile sevenZFile = new SevenZFile(sevenZSourceFile)){
-
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null){
                 if (entry.isDirectory()){
@@ -94,11 +93,16 @@ public class UpgradeService {
 
         /* is it a jar file? */
         if (!jarFile.isPresent()) {
+            logger.error("Error when restarting application. Could not file jar file.");
             return;
         }
-        /*if (!jarFile.get().getName().endsWith(".jar")) {
+        if (!jarFile.get().getName().endsWith(".jar")) {
             jarFile = Optional.of(Paths.get(jarFile.get().getAbsolutePath().replaceFirst("classes", "Gipter.jar")).toFile());
-        }*/
+        }
+
+        if (!jarFile.get().exists() || !jarFile.get().isFile()) {
+            logger.error("Error when restarting application. {} is not a file.", jarFile.get().getAbsolutePath());
+        }
 
         /* Build command: java -jar application.jar */
         final LinkedList<String> command = new LinkedList<>();

@@ -1781,4 +1781,63 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).startsWith("my-JUNE-2018-name");
     }
+
+    @Test
+    void givenNoUpgradeFinished_whenIsUpgradeFinished_thenReturnDefault() {
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isUpgradeFinished();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUpgradeFinishedFromCLI_whenIsUpgradeFinished_thenReturnCliUpgradeFinished() {
+        applicationProperties = new CliPreferredApplicationProperties(
+                new String[]{"upgradeFinished=y"}
+        );
+
+        boolean actual = applicationProperties.isUpgradeFinished();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUpgradeFinishedFileAndCLI_whenIsUpgradeFinished_thenReturnCliUpgradeFinished() {
+        String[] args = {"upgradeFinished=y"};
+        Properties props = new Properties();
+        props.put("upgradeFinished", "n");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUpgradeFinished();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUpgradeFinishedFromProperties_whenIsUpgradeFinished_thenReturnUpgradeFinishedFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("upgradeFinished", "y");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUpgradeFinished();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUpgradeFinishedFromPropertiesAndOtherArgs_whenIsUpgradeFinished_thenReturnUseAsFileNameFromProperties() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("upgradeFinished", "y");
+        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isUpgradeFinished();
+
+        assertThat(actual).isTrue();
+    }
 }

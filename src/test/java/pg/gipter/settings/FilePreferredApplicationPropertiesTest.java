@@ -938,4 +938,52 @@ class FilePreferredApplicationPropertiesTest {
 
         assertThat(actual).isEqualTo("propsAuthor");
     }
+
+    @Test
+    void givenNoProperties_whenIsUpgradeFinished_thenReturnFalse() {
+        String[] args = {""};
+        appProps = new FilePreferredApplicationProperties(args);
+
+        boolean actual = appProps.isUpgradeFinished();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenEmptyUpgradeFinishedFiles_whenIsUpgradeFinished_thenReturnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUpgradeFinished();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUpgradeFinishedSetY_whenIsUpgradeFinished_thenReturnTrue() {
+        String[] args = {"upgradeFinished=N"};
+        Properties props = new Properties();
+        props.put("upgradeFinished", "Y");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUpgradeFinished();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenUpgradeFinishedN_whenIsUpgradeFinished_thenReturnFalse() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("upgradeFinished", "n");
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isUpgradeFinished();
+
+        assertThat(actual).isFalse();
+    }
 }

@@ -290,4 +290,14 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
         return configurationName;
     }
 
+    @Override
+    public boolean isUpgradeFinished() {
+        boolean upgradeFinished = argExtractor.isUpgradeFinished();
+        String argName = ArgName.upgradeFinished.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            upgradeFinished = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(upgradeFinished)));
+        }
+        return upgradeFinished;
+    }
+
 }

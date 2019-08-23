@@ -126,7 +126,7 @@ final class ArgExtractor {
 
     boolean isConfirmationWindow() {
         if (containsArg(ArgName.confirmationWindow.name())) {
-            return StringUtils.getBoolean(getValue(ArgName.confirmationWindow, ArgName.uploadType.defaultValue()));
+            return StringUtils.getBoolean(getValue(ArgName.confirmationWindow, ArgName.confirmationWindow.defaultValue()));
         }
         return StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
     }
@@ -239,5 +239,12 @@ final class ArgExtractor {
             return getValue(ArgName.configurationName, ArgName.configurationName.defaultValue());
         }
         return ArgName.configurationName.defaultValue();
+    }
+
+    public boolean isUpgradeFinished() {
+        if (containsArg(ArgName.upgradeFinished.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.upgradeFinished, ArgName.upgradeFinished.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.upgradeFinished.defaultValue());
     }
 }

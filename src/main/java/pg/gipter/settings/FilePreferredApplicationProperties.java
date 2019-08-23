@@ -273,4 +273,14 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
         return argExtractor.configurationName();
     }
 
+    @Override
+    public boolean isUpgradeFinished() {
+        if (hasProperties()) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    ArgName.upgradeFinished.name(), ArgName.upgradeFinished.defaultValue()
+            ));
+        }
+        return argExtractor.isUpgradeFinished();
+    }
+
 }
