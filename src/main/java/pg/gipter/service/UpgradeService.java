@@ -11,6 +11,7 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.BundleUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,19 +42,19 @@ public class UpgradeService {
                     FileUtils.forceDelete(sevenZFile);
                     restartApplication();
                 } else {
-                    alertWindowBuilder.withHeaderText("Could not upgrade version.")
+                    alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
                             .withLink(AlertHelper.logsFolder())
                             .withWindowType(WindowType.LOG_WINDOW)
                             .withAlertType(Alert.AlertType.WARNING);
                 }
             } else {
-                alertWindowBuilder.withHeaderText("Could not upgrade version.")
+                alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING);
             }
         } catch (Exception ex) {
-            alertWindowBuilder.withHeaderText("Could not upgrade version.")
+            alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
                     .withMessage(ex.getMessage())
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
@@ -63,7 +64,7 @@ public class UpgradeService {
         }
     }
 
-    private void decompress(File sevenZSourceFile, File destination) {
+    private void decompress(File sevenZSourceFile, File destination) throws IOException {
         try (SevenZFile sevenZFile = new SevenZFile(sevenZSourceFile)){
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null){
@@ -81,9 +82,6 @@ public class UpgradeService {
                 out.write(content);
                 out.close();
             }
-
-        } catch (Exception e) {
-            logger.error("Something went wrong.", e);
         }
     }
 
