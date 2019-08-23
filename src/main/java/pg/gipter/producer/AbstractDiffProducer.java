@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.producer.command.DiffCommand;
 import pg.gipter.producer.command.DiffCommandFactory;
 import pg.gipter.producer.command.VersionControlSystem;
+import pg.gipter.producer.version.CVSVersionProducer;
+import pg.gipter.producer.version.CVSVersionProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 
 import java.io.*;
@@ -34,7 +36,8 @@ abstract class AbstractDiffProducer implements DiffProducer {
             for (String projectPath : applicationProperties.projectPaths()) {
                 logger.info("Project path: {}", projectPath);
                 VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath).toFile());
-                logger.info("Discovered '{}' version control system.", vcs);
+                CVSVersionProducer cvsVersionProducer = CVSVersionProducerFactory.getInstance(vcs, projectPath);
+                logger.info("Discovered '{}' version control system.", cvsVersionProducer.getVersion());
 
                 final DiffCommand diffCommand = DiffCommandFactory.getInstance(vcs, applicationProperties);
                 List<String> cmd = diffCommand.commandAsList();
