@@ -13,7 +13,7 @@
         <appender-ref ref="CONSOLE" />
     </logger>
 
-    <root level="info">
+    <root level="all">
         <appender-ref ref="CONSOLE" />
     </root>
 </configuration>

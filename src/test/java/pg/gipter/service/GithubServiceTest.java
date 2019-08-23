@@ -1,12 +1,16 @@
 package pg.gipter.service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import pg.gipter.settings.ApplicationProperties;
 
+import java.io.*;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 /** Created by Pawel Gawedzki on 02-Aug-2019. */
@@ -84,5 +88,39 @@ class GithubServiceTest {
         boolean actual = spyGithubService.isNewVersion();
 
         assertThat(actual).isFalse();
+    }
+
+    void mockDownloadLastDistributionDetails() throws FileNotFoundException {
+        String json = String.format(".%ssrc%stest%sjava%sresources%slatestDistributionDetails.json",
+                File.separator, File.separator, File.separator, File.separator, File.separator);
+        Reader reader = new BufferedReader(new FileReader(json));
+        doReturn(Optional.of(new Gson().fromJson(reader, JsonObject.class))).when(spyGithubService).downloadLatestDistributionDetails();
+    }
+
+    @Test
+    void givenLatestDistroDetails_whenGetDownloadLink_thenFileDownloaded() throws FileNotFoundException {
+        String json = String.format(".%ssrc%stest%sjava%sresources%slatestDistributionDetails.json",
+                File.separator, File.separator, File.separator, File.separator, File.separator);
+        Reader reader = new BufferedReader(new FileReader(json));
+
+        Optional<String> fileName = spyGithubService.getDownloadLink(new Gson().fromJson(reader, JsonObject.class));
+
+        assertThat(fileName.isPresent()).isTrue();
+        assertThat("Gipter_v3.6.6.7z").isEqualTo(spyGithubService.distributionName);
+    }
+
+    @Test
+    void givenNoLatestDistroDetails_whenDownloadLatestDistribution_thenThrowIllegalStateException() {
+        doReturn(Optional.empty()).when(spyGithubService).downloadLatestDistributionDetails();
+
+        try {
+            spyGithubService.downloadLatestDistribution(".");
+            fail("Should throw IllegalStateException.");
+        } catch (Exception ex) {
+            assertThat(ex).isExactlyInstanceOf(IllegalStateException.class);
+            assertThat(ex.getMessage()).isEqualTo("Can not download latest distribution details.");
+        }
+
+
     }
 }

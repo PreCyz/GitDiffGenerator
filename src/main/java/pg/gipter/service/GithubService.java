@@ -1,12 +1,13 @@
 package pg.gipter.service;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
+import org.apache.commons.io.FileUtils;
+import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -22,7 +23,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class GithubService {
 
@@ -32,6 +36,8 @@ public class GithubService {
 
     private static final Logger logger = LoggerFactory.getLogger(GithubService.class);
     private String strippedVersion;
+    private static JsonObject latestReleaseDetails;
+    String distributionName;
 
     public GithubService(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -39,34 +45,13 @@ public class GithubService {
 
     Optional<String> getLatestVersion() {
         Optional<String> latestVersion = Optional.empty();
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest");
-        request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
 
-        try {
-            HttpResponse response = httpClient.execute(request);
-
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                try (InputStream content = response.getEntity().getContent();
-                     InputStreamReader inputStreamReader = new InputStreamReader(content);
-                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
-
-                    StringBuilder result = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        result.append(line);
-                    }
-
-                    Gson gson = new Gson();
-                    JsonObject json = gson.fromJson(result.toString(), JsonObject.class);
-
-                    latestVersion = Optional.ofNullable(json.get("tag_name").getAsString());
-                }
-            }
-        } catch (IOException e) {
-            logger.warn("Can not download latest version of application.", e);
-            latestVersion = Optional.empty();
+        Optional<JsonObject> latestDistroDetails = downloadLatestDistributionDetails();
+        if (latestDistroDetails.isPresent()) {
+            latestReleaseDetails = latestDistroDetails.get();
+            latestVersion = Optional.ofNullable(latestDistroDetails.get().get("tag_name").getAsString());
         }
+
         return latestVersion;
     }
 
@@ -134,5 +119,85 @@ public class GithubService {
                     .buildAndDisplayWindow()
             );
         }
+    }
+
+    Optional<JsonObject> downloadLatestDistributionDetails() {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest");
+        request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
+
+        try {
+            HttpResponse response = httpClient.execute(request);
+
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                try (InputStream content = response.getEntity().getContent();
+                     InputStreamReader inputStreamReader = new InputStreamReader(content);
+                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+
+                    StringBuilder result = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        result.append(line);
+                    }
+
+                    Gson gson = new Gson();
+                    return Optional.ofNullable(gson.fromJson(result.toString(), JsonObject.class));
+                }
+            } else {
+                Stream.of(response.getAllHeaders())
+                        .map(Header::getElements)
+                        .flatMap(Arrays::stream)
+                        .forEach(headerElement -> logger.error("Name: {}, Value {}.", headerElement.getName(), headerElement.getValue()));
+            }
+        } catch (IOException e) {
+            logger.warn("Can not download latest distribution details.", e);
+        }
+        return Optional.empty();
+
+    }
+
+    Optional<String> downloadLatestDistribution(String downloadLocation) {
+        if (latestReleaseDetails == null) {
+            downloadLatestDistributionDetails().ifPresent(jsonObject -> latestReleaseDetails = jsonObject);
+        }
+        if (latestReleaseDetails != null) {
+            Optional<String> downloadLink = getDownloadLink(latestReleaseDetails);
+            if (downloadLink.isPresent()) {
+                HttpClient httpClient = HttpClientBuilder.create().build();
+                HttpGet request = new HttpGet(downloadLink.get());
+                try {
+                    HttpResponse response = httpClient.execute(request);
+                    HttpEntity entity = response.getEntity();
+
+                    if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK && entity != null) {
+                        FileUtils.copyInputStreamToFile(entity.getContent(), Paths.get(downloadLocation, distributionName).toFile());
+                        return Optional.of(distributionName);
+                    }
+                } catch (IOException e) {
+                    logger.error("Can not download latest distribution details.", e);
+                    throw new IllegalStateException("Can not download latest distribution details.");
+                }
+            }
+        } else {
+            logger.error("Can not download latest distribution details.");
+            throw new IllegalStateException("Can not download latest distribution details.");
+        }
+        return Optional.empty();
+    }
+
+    Optional<String> getDownloadLink(JsonObject jsonObject) {
+        Optional<String> downloadLink = Optional.empty();
+        String name = jsonObject.get("name").getAsString();
+        JsonArray assets = jsonObject.get("assets").getAsJsonArray();
+        for (JsonElement asset : assets) {
+            JsonObject element = (JsonObject) asset;
+            JsonElement assetName = element.get("name");
+            if (assetName != null && !assetName.isJsonNull() && assetName.getAsString().startsWith(name)) {
+                distributionName = assetName.getAsString();
+                downloadLink = Optional.ofNullable(element.get("browser_download_url").getAsString());
+                break;
+            }
+        }
+        return downloadLink;
     }
 }
