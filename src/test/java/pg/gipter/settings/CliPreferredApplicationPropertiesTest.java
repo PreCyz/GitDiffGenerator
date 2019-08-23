@@ -726,7 +726,7 @@ class CliPreferredApplicationPropertiesTest {
 
         boolean actual = applicationProperties.isConfirmationWindow();
 
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
     }
 
     @Test

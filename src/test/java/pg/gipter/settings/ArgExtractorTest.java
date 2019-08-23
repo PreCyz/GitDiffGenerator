@@ -431,12 +431,12 @@ class ArgExtractorTest {
     }
 
     @Test
-    void when_isConfirmation_then_returnFalse() {
+    void when_isConfirmation_then_returnTrue() {
         argExtractor = new ArgExtractor(new String[]{});
 
         boolean actual = argExtractor.isConfirmationWindow();
 
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
     }
 
     @Test
@@ -563,6 +563,33 @@ class ArgExtractorTest {
         argExtractor = new ArgExtractor(new String[]{"silentMode=Y"});
 
         boolean actual = argExtractor.isSilentMode();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenNoUpgradeFinished_whenIsUpgradeFinished_thenReturnFalse() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        boolean actual = argExtractor.isUpgradeFinished();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUpgradeFinishedN_whenIsUpgradeFinished_thenReturnFalse() {
+        argExtractor = new ArgExtractor(new String[]{"upgradeFinished=N"});
+
+        boolean actual = argExtractor.isUpgradeFinished();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenUpgradeFinishedY_whenIsUpgradeFinished_thenReturnTrue() {
+        argExtractor = new ArgExtractor(new String[]{"upgradeFinished=Y"});
+
+        boolean actual = argExtractor.isUpgradeFinished();
 
         assertThat(actual).isTrue();
     }

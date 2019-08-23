@@ -101,7 +101,7 @@ public class UpgradeService {
         }
 
         if (!jarFile.get().exists() || !jarFile.get().isFile()) {
-            logger.error("Error when restarting application. {} is not a file.", jarFile.get().getAbsolutePath());
+            logger.error("Error when restarting application. [{}] is not a file.", jarFile.get().getAbsolutePath());
         }
 
         /* Build command: java -jar application.jar */

@@ -28,7 +28,7 @@ public enum ArgName {
     startDate(LocalDate.now().minusDays(Integer.parseInt(periodInDays.defaultValue)).format(yyyy_MM_dd)),
     endDate(LocalDate.now().format(yyyy_MM_dd)),
 
-    confirmationWindow("N"),
+    confirmationWindow("Y"),
     preferredArgSource(PreferredArgSource.CLI.name()),
     useUI("Y"),
     activeTray("Y"),

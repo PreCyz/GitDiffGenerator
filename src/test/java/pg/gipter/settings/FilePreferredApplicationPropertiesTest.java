@@ -579,7 +579,7 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void given_emptyConfirmationWindow_when_isConfirmation_then_returnFalse() {
+    void givenEmptyConfirmationWindow_whenIsConfirmation_thenReturnTrue() {
         String[] args = {""};
         Properties props = new Properties();
         appProps = new FilePreferredApplicationProperties(args);
@@ -587,7 +587,7 @@ class FilePreferredApplicationPropertiesTest {
 
         boolean actual = appProps.isConfirmationWindow();
 
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
     }
 
     @Test

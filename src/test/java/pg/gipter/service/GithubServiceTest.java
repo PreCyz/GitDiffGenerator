@@ -120,7 +120,6 @@ class GithubServiceTest {
             assertThat(ex).isExactlyInstanceOf(IllegalStateException.class);
             assertThat(ex.getMessage()).isEqualTo("Can not download latest distribution details.");
         }
-
-
     }
+
 }
