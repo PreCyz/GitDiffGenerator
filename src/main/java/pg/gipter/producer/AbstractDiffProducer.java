@@ -67,6 +67,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
     private void writeItemToFile(FileWriter fw, String projectPath, List<String> gitCommand) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(gitCommand);
         processBuilder.directory(Paths.get(projectPath).toFile());
+        processBuilder.environment().put("LANG", "pl_PL.UTF-8");
         Process process = processBuilder.start();
 
         try (InputStream is = process.getInputStream();

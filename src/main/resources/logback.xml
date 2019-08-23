@@ -8,6 +8,7 @@
     <appender name="GIPTER" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>./logs/gipter.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] [%thread] %-30.30logger: %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -18,6 +19,7 @@
     <appender name="SPRING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>./logs/spring.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] [%thread] %-30.30logger: %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -28,6 +30,7 @@
     <appender name="QUARTZ" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>./logs/quartz-job.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] [%thread] %-30.30logger: %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
