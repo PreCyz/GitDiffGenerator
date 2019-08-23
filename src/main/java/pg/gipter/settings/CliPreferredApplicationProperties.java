@@ -29,6 +29,9 @@ class CliPreferredApplicationProperties extends ApplicationProperties {
             );
             authors = Stream.of(author.split(",")).collect(toCollection(LinkedHashSet::new));
         }
+        if (authors.contains(ArgName.author.defaultValue()) && isOtherAuthorsExists()) {
+            authors = new LinkedHashSet<>();
+        }
         return authors;
     }
 

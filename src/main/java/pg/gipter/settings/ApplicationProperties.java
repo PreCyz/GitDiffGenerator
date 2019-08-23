@@ -73,6 +73,14 @@ public abstract class ApplicationProperties {
         logger.info("Application properties loaded: {}.", log());
     }
 
+    protected boolean isOtherAuthorsExists() {
+        boolean isNoOtherAuthors = StringUtils.nullOrEmpty(committerEmail());
+        isNoOtherAuthors &= StringUtils.nullOrEmpty(gitAuthor());
+        isNoOtherAuthors &= StringUtils.nullOrEmpty(svnAuthor());
+        isNoOtherAuthors &= StringUtils.nullOrEmpty(mercurialAuthor());
+        return !isNoOtherAuthors;
+    }
+
     protected final boolean hasProperties() {
         return properties != null;
     }

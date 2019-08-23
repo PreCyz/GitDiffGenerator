@@ -62,6 +62,71 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
+    void givenCommitterEmailCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
+        String[] args = {ArgName.committerEmail.name() + "=testAuthor"};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = appProps.authors();
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void givengitAuthorCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
+        String[] args = {ArgName.gitAuthor.name() + "=testAuthor"};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = appProps.authors();
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void givenMercurialAuthorCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
+        String[] args = {ArgName.mercurialAuthor.name() + "=testAuthor"};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = appProps.authors();
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void givenSvnAuthorCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
+        String[] args = {ArgName.svnAuthor.name() + "=testAuthor"};
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = appProps.authors();
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void givenAllOtherAuthorsCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
+        String[] args = {
+                ArgName.committerEmail.name() + "=testAuthor",
+                ArgName.gitAuthor.name() + "=testAuthor",
+                ArgName.mercurialAuthor.name() + "=testAuthor",
+                ArgName.svnAuthor.name() + "=testAuthor",
+        };
+        Properties props = new Properties();
+        appProps = new FilePreferredApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        Set<String> actual = appProps.authors();
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
     void given_authorFromCommandLine_when_gitAuthor_then_returnThatAuthor() {
         appProps = new FilePreferredApplicationProperties(new String[]{"gitAuthor=testAuthor"});
 

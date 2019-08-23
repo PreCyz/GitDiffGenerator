@@ -22,13 +22,21 @@ class FilePreferredApplicationProperties extends ApplicationProperties {
 
     @Override
     public Set<String> authors() {
+        Set<String> result;
         if (hasProperties()) {
             String authors = properties.getProperty(
                     ArgName.author.name(), String.join(",", argExtractor.authors())
             );
-            return Stream.of(authors.split(",")).collect(toCollection(LinkedHashSet::new));
+            result = Stream.of(authors.split(","))
+                    .filter(value -> !StringUtils.nullOrEmpty(value))
+                    .collect(toCollection(LinkedHashSet::new));
+        } else {
+            result = argExtractor.authors();
         }
-        return argExtractor.authors();
+        if (result.contains(ArgName.author.defaultValue()) && isOtherAuthorsExists()) {
+            result = new LinkedHashSet<>();
+        }
+        return result;
     }
 
     @Override

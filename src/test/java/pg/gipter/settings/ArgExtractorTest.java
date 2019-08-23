@@ -35,6 +35,42 @@ class ArgExtractorTest {
     }
 
     @Test
+    void givenCommitterEmailAndNoAuthors_whenAuthorDefaultValue_thenReturnEmptyString() {
+        argExtractor = new ArgExtractor(new String[]{ArgName.committerEmail.name() + "=author1"});
+
+        String actual = argExtractor.authorDefaultValue();
+
+        assertThat(actual).isNull();
+    }
+
+    @Test
+    void givenGitAuthorAndNoAuthors_whenAuthorDefaultValue_thenReturnEmptyString() {
+        argExtractor = new ArgExtractor(new String[]{ArgName.gitAuthor.name() + "=author1"});
+
+        String actual = argExtractor.authorDefaultValue();
+
+        assertThat(actual).isNull();
+    }
+
+    @Test
+    void givenMercurialAuthorAndNoAuthors_whenAuthorDefaultValue_thenReturnEmptyString() {
+        argExtractor = new ArgExtractor(new String[]{ArgName.mercurialAuthor.name() + "=author1"});
+
+        String actual = argExtractor.authorDefaultValue();
+
+        assertThat(actual).isNull();
+    }
+
+    @Test
+    void givenSvnAuthorAndNoAuthors_whenAuthorDefaultValue_thenReturnEmptyString() {
+        argExtractor = new ArgExtractor(new String[]{ArgName.svnAuthor.name() + "=author1"});
+
+        String actual = argExtractor.authorDefaultValue();
+
+        assertThat(actual).isNull();
+    }
+
+    @Test
     void given_noAuthor_when_gitAuthor_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 

@@ -97,6 +97,74 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
+    void givenFileCommitterEmail_whenAuthors_thenReturnEmptyCollection() {
+        Properties properties = new Properties();
+        properties.setProperty(ArgName.committerEmail.name(), "email");
+        PropertiesDao loader = mockPropertiesLoader(properties);
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties.init(new String[]{}, loader);
+
+        Set<String> authors = applicationProperties.authors();
+
+        assertThat(authors).isEmpty();
+    }
+
+    @Test
+    void givenFileGitAuthor_whenAuthors_thenReturnEmptyCollection() {
+        Properties properties = new Properties();
+        properties.setProperty(ArgName.gitAuthor.name(), "author");
+        PropertiesDao loader = mockPropertiesLoader(properties);
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties.init(new String[]{}, loader);
+
+        Set<String> authors = applicationProperties.authors();
+
+        assertThat(authors).isEmpty();
+    }
+
+    @Test
+    void givenFileMercurialAuthor_whenAuthors_thenReturnEmptyCollection() {
+        Properties properties = new Properties();
+        properties.setProperty(ArgName.mercurialAuthor.name(), "author");
+        PropertiesDao loader = mockPropertiesLoader(properties);
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties.init(new String[]{}, loader);
+
+        Set<String> authors = applicationProperties.authors();
+
+        assertThat(authors).isEmpty();
+    }
+
+    @Test
+    void givenFileSvnAuthor_whenAuthors_thenReturnEmptyCollection() {
+        Properties properties = new Properties();
+        properties.setProperty(ArgName.svnAuthor.name(), "author");
+        PropertiesDao loader = mockPropertiesLoader(properties);
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties.init(new String[]{}, loader);
+
+        Set<String> authors = applicationProperties.authors();
+
+        assertThat(authors).isEmpty();
+    }
+
+    @Test
+    void givenAllOtherAuthors_whenAuthors_thenReturnEmptyCollection() {
+        Properties properties = new Properties();
+        properties.setProperty(ArgName.committerEmail.name(), "author");
+        properties.setProperty(ArgName.gitAuthor.name(), "author");
+        properties.setProperty(ArgName.mercurialAuthor.name(), "author");
+        properties.setProperty(ArgName.svnAuthor.name(), "author");
+        PropertiesDao loader = mockPropertiesLoader(properties);
+        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties.init(new String[]{}, loader);
+
+        Set<String> authors = applicationProperties.authors();
+
+        assertThat(authors).isEmpty();
+    }
+
+    @Test
     void given_noGitAuthor_when_gitAuthor_then_returnDefault() {
         applicationProperties = new CliPreferredApplicationProperties(new String[]{});
 

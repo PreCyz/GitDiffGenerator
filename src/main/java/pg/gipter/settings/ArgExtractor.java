@@ -4,10 +4,13 @@ import pg.gipter.producer.command.UploadType;
 import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toCollection;
 import static pg.gipter.settings.FilePreferredApplicationProperties.yyyy_MM_dd;
 
 /** Created by Pawel Gawedzki on 17-Sep-2018.*/
@@ -28,10 +31,22 @@ final class ArgExtractor {
 
     Set<String> authors() {
         if (containsArg(ArgName.author.name())) {
-            String authors = getValue(ArgName.author, ArgName.author.defaultValue());
-            return Stream.of(authors.split(",")).collect(Collectors.toCollection(LinkedHashSet::new));
+            String authors = getValue(ArgName.author, authorDefaultValue());
+            return Stream.of(authors.split(","))
+                    .filter(value -> !StringUtils.nullOrEmpty(value))
+                    .collect(toCollection(LinkedHashSet::new));
         }
-        return Stream.of(ArgName.author.defaultValue()).collect(Collectors.toCollection(HashSet::new));
+        return Stream.of(authorDefaultValue())
+                .filter(value -> !StringUtils.nullOrEmpty(value))
+                .collect(toCollection(LinkedHashSet::new));
+    }
+
+    String authorDefaultValue() {
+        boolean useDefaultValue = StringUtils.nullOrEmpty(committerEmail());
+        useDefaultValue &= StringUtils.nullOrEmpty(gitAuthor());
+        useDefaultValue &= StringUtils.nullOrEmpty(svnAuthor());
+        useDefaultValue &= StringUtils.nullOrEmpty(mercurialAuthor());
+        return useDefaultValue ? ArgName.author.defaultValue() : null;
     }
 
     String gitAuthor() {
