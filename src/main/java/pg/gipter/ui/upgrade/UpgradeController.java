@@ -41,6 +41,7 @@ public class UpgradeController  extends AbstractController {
     }
 
     private void resetIndicatorProperties(Task<?> task) {
+        upgradeProgressBar.setProgress(0);
         upgradeProgressBar.progressProperty().unbind();
         upgradeProgressBar.progressProperty().bind(task.progressProperty());
         upgradeLabel.textProperty().unbind();

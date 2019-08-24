@@ -116,11 +116,11 @@ public class GithubService {
 
     Optional<String> downloadLatestDistribution(String downloadLocation, TaskService<?> taskService) {
         if (latestReleaseDetails == null) {
-            taskService.taskUpdateMessage("Downloading distribution details.");
-            taskService.taskUpdateProgress(0);
+            taskService.updateMsg("Downloading distribution details.");
             downloadLatestDistributionDetails().ifPresent(jsonObject -> latestReleaseDetails = jsonObject);
-            taskService.taskUpdateMessage("Distribution details downloaded.");
+            taskService.updateMsg("Distribution details downloaded.");
         }
+        taskService.increaseProgress();
         if (latestReleaseDetails != null) {
             Optional<String> downloadLink = getDownloadLink(latestReleaseDetails);
             if (downloadLink.isPresent()) {
@@ -132,19 +132,17 @@ public class GithubService {
 
                     if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK && entity != null) {
                         downloadFile(entity, downloadLocation, taskService);
-                        taskService.taskUpdateMessage("File downloaded.");
-                        //FileUtils.copyInputStreamToFile(entity.getContent(), Paths.get(downloadLocation, distributionName).toFile());
                         return Optional.of(distributionName);
                     }
                 } catch (IOException e) {
-                    taskService.taskUpdateMessage("Upgrade failed.");
+                    taskService.updateMsg("Upgrade failed.");
                     taskService.workCompleted();
                     logger.error("Can not download latest distribution details.", e);
                     throw new IllegalStateException("Can not download latest distribution details.");
                 }
             }
         } else {
-            taskService.taskUpdateMessage("Upgrade failed.");
+            taskService.updateMsg("Upgrade failed.");
             taskService.workCompleted();
             logger.error("Can not download latest distribution details.");
             throw new IllegalStateException("Can not download latest distribution details.");
@@ -153,9 +151,10 @@ public class GithubService {
     }
 
     private void downloadFile(HttpEntity entity, String downloadLocation, TaskService<?> taskService) throws IOException {
-        taskService.taskUpdateMessage("Downloading file ...");
+        taskService.updateMsg("Downloading file ...");
         long fileLength = entity.getContentLength();
-        taskService.taskUpdateProgress(1, fileLength + 3);
+        int additionalProgressNumber = 4;
+        taskService.increaseProgressWithNewMax(fileLength + additionalProgressNumber);
 
         try (OutputStream outStream = new FileOutputStream(Paths.get(downloadLocation, distributionName).toFile());
              InputStream entityContent = entity.getContent()) {
@@ -166,8 +165,9 @@ public class GithubService {
             while ((bytesRead = entityContent.read(buffer)) != -1) {
                 outStream.write(buffer, 0, bytesRead);
                 numberOfBytesDownloaded += bytesRead;
-                taskService.taskUpdateProgress(numberOfBytesDownloaded);
+                taskService.increaseProgress(numberOfBytesDownloaded);
             }
+            taskService.updateMsg("File downloaded.");
         }
     }
 

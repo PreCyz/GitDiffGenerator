@@ -44,7 +44,7 @@ public class UpgradeService extends TaskService<Void> {
                     decompress(sevenZFile, Paths.get(homeDirectoryPath.get()).toFile());
                     restartApplication();
                 } else {
-                    logger.error("Did not downloaded the new version.");
+                    logger.error("Did not downloaded the newest version.");
                     alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
                             .withLink(AlertHelper.logsFolder())
                             .withWindowType(WindowType.LOG_WINDOW)
@@ -65,17 +65,14 @@ public class UpgradeService extends TaskService<Void> {
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.WARNING);
         } finally {
-            taskUpdateMessage(BundleUtils.getMsg("upgrade.fail"));
+            updateMsg(BundleUtils.getMsg("upgrade.fail"));
             workCompleted();
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         }
     }
 
     private void decompress(File sevenZSourceFile, File destination) throws IOException {
-        Platform.runLater(() -> {
-            taskUpdateMessage("Decompressing files ...");
-            taskUpdateProgress((long) getWorkDone() + 1);
-        });
+        updateMsg("Decompressing files ...");
         try (SevenZFile sevenZFile = new SevenZFile(sevenZSourceFile)) {
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null) {
@@ -92,16 +89,17 @@ public class UpgradeService extends TaskService<Void> {
                 sevenZFile.read(content, 0, content.length);
                 out.write(content);
                 out.close();
+                increaseTotalWorkAndProgress();
             }
         } finally {
-            taskUpdateMessage("Deleting downloaded file ...");
+            updateMsg("Deleting downloaded file ...");
             FileUtils.forceDelete(sevenZSourceFile);
             logger.info("File [{}] deleted.", sevenZSourceFile.getName());
         }
     }
 
     private void restartApplication() throws IOException {
-        taskUpdateMessage("Restarting application.");
+        updateMsg("Restarting application.");
         workCompleted();
         final String javaBin = Paths.get(System.getProperty("java.home"), "bin", "java").toString();
         Optional<File> jarFile = AlertHelper.getJarFile();
