@@ -83,7 +83,7 @@ public class MainController extends AbstractController {
     @FXML
     private MenuItem instructionMenuItem;
     @FXML
-    private MenuItem checkUpdatesMenuItem;
+    private MenuItem upgradeMenuItem;
 
     @FXML
     private TextField authorsTextField;
@@ -309,6 +309,7 @@ public class MainController extends AbstractController {
         setDisableDependOnConfigurations();
 
         TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
+        setUpgradeMenuItemDisabled();
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -351,13 +352,27 @@ public class MainController extends AbstractController {
         };
     }
 
+    private void setUpgradeMenuItemDisabled() {
+        uiLauncher.executeOutsideUIThread(() -> {
+            logger.info("Checking new version.");
+            GithubService service = new GithubService(applicationProperties.version());
+            final boolean newVersion = service.isNewVersion();
+            if (newVersion) {
+                logger.info("New version [{}] available.", service.getStrippedVersion());
+            } else {
+                logger.info("This version is up to date.");
+            }
+            Platform.runLater(() -> upgradeMenuItem.setDisable(!newVersion));
+        });
+    }
+
     private void setActions(ResourceBundle resources) {
         applicationMenuItem.setOnAction(applicationActionEventHandler());
         toolkitMenuItem.setOnAction(toolkitActionEventHandler());
         fileNameMenuItem.setOnAction(nameSettingsActionEvent());
         readMeMenuItem.setOnAction(readMeActionEventHandler());
         instructionMenuItem.setOnAction(instructionActionEventHandler());
-        checkUpdatesMenuItem.setOnAction(checkUpdatesActionEventHandler());
+        upgradeMenuItem.setOnAction(upgradeActionEventHandler());
         projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         uploadTypeComboBox.setOnAction(uploadTypeActionEventHandler());
@@ -426,8 +441,29 @@ public class MainController extends AbstractController {
         };
     }
 
-    private EventHandler<ActionEvent> checkUpdatesActionEventHandler() {
-        return event -> new GithubService(applicationProperties).checkUpgradesWithPopups();
+    private EventHandler<ActionEvent> upgradeActionEventHandler() {
+        return event -> {
+            uiLauncher.hideMainWindow();
+            uiLauncher.showUpgradeWindow();
+            /*GithubService service = new GithubService(applicationProperties);
+                if (service.isNewVersion()) {
+                    logger.info("New version available: {}.", service.getStrippedVersion());
+                    new AlertWindowBuilder()
+                            .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getStrippedVersion()))
+                            .withLink(GithubService.GITHUB_URL + "/releases/latest")
+                            .withWindowType(WindowType.BROWSER_WINDOW)
+                            .withAlertType(Alert.AlertType.INFORMATION)
+                            .buildAndDisplayWindow();
+                } else {
+                    logger.info("Your version is up to date: {}.", service.getStrippedVersion());
+                    new AlertWindowBuilder()
+                            .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
+                            .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                            .withAlertType(Alert.AlertType.INFORMATION)
+                            .withImage(ImageFile.FINGER_UP)
+                            .buildAndDisplayWindow();
+                }*/
+        };
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {

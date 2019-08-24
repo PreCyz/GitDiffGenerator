@@ -8,7 +8,7 @@ class UpgradeServiceTest {
     @Test
     @Disabled
     void whenUpgradeVersion_thenDoSth() {
-        UpgradeService upgradeService = new UpgradeService();
+        UpgradeService upgradeService = new UpgradeService("1.0");
 
         upgradeService.upgradeAndRestartApplication();
     }

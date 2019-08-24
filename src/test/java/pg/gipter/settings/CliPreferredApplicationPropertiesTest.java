@@ -26,7 +26,7 @@ import static pg.gipter.TestUtils.mockPropertiesLoader;
 
 class CliPreferredApplicationPropertiesTest {
 
-    private CliPreferredApplicationProperties applicationProperties;
+    private CliApplicationProperties applicationProperties;
 
     @AfterEach
     void tearDown() {
@@ -39,7 +39,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noAuthor_when_author_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         Set<String> authors = applicationProperties.authors();
 
@@ -48,7 +48,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_cliAuthor_when_author_then_returnCliAuthor() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"author=cliAuthor"}
         );
 
@@ -62,7 +62,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("author", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=cliAuthor"});
+        applicationProperties = new CliApplicationProperties(new String[]{"author=cliAuthor"});
         applicationProperties.init(new String[]{"author=fileAuthor"}, loader);
 
         Set<String> authors = applicationProperties.authors();
@@ -75,7 +75,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("author", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{"author=fileAuthor"}, loader);
 
         Set<String> authors = applicationProperties.authors();
@@ -88,7 +88,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("author", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=2019-02-16"});
+        applicationProperties = new CliApplicationProperties(new String[]{"startDate=2019-02-16"});
         applicationProperties.init(new String[]{"author=fileAuthor"}, loader);
 
         Set<String> authors = applicationProperties.authors();
@@ -101,7 +101,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty(ArgName.committerEmail.name(), "email");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{}, loader);
 
         Set<String> authors = applicationProperties.authors();
@@ -114,7 +114,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty(ArgName.gitAuthor.name(), "author");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{}, loader);
 
         Set<String> authors = applicationProperties.authors();
@@ -127,7 +127,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty(ArgName.mercurialAuthor.name(), "author");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{}, loader);
 
         Set<String> authors = applicationProperties.authors();
@@ -140,7 +140,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty(ArgName.svnAuthor.name(), "author");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{}, loader);
 
         Set<String> authors = applicationProperties.authors();
@@ -156,7 +156,7 @@ class CliPreferredApplicationPropertiesTest {
         properties.setProperty(ArgName.mercurialAuthor.name(), "author");
         properties.setProperty(ArgName.svnAuthor.name(), "author");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{}, loader);
 
         Set<String> authors = applicationProperties.authors();
@@ -166,7 +166,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noGitAuthor_when_gitAuthor_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.gitAuthor();
 
@@ -175,7 +175,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_cliGitAuthor_when_gitAuthor_then_returnCliAuthor() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"gitAuthor=cliAuthor"}
         );
 
@@ -189,7 +189,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("gitAuthor", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"gitAuthor=cliAuthor"});
+        applicationProperties = new CliApplicationProperties(new String[]{"gitAuthor=cliAuthor"});
         applicationProperties.init(new String[]{"gitAuthor=fileAuthor"}, loader);
 
         String actual = applicationProperties.gitAuthor();
@@ -202,7 +202,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("gitAuthor", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{"gitAuthor=fileAuthor"}, loader);
 
         String actual = applicationProperties.gitAuthor();
@@ -215,7 +215,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("gitAuthor", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=test"});
+        applicationProperties = new CliApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(new String[]{"gitAuthor=fileAuthor"}, loader);
 
         String actual = applicationProperties.gitAuthor();
@@ -225,7 +225,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noMercurialAuthor_when_mercurialAuthor_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.mercurialAuthor();
 
@@ -234,7 +234,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_cliMercurialAuthor_when_mercurialAuthor_then_returnCliAuthor() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"mercurialAuthorAuthor=cliAuthor"}
         );
 
@@ -248,7 +248,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("mercurialAuthor", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"mercurialAuthor=cliAuthor"});
+        applicationProperties = new CliApplicationProperties(new String[]{"mercurialAuthor=cliAuthor"});
         applicationProperties.init(new String[]{"mercurialAuthor=fileAuthor"}, loader);
 
         String actual = applicationProperties.mercurialAuthor();
@@ -261,7 +261,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("mercurialAuthor", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{"mercurialAuthor=fileAuthor"}, loader);
 
         String actual = applicationProperties.mercurialAuthor();
@@ -274,7 +274,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("mercurialAuthor", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=test"});
+        applicationProperties = new CliApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(new String[]{"mercurialAuthor=fileAuthor"}, loader);
 
         String actual = applicationProperties.mercurialAuthor();
@@ -284,7 +284,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noSvnAuthor_when_svnAuthor_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.svnAuthor();
 
@@ -293,7 +293,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_cliSvnAuthor_when_svnAuthor_then_returnCliAuthor() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"svnAuthor=cliAuthor"}
         );
 
@@ -307,7 +307,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("svnAuthor", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"svnAuthor=cliAuthor"});
+        applicationProperties = new CliApplicationProperties(new String[]{"svnAuthor=cliAuthor"});
         applicationProperties.init(new String[]{"svnAuthor=fileAuthor"}, loader);
 
         String actual = applicationProperties.svnAuthor();
@@ -320,7 +320,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("svnAuthor", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{"svnAuthor=fileAuthor"}, loader);
 
         String actual = applicationProperties.svnAuthor();
@@ -333,7 +333,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("svnAuthor", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=test"});
+        applicationProperties = new CliApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(new String[]{"svnAuthor=fileAuthor"}, loader);
 
         String actual = applicationProperties.svnAuthor();
@@ -343,7 +343,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noItemPath_when_itemPath_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.itemPath();
 
@@ -352,7 +352,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_itemPathFromCLI_when_itemPath_then_returnThatItemPath() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"itemPath=testItemPath"});
+        applicationProperties = new CliApplicationProperties(new String[]{"itemPath=testItemPath"});
 
         String actual = applicationProperties.itemPath();
 
@@ -364,7 +364,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"itemPath=cliItemPath"};
         Properties props = new Properties();
         props.put("itemPath", "propertiesItemPath");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.itemPath();
@@ -377,7 +377,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("itemPath", "propertiesItemPath");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.itemPath();
@@ -390,7 +390,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("itemPath", "propertiesItemPath");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.itemPath();
@@ -400,7 +400,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noItemFileNamePrefix_when_itemFileNamePrefix_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.itemFileNamePrefix();
 
@@ -409,7 +409,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_itemFileNamePrefixFromCLI_when_itemFileNamePrefix_then_returnThatCliItemFileNamePrefix() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"itemFileNamePrefix=cliItemFileNamePrefix"}
         );
 
@@ -423,7 +423,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"itemFileNamePrefix=cliItemFileNamePrefix"};
         Properties props = new Properties();
         props.put("itemFileNamePrefix", "propertiesItemPath");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.itemFileNamePrefix();
@@ -436,7 +436,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("itemFileNamePrefix", "propertiesItemFileNamePrefix");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.itemPath();
@@ -449,7 +449,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("itemFileNamePrefix", "propertiesItemFileNamePrefix");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.itemFileNamePrefix();
@@ -459,7 +459,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noProjectPaths_when_projectPaths_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         Set<String> actual = applicationProperties.projectPaths();
 
@@ -468,7 +468,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_projectPathsFromCLI_when_projectPaths_then_returnCliProjectPaths() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"projectPath=cliProjectPath1,cliProjectPath2"}
         );
 
@@ -482,7 +482,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"projectPath=cliProjectPath1,cliProjectPath2"};
         Properties props = new Properties();
         props.put("projectPath", "propertiesProjectPath1,propertiesProjectPath2");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = applicationProperties.projectPaths();
@@ -495,7 +495,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("projectPath", "propertiesProjectPath1,propertiesProjectPath2");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = applicationProperties.projectPaths();
@@ -508,7 +508,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("projectPath", "propertiesProjectPath1,propertiesProjectPath2");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = applicationProperties.projectPaths();
@@ -518,7 +518,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noCommitterEmail_when_committerEmail_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.committerEmail();
 
@@ -527,7 +527,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_committerEmailFromCLI_when_committerEmail_then_returnCliCommitterEmail() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"committerEmail=test@email.cli"}
         );
 
@@ -541,7 +541,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"committerEmail=test@email.cli"};
         Properties props = new Properties();
         props.put("committerEmail", "test@email.properties");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.committerEmail();
@@ -554,7 +554,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("committerEmail", "test@email.properties");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.committerEmail();
@@ -567,7 +567,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("committerEmail", "test@email.properties");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.committerEmail();
@@ -577,7 +577,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noStartDate_when_startDate_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         LocalDate actual = applicationProperties.startDate();
 
@@ -586,7 +586,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_startDateFromCLI_when_startDate_then_returnCliStartDate() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"startDate=2019-02-01"}
         );
 
@@ -600,7 +600,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"startDate=2019-02-01"};
         Properties props = new Properties();
         props.put("startDate", "2019-02-09");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = applicationProperties.startDate();
@@ -613,7 +613,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("startDate", "2019-02-09");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = applicationProperties.startDate();
@@ -626,7 +626,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("startDate", "2019-02-09");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = applicationProperties.startDate();
@@ -637,7 +637,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenPeriodInDaysFromCli_when_startDate_then_returnStartDateBasedOnPeriodInDays() {
         String[] args = {"periodInDays=5"};
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
 
         LocalDate actual = applicationProperties.startDate();
 
@@ -649,7 +649,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"periodInDays=5"};
         Properties props = new Properties();
         props.put("periodInDays", "6");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = applicationProperties.startDate();
@@ -662,7 +662,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("periodInDays", "6");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = applicationProperties.startDate();
@@ -672,7 +672,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noEndDate_when_endDate_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         LocalDate actual = applicationProperties.endDate();
 
@@ -681,7 +681,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_endDateFromCLI_when_endDate_then_returnCliEndDate() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"endDate=2019-02-01"}
         );
 
@@ -695,7 +695,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"endDate=2019-02-01"};
         Properties props = new Properties();
         props.put("endDate", "2019-02-09");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = applicationProperties.endDate();
@@ -708,7 +708,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("endDate", "2019-02-09");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = applicationProperties.endDate();
@@ -721,7 +721,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("endDate", "2019-02-09");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = applicationProperties.endDate();
@@ -731,7 +731,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noCodeProtection_when_uploadType_then_returnCodeProtection() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         UploadType actual = applicationProperties.uploadType();
 
@@ -740,7 +740,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_uploadTypeFromCLI_when_uploadType_then_returnCliCodeProtection() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"uploadType=protected"}
         );
 
@@ -754,7 +754,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=PROTECTED"};
         Properties props = new Properties();
         props.put("uploadType", "statement");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         UploadType actual = applicationProperties.uploadType();
@@ -767,7 +767,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("uploadType", "STATEMENT");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         UploadType actual = applicationProperties.uploadType();
@@ -780,7 +780,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         Properties props = new Properties();
         props.put("uploadType", "statement");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         UploadType actual = applicationProperties.uploadType();
@@ -790,7 +790,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noConfirmationWindow_when_isConfirmationWindow_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         boolean actual = applicationProperties.isConfirmationWindow();
 
@@ -799,7 +799,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_confirmationWindowFromCLI_when_isConfirmationWindow_then_returnCliConfirmationWindow() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"confirmationWindow=y"}
         );
 
@@ -813,7 +813,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"confirmationWindow=y"};
         Properties props = new Properties();
         props.put("confirmationWindow", "n");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isConfirmationWindow();
@@ -826,7 +826,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("confirmationWindow", "y");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isConfirmationWindow();
@@ -839,7 +839,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         Properties props = new Properties();
         props.put("confirmationWindow", "y");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isConfirmationWindow();
@@ -849,7 +849,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noToolkitUsername_when_toolkitUsername_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.toolkitUsername();
 
@@ -858,7 +858,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitUsernameFromCLI_when_toolkitUsername_then_returnCliToolkitUsername() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"toolkitUsername=cliUserName"}
         );
 
@@ -872,7 +872,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"toolkitUsername=cliUserName"};
         Properties props = new Properties();
         props.put("toolkitUsername", "propertiesUserName");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUsername();
@@ -885,7 +885,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitUsername", "propertiesUserName");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUsername();
@@ -898,7 +898,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitUsername", "propertiesUserName");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUsername();
@@ -908,7 +908,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noToolkitPassword_when_toolkitPassword_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.toolkitPassword();
 
@@ -917,7 +917,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitPasswordFromCLI_when_toolkitPassword_then_returnCliToolkitPassword() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"toolkitPassword=cliPassword"}
         );
 
@@ -931,7 +931,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"toolkitPassword=cliPassword"};
         Properties props = new Properties();
         props.put("toolkitPassword", "propertiesPassword");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitPassword();
@@ -944,7 +944,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitPassword", "propertiesPassword");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitPassword();
@@ -957,7 +957,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitPassword", "propertiesPassword");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitPassword();
@@ -967,7 +967,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noToolkitDomain_when_toolkitDomain_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.toolkitDomain();
 
@@ -976,7 +976,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitDomainFromCLI_when_toolkitDomain_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"toolkitDomain=cliDomain"}
         );
 
@@ -990,7 +990,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"toolkitDomain=cliDomain"};
         Properties props = new Properties();
         props.put("toolkitDomain", "propertiesDomain");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitDomain();
@@ -1003,7 +1003,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitDomain", "propertiesDomain");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitDomain();
@@ -1016,7 +1016,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitDomain", "propertiesDomain");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitDomain();
@@ -1026,7 +1026,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noToolkitUrl_when_toolkitUrl_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.toolkitUrl();
 
@@ -1035,7 +1035,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitUrlFromCLI_when_toolkitUrl_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"toolkitUrl=cliUrl"}
         );
 
@@ -1049,7 +1049,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"toolkitUrl=cliUrl"};
         Properties props = new Properties();
         props.put("toolkitUrl", "propertiesUrl");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUrl();
@@ -1062,7 +1062,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitUrl", "propertiesUrl");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUrl();
@@ -1075,7 +1075,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitUrl", "propertiesUrl");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUrl();
@@ -1085,7 +1085,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noToolkitListName_when_toolkitListName_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.toolkitCopyListName();
 
@@ -1094,7 +1094,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitListNameFromCLI_when_toolkitListName_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"toolkitCopyListName=cliListName"}
         );
 
@@ -1108,7 +1108,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"toolkitCopyListName=cliListName"};
         Properties props = new Properties();
         props.put("toolkitCopyListName", "propertiesListName");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitCopyListName();
@@ -1121,7 +1121,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitCopyListName", "propertiesListName");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitCopyListName();
@@ -1134,7 +1134,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitCopyListName", "propertiesListName");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitCopyListName();
@@ -1144,7 +1144,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noToolkitUserFolder_when_toolkitUserFolder_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.toolkitUserFolder();
 
@@ -1153,7 +1153,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitUserNameFromCLI_when_toolkitUserFolder_then_returnProperFolder() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"toolkitUsername=cliUserName"}
         );
 
@@ -1167,7 +1167,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"toolkitUsername=cliUserName"};
         Properties props = new Properties();
         props.put("toolkitUsername", "propertiesUserName");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUserFolder();
@@ -1180,7 +1180,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitUsername", "propertiesUserName");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUserFolder();
@@ -1193,7 +1193,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitUsername", "propertiesUsername");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUserFolder();
@@ -1203,7 +1203,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noSkipRemote_when_isSkipRemote_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         boolean actual = applicationProperties.isSkipRemote();
 
@@ -1212,7 +1212,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_skipRemoteFromCLI_when_isSkipRemote_then_returnCliSkipRemote() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"skipRemote=N"});
+        applicationProperties = new CliApplicationProperties(new String[]{"skipRemote=N"});
 
         boolean actual = applicationProperties.isSkipRemote();
 
@@ -1224,7 +1224,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"skipRemote=n"};
         Properties props = new Properties();
         props.put("skipRemote", "y");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isSkipRemote();
@@ -1237,7 +1237,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("skipRemote", "n");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isSkipRemote();
@@ -1250,7 +1250,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         Properties props = new Properties();
         props.put("skipRemote", "n");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isSkipRemote();
@@ -1260,7 +1260,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noPreferredArgSource_when_preferredArgSource_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         PreferredArgSource actual = applicationProperties.preferredArgSource();
 
@@ -1269,7 +1269,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_preferredArgSourceFromCLI_when_preferredArgSource_then_returnCliPreferredArgSource() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"preferredArgSource=file"});
+        applicationProperties = new CliApplicationProperties(new String[]{"preferredArgSource=file"});
 
         PreferredArgSource actual = applicationProperties.preferredArgSource();
 
@@ -1281,7 +1281,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"preferredArgSource=FILE"};
         Properties props = new Properties();
         props.put("preferredArgSource", "cli");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         PreferredArgSource actual = applicationProperties.preferredArgSource();
@@ -1294,7 +1294,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("preferredArgSource", "FILE");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         PreferredArgSource actual = applicationProperties.preferredArgSource();
@@ -1307,7 +1307,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         Properties props = new Properties();
         props.put("preferredArgSource", "FILE");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         PreferredArgSource actual = applicationProperties.preferredArgSource();
@@ -1317,7 +1317,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_versionTxt_when_version_then_returnVersion() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.version();
 
@@ -1327,7 +1327,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_noUseUI_when_isUseUI_then_returnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         boolean actual = applicationProperties.isUseUI();
 
@@ -1336,7 +1336,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void given_useUIFromCLI_when_isUseUI_then_returnCliUseUI() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"useUI=T"});
+        applicationProperties = new CliApplicationProperties(new String[]{"useUI=T"});
 
         boolean actual = applicationProperties.isUseUI();
 
@@ -1348,7 +1348,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"useUI=t"};
         Properties props = new Properties();
         props.put("useUI", "n");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isUseUI();
@@ -1361,7 +1361,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("useUI", "t");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isUseUI();
@@ -1374,7 +1374,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         Properties props = new Properties();
         props.put("useUI", "y");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isUseUI();
@@ -1385,7 +1385,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnDefault() {
         String[] args = {};
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
 
         String actual = applicationProperties.toolkitUserFolder();
 
@@ -1395,7 +1395,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
         String[] args = {"toolkitUsername=xxx"};
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
 
         String actual = applicationProperties.toolkitUserFolder();
 
@@ -1407,7 +1407,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"toolkitUsername=xxx"};
         Properties props = new Properties();
         props.put("toolkitUsername", "aaa");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUserFolder();
@@ -1420,7 +1420,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitUsername", "aaa");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUserFolder();
@@ -1433,7 +1433,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"toolkitUsername=qqq"};
         Properties props = new Properties();
         props.put("toolkitCustomUserFolder", "aaa");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         String actual = applicationProperties.toolkitUserFolder();
@@ -1443,7 +1443,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenNoProjectPaths_whenToolkitProjectListNames_thenReturnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         Set<String> actual = applicationProperties.toolkitProjectListNames();
 
@@ -1452,7 +1452,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenToolkitProjectListNamesFromCLI_whenToolkitProjectListNames_thenReturnCliToolkitProjectListNames() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"toolkitProjectListNames=name1,name2"}
         );
 
@@ -1466,7 +1466,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"toolkitProjectListNames=cli1,cli2"};
         Properties props = new Properties();
         props.put("toolkitProjectListNames", "properties1,properties2");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = applicationProperties.toolkitProjectListNames();
@@ -1479,7 +1479,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitProjectListNames", "properties1,properties2");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = applicationProperties.toolkitProjectListNames();
@@ -1492,7 +1492,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         Properties props = new Properties();
         props.put("toolkitProjectListNames", "properties1,properties2");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = applicationProperties.toolkitProjectListNames();
@@ -1502,7 +1502,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenNoDeleteDownloadedFiles_whenIsDeleteDownloadedFiles_thenReturnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         boolean actual = applicationProperties.isDeleteDownloadedFiles();
 
@@ -1511,7 +1511,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenDeleteDownloadedFilesFromCLI_whenIsDeleteDownloadedFiles_thenReturnCliDeleteDownloadedFiles() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"deleteDownloadedFiles=y"}
         );
 
@@ -1525,7 +1525,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"deleteDownloadedFiles=y"};
         Properties props = new Properties();
         props.put("deleteDownloadedFiles", "n");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isDeleteDownloadedFiles();
@@ -1538,7 +1538,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("deleteDownloadedFiles", "n");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isDeleteDownloadedFiles();
@@ -1551,7 +1551,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         Properties props = new Properties();
         props.put("deleteDownloadedFiles", "n");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isDeleteDownloadedFiles();
@@ -1561,7 +1561,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenNoUseAsFileName_whenIsUseAsFileName_thenReturnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         boolean actual = applicationProperties.isUseAsFileName();
 
@@ -1570,7 +1570,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenUseAsFileNameFromCLI_whenIsUseAsFileName_thenReturnCliUseAsFileName() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"useAsFileName=y"}
         );
 
@@ -1584,7 +1584,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"useAsFileName=y"};
         Properties props = new Properties();
         props.put("useAsFileName", "n");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isUseAsFileName();
@@ -1597,7 +1597,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("useAsFileName", "y");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isUseAsFileName();
@@ -1610,7 +1610,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         Properties props = new Properties();
         props.put("useAsFileName", "y");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isUseAsFileName();
@@ -1620,7 +1620,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenNoConfigurationName_whenConfigurationName_thenReturnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.configurationName();
 
@@ -1629,7 +1629,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenCliConfigurationName_whenConfigurationName_thenReturnCliConfigurationName() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"configurationName=cliAuthor"}
         );
 
@@ -1643,7 +1643,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("configurationName", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"configurationName=cliAuthor"});
+        applicationProperties = new CliApplicationProperties(new String[]{"configurationName=cliAuthor"});
         applicationProperties.init(new String[]{"configurationName=fileAuthor"}, loader);
 
         String actual = applicationProperties.configurationName();
@@ -1656,7 +1656,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("configurationName", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(new String[]{"configurationName=fileAuthor"}, loader);
 
         String actual = applicationProperties.configurationName();
@@ -1669,7 +1669,7 @@ class CliPreferredApplicationPropertiesTest {
         Properties properties = new Properties();
         properties.setProperty("configurationName", "fileAuthor");
         PropertiesDao loader = mockPropertiesLoader(properties);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"author=test"});
+        applicationProperties = new CliApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(new String[]{"configurationName=fileAuthor"}, loader);
 
         String actual = applicationProperties.configurationName();
@@ -1679,7 +1679,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenNoNamePatternValue_whenValueFromPattern_thenReturnEmptyString() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.valueFromPattern(null);
 
@@ -1688,7 +1688,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenCURRENT_DATE_whenValueFromPattern_thenReturnNow() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_DATE);
 
@@ -1697,7 +1697,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenCURRENT_YEAR_whenValueFromPattern_thenReturnYear() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_YEAR);
 
@@ -1706,7 +1706,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenCURRENT_MONTH_whenValueFromPattern_thenReturnMonthName() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_MONTH_NAME);
 
@@ -1715,7 +1715,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenCURRENT_MONTH_NUMBER_whenValueFromPattern_thenReturnMonthNumber() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_MONTH_NUMBER);
 
@@ -1724,7 +1724,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenCURRENT_WEEK_NUMBER_whenValueFromPattern_thenReturnCurrentWeekNumber() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_WEEK_NUMBER);
 
@@ -1735,7 +1735,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenSTART_DATE_whenValueFromPattern_thenReturnStartDate() {
         String startDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"startDate=" + startDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE);
 
@@ -1745,7 +1745,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenSTART_DATE_YEAR_whenValueFromPattern_thenReturnStartDateYear() {
         String startDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"startDate=" + startDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_YEAR);
 
@@ -1755,7 +1755,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenSTART_DATE_MONTH_NAME_whenValueFromPattern_thenReturnStartDateMonthName() {
         String startDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"startDate=" + startDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_MONTH_NAME);
 
@@ -1765,7 +1765,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenSTART_DATE_MONTH_NUMBER_whenValueFromPattern_thenReturnStartDateMonthNumber() {
         String startDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"startDate=" + startDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_MONTH_NUMBER);
 
@@ -1775,7 +1775,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenSTART_DATE_WEEK_NUMBER_whenValueFromPattern_thenReturnStartDateMonthName() {
         String startDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"startDate=" + startDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"startDate=" + startDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_WEEK_NUMBER);
 
@@ -1786,7 +1786,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenEND_DATE_whenValueFromPattern_thenReturnEndDate() {
         String endDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"endDate=" + endDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE);
 
@@ -1796,7 +1796,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenEND_DATE_YEAR_whenValueFromPattern_thenReturnEndDateYear() {
         String endDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"endDate=" + endDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_YEAR);
 
@@ -1806,7 +1806,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenEND_DATE_MONTH_NAME_whenValueFromPattern_thenReturnEndDateMonthName() {
         String endDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"endDate=" + endDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_MONTH_NAME);
 
@@ -1816,7 +1816,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenEND_DATE_MONTH_NUMBER_whenValueFromPattern_thenReturnEndDateMonthNumber() {
         String endDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"endDate=" + endDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_MONTH_NUMBER);
 
@@ -1826,7 +1826,7 @@ class CliPreferredApplicationPropertiesTest {
     @Test
     void givenEND_DATE_WEEK_NUMBER_whenValueFromPattern_thenReturnEndDateMonthName() {
         String endDate = "2018-06-12";
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{"endDate=" + endDate});
+        applicationProperties = new CliApplicationProperties(new String[]{"endDate=" + endDate});
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_WEEK_NUMBER);
 
@@ -1840,7 +1840,7 @@ class CliPreferredApplicationPropertiesTest {
         fns.addSetting("{%1}", NamePatternValue.START_DATE_MONTH_NAME);
         fns.addSetting("{%2}", NamePatternValue.START_DATE_YEAR);
         DaoFactory.getPropertiesDao().saveFileNameSetting(fns);
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{
+        applicationProperties = new CliApplicationProperties(new String[]{
                 ArgName.itemFileNamePrefix + "=" + "my-{%1}-{%2}-name",
                 ArgName.startDate + "=2018-06-12"
         });
@@ -1852,7 +1852,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenNoUpgradeFinished_whenIsUpgradeFinished_thenReturnDefault() {
-        applicationProperties = new CliPreferredApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{});
 
         boolean actual = applicationProperties.isUpgradeFinished();
 
@@ -1861,7 +1861,7 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenUpgradeFinishedFromCLI_whenIsUpgradeFinished_thenReturnCliUpgradeFinished() {
-        applicationProperties = new CliPreferredApplicationProperties(
+        applicationProperties = new CliApplicationProperties(
                 new String[]{"upgradeFinished=y"}
         );
 
@@ -1875,7 +1875,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"upgradeFinished=y"};
         Properties props = new Properties();
         props.put("upgradeFinished", "n");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isUpgradeFinished();
@@ -1888,7 +1888,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("upgradeFinished", "y");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isUpgradeFinished();
@@ -1901,7 +1901,7 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         Properties props = new Properties();
         props.put("upgradeFinished", "y");
-        applicationProperties = new CliPreferredApplicationProperties(args);
+        applicationProperties = new CliApplicationProperties(args);
         applicationProperties.init(args, mockPropertiesLoader(props));
 
         boolean actual = applicationProperties.isUpgradeFinished();

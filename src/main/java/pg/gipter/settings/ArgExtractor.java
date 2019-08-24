@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
-import static pg.gipter.settings.FilePreferredApplicationProperties.yyyy_MM_dd;
+import static pg.gipter.settings.FileApplicationProperties.yyyy_MM_dd;
 
 /** Created by Pawel Gawedzki on 17-Sep-2018.*/
 final class ArgExtractor {

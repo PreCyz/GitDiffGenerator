@@ -8,16 +8,16 @@ public class ApplicationPropertiesFactory {
         ArgExtractor argExtractor = new ArgExtractor(args);
         switch (argExtractor.preferredArgSource()) {
             case FILE:
-                return new FilePreferredApplicationProperties(args);
+                return new FileApplicationProperties(args);
             case UI:
-                return new UIPreferredApplicationProperties(args);
+                return new UIApplicationProperties(args);
             case CLI:
                 if (argExtractor.isUseUI()) {
-                    return new UIPreferredApplicationProperties(args);
+                    return new UIApplicationProperties(args);
                 }
-                return new CliPreferredApplicationProperties(args);
+                return new CliApplicationProperties(args);
             default:
-                return new CliPreferredApplicationProperties(args);
+                return new CliApplicationProperties(args);
         }
     }
 }

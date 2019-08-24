@@ -10,13 +10,13 @@ import static pg.gipter.TestUtils.mockPropertiesLoader;
 /**Created by Pawel Gawedzki on 06-Mar-2019.*/
 class UIPreferredApplicationPropertiesTest {
 
-    private UIPreferredApplicationProperties appProps;
+    private UIApplicationProperties appProps;
 
     @Test
     void given_emptyActiveTray_when_isActiveTray_then_returnTrue() {
         String[] args = {""};
         Properties props = new Properties();
-        appProps = new UIPreferredApplicationProperties(args);
+        appProps = new UIApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isActiveTray();
@@ -29,7 +29,7 @@ class UIPreferredApplicationPropertiesTest {
         String[] args = {"activeTray=N"};
         Properties props = new Properties();
         props.put("activeTray", "Y");
-        appProps = new UIPreferredApplicationProperties(args);
+        appProps = new UIApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isActiveTray();
@@ -42,7 +42,7 @@ class UIPreferredApplicationPropertiesTest {
         String[] args = {""};
         Properties props = new Properties();
         props.put("activeTray", "N");
-        appProps = new UIPreferredApplicationProperties(args);
+        appProps = new UIApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isActiveTray();
@@ -52,7 +52,7 @@ class UIPreferredApplicationPropertiesTest {
 
     @Test
     void givenNoEnableOnStartup_whenIsEnableOnStartup_thenReturnDefault() {
-        appProps = new UIPreferredApplicationProperties(new String[]{});
+        appProps = new UIApplicationProperties(new String[]{});
 
         boolean actual = appProps.isEnableOnStartup();
 
@@ -61,7 +61,7 @@ class UIPreferredApplicationPropertiesTest {
 
     @Test
     void givenEnableOnStartupFromCLI_whenIsEnableOnStartup_thenReturnCliEnableOnStartup() {
-        appProps = new UIPreferredApplicationProperties(
+        appProps = new UIApplicationProperties(
                 new String[]{"enableOnStartup=n"}
         );
 
@@ -75,7 +75,7 @@ class UIPreferredApplicationPropertiesTest {
         String[] args = {"enableOnStartup=n"};
         Properties props = new Properties();
         props.put("enableOnStartup", "t");
-        appProps = new UIPreferredApplicationProperties(args);
+        appProps = new UIApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
@@ -88,7 +88,7 @@ class UIPreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("enableOnStartup", "n");
-        appProps = new UIPreferredApplicationProperties(args);
+        appProps = new UIApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
@@ -101,7 +101,7 @@ class UIPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         Properties props = new Properties();
         props.put("enableOnStartup", "n");
-        appProps = new UIPreferredApplicationProperties(args);
+        appProps = new UIApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();

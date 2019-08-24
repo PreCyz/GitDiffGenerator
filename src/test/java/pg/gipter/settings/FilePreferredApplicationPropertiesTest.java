@@ -15,16 +15,16 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static pg.gipter.TestUtils.mockPropertiesLoader;
-import static pg.gipter.settings.FilePreferredApplicationProperties.yyyy_MM_dd;
+import static pg.gipter.settings.FileApplicationProperties.yyyy_MM_dd;
 
 class FilePreferredApplicationPropertiesTest {
 
-    private FilePreferredApplicationProperties appProps;
+    private FileApplicationProperties appProps;
 
     @Test
     void given_propertiesFromFile_when_hasProperties_then_returnTrue() {
         PropertiesDao loader = mockPropertiesLoader(new Properties());
-        appProps = new FilePreferredApplicationProperties(new String[]{});
+        appProps = new FileApplicationProperties(new String[]{});
         appProps.init(new String[]{}, loader);
 
         assertThat(appProps.hasProperties()).isTrue();
@@ -32,14 +32,14 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_noPropertiesFromFile_when_hasProperties_then_returnFalse() {
-        appProps = new FilePreferredApplicationProperties(new String[]{});
+        appProps = new FileApplicationProperties(new String[]{});
 
         assertThat(appProps.hasProperties()).isFalse();
     }
 
     @Test
     void given_authorFromCommandLine_when_authors_then_returnThatAuthor() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"author=author1"});
+        appProps = new FileApplicationProperties(new String[]{"author=author1"});
 
         Set<String> actual = appProps.authors();
 
@@ -52,7 +52,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"author=testAuthor"};
         Properties props = new Properties();
         props.put("author", "propsAuthor1,propsAuthor2");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = appProps.authors();
@@ -65,7 +65,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenCommitterEmailCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
         String[] args = {ArgName.committerEmail.name() + "=testAuthor"};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = appProps.authors();
@@ -77,7 +77,7 @@ class FilePreferredApplicationPropertiesTest {
     void givengitAuthorCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
         String[] args = {ArgName.gitAuthor.name() + "=testAuthor"};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = appProps.authors();
@@ -89,7 +89,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenMercurialAuthorCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
         String[] args = {ArgName.mercurialAuthor.name() + "=testAuthor"};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = appProps.authors();
@@ -101,7 +101,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenSvnAuthorCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
         String[] args = {ArgName.svnAuthor.name() + "=testAuthor"};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = appProps.authors();
@@ -118,7 +118,7 @@ class FilePreferredApplicationPropertiesTest {
                 ArgName.svnAuthor.name() + "=testAuthor",
         };
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = appProps.authors();
@@ -128,7 +128,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_authorFromCommandLine_when_gitAuthor_then_returnThatAuthor() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"gitAuthor=testAuthor"});
+        appProps = new FileApplicationProperties(new String[]{"gitAuthor=testAuthor"});
 
         String actual = appProps.gitAuthor();
 
@@ -140,7 +140,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"gitAuthor=testAuthor"};
         Properties props = new Properties();
         props.put("gitAuthor", "propsAuthor");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.gitAuthor();
@@ -150,7 +150,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_authorFromCommandLine_when_mercurialAuthor_then_returnThatAuthor() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"mercurialAuthor=testAuthor"});
+        appProps = new FileApplicationProperties(new String[]{"mercurialAuthor=testAuthor"});
 
         String actual = appProps.mercurialAuthor();
 
@@ -162,7 +162,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"mercurialAuthor=testAuthor"};
         Properties props = new Properties();
         props.put("mercurialAuthor", "propsAuthor");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.mercurialAuthor();
@@ -172,7 +172,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_authorFromCommandLine_when_svnAuthor_then_returnThatAuthor() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"svnAuthor=testAuthor"});
+        appProps = new FileApplicationProperties(new String[]{"svnAuthor=testAuthor"});
 
         String actual = appProps.svnAuthor();
 
@@ -184,7 +184,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"svnAuthor=testAuthor"};
         Properties props = new Properties();
         props.put("svnAuthor", "propsAuthor");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.svnAuthor();
@@ -194,7 +194,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_itemPathFromCommandLine_when_itemPath_then_returnThatItemPath() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"itemPath=testItemPath"});
+        appProps = new FileApplicationProperties(new String[]{"itemPath=testItemPath"});
 
         String actual = appProps.itemPath();
 
@@ -206,7 +206,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"itemPath=testItemPath"};
         Properties props = new Properties();
         props.put("itemPath", "propertiesItemPath");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.itemPath();
@@ -216,7 +216,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_defaultParams_when_fileName_then_returnThatFileName() {
-        appProps = new FilePreferredApplicationProperties(new String[]{});
+        appProps = new FileApplicationProperties(new String[]{});
         LocalDate now = LocalDate.now();
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
@@ -229,7 +229,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_statement_when_fileName_then_returnFileNameForStatement() {
-        appProps = new FilePreferredApplicationProperties(new String[]{
+        appProps = new FileApplicationProperties(new String[]{
                 "uploadType=statement"
         });
         LocalDate now = LocalDate.now();
@@ -244,7 +244,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_endDateNotNow_when_fileName_then_returnYearMonthPeriod() {
-        appProps = new FilePreferredApplicationProperties(new String[]{
+        appProps = new FileApplicationProperties(new String[]{
                 "startDate=2018-09-19",
                 "endDate=2018-10-19"
         });
@@ -261,7 +261,7 @@ class FilePreferredApplicationPropertiesTest {
         props.put("startDate", "2017-10-19");
         props.put("endDate", "2017-12-20");
         props.put("itemFileNamePrefix", "custom");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.fileName();
@@ -278,7 +278,7 @@ class FilePreferredApplicationPropertiesTest {
                 "itemFileNamePrefix=custom",
                 "toolkitUsername=xxx",
         };
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
 
         String actual = appProps.fileName();
 
@@ -287,7 +287,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_itemFileNameFromCommandLine_when_fileName_then_returnThatFileName() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"itemFileNamePrefix=fileName"});
+        appProps = new FileApplicationProperties(new String[]{"itemFileNamePrefix=fileName"});
 
         String actual = appProps.fileName();
 
@@ -296,7 +296,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_itemFileNameAndStartDateAndEndDateFromCommandLine_when_fileName_then_returnBuildFileName() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"itemFileNamePrefix=fileName", "startDate=2018-10-07", "endDate=2018-10-14"});
+        appProps = new FileApplicationProperties(new String[]{"itemFileNamePrefix=fileName", "startDate=2018-10-07", "endDate=2018-10-14"});
 
         String actual = appProps.fileName();
 
@@ -305,7 +305,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_uploadTypeToolkitDocs_whenFileName_thenReturnFileNameWithZip() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"uploadType=toolkit_docs"});
+        appProps = new FileApplicationProperties(new String[]{"uploadType=toolkit_docs"});
 
         String actual = appProps.fileName();
 
@@ -314,7 +314,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void givenUseAsFileNameYAndFileNamePrefixAndToolkitDocs_whenFileName_thenReturnFileNamePrefixAsNameWithZip() {
-        appProps = new FilePreferredApplicationProperties(new String[]{
+        appProps = new FileApplicationProperties(new String[]{
                 ArgName.uploadType.name() + "=" + UploadType.TOOLKIT_DOCS.name(),
                 ArgName.itemFileNamePrefix + "=my_custom_name",
                 ArgName.useAsFileName + "=Y",
@@ -327,7 +327,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void givenUseAsFileNameYAndFileNamePrefix_whenFileName_thenReturnFileNamePrefixAsNameWithTxt() {
-        appProps = new FilePreferredApplicationProperties(new String[]{
+        appProps = new FileApplicationProperties(new String[]{
                 ArgName.itemFileNamePrefix + "=my_custom_name",
                 ArgName.useAsFileName + "=Y",
         });
@@ -339,7 +339,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void givenUseAsFileNameYAndFileNamePrefixAndUploadAsHtml_whenFileName_thenReturnFileNamePrefixAsNameWithTxt() {
-        appProps = new FilePreferredApplicationProperties(new String[]{
+        appProps = new FileApplicationProperties(new String[]{
                 ArgName.itemFileNamePrefix + "=my_custom_name",
                 ArgName.useAsFileName + "=Y",
         });
@@ -351,7 +351,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_periodInDaysAndStartDate_when_startDate_then_returnStartDate() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"periodInDays=16","startDate=2018-10-18"});
+        appProps = new FileApplicationProperties(new String[]{"periodInDays=16","startDate=2018-10-18"});
 
         LocalDate actual = appProps.startDate();
 
@@ -360,7 +360,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_onlyPeriodInDays_when_startDate_then_returnNowMinusPeriodInDays() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"periodInDays=16"});
+        appProps = new FileApplicationProperties(new String[]{"periodInDays=16"});
 
         LocalDate actual = appProps.startDate();
 
@@ -372,7 +372,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"startDate=2018-10-18"};
         Properties props = new Properties();
         props.put("startDate", "2018-10-19");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = appProps.startDate();
@@ -385,7 +385,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"startDate=2018-10-18"};
         Properties props = new Properties();
         props.put("periodInDays", "12");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = appProps.startDate();
@@ -395,7 +395,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_itemFileNamePrefix_when_itemFileNamePrefix_then_returnThatItemFileNamePrefix() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"itemFileNamePrefix=testItemFileNamePrefix"});
+        appProps = new FileApplicationProperties(new String[]{"itemFileNamePrefix=testItemFileNamePrefix"});
 
         String actual = appProps.itemFileNamePrefix();
 
@@ -407,7 +407,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"itemFileNamePrefix=testItemFileNamePrefix"};
         Properties props = new Properties();
         props.put("itemFileNamePrefix","propsItemFileNamePrefix");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.itemFileNamePrefix();
@@ -417,7 +417,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_toolkitUsername_when_toolkitUsername_then_returnNowMinusPeriodInDays() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"toolkitUsername=userName"});
+        appProps = new FileApplicationProperties(new String[]{"toolkitUsername=userName"});
 
         String actual = appProps.toolkitUsername();
 
@@ -426,7 +426,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_endDate_when_endDate_then_returnThatEndDate() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"endDate=2018-10-19"});
+        appProps = new FileApplicationProperties(new String[]{"endDate=2018-10-19"});
 
         LocalDate actual = appProps.endDate();
 
@@ -437,7 +437,7 @@ class FilePreferredApplicationPropertiesTest {
     void given_noEndDateInAppPropertiesAndEndDateFromCliArgs_when_endDate_then_returnEndDateFromCliArgs() {
         String[] args = {"startDate=2018-09-19", "endDate=2018-10-15"};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = appProps.endDate();
@@ -450,7 +450,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"startDate=2018-09-19", "endDate=2018-10-15"};
         Properties props = new Properties();
         props.put("endDate", "2018-10-19");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = appProps.endDate();
@@ -463,7 +463,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"startDate=2018-09-19", "endDate=2018-10-15"};
         Properties props = new Properties();
         props.put("endDate", "");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         LocalDate actual = appProps.endDate();
@@ -473,7 +473,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_noEndDate_when_endDate_then_returnNow() {
-        appProps = new FilePreferredApplicationProperties(new String[]{});
+        appProps = new FileApplicationProperties(new String[]{});
 
         LocalDate actual = appProps.endDate();
 
@@ -483,7 +483,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void given_wrongEndDate_when_endDate_then_throwDateTimeException() {
         try {
-            appProps = new FilePreferredApplicationProperties(new String[]{"endDate=2018-02-30"});
+            appProps = new FileApplicationProperties(new String[]{"endDate=2018-02-30"});
 
             appProps.endDate();
             fail("Should throw DateTimeException.");
@@ -495,7 +495,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void given_wrongStartDate_when_startDate_then_throwDateTimeException() {
         try {
-            appProps = new FilePreferredApplicationProperties(new String[]{"endDate=2018-02-30"});
+            appProps = new FileApplicationProperties(new String[]{"endDate=2018-02-30"});
 
             appProps.endDate();
             fail("Should throw DateTimeException.");
@@ -506,7 +506,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_projectPath_when_projectPaths_then_returnSetWithThatProjectPath() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"projectPath=Proj1"});
+        appProps = new FileApplicationProperties(new String[]{"projectPath=Proj1"});
 
         Set<String> actual = appProps.projectPaths();
 
@@ -518,7 +518,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"projectPath=Proj1,Proj2"};
         Properties props = new Properties();
         props.put("projectPath", "Proj3");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = appProps.projectPaths();
@@ -528,7 +528,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_noPeriodInDaysFromCommandLine_when_periodInDays_then_returnDefaultValue7() {
-        appProps = new FilePreferredApplicationProperties(new String[]{});
+        appProps = new FileApplicationProperties(new String[]{});
 
         int actual = appProps.periodInDays();
 
@@ -537,7 +537,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_periodInDaysFromCommandLine_when_periodInDays_then_returnThatPeriodInDays() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"periodInDays=1"});
+        appProps = new FileApplicationProperties(new String[]{"periodInDays=1"});
 
         int actual = appProps.periodInDays();
 
@@ -549,7 +549,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"periodInDays=1"};
         Properties props = new Properties();
         props.put("periodInDays", "2");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         int actual = appProps.periodInDays();
@@ -559,7 +559,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_committerEmailFromCommandLine_when_committerEmail_then_returnThatCommitterEmail() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"committerEmail=testCommitterEmail"});
+        appProps = new FileApplicationProperties(new String[]{"committerEmail=testCommitterEmail"});
 
         String actual = appProps.committerEmail();
 
@@ -571,7 +571,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"committerEmail=testCommitterEmail"};
         Properties props = new Properties();
         props.put("committerEmail", "propsCommitterEmail");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.committerEmail();
@@ -581,7 +581,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_noCodeProtection_when_uploadType_then_returnDefaultValueNONE() {
-        appProps = new FilePreferredApplicationProperties(new String[]{});
+        appProps = new FileApplicationProperties(new String[]{});
 
         UploadType actual = appProps.uploadType();
 
@@ -590,7 +590,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_uploadType_when_uploadType_then_returnThatCodeProtection() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"uploadType=protected"});
+        appProps = new FileApplicationProperties(new String[]{"uploadType=protected"});
 
         UploadType actual = appProps.uploadType();
 
@@ -602,7 +602,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"uploadType=Simple"};
         Properties props = new Properties();
         props.put("uploadType", "statement");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         UploadType actual = appProps.uploadType();
@@ -613,7 +613,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void given_noToolkitUsernameAndPassword_when_isToolkitPropertiesSet_then_returnFalse() {
         String[] args = new String[]{};
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
 
         boolean actual = appProps.isToolkitCredentialsSet();
 
@@ -623,7 +623,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void given_emptyToolkitUsernameAndPassword_when_isToolkitPropertiesSet_then_returnFalse() {
         String[] args = {"toolkitUsername=", "toolkitPassword="};
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
 
         boolean actual = appProps.isToolkitCredentialsSet();
 
@@ -635,7 +635,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"toolkitPassword=yui"};
         Properties props = new Properties();
         props.put("toolkitUsername", "cvb");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isToolkitCredentialsSet();
@@ -647,7 +647,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenEmptyConfirmationWindow_whenIsConfirmation_thenReturnTrue() {
         String[] args = {""};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isConfirmationWindow();
@@ -660,7 +660,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"confirmationWindow=Y"};
         Properties props = new Properties();
         props.put("confirmationWindow", "N");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isConfirmationWindow();
@@ -673,7 +673,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         Properties props = new Properties();
         props.put("confirmationWindow", "Y");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isConfirmationWindow();
@@ -685,7 +685,7 @@ class FilePreferredApplicationPropertiesTest {
     void given_emptySkipRemote_when_isSkipRemote_then_returnTrue() {
         String[] args = {""};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isSkipRemote();
@@ -698,7 +698,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"skipRemote=Y"};
         Properties props = new Properties();
         props.put("skipRemote", "N");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isSkipRemote();
@@ -711,7 +711,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         Properties props = new Properties();
         props.put("skipRemote", "Y");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isSkipRemote();
@@ -723,7 +723,7 @@ class FilePreferredApplicationPropertiesTest {
     void given_emptyUseUI_when_isUseUI_then_returnTrue() {
         String[] args = {""};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isUseUI();
@@ -736,7 +736,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"useUI=Y"};
         Properties props = new Properties();
         props.put("useUI", "N");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isUseUI();
@@ -749,7 +749,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         Properties props = new Properties();
         props.put("useUI", "Y");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isUseUI();
@@ -760,7 +760,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnDefault() {
         String[] args = {};
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
 
         String actual = appProps.toolkitUserFolder();
 
@@ -770,7 +770,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
         String[] args = {"toolkitUsername=xxx"};
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
 
         String actual = appProps.toolkitUserFolder();
 
@@ -782,7 +782,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"toolkitUsername=xxx"};
         Properties props = new Properties();
         props.put("toolkitUsername", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.toolkitUserFolder();
@@ -795,7 +795,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {};
         Properties props = new Properties();
         props.put("toolkitUsername", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.toolkitUserFolder();
@@ -808,7 +808,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"toolkitCustomUserFolder=qqq"};
         Properties props = new Properties();
         props.put("toolkitUsername", "aaa");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.toolkitUserFolder();
@@ -818,7 +818,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void givenToolkitProjectListNames_whenToolkitProjectListNames_thenReturnSetWithThatToolkitProjectListNames() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"toolkitProjectListNames=name1"});
+        appProps = new FileApplicationProperties(new String[]{"toolkitProjectListNames=name1"});
 
         Set<String> actual = appProps.toolkitProjectListNames();
 
@@ -830,7 +830,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"toolkitProjectListNames=Proj1,Proj2"};
         Properties props = new Properties();
         props.put("toolkitProjectListNames", "Proj3");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         Set<String> actual = appProps.toolkitProjectListNames();
@@ -841,7 +841,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenNoProperties_whenIsDeleteDownloadedFiles_thenReturnTrue() {
         String[] args = {""};
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
 
         boolean actual = appProps.isDeleteDownloadedFiles();
 
@@ -852,7 +852,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenEmptyDeleteDownloadedFiles_whenIsDeleteDownloadedFiles_thenReturnTrue() {
         String[] args = {""};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isDeleteDownloadedFiles();
@@ -865,7 +865,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"deleteDownloadedFiles=Y"};
         Properties props = new Properties();
         props.put("deleteDownloadedFiles", "N");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isDeleteDownloadedFiles();
@@ -878,7 +878,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         Properties props = new Properties();
         props.put("deleteDownloadedFiles", "Y");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isDeleteDownloadedFiles();
@@ -889,7 +889,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenNoProperties_whenIsEnableOnStartup_thenReturnTrue() {
         String[] args = {""};
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
 
         boolean actual = appProps.isEnableOnStartup();
 
@@ -900,7 +900,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenEmptyEnableOnStartupFiles_whenIsEnableOnStartup_thenReturnTrue() {
         String[] args = {""};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
@@ -913,7 +913,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"enableOnStartup=Y"};
         Properties props = new Properties();
         props.put("enableOnStartup", "N");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
@@ -926,7 +926,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         Properties props = new Properties();
         props.put("enableOnStartup", "n");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
@@ -937,7 +937,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenNoProperties_whenIsUseAsFileName_thenReturnFalse() {
         String[] args = {""};
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
 
         boolean actual = appProps.isUseAsFileName();
 
@@ -948,7 +948,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenEmptyUseAsFileNameFiles_whenIsUseAsFileName_thenReturnFalse() {
         String[] args = {""};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isUseAsFileName();
@@ -961,7 +961,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"useAsFileName=N"};
         Properties props = new Properties();
         props.put("useAsFileName", "Y");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isUseAsFileName();
@@ -974,7 +974,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         Properties props = new Properties();
         props.put("useAsFileName", "n");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isUseAsFileName();
@@ -984,7 +984,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void givenConfigurationNameFromCommandLine_whenConfigurationName_thenReturnThatConfigurationName() {
-        appProps = new FilePreferredApplicationProperties(new String[]{"configurationName=testAuthor"});
+        appProps = new FileApplicationProperties(new String[]{"configurationName=testAuthor"});
 
         String actual = appProps.configurationName();
 
@@ -996,7 +996,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"configurationName=testAuthor"};
         Properties props = new Properties();
         props.put("configurationName", "propsAuthor");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         String actual = appProps.configurationName();
@@ -1007,7 +1007,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenNoProperties_whenIsUpgradeFinished_thenReturnFalse() {
         String[] args = {""};
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
 
         boolean actual = appProps.isUpgradeFinished();
 
@@ -1018,7 +1018,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenEmptyUpgradeFinishedFiles_whenIsUpgradeFinished_thenReturnFalse() {
         String[] args = {""};
         Properties props = new Properties();
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isUpgradeFinished();
@@ -1031,7 +1031,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"upgradeFinished=N"};
         Properties props = new Properties();
         props.put("upgradeFinished", "Y");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isUpgradeFinished();
@@ -1044,7 +1044,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         Properties props = new Properties();
         props.put("upgradeFinished", "n");
-        appProps = new FilePreferredApplicationProperties(args);
+        appProps = new FileApplicationProperties(args);
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isUpgradeFinished();

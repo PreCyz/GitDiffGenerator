@@ -1,5 +1,7 @@
 package pg.gipter.job.upgrade;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
@@ -8,6 +10,9 @@ import pg.gipter.service.GithubService;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.WindowType;
+import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,12 +26,25 @@ public class UpgradeJob implements Job {
 
     UpgradeJob() {
         String[] args = {ArgName.preferredArgSource + "=" + PreferredArgSource.UI};
-        githubService = new GithubService(ApplicationPropertiesFactory.getInstance(args));
+        githubService = new GithubService(ApplicationPropertiesFactory.getInstance(args).version());
     }
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
         logger.info("Executing check upgrade job {}.", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        githubService.checkUpgrades();
+        checkUpgrades();
+    }
+
+    private void checkUpgrades() {
+        if (githubService.isNewVersion()) {
+            logger.info("New version available: {}.", githubService.getStrippedVersion());
+            Platform.runLater(() -> new AlertWindowBuilder()
+                    .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", githubService.getStrippedVersion()))
+                    .withLink(GithubService.GITHUB_URL + "/releases/latest")
+                    .withWindowType(WindowType.BROWSER_WINDOW)
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .buildAndDisplayWindow()
+            );
+        }
     }
 }

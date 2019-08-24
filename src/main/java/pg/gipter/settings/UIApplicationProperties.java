@@ -3,9 +3,9 @@ package pg.gipter.settings;
 import pg.gipter.utils.StringUtils;
 
 /** Created by Pawel Gawedzki on 06-Mar-2019. */
-class UIPreferredApplicationProperties extends CliPreferredApplicationProperties {
+class UIApplicationProperties extends CliApplicationProperties {
 
-    UIPreferredApplicationProperties(String[] args) {
+    UIApplicationProperties(String[] args) {
         super(args);
     }
 

@@ -47,7 +47,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
-/** Created by Gawa 2017-10-04 */
+/**
+ * Created by Gawa 2017-10-04
+ */
 public class UILauncher implements Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
@@ -58,6 +60,7 @@ public class UILauncher implements Launcher {
     private Stage projectsWindow;
     private Stage toolkitProjectsWindow;
     private Stage applicationSettingsWindow;
+    private Stage upgradeWindow;
     private TrayHandler trayHandler;
     private PropertiesDao propertiesDao;
     private DataDao dataDao;
@@ -87,6 +90,10 @@ public class UILauncher implements Launcher {
 
     void setSilentMode(boolean silentMode) {
         this.silentMode = silentMode;
+    }
+
+    public boolean isUpgradeChecked() {
+        return upgradeChecked;
     }
 
     public LocalDateTime getLastItemSubmissionDate() {
@@ -124,7 +131,11 @@ public class UILauncher implements Launcher {
             logger.info("Tray icon is not supported. Can't launch in silent mode. Program is terminated");
             Platform.exit();
         }
-        checkUpgrades();
+        if (applicationProperties.isUpgradeFinished()) {
+            displayUpgradeInfo();
+        } else {
+            checkUpgrades();
+        }
         setStartOnStartup();
         logger.info("Launching UI. Silent mode: [{}].", silentMode);
         initTray();
@@ -133,10 +144,31 @@ public class UILauncher implements Launcher {
         }
     }
 
+    private void displayUpgradeInfo() {
+        logger.info("Upgrade to version {} finished [{}].", applicationProperties.version(), applicationProperties.isUpgradeFinished());
+        new AlertWindowBuilder()
+                .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
+                .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                .withAlertType(Alert.AlertType.INFORMATION)
+                .withImage(ImageFile.FINGER_UP)
+                .buildAndDisplayWindow();
+    }
+
     private void checkUpgrades() {
         if (!upgradeChecked) {
-            GithubService service = new GithubService(applicationProperties);
-            executor.execute(service::checkUpgrades);
+            executor.execute(() -> {
+                GithubService service = new GithubService(applicationProperties.version());
+                if (service.isNewVersion()) {
+                    logger.info("New version available: {}.", service.getStrippedVersion());
+                    Platform.runLater(() -> new AlertWindowBuilder()
+                            .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getStrippedVersion()))
+                            .withLink(GithubService.GITHUB_URL + "/releases/latest")
+                            .withWindowType(WindowType.BROWSER_WINDOW)
+                            .withAlertType(Alert.AlertType.INFORMATION)
+                            .buildAndDisplayWindow()
+                    );
+                }
+            });
             upgradeChecked = true;
         }
     }
@@ -358,7 +390,7 @@ public class UILauncher implements Launcher {
         mainWindow.setOnCloseRequest(onCloseEventHandler);
     }
 
-    void hideMainWindow() {
+    public void hideMainWindow() {
         mainWindow.hide();
     }
 
@@ -436,4 +468,18 @@ public class UILauncher implements Launcher {
         createSettingsWindow(WindowFactory.NAME_SETTINGS_MENU);
     }
 
+    public void showUpgradeWindow() {
+        upgradeWindow = new Stage();
+        upgradeWindow.initModality(Modality.APPLICATION_MODAL);
+        buildScene(upgradeWindow, WindowFactory.UPGRADE.createWindow(applicationProperties, this));
+        upgradeWindow.setOnCloseRequest(event -> {
+            upgradeWindow.close();
+            System.exit(0);
+        });
+        upgradeWindow.showAndWait();
+    }
+
+    public void hideUpgradeWindow() {
+        upgradeWindow.close();
+    }
 }

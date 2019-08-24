@@ -10,27 +10,27 @@ class ApplicationPropertiesFactoryTest {
     void given_noArg_when_getInstance_then_returnCliApplicationProperties() {
         ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{});
 
-        assertThat(actual).isInstanceOf(CliPreferredApplicationProperties.class);
+        assertThat(actual).isInstanceOf(CliApplicationProperties.class);
     }
 
     @Test
     void given_cliPreferredArgSource_when_getInstance_then_returnCliApplicationProperties() {
         ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=cli"});
 
-        assertThat(actual).isInstanceOf(CliPreferredApplicationProperties.class);
+        assertThat(actual).isInstanceOf(CliApplicationProperties.class);
     }
 
     @Test
     void given_filePreferredArgSource_when_getInstance_then_returnFileApplicationProperties() {
         ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=file"});
 
-        assertThat(actual).isInstanceOf(FilePreferredApplicationProperties.class);
+        assertThat(actual).isInstanceOf(FileApplicationProperties.class);
     }
 
     @Test
     void given_uiPreferredArgSource_when_getInstance_then_returnCliApplicationProperties() {
         ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=ui"});
 
-        assertThat(actual).isInstanceOf(CliPreferredApplicationProperties.class);
+        assertThat(actual).isInstanceOf(CliApplicationProperties.class);
     }
 }

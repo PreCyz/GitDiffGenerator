@@ -13,9 +13,9 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toCollection;
 
 /** Created by Pawel Gawedzki on 17-Sep-2018. */
-class CliPreferredApplicationProperties extends ApplicationProperties {
+class CliApplicationProperties extends ApplicationProperties {
 
-    CliPreferredApplicationProperties(String[] args) {
+    CliApplicationProperties(String[] args) {
         super(args);
     }
 
