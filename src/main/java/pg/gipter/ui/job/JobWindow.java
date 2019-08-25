@@ -2,6 +2,7 @@ package pg.gipter.ui.job;
 
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
+import pg.gipter.ui.alert.ImageFile;
 
 /**Created by Gawa 2019-03-02*/
 public class JobWindow extends AbstractWindow {
@@ -16,8 +17,8 @@ public class JobWindow extends AbstractWindow {
     }
 
     @Override
-    protected String windowImgFileName() {
-        return "chicken-face.png";
+    protected ImageFile windowImgFileName() {
+        return ImageFile.CHICKEN_FACE_PNG;
     }
 
     @Override

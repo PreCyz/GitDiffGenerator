@@ -16,14 +16,14 @@
 }
 
 #remove-project-button {
-    -fx-background-image: url('../img/red-minus.png');
+    -fx-background-image: url('../img/png/red-minus.png');
     -fx-background-size: 30px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: 50%;
 }
 
 #add-project-button {
-    -fx-background-image: url('../img/green-plus.png');
+    -fx-background-image: url('../img/png/green-plus.png');
     -fx-background-size: 30px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: 50%;

@@ -2,6 +2,7 @@ package pg.gipter.ui.upgrade;
 
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
+import pg.gipter.ui.alert.ImageFile;
 
 public class UpgradeWindow extends AbstractWindow {
 
@@ -15,8 +16,8 @@ public class UpgradeWindow extends AbstractWindow {
     }
 
     @Override
-    protected String windowImgFileName() {
-        return "chicken-face.png";
+    protected ImageFile windowImgFileName() {
+        return ImageFile.CHICKEN_FACE_PNG;
     }
 
     @Override

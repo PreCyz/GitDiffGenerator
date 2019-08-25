@@ -150,7 +150,7 @@ public class UILauncher implements Launcher {
                 .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
                 .withWindowType(WindowType.CONFIRMATION_WINDOW)
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withImage(ImageFile.FINGER_UP)
+                .withImage(ImageFile.MINION_AAAA_GIF)
                 .buildAndDisplayWindow();
     }
 
@@ -249,7 +249,7 @@ public class UILauncher implements Launcher {
                         .withHeaderText(BundleUtils.getMsg("popup.job.window.canNotOpen"))
                         .withWindowType(WindowType.OVERRIDE_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING)
-                        .withImage(ImageFile.OVERRIDE);
+                        .withImage(ImageFile.OVERRIDE_PNG);
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             } else {
                 jobWindow = new Stage();
@@ -297,7 +297,7 @@ public class UILauncher implements Launcher {
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN);
+                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } finally {
             Optional<Properties> data = dataDao.loadDataProperties();
@@ -364,7 +364,7 @@ public class UILauncher implements Launcher {
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.ERROR_CHICKEN);
+                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         }

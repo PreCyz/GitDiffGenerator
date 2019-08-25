@@ -423,7 +423,7 @@ public class MainController extends AbstractController {
                     .withLink(applicationProperties.toolkitUserFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImage(ImageFile.ERROR_CHICKEN);
+                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
             try {
                 File pdfFile = Paths.get(pdfFileName).toFile();
                 if (pdfFile.exists()) {
@@ -669,7 +669,7 @@ public class MainController extends AbstractController {
                     .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                    .withImage(ImageFile.FINGER_UP);
+                    .withImage(ImageFile.FINGER_UP_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         };
     }
@@ -706,7 +706,7 @@ public class MainController extends AbstractController {
                         .withHeaderText(BundleUtils.getMsg("popup.overrideProperties.message", configurationName))
                         .withAlertType(Alert.AlertType.CONFIRMATION)
                         .withWindowType(WindowType.OVERRIDE_WINDOW)
-                        .withImage(ImageFile.OVERRIDE)
+                        .withImage(ImageFile.OVERRIDE_PNG)
                         .withOkButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonOk"))
                         .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
                         .buildAndDisplayOverrideWindow();
@@ -727,7 +727,7 @@ public class MainController extends AbstractController {
                         .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                        .withImage(ImageFile.FINGER_UP);
+                        .withImage(ImageFile.FINGER_UP_PNG);
                 alertWindowBuilder.buildAndDisplayWindow();
             }
 
@@ -763,14 +763,14 @@ public class MainController extends AbstractController {
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                        .withImage(ImageFile.FINGER_UP);
+                        .withImage(ImageFile.FINGER_UP_PNG);
             } catch (IllegalStateException ex) {
                 alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(ex.getMessage())
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.ERROR_CHICKEN);
+                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
             }
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         };

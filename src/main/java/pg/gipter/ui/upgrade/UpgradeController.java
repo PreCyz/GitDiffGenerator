@@ -3,6 +3,7 @@ package pg.gipter.ui.upgrade;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import pg.gipter.service.UpgradeService;
@@ -31,6 +32,11 @@ public class UpgradeController  extends AbstractController {
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
         resetIndicatorProperties(upgradeService);
+        upgradeLabel.setAlignment(Pos.CENTER);
+        upgrade();
+    }
+
+    private void upgrade() {
         uiLauncher.executeOutsideUIThread(() -> {
             upgradeService.run();
             Platform.runLater(() -> {

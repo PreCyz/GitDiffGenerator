@@ -94,7 +94,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN);
+                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {
@@ -256,7 +256,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.ERROR_CHICKEN);
+                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
                 break;
             case PARTIAL_SUCCESS:
                 detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
@@ -265,14 +265,14 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING)
-                        .withImage(ImageFile.ALMOST_ALL);
+                        .withImage(ImageFile.ALMOST_ALL_GIF);
                 break;
             default:
                 alertWindowBuilder
                         .withLink(toolkitUserFolder())
                         .withWindowType(WindowType.BROWSER_WINDOW)
                         .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage(ImageFile.GOOD_JOB);
+                        .withImage(ImageFile.GOOD_JOB_PNG);
 
         }
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);

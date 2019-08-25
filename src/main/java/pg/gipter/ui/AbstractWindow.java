@@ -2,6 +2,7 @@ package pg.gipter.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.ResourceUtils;
 
@@ -29,7 +30,7 @@ public abstract class AbstractWindow {
     }
 
     String windowImgFilePath() {
-        return ResourceUtils.getImgResourcePath(windowImgFileName());
+        return ResourceUtils.getImgResourcePath(windowImgFileName().fileUrl());
     }
 
     boolean resizable() {
@@ -46,7 +47,7 @@ public abstract class AbstractWindow {
     }
 
     protected abstract String fxmlFileName();
-    protected abstract String windowImgFileName();
+    protected abstract ImageFile windowImgFileName();
     protected abstract String cssFileName();
     public abstract String windowTitleBundle();
 }

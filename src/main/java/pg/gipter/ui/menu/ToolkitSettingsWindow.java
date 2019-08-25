@@ -2,6 +2,7 @@ package pg.gipter.ui.menu;
 
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
+import pg.gipter.ui.alert.ImageFile;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
 public class ToolkitSettingsWindow extends AbstractWindow {
@@ -16,8 +17,8 @@ public class ToolkitSettingsWindow extends AbstractWindow {
     }
 
     @Override
-    protected String windowImgFileName() {
-        return "chicken-face.png";
+    protected ImageFile windowImgFileName() {
+        return ImageFile.CHICKEN_FACE_PNG;
     }
 
     @Override

@@ -127,7 +127,7 @@ public class AlertWindowBuilder {
 
         ImageView imageView = null;
         if (imageFile != null) {
-            imageView = ResourceUtils.getImgResource(imageFile.fileName())
+            imageView = ResourceUtils.getImgResource(imageFile.fileUrl())
                     .map(url -> new ImageView(new Image(url.toString())))
                     .orElseGet(ImageView::new);
             flowPane.setPrefWrapLength(imageView.getImage().getWidth());

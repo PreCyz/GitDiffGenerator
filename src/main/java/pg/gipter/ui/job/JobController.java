@@ -311,7 +311,7 @@ public class JobController extends AbstractController {
                         .withLink(AlertHelper.logsFolder())
                         .withAlertType(Alert.AlertType.ERROR)
                         .withWindowType(WindowType.LOG_WINDOW)
-                        .withImage(ImageFile.ERROR_CHICKEN);
+                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         };

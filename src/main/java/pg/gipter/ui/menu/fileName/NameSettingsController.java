@@ -127,7 +127,7 @@ public class NameSettingsController extends AbstractController {
                     .withHeaderText(BundleUtils.getMsg("nameSettings.saved"))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                    .withImage(ImageFile.FINGER_UP)
+                    .withImage(ImageFile.FINGER_UP_PNG)
                     .buildAndDisplayWindow();
         };
     }

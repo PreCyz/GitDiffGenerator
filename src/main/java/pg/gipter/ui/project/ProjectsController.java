@@ -241,7 +241,7 @@ public class ProjectsController extends AbstractController {
                             .withLink(AlertHelper.logsFolder())
                             .withWindowType(WindowType.LOG_WINDOW)
                             .withAlertType(Alert.AlertType.ERROR)
-                            .withImage(ImageFile.ERROR_CHICKEN);
+                            .withImage(ImageFile.ERROR_CHICKEN_PNG);
                     Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
                 }
             }

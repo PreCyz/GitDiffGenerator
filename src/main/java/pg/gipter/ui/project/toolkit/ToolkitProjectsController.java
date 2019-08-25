@@ -163,7 +163,7 @@ public class ToolkitProjectsController extends AbstractController {
                             .withLink(AlertHelper.logsFolder())
                             .withAlertType(Alert.AlertType.WARNING)
                             .withWindowType(WindowType.LOG_WINDOW)
-                            .withImage(ImageFile.ERROR_CHICKEN);
+                            .withImage(ImageFile.ERROR_CHICKEN_PNG);
                     Platform.runLater(() -> {
                         alertWindowBuilder.buildAndDisplayWindow();
                         downloadProgressIndicator.setVisible(false);
@@ -178,7 +178,7 @@ public class ToolkitProjectsController extends AbstractController {
                     .withHeaderText(BundleUtils.getMsg("toolkit.projects.credentialsNotSet"))
                     .withAlertType(Alert.AlertType.WARNING)
                     .withWindowType(WindowType.OVERRIDE_WINDOW)
-                    .withImage(ImageFile.OVERRIDE);
+                    .withImage(ImageFile.OVERRIDE_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         }
     }

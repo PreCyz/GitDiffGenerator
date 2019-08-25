@@ -56,7 +56,7 @@ class Runner implements Starter {
                     .withLink(AlertHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN)
+                    .withImage(ImageFile.ERROR_CHICKEN_PNG)
                     .buildAndDisplayWindow()
             );
         } finally {
@@ -69,7 +69,7 @@ class Runner implements Starter {
                     .withLink(applicationProperties.toolkitUserFolder())
                     .withWindowType(WindowType.BROWSER_WINDOW)
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImage(ImageFile.GOOD_JOB)
+                    .withImage(ImageFile.GOOD_JOB_PNG)
                     .buildAndDisplayWindow()
             );
         }
