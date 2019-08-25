@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.utils.BundleUtils;
 
 import java.io.*;
 import java.nio.file.Paths;
@@ -27,6 +28,7 @@ public class GithubService {
     private String strippedVersion;
     private static JsonObject latestReleaseDetails;
     String distributionName;
+    private final String tagSuffix = "v";
 
     public GithubService(String currentVersion) {
         this.currentVersion = currentVersion;
@@ -53,7 +55,6 @@ public class GithubService {
         Optional<String> latestVersion = getLatestVersion();
         if (latestVersion.isPresent()) {
             String version = latestVersion.get();
-            String tagSuffix = "v";
             strippedVersion = version.substring(version.indexOf(tagSuffix) + 1);
 
             String[] newVersion = strippedVersion.split("\\.");
@@ -116,9 +117,9 @@ public class GithubService {
 
     Optional<String> downloadLatestDistribution(String downloadLocation, TaskService<?> taskService) {
         if (latestReleaseDetails == null) {
-            taskService.updateMsg("Downloading distribution details.");
+            taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.distributionDetails"));
             downloadLatestDistributionDetails().ifPresent(jsonObject -> latestReleaseDetails = jsonObject);
-            taskService.updateMsg("Distribution details downloaded.");
+            taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.distributionDetails.finished"));
         }
         if (latestReleaseDetails != null) {
             Optional<String> downloadLink = getDownloadLink(latestReleaseDetails);
@@ -134,14 +135,14 @@ public class GithubService {
                         return Optional.of(distributionName);
                     }
                 } catch (IOException e) {
-                    taskService.updateMsg("Upgrade failed.");
+                    taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
                     taskService.workCompleted();
                     logger.error("Can not download latest distribution details.", e);
                     throw new IllegalStateException("Can not download latest distribution details.");
                 }
             }
         } else {
-            taskService.updateMsg("Upgrade failed.");
+            taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
             taskService.workCompleted();
             logger.error("Can not download latest distribution details.");
             throw new IllegalStateException("Can not download latest distribution details.");
@@ -150,11 +151,7 @@ public class GithubService {
     }
 
     private void downloadFile(HttpEntity entity, String downloadLocation, TaskService<?> taskService) throws IOException {
-        taskService.updateMsg("Downloading file ...");
-        long fileLength = entity.getContentLength();
-        taskService.init(fileLength);
-        taskService.increaseProgress();
-
+        taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.downloading", getLastVersion()));
         try (OutputStream outStream = new FileOutputStream(Paths.get(downloadLocation, distributionName).toFile());
              InputStream entityContent = entity.getContent()) {
 
@@ -166,7 +163,7 @@ public class GithubService {
                 numberOfBytesDownloaded += bytesRead;
                 taskService.increaseProgress(numberOfBytesDownloaded);
             }
-            taskService.updateMsg("File downloaded.");
+            taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.downloaded"));
         }
     }
 
@@ -184,5 +181,34 @@ public class GithubService {
             }
         }
         return downloadLink;
+    }
+
+    private Optional<Long> getFileSize(JsonObject jsonObject) {
+        Optional<Long> size = Optional.empty();
+        String name = jsonObject.get("name").getAsString();
+        JsonArray assets = jsonObject.get("assets").getAsJsonArray();
+        for (JsonElement asset : assets) {
+            JsonObject element = (JsonObject) asset;
+            JsonElement assetName = element.get("name");
+            if (assetName != null && !assetName.isJsonNull() && assetName.getAsString().startsWith(name)) {
+                distributionName = assetName.getAsString();
+                size = Optional.of(element.get("size").getAsLong());
+                break;
+            }
+        }
+        return size;
+    }
+
+    Optional<Long> getFileSize() {
+        return getFileSize(latestReleaseDetails);
+    }
+
+    private String getLastVersion() {
+        String version = "";
+        if (latestReleaseDetails != null && latestReleaseDetails.get("tag_name") != null) {
+            version = latestReleaseDetails.get("tag_name").getAsString();
+            strippedVersion = version = version.substring(version.indexOf(tagSuffix) + 1);
+        }
+        return version;
     }
 }

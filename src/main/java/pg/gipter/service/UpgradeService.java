@@ -34,7 +34,8 @@ public class UpgradeService extends TaskService<Void> {
     }
 
     void upgradeAndRestartApplication() {
-        updateMessage("Upgrade to new version started.");
+        updateMessage(BundleUtils.getMsg("upgrade.progress.started"));
+        init(githubService.getFileSize().orElse(0L));
         increaseProgress();
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
         try {
@@ -74,7 +75,7 @@ public class UpgradeService extends TaskService<Void> {
     }
 
     private void decompress(File sevenZSourceFile, File destination) throws IOException {
-        updateMsg("Decompressing files ...");
+        updateMsg(BundleUtils.getMsg("upgrade.progress.decompressing"));
         try (SevenZFile sevenZFile = new SevenZFile(sevenZSourceFile)) {
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null) {
@@ -94,14 +95,14 @@ public class UpgradeService extends TaskService<Void> {
                 updateTaskProgress(Double.valueOf(5 * Math.pow(10, 5)).longValue());
             }
         } finally {
-            updateMsg("Deleting downloaded file ...");
+            updateMsg(BundleUtils.getMsg("upgrade.progress.deleting"));
             FileUtils.forceDelete(sevenZSourceFile);
             logger.info("File [{}] deleted.", sevenZSourceFile.getName());
         }
     }
 
     private void restartApplication() throws IOException {
-        updateMsg("Restarting application.");
+        updateMsg(BundleUtils.getMsg("upgrade.progress.restarting"));
         final String javaBin = Paths.get(System.getProperty("java.home"), "bin", "java").toString();
         Optional<File> jarFile = AlertHelper.getJarFile();
 
