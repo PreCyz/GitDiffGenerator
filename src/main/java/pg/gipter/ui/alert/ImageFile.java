@@ -14,10 +14,11 @@ public enum ImageFile {
     FINGER_UP_PNG("png/finger-up.png"),
     ALMOST_ALL_PNG("png/almost-all.png"),
 
-    MINION_NAPOLEON_GIF("gif/minion-napoleon.gif"),
+    MINION_BOMB_GIF("gif/minion-bomb.gif"),
     MINION_AAAA_GIF("gif/minion-aaaa.gif"),
     MINION_DISCO_GIF("gif/minion-disco.gif"),
-    MINION_FART_GIF("gif/minion-fart.gif")
+    MINION_FART_GIF("gif/minion-fart.gif"),
+    MINION_IOIO_GIF("gif/minion-ioio.gif"),
     ;
 
     private String fileName;
@@ -37,10 +38,14 @@ public enum ImageFile {
     }
 
     public static ImageFile randomPartialSuccessImage() {
-        return randomImage(EnumSet.of(ALMOST_ALL_PNG, MINION_NAPOLEON_GIF, MINION_FART_GIF));
+        return randomImage(EnumSet.of(ALMOST_ALL_PNG, MINION_BOMB_GIF, MINION_FART_GIF));
     }
 
     public static ImageFile randomSuccessImage() {
         return randomImage(EnumSet.of(GOOD_JOB_PNG, MINION_AAAA_GIF, MINION_DISCO_GIF));
+    }
+
+    public static ImageFile randomFailImage() {
+        return randomImage(EnumSet.of(ERROR_CHICKEN_PNG, MINION_IOIO_GIF));
     }
 }

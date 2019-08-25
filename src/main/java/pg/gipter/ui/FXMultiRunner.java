@@ -256,7 +256,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                        .withImage(ImageFile.randomFailImage());
                 break;
             case PARTIAL_SUCCESS:
                 detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
