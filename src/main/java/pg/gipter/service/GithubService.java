@@ -120,7 +120,6 @@ public class GithubService {
             downloadLatestDistributionDetails().ifPresent(jsonObject -> latestReleaseDetails = jsonObject);
             taskService.updateMsg("Distribution details downloaded.");
         }
-        taskService.increaseProgress();
         if (latestReleaseDetails != null) {
             Optional<String> downloadLink = getDownloadLink(latestReleaseDetails);
             if (downloadLink.isPresent()) {
@@ -153,8 +152,8 @@ public class GithubService {
     private void downloadFile(HttpEntity entity, String downloadLocation, TaskService<?> taskService) throws IOException {
         taskService.updateMsg("Downloading file ...");
         long fileLength = entity.getContentLength();
-        int additionalProgressNumber = 4;
-        taskService.increaseProgressWithNewMax(fileLength + additionalProgressNumber);
+        taskService.init(fileLength);
+        taskService.increaseProgress();
 
         try (OutputStream outStream = new FileOutputStream(Paths.get(downloadLocation, distributionName).toFile());
              InputStream entityContent = entity.getContent()) {

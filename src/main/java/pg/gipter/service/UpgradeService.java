@@ -34,6 +34,8 @@ public class UpgradeService extends TaskService<Void> {
     }
 
     void upgradeAndRestartApplication() {
+        updateMessage("Upgrade to new version started.");
+        increaseProgress();
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
         try {
             Optional<String> homeDirectoryPath = AlertHelper.homeDirectoryPath();
@@ -89,7 +91,7 @@ public class UpgradeService extends TaskService<Void> {
                 sevenZFile.read(content, 0, content.length);
                 out.write(content);
                 out.close();
-                increaseTotalWorkAndProgress();
+                updateTaskProgress(Double.valueOf(5 * Math.pow(10, 5)).longValue());
             }
         } finally {
             updateMsg("Deleting downloaded file ...");
@@ -100,11 +102,11 @@ public class UpgradeService extends TaskService<Void> {
 
     private void restartApplication() throws IOException {
         updateMsg("Restarting application.");
-        workCompleted();
         final String javaBin = Paths.get(System.getProperty("java.home"), "bin", "java").toString();
         Optional<File> jarFile = AlertHelper.getJarFile();
 
         if (!jarFile.isPresent()) {
+            workCompleted();
             logger.error("Error when restarting application. Could not file jar file.");
             return;
         }
@@ -114,8 +116,11 @@ public class UpgradeService extends TaskService<Void> {
 
         if (!jarFile.get().exists() || !jarFile.get().isFile()) {
             logger.error("Error when restarting application. [{}] is not a file.", jarFile.get().getAbsolutePath());
+            workCompleted();
+            return;
         }
 
+        workCompleted();
         final LinkedList<String> command = Stream.of(
                 javaBin, "-jar", jarFile.get().getPath(), ArgName.upgradeFinished.name() + "=" + Boolean.TRUE
         ).collect(Collectors.toCollection(LinkedList::new));

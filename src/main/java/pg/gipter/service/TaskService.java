@@ -9,17 +9,16 @@ abstract class TaskService<T> extends Task<T> {
     protected Logger logger;
     private long maxWork;
     private long workDone;
+    private final int numberOfSteps = 3;
 
     protected TaskService() {
         logger = LoggerFactory.getLogger(getClass());
-        this.maxWork = 100;
         workDone = 0;
+        maxWork = (long) Math.pow(10, 6);
     }
 
-    void increaseTotalWorkAndProgress() {
-        workDone +=100;
-        maxWork += 100;
-        updateProgress(workDone, maxWork);
+    void init(long maxWork) {
+        this.maxWork = maxWork + (numberOfSteps - 1) * (long) Math.pow(10, 6);
     }
 
     void increaseProgress() {
@@ -32,9 +31,9 @@ abstract class TaskService<T> extends Task<T> {
         updateProgress(this.workDone, maxWork);
     }
 
-    void increaseProgressWithNewMax(long maxWork) {
-        this.maxWork = maxWork;
-        updateProgress(++workDone, this.maxWork);
+    void updateTaskProgress(long workDone) {
+        this.workDone += workDone;
+        updateProgress(this.workDone, maxWork);
     }
 
     void updateMsg(String message) {
