@@ -30,14 +30,14 @@ public enum ImageFile {
         return fileName;
     }
 
-    public static ImageFile randomPartialSuccessImage() {
-        return randomImage(EnumSet.of(ALMOST_ALL_PNG, MINION_NAPOLEON_GIF, MINION_FART_GIF));
-    }
-
     private static ImageFile randomImage(Set<ImageFile> set) {
         Random random = new Random();
         int imageIdx = random.nextInt(set.size());
         return new ArrayList<>(set).get(imageIdx);
+    }
+
+    public static ImageFile randomPartialSuccessImage() {
+        return randomImage(EnumSet.of(ALMOST_ALL_PNG, MINION_NAPOLEON_GIF, MINION_FART_GIF));
     }
 
     public static ImageFile randomSuccessImage() {
