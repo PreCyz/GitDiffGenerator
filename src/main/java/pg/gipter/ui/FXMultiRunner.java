@@ -265,14 +265,14 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                         .withLink(AlertHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING)
-                        .withImage(ImageFile.ALMOST_ALL_GIF);
+                        .withImage(ImageFile.randomPartialSuccessImage());
                 break;
             default:
                 alertWindowBuilder
                         .withLink(toolkitUserFolder())
                         .withWindowType(WindowType.BROWSER_WINDOW)
                         .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage(ImageFile.GOOD_JOB_PNG);
+                        .withImage(ImageFile.randomSuccessImage());
 
         }
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
