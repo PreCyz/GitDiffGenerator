@@ -165,6 +165,7 @@ public class UILauncher implements Launcher {
                             .withLink(GithubService.GITHUB_URL + "/releases/latest")
                             .withWindowType(WindowType.BROWSER_WINDOW)
                             .withAlertType(Alert.AlertType.INFORMATION)
+                            .withImage(ImageFile.MINION_AAAA_2_GIF)
                             .buildAndDisplayWindow()
                     );
                 }
