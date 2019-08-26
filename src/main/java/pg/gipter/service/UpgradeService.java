@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ArgName;
@@ -14,6 +13,7 @@ import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -94,10 +94,28 @@ public class UpgradeService extends TaskService<Void> {
                 out.close();
                 updateTaskProgress(Double.valueOf(5 * Math.pow(10, 5)).longValue());
             }
+        } catch (IOException ex) {
+            logger.error("What tha hell ?", ex);
+            throw ex;
         } finally {
             updateMsg(BundleUtils.getMsg("upgrade.progress.deleting"));
-            FileUtils.forceDelete(sevenZSourceFile);
+            forceDelete(sevenZSourceFile);
+        }
+    }
+
+    private void forceDelete(File sevenZSourceFile) throws IOException {
+        try {
+            boolean filePresent = sevenZSourceFile.exists();
+            if (!sevenZSourceFile.delete()) {
+                if (!filePresent) {
+                    throw new FileNotFoundException("File does not exist: " + sevenZSourceFile);
+                }
+                throw new IOException("Unable to delete file: " + sevenZSourceFile);
+            }
             logger.info("File [{}] deleted.", sevenZSourceFile.getName());
+        } catch (IOException ex) {
+            logger.error("Could not delete the {} file.", sevenZSourceFile.getName(), ex);
+            throw ex;
         }
     }
 
