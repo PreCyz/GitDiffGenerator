@@ -18,7 +18,7 @@ abstract class TaskService<T> extends Task<T> {
         maxWork = defaultValue;
     }
 
-    void init(long maxWork) {
+    void initProgress(long maxWork) {
         if (maxWork == 0) {
             maxWork = 20 * defaultValue;
         }
