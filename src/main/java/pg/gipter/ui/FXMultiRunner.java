@@ -13,6 +13,9 @@ import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
+import pg.gipter.statistic.dao.UserDao;
+import pg.gipter.statistic.dao.UserDaoFactory;
+import pg.gipter.statistic.dto.GipterUser;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
@@ -20,6 +23,8 @@ import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -62,6 +67,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private Collection<ApplicationProperties> applicationPropertiesCollection;
     private PropertiesDao propertiesDao;
     private DataDao dataDao;
+    private UserDao userDao;
 
     public FXMultiRunner(Set<String> configurationNames, Executor executor) {
         this.configurationNames = new LinkedList<>(configurationNames);
@@ -71,6 +77,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.applicationPropertiesCollection = Collections.emptyList();
         this.propertiesDao = DaoFactory.getPropertiesDao();
         this.dataDao = DaoFactory.getDataDao();
+        this.userDao = UserDaoFactory.getUserDao();
     }
 
     public FXMultiRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor) {
@@ -107,6 +114,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 logger.error("Diff upload failure.", ex);
                 resultMap.put(ex.getClass().getName(), new UploadResult(ex.getClass().getName(), Boolean.FALSE, ex));
             } finally {
+                updateStatistics();
                 status = calculateFinalStatus();
                 saveUploadStatus(status);
                 displayAlertWindow(status);
@@ -217,6 +225,22 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         }
         resultMap.put(configName, new UploadResult(configName, isUploaded, throwable));
         return isUploaded;
+    }
+
+    private void updateStatistics() {
+        if (userDao.isStatisticsAvailable()) {
+            executor.execute(() -> {
+                ApplicationProperties appProperties = new ArrayList<>(applicationPropertiesCollection).get(0);
+
+                GipterUser gipterUser = new GipterUser();
+                gipterUser.setUsername(appProperties.toolkitUsername());
+                gipterUser.setFirstExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                gipterUser.setLastExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                gipterUser.setJavaVersion(System.getProperty("java.home"));
+
+                userDao.updateUserStatistics(gipterUser);
+            });
+        }
     }
 
     private UploadStatus calculateFinalStatus() {

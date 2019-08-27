@@ -11,6 +11,7 @@ import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.BundleUtils;
 
@@ -43,6 +44,7 @@ public class UpgradeJob implements Job {
                     .withLink(GithubService.GITHUB_URL + "/releases/latest")
                     .withWindowType(WindowType.BROWSER_WINDOW)
                     .withAlertType(Alert.AlertType.INFORMATION)
+                    .withImage(ImageFile.MINION_AAAA_GIF)
                     .buildAndDisplayWindow()
             );
         }
