@@ -35,7 +35,7 @@ public class UpgradeService extends TaskService<Void> {
 
     void upgradeAndRestartApplication() {
         updateMessage(BundleUtils.getMsg("upgrade.progress.started"));
-        init(githubService.getFileSize().orElse(0L));
+        initProgress(githubService.getFileSize().orElse(0L));
         increaseProgress();
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
         try {
@@ -153,10 +153,5 @@ public class UpgradeService extends TaskService<Void> {
     protected Void call() {
         upgradeAndRestartApplication();
         return null;
-    }
-
-    @Override
-    public void run() {
-        super.run();
     }
 }
