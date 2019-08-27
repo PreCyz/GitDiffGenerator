@@ -1,7 +1,7 @@
 package pg.gipter.statistic.dao;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.statistic.dto.GipterUser;
+import pg.gipter.statistic.dto.Statistics;
 import pg.gipter.ui.UploadStatus;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ class UserDaoImplTest {
         UserDaoImpl userDao = new UserDaoImpl();
         assertThat(userDao.isStatisticsAvailable()).isTrue();
 
-        GipterUser user = new GipterUser();
+        Statistics user = new Statistics();
         user.setUsername("pawg");
         user.setFirstExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         user.setLastExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));

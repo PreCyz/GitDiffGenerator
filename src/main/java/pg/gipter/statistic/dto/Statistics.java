@@ -1,12 +1,13 @@
 package pg.gipter.statistic.dto;
 
+import pg.gipter.ui.RunType;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.Serializable;
 
-public class GipterUser implements Serializable {
+public class Statistics implements Serializable {
 
-    public static final String COLLECTION_NAME = "users";
+    public static final String COLLECTION_NAME = "statistics";
 
     private String id;
     private String username;
@@ -14,6 +15,7 @@ public class GipterUser implements Serializable {
     private String firstExecutionDate;
     private String javaVersion;
     private UploadStatus lastUpdateStatus;
+    private RunType lastRunType;
 
     public String getId() {
         return id;
@@ -61,5 +63,13 @@ public class GipterUser implements Serializable {
 
     public UploadStatus getLastUpdateStatus() {
         return lastUpdateStatus;
+    }
+
+    public RunType getLastRunType() {
+        return lastRunType;
+    }
+
+    public void setLastRunType(RunType lastRunType) {
+        this.lastRunType = lastRunType;
     }
 }

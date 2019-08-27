@@ -15,7 +15,7 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.statistic.dao.UserDao;
 import pg.gipter.statistic.dao.UserDaoFactory;
-import pg.gipter.statistic.dto.GipterUser;
+import pg.gipter.statistic.dto.Statistics;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
@@ -33,7 +33,9 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
 
-/** Created by Pawel Gawedzki on 15-Jul-2019. */
+/**
+ * Created by Pawel Gawedzki on 15-Jul-2019.
+ */
 public class FXMultiRunner extends Task<Void> implements Starter {
 
     private static class UploadResult {
@@ -68,8 +70,9 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private PropertiesDao propertiesDao;
     private DataDao dataDao;
     private UserDao userDao;
+    private RunType runType;
 
-    public FXMultiRunner(Set<String> configurationNames, Executor executor) {
+    public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType) {
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
         this.totalProgress = configurationNames.size() * 5;
@@ -78,10 +81,17 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.propertiesDao = DaoFactory.getPropertiesDao();
         this.dataDao = DaoFactory.getDataDao();
         this.userDao = UserDaoFactory.getUserDao();
+        this.runType = runType;
     }
 
-    public FXMultiRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor) {
-        this(applicationPropertiesCollection.stream().map(ApplicationProperties::configurationName).collect(toCollection(LinkedHashSet::new)), executor);
+    public FXMultiRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor, RunType runType) {
+        this(
+                applicationPropertiesCollection.stream()
+                        .map(ApplicationProperties::configurationName)
+                        .collect(toCollection(LinkedHashSet::new)),
+                executor,
+                runType
+        );
         this.applicationPropertiesCollection = applicationPropertiesCollection;
     }
 
@@ -232,14 +242,15 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             executor.execute(() -> {
                 ApplicationProperties appProperties = new ArrayList<>(applicationPropertiesCollection).get(0);
 
-                GipterUser gipterUser = new GipterUser();
-                gipterUser.setUsername(appProperties.toolkitUsername());
-                gipterUser.setFirstExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-                gipterUser.setLastExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-                gipterUser.setJavaVersion(System.getProperty("java.version"));
-                gipterUser.setLastUpdateStatus(status);
+                Statistics statistics = new Statistics();
+                statistics.setUsername(appProperties.toolkitUsername());
+                statistics.setFirstExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                statistics.setLastExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                statistics.setJavaVersion(System.getProperty("java.version"));
+                statistics.setLastUpdateStatus(status);
+                statistics.setLastRunType(runType);
 
-                userDao.updateUserStatistics(gipterUser);
+                userDao.updateUserStatistics(statistics);
             });
         }
     }

@@ -1,9 +1,9 @@
 package pg.gipter.statistic.dao;
 
-import pg.gipter.statistic.dto.GipterUser;
+import pg.gipter.statistic.dto.Statistics;
 
 public interface UserDao {
 
-    void updateUserStatistics(GipterUser user);
+    void updateUserStatistics(Statistics user);
     boolean isStatisticsAvailable();
 }

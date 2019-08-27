@@ -12,6 +12,7 @@ import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.FXMultiRunner;
+import pg.gipter.ui.RunType;
 import pg.gipter.ui.UILauncher;
 
 import java.text.ParseException;
@@ -49,7 +50,7 @@ public class UploadItemJob implements Job {
         LinkedList<String> configurationNames = new LinkedList<>(Arrays.asList(configNames.split(UploadJobCreator.CONFIG_DELIMITER)));
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
 
-        new FXMultiRunner(new LinkedHashSet<>(configurationNames), uiLauncher.nonUIExecutor()).start();
+        new FXMultiRunner(new LinkedHashSet<>(configurationNames), uiLauncher.nonUIExecutor(), RunType.UPLOAD_ITEM_JOB).start();
 
         logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         dataDao.saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));

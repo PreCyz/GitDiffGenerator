@@ -9,7 +9,7 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import pg.gipter.dao.MongoDaoConfig;
-import pg.gipter.statistic.dto.GipterUser;
+import pg.gipter.statistic.dto.Statistics;
 
 class UserDaoImpl extends MongoDaoConfig implements UserDao {
 
@@ -17,14 +17,14 @@ class UserDaoImpl extends MongoDaoConfig implements UserDao {
 
     UserDaoImpl() {
         super();
-        usersCollection = database.getCollection(GipterUser.COLLECTION_NAME);
+        usersCollection = database.getCollection(Statistics.COLLECTION_NAME);
     }
 
     @Override
-    public void updateUserStatistics(GipterUser user) {
+    public void updateUserStatistics(Statistics user) {
         Bson searchQuery = Filters.eq("username", user.getUsername());
 
-        Document userToUpsert = Document.parse(new Gson().toJson(user, GipterUser.class));
+        Document userToUpsert = Document.parse(new Gson().toJson(user, Statistics.class));
 
         FindIterable<Document> users = usersCollection.find(searchQuery);
         try (MongoCursor<Document> cursor = users.cursor()) {
@@ -33,6 +33,7 @@ class UserDaoImpl extends MongoDaoConfig implements UserDao {
                 userToUpsert.put("lastExecutionDate", user.getLastExecutionDate());
                 userToUpsert.put("javaVersion", user.getJavaVersion());
                 userToUpsert.put("lastUpdateStatus", user.getLastUpdateStatus().name());
+                userToUpsert.put("lastRunType", user.getLastRunType().name());
                 searchQuery = Filters.eq(userToUpsert.getObjectId("_id"));
 
                 usersCollection.updateOne(searchQuery, new BasicDBObject().append("$set", userToUpsert));

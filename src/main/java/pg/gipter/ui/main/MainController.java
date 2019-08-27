@@ -39,10 +39,7 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
-import pg.gipter.ui.AbstractController;
-import pg.gipter.ui.FXMultiRunner;
-import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.UploadStatus;
+import pg.gipter.ui.*;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
@@ -519,7 +516,11 @@ public class MainController extends AbstractController {
             String[] args = createArgsFromUI();
             ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
 
-            FXMultiRunner runner = new FXMultiRunner(Stream.of(uiAppProperties).collect(Collectors.toList()), uiLauncher.nonUIExecutor());
+            FXMultiRunner runner = new FXMultiRunner(
+                    Stream.of(uiAppProperties).collect(Collectors.toList()),
+                    uiLauncher.nonUIExecutor(),
+                    RunType.EXECUTE
+            );
             resetIndicatorProperties(runner);
             uiLauncher.executeOutsideUIThread(() -> {
                 runner.start();
@@ -555,7 +556,7 @@ public class MainController extends AbstractController {
             Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
             map.put(uiAppProperties.configurationName(), uiAppProperties);
 
-            FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor());
+            FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
             resetIndicatorProperties(runner);
             uiLauncher.executeOutsideUIThread(() -> {
                 runner.call();
