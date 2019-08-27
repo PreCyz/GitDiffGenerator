@@ -13,11 +13,11 @@ import pg.gipter.statistic.dto.Statistics;
 
 class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
 
-    private MongoCollection<Document> usersCollection;
+    private MongoCollection<Document> statisticsCollection;
 
     StatisticDaoImpl() {
         super();
-        usersCollection = database.getCollection(Statistics.COLLECTION_NAME);
+        statisticsCollection = database != null ? database.getCollection(Statistics.COLLECTION_NAME) : null;
     }
 
     @Override
@@ -26,7 +26,7 @@ class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
 
         Document userToUpsert = Document.parse(new Gson().toJson(statistics, Statistics.class));
 
-        FindIterable<Document> users = usersCollection.find(searchQuery);
+        FindIterable<Document> users = statisticsCollection.find(searchQuery);
         try (MongoCursor<Document> cursor = users.cursor()) {
             if (cursor.hasNext()) {
                 userToUpsert = cursor.next();
@@ -36,9 +36,9 @@ class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
                 userToUpsert.put("lastRunType", statistics.getLastRunType().name());
                 searchQuery = Filters.eq(userToUpsert.getObjectId("_id"));
 
-                usersCollection.updateOne(searchQuery, new BasicDBObject().append("$set", userToUpsert));
+                statisticsCollection.updateOne(searchQuery, new BasicDBObject().append("$set", userToUpsert));
             } else {
-                usersCollection.insertOne(userToUpsert);
+                statisticsCollection.insertOne(userToUpsert);
             }
             logger.info("User statistics updated.");
         } catch (Exception ex) {

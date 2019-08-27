@@ -252,6 +252,8 @@ public class FXMultiRunner extends Task<Void> implements Starter {
 
                 userDao.updateStatistics(statistics);
             });
+        } else {
+            logger.info("Statistics are not available and have not been updated.");
         }
     }
 
