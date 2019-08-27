@@ -3,6 +3,8 @@ package pg.gipter.dao;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pg.gipter.settings.ArgName;
+import pg.gipter.utils.PasswordUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,7 +37,7 @@ class PropertiesConverterImplTest {
     @Test
     void givenBothApplicationProperties_whenConvertPropertiesToJson_thenCreateJsonConfigFile() {
         Properties properties = TestDataFactory.generateProperty();
-        propertiesDao.encryptPassword(properties);
+        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
         propertiesDao.saveProperties(properties, PropertiesDaoImpl.APPLICATION_PROPERTIES);
         propertiesDao.saveProperties(properties, PropertiesDaoImpl.UI_APPLICATION_PROPERTIES);
         assertThat(Files.exists(Paths.get(PropertiesDaoImpl.APPLICATION_PROPERTIES))).isTrue();

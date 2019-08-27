@@ -1,5 +1,7 @@
 package pg.gipter.statistic.dto;
 
+import pg.gipter.ui.UploadStatus;
+
 import java.io.Serializable;
 
 public class GipterUser implements Serializable {
@@ -11,6 +13,7 @@ public class GipterUser implements Serializable {
     private String lastExecutionDate;
     private String firstExecutionDate;
     private String javaVersion;
+    private UploadStatus lastUpdateStatus;
 
     public String getId() {
         return id;
@@ -50,5 +53,13 @@ public class GipterUser implements Serializable {
 
     public void setJavaVersion(String javaVersion) {
         this.javaVersion = javaVersion;
+    }
+
+    public void setLastUpdateStatus(UploadStatus lastUpdateStatus) {
+        this.lastUpdateStatus = lastUpdateStatus;
+    }
+
+    public UploadStatus getLastUpdateStatus() {
+        return lastUpdateStatus;
     }
 }

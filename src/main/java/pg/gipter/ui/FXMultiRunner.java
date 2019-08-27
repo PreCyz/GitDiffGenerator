@@ -114,9 +114,9 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 logger.error("Diff upload failure.", ex);
                 resultMap.put(ex.getClass().getName(), new UploadResult(ex.getClass().getName(), Boolean.FALSE, ex));
             } finally {
-                updateStatistics();
                 status = calculateFinalStatus();
                 saveUploadStatus(status);
+                updateStatistics(status);
                 displayAlertWindow(status);
             }
         }
@@ -227,7 +227,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         return isUploaded;
     }
 
-    private void updateStatistics() {
+    private void updateStatistics(final UploadStatus status) {
         if (userDao.isStatisticsAvailable()) {
             executor.execute(() -> {
                 ApplicationProperties appProperties = new ArrayList<>(applicationPropertiesCollection).get(0);
@@ -236,7 +236,8 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 gipterUser.setUsername(appProperties.toolkitUsername());
                 gipterUser.setFirstExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
                 gipterUser.setLastExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-                gipterUser.setJavaVersion(System.getProperty("java.home"));
+                gipterUser.setJavaVersion(System.getProperty("java.version"));
+                gipterUser.setLastUpdateStatus(status);
 
                 userDao.updateUserStatistics(gipterUser);
             });
