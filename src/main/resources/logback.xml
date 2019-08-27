@@ -38,12 +38,27 @@
         </rollingPolicy>
     </appender>
 
+    <appender name="MONGODB" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/mongodb.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5level] [%thread] %-30.30logger: %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>./logs/mongodb-%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
     <logger name="pg.gipter" level="all">
         <appender-ref ref="GIPTER" />
     </logger>
 
     <logger name="org.springframework" level="all" >
         <appender-ref ref="SPRING" />
+    </logger>
+
+    <logger name="org.mongodb" level="all" >
+        <appender-ref ref="MONGODB" />
     </logger>
 
     <logger name="org.quartz" level="all" >
@@ -54,5 +69,6 @@
         <appender-ref ref="CONSOLE" />
         <!--<appender-ref ref="GIPTER" />-->
         <!--<appender-ref ref="SPRING" />-->
+        <!--<appender-ref ref="MONGODB" />-->
     </root>
 </configuration>
