@@ -1,10 +1,10 @@
 package pg.gipter.dao;
 
-import com.mongodb.*;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientURI;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoDatabase;
-import io.github.cbartosiak.bson.codecs.jsr310.localdatetime.LocalDateTimeAsStringCodec;
-import org.bson.codecs.configuration.CodecRegistries;
-import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.utils.PasswordUtils;
@@ -69,12 +69,7 @@ public abstract class MongoDaoConfig {
         MongoClientURI mongoClientURI = new MongoClientURI(uri, mongoClientOptionsBuilder);
         mongoClient = new MongoClient(mongoClientURI);
 
-        CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
-                MongoClientSettings.getDefaultCodecRegistry(),
-                CodecRegistries.fromCodecs(new LocalDateTimeAsStringCodec())
-        );
-
-        database = mongoClient.getDatabase(databaseName).withCodecRegistry(codecRegistry);
+        database = mongoClient.getDatabase(databaseName);
         logger.info("Connection to database established.");
     }
 

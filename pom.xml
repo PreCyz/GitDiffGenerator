@@ -208,11 +208,6 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>3.11.0</version>
         </dependency>
-        <dependency>
-            <groupId>io.github.cbartosiak</groupId>
-            <artifactId>bson-codecs-jsr310</artifactId>
-            <version>3.4.0</version>
-        </dependency>
 
 
         <!--Unit tests-->
