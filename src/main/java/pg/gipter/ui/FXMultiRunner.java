@@ -13,8 +13,8 @@ import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.statistic.dao.UserDao;
-import pg.gipter.statistic.dao.UserDaoFactory;
+import pg.gipter.statistic.dao.StatisticDao;
+import pg.gipter.statistic.dao.StatisticDaoFactory;
 import pg.gipter.statistic.dto.Statistics;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alert.AlertWindowBuilder;
@@ -69,7 +69,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private Collection<ApplicationProperties> applicationPropertiesCollection;
     private PropertiesDao propertiesDao;
     private DataDao dataDao;
-    private UserDao userDao;
+    private StatisticDao userDao;
     private RunType runType;
 
     public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType) {
@@ -80,7 +80,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.applicationPropertiesCollection = Collections.emptyList();
         this.propertiesDao = DaoFactory.getPropertiesDao();
         this.dataDao = DaoFactory.getDataDao();
-        this.userDao = UserDaoFactory.getUserDao();
+        this.userDao = StatisticDaoFactory.getUserDao();
         this.runType = runType;
     }
 
@@ -250,7 +250,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 statistics.setLastUpdateStatus(status);
                 statistics.setLastRunType(runType);
 
-                userDao.updateUserStatistics(statistics);
+                userDao.updateStatistics(statistics);
             });
         }
     }

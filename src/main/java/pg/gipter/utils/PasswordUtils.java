@@ -11,7 +11,7 @@ public final class PasswordUtils {
 
     public static void decryptPassword(Properties properties, String propertyKey) {
         try {
-            properties.replace("db.password", CryptoUtils.decrypt(properties.getProperty("db.password")));
+            properties.replace(propertyKey, CryptoUtils.decrypt(properties.getProperty(propertyKey)));
         } catch (GeneralSecurityException e) {
             LoggerFactory.getLogger(PasswordUtils.class).warn("Can not decode property. {}", e.getMessage(), e);
         }

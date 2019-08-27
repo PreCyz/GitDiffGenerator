@@ -11,29 +11,29 @@ import org.bson.conversions.Bson;
 import pg.gipter.dao.MongoDaoConfig;
 import pg.gipter.statistic.dto.Statistics;
 
-class UserDaoImpl extends MongoDaoConfig implements UserDao {
+class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
 
     private MongoCollection<Document> usersCollection;
 
-    UserDaoImpl() {
+    StatisticDaoImpl() {
         super();
         usersCollection = database.getCollection(Statistics.COLLECTION_NAME);
     }
 
     @Override
-    public void updateUserStatistics(Statistics user) {
-        Bson searchQuery = Filters.eq("username", user.getUsername());
+    public void updateStatistics(Statistics statistics) {
+        Bson searchQuery = Filters.eq("username", statistics.getUsername());
 
-        Document userToUpsert = Document.parse(new Gson().toJson(user, Statistics.class));
+        Document userToUpsert = Document.parse(new Gson().toJson(statistics, Statistics.class));
 
         FindIterable<Document> users = usersCollection.find(searchQuery);
         try (MongoCursor<Document> cursor = users.cursor()) {
             if (cursor.hasNext()) {
                 userToUpsert = cursor.next();
-                userToUpsert.put("lastExecutionDate", user.getLastExecutionDate());
-                userToUpsert.put("javaVersion", user.getJavaVersion());
-                userToUpsert.put("lastUpdateStatus", user.getLastUpdateStatus().name());
-                userToUpsert.put("lastRunType", user.getLastRunType().name());
+                userToUpsert.put("lastExecutionDate", statistics.getLastExecutionDate());
+                userToUpsert.put("javaVersion", statistics.getJavaVersion());
+                userToUpsert.put("lastUpdateStatus", statistics.getLastUpdateStatus().name());
+                userToUpsert.put("lastRunType", statistics.getLastRunType().name());
                 searchQuery = Filters.eq(userToUpsert.getObjectId("_id"));
 
                 usersCollection.updateOne(searchQuery, new BasicDBObject().append("$set", userToUpsert));

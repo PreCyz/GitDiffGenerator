@@ -25,7 +25,7 @@ public abstract class MongoDaoConfig {
     private String password;
     private String databaseName;
     private static MongoClient mongoClient;
-    protected MongoDatabase database;
+    protected static MongoDatabase database;
 
     private boolean statisticsAvailable;
 

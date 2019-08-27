@@ -195,7 +195,9 @@ class TrayHandler {
     }
 
     private ActionListener uploadActionListener() {
-        return e -> executor.execute(() -> new FXMultiRunner(propertiesDao.loadAllApplicationProperties().keySet(), executor).start());
+        return e -> executor.execute(() ->
+                new FXMultiRunner(propertiesDao.loadAllApplicationProperties().keySet(), executor, RunType.TRAY).start()
+        );
     }
 
     private ActionListener cancelJobActionListener() {
