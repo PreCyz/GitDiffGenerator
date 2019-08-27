@@ -1,4 +1,4 @@
-package pg.gipter.statistic.dao;
+package pg.gipter.dao;
 
 import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
@@ -8,7 +8,6 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import pg.gipter.dao.MongoDaoConfig;
 import pg.gipter.statistic.dto.Statistics;
 
 class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {

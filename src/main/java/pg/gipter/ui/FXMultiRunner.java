@@ -8,13 +8,12 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.dao.DaoFactory;
 import pg.gipter.dao.DataDao;
 import pg.gipter.dao.PropertiesDao;
+import pg.gipter.dao.StatisticDao;
 import pg.gipter.launcher.Starter;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.statistic.dao.StatisticDao;
-import pg.gipter.statistic.dao.StatisticDaoFactory;
 import pg.gipter.statistic.dto.Statistics;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alert.AlertWindowBuilder;
@@ -69,7 +68,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private Collection<ApplicationProperties> applicationPropertiesCollection;
     private PropertiesDao propertiesDao;
     private DataDao dataDao;
-    private StatisticDao userDao;
+    private StatisticDao statisticDao;
     private RunType runType;
 
     public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType) {
@@ -80,7 +79,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.applicationPropertiesCollection = Collections.emptyList();
         this.propertiesDao = DaoFactory.getPropertiesDao();
         this.dataDao = DaoFactory.getDataDao();
-        this.userDao = StatisticDaoFactory.getUserDao();
+        this.statisticDao = DaoFactory.getStatisticDao();
         this.runType = runType;
     }
 
@@ -238,7 +237,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     }
 
     private void updateStatistics(final UploadStatus status) {
-        if (userDao.isStatisticsAvailable()) {
+        if (statisticDao.isStatisticsAvailable()) {
             executor.execute(() -> {
                 ApplicationProperties appProperties = new ArrayList<>(applicationPropertiesCollection).get(0);
 
@@ -250,7 +249,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 statistics.setLastUpdateStatus(status);
                 statistics.setLastRunType(runType);
 
-                userDao.updateStatistics(statistics);
+                statisticDao.updateStatistics(statistics);
             });
         } else {
             logger.info("Statistics are not available and have not been updated.");

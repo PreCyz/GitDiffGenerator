@@ -1,4 +1,4 @@
-package pg.gipter.statistic.dao;
+package pg.gipter.dao;
 
 import pg.gipter.statistic.dto.Statistics;
 

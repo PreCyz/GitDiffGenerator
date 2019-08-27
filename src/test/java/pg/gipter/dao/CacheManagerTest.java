@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
+import pg.gipter.utils.PasswordUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,6 +47,8 @@ class CacheManagerTest {
         String confName = "confName";
         Properties props = new Properties();
         props.put(ArgName.configurationName.name(), confName);
+        props.put(ArgName.toolkitPassword.name(), "somePass");
+        PasswordUtils.encryptPassword(props, ArgName.toolkitPassword.name());
         DaoFactory.getPropertiesDao().saveRunConfig(props);
 
         ApplicationProperties applicationProperties = CacheManager.getApplicationProperties(confName);
