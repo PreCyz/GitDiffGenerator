@@ -4,7 +4,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
 import com.mongodb.WriteConcern;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.utils.PasswordUtils;
@@ -19,30 +20,18 @@ public abstract class MongoDaoConfig {
     protected final Logger logger;
 
     private final String DB_CONFIG = "db.properties";
-
-    private String host;
-    private String username;
-    private String password;
-    private String databaseName;
     private static MongoClient mongoClient;
-    protected static MongoDatabase database;
+
+    private String collectionName;
+    protected MongoCollection<Document> collection;
 
     private boolean statisticsAvailable;
 
-    public MongoDaoConfig() {
+    protected MongoDaoConfig(String collectionName) {
         logger = LoggerFactory.getLogger(getClass());
+        this.collectionName = collectionName;
         if (mongoClient == null) {
-            Optional<Properties> properties = loadProperties();
-            if (properties.isPresent()) {
-                Properties dbConfig = properties.get();
-                PasswordUtils.decryptPassword(dbConfig, "db.password");
-                host = dbConfig.getProperty("db.host");
-                username = dbConfig.getProperty("db.username");
-                password = dbConfig.getProperty("db.password");
-                databaseName = dbConfig.getProperty("db.dbName");
-                init();
-                statisticsAvailable = true;
-            }
+            init(loadProperties().orElseGet(() -> MongoConfig.dbProperties));
         }
     }
 
@@ -62,15 +51,28 @@ public abstract class MongoDaoConfig {
         return Optional.ofNullable(properties);
     }
 
-    private void init() {
-        MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
-                .writeConcern(WriteConcern.ACKNOWLEDGED);
-        String uri = String.format("mongodb+srv://%s:%s@%s", username, password, host);
-        MongoClientURI mongoClientURI = new MongoClientURI(uri, mongoClientOptionsBuilder);
-        mongoClient = new MongoClient(mongoClientURI);
+    private void init(Properties dbConfig) {
+        try {
+            PasswordUtils.decryptPassword(dbConfig, "db.password");
+            String host = dbConfig.getProperty("db.host");
+            String username = dbConfig.getProperty("db.username");
+            String password = dbConfig.getProperty("db.password");
+            String databaseName = dbConfig.getProperty("db.dbName");
 
-        database = mongoClient.getDatabase(databaseName);
-        logger.info("Connection to database established.");
+            MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
+                    .writeConcern(WriteConcern.ACKNOWLEDGED);
+            String uri = String.format("mongodb+srv://%s:%s@%s", username, password, host);
+            MongoClientURI mongoClientURI = new MongoClientURI(uri, mongoClientOptionsBuilder);
+            MongoDaoConfig.mongoClient = new MongoClient(mongoClientURI);
+
+            collection = mongoClient.getDatabase(databaseName).getCollection(collectionName);
+            statisticsAvailable = true;
+
+            logger.info("Connection to the database established. [host: {}, databaseName: {}]", host, databaseName);
+        } catch (Exception ex) {
+            logger.error("Can not establish connection to the database.");
+            statisticsAvailable = false;
+        }
     }
 
     public boolean isStatisticsAvailable() {
@@ -80,6 +82,6 @@ public abstract class MongoDaoConfig {
     public void refreshConnection() {
         logger.info("Refreshing connection to database.");
         mongoClient = null;
-        init();
+        init(loadProperties().orElseGet(() -> MongoConfig.dbProperties));
     }
 }
