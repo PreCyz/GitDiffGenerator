@@ -6,8 +6,8 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import pg.gipter.statistic.dto.Statistics;
+import pg.gipter.utils.StringUtils;
 
 class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
 
@@ -17,21 +17,27 @@ class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
 
     @Override
     public void updateStatistics(Statistics statistics) {
-        Bson searchQuery = Filters.eq("username", statistics.getUsername());
+        FindIterable<Document> users = collection.find(Filters.eq("username", statistics.getUsername()));
 
-        Document userToUpsert = Document.parse(new Gson().toJson(statistics, Statistics.class));
-
-        FindIterable<Document> users = collection.find(searchQuery);
         try (MongoCursor<Document> cursor = users.cursor()) {
+            Document userToUpsert = Document.parse(new Gson().toJson(statistics, Statistics.class));
             if (cursor.hasNext()) {
                 userToUpsert = cursor.next();
                 userToUpsert.put("lastExecutionDate", statistics.getLastExecutionDate());
                 userToUpsert.put("javaVersion", statistics.getJavaVersion());
                 userToUpsert.put("lastUpdateStatus", statistics.getLastUpdateStatus().name());
                 userToUpsert.put("lastRunType", statistics.getLastRunType().name());
-                searchQuery = Filters.eq(userToUpsert.getObjectId("_id"));
+                if (!StringUtils.nullOrEmpty(statistics.getLastSuccessDate())) {
+                    userToUpsert.put("lastSuccessDate", statistics.getLastSuccessDate());
+                }
+                if (!StringUtils.nullOrEmpty(statistics.getLastFailedDate())) {
+                    userToUpsert.put("lastFailedDate", statistics.getLastFailedDate());
+                }
 
-                collection.updateOne(searchQuery, new BasicDBObject().append("$set", userToUpsert));
+                collection.updateOne(
+                        Filters.eq(userToUpsert.getObjectId("_id")),
+                        new BasicDBObject().append("$set", userToUpsert)
+                );
             } else {
                 collection.insertOne(userToUpsert);
             }

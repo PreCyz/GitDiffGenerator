@@ -241,13 +241,19 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             executor.execute(() -> {
                 ApplicationProperties appProperties = new ArrayList<>(applicationPropertiesCollection).get(0);
 
+                String now = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
                 Statistics statistics = new Statistics();
                 statistics.setUsername(appProperties.toolkitUsername());
-                statistics.setFirstExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-                statistics.setLastExecutionDate(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                statistics.setFirstExecutionDate(now);
+                statistics.setLastExecutionDate(now);
                 statistics.setJavaVersion(System.getProperty("java.version"));
                 statistics.setLastUpdateStatus(status);
                 statistics.setLastRunType(runType);
+                if (EnumSet.of(UploadStatus.FAIL, UploadStatus.N_A).contains(status)) {
+                    statistics.setLastFailedDate(now);
+                } else if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(status)) {
+                    statistics.setLastSuccessDate(now);
+                }
 
                 statisticDao.updateStatistics(statistics);
             });

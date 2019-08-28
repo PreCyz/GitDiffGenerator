@@ -13,6 +13,8 @@ public class Statistics implements Serializable {
     private String username;
     private String lastExecutionDate;
     private String firstExecutionDate;
+    private String lastSuccessDate;
+    private String lastFailedDate;
     private String javaVersion;
     private UploadStatus lastUpdateStatus;
     private RunType lastRunType;
@@ -71,5 +73,21 @@ public class Statistics implements Serializable {
 
     public void setLastRunType(RunType lastRunType) {
         this.lastRunType = lastRunType;
+    }
+
+    public String getLastSuccessDate() {
+        return lastSuccessDate;
+    }
+
+    public void setLastSuccessDate(String lastSuccessDate) {
+        this.lastSuccessDate = lastSuccessDate;
+    }
+
+    public String getLastFailedDate() {
+        return lastFailedDate;
+    }
+
+    public void setLastFailedDate(String lastFailedDate) {
+        this.lastFailedDate = lastFailedDate;
     }
 }
