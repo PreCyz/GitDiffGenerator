@@ -68,7 +68,6 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private Collection<ApplicationProperties> applicationPropertiesCollection;
     private PropertiesDao propertiesDao;
     private DataDao dataDao;
-    private StatisticDao statisticDao;
     private RunType runType;
 
     public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType) {
@@ -79,7 +78,6 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.applicationPropertiesCollection = Collections.emptyList();
         this.propertiesDao = DaoFactory.getPropertiesDao();
         this.dataDao = DaoFactory.getDataDao();
-        this.statisticDao = DaoFactory.getStatisticDao();
         this.runType = runType;
     }
 
@@ -237,8 +235,10 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     }
 
     private void updateStatistics(final UploadStatus status) {
-        if (statisticDao.isStatisticsAvailable()) {
-            executor.execute(() -> {
+        executor.execute(() -> {
+            StatisticDao statisticDao = DaoFactory.getStatisticDao();
+            if (statisticDao.isStatisticsAvailable()) {
+
                 ApplicationProperties appProperties = new ArrayList<>(applicationPropertiesCollection).get(0);
 
                 String now = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
@@ -256,10 +256,10 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 }
 
                 statisticDao.updateStatistics(statistics);
-            });
-        } else {
-            logger.info("Statistics are not available and have not been updated.");
-        }
+            } else {
+                logger.info("Statistics are not available and have not been updated.");
+            }
+        });
     }
 
     private UploadStatus calculateFinalStatus() {
