@@ -59,6 +59,7 @@ When application is executed with `uploadType = TOOLKIT_DOCS', then item file is
 **activeTray** - used in UI, tells if tray icon should be active or not. Default value is `Y`.<br/>
 **silentMode** - used in UI, tells if application should be executed and located directly in tray icon. It is used by startup functionality. Default value is `N`.<br/>
 **enableOnStartup** - used in UI, enables application on system start up, if value on  is `Y` then application will be launched on system start.<br/>
+**loggerLevel** - If given then all loggers in the application has that logger level.<br/>
 
 Below parameters are mandatory for toolkit:<br/>
 **toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />

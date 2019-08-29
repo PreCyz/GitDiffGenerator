@@ -1,5 +1,7 @@
 package pg.gipter;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -11,11 +13,18 @@ import pg.gipter.launcher.Launcher;
 import pg.gipter.launcher.LauncherFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
+import pg.gipter.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.stream.Stream;
 
-/**Created by Pawel Gawedzki on 17-Sep-2018*/
+import static java.util.stream.Collectors.toSet;
+
+/**
+ * Created by Pawel Gawedzki on 17-Sep-2018
+ */
 public class Main extends Application {
 
     private static ApplicationProperties applicationProperties;
@@ -31,11 +40,25 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+        setLoggerLevel(applicationProperties.loggerLevel());
         logger.info("Version of application '{}'.", applicationProperties.version());
         logger.info("Gipter can use '{}' threads.", Runtime.getRuntime().availableProcessors());
         convertPropertiesToNewFormat();
         Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
         launcher.execute();
+    }
+
+    private void setLoggerLevel(String loggerLevel) {
+        if (!StringUtils.nullOrEmpty(loggerLevel)) {
+            Set<String> loggers = Stream.of("pg.gipter", "org.springframework", "org.mongodb", "org.quartz").collect(toSet());
+            LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+            for (String loggerName : loggers) {
+                ch.qos.logback.classic.Logger logger = loggerContext.getLogger(loggerName);
+                logger.setLevel(Level.toLevel(loggerLevel));
+                Main.logger.info("Level of the logger [{}] is set to [{}]", loggerName, Level.toLevel(loggerLevel));
+            }
+        }
     }
 
     private void convertPropertiesToNewFormat() {

@@ -303,4 +303,14 @@ class CliApplicationProperties extends ApplicationProperties {
         return upgradeFinished;
     }
 
+    @Override
+    public String loggerLevel() {
+        String loggerLevel = argExtractor.loggerLevel();
+        String argName = ArgName.loggerLevel.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            loggerLevel = properties.getProperty(argName, loggerLevel);
+        }
+        return loggerLevel;
+    }
+
 }

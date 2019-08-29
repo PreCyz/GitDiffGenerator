@@ -262,4 +262,11 @@ final class ArgExtractor {
         }
         return StringUtils.getBoolean(ArgName.upgradeFinished.defaultValue());
     }
+
+    public String loggerLevel() {
+        if (containsArg(ArgName.loggerLevel.name())) {
+            return getValue(ArgName.loggerLevel, ArgName.loggerLevel.defaultValue());
+        }
+        return ArgName.loggerLevel.defaultValue();
+    }
 }

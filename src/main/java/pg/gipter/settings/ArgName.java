@@ -35,6 +35,7 @@ public enum ArgName {
     silentMode("N"),
     upgradeFinished("N"),
     enableOnStartup("Y"),
+    loggerLevel(""),
 
     toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
     toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),

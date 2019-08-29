@@ -291,4 +291,12 @@ class FileApplicationProperties extends ApplicationProperties {
         return argExtractor.isUpgradeFinished();
     }
 
+    @Override
+    public String loggerLevel() {
+        if (hasProperties()) {
+            return properties.getProperty(ArgName.loggerLevel.name(), argExtractor.loggerLevel());
+        }
+        return argExtractor.loggerLevel();
+    }
+
 }

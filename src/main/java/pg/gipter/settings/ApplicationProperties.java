@@ -246,7 +246,8 @@ public abstract class ApplicationProperties {
                 ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\'' +
                 ", deleteDownloadedFiles='" + isDeleteDownloadedFiles() + '\'' +
                 ", enableOnStartup='" + isEnableOnStartup() + '\'' +
-                ", upgradeFinished='" + isUpgradeFinished() + '\''
+                ", upgradeFinished='" + isUpgradeFinished() + '\'' +
+                ", loggerLevel='" + loggerLevel() + '\''
         ;
     }
 
@@ -278,4 +279,5 @@ public abstract class ApplicationProperties {
     public abstract boolean isEnableOnStartup();
     public abstract String configurationName();
     public abstract boolean isUpgradeFinished();
+    public abstract String loggerLevel();
 }
