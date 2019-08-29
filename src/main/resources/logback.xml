@@ -57,11 +57,11 @@
         <appender-ref ref="SPRING" />
     </logger>
 
-    <logger name="org.mongodb" level="all" >
+    <logger name="org.mongodb" level="info" >
         <appender-ref ref="MONGODB" />
     </logger>
 
-    <logger name="org.quartz" level="all" >
+    <logger name="org.quartz" level="debug" >
         <appender-ref ref="QUARTZ" />
     </logger>
 
