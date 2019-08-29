@@ -2,7 +2,7 @@ package pg.gipter.dao;
 
 import java.util.Properties;
 
-public final class MongoConfig {
+final class MongoConfig {
 
     private MongoConfig() { }
 

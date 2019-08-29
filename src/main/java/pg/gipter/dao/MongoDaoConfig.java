@@ -20,20 +20,16 @@ public abstract class MongoDaoConfig {
     protected final Logger logger;
 
     private final String DB_CONFIG = "db.properties";
-    private static MongoClient mongoClient;
 
     private String collectionName;
-    protected static MongoCollection<Document> collection;
+    protected MongoCollection<Document> collection;
 
     private boolean statisticsAvailable;
 
     protected MongoDaoConfig(String collectionName) {
         logger = LoggerFactory.getLogger(getClass());
         this.collectionName = collectionName;
-        this.statisticsAvailable = mongoClient != null;
-        if (mongoClient == null) {
-            init(loadProperties().orElseGet(() -> MongoConfig.dbProperties));
-        }
+        init(loadProperties().orElseGet(() -> MongoConfig.dbProperties));
     }
 
     private Optional<Properties> loadProperties() {
@@ -64,7 +60,7 @@ public abstract class MongoDaoConfig {
                     .writeConcern(WriteConcern.ACKNOWLEDGED);
             String uri = String.format("mongodb+srv://%s:%s@%s", username, password, host);
             MongoClientURI mongoClientURI = new MongoClientURI(uri, mongoClientOptionsBuilder);
-            MongoDaoConfig.mongoClient = new MongoClient(mongoClientURI);
+            MongoClient mongoClient = new MongoClient(mongoClientURI);
 
             collection = mongoClient.getDatabase(databaseName).getCollection(collectionName);
             statisticsAvailable = true;
@@ -80,9 +76,4 @@ public abstract class MongoDaoConfig {
         return statisticsAvailable;
     }
 
-    public void refreshConnection() {
-        logger.info("Refreshing connection to database.");
-        mongoClient = null;
-        init(loadProperties().orElseGet(() -> MongoConfig.dbProperties));
-    }
 }

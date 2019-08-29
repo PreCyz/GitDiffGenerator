@@ -17,8 +17,9 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 /** Created by Pawel Gawedzki on 29-Aug-2019. */
 public class StatisticService {
@@ -57,9 +58,9 @@ public class StatisticService {
         return statistic;
     }
 
-    Map<VersionControlSystem, Set<String>> createControlSystemMap(Collection<ApplicationProperties> applicationPropertiesCollection) {
+    Map<VersionControlSystem, Set<String>> createControlSystemMap(Collection<ApplicationProperties> appPropertiesCollection) {
         Map<VersionControlSystem, Set<String>> controlSystemMap = new LinkedHashMap<>();
-        for (ApplicationProperties ap : applicationPropertiesCollection) {
+        for (ApplicationProperties ap : appPropertiesCollection) {
             for (String projectPath : ap.projectPaths()) {
                 VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath).toFile());
                 VCSVersionProducer vcsVersionProducer = VCSVersionProducerFactory.getInstance(vcs, projectPath);
@@ -67,7 +68,7 @@ public class StatisticService {
                     if (controlSystemMap.containsKey(vcs)) {
                         controlSystemMap.get(vcs).add(vcsVersionProducer.getVersion());
                     } else {
-                        controlSystemMap.put(vcs, Stream.of(vcsVersionProducer.getVersion()).collect(Collectors.toSet()));
+                        controlSystemMap.put(vcs, Stream.of(vcsVersionProducer.getVersion()).collect(toSet()));
                     }
                 } catch (IOException e) {
                     logger.warn("Can not get vcs version for project [{}]", projectPath);
