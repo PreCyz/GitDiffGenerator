@@ -391,14 +391,16 @@ public class UILauncher implements Launcher {
         mainWindow.hide();
     }
 
-    public void showProjectsWindow() {
+    public void showProjectsWindow(boolean shouldExecute) {
         Platform.runLater(() -> {
             projectsWindow = new Stage();
             projectsWindow.initModality(Modality.APPLICATION_MODAL);
             buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
             projectsWindow.setOnCloseRequest(event -> {
                 hideProjectsWindow();
-                execute();
+                if (shouldExecute) {
+                    execute();
+                }
             });
             projectsWindow.showAndWait();
         });
@@ -440,14 +442,16 @@ public class UILauncher implements Launcher {
         createSettingsWindow(WindowFactory.TOOLKIT_MENU);
     }
 
-    public void showToolkitProjectsWindow() {
+    public void showToolkitProjectsWindow(boolean shouldExecute) {
         Platform.runLater(() -> {
             toolkitProjectsWindow = new Stage();
             toolkitProjectsWindow.initModality(Modality.APPLICATION_MODAL);
             buildScene(toolkitProjectsWindow, WindowFactory.TOOLKIT_PROJECTS.createWindow(applicationProperties, this));
             toolkitProjectsWindow.setOnCloseRequest(event -> {
                 hideToolkitProjectsWindow();
-                execute();
+                if (shouldExecute) {
+                    execute();
+                }
             });
             toolkitProjectsWindow.showAndWait();
         });
