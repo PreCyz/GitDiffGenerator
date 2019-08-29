@@ -190,10 +190,6 @@ public class UILauncher implements Launcher {
                 mainWindow,
                 WindowFactory.MAIN.createWindow(applicationProperties, this)
         );
-        showMainWindow();
-    }
-
-    void showMainWindow() {
         Platform.runLater(mainWindow::show);
     }
 

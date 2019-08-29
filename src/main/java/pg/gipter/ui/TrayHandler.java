@@ -183,10 +183,8 @@ class TrayHandler {
         return e -> Platform.runLater(() -> {
             if (uiLauncher.isSilentMode()) {
                 uiLauncher.setSilentMode(false);
-                uiLauncher.buildAndShowMainWindow();
-            } else {
-                uiLauncher.showMainWindow();
             }
+            uiLauncher.buildAndShowMainWindow();
         });
     }
 
