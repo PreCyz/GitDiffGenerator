@@ -8,3 +8,4 @@ logs
 libs
 *.properties
 *.pdf
+*.json
