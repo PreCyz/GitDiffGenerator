@@ -2,11 +2,11 @@ package pg.gipter.producer.version;
 
 import pg.gipter.producer.command.VersionControlSystem;
 
-public final class CVSVersionProducerFactory {
+public final class VCSVersionProducerFactory {
 
-    private CVSVersionProducerFactory() { }
+    private VCSVersionProducerFactory() { }
 
-    public static CVSVersionProducer getInstance(VersionControlSystem vcs, String projectPath) {
+    public static VCSVersionProducer getInstance(VersionControlSystem vcs, String projectPath) {
         switch (vcs) {
             case MERCURIAL:
                 return new MercurialVersionProducer(projectPath);

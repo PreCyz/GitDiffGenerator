@@ -1,11 +1,14 @@
-package pg.gipter.statistic.dto;
+package pg.gipter.statistic;
 
+import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
 
-public class Statistics implements Serializable {
+public class Statistic implements Serializable {
 
     public static final String COLLECTION_NAME = "statistics";
 
@@ -18,6 +21,8 @@ public class Statistics implements Serializable {
     private String javaVersion;
     private UploadStatus lastUpdateStatus;
     private RunType lastRunType;
+    private Map<VersionControlSystem, Set<String>> controlSystemMap;
+    private Set<String> systemUsers;
 
     public String getId() {
         return id;
@@ -89,5 +94,21 @@ public class Statistics implements Serializable {
 
     public void setLastFailedDate(String lastFailedDate) {
         this.lastFailedDate = lastFailedDate;
+    }
+
+    public Map<VersionControlSystem, Set<String>> getControlSystemMap() {
+        return controlSystemMap;
+    }
+
+    public void setControlSystemMap(Map<VersionControlSystem, Set<String>> controlSystemMap) {
+        this.controlSystemMap = controlSystemMap;
+    }
+
+    public void setSystemUsers(Set<String> systemUsers) {
+        this.systemUsers = systemUsers;
+    }
+
+    public Set<String> getSystemUsers() {
+        return systemUsers;
     }
 }

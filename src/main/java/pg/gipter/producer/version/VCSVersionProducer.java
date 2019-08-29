@@ -2,7 +2,7 @@ package pg.gipter.producer.version;
 
 import java.io.IOException;
 
-public interface CVSVersionProducer {
+public interface VCSVersionProducer {
 
     String getVersion() throws IOException;
 

@@ -23,13 +23,14 @@ public abstract class MongoDaoConfig {
     private static MongoClient mongoClient;
 
     private String collectionName;
-    protected MongoCollection<Document> collection;
+    protected static MongoCollection<Document> collection;
 
     private boolean statisticsAvailable;
 
     protected MongoDaoConfig(String collectionName) {
         logger = LoggerFactory.getLogger(getClass());
         this.collectionName = collectionName;
+        this.statisticsAvailable = mongoClient != null;
         if (mongoClient == null) {
             init(loadProperties().orElseGet(() -> MongoConfig.dbProperties));
         }

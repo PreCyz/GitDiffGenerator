@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.dao.DaoFactory;
 import pg.gipter.dao.DataDao;
 import pg.gipter.dao.PropertiesDao;
-import pg.gipter.dao.StatisticDao;
 import pg.gipter.launcher.Starter;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.statistic.dto.Statistics;
+import pg.gipter.statistic.dto.ServiceDto;
+import pg.gipter.statistic.service.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
@@ -22,8 +22,6 @@ import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -236,29 +234,8 @@ public class FXMultiRunner extends Task<Void> implements Starter {
 
     private void updateStatistics(final UploadStatus status) {
         executor.execute(() -> {
-            StatisticDao statisticDao = DaoFactory.getStatisticDao();
-            if (statisticDao.isStatisticsAvailable()) {
-
-                ApplicationProperties appProperties = new ArrayList<>(applicationPropertiesCollection).get(0);
-
-                String now = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-                Statistics statistics = new Statistics();
-                statistics.setUsername(appProperties.toolkitUsername());
-                statistics.setFirstExecutionDate(now);
-                statistics.setLastExecutionDate(now);
-                statistics.setJavaVersion(System.getProperty("java.version"));
-                statistics.setLastUpdateStatus(status);
-                statistics.setLastRunType(runType);
-                if (EnumSet.of(UploadStatus.FAIL, UploadStatus.N_A).contains(status)) {
-                    statistics.setLastFailedDate(now);
-                } else if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(status)) {
-                    statistics.setLastSuccessDate(now);
-                }
-
-                statisticDao.updateStatistics(statistics);
-            } else {
-                logger.info("Statistics are not available and have not been updated.");
-            }
+            StatisticService statisticService = new StatisticService();
+            statisticService.updateStatistics(new ServiceDto(applicationPropertiesCollection, status, runType));
         });
     }
 

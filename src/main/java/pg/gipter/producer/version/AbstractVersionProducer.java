@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.List;
 
-abstract class AbstractVersionProducer implements CVSVersionProducer {
+abstract class AbstractVersionProducer implements VCSVersionProducer {
 
     private final String projectPath;
     private final Logger logger;

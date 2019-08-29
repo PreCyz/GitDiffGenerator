@@ -6,32 +6,55 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
-import pg.gipter.statistic.dto.Statistics;
+import pg.gipter.producer.command.VersionControlSystem;
+import pg.gipter.statistic.Statistic;
 import pg.gipter.utils.StringUtils;
+
+import java.util.*;
 
 class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
 
     StatisticDaoImpl() {
-        super(Statistics.COLLECTION_NAME);
+        super(Statistic.COLLECTION_NAME);
     }
 
     @Override
-    public void updateStatistics(Statistics statistics) {
-        FindIterable<Document> users = collection.find(Filters.eq("username", statistics.getUsername()));
+    public void updateStatistics(Statistic statistic) {
+        FindIterable<Document> users = collection.find(Filters.eq("username", statistic.getUsername()));
 
         try (MongoCursor<Document> cursor = users.cursor()) {
-            Document userToUpsert = Document.parse(new Gson().toJson(statistics, Statistics.class));
+            Document userToUpsert = Document.parse(new Gson().toJson(statistic, Statistic.class));
             if (cursor.hasNext()) {
                 userToUpsert = cursor.next();
-                userToUpsert.put("lastExecutionDate", statistics.getLastExecutionDate());
-                userToUpsert.put("javaVersion", statistics.getJavaVersion());
-                userToUpsert.put("lastUpdateStatus", statistics.getLastUpdateStatus().name());
-                userToUpsert.put("lastRunType", statistics.getLastRunType().name());
-                if (!StringUtils.nullOrEmpty(statistics.getLastSuccessDate())) {
-                    userToUpsert.put("lastSuccessDate", statistics.getLastSuccessDate());
+                userToUpsert.put("lastExecutionDate", statistic.getLastExecutionDate());
+                userToUpsert.put("javaVersion", statistic.getJavaVersion());
+                userToUpsert.put("lastUpdateStatus", statistic.getLastUpdateStatus().name());
+                userToUpsert.put("lastRunType", statistic.getLastRunType().name());
+
+                List<String> existingSystemUsers = Optional.ofNullable(userToUpsert.getList("systemUsers", String.class))
+                        .orElseGet(ArrayList::new);
+                LinkedHashSet<String> systemUsers = new LinkedHashSet<>(existingSystemUsers);
+                systemUsers.addAll(statistic.getSystemUsers());
+                userToUpsert.put("systemUsers", systemUsers);
+
+                Map<String, Set<String>> controlSystemMap = Optional.ofNullable(userToUpsert.get("controlSystemMap", Map.class))
+                        .orElseGet(LinkedHashMap::new);
+                for (Map.Entry<VersionControlSystem, Set<String>> entry : statistic.getControlSystemMap().entrySet()) {
+                    if (controlSystemMap.containsKey(entry.getKey().name())) {
+                        Set<String> scvs = new LinkedHashSet<>(controlSystemMap.get(entry.getKey().name()));
+                        scvs.addAll(entry.getValue());
+                        controlSystemMap.put(entry.getKey().name(), scvs);
+                    } else {
+                        controlSystemMap.put(entry.getKey().name(), entry.getValue());
+                    }
                 }
-                if (!StringUtils.nullOrEmpty(statistics.getLastFailedDate())) {
-                    userToUpsert.put("lastFailedDate", statistics.getLastFailedDate());
+                userToUpsert.put("controlSystemMap", controlSystemMap);
+
+                if (!StringUtils.nullOrEmpty(statistic.getLastSuccessDate())) {
+                    userToUpsert.put("lastSuccessDate", statistic.getLastSuccessDate());
+                }
+                if (!StringUtils.nullOrEmpty(statistic.getLastFailedDate())) {
+                    userToUpsert.put("lastFailedDate", statistic.getLastFailedDate());
                 }
 
                 collection.updateOne(
