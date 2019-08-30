@@ -778,14 +778,23 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<MouseEvent> toolkitUserFolderOnMouseClickEventHandler() {
-        return event -> Platform.runLater(() -> {
-            String userFolder = applicationProperties.toolkitUserFolder();
-            if (!applicationProperties.toolkitUserFolder().equalsIgnoreCase(userFolderUrl)) {
-                userFolder = userFolderUrl;
+        return event -> uiLauncher.executeOutsideUIThread(() -> {
+            ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
+            boolean hasProperCredentials = new ToolkitService(uiAppProps).hasProperCredentials();
+            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
+            if (hasProperCredentials) {
+                alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
+                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                        .withAlertType(Alert.AlertType.INFORMATION)
+                        .withImage(ImageFile.FINGER_UP_PNG);
+            } else {
+                alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
+                        .withLink(AlertHelper.logsFolder())
+                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withAlertType(Alert.AlertType.ERROR)
+                        .withImage(ImageFile.MINION_IOIO_GIF);
             }
-            AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser(userFolder);
-            toolkitUserFolderHyperlink.setVisited(false);
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         });
     }
 

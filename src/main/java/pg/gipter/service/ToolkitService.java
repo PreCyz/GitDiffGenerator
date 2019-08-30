@@ -127,7 +127,7 @@ public class ToolkitService extends Task<Set<String>> {
         );
 
         try {
-            new GETCall(url, applicationProperties).call();
+            result = new GETCall(url, applicationProperties).call() != null;
         } catch (Exception ex) {
             logger.error("Toolkit credentials are not valid. {}", ex.getMessage());
             result = false;

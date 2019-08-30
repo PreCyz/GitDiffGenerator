@@ -65,7 +65,8 @@ public class WizardLauncher implements Launcher {
             if (result == ButtonType.FINISH) {
                 logger.info("Wizard finished.");
                 String[] args = propertiesDao.loadArgumentArray(wizardProperties.getProperty(ArgName.configurationName.name()));
-                uiLauncher = new UILauncher(primaryStage, ApplicationPropertiesFactory.getInstance(args));
+                ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(args);
+                uiLauncher = new UILauncher(primaryStage, instance);
                 uiLauncher.execute();
             }
         });
@@ -277,7 +278,6 @@ public class WizardLauncher implements Launcher {
             public void onEnteringPage(Wizard wizard) {
                 updateProperties(wizard, wizardProperties);
                 propertiesDao.saveRunConfig(wizardProperties);
-                propertiesDao.saveToolkitSettings(wizardProperties);
             }
         };
         wizardPane.setHeaderText("Huuzzaaaa!! Konfiguracja ukonczona. (" + step + "/6)");
