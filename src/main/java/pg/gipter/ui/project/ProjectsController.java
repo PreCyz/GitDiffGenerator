@@ -207,10 +207,12 @@ public class ProjectsController extends AbstractController {
             properties.setProperty(ArgName.projectPath.name(), projects);
             propertiesDao.saveRunConfig(properties);
 
-            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationName));
-            uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.hideProjectsWindow();
-            uiLauncher.buildAndShowMainWindow();
+            if (uiLauncher.isInvokeExecute()) {
+                applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationName));
+                uiLauncher.setApplicationProperties(applicationProperties);
+                uiLauncher.buildAndShowMainWindow();
+            }
         };
     }
 

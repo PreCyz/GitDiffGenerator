@@ -69,6 +69,7 @@ public class UILauncher implements Launcher {
     private LocalDateTime lastItemSubmissionDate;
     private Executor executor;
     private JobHandler jobHandler;
+    private boolean invokeExecute;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
         this.mainWindow = mainWindow;
@@ -78,6 +79,7 @@ public class UILauncher implements Launcher {
         silentMode = applicationProperties.isSilentMode();
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         jobHandler = new JobHandler();
+        invokeExecute = true;
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -102,6 +104,10 @@ public class UILauncher implements Launcher {
 
     public void setLastItemSubmissionDate(LocalDateTime lastItemSubmissionDate) {
         this.lastItemSubmissionDate = lastItemSubmissionDate;
+    }
+
+    public boolean isInvokeExecute() {
+        return invokeExecute;
     }
 
     public void executeOutsideUIThread(Runnable runnable) {
@@ -391,14 +397,15 @@ public class UILauncher implements Launcher {
         mainWindow.hide();
     }
 
-    public void showProjectsWindow(boolean shouldExecute) {
+    public void showProjectsWindow(boolean invokeExecute) {
+        this.invokeExecute = invokeExecute;
         Platform.runLater(() -> {
             projectsWindow = new Stage();
             projectsWindow.initModality(Modality.APPLICATION_MODAL);
             buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
             projectsWindow.setOnCloseRequest(event -> {
                 hideProjectsWindow();
-                if (shouldExecute) {
+                if (invokeExecute) {
                     execute();
                 }
             });
@@ -442,14 +449,15 @@ public class UILauncher implements Launcher {
         createSettingsWindow(WindowFactory.TOOLKIT_MENU);
     }
 
-    public void showToolkitProjectsWindow(boolean shouldExecute) {
+    public void showToolkitProjectsWindow(boolean invokeExecute) {
+        this.invokeExecute = invokeExecute;
         Platform.runLater(() -> {
             toolkitProjectsWindow = new Stage();
             toolkitProjectsWindow.initModality(Modality.APPLICATION_MODAL);
             buildScene(toolkitProjectsWindow, WindowFactory.TOOLKIT_PROJECTS.createWindow(applicationProperties, this));
             toolkitProjectsWindow.setOnCloseRequest(event -> {
                 hideToolkitProjectsWindow();
-                if (shouldExecute) {
+                if (invokeExecute) {
                     execute();
                 }
             });

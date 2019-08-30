@@ -21,7 +21,9 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-/** Created by Pawel Gawedzki on 26-Jul-2019. */
+/**
+ * Created by Pawel Gawedzki on 26-Jul-2019.
+ */
 public class ToolkitService extends Task<Set<String>> {
 
     protected static Logger logger = LoggerFactory.getLogger(ToolkitService.class);
@@ -108,6 +110,30 @@ public class ToolkitService extends Task<Set<String>> {
             logger.error("Can not download last item submission date. {}", ex.getMessage());
         }
         return submissionDate;
+    }
+
+    public boolean hasProperCredentials() {
+        boolean result = true;
+        String select = "$select=Body,SubmissionDate,GUID,Title";
+        String orderBy = "$orderby=SubmissionDate+desc";
+        String top = "$top=1";
+        String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
+                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitCopyCase(),
+                applicationProperties.toolkitCopyListName(),
+                select,
+                orderBy,
+                top
+        );
+
+        try {
+            new GETCall(url, applicationProperties).call();
+        } catch (Exception ex) {
+            logger.error("Toolkit credentials are not valid. {}", ex.getMessage());
+            result = false;
+        }
+
+        return result;
     }
 
 }
