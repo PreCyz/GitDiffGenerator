@@ -42,7 +42,7 @@ public abstract class MongoDaoConfig {
             properties = new Properties();
             properties.load(reader);
         } catch (IOException | NullPointerException e) {
-            logger.warn("Error when loading {}. Exception message is: {}", DB_CONFIG, e.getMessage());
+            logger.warn("Could not load [{}] because: {}", DB_CONFIG, e.getMessage());
             properties = null;
         }
         return Optional.ofNullable(properties);

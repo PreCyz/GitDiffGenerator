@@ -470,9 +470,9 @@ public class MainController extends AbstractController {
             String configurationName = configurationNameTextField.getText();
             updateConfigurationNameComboBox(configurationName, configurationName);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
-                uiLauncher.showToolkitProjectsWindow(true);
+                uiLauncher.showToolkitProjectsWindow(new Properties());
             } else {
-                uiLauncher.showProjectsWindow(true);
+                uiLauncher.showProjectsWindow(new Properties());
             }
         };
     }

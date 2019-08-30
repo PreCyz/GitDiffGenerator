@@ -3,9 +3,12 @@ package pg.gipter.ui;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -20,7 +23,9 @@ import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
+import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.ResourceUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -33,82 +38,84 @@ public class WizardLauncher implements Launcher {
     private Stage primaryStage;
     private UILauncher uiLauncher;
     private PropertiesDao propertiesDao;
+    private Properties wizardProperties;
 
     public WizardLauncher(Stage stage) {
         this.primaryStage = stage;
         propertiesDao = DaoFactory.getPropertiesDao();
+        wizardProperties = new Properties();
     }
 
     @Override
     public void execute() {
-        showLinearWizard();
-    }
 
-    private void showLinearWizard() {
-        Properties properties = new Properties();
-
+        short step = 1;
         Wizard wizard = new Wizard();
         wizard.setTitle(BundleUtils.getMsg("wizard.title"));
-        WizardPane configurationPage = buildConfigurationPage();
-        WizardPane toolkitCredentialsPage = buildToolkitCredentialsPage(properties);
-        WizardPane committerPage = buildCommitterPage(properties);
-        WizardPane projectPage = buildProjectPage(properties);
-        WizardPane finishPage = buildFinishPage(properties);
+        WizardPane welcomePage = buildWelcomePage(step++);
+        WizardPane configurationPage = buildConfigurationPage(step++);
+        WizardPane toolkitCredentialsPage = buildToolkitCredentialsPage(step++);
+        WizardPane committerPage = buildCommitterPage(step++);
+        WizardPane projectPage = buildProjectPage(step++);
+        WizardPane finishPage = buildFinishPage(step);
 
-        wizard.setFlow(buildFlow(configurationPage, toolkitCredentialsPage, committerPage, projectPage, finishPage, properties));
+        wizard.setFlow(buildFlow(welcomePage, configurationPage, toolkitCredentialsPage, committerPage, projectPage, finishPage));
 
         wizard.showAndWait().ifPresent(result -> {
             if (result == ButtonType.FINISH) {
                 logger.info("Wizard finished.");
-                String[] args = propertiesDao.loadArgumentArray(properties.getProperty(ArgName.configurationName.name()));
+                String[] args = propertiesDao.loadArgumentArray(wizardProperties.getProperty(ArgName.configurationName.name()));
                 uiLauncher = new UILauncher(primaryStage, ApplicationPropertiesFactory.getInstance(args));
                 uiLauncher.execute();
             }
         });
     }
 
-    private Wizard.Flow buildFlow(WizardPane configurationPage, WizardPane toolkitCredentialsPage, WizardPane committerPage,
-                                  WizardPane projectPage, WizardPane finishPage, Properties properties) {
-        return new Wizard.Flow() {
+    private WizardPane buildWelcomePage(int step) {
+        WizardPane wizardPane = new WizardPane();
+        AnchorPane anchorPane = new AnchorPane();
+        anchorPane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+        ImageView imageView = ResourceUtils.getImgResource(ImageFile.MINION_FART_GIF.fileUrl())
+                .map(url -> new ImageView(new Image(url.toString())))
+                .orElseGet(ImageView::new);
+        imageView.setId("imageView");
+        imageView.setX(60);
+        imageView.setY(10);
+        anchorPane.getChildren().addAll(imageView);
 
-            @Override
-            public Optional<WizardPane> advance(WizardPane currentPage) {
-                return Optional.of(getNext(currentPage));
-            }
-
-            @Override
-            public boolean canAdvance(WizardPane currentPage) {
-                return currentPage != finishPage;
-            }
-
-            private WizardPane getNext(WizardPane currentPage) {
-                if (currentPage == null) {
-                    return configurationPage;
-                } else if (currentPage == configurationPage) {
-                    return toolkitCredentialsPage;
-                } else if (currentPage == toolkitCredentialsPage) {
-                    String property = properties.getProperty(ArgName.uploadType.name());
-                    if (StringUtils.nullOrEmpty(property) || UploadType.valueFor(property) == UploadType.TOOLKIT_DOCS) {
-                        return projectPage;
-                    }
-                    return committerPage;
-                } else if (currentPage == committerPage) {
-                    return projectPage;
-                } else {
-                    return finishPage;
-                }
-            }
-        };
+        wizardPane.setContent(anchorPane);
+        wizardPane.setHeaderText("Welcome to the Gipter Wizard.\nThis will help you go through the basic setup. ("+step+"/6)");
+        return wizardPane;
     }
 
-    private WizardPane buildToolkitCredentialsPage(Properties properties) {
+    private WizardPane buildConfigurationPage(short step) {
+        int row = 0;
+
+        WizardPane wizardPane = new WizardPane();
+        GridPane gridPane = new GridPane();
+        gridPane.setVgap(10);
+        gridPane.setHgap(10);
+
+        gridPane.add(new Label(BundleUtils.getMsg("main.configurationName")), 0, row);
+        TextField configurationName = createTextField(ArgName.configurationName.name());
+        gridPane.add(configurationName, 1, row++);
+
+        gridPane.add(new Label(BundleUtils.getMsg("csv.panel.uploadType")), 0, row);
+        ComboBox<UploadType> comboBox = createComboBox(ArgName.uploadType.name());
+        gridPane.add(comboBox, 1, row);
+
+        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.configuration.details") + " ("+step+"/6)");
+        wizardPane.setContent(gridPane);
+        return wizardPane;
+    }
+
+    private WizardPane buildToolkitCredentialsPage(short step) {
         int row = 0;
 
         WizardPane page = new WizardPane() {
             @Override
             public void onEnteringPage(Wizard wizard) {
-                updateProperties(wizard, properties);
-                propertiesDao.saveRunConfig(properties);
+                updateProperties(wizard, wizardProperties);
             }
         };
 
@@ -124,19 +131,23 @@ public class WizardLauncher implements Launcher {
         PasswordField password = createPasswordField(ArgName.toolkitPassword.name());
         gridPane.add(password, 1, row);
 
-        page.setHeaderText(BundleUtils.getMsg("wizard.toolkit.credentials") + " (2/5)");
+        page.setHeaderText(BundleUtils.getMsg("wizard.toolkit.credentials") + " ("+step+"/6)");
         page.setContent(gridPane);
         return page;
     }
 
     private void updateProperties(Wizard wizard, Properties properties) {
-        properties.put(ArgName.configurationName.name(), String.valueOf(wizard.getSettings().get(ArgName.configurationName.name())));
-        properties.put(ArgName.uploadType.name(), String.valueOf(wizard.getSettings().get(ArgName.uploadType.name())));
-        properties.put(ArgName.toolkitUsername.name(), String.valueOf(wizard.getSettings().get(ArgName.toolkitUsername.name())));
-        properties.put(ArgName.toolkitPassword.name(), String.valueOf(wizard.getSettings().get(ArgName.toolkitPassword.name())));
-        properties.put(ArgName.author.name(), String.valueOf(wizard.getSettings().get(ArgName.author.name())));
-        properties.put(ArgName.committerEmail.name(), String.valueOf(wizard.getSettings().get(ArgName.committerEmail.name())));
-        properties.put(ArgName.itemPath.name(), String.valueOf(wizard.getSettings().get(ArgName.itemPath.name())));
+        properties.put(ArgName.configurationName.name(), getValue(wizard, ArgName.configurationName));
+        properties.put(ArgName.uploadType.name(), getValue(wizard, ArgName.uploadType));
+        properties.put(ArgName.toolkitUsername.name(), getValue(wizard, ArgName.toolkitUsername).toUpperCase());
+        properties.put(ArgName.toolkitPassword.name(), getValue(wizard, ArgName.toolkitPassword));
+        properties.put(ArgName.author.name(), getValue(wizard, ArgName.author));
+        properties.put(ArgName.committerEmail.name(), getValue(wizard, ArgName.committerEmail));
+        properties.put(ArgName.itemPath.name(), getValue(wizard, ArgName.itemPath));
+    }
+
+    private String getValue(Wizard wizard, ArgName argName) {
+        return Optional.ofNullable(wizard.getSettings().get(argName.name())).map(String::valueOf).orElseGet(() -> "");
     }
 
     private TextField createTextField(String id) {
@@ -153,27 +164,6 @@ public class WizardLauncher implements Launcher {
         return passwordField;
     }
 
-    private WizardPane buildConfigurationPage() {
-        int row = 0;
-
-        WizardPane wizardPane = new WizardPane();
-        GridPane gridPane = new GridPane();
-        gridPane.setVgap(10);
-        gridPane.setHgap(10);
-
-        gridPane.add(new Label(BundleUtils.getMsg("main.configurationName")), 0, row);
-        TextField configurationName = createTextField(ArgName.configurationName.name());
-        gridPane.add(configurationName, 1, row++);
-
-        gridPane.add(new Label(BundleUtils.getMsg("csv.panel.uploadType")), 0, row);
-        ComboBox<UploadType> comboBox = createComboBox(ArgName.uploadType.name());
-        gridPane.add(comboBox, 1, row);
-
-        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.configuration.details") + " (1/5)");
-        wizardPane.setContent(gridPane);
-        return wizardPane;
-    }
-
     private ComboBox<UploadType> createComboBox(String id) {
         ComboBox<UploadType> comboBox = new ComboBox<>();
         comboBox.setId(id);
@@ -183,15 +173,13 @@ public class WizardLauncher implements Launcher {
         return comboBox;
     }
 
-    private WizardPane buildCommitterPage(Properties properties) {
+    private WizardPane buildCommitterPage(short step) {
         int row = 0;
 
         WizardPane page2 = new WizardPane() {
             @Override
             public void onEnteringPage(Wizard wizard) {
-                updateProperties(wizard, properties);
-                propertiesDao.saveRunConfig(properties);
-                propertiesDao.saveToolkitSettings(properties);
+                updateProperties(wizard, wizardProperties);
             }
         };
 
@@ -207,19 +195,17 @@ public class WizardLauncher implements Launcher {
         TextField committerEmail = createTextField(ArgName.committerEmail.name());
         pageGrid.add(committerEmail, 1, row);
 
-        page2.setHeaderText(BundleUtils.getMsg("wizard.scv.details") + " (3/5)");
+        page2.setHeaderText(BundleUtils.getMsg("wizard.scv.details") + " ("+ step +"/6)");
         page2.setContent(pageGrid);
         return page2;
     }
 
-    private WizardPane buildProjectPage(Properties properties) {
+    private WizardPane buildProjectPage(short step) {
         int row = 0;
         WizardPane wizardPane = new WizardPane() {
             @Override
             public void onEnteringPage(Wizard wizard) {
-                updateProperties(wizard, properties);
-                propertiesDao.saveRunConfig(properties);
-                propertiesDao.saveToolkitSettings(properties);
+                updateProperties(wizard, wizardProperties);
             }
         };
         GridPane pageGrid = new GridPane();
@@ -228,7 +214,7 @@ public class WizardLauncher implements Launcher {
 
         Label projectLabel = new Label(BundleUtils.getMsg("paths.panel.projectPath"));
         Button projectButton = new Button(BundleUtils.getMsg("button.add"));
-        projectButton.setOnAction(addProjectEventHandler(properties, projectLabel));
+        projectButton.setOnAction(addProjectEventHandler(wizardProperties, projectLabel));
         pageGrid.add(projectButton, 0, row);
         pageGrid.add(projectLabel, 1, row++);
 
@@ -236,11 +222,11 @@ public class WizardLauncher implements Launcher {
         itemPathField.setDisable(true);
         itemPathField.setText(BundleUtils.getMsg("paths.panel.itemPath"));
         Button itemButton = new Button(BundleUtils.getMsg("button.add"));
-        itemButton.setOnAction(addItemEventHandler(properties, itemPathField));
+        itemButton.setOnAction(addItemEventHandler(wizardProperties, itemPathField));
         pageGrid.add(itemButton, 0, row);
         pageGrid.add(itemPathField, 1, row);
 
-        wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + " (4/5)");
+        wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + " ("+step+"/6)");
         wizardPane.setContent(pageGrid);
 
         return wizardPane;
@@ -248,16 +234,15 @@ public class WizardLauncher implements Launcher {
 
     private EventHandler<ActionEvent> addProjectEventHandler(Properties properties, Label projectLabel) {
         return event -> {
-            propertiesDao.saveRunConfig(properties);
             String[] args = properties.entrySet().stream()
                     .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
                     .toArray(String[]::new);
             ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             uiLauncher = new UILauncher(primaryStage, applicationProperties);
             if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
-                uiLauncher.showToolkitProjectsWindow(false);
+                uiLauncher.showToolkitProjectsWindow(properties);
             } else {
-                uiLauncher.showProjectsWindow(false);
+                uiLauncher.showProjectsWindow(properties);
             }
             projectLabel.setText("Set");
         };
@@ -265,7 +250,6 @@ public class WizardLauncher implements Launcher {
 
     private EventHandler<ActionEvent> addItemEventHandler(Properties properties, TextField itemPathField) {
         return event -> {
-            propertiesDao.saveRunConfig(properties);
             UploadType uploadType = UploadType.valueFor(properties.getProperty(ArgName.uploadType.name()));
             if (uploadType == UploadType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
@@ -287,76 +271,62 @@ public class WizardLauncher implements Launcher {
         };
     }
 
-    private WizardPane buildFinishPage(Properties properties) {
+    private WizardPane buildFinishPage(short step) {
         WizardPane wizardPane = new WizardPane() {
             @Override
             public void onEnteringPage(Wizard wizard) {
-                updateProperties(wizard, properties);
-                Properties savedProperties = propertiesDao.loadApplicationProperties(properties.getProperty(ArgName.configurationName.name()))
-                        .orElseGet(() -> properties);
-                properties.setProperty(ArgName.projectPath.name(), savedProperties.getProperty(ArgName.projectPath.name()));
-                propertiesDao.saveRunConfig(properties);
-                propertiesDao.saveToolkitSettings(properties);
+                updateProperties(wizard, wizardProperties);
+                propertiesDao.saveRunConfig(wizardProperties);
+                propertiesDao.saveToolkitSettings(wizardProperties);
             }
         };
-        wizardPane.setHeaderText("Huuzzaaaa!! Konfiguracja ukonczona. (5/5)");
+        wizardPane.setHeaderText("Huuzzaaaa!! Konfiguracja ukonczona. (" + step + "/6)");
 
-        int row = 0;
-        GridPane pageGrid = new GridPane();
-        pageGrid.setVgap(10);
-        pageGrid.setHgap(10);
-
-        GridPane gridPane = new GridPane();
-        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.username")), 0, row);
-        TextField username = createTextField(ArgName.toolkitUsername.name());
-        username.setDisable(true);
-        username.setText(properties.getProperty(ArgName.toolkitUsername.name()));
-        gridPane.add(username, 1, row++);
-
-        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.password")), 0, row);
-        TextField password = createTextField(ArgName.toolkitPassword.name());
-        password.setDisable(true);
-        password.setText(properties.getProperty(ArgName.toolkitPassword.name()));
-        gridPane.add(password, 1, row++);
-
-        gridPane.add(new Label(BundleUtils.getMsg("main.configurationName")), 0, row);
-        TextField configurationName = createTextField(ArgName.configurationName.name());
-        configurationName.setDisable(true);
-        configurationName.setText(properties.getProperty(ArgName.configurationName.name()));
-        gridPane.add(configurationName, 1, row++);
-
-        gridPane.add(new Label(BundleUtils.getMsg("csv.panel.uploadType")), 0, row);
-        TextField uploadType = createTextField(ArgName.uploadType.name());
-        uploadType.setDisable(true);
-        uploadType.setText(properties.getProperty(ArgName.uploadType.name()));
-        gridPane.add(uploadType, 1, row++);
-
-        pageGrid.add(new Label(BundleUtils.getMsg("csv.panel.authors")), 0, row);
-        TextField author = createTextField(ArgName.author.name());
-        author.setDisable(true);
-        author.setText(properties.getProperty(ArgName.author.name()));
-        pageGrid.add(author, 1, row++);
-
-        pageGrid.add(new Label(BundleUtils.getMsg("csv.panel.committerEmail")), 0, row);
-        TextField committerEmail = createTextField(ArgName.committerEmail.name());
-        committerEmail.setDisable(true);
-        committerEmail.setText(properties.getProperty(ArgName.committerEmail.name()));
-        pageGrid.add(committerEmail, 1, row++);
-
-        pageGrid.add(new Label(BundleUtils.getMsg("paths.panel.projectPath")), 0, row);
-        TextField projectPath = createTextField(ArgName.projectPath.name());
-        projectPath.setDisable(true);
-        projectPath.setText(properties.getProperty(ArgName.projectPath.name()));
-        pageGrid.add(projectPath, 1, row++);
-
-        pageGrid.add(new Label(BundleUtils.getMsg("paths.panel.itemPath")), 0, row);
-        TextField itemPath = createTextField(ArgName.itemPath.name());
-        itemPath.setDisable(true);
-        itemPath.setText(properties.getProperty(ArgName.itemPath.name()));
-        pageGrid.add(itemPath, 1, row);
-
-        wizardPane.setContent(pageGrid);
-
+        AnchorPane anchorPane = new AnchorPane();
+        ImageView imageView = ResourceUtils.getImgResource(ImageFile.MINION_APPLAUSE_GIF.fileUrl())
+                .map(url -> new ImageView(new Image(url.toString())))
+                .orElseGet(ImageView::new);
+        imageView.setId("imageView");
+        imageView.setX(20);
+        imageView.setY(10);
+        anchorPane.getChildren().addAll(imageView);
+        wizardPane.setContent(anchorPane);
         return wizardPane;
+    }
+
+    private Wizard.Flow buildFlow(WizardPane welcomePage, WizardPane configurationPage, WizardPane toolkitCredentialsPage,
+                                  WizardPane committerPage, WizardPane projectPage, WizardPane finishPage) {
+        return new Wizard.Flow() {
+
+            @Override
+            public Optional<WizardPane> advance(WizardPane currentPage) {
+                return Optional.of(getNext(currentPage));
+            }
+
+            @Override
+            public boolean canAdvance(WizardPane currentPage) {
+                return currentPage != finishPage;
+            }
+
+            private WizardPane getNext(WizardPane currentPage) {
+                if (currentPage == null) {
+                    return welcomePage;
+                } else if (currentPage == welcomePage) {
+                    return configurationPage;
+                } else if (currentPage == configurationPage) {
+                    return toolkitCredentialsPage;
+                } else if (currentPage == toolkitCredentialsPage) {
+                    String property = wizardProperties.getProperty(ArgName.uploadType.name());
+                    if (StringUtils.nullOrEmpty(property) || UploadType.valueFor(property) == UploadType.TOOLKIT_DOCS) {
+                        return projectPage;
+                    }
+                    return committerPage;
+                } else if (currentPage == committerPage) {
+                    return projectPage;
+                } else {
+                    return finishPage;
+                }
+            }
+        };
     }
 }

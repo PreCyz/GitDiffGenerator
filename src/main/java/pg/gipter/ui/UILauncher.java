@@ -47,9 +47,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
-/**
- * Created by Gawa 2017-10-04
- */
+/** Created by Gawa 2017-10-04 */
 public class UILauncher implements Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
@@ -69,7 +67,7 @@ public class UILauncher implements Launcher {
     private LocalDateTime lastItemSubmissionDate;
     private Executor executor;
     private JobHandler jobHandler;
-    private boolean invokeExecute;
+    private Properties wizardProperties;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
         this.mainWindow = mainWindow;
@@ -79,7 +77,6 @@ public class UILauncher implements Launcher {
         silentMode = applicationProperties.isSilentMode();
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         jobHandler = new JobHandler();
-        invokeExecute = true;
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -94,10 +91,6 @@ public class UILauncher implements Launcher {
         this.silentMode = silentMode;
     }
 
-    public boolean isUpgradeChecked() {
-        return upgradeChecked;
-    }
-
     public LocalDateTime getLastItemSubmissionDate() {
         return lastItemSubmissionDate;
     }
@@ -106,8 +99,8 @@ public class UILauncher implements Launcher {
         this.lastItemSubmissionDate = lastItemSubmissionDate;
     }
 
-    public boolean isInvokeExecute() {
-        return invokeExecute;
+    public void addPropertyToWizard(String key, String value) {
+        wizardProperties.put(key, value);
     }
 
     public void executeOutsideUIThread(Runnable runnable) {
@@ -397,15 +390,15 @@ public class UILauncher implements Launcher {
         mainWindow.hide();
     }
 
-    public void showProjectsWindow(boolean invokeExecute) {
-        this.invokeExecute = invokeExecute;
+    public void showProjectsWindow(Properties wizardProperties) {
+        this.wizardProperties = wizardProperties;
         Platform.runLater(() -> {
             projectsWindow = new Stage();
             projectsWindow.initModality(Modality.APPLICATION_MODAL);
             buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
             projectsWindow.setOnCloseRequest(event -> {
                 hideProjectsWindow();
-                if (invokeExecute) {
+                if (isInvokeExecute()) {
                     execute();
                 }
             });
@@ -449,15 +442,15 @@ public class UILauncher implements Launcher {
         createSettingsWindow(WindowFactory.TOOLKIT_MENU);
     }
 
-    public void showToolkitProjectsWindow(boolean invokeExecute) {
-        this.invokeExecute = invokeExecute;
+    public void showToolkitProjectsWindow(Properties wizardProperties) {
+        this.wizardProperties = wizardProperties;
         Platform.runLater(() -> {
             toolkitProjectsWindow = new Stage();
             toolkitProjectsWindow.initModality(Modality.APPLICATION_MODAL);
             buildScene(toolkitProjectsWindow, WindowFactory.TOOLKIT_PROJECTS.createWindow(applicationProperties, this));
             toolkitProjectsWindow.setOnCloseRequest(event -> {
                 hideToolkitProjectsWindow();
-                if (invokeExecute) {
+                if (isInvokeExecute()) {
                     execute();
                 }
             });
@@ -490,5 +483,9 @@ public class UILauncher implements Launcher {
 
     public void hideUpgradeWindow() {
         upgradeWindow.close();
+    }
+
+    public boolean isInvokeExecute() {
+        return wizardProperties == null || wizardProperties.isEmpty();
     }
 }

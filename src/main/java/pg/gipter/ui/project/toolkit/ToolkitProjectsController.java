@@ -261,6 +261,8 @@ public class ToolkitProjectsController extends AbstractController {
                 applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationName));
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
+            } else {
+                uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
             }
         };
     }
