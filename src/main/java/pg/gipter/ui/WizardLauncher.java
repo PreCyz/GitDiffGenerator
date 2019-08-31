@@ -26,6 +26,7 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.ResourceUtils;
+import pg.gipter.utils.StringUtils;
 
 import java.io.File;
 import java.util.Optional;
@@ -38,16 +39,21 @@ public class WizardLauncher implements Launcher {
     private UILauncher uiLauncher;
     private PropertiesDao propertiesDao;
     private Properties wizardProperties;
+    private final boolean onApplicationStart;
 
     public WizardLauncher(Stage stage) {
+        this(stage, true);
+    }
+
+    public WizardLauncher(Stage stage, boolean onApplicationStart) {
         this.primaryStage = stage;
         propertiesDao = DaoFactory.getPropertiesDao();
         wizardProperties = new Properties();
+        this.onApplicationStart = onApplicationStart;
     }
 
     @Override
     public void execute() {
-
         short step = 1;
         Wizard wizard = new Wizard();
         wizard.setTitle(BundleUtils.getMsg("wizard.title"));
@@ -67,6 +73,10 @@ public class WizardLauncher implements Launcher {
                 ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(args);
                 uiLauncher = new UILauncher(primaryStage, instance);
                 uiLauncher.execute();
+            } else if (result == ButtonType.CANCEL) {
+                propertiesDao.loadApplicationProperties(wizardProperties.getProperty(ArgName.configurationName.name()))
+                        .ifPresent(props -> propertiesDao.removeConfig(wizardProperties.getProperty(ArgName.configurationName.name())));
+                logger.info("Wizard canceled.");
             }
         });
     }
@@ -91,7 +101,14 @@ public class WizardLauncher implements Launcher {
     private WizardPane buildConfigurationPage(short step) {
         int row = 0;
 
-        WizardPane wizardPane = new WizardPane();
+        WizardPane wizardPane = new WizardPane() {
+            @Override
+            public void onExitingPage(Wizard wizard) {
+                if (StringUtils.nullOrEmpty(getValue(wizard, ArgName.configurationName))) {
+                    wizard.getSettings().put(ArgName.configurationName.name(), "wizard-config");
+                }
+            }
+        };
         GridPane gridPane = new GridPane();
         gridPane.setVgap(10);
         gridPane.setHgap(10);
@@ -224,11 +241,38 @@ public class WizardLauncher implements Launcher {
             @Override
             public void onEnteringPage(Wizard wizard) {
                 updateProperties(wizard, wizardProperties);
+                itemPathField.setText(BundleUtils.getMsg("wizard.item.location"));
+                projectLabel.setVisible(true);
+                projectButton.setVisible(true);
                 if (UploadType.valueFor(getValue(wizard, ArgName.uploadType)) == UploadType.STATEMENT) {
                     itemPathField.setText(BundleUtils.getMsg("wizard.item.statement.location"));
                     projectLabel.setVisible(false);
                     projectButton.setVisible(false);
                 }
+
+                projectLabel.setText(BundleUtils.getMsg("wizard.project.choose"));
+                String projectPath = wizardProperties.getProperty(ArgName.projectPath.name());
+                if (!StringUtils.nullOrEmpty(projectPath)) {
+                    projectLabel.setText(trimPath(projectPath));
+                }
+
+                String itemPath = wizardProperties.getProperty(ArgName.itemPath.name());
+                if (!StringUtils.nullOrEmpty(itemPath)) {
+                    itemPathField.setText(trimPath(itemPath));
+                }
+            }
+
+            private String trimPath(String path) {
+                int maxPathLength = 50;
+                if (path.length() > 50) {
+                    path = path.substring(0, maxPathLength) + "...";
+                }
+                return path;
+            }
+
+            @Override
+            public void onExitingPage(Wizard wizard) {
+                projectLabel.setText(getValue(wizard, ArgName.projectPath));
             }
         };
         wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + " (" + step + "/6)");
@@ -281,6 +325,11 @@ public class WizardLauncher implements Launcher {
             @Override
             public void onEnteringPage(Wizard wizard) {
                 updateProperties(wizard, wizardProperties);
+            }
+
+            @Override
+            public void onExitingPage(Wizard wizard) {
+                propertiesDao.saveToolkitSettings(wizardProperties);
                 propertiesDao.saveRunConfig(wizardProperties);
             }
         };
@@ -318,20 +367,33 @@ public class WizardLauncher implements Launcher {
                 } else if (currentPage == welcomePage) {
                     return configurationPage;
                 } else if (currentPage == configurationPage) {
+                    if (onApplicationStart) {
+                        return toolkitCredentialsPage;
+                    }
+                    Properties properties = propertiesDao.loadToolkitCredentials();
+                    String[] args = properties.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).toArray(String[]::new);
+                    ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(args);
+                    if (instance.isToolkitCredentialsSet()) {
+                        return flowAdvanceLogic();
+                    }
                     return toolkitCredentialsPage;
                 } else if (currentPage == toolkitCredentialsPage) {
-                    String property = wizardProperties.getProperty(ArgName.uploadType.name());
-                    switch (UploadType.valueFor(property)) {
-                        case TOOLKIT_DOCS:
-                        case STATEMENT:
-                            return projectPage;
-                        default:
-                            return committerPage;
-                    }
+                    return flowAdvanceLogic();
                 } else if (currentPage == committerPage) {
                     return projectPage;
                 } else {
                     return finishPage;
+                }
+            }
+
+            private WizardPane flowAdvanceLogic() {
+                String property = wizardProperties.getProperty(ArgName.uploadType.name());
+                switch (UploadType.valueFor(property)) {
+                    case TOOLKIT_DOCS:
+                    case STATEMENT:
+                        return projectPage;
+                    default:
+                        return committerPage;
                 }
             }
         };
