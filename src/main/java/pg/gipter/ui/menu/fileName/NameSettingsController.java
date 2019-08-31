@@ -1,6 +1,5 @@
 package pg.gipter.ui.menu.fileName;
 
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -44,7 +43,7 @@ public class NameSettingsController extends AbstractController {
     @FXML
     private Button removeButton;
 
-    private Set<NameTableData> patternsToDelete;
+    //private Set<NameTableData> patternsToDelete;
     private NameSetting fileNameSetting;
 
     private final String emptyString = "";
@@ -83,13 +82,13 @@ public class NameSettingsController extends AbstractController {
         nameSettingsTableView.getColumns().addAll(wordToReplaceColumn, replacementColumn);
 
         nameSettingsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        nameSettingsTableView.getSelectionModel().selectedItemProperty().addListener(toDeleteChangeListener());
+        //nameSettingsTableView.getSelectionModel().selectedItemProperty().addListener(toDeleteChangeListener());
     }
 
-    private ChangeListener<NameTableData> toDeleteChangeListener() {
+    /*private ChangeListener<NameTableData> toDeleteChangeListener() {
         return (observable, oldValue, newValue) ->
                 patternsToDelete = new LinkedHashSet<>(nameSettingsTableView.getSelectionModel().getSelectedItems());
-    }
+    }*/
 
     private void setInitValues() {
         Optional<NameSetting> fnsOpt = propertiesDao.loadFileNameSetting();
@@ -153,11 +152,11 @@ public class NameSettingsController extends AbstractController {
 
     private EventHandler<ActionEvent> removeButtonActionEventHandler() {
         return event -> {
-            patternsToDelete = new LinkedHashSet<>(nameSettingsTableView.getSelectionModel().getSelectedItems());
+            LinkedHashSet<NameTableData> patternsToDelete = new LinkedHashSet<>(nameSettingsTableView.getSelectionModel().getSelectedItems());
             nameSettingsTableView.getItems().removeAll(patternsToDelete);
             nameSettingsTableView.refresh();
             fileNameSetting.removeSettings(patternsToDelete.stream().map(NameTableData::getWordToReplace).collect(toSet()));
-            saveButton.setDisable(nameSettingsTableView.getItems().isEmpty());
+//            saveButton.setDisable(nameSettingsTableView.getItems().isEmpty());
             clearButton.setDisable(nameSettingsTableView.getItems().isEmpty());
             removeButton.setDisable(nameSettingsTableView.getItems().isEmpty());
         };

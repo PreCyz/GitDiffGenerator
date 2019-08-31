@@ -1,7 +1,6 @@
 package pg.gipter.ui.project;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -45,7 +44,6 @@ public class ProjectsController extends AbstractController {
     @FXML
     private Button removeProjectButton;
 
-    private Set<ProjectDetails> projectsToDelete;
     private ApplicationProperties applicationProperties;
 
     public ProjectsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
@@ -90,12 +88,6 @@ public class ProjectsController extends AbstractController {
         projectsTableView.getColumns().addAll(nameColumn, cvsTypeColumn, path);
 
         projectsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        projectsTableView.getSelectionModel().selectedItemProperty().addListener(toDeleteChangeListener());
-    }
-
-    private ChangeListener<ProjectDetails> toDeleteChangeListener() {
-        return (observable, oldValue, newValue) ->
-                projectsToDelete = new LinkedHashSet<>(projectsTableView.getSelectionModel().getSelectedItems());
     }
 
     private void initValues() {
@@ -254,7 +246,7 @@ public class ProjectsController extends AbstractController {
 
     private EventHandler<ActionEvent> removeButtonActionEventHandler() {
         return event -> {
-            projectsToDelete = new LinkedHashSet<>(projectsTableView.getSelectionModel().getSelectedItems());
+            LinkedHashSet<ProjectDetails> projectsToDelete = new LinkedHashSet<>(projectsTableView.getSelectionModel().getSelectedItems());
             projectsTableView.getItems().removeAll(projectsToDelete);
             if (projectsTableView.getItems().isEmpty()) {
                 projectsTableView.getItems().add(ProjectDetails.DEFAULT);
