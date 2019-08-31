@@ -26,7 +26,6 @@ import pg.gipter.settings.ArgName;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.ResourceUtils;
-import pg.gipter.utils.StringUtils;
 
 import java.io.File;
 import java.util.Optional;
@@ -85,7 +84,7 @@ public class WizardLauncher implements Launcher {
         anchorPane.getChildren().addAll(imageView);
 
         wizardPane.setContent(anchorPane);
-        wizardPane.setHeaderText("Welcome to the Gipter Wizard.\nThis will help you go through the basic setup. ("+step+"/6)");
+        wizardPane.setHeaderText("Welcome to the Gipter Wizard.\nThis will help you go through the basic setup. (" + step + "/6)");
         return wizardPane;
     }
 
@@ -105,7 +104,7 @@ public class WizardLauncher implements Launcher {
         ComboBox<UploadType> comboBox = createComboBox(ArgName.uploadType.name());
         gridPane.add(comboBox, 1, row);
 
-        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.configuration.details") + " ("+step+"/6)");
+        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.configuration.details") + " (" + step + "/6)");
         wizardPane.setContent(gridPane);
         return wizardPane;
     }
@@ -132,7 +131,7 @@ public class WizardLauncher implements Launcher {
         PasswordField password = createPasswordField(ArgName.toolkitPassword.name());
         gridPane.add(password, 1, row);
 
-        page.setHeaderText(BundleUtils.getMsg("wizard.toolkit.credentials") + " ("+step+"/6)");
+        page.setHeaderText(BundleUtils.getMsg("wizard.toolkit.credentials") + " (" + step + "/6)");
         page.setContent(gridPane);
         return page;
     }
@@ -196,38 +195,43 @@ public class WizardLauncher implements Launcher {
         TextField committerEmail = createTextField(ArgName.committerEmail.name());
         pageGrid.add(committerEmail, 1, row);
 
-        page2.setHeaderText(BundleUtils.getMsg("wizard.scv.details") + " ("+ step +"/6)");
+        page2.setHeaderText(BundleUtils.getMsg("wizard.scv.details") + " (" + step + "/6)");
         page2.setContent(pageGrid);
         return page2;
     }
 
     private WizardPane buildProjectPage(short step) {
         int row = 0;
-        WizardPane wizardPane = new WizardPane() {
-            @Override
-            public void onEnteringPage(Wizard wizard) {
-                updateProperties(wizard, wizardProperties);
-            }
-        };
         GridPane pageGrid = new GridPane();
         pageGrid.setVgap(10);
         pageGrid.setHgap(10);
 
-        Label projectLabel = new Label(BundleUtils.getMsg("paths.panel.projectPath"));
-        Button projectButton = new Button(BundleUtils.getMsg("button.add"));
-        projectButton.setOnAction(addProjectEventHandler(wizardProperties, projectLabel));
-        pageGrid.add(projectButton, 0, row);
-        pageGrid.add(projectLabel, 1, row++);
-
         TextField itemPathField = createTextField(ArgName.itemPath.name());
         itemPathField.setDisable(true);
-        itemPathField.setText(BundleUtils.getMsg("paths.panel.itemPath"));
+        itemPathField.setText(BundleUtils.getMsg("wizard.item.location"));
         Button itemButton = new Button(BundleUtils.getMsg("button.add"));
         itemButton.setOnAction(addItemEventHandler(wizardProperties, itemPathField));
         pageGrid.add(itemButton, 0, row);
-        pageGrid.add(itemPathField, 1, row);
+        pageGrid.add(itemPathField, 1, row++);
 
-        wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + " ("+step+"/6)");
+        Label projectLabel = new Label(BundleUtils.getMsg("wizard.project.choose"));
+        Button projectButton = new Button(BundleUtils.getMsg("button.add"));
+        projectButton.setOnAction(addProjectEventHandler(wizardProperties, projectLabel));
+        pageGrid.add(projectButton, 0, row);
+        pageGrid.add(projectLabel, 1, row);
+
+        WizardPane wizardPane = new WizardPane() {
+            @Override
+            public void onEnteringPage(Wizard wizard) {
+                updateProperties(wizard, wizardProperties);
+                if (UploadType.valueFor(getValue(wizard, ArgName.uploadType)) == UploadType.STATEMENT) {
+                    itemPathField.setText(BundleUtils.getMsg("wizard.item.statement.location"));
+                    projectLabel.setVisible(false);
+                    projectButton.setVisible(false);
+                }
+            }
+        };
+        wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + " (" + step + "/6)");
         wizardPane.setContent(pageGrid);
 
         return wizardPane;
@@ -256,7 +260,7 @@ public class WizardLauncher implements Launcher {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setInitialDirectory(new File("."));
                 fileChooser.setTitle(BundleUtils.getMsg("directory.item.statement.title"));
-                File statementFile = fileChooser.showOpenDialog(uiLauncher.currentWindow());
+                File statementFile = fileChooser.showOpenDialog(primaryStage);
                 if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
                     itemPathField.setText(statementFile.getAbsolutePath());
                 }
@@ -317,10 +321,13 @@ public class WizardLauncher implements Launcher {
                     return toolkitCredentialsPage;
                 } else if (currentPage == toolkitCredentialsPage) {
                     String property = wizardProperties.getProperty(ArgName.uploadType.name());
-                    if (StringUtils.nullOrEmpty(property) || UploadType.valueFor(property) == UploadType.TOOLKIT_DOCS) {
-                        return projectPage;
+                    switch (UploadType.valueFor(property)) {
+                        case TOOLKIT_DOCS:
+                        case STATEMENT:
+                            return projectPage;
+                        default:
+                            return committerPage;
                     }
-                    return committerPage;
                 } else if (currentPage == committerPage) {
                     return projectPage;
                 } else {
