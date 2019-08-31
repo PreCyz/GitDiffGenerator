@@ -81,6 +81,8 @@ public class MainController extends AbstractController {
     private MenuItem instructionMenuItem;
     @FXML
     private MenuItem upgradeMenuItem;
+    @FXML
+    private MenuItem wizardMenuItem;
 
     @FXML
     private TextField authorsTextField;
@@ -370,6 +372,7 @@ public class MainController extends AbstractController {
         readMeMenuItem.setOnAction(readMeActionEventHandler());
         instructionMenuItem.setOnAction(instructionActionEventHandler());
         upgradeMenuItem.setOnAction(upgradeActionEventHandler());
+        wizardMenuItem.setOnAction(launchWizardActionEventHandler());
         projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         uploadTypeComboBox.setOnAction(uploadTypeActionEventHandler());
@@ -442,24 +445,13 @@ public class MainController extends AbstractController {
         return event -> {
             uiLauncher.hideMainWindow();
             uiLauncher.showUpgradeWindow();
-            /*GithubService service = new GithubService(applicationProperties);
-                if (service.isNewVersion()) {
-                    logger.info("New version available: {}.", service.getStrippedVersion());
-                    new AlertWindowBuilder()
-                            .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getStrippedVersion()))
-                            .withLink(GithubService.GITHUB_URL + "/releases/latest")
-                            .withWindowType(WindowType.BROWSER_WINDOW)
-                            .withAlertType(Alert.AlertType.INFORMATION)
-                            .buildAndDisplayWindow();
-                } else {
-                    logger.info("Your version is up to date: {}.", service.getStrippedVersion());
-                    new AlertWindowBuilder()
-                            .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
-                            .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                            .withAlertType(Alert.AlertType.INFORMATION)
-                            .withImage(ImageFile.FINGER_UP)
-                            .buildAndDisplayWindow();
-                }*/
+        };
+    }
+
+    private EventHandler<ActionEvent> launchWizardActionEventHandler() {
+        return event -> {
+            uiLauncher.hideMainWindow();
+            new WizardLauncher(uiLauncher.currentWindow(), configurationNameComboBox.getValue()).execute();
         };
     }
 

@@ -39,17 +39,17 @@ public class WizardLauncher implements Launcher {
     private UILauncher uiLauncher;
     private PropertiesDao propertiesDao;
     private Properties wizardProperties;
-    private final boolean onApplicationStart;
+    private String lastChosenConfiguration;
 
     public WizardLauncher(Stage stage) {
-        this(stage, true);
+        this(stage, "");
     }
 
-    public WizardLauncher(Stage stage, boolean onApplicationStart) {
+    public WizardLauncher(Stage stage, String lastChosenConfiguration) {
         this.primaryStage = stage;
+        this.lastChosenConfiguration = lastChosenConfiguration;
         propertiesDao = DaoFactory.getPropertiesDao();
         wizardProperties = new Properties();
-        this.onApplicationStart = onApplicationStart;
     }
 
     @Override
@@ -67,17 +67,25 @@ public class WizardLauncher implements Launcher {
         wizard.setFlow(buildFlow(welcomePage, configurationPage, toolkitCredentialsPage, committerPage, projectPage, finishPage));
 
         wizard.showAndWait().ifPresent(result -> {
+            ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(new String[]{});
             if (result == ButtonType.FINISH) {
                 logger.info("Wizard finished.");
                 String[] args = propertiesDao.loadArgumentArray(wizardProperties.getProperty(ArgName.configurationName.name()));
-                ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(args);
-                uiLauncher = new UILauncher(primaryStage, instance);
-                uiLauncher.execute();
+                instance = ApplicationPropertiesFactory.getInstance(args);
             } else if (result == ButtonType.CANCEL) {
                 propertiesDao.loadApplicationProperties(wizardProperties.getProperty(ArgName.configurationName.name()))
                         .ifPresent(props -> propertiesDao.removeConfig(wizardProperties.getProperty(ArgName.configurationName.name())));
                 logger.info("Wizard canceled.");
+                instance = ApplicationPropertiesFactory.getInstance(new String[]{});
+                if (!StringUtils.nullOrEmpty(lastChosenConfiguration)) {
+                    Optional<Properties> lastConfiguration = propertiesDao.loadApplicationProperties(lastChosenConfiguration);
+                    if (lastConfiguration.isPresent()) {
+                        instance = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(lastChosenConfiguration));
+                    }
+                }
             }
+            uiLauncher = new UILauncher(primaryStage, instance);
+            uiLauncher.execute();
         });
     }
 
@@ -101,14 +109,6 @@ public class WizardLauncher implements Launcher {
     private WizardPane buildConfigurationPage(short step) {
         int row = 0;
 
-        WizardPane wizardPane = new WizardPane() {
-            @Override
-            public void onExitingPage(Wizard wizard) {
-                if (StringUtils.nullOrEmpty(getValue(wizard, ArgName.configurationName))) {
-                    wizard.getSettings().put(ArgName.configurationName.name(), "wizard-config");
-                }
-            }
-        };
         GridPane gridPane = new GridPane();
         gridPane.setVgap(10);
         gridPane.setHgap(10);
@@ -118,12 +118,42 @@ public class WizardLauncher implements Launcher {
         gridPane.add(configurationName, 1, row++);
 
         gridPane.add(new Label(BundleUtils.getMsg("csv.panel.uploadType")), 0, row);
-        ComboBox<UploadType> comboBox = createComboBox(ArgName.uploadType.name());
+        ComboBox<UploadType> comboBox = createUploadTypeComboBox(ArgName.uploadType.name());
         gridPane.add(comboBox, 1, row);
 
+        WizardPane wizardPane = new WizardPane() {
+            @Override
+            public void onEnteringPage(Wizard wizard) {
+                wizardProperties.putIfAbsent(ArgName.uploadType.name(), UploadType.SIMPLE.name());
+            }
+
+            @Override
+            public void onExitingPage(Wizard wizard) {
+                if (StringUtils.nullOrEmpty(getValue(wizard, ArgName.configurationName))) {
+                    wizard.getSettings().put(ArgName.configurationName.name(), "wizard-config");
+                }
+                if (!StringUtils.nullOrEmpty(lastChosenConfiguration)) {
+                    ApplicationProperties applicationProperties = propertiesWithCredentials();
+                    if (applicationProperties.isToolkitCredentialsSet()) {
+                        wizard.getSettings().put(ArgName.toolkitUsername.name(), applicationProperties.toolkitUsername());
+                        wizard.getSettings().put(ArgName.toolkitPassword.name(), applicationProperties.toolkitPassword());
+                    }
+                }
+                String uploadType = wizardProperties.getProperty(ArgName.uploadType.name());
+                if (StringUtils.nullOrEmpty(uploadType)) {
+                    wizardProperties.put(ArgName.uploadType.name(), comboBox.getValue().name());
+                }
+            }
+        };
         wizardPane.setHeaderText(BundleUtils.getMsg("wizard.configuration.details") + " (" + step + "/6)");
         wizardPane.setContent(gridPane);
         return wizardPane;
+    }
+
+    private ApplicationProperties propertiesWithCredentials() {
+        Properties properties = propertiesDao.loadToolkitCredentials();
+        String[] args = properties.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).toArray(String[]::new);
+        return ApplicationPropertiesFactory.getInstance(args);
     }
 
     private WizardPane buildToolkitCredentialsPage(short step) {
@@ -181,11 +211,14 @@ public class WizardLauncher implements Launcher {
         return passwordField;
     }
 
-    private ComboBox<UploadType> createComboBox(String id) {
+    private ComboBox<UploadType> createUploadTypeComboBox(String id) {
         ComboBox<UploadType> comboBox = new ComboBox<>();
         comboBox.setId(id);
         comboBox.setValue(UploadType.SIMPLE);
         comboBox.setItems(FXCollections.observableArrayList(UploadType.values()));
+        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            wizardProperties.put(ArgName.uploadType.name(), newValue.name());
+        });
         GridPane.setHgrow(comboBox, Priority.ALWAYS);
         return comboBox;
     }
@@ -227,13 +260,13 @@ public class WizardLauncher implements Launcher {
         itemPathField.setDisable(true);
         itemPathField.setText(BundleUtils.getMsg("wizard.item.location"));
         Button itemButton = new Button(BundleUtils.getMsg("button.add"));
-        itemButton.setOnAction(addItemEventHandler(wizardProperties, itemPathField));
+        itemButton.setOnAction(addItemEventHandler(itemPathField));
         pageGrid.add(itemButton, 0, row);
         pageGrid.add(itemPathField, 1, row++);
 
         Label projectLabel = new Label(BundleUtils.getMsg("wizard.project.choose"));
         Button projectButton = new Button(BundleUtils.getMsg("button.add"));
-        projectButton.setOnAction(addProjectEventHandler(wizardProperties, projectLabel));
+        projectButton.setOnAction(addProjectEventHandler(projectLabel));
         pageGrid.add(projectButton, 0, row);
         pageGrid.add(projectLabel, 1, row);
 
@@ -281,25 +314,26 @@ public class WizardLauncher implements Launcher {
         return wizardPane;
     }
 
-    private EventHandler<ActionEvent> addProjectEventHandler(Properties properties, Label projectLabel) {
+    private EventHandler<ActionEvent> addProjectEventHandler(Label projectLabel) {
         return event -> {
-            String[] args = properties.entrySet().stream()
+            propertiesDao.saveRunConfig(wizardProperties);
+            String[] args = wizardProperties.entrySet().stream()
                     .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
                     .toArray(String[]::new);
             ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             uiLauncher = new UILauncher(primaryStage, applicationProperties);
             if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
-                uiLauncher.showToolkitProjectsWindow(properties);
+                uiLauncher.showToolkitProjectsWindow(wizardProperties);
             } else {
-                uiLauncher.showProjectsWindow(properties);
+                uiLauncher.showProjectsWindow(wizardProperties);
             }
             projectLabel.setText("Set");
         };
     }
 
-    private EventHandler<ActionEvent> addItemEventHandler(Properties properties, TextField itemPathField) {
+    private EventHandler<ActionEvent> addItemEventHandler(TextField itemPathField) {
         return event -> {
-            UploadType uploadType = UploadType.valueFor(properties.getProperty(ArgName.uploadType.name()));
+            UploadType uploadType = UploadType.valueFor(wizardProperties.getProperty(ArgName.uploadType.name()));
             if (uploadType == UploadType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setInitialDirectory(new File("."));
@@ -367,13 +401,11 @@ public class WizardLauncher implements Launcher {
                 } else if (currentPage == welcomePage) {
                     return configurationPage;
                 } else if (currentPage == configurationPage) {
-                    if (onApplicationStart) {
+                    if (StringUtils.nullOrEmpty(lastChosenConfiguration)) {
                         return toolkitCredentialsPage;
                     }
-                    Properties properties = propertiesDao.loadToolkitCredentials();
-                    String[] args = properties.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).toArray(String[]::new);
-                    ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(args);
-                    if (instance.isToolkitCredentialsSet()) {
+                    ApplicationProperties applicationProperties = propertiesWithCredentials();
+                    if (applicationProperties.isToolkitCredentialsSet()) {
                         return flowAdvanceLogic();
                     }
                     return toolkitCredentialsPage;
@@ -388,6 +420,9 @@ public class WizardLauncher implements Launcher {
 
             private WizardPane flowAdvanceLogic() {
                 String property = wizardProperties.getProperty(ArgName.uploadType.name());
+                if (StringUtils.nullOrEmpty(property)) {
+                    return committerPage;
+                }
                 switch (UploadType.valueFor(property)) {
                     case TOOLKIT_DOCS:
                     case STATEMENT:
