@@ -84,7 +84,7 @@ public class WizardLauncher implements Launcher {
         anchorPane.getChildren().addAll(imageView);
 
         wizardPane.setContent(anchorPane);
-        wizardPane.setHeaderText("Welcome to the Gipter Wizard.\nThis will help you go through the basic setup. (" + step + "/6)");
+        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.welcome.text", String.valueOf(step)));
         return wizardPane;
     }
 
@@ -284,7 +284,7 @@ public class WizardLauncher implements Launcher {
                 propertiesDao.saveRunConfig(wizardProperties);
             }
         };
-        wizardPane.setHeaderText("Huuzzaaaa!! Konfiguracja ukonczona. (" + step + "/6)");
+        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.finish.text", String.valueOf(step)));
 
         AnchorPane anchorPane = new AnchorPane();
         ImageView imageView = ResourceUtils.getImgResource(ImageFile.MINION_APPLAUSE_GIF.fileUrl())
