@@ -30,7 +30,7 @@
                <children>
                   <TextField fx:id="toolkitUsernameTextField" layoutX="107.0" layoutY="7.0" />
                   <PasswordField fx:id="toolkitPasswordField" layoutX="107.0" layoutY="37.0" />
-                  <Hyperlink fx:id="toolkitUserFolderHyperlink" layoutX="262.0" layoutY="68.0" prefHeight="23.0" text="%toolkit.panel.link">
+                  <Hyperlink fx:id="verifyCredentialsHyperlink" layoutX="262.0" layoutY="68.0" prefHeight="23.0" text="%toolkit.panel.link">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
@@ -40,6 +40,7 @@
                   <Label layoutX="10.0" layoutY="39.0" text="%toolkit.panel.password" />
                   <Label layoutX="10.0" layoutY="9.0" text="%toolkit.panel.username" />
                   <Pane id="minion" layoutX="457.0" layoutY="2.0" prefHeight="102.0" prefWidth="105.0" stylesheets="@../css/main.css" />
+                  <ProgressIndicator fx:id="verifyProgressIndicator" layoutX="409.0" layoutY="69.0" prefHeight="25.0" prefWidth="25.0" />
                </children>
             </AnchorPane>
         </content>
@@ -173,7 +174,7 @@
                         <Font name="System Bold" size="13.0" />
                      </font>
                   </Button>
-                  <ProgressIndicator fx:id="progressIndicator" layoutX="300.0" layoutY="445.0" progress="0.0" />
+                  <ProgressIndicator fx:id="loadProgressIndicator" layoutX="300.0" layoutY="445.0" progress="0.0" />
                   <Label layoutX="8.0" layoutY="13.0" text="%main.configurationName">
                      <font>
                         <Font name="System Bold" size="12.0" />

@@ -106,11 +106,13 @@ public class MainController extends AbstractController {
     @FXML
     private TextField toolkitDomainTextField;
     @FXML
-    private Hyperlink toolkitUserFolderHyperlink;
+    private Hyperlink verifyCredentialsHyperlink;
     @FXML
     private TextField toolkitProjectListNamesTextField;
     @FXML
     private CheckBox deleteDownloadedFilesCheckBox;
+    @FXML
+    private ProgressIndicator verifyProgressIndicator;
 
     @FXML
     private Label projectPathLabel;
@@ -141,7 +143,7 @@ public class MainController extends AbstractController {
     @FXML
     private Button exitButton;
     @FXML
-    private ProgressIndicator progressIndicator;
+    private ProgressIndicator loadProgressIndicator;
     @FXML
     private Label infoLabel;
     @FXML
@@ -302,7 +304,8 @@ public class MainController extends AbstractController {
         mercurialAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
         skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
 
-        progressIndicator.setVisible(false);
+        loadProgressIndicator.setVisible(false);
+        verifyProgressIndicator.setVisible(false);
         instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
         useAsFileNameCheckBox.setDisable(!definedPatterns.isEmpty());
         setDisableDependOnConfigurations();
@@ -383,7 +386,7 @@ public class MainController extends AbstractController {
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler());
         addConfigurationButton.setOnAction(addConfigurationEventHandler());
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
-        toolkitUserFolderHyperlink.setOnMouseClicked(toolkitUserFolderOnMouseClickEventHandler());
+        verifyCredentialsHyperlink.setOnMouseClicked(verifyCredentialsHyperlinkOnMouseClickEventHandler());
         itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
     }
 
@@ -610,9 +613,9 @@ public class MainController extends AbstractController {
     }
 
     private void resetIndicatorProperties(Task task) {
-        progressIndicator.setVisible(true);
-        progressIndicator.progressProperty().unbind();
-        progressIndicator.progressProperty().bind(task.progressProperty());
+        loadProgressIndicator.setVisible(true);
+        loadProgressIndicator.progressProperty().unbind();
+        loadProgressIndicator.progressProperty().bind(task.progressProperty());
         infoLabel.textProperty().unbind();
         infoLabel.textProperty().bind(task.messageProperty());
     }
@@ -769,25 +772,37 @@ public class MainController extends AbstractController {
         };
     }
 
-    private EventHandler<MouseEvent> toolkitUserFolderOnMouseClickEventHandler() {
-        return event -> uiLauncher.executeOutsideUIThread(() -> {
-            ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
-            boolean hasProperCredentials = new ToolkitService(uiAppProps).hasProperCredentials();
-            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
-            if (hasProperCredentials) {
-                alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
-                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage(ImageFile.FINGER_UP_PNG);
-            } else {
-                alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
-                        .withLink(AlertHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.MINION_IOIO_GIF);
-            }
-            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-        });
+    private EventHandler<MouseEvent> verifyCredentialsHyperlinkOnMouseClickEventHandler() {
+        return event -> {
+            Task<Void> task = new Task<Void>() {
+                @Override
+                public Void call() {
+                    ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
+                    boolean hasProperCredentials = new ToolkitService(uiAppProps).hasProperCredentials();
+                    AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
+                    if (hasProperCredentials) {
+                        alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
+                                .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                                .withAlertType(Alert.AlertType.INFORMATION)
+                                .withImage(ImageFile.FINGER_UP_PNG);
+                    } else {
+                        alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
+                                .withLink(AlertHelper.logsFolder())
+                                .withWindowType(WindowType.LOG_WINDOW)
+                                .withAlertType(Alert.AlertType.ERROR)
+                                .withImage(ImageFile.MINION_IOIO_GIF);
+                    }
+                    Platform.runLater(() -> {
+                        verifyProgressIndicator.setVisible(false);
+                        alertWindowBuilder.buildAndDisplayWindow();
+                    });
+                    return null;
+                }
+            };
+            verifyProgressIndicator.setVisible(true);
+            uiLauncher.executeOutsideUIThread(task);
+            verifyCredentialsHyperlink.setVisited(false);
+        };
     }
 
     private EventHandler<KeyEvent> itemNameKeyReleasedEventHandler() {
