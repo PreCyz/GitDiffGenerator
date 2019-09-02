@@ -9,7 +9,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
 public class UpgradeJobCreator {
 
     final static TriggerKey UPGRADE_TRIGGER_KEY = new TriggerKey("checkUpgradesTrigger", "checkUpgradesTriggerGroup");
-    public static final String UPGRADE_CRON_EXPRESSION = "0 0 12 */14 * ?";
+    public static final String UPGRADE_CRON_EXPRESSION = "0 0 12 */3 * ?";
     private Trigger trigger;
 
     public JobDetail create() {
