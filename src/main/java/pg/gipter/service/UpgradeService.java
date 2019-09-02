@@ -47,7 +47,7 @@ public class UpgradeService extends TaskService<Void> {
                     decompress(sevenZFile, Paths.get(homeDirectoryPath.get()).toFile());
                     restartApplication();
                 } else {
-                    logger.error("Did not downloaded the newest version.");
+                    logger.error("Did not download the newest version.");
                     alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
                             .withLink(AlertHelper.logsFolder())
                             .withWindowType(WindowType.LOG_WINDOW)
@@ -95,7 +95,7 @@ public class UpgradeService extends TaskService<Void> {
                 updateTaskProgress(Double.valueOf(5 * Math.pow(10, 5)).longValue());
             }
         } catch (IOException ex) {
-            logger.error("What tha hell ?", ex);
+            logger.error("What da hell ?", ex);
             throw ex;
         } finally {
             updateMsg(BundleUtils.getMsg("upgrade.progress.deleting"));
@@ -114,7 +114,7 @@ public class UpgradeService extends TaskService<Void> {
             }
             logger.info("File [{}] deleted.", sevenZSourceFile.getName());
         } catch (IOException ex) {
-            logger.error("Could not delete the {} file.", sevenZSourceFile.getName(), ex);
+            logger.error("Could not delete the [{}] file.", sevenZSourceFile.getName(), ex);
             throw ex;
         }
     }

@@ -100,7 +100,14 @@ public class GithubService {
                     }
 
                     Gson gson = new Gson();
-                    return Optional.ofNullable(gson.fromJson(result.toString(), JsonObject.class));
+                    Optional<JsonObject> distributionDetails = Optional.ofNullable(gson.fromJson(result.toString(), JsonObject.class));
+                    if (distributionDetails.isPresent()) {
+                        logger.info("Last distribution details downloaded.");
+                        logger.debug("Last distribution details: {}", result.toString());
+                    } else {
+                        logger.warn("Last distribution details is not available.");
+                    }
+                    return distributionDetails;
                 }
             } else {
                 Stream.of(response.getAllHeaders())
@@ -177,6 +184,7 @@ public class GithubService {
             if (assetName != null && !assetName.isJsonNull() && assetName.getAsString().startsWith(name)) {
                 distributionName = assetName.getAsString();
                 downloadLink = Optional.ofNullable(element.get("browser_download_url").getAsString());
+                logger.info("New version download link: [{}]", downloadLink.orElseGet(() -> "N/A"));
                 break;
             }
         }
@@ -193,6 +201,7 @@ public class GithubService {
             if (assetName != null && !assetName.isJsonNull() && assetName.getAsString().startsWith(name)) {
                 distributionName = assetName.getAsString();
                 size = Optional.of(element.get("size").getAsLong());
+                logger.info("New version file size: [{}]", size.orElseGet(() -> 0L));
                 break;
             }
         }
