@@ -39,6 +39,7 @@ import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -119,8 +120,6 @@ public class UILauncher implements Launcher {
         } else {
             logger.info("Initializing tray icon. Silent mode [{}].", silentMode);
             trayHandler.createTrayIcon();
-            scheduleJobIfExists();
-            jobHandler.scheduleUpgradeJob();
         }
     }
 
@@ -136,6 +135,7 @@ public class UILauncher implements Launcher {
             checkUpgrades();
         }
         setStartOnStartup();
+        scheduleJobs();
         logger.info("Launching UI. Silent mode: [{}].", silentMode);
         initTray();
         if (!silentMode) {
@@ -182,6 +182,11 @@ public class UILauncher implements Launcher {
         if (applicationProperties.isEnableOnStartup()) {
             new StartupService().startOnStartup();
         }
+    }
+
+    private void scheduleJobs() {
+        scheduleUploadJob();
+        jobHandler.scheduleUpgradeJob();
     }
 
     public void buildAndShowMainWindow() {
@@ -307,9 +312,10 @@ public class UILauncher implements Launcher {
         }
     }
 
-    private void scheduleJobIfExists() {
+    private void scheduleUploadJob() {
         Optional<Properties> data = dataDao.loadDataProperties();
         if (data.isPresent() && !jobHandler.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.value())) {
+            logger.info("Setting up the job.");
             try {
                 JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.value()));
 
@@ -352,6 +358,10 @@ public class UILauncher implements Launcher {
                         .withCronExpression(cronExpression)
                         .withConfigs(configs);
                 jobHandler.scheduleUploadJob(builder, additionalJobParams);
+                if (shouldTriggerUploadJob(data.get())) {
+                    jobHandler.triggerJob();
+                }
+                logger.info("Job set up successfully.");
 
             } catch (ParseException | SchedulerException e) {
                 logger.warn("Can not restart the scheduler.", e);
@@ -364,6 +374,16 @@ public class UILauncher implements Launcher {
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         }
+    }
+
+    private boolean shouldTriggerUploadJob(Properties data) {
+        boolean result = false;
+        String nextFireDate = String.valueOf(data.get(JobProperty.NEXT_FIRE_DATE.value()));
+        if (!StringUtils.nullOrEmpty(nextFireDate)) {
+            LocalDateTime nextFireDateTime = LocalDateTime.parse(nextFireDate, DateTimeFormatter.ISO_DATE_TIME);
+            result = nextFireDateTime.isBefore(LocalDateTime.now());
+        }
+        return result;
     }
 
     public boolean isTrayActivated() {

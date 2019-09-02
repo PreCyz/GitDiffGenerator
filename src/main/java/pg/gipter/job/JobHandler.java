@@ -96,4 +96,9 @@ public class JobHandler {
     public Properties getDataProperties() {
         return uploadJobCreator.getDataProperties();
     }
+
+    public void triggerJob() throws SchedulerException {
+        scheduler.triggerJob(uploadJobCreator.getJobDetail().getKey(), uploadJobCreator.getJobDetail().getJobDataMap());
+        logger.info("New upload job [{}] triggered.", uploadJobCreator.getJobDetail().getKey());
+    }
 }
