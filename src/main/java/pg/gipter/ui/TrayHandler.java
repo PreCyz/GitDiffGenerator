@@ -91,18 +91,18 @@ class TrayHandler {
                     popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
                     addSeparator = true;
                 }
-                if (data.get().containsKey(JobProperty.NEXT_FIRE_DATE.value()) &&
-                        !StringUtils.nullOrEmpty(data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value(), ""))) {
+                if (data.get().containsKey(JobProperty.NEXT_FIRE_DATE.key()) &&
+                        !StringUtils.nullOrEmpty(data.get().getProperty(JobProperty.NEXT_FIRE_DATE.key(), ""))) {
                     popupMenu.add(BundleUtils.getMsg(
                             "tray.item.nextUpdate",
-                            data.get().getProperty(JobProperty.NEXT_FIRE_DATE.value())
+                            data.get().getProperty(JobProperty.NEXT_FIRE_DATE.key())
                     ));
                     addSeparator = true;
                 }
 
-                if (data.get().containsKey(JobProperty.TYPE.value())) {
+                if (data.get().containsKey(JobProperty.TYPE.key())) {
                     Menu jobMenu = new Menu(
-                            String.format("%s %s", UploadItemJob.NAME, data.get().getProperty(JobProperty.TYPE.value()))
+                            String.format("%s %s", UploadItemJob.NAME, data.get().getProperty(JobProperty.TYPE.key()))
                     );
                     JobController.buildLabel(data.get(), JobProperty.DAY_OF_WEEK).ifPresent(jobMenu::add);
                     JobController.buildLabel(data.get(), JobProperty.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);

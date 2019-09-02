@@ -57,7 +57,7 @@ class DataDaoImpl implements DataDao {
     @Override
     public void saveNextUpload(String nextUploadDateTime) {
         Properties data = loadDataProperties().orElseGet(Properties::new);
-        data.put(JobProperty.NEXT_FIRE_DATE.value(), nextUploadDateTime);
+        data.put(JobProperty.NEXT_FIRE_DATE.key(), nextUploadDateTime);
         saveProperties(data);
     }
 
@@ -75,9 +75,9 @@ class DataDaoImpl implements DataDao {
 
     void convertExistingJob(Set<String> configNames) {
         Optional<Properties> properties = loadDataProperties();
-        if (properties.isPresent() && !properties.get().containsKey(JobProperty.CONFIGS.value())) {
+        if (properties.isPresent() && !properties.get().containsKey(JobProperty.CONFIGS.key())) {
             Properties data = properties.get();
-            data.setProperty(JobProperty.CONFIGS.value(), String.join(",", configNames));
+            data.setProperty(JobProperty.CONFIGS.key(), String.join(",", configNames));
             saveDataProperties(data);
         }
     }

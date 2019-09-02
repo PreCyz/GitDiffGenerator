@@ -39,7 +39,6 @@ import java.text.ParseException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -187,6 +186,7 @@ public class UILauncher implements Launcher {
     private void scheduleJobs() {
         scheduleUploadJob();
         jobHandler.scheduleUpgradeJob();
+        jobHandler.executeUploadJobIfMissed(executor);
     }
 
     public void buildAndShowMainWindow() {
@@ -303,7 +303,7 @@ public class UILauncher implements Launcher {
         } finally {
             Optional<Properties> data = dataDao.loadDataProperties();
             if (data.isPresent()) {
-                data.ifPresent(properties -> Stream.of(JobProperty.values()).forEach(jobKey -> properties.remove(jobKey.value())));
+                data.ifPresent(properties -> Stream.of(JobProperty.values()).forEach(jobKey -> properties.remove(jobKey.key())));
                 dataDao.saveDataProperties(data.get());
             }
 
@@ -314,35 +314,35 @@ public class UILauncher implements Launcher {
 
     private void scheduleUploadJob() {
         Optional<Properties> data = dataDao.loadDataProperties();
-        if (data.isPresent() && !jobHandler.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.value())) {
+        if (data.isPresent() && !jobHandler.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.key())) {
             logger.info("Setting up the job.");
             try {
-                JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.value()));
+                JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.key()));
 
                 LocalDate scheduleStart = null;
-                if (data.get().containsKey(JobProperty.SCHEDULE_START.value())) {
+                if (data.get().containsKey(JobProperty.SCHEDULE_START.key())) {
                     scheduleStart = LocalDate.parse(
-                            data.get().getProperty(JobProperty.SCHEDULE_START.value()),
+                            data.get().getProperty(JobProperty.SCHEDULE_START.key()),
                             ApplicationProperties.yyyy_MM_dd
                     );
                 }
                 int dayOfMonth = 0;
-                if (data.get().containsKey(JobProperty.DAY_OF_MONTH.value())) {
-                    dayOfMonth = Integer.parseInt(data.get().getProperty(JobProperty.DAY_OF_MONTH.value()));
+                if (data.get().containsKey(JobProperty.DAY_OF_MONTH.key())) {
+                    dayOfMonth = Integer.parseInt(data.get().getProperty(JobProperty.DAY_OF_MONTH.key()));
                 }
                 int hourOfDay = 0;
                 int minuteOfHour = 0;
-                if (data.get().containsKey(JobProperty.HOUR_OF_THE_DAY.value())) {
-                    String hourOfDayString = data.get().getProperty(JobProperty.HOUR_OF_THE_DAY.value());
+                if (data.get().containsKey(JobProperty.HOUR_OF_THE_DAY.key())) {
+                    String hourOfDayString = data.get().getProperty(JobProperty.HOUR_OF_THE_DAY.key());
                     hourOfDay = Integer.parseInt(hourOfDayString.substring(0, hourOfDayString.lastIndexOf(":")));
                     minuteOfHour = Integer.parseInt(hourOfDayString.substring(hourOfDayString.lastIndexOf(":") + 1));
                 }
                 DayOfWeek dayOfWeek = null;
-                if (data.get().containsKey(JobProperty.DAY_OF_WEEK.value())) {
-                    dayOfWeek = DayOfWeek.valueOf(data.get().getProperty(JobProperty.DAY_OF_WEEK.value()));
+                if (data.get().containsKey(JobProperty.DAY_OF_WEEK.key())) {
+                    dayOfWeek = DayOfWeek.valueOf(data.get().getProperty(JobProperty.DAY_OF_WEEK.key()));
                 }
-                String cronExpression = data.get().getProperty(JobProperty.CRON.value());
-                String configs = data.get().getProperty(JobProperty.CONFIGS.value());
+                String cronExpression = data.get().getProperty(JobProperty.CRON.key());
+                String configs = data.get().getProperty(JobProperty.CONFIGS.key());
 
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), this);
@@ -358,9 +358,6 @@ public class UILauncher implements Launcher {
                         .withCronExpression(cronExpression)
                         .withConfigs(configs);
                 jobHandler.scheduleUploadJob(builder, additionalJobParams);
-                if (shouldTriggerUploadJob(data.get())) {
-                    jobHandler.triggerJob();
-                }
                 logger.info("Job set up successfully.");
 
             } catch (ParseException | SchedulerException e) {
@@ -374,16 +371,6 @@ public class UILauncher implements Launcher {
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         }
-    }
-
-    private boolean shouldTriggerUploadJob(Properties data) {
-        boolean result = false;
-        String nextFireDate = String.valueOf(data.get(JobProperty.NEXT_FIRE_DATE.value()));
-        if (!StringUtils.nullOrEmpty(nextFireDate)) {
-            LocalDateTime nextFireDateTime = LocalDateTime.parse(nextFireDate, DateTimeFormatter.ISO_DATE_TIME);
-            result = nextFireDateTime.isBefore(LocalDateTime.now());
-        }
-        return result;
     }
 
     public boolean isTrayActivated() {

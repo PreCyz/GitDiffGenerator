@@ -46,7 +46,7 @@ public class UploadItemJob implements Job {
                 NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
         );
 
-        String configNames = jobDataMap.getString(JobProperty.CONFIGS.value());
+        String configNames = jobDataMap.getString(JobProperty.CONFIGS.key());
         LinkedList<String> configurationNames = new LinkedList<>(Arrays.asList(configNames.split(UploadJobCreator.CONFIG_DELIMITER)));
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
 
@@ -68,7 +68,7 @@ public class UploadItemJob implements Job {
     }
 
     private LocalDateTime calculateAndSetDates(JobDataMap jobDataMap) throws JobExecutionException {
-        JobType jobType = JobType.valueOf(jobDataMap.getString(JobProperty.TYPE.value()));
+        JobType jobType = JobType.valueOf(jobDataMap.getString(JobProperty.TYPE.key()));
         LocalDate startDate = LocalDate.now();
         LocalDateTime nextUploadDate = LocalDateTime.now();
         switch (jobType) {
@@ -86,7 +86,7 @@ public class UploadItemJob implements Job {
                 break;
             case CRON:
                 CronExpression cronExpression;
-                String cronString = jobDataMap.getString(JobProperty.CRON.value());
+                String cronString = jobDataMap.getString(JobProperty.CRON.key());
                 try {
                     cronExpression = new CronExpression(cronString);
                 } catch (ParseException e) {

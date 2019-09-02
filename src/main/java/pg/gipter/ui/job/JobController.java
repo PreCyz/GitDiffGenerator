@@ -138,24 +138,24 @@ public class JobController extends AbstractController {
             );
             lastExecutionLabel.setText(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
         }
-        if (data.containsKey(JobProperty.NEXT_FIRE_DATE.value()) &&
-                !StringUtils.nullOrEmpty(data.getProperty(JobProperty.NEXT_FIRE_DATE.value(), ""))) {
+        if (data.containsKey(JobProperty.NEXT_FIRE_DATE.key()) &&
+                !StringUtils.nullOrEmpty(data.getProperty(JobProperty.NEXT_FIRE_DATE.key(), ""))) {
             nextExecutionLabel.setText(BundleUtils.getMsg(
                     "tray.item.nextUpdate",
-                    data.getProperty(JobProperty.NEXT_FIRE_DATE.value())
+                    data.getProperty(JobProperty.NEXT_FIRE_DATE.key())
             ));
         }
     }
 
     private void setDefinedJobDetails(Properties dataProp) {
-        if (dataProp.containsKey(JobProperty.TYPE.value())) {
+        if (dataProp.containsKey(JobProperty.TYPE.key())) {
             cancelJobButton.setVisible(true);
             jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
-            JobType jobType = JobType.valueOf(dataProp.getProperty(JobProperty.TYPE.value()));
+            JobType jobType = JobType.valueOf(dataProp.getProperty(JobProperty.TYPE.key()));
             jobTypeLabel.setText(jobType.name());
             String details;
             if (jobType == JobType.CRON) {
-                details = BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobProperty.CRON.value()));
+                details = BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobProperty.CRON.key()));
             } else {
                 details = buildLabel(dataProp, JobProperty.SCHEDULE_START).map(value -> value + "\n").orElse("");
                 details += buildLabel(dataProp, JobProperty.DAY_OF_MONTH).map(value -> value + "\n").orElse("");
@@ -163,13 +163,13 @@ public class JobController extends AbstractController {
                 details += buildLabel(dataProp, JobProperty.HOUR_OF_THE_DAY).orElse("");
             }
             jobDetailsLabel.setText(details);
-            configsLabel.setText(dataProp.getProperty(JobProperty.CONFIGS.value()));
+            configsLabel.setText(dataProp.getProperty(JobProperty.CONFIGS.key()));
         }
     }
 
     public static Optional<String> buildLabel(Properties data, JobProperty key) {
-        if (data.containsKey(key.value())) {
-            String value = data.getProperty(key.value());
+        if (data.containsKey(key.key())) {
+            String value = data.getProperty(key.key());
             if (key == JobProperty.HOUR_OF_THE_DAY) {
                 String minuetOfHour = value.substring(value.indexOf(":") + 1);
                 if (minuetOfHour.length() == 1) {

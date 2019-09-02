@@ -53,14 +53,14 @@ public class UploadJobCreator {
     }
 
     private void clearProperties() {
-        data.remove(JobProperty.TYPE.value());
-        data.remove(JobProperty.DAY_OF_MONTH.value());
-        data.remove(JobProperty.SCHEDULE_START.value());
-        data.remove(JobProperty.CRON.value());
-        data.remove(JobProperty.HOUR_OF_THE_DAY.value());
-        data.remove(JobProperty.DAY_OF_WEEK.value());
-        data.remove(JobProperty.NEXT_FIRE_DATE.value());
-        data.remove(JobProperty.CONFIGS.value());
+        data.remove(JobProperty.TYPE.key());
+        data.remove(JobProperty.DAY_OF_MONTH.key());
+        data.remove(JobProperty.SCHEDULE_START.key());
+        data.remove(JobProperty.CRON.key());
+        data.remove(JobProperty.HOUR_OF_THE_DAY.key());
+        data.remove(JobProperty.DAY_OF_WEEK.key());
+        data.remove(JobProperty.NEXT_FIRE_DATE.key());
+        data.remove(JobProperty.CONFIGS.key());
     }
 
     private Trigger createTriggerEveryMonth() {
@@ -68,11 +68,11 @@ public class UploadJobCreator {
         String scheduleStart = startDateTime.format(ApplicationProperties.yyyy_MM_dd);
 
         clearProperties();
-        data.put(JobProperty.TYPE.value(), JobType.EVERY_MONTH.name());
-        data.put(JobProperty.DAY_OF_MONTH.value(), String.valueOf(dayOfMonth));
-        data.put(JobProperty.SCHEDULE_START.value(), scheduleStart);
-        data.put(JobProperty.HOUR_OF_THE_DAY.value(), String.format("%d:%d", hourOfDay, minuteOfHour));
-        data.put(JobProperty.CONFIGS.value(), configs);
+        data.put(JobProperty.TYPE.key(), JobType.EVERY_MONTH.name());
+        data.put(JobProperty.DAY_OF_MONTH.key(), String.valueOf(dayOfMonth));
+        data.put(JobProperty.SCHEDULE_START.key(), scheduleStart);
+        data.put(JobProperty.HOUR_OF_THE_DAY.key(), String.format("%d:%d", hourOfDay, minuteOfHour));
+        data.put(JobProperty.CONFIGS.key(), configs);
 
         return newTrigger()
                 .withIdentity(EVERY_MONTH_TRIGGER_KEY)
@@ -84,10 +84,10 @@ public class UploadJobCreator {
     private Trigger createTriggerEvery2Weeks() throws ParseException {
         //0 0 12 */14 * ? 	Every 14 days at noon
         clearProperties();
-        data.put(JobProperty.TYPE.value(), JobType.EVERY_2_WEEKS.name());
-        data.put(JobProperty.HOUR_OF_THE_DAY.value(), String.format("%d:%d", hourOfDay, minuteOfHour));
-        data.put(JobProperty.SCHEDULE_START.value(), startDateTime.format(ApplicationProperties.yyyy_MM_dd));
-        data.put(JobProperty.CONFIGS.value(), configs);
+        data.put(JobProperty.TYPE.key(), JobType.EVERY_2_WEEKS.name());
+        data.put(JobProperty.HOUR_OF_THE_DAY.key(), String.format("%d:%d", hourOfDay, minuteOfHour));
+        data.put(JobProperty.SCHEDULE_START.key(), startDateTime.format(ApplicationProperties.yyyy_MM_dd));
+        data.put(JobProperty.CONFIGS.key(), configs);
 
         int second = 0;
         Date startDate = DateBuilder.dateOf(
@@ -117,11 +117,11 @@ public class UploadJobCreator {
         String hourOfThDay = String.format("%s:%s", hourOfDay, minuteOfHour);
 
         clearProperties();
-        data.put(JobProperty.TYPE.value(), JobType.EVERY_WEEK.name());
-        data.put(JobProperty.DAY_OF_WEEK.value(), dayOfWeek.name());
-        data.put(JobProperty.HOUR_OF_THE_DAY.value(), hourOfThDay);
-        data.put(JobProperty.SCHEDULE_START.value(), LocalDate.now().format(ApplicationProperties.yyyy_MM_dd));
-        data.put(JobProperty.CONFIGS.value(), configs);
+        data.put(JobProperty.TYPE.key(), JobType.EVERY_WEEK.name());
+        data.put(JobProperty.DAY_OF_WEEK.key(), dayOfWeek.name());
+        data.put(JobProperty.HOUR_OF_THE_DAY.key(), hourOfThDay);
+        data.put(JobProperty.SCHEDULE_START.key(), LocalDate.now().format(ApplicationProperties.yyyy_MM_dd));
+        data.put(JobProperty.CONFIGS.key(), configs);
 
         //0 0 12 ? * FRI - Every Friday at noon
         /*String cronExpr = "0" + " " +
@@ -162,9 +162,9 @@ public class UploadJobCreator {
 
     private Trigger createCronTrigger() throws ParseException {
         clearProperties();
-        data.put(JobProperty.TYPE.value(), JobType.CRON.name());
-        data.put(JobProperty.CRON.value(), cronExpression);
-        data.put(JobProperty.CONFIGS.value(), configs);
+        data.put(JobProperty.TYPE.key(), JobType.CRON.name());
+        data.put(JobProperty.CRON.key(), cronExpression);
+        data.put(JobProperty.CONFIGS.key(), configs);
 
         CronExpression expression = new CronExpression(cronExpression);
         return newTrigger()
@@ -177,8 +177,8 @@ public class UploadJobCreator {
     private JobDetail createJobDetail() {
         JobDataMap jobDataMap = new JobDataMap();
         for (JobProperty key : JobProperty.values()) {
-            if (data.containsKey(key.value())) {
-                jobDataMap.put(key.value(), data.getProperty(key.value()));
+            if (data.containsKey(key.key())) {
+                jobDataMap.put(key.key(), data.getProperty(key.key()));
             }
         }
         return JobBuilder.newJob(UploadItemJob.class)
@@ -233,7 +233,7 @@ public class UploadJobCreator {
     }
 
     public void setNextFireDate() {
-        getNextFireTime(trigger).ifPresent(nextFireTime -> data.put(JobProperty.NEXT_FIRE_DATE.value(), nextFireTime));
+        getNextFireTime(trigger).ifPresent(nextFireTime -> data.put(JobProperty.NEXT_FIRE_DATE.key(), nextFireTime));
     }
 
     public JobDetail getJobDetail() {

@@ -21,16 +21,16 @@ public class JobHelper {
 
     public void updateJobConfigs(String oldConfigName, String newConfigName) {
         Optional<Properties> dataProperties = dataDao.loadDataProperties();
-        if (dataProperties.isPresent() && dataProperties.get().containsKey(JobProperty.CONFIGS.value())) {
+        if (dataProperties.isPresent() && dataProperties.get().containsKey(JobProperty.CONFIGS.key())) {
             Properties data = dataProperties.get();
-            LinkedHashSet<String> configs = Stream.of(data.getProperty(JobProperty.CONFIGS.value()).split(","))
+            LinkedHashSet<String> configs = Stream.of(data.getProperty(JobProperty.CONFIGS.key()).split(","))
                     .collect(toCollection(LinkedHashSet::new));
             if (configs.contains(oldConfigName)) {
                 configs = configs.stream()
                         .filter(configName -> !configName.equals(oldConfigName))
                         .collect(toCollection(LinkedHashSet::new));
                 configs.add(newConfigName);
-                data.put(JobProperty.CONFIGS.value(), String.join(",", configs));
+                data.put(JobProperty.CONFIGS.key(), String.join(",", configs));
                 dataDao.saveDataProperties(data);
             }
         }
