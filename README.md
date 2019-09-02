@@ -205,5 +205,5 @@ uploadType=STATEMENT
 ### Download
 To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
 
-### Licence
-Free to use.
+### License
+MIT - please read the file [LICENSE](https://github.com/PreCyz/GitDiffGenerator/blob/master/LICENSE).
