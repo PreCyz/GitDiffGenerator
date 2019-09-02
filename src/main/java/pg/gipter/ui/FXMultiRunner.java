@@ -235,7 +235,13 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private void updateStatistics(final UploadStatus status) {
         executor.execute(() -> {
             StatisticService statisticService = new StatisticService();
-            statisticService.updateStatistics(new ServiceDto(applicationPropertiesCollection, status, runType));
+            LinkedList<ApplicationProperties> appProps = new LinkedList<>(applicationPropertiesCollection);
+            if (appProps.isEmpty()) {
+                for (String configName : configurationNames) {
+                    appProps.add(ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configName)));
+                }
+            }
+            statisticService.updateStatistics(new ServiceDto(appProps, status, runType));
         });
     }
 
