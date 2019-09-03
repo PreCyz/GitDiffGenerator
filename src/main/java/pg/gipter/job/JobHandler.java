@@ -83,10 +83,6 @@ public class JobHandler {
         return scheduler != null;
     }
 
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
-
     public void scheduleUploadJob(UploadItemJobBuilder jobCreatorBuilder, Map<String, Object> additionalJobParameters)
             throws ParseException, SchedulerException {
         uploadJobCreator = jobCreatorBuilder.createJobCreator();
@@ -99,8 +95,12 @@ public class JobHandler {
         } else if (scheduler.checkExists(uploadJobCreator.getJobKey())) {
             cancelUploadJob();
         }
-        scheduler.scheduleJob(uploadJobCreator.getJobDetail(), uploadJobCreator.getTrigger());
-        logger.info("New upload items job scheduled and started.");
+        if (scheduler.getJobDetail(uploadJobCreator.getJobDetail().getKey()) == null) {
+            scheduler.scheduleJob(uploadJobCreator.getJobDetail(), uploadJobCreator.getTrigger());
+            logger.info("New upload items job scheduled and started.");
+        } else {
+            logger.info("Job with key [{}] already exists. No need to schedule it again.", uploadJobCreator.getJobDetail().getKey());
+        }
     }
 
     public void cancelUploadJob() throws SchedulerException {
