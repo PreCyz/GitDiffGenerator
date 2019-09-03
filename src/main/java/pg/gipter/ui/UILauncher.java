@@ -1,6 +1,7 @@
 package pg.gipter.ui;
 
 import javafx.application.Platform;
+import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -101,6 +102,9 @@ public class UILauncher implements Launcher {
 
     public void addPropertyToWizard(String key, String value) {
         wizardProperties.put(key, value);
+        StringProperty projectLabelProperty = (StringProperty) wizardProperties.get(WizardLauncher.projectLabelPropertyName);
+        projectLabelProperty.setValue(StringUtils.trimTo50(value));
+        wizardProperties.put(WizardLauncher.projectLabelPropertyName, projectLabelProperty);
     }
 
     public void executeOutsideUIThread(Runnable runnable) {

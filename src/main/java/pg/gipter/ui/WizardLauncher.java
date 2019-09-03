@@ -1,5 +1,7 @@
 package pg.gipter.ui;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -40,6 +42,8 @@ public class WizardLauncher implements Launcher {
     private PropertiesDao propertiesDao;
     private Properties wizardProperties;
     private String lastChosenConfiguration;
+
+    static final String projectLabelPropertyName = "projectLabelProperty";
 
     public WizardLauncher(Stage stage) {
         this(stage, "");
@@ -256,17 +260,26 @@ public class WizardLauncher implements Launcher {
         pageGrid.setVgap(10);
         pageGrid.setHgap(10);
 
-        TextField itemPathField = createTextField(ArgName.itemPath.name());
-        itemPathField.setDisable(true);
-        itemPathField.setText(BundleUtils.getMsg("wizard.item.location"));
-        Button itemButton = new Button(BundleUtils.getMsg("button.add"));
-        itemButton.setOnAction(addItemEventHandler(itemPathField));
-        pageGrid.add(itemButton, 0, row);
-        pageGrid.add(itemPathField, 1, row++);
+        StringProperty itemPathStringProperty = new SimpleStringProperty();
+        itemPathStringProperty.setValue(BundleUtils.getMsg("wizard.item.location"));
+        Label itemPathLabel = new Label();
+        itemPathLabel.textProperty().unbind();
+        itemPathLabel.textProperty().bind(itemPathStringProperty);
 
-        Label projectLabel = new Label(BundleUtils.getMsg("wizard.project.choose"));
+        Button itemButton = new Button(BundleUtils.getMsg("button.add"));
+        itemButton.setOnAction(addItemEventHandler(itemPathStringProperty));
+        pageGrid.add(itemButton, 0, row);
+        pageGrid.add(itemPathLabel, 1, row++);
+
+        Label projectLabel = new Label();
+        projectLabel.textProperty().unbind();
+        StringProperty projectLabelStringProperty = new SimpleStringProperty();
+        projectLabelStringProperty.setValue(BundleUtils.getMsg("wizard.project.choose"));
+        projectLabel.textProperty().bind(projectLabelStringProperty);
+        wizardProperties.put(projectLabelPropertyName, projectLabelStringProperty);
+
         Button projectButton = new Button(BundleUtils.getMsg("button.add"));
-        projectButton.setOnAction(addProjectEventHandler(projectLabel));
+        projectButton.setOnAction(addProjectEventHandler());
         pageGrid.add(projectButton, 0, row);
         pageGrid.add(projectLabel, 1, row);
 
@@ -274,38 +287,30 @@ public class WizardLauncher implements Launcher {
             @Override
             public void onEnteringPage(Wizard wizard) {
                 updateProperties(wizard, wizardProperties);
-                itemPathField.setText(BundleUtils.getMsg("wizard.item.location"));
+                itemPathStringProperty.setValue(BundleUtils.getMsg("wizard.item.location"));
                 projectLabel.setVisible(true);
                 projectButton.setVisible(true);
                 if (UploadType.valueFor(getValue(wizard, ArgName.uploadType)) == UploadType.STATEMENT) {
-                    itemPathField.setText(BundleUtils.getMsg("wizard.item.statement.location"));
+                    itemPathStringProperty.setValue(BundleUtils.getMsg("wizard.item.statement.location"));
                     projectLabel.setVisible(false);
                     projectButton.setVisible(false);
                 }
 
-                projectLabel.setText(BundleUtils.getMsg("wizard.project.choose"));
                 String projectPath = wizardProperties.getProperty(ArgName.projectPath.name());
                 if (!StringUtils.nullOrEmpty(projectPath)) {
-                    projectLabel.setText(trimPath(projectPath));
+                    StringProperty textProperty = (StringProperty) wizardProperties.get(projectLabelPropertyName);
+                    textProperty.setValue(StringUtils.trimTo50(projectPath));
                 }
 
                 String itemPath = wizardProperties.getProperty(ArgName.itemPath.name());
                 if (!StringUtils.nullOrEmpty(itemPath)) {
-                    itemPathField.setText(trimPath(itemPath));
+                    itemPathStringProperty.setValue(StringUtils.trimTo50(itemPath));
                 }
-            }
-
-            private String trimPath(String path) {
-                int maxPathLength = 50;
-                if (path.length() > 50) {
-                    path = path.substring(0, maxPathLength) + "...";
-                }
-                return path;
             }
 
             @Override
             public void onExitingPage(Wizard wizard) {
-                projectLabel.setText(getValue(wizard, ArgName.projectPath));
+                wizard.getSettings().put(ArgName.itemPath.name(), itemPathStringProperty.getValue());
             }
         };
         wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + " (" + step + "/6)");
@@ -314,7 +319,7 @@ public class WizardLauncher implements Launcher {
         return wizardPane;
     }
 
-    private EventHandler<ActionEvent> addProjectEventHandler(Label projectLabel) {
+    private EventHandler<ActionEvent> addProjectEventHandler() {
         return event -> {
             propertiesDao.saveRunConfig(wizardProperties);
             String[] args = wizardProperties.entrySet().stream()
@@ -327,11 +332,10 @@ public class WizardLauncher implements Launcher {
             } else {
                 uiLauncher.showProjectsWindow(wizardProperties);
             }
-            projectLabel.setText("Set");
         };
     }
 
-    private EventHandler<ActionEvent> addItemEventHandler(TextField itemPathField) {
+    private EventHandler<ActionEvent> addItemEventHandler(StringProperty itemPathStringProperty) {
         return event -> {
             UploadType uploadType = UploadType.valueFor(wizardProperties.getProperty(ArgName.uploadType.name()));
             if (uploadType == UploadType.STATEMENT) {
@@ -340,7 +344,8 @@ public class WizardLauncher implements Launcher {
                 fileChooser.setTitle(BundleUtils.getMsg("directory.item.statement.title"));
                 File statementFile = fileChooser.showOpenDialog(primaryStage);
                 if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
-                    itemPathField.setText(statementFile.getAbsolutePath());
+                    itemPathStringProperty.setValue(statementFile.getAbsolutePath());
+                    wizardProperties.put(ArgName.itemPath.name(), statementFile.getAbsolutePath());
                 }
             } else {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -348,7 +353,8 @@ public class WizardLauncher implements Launcher {
                 directoryChooser.setTitle(BundleUtils.getMsg("directory.item.store"));
                 File itemPathDirectory = directoryChooser.showDialog(primaryStage);
                 if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                    itemPathField.setText(itemPathDirectory.getAbsolutePath());
+                    itemPathStringProperty.setValue(itemPathDirectory.getAbsolutePath());
+                    wizardProperties.put(ArgName.itemPath.name(), itemPathDirectory.getAbsolutePath());
                 }
             }
         };

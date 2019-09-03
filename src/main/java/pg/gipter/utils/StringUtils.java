@@ -1,7 +1,5 @@
 package pg.gipter.utils;
 
-import java.nio.charset.StandardCharsets;
-
 public final class StringUtils {
 
     private StringUtils() { }
@@ -23,11 +21,11 @@ public final class StringUtils {
         return result;
     }
 
-    public static String utf8(String value) {
-        try {
-            return new String(value.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception e) {
-            return value;
+    public static String trimTo50(String value) {
+        int maxPathLength = 50;
+        if (value.length() > 50) {
+            value = value.substring(0, maxPathLength) + "...";
         }
+        return value;
     }
 }
