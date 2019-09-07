@@ -9,3 +9,4 @@ libs
 *.properties
 *.pdf
 *.json
+dependency-reduced-pom.xml
