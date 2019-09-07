@@ -181,7 +181,7 @@ public class GithubService {
         for (JsonElement asset : assets) {
             JsonObject element = (JsonObject) asset;
             JsonElement assetName = element.get("name");
-            if (assetName != null && !assetName.isJsonNull() && assetName.getAsString().startsWith(name)) {
+            if (isProperAsset(name, assetName)) {
                 distributionName = assetName.getAsString();
                 downloadLink = Optional.ofNullable(element.get("browser_download_url").getAsString());
                 logger.info("New version download link: [{}]", downloadLink.orElseGet(() -> "N/A"));
@@ -189,6 +189,11 @@ public class GithubService {
             }
         }
         return downloadLink;
+    }
+
+    private boolean isProperAsset(String name, JsonElement assetName) {
+        return assetName != null && !assetName.isJsonNull() && assetName.getAsString().startsWith(name) &&
+                assetName.getAsString().contains("11+");
     }
 
     private Optional<Long> getFileSize(JsonObject jsonObject) {
