@@ -11,6 +11,7 @@
 
     <properties>
         <java.version>11</java.version>
+        <javaFX.version>11.0.2</javaFX.version>
     </properties>
 
     <build>
@@ -188,45 +189,52 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>11.0.2</version>
+            <version>${javaFX.version}</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>11.0.2</version>
+            <version>${javaFX.version}</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>11.0.2</version>
+            <version>${javaFX.version}</version>
             <classifier>win</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>11.0.2</version>
+            <version>${javaFX.version}</version>
             <classifier>win</classifier>
         </dependency>
-        <!--<dependency>
+
+        <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>11.0.2</version>
-            <classifier>win</classifier>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javaFX.version}</version>
+            <classifier>linux</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>11.0.2</version>
-            <classifier>win</classifier>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javaFX.version}</version>
+            <classifier>linux</classifier>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
-            <version>11.0.2</version>
-            <classifier>win</classifier>
-        </dependency>-->
+            <artifactId>javafx-base</artifactId>
+            <version>${javaFX.version}</version>
+            <classifier>linux</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javaFX.version}</version>
+            <classifier>linux</classifier>
+        </dependency>
 
         <dependency>
             <groupId>javax.xml.bind</groupId>
