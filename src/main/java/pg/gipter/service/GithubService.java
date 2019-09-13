@@ -194,8 +194,8 @@ public class GithubService {
     private boolean isProperAsset(String name, JsonElement assetName) {
         boolean result = assetName != null;
         result &= !assetName.isJsonNull();
-        result &= assetName.getAsString().startsWith(name);
-        result &= assetName.getAsString().contains("11+");
+        result &= assetName.getAsString().startsWith("11+");
+        result &= assetName.getAsString().contains(name);
         return result;
     }
 
