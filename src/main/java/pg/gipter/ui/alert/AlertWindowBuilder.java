@@ -1,22 +1,18 @@
 package pg.gipter.ui.alert;
 
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.ResourceUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 /** Created by Pawel Gawedzki on 01-Apr-2019. */
@@ -81,13 +77,13 @@ public class AlertWindowBuilder {
     public void buildAndDisplayWindow() {
         Alert alert = buildDefaultAlert();
         Hyperlink hyperLink = buildHyperlink(alert);
-        FlowPane flowPane = buildFlowPane(hyperLink, windowType);
+        //FlowPane flowPane = buildFlowPane(hyperLink);
+        GridPane gridPane = buildGridPane(hyperLink);
 
-        alert.getDialogPane().contentProperty().set(flowPane);
+        alert.getDialogPane().contentProperty().set(gridPane);
         alert.showAndWait();
     }
 
-    @NotNull
     private Alert buildDefaultAlert() {
         Alert alert = new Alert(alertType);
         alert.setTitle(StringUtils.nullOrEmpty(title) ? BundleUtils.getMsg("popup.title") : title);
@@ -100,7 +96,6 @@ public class AlertWindowBuilder {
         return alert;
     }
 
-    @NotNull
     private Hyperlink buildHyperlink(Alert alert) {
         Hyperlink hyperLink = new Hyperlink(link);
         if (windowType == WindowType.LOG_WINDOW) {
@@ -118,38 +113,30 @@ public class AlertWindowBuilder {
         return hyperLink;
     }
 
-    @NotNull
-    private FlowPane buildFlowPane(Hyperlink hyperLink, WindowType windowType) {
-        FlowPane flowPane = new FlowPane();
-        flowPane.setAlignment(Pos.TOP_CENTER);
-        flowPane.setVgap(10);
-        flowPane.setHgap(100);
+    private GridPane buildGridPane(Hyperlink hyperLink) {
+        GridPane gridPane = new GridPane();
+        gridPane.setVgap(10);
+        gridPane.setHgap(10);
+        gridPane.setAlignment(Pos.CENTER);
 
-        ImageView imageView = null;
-        if (imageFile != null) {
-            imageView = ResourceUtils.getImgResource(imageFile.fileUrl())
-                    .map(url -> new ImageView(new Image(url.toString())))
-                    .orElseGet(ImageView::new);
-            flowPane.setPrefWrapLength(imageView.getImage().getWidth());
-        }
-
-        List<Node> nodes = new LinkedList<>();
+        int row = 0;
 
         if (!StringUtils.nullOrEmpty(message)) {
-            Label lbl = new Label(message);
-            nodes.add(lbl);
+            gridPane.add(new Label(message), 0, row++);
         }
 
         if (hyperLink != null && !StringUtils.nullOrEmpty(hyperLink.getText())) {
-            nodes.add(hyperLink);
+            gridPane.add(hyperLink, 0, row++);
         }
 
-        if (imageView != null && imageView.getImage() != null) {
-            nodes.add(imageView);
+        if (imageFile != null) {
+            ImageView imageView = ResourceUtils.getImgResource(imageFile.fileUrl())
+                    .map(url -> new ImageView(new Image(url.toString())))
+                    .orElseGet(ImageView::new);
+            gridPane.add(imageView, 0, row);
         }
 
-        flowPane.getChildren().addAll(nodes);
-        return flowPane;
+        return gridPane;
     }
 
     public boolean buildAndDisplayOverrideWindow() {
@@ -160,7 +147,7 @@ public class AlertWindowBuilder {
         ButtonType cancelButton = new ButtonType(cancelButtonText, ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().addAll(okButton, cancelButton);
 
-        FlowPane fp = buildFlowPane(new Hyperlink(""), WindowType.OVERRIDE_WINDOW);
+        GridPane fp = buildGridPane(new Hyperlink(""));
         alert.getDialogPane().contentProperty().set(fp);
 
         return alert.showAndWait().orElse(cancelButton) == okButton;
