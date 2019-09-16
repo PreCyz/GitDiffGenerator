@@ -6,7 +6,9 @@ import pg.gipter.utils.StringUtils;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 final class MercurialDiffCommand extends AbstractDiffCommand {
@@ -22,6 +24,11 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
         command.add("--date");
         command.add(String.format("\"%s to %s\"", appProps.startDate().format(yyyy_MM_dd), appProps.endDate().format(yyyy_MM_dd)));
         return command;
+    }
+
+    @Override
+    public List<String> updateRepositoriesCommand() {
+        return Stream.of("hg", "pull", "-u").collect(toList());
     }
 
     @Override

@@ -40,6 +40,8 @@ abstract class AbstractDiffProducer implements DiffProducer {
                 logger.info("Discovered '{}' version control system.", VCSVersionProducer.getVersion());
 
                 final DiffCommand diffCommand = DiffCommandFactory.getInstance(vcs, applicationProperties);
+                updateRepositories(projectPath, diffCommand);
+
                 List<String> cmd = diffCommand.commandAsList();
                 logger.info("{} command: {}", vcs.name(), String.join(" ", cmd));
                 cmd = getFullCommand(cmd);
@@ -61,6 +63,29 @@ abstract class AbstractDiffProducer implements DiffProducer {
         } catch (Exception ex) {
             logger.error("Error when producing diff.", ex);
             throw new IllegalArgumentException(ex.getMessage(), ex);
+        }
+    }
+
+    private void updateRepositories(String projectPath, DiffCommand diffCommand) throws IOException {
+        logger.info("Updating the repository [{}] with command [{}].", projectPath, String.join(" ", diffCommand.updateRepositoriesCommand()));
+        ProcessBuilder processBuilder = new ProcessBuilder(diffCommand.updateRepositoriesCommand());
+        processBuilder.directory(Paths.get(projectPath).toFile());
+        Process process = processBuilder.start();
+
+        try (InputStream is = process.getInputStream();
+             InputStreamReader isr = new InputStreamReader(is);
+             BufferedReader br = new BufferedReader(isr)) {
+
+            StringBuilder builder = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) {
+                builder.append(String.format("%s%n", line));
+            }
+            logger.debug(builder.toString());
+
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+            throw new IOException(ex);
         }
     }
 
