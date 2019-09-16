@@ -17,6 +17,11 @@ final class EmptyDiffCommand extends AbstractDiffCommand {
     }
 
     @Override
+    public List<String> updateRepositoriesCommand() {
+        return Collections.emptyList();
+    }
+
+    @Override
     List<String> getInitialCommand() {
         return Collections.emptyList();
     }

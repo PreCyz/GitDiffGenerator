@@ -4,4 +4,5 @@ import java.util.List;
 
 public interface DiffCommand {
     List<String> commandAsList();
+    List<String> updateRepositoriesCommand();
 }

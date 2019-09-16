@@ -128,4 +128,13 @@ class SvnDiffCommandTest {
         assertThat(actual).containsExactly("--search", "svnAuthor", "--search", "committerEmail");
     }
 
+    @Test
+    void givenMercurialDiffCommand_whenUpdateRepositoriesCommand_thenReturnProperList() {
+        command = new SvnDiffCommand(applicationProperties);
+
+        List<String> actual = command.updateRepositoriesCommand();
+
+        assertThat(actual).containsExactly("svn", "update");
+    }
+
 }

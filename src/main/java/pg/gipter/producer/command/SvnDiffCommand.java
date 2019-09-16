@@ -6,7 +6,9 @@ import pg.gipter.utils.StringUtils;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 
@@ -28,6 +30,11 @@ final class SvnDiffCommand extends AbstractDiffCommand {
         ));
 
         return command;
+    }
+
+    @Override
+    public List<String> updateRepositoriesCommand() {
+        return Stream.of("svn", "update").collect(toList());
     }
 
     @Override

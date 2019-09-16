@@ -128,4 +128,13 @@ class MercurialDiffCommandTest {
         assertThat(actual).containsExactly("--user", "mercurialAuthor", "--user", "committerEmail");
     }
 
+    @Test
+    void givenMercurialDiffCommand_whenUpdateRepositoriesCommand_thenReturnProperList() {
+        command = new MercurialDiffCommand(applicationProperties);
+
+        List<String> actual = command.updateRepositoriesCommand();
+
+        assertThat(actual).containsExactly("hg", "pull", "-u");
+    }
+
 }

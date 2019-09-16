@@ -6,8 +6,10 @@ import pg.gipter.utils.StringUtils;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 final class GitDiffCommand extends AbstractDiffCommand {
@@ -27,6 +29,11 @@ final class GitDiffCommand extends AbstractDiffCommand {
         return command;
     }
 
+    @Override
+    public List<String> updateRepositoriesCommand() {
+        return Stream.of("git", "fetch", "--all").collect(toList());
+    }
+
     List<String> getInitialCommand() {
         List<String> initialCommand = new LinkedList<>(Arrays.asList("git", "log"));
         if (!appProps.isSkipRemote()) {
@@ -41,7 +48,7 @@ final class GitDiffCommand extends AbstractDiffCommand {
                 break;
 
         }
-        initialCommand.add("--branches=*");
+        initialCommand.add("--all");
         return initialCommand;
     }
 

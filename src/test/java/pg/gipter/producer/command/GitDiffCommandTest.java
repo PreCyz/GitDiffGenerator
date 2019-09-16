@@ -31,7 +31,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.getInitialCommand();
 
-        assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--patch", "--branches=*");
+        assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--patch", "--all");
     }
 
     @Test
@@ -41,7 +41,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.getInitialCommand();
 
-        assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--oneline", "--branches=*");
+        assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--oneline", "--all");
     }
 
     @Test
@@ -52,7 +52,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.getInitialCommand();
 
-        assertThat(actual).containsExactly("git", "log", "--oneline", "--branches=*");
+        assertThat(actual).containsExactly("git", "log", "--oneline", "--all");
     }
 
     @Test
@@ -72,7 +72,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.commandAsList();
 
-        assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--patch", "--branches=*",
+        assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--patch", "--all",
                 "--author=" + author,
                 "--author=" + committerEmail,
                 "--since", startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
@@ -97,7 +97,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.commandAsList();
 
-        assertThat(actual).containsExactly("git", "log", "--patch", "--branches=*",
+        assertThat(actual).containsExactly("git", "log", "--patch", "--all",
                 "--author=" + author,
                 "--since", startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 "--until", endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
@@ -139,5 +139,14 @@ class GitDiffCommandTest {
         List<String> actual = command.authors();
 
         assertThat(actual).containsExactly("--author=gitAuthor", "--author=committerEmail");
+    }
+
+    @Test
+    void givenGitDiffCommand_whenUpdateRepositoriesCommand_thenReturnProperList() {
+        command = new GitDiffCommand(applicationProperties);
+
+        List<String> actual = command.updateRepositoriesCommand();
+
+        assertThat(actual).containsExactly("git", "fetch", "--all");
     }
 }
