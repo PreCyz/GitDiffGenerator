@@ -29,6 +29,11 @@ For *Linux*
 java -jar Gipter.jar useUI=N author="Anakin Skywalker" itemPath="/home/wall-e/Path/to/git/diff/item"
 projectPath="/home/eva/Path/to/git/project1,/home/eva/Path/to/git/project2"
 ```
+### java -jar for 11+ distribution
+```
+%JFX11% = path to javafx distribution version 11+.
+java -jar --module-path %JFX11% --add-modules="javafx.fxml,javafx.controls,javafx.media,javafx.web,javafx.swing" --add-exports="javafx.base/com.sun.javafx.event=ALL-UNNAMED" Gipter.jar
+```
 ### java -jar + application.properties at at the same location as jar file
 If there are _application.properties_ file at the same location as your jar file then program can be run as follows: `java -jar Gipter.jar useUI=N`
 #### Tips
