@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,16 +15,14 @@ import java.io.IOException;
 public class StartupService {
 
     private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
-    private final String platform;
     private final String systemUsername;
 
     public StartupService() {
-        platform = System.getProperty("os.name").toLowerCase();
         systemUsername = System.getProperty("user.name");
     }
 
     public void startOnStartup() {
-        if (platform.contains("win")) {
+        if (SystemUtils.isWindows()) {
             String shortcutLnkPath = String.format(
                     "C:\\Users\\%s\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Gipter.lnk",
                     systemUsername
@@ -56,7 +55,7 @@ public class StartupService {
     }
 
     public void disableStartOnStartup() {
-        if (platform.contains("win")) {
+        if (SystemUtils.isWindows()) {
             String shortcutLnkPath = String.format(
                     "C:\\Users\\%s\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Gipter.lnk",
                     systemUsername
