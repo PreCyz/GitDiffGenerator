@@ -13,7 +13,7 @@ import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.statistic.dto.ServiceDto;
+import pg.gipter.statistic.dto.RunDetails;
 import pg.gipter.statistic.service.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alert.AlertWindowBuilder;
@@ -241,7 +241,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                     appProps.add(ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configName)));
                 }
             }
-            statisticService.updateStatistics(new ServiceDto(appProps, status, runType));
+            statisticService.updateStatistics(new RunDetails(appProps, status, runType));
         });
     }
 

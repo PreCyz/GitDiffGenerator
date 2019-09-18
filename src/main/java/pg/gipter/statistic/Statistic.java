@@ -23,6 +23,7 @@ public class Statistic implements Serializable {
     private RunType lastRunType;
     private Map<VersionControlSystem, Set<String>> controlSystemMap;
     private Set<String> systemUsers;
+    private String applicationVersion;
 
     public String getId() {
         return id;
@@ -110,5 +111,13 @@ public class Statistic implements Serializable {
 
     public Set<String> getSystemUsers() {
         return systemUsers;
+    }
+
+    public String getApplicationVersion() {
+        return applicationVersion;
+    }
+
+    public void setApplicationVersion(String applicationVersion) {
+        this.applicationVersion = applicationVersion;
     }
 }
