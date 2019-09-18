@@ -9,7 +9,7 @@ import pg.gipter.producer.version.VCSVersionProducer;
 import pg.gipter.producer.version.VCSVersionProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.statistic.Statistic;
-import pg.gipter.statistic.dto.ServiceDto;
+import pg.gipter.statistic.dto.RunDetails;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.IOException;
@@ -26,18 +26,18 @@ public class StatisticService {
 
     private static final Logger logger = LoggerFactory.getLogger(StatisticService.class);
 
-    public void updateStatistics(ServiceDto serviceDto) {
+    public void updateStatistics(RunDetails runDetails) {
         StatisticDao statisticDao = DaoFactory.getStatisticDao();
         if (statisticDao.isStatisticsAvailable()) {
-            Statistic statistic = createStatistics(serviceDto);
+            Statistic statistic = createStatistics(runDetails);
             statisticDao.updateStatistics(statistic);
         } else {
             logger.info("Statistics are not available and have not been updated.");
         }
     }
 
-    Statistic createStatistics(ServiceDto serviceDto) {
-        ApplicationProperties appProperties = new ArrayList<>(serviceDto.getApplicationPropertiesCollection()).get(0);
+    Statistic createStatistics(RunDetails runDetails) {
+        ApplicationProperties appProperties = new ArrayList<>(runDetails.getApplicationPropertiesCollection()).get(0);
 
         String now = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
         Statistic statistic = new Statistic();
@@ -46,14 +46,15 @@ public class StatisticService {
         statistic.setLastExecutionDate(now);
         statistic.setJavaVersion(System.getProperty("java.version"));
         statistic.setSystemUsers(new HashSet<>(Collections.singletonList(System.getProperty("user.name"))));
-        statistic.setLastUpdateStatus(serviceDto.getStatus());
-        statistic.setLastRunType(serviceDto.getRunType());
-        if (EnumSet.of(UploadStatus.FAIL, UploadStatus.N_A).contains(serviceDto.getStatus())) {
+        statistic.setLastUpdateStatus(runDetails.getStatus());
+        statistic.setLastRunType(runDetails.getRunType());
+        if (EnumSet.of(UploadStatus.FAIL, UploadStatus.N_A).contains(runDetails.getStatus())) {
             statistic.setLastFailedDate(now);
-        } else if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(serviceDto.getStatus())) {
+        } else if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(runDetails.getStatus())) {
             statistic.setLastSuccessDate(now);
         }
-        statistic.setControlSystemMap(createControlSystemMap(serviceDto.getApplicationPropertiesCollection()));
+        statistic.setControlSystemMap(createControlSystemMap(runDetails.getApplicationPropertiesCollection()));
+        statistic.setApplicationVersion(appProperties.version());
 
         return statistic;
     }

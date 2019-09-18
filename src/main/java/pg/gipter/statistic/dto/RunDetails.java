@@ -7,13 +7,13 @@ import pg.gipter.ui.UploadStatus;
 import java.util.Collection;
 
 /** Created by Pawel Gawedzki on 29-Aug-2019. */
-public class ServiceDto {
+public class RunDetails {
 
     private Collection<ApplicationProperties> applicationPropertiesCollection;
     private UploadStatus status;
     private RunType runType;
 
-    public ServiceDto(Collection<ApplicationProperties> applicationPropertiesCollection, UploadStatus status, RunType runType) {
+    public RunDetails(Collection<ApplicationProperties> applicationPropertiesCollection, UploadStatus status, RunType runType) {
         this.applicationPropertiesCollection = applicationPropertiesCollection;
         this.status = status;
         this.runType = runType;
