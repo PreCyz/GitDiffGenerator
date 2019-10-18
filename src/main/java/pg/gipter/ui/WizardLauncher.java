@@ -11,6 +11,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -223,6 +225,10 @@ public class WizardLauncher implements Launcher {
         comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             wizardProperties.put(ArgName.uploadType.name(), newValue.name());
         });
+        Tooltip tooltip = new Tooltip(BundleUtils.getMsg("wizard.uploadType.description"));
+        tooltip.setTextAlignment(TextAlignment.LEFT);
+        tooltip.setFont(Font.font("Courier New", 14));
+        comboBox.setTooltip(tooltip);
         GridPane.setHgrow(comboBox, Priority.ALWAYS);
         return comboBox;
     }
