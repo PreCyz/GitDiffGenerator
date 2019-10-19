@@ -1,9 +1,11 @@
 package pg.gipter.ui.alert;
 
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -13,6 +15,7 @@ import pg.gipter.utils.ResourceUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Optional;
 
 /** Created by Pawel Gawedzki on 01-Apr-2019. */
@@ -119,13 +122,22 @@ public class AlertWindowBuilder {
         gridPane.setHgap(10);
         gridPane.setAlignment(Pos.CENTER);
 
+        double preferredWidth = 0;
         int row = 0;
 
         if (!StringUtils.nullOrEmpty(message)) {
-            gridPane.add(new Label(message), 0, row++);
+            Label messageLabel = new Label(message);
+            double pixelsPerLetter = 5.3; //depends on font size
+            preferredWidth = pixelsPerLetter * Arrays.stream(message.split("\n"))
+                    .map(String::length)
+                    .max((o1, o2) -> o1 > o2 ? o1 : o2)
+                    .orElseGet(() -> 0);
+            gridPane.add(messageLabel, 0, row++);
         }
 
         if (hyperLink != null && !StringUtils.nullOrEmpty(hyperLink.getText())) {
+            int pixelsPerLetter = 8; //depends on font size
+            preferredWidth = Math.max(preferredWidth, pixelsPerLetter * hyperLink.getText().length());
             gridPane.add(hyperLink, 0, row++);
         }
 
@@ -133,8 +145,14 @@ public class AlertWindowBuilder {
             ImageView imageView = ResourceUtils.getImgResource(imageFile.fileUrl())
                     .map(url -> new ImageView(new Image(url.toString())))
                     .orElseGet(ImageView::new);
+            preferredWidth = Math.max(preferredWidth, imageView.getImage().getWidth());
             gridPane.add(imageView, 0, row);
         }
+
+        ColumnConstraints columnConstraint = new ColumnConstraints();
+        columnConstraint.setHalignment(HPos.CENTER);
+        columnConstraint.setPrefWidth(preferredWidth);
+        gridPane.getColumnConstraints().add(columnConstraint);
 
         return gridPane;
     }
