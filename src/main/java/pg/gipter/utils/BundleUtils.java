@@ -1,5 +1,7 @@
 package pg.gipter.utils;
 
+import org.slf4j.LoggerFactory;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -39,7 +41,12 @@ public final class BundleUtils {
 
     public static ResourceBundle loadBundle() {
         if (bundle == null) {
-            return bundle = ResourceBundle.getBundle(BundleUtils.BUNDLE_BASE_NAME, Locale.getDefault());
+            try {
+                return bundle = ResourceBundle.getBundle(BundleUtils.BUNDLE_BASE_NAME, Locale.getDefault());
+            } catch (Exception ex) {
+                LoggerFactory.getLogger(BundleUtils.class).warn("Could not load bundle {}. Default will be loaded", Locale.getDefault());
+            }
+            return bundle = ResourceBundle.getBundle(BundleUtils.BUNDLE_BASE_NAME);
         }
         return bundle;
     }
