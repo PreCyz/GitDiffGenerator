@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane fx:id="mainAnchorPane" prefHeight="714.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="mainAnchorPane" prefHeight="714.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <MenuBar>
         <menus>
@@ -178,6 +178,16 @@
                   <Label layoutX="8.0" layoutY="13.0" text="%main.configurationName">
                      <font>
                         <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="340.0" layoutY="45.0" text="%main.currentWeekNumber">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="currentWeekNumberLabel" layoutX="486.0" layoutY="41.0" text="43">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
                      </font>
                   </Label>
                </children>

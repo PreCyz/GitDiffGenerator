@@ -121,8 +121,7 @@ public abstract class ApplicationProperties {
             LocalDate now = LocalDate.now();
             LocalDate endDate = endDate();
             if (now.isEqual(endDate)) {
-                WeekFields weekFields = WeekFields.of(Locale.getDefault());
-                int weekNumber = now.get(weekFields.weekOfWeekBasedYear());
+                int weekNumber = getWeekNumber(now);
                 fileName = String.format("%d-%s-week-%d", now.getYear(), now.getMonth(), weekNumber).toLowerCase();
             } else {
                 fileName = String.format("%d-%s-%s-%s",
@@ -142,6 +141,11 @@ public abstract class ApplicationProperties {
         }
         String extension = getFileExtension();
         return fileName + "." + extension;
+    }
+
+    public int getWeekNumber(LocalDate localDate) {
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        return localDate.get(weekFields.weekOfWeekBasedYear());
     }
 
     String valueFromPattern(NamePatternValue patternValue) {

@@ -5,10 +5,7 @@ import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.DaoConstants;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
-import pg.gipter.dao.PropertiesDao;
+import pg.gipter.dao.*;
 import pg.gipter.job.JobHandler;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.job.upload.UploadItemJob;
@@ -176,7 +173,10 @@ class TrayHandler {
     }
 
     EventHandler<WindowEvent> trayOnCloseEventHandler() {
-        return windowEvent -> hide();
+        return windowEvent -> {
+            hide();
+            CacheManager.clearAllCache();
+        };
     }
 
     private ActionListener showActionListener() {

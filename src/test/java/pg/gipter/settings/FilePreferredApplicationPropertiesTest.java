@@ -1051,4 +1051,15 @@ class FilePreferredApplicationPropertiesTest {
 
         assertThat(actual).isFalse();
     }
+
+    @Test
+    void givenFewDates_whenGetCurrentWeekNumber_thenReturnProperNumber() {
+        String[] args = {""};
+        appProps = new FileApplicationProperties(args);
+
+        assertThat(appProps.getWeekNumber(LocalDate.of(2019, 6, 1))).isEqualTo(22);
+        assertThat(appProps.getWeekNumber(LocalDate.of(2019, 10, 26))).isEqualTo(43);//Saturday
+        assertThat(appProps.getWeekNumber(LocalDate.of(2019, 10, 27))).isEqualTo(44);//Sunday
+
+    }
 }
