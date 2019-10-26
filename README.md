@@ -77,6 +77,11 @@ _Note:_ When `periodInDays` is used together with `startDate` then **startDate**
 * `CLI` - commandLine arguments will be used as first then missing parameters will be read from _application.properties_,
 * `FILE` - arguments from _application.properties_ will be used as first then missing parameters will be read from commandLine arguments.
 * `UI` - it is used by the UI. Arguments from _ui-application.properties_ will be used as first then missing parameters will be read from commandLine arguments.
+### Explanation of *toolkitProjectListNames* upload type
+Each toolkit project has its own list, that store the documentation of the project. The most known list is `Deliverables`.<br/>
+But there are more lists, depends on the project. If produced by you documents are kept under different lists<br/>
+then you should enter comma separated display names of the lists (the names what you see on the web page of your project).<br/>
+If display names don't work then use the names taken from the links of these lists.
 ### Explanation of *TOOLKIT_DOCS* upload type
 This option should be used by the users that do not create code, but work with project documentation. If this is the case then copyright items are created from documentations produced by the user.<br/> 
 How the application handles such a case? Documentation of the project is kept on SharePoint in different folders. In order to extract the changes from these documents made by the user,<br/>
