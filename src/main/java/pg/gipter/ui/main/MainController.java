@@ -282,6 +282,7 @@ public class MainController extends AbstractController {
     private void setProperties(ResourceBundle resources) {
         toolkitDomainTextField.setEditable(false);
         toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
+        setTooltipOnProjectListNames();
         deleteDownloadedFilesCheckBox.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
 
         if (applicationProperties.projectPaths().isEmpty()) {
@@ -315,6 +316,17 @@ public class MainController extends AbstractController {
 
         TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
         setUpgradeMenuItemDisabled();
+    }
+
+    private void setTooltipOnProjectListNames() {
+        if (!toolkitProjectListNamesTextField.isDisabled()) {
+            Tooltip tooltip = new Tooltip(BundleUtils.getMsg("toolkit.panel.projectListNames.tooltip"));
+            tooltip.setTextAlignment(TextAlignment.LEFT);
+            tooltip.setFont(Font.font("Courier New", 14));
+            toolkitProjectListNamesTextField.setTooltip(tooltip);
+        } else {
+            toolkitProjectListNamesTextField.setTooltip(null);
+        }
     }
 
     private StringConverter<LocalDate> dateConverter() {
@@ -632,6 +644,7 @@ public class MainController extends AbstractController {
                 endDatePicker.setValue(LocalDate.now());
             }
             toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
+            setTooltipOnProjectListNames();
             endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             authorsTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             committerEmailTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
