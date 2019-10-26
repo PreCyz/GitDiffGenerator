@@ -158,6 +158,8 @@ public class MainController extends AbstractController {
     private Button saveConfigurationButton;
     @FXML
     private CheckBox useLastItemDateCheckbox;
+    @FXML
+    private Label currentWeekNumberLabel;
 
     private ApplicationProperties applicationProperties;
     private DataDao dataDao;
@@ -230,6 +232,7 @@ public class MainController extends AbstractController {
             userFolderUrl = "";
         }
         setLastItemSubmissionDate();
+        currentWeekNumberLabel.setText(String.valueOf(applicationProperties.getWeekNumber(LocalDate.now())));
     }
 
     private void setLastItemSubmissionDate() {
