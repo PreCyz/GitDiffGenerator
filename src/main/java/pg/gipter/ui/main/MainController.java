@@ -322,7 +322,7 @@ public class MainController extends AbstractController {
         if (!toolkitProjectListNamesTextField.isDisabled()) {
             Tooltip tooltip = new Tooltip(BundleUtils.getMsg("toolkit.panel.projectListNames.tooltip"));
             tooltip.setTextAlignment(TextAlignment.LEFT);
-            tooltip.setFont(Font.font("Courier New", 14));
+            tooltip.setFont(Font.font("Courier New", 16));
             toolkitProjectListNamesTextField.setTooltip(tooltip);
         } else {
             toolkitProjectListNamesTextField.setTooltip(null);
