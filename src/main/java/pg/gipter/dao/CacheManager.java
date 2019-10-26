@@ -51,11 +51,10 @@ public class CacheManager {
         logger.info("Configuration [{}] removed from cache.", configName);
     }
 
-    static void clearAllCache() {
+    public static void clearAllCache() {
         int size = cacheMap.size();
         cacheMap.clear();
         logger.info("Cached cleared. [{}] entries removed.", size);
     }
-
 
 }
