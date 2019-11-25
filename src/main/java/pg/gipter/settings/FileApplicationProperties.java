@@ -209,6 +209,17 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public boolean isFetchAll() {
+        String propertyName = ArgName.fetchAll.name();
+        if (containsProperty(propertyName)) {
+            return StringUtils.getBoolean(properties.getProperty(
+                    propertyName, ArgName.fetchAll.defaultValue()
+            ));
+        }
+        return argExtractor.isFetchAll();
+    }
+
+    @Override
     public String toolkitUserFolder() {
         if (hasProperties()) {
             return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();

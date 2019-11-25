@@ -720,6 +720,44 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
+    void givenEmptyFetchAll_whenIsFetchAll_thenReturnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        appProps = new FileApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isFetchAll();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenFetchAllPropertiesSetNAndCliSetY_whenIsFetchAll_thenReturnFalse() {
+        String[] args = {"fetchAll=Y"};
+        Properties props = new Properties();
+        props.put("fetchAll", "N");
+        appProps = new FileApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isFetchAll();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenNoFetchAllCliAndPropertySetY_whenIsFetchAll_thenReturnTrue() {
+        String[] args = {""};
+        Properties props = new Properties();
+        props.put("fetchAll", "Y");
+        appProps = new FileApplicationProperties(args);
+        appProps.init(args, mockPropertiesLoader(props));
+
+        boolean actual = appProps.isFetchAll();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
     void given_emptyUseUI_when_isUseUI_then_returnTrue() {
         String[] args = {""};
         Properties props = new Properties();

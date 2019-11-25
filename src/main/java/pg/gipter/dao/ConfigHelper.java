@@ -47,6 +47,7 @@ class ConfigHelper {
         RUN_CONFIG_PROPERTIES.add(ArgName.committerEmail.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.uploadType.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.skipRemote.name());
+        RUN_CONFIG_PROPERTIES.add(ArgName.fetchAll.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.itemPath.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.projectPath.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.itemFileNamePrefix.name());

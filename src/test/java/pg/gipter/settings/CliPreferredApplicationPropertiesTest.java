@@ -1259,6 +1259,63 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
+    void givenFetchAll_whenIsFetchAll_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isFetchAll();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenFetchAllFromCLI_whenIsFetchAll_thenReturnCliFetchAll() {
+        applicationProperties = new CliApplicationProperties(new String[]{"fetchAll=N"});
+
+        boolean actual = applicationProperties.isFetchAll();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllFileAndCLI_whenIsFetchAll_thenReturnCliFetchAll() {
+        String[] args = {"fetchAll=n"};
+        Properties props = new Properties();
+        props.put("fetchAll", "y");
+        applicationProperties = new CliApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isFetchAll();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllFromProperties_whenIsFetchAll_thenReturnFetchAllFromProperties() {
+        String[] args = {};
+        Properties props = new Properties();
+        props.put("fetchAll", "n");
+        applicationProperties = new CliApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isFetchAll();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllFromPropertiesAndOtherArgs_whenIsFetchAll_thenReturnFetchAllFromProperties() {
+        String[] args = {"author=test"};
+        Properties props = new Properties();
+        props.put("fetchAll", "n");
+        applicationProperties = new CliApplicationProperties(args);
+        applicationProperties.init(args, mockPropertiesLoader(props));
+
+        boolean actual = applicationProperties.isFetchAll();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
     void given_noPreferredArgSource_when_preferredArgSource_then_returnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 

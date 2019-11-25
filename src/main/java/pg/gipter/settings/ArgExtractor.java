@@ -269,4 +269,11 @@ final class ArgExtractor {
         }
         return ArgName.loggerLevel.defaultValue();
     }
+
+    boolean isFetchAll() {
+        if (containsArg(ArgName.fetchAll.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.fetchAll, ArgName.fetchAll.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.fetchAll.defaultValue());
+    }
 }

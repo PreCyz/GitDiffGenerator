@@ -15,6 +15,7 @@ public enum ArgName {
     committerEmail(""),
     uploadType(UploadType.SIMPLE.name()),
     skipRemote("Y"),
+    fetchAll("Y"),
     toolkitProjectListNames("Deliverables"),
     deleteDownloadedFiles("Y"),
     configurationName(""),

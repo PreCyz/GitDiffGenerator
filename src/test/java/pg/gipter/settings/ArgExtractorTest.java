@@ -629,4 +629,31 @@ class ArgExtractorTest {
 
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void whenIsFetchAll_thenReturnTrue() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        boolean actual = argExtractor.isFetchAll();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenFetchAllN_whenIsFetchAll_thenReturnFalse() {
+        argExtractor = new ArgExtractor(new String[]{"fetchAll=N"});
+
+        boolean actual = argExtractor.isFetchAll();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllY_whenIsFetchAll_thenReturnTrue() {
+        argExtractor = new ArgExtractor(new String[]{"fetchAll=Y"});
+
+        boolean actual = argExtractor.isFetchAll();
+
+        assertThat(actual).isTrue();
+    }
 }

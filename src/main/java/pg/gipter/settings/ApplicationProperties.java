@@ -238,6 +238,7 @@ public abstract class ApplicationProperties {
                 ", uploadType='" + uploadType() + '\'' +
                 ", preferredArgSource='" + preferredArgSource() + '\'' +
                 ", skipRemote='" + isSkipRemote() + '\'' +
+                ", fetchAll='" + isFetchAll() + '\'' +
                 ", useUI='" + isUseUI() + '\'' +
                 ", silentMode='" + isSilentMode() + '\'' +
                 ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
@@ -277,6 +278,7 @@ public abstract class ApplicationProperties {
     public abstract Set<String> toolkitProjectListNames();
     public abstract String toolkitUrl();
     public abstract boolean isSkipRemote();
+    public abstract boolean isFetchAll();
     public abstract boolean isUseUI();
     public abstract boolean isActiveTray();
     public abstract boolean isDeleteDownloadedFiles();

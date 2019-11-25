@@ -228,6 +228,16 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public boolean isFetchAll() {
+        boolean fetchAll = argExtractor.isFetchAll();
+        String argName = ArgName.fetchAll.name();
+        if (!containsArg(argName) && containsProperty(argName)) {
+            fetchAll = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(fetchAll)));
+        }
+        return fetchAll;
+    }
+
+    @Override
     public String toolkitUserFolder() {
         return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
     }

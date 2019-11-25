@@ -98,6 +98,8 @@ public class MainController extends AbstractController {
     private ComboBox<UploadType> uploadTypeComboBox;
     @FXML
     private CheckBox skipRemoteCheckBox;
+    @FXML
+    private CheckBox fetchAllCheckBox;
 
     @FXML
     private TextField toolkitUsernameTextField;
@@ -199,6 +201,7 @@ public class MainController extends AbstractController {
         uploadTypeComboBox.setItems(FXCollections.observableArrayList(UploadType.values()));
         uploadTypeComboBox.setValue(applicationProperties.uploadType());
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
+        fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
 
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
         toolkitPasswordField.setText(applicationProperties.toolkitPassword());
@@ -307,6 +310,7 @@ public class MainController extends AbstractController {
         svnAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
         mercurialAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
         skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
+        fetchAllCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
 
         loadProgressIndicator.setVisible(false);
         verifyProgressIndicator.setVisible(false);
@@ -602,6 +606,7 @@ public class MainController extends AbstractController {
         }
         argList.add(ArgName.uploadType + "=" + uploadTypeComboBox.getValue());
         argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
+        argList.add(ArgName.fetchAll + "=" + fetchAllCheckBox.isSelected());
 
         if (!StringUtils.nullOrEmpty(toolkitProjectListNamesTextField.getText())) {
             argList.add(ArgName.toolkitProjectListNames + "=" + toolkitProjectListNamesTextField.getText());
@@ -652,6 +657,7 @@ public class MainController extends AbstractController {
             svnAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             mercurialAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             skipRemoteCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+            fetchAllCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             deleteDownloadedFilesCheckBox.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
         };
     }
