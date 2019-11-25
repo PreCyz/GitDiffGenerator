@@ -22,6 +22,8 @@ public abstract class ApplicationProperties {
 
     protected final Logger logger;
     public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ISO_DATE;
+    public static final String APPLICATION_PROPERTIES = "application.properties";
+    public static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
 
     protected Properties properties;
     protected final ArgExtractor argExtractor;

@@ -1,4 +1,4 @@
-package pg.gipter.dao;
+package pg.gipter;
 
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.settings.ArgName;
@@ -12,7 +12,7 @@ public class TestDataFactory {
     private TestDataFactory() { }
 
     @NotNull
-    static Properties generateProperty() {
+    public static Properties generateProperty() {
         Properties properties = new Properties();
         for (ArgName argName : ArgName.values()) {
             if (!StringUtils.nullOrEmpty(argName.defaultValue())) {

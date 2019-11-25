@@ -20,10 +20,6 @@ public final class DaoFactory {
         return dataDao;
     }
 
-    public static PropertiesConverter getPropertiesConverter() {
-        return new PropertiesConverterImpl();
-    }
-
     public static StatisticDao getStatisticDao() {
         return new StatisticDaoImpl();
     }

@@ -73,7 +73,8 @@ class DataDaoImpl implements DataDao {
         }
     }
 
-    void convertExistingJob(Set<String> configNames) {
+    @Override
+    public void convertExistingJob(Set<String> configNames) {
         Optional<Properties> properties = loadDataProperties();
         if (properties.isPresent() && !properties.get().containsKey(JobProperty.CONFIGS.key())) {
             Properties data = properties.get();
