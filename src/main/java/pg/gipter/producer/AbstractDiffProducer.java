@@ -40,7 +40,9 @@ abstract class AbstractDiffProducer implements DiffProducer {
                 logger.info("Discovered '{}' version control system.", VCSVersionProducer.getVersion());
 
                 final DiffCommand diffCommand = DiffCommandFactory.getInstance(vcs, applicationProperties);
-                updateRepositories(projectPath, diffCommand);
+                if (applicationProperties.isFetchAll()) {
+                    updateRepositories(projectPath, diffCommand);
+                }
 
                 List<String> cmd = diffCommand.commandAsList();
                 logger.info("{} command: {}", vcs.name(), String.join(" ", cmd));

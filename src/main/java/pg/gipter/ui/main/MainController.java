@@ -39,6 +39,7 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.ui.*;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
@@ -74,8 +75,6 @@ public class MainController extends AbstractController {
     @FXML
     private MenuItem toolkitMenuItem;
     @FXML
-    private MenuItem fileNameMenuItem;
-    @FXML
     private MenuItem readMeMenuItem;
     @FXML
     private MenuItem instructionMenuItem;
@@ -98,6 +97,8 @@ public class MainController extends AbstractController {
     private ComboBox<UploadType> uploadTypeComboBox;
     @FXML
     private CheckBox skipRemoteCheckBox;
+    @FXML
+    private CheckBox fetchAllCheckBox;
 
     @FXML
     private TextField toolkitUsernameTextField;
@@ -124,8 +125,6 @@ public class MainController extends AbstractController {
     private Button projectPathButton;
     @FXML
     private Button itemPathButton;
-    @FXML
-    private CheckBox useAsFileNameCheckBox;
 
     @FXML
     private DatePicker startDatePicker;
@@ -175,7 +174,10 @@ public class MainController extends AbstractController {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         this.dataDao = DaoFactory.getDataDao();
-        this.definedPatterns = new LinkedHashSet<>();
+        this.definedPatterns = EnumSet.allOf(NamePatternValue.class)
+                .stream()
+                .map(e -> String.format("{%s}", e.name()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
@@ -189,8 +191,6 @@ public class MainController extends AbstractController {
     }
 
     private void setInitValues() {
-        propertiesDao.loadFileNameSetting().ifPresent(nameSetting -> definedPatterns.addAll(nameSetting.getNameSettings().keySet()));
-
         authorsTextField.setText(String.join(",", applicationProperties.authors()));
         committerEmailTextField.setText(applicationProperties.committerEmail());
         gitAuthorTextField.setText(applicationProperties.gitAuthor());
@@ -199,6 +199,7 @@ public class MainController extends AbstractController {
         uploadTypeComboBox.setItems(FXCollections.observableArrayList(UploadType.values()));
         uploadTypeComboBox.setValue(applicationProperties.uploadType());
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
+        fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
 
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
         toolkitPasswordField.setText(applicationProperties.toolkitPassword());
@@ -211,7 +212,6 @@ public class MainController extends AbstractController {
         projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
         itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
-        useAsFileNameCheckBox.setSelected(applicationProperties.isUseAsFileName() && definedPatterns.isEmpty());
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
         deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
 
@@ -307,11 +307,11 @@ public class MainController extends AbstractController {
         svnAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
         mercurialAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
         skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
+        fetchAllCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
 
         loadProgressIndicator.setVisible(false);
         verifyProgressIndicator.setVisible(false);
         instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
-        useAsFileNameCheckBox.setDisable(!definedPatterns.isEmpty());
         setDisableDependOnConfigurations();
 
         TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
@@ -386,7 +386,6 @@ public class MainController extends AbstractController {
     private void setActions(ResourceBundle resources) {
         applicationMenuItem.setOnAction(applicationActionEventHandler());
         toolkitMenuItem.setOnAction(toolkitActionEventHandler());
-        fileNameMenuItem.setOnAction(nameSettingsActionEvent());
         readMeMenuItem.setOnAction(readMeActionEventHandler());
         instructionMenuItem.setOnAction(instructionActionEventHandler());
         upgradeMenuItem.setOnAction(upgradeActionEventHandler());
@@ -416,13 +415,6 @@ public class MainController extends AbstractController {
         return event -> {
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.showToolkitSettingsWindow();
-        };
-    }
-
-    private EventHandler<ActionEvent> nameSettingsActionEvent() {
-        return event -> {
-            uiLauncher.setApplicationProperties(applicationProperties);
-            uiLauncher.showNameSettingsWindow();
         };
     }
 
@@ -602,6 +594,7 @@ public class MainController extends AbstractController {
         }
         argList.add(ArgName.uploadType + "=" + uploadTypeComboBox.getValue());
         argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
+        argList.add(ArgName.fetchAll + "=" + fetchAllCheckBox.isSelected());
 
         if (!StringUtils.nullOrEmpty(toolkitProjectListNamesTextField.getText())) {
             argList.add(ArgName.toolkitProjectListNames + "=" + toolkitProjectListNamesTextField.getText());
@@ -613,7 +606,6 @@ public class MainController extends AbstractController {
         if (!StringUtils.nullOrEmpty(itemFileNamePrefixTextField.getText())) {
             argList.add(ArgName.itemFileNamePrefix + "=" + itemFileNamePrefixTextField.getText());
         }
-        argList.add(ArgName.useAsFileName + "=" + useAsFileNameCheckBox.isSelected());
 
         argList.add(ArgName.startDate + "=" + startDatePicker.getValue().format(yyyy_MM_dd));
         argList.add(ArgName.endDate + "=" + endDatePicker.getValue().format(yyyy_MM_dd));
@@ -652,6 +644,7 @@ public class MainController extends AbstractController {
             svnAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             mercurialAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             skipRemoteCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
+            fetchAllCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             deleteDownloadedFilesCheckBox.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
         };
     }

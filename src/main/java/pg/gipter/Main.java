@@ -6,8 +6,9 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.converter.Converter;
+import pg.gipter.converter.ConverterFactory;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.PropertiesConverter;
 import pg.gipter.dao.PropertiesDao;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.launcher.LauncherFactory;
@@ -22,9 +23,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 
-/**
- * Created by Pawel Gawedzki on 17-Sep-2018
- */
+/** Created by Pawel Gawedzki on 17-Sep-2018 */
 public class Main extends Application {
 
     private static ApplicationProperties applicationProperties;
@@ -43,7 +42,8 @@ public class Main extends Application {
         setLoggerLevel(applicationProperties.loggerLevel());
         logger.info("Version of application '{}'.", applicationProperties.version());
         logger.info("Gipter can use '{}' threads.", Runtime.getRuntime().availableProcessors());
-        convertPropertiesToNewFormat();
+        runConverters();
+        setDefaultConfig();
         Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
         launcher.execute();
     }
@@ -61,20 +61,19 @@ public class Main extends Application {
         }
     }
 
-    private void convertPropertiesToNewFormat() {
-        PropertiesConverter converter = DaoFactory.getPropertiesConverter();
-        boolean isConverted = converter.convertPropertiesToNewFormat();
-        if (isConverted) {
-            PropertiesDao propertiesDao = DaoFactory.getPropertiesDao();
-            LinkedList<String> configs = new LinkedList<>(propertiesDao.loadAllApplicationProperties().keySet());
-            if (!configs.isEmpty()) {
-                logger.info("Old configuration converted to new format. [{}] run configs created.", String.join(",", configs));
-                String defaultConfigName = configs.getFirst();
-                String[] arguments = Arrays.copyOf(args, args.length + 1);
-                arguments[arguments.length - 1] = defaultConfigName;
-                applicationProperties = ApplicationPropertiesFactory.getInstance(arguments);
-                logger.info("Configuration '{}' is set as default one.", defaultConfigName);
-            }
+    private void runConverters() {
+        ConverterFactory.getConverters().forEach(Converter::convert);
+    }
+
+    private void setDefaultConfig() {
+        PropertiesDao propertiesDao = DaoFactory.getPropertiesDao();
+        LinkedList<String> configs = new LinkedList<>(propertiesDao.loadAllApplicationProperties().keySet());
+        if (!configs.isEmpty()) {
+            String defaultConfigName = configs.getFirst();
+            String[] arguments = Arrays.copyOf(args, args.length + 1);
+            arguments[arguments.length - 1] = defaultConfigName;
+            applicationProperties = ApplicationPropertiesFactory.getInstance(arguments);
+            logger.info("Configuration '{}' is set as default one.", defaultConfigName);
         }
     }
 }

@@ -477,10 +477,6 @@ public class UILauncher implements Launcher {
         return jobHandler;
     }
 
-    public void showNameSettingsWindow() {
-        createSettingsWindow(WindowFactory.NAME_SETTINGS_MENU);
-    }
-
     public void showUpgradeWindow() {
         upgradeWindow = new Stage();
         upgradeWindow.initModality(Modality.APPLICATION_MODAL);

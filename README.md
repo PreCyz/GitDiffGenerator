@@ -53,13 +53,13 @@ When application is executed with `uploadType = TOOLKIT_DOCS', then item file is
 **startDate** - start date of diff given in format `yyyy-MM-dd`.<br />
 **endDate** - end date of diff given in format `yyyy-MM-dd`. By default it is set as now.<br />
 **itemFileNamePrefix** - if given then this value will be used as prefix of the diff file name.<br />
-**useAsFileName** - when set as `Y` then `itemFileNamePrefix` is used as file name for produced item. Default value is `N`.<br />
 **gitAuthor** - author specific for git repository stored at git config under key '_user.name_'. When used together with _author_, this parameter has higher priority.<br />
 **mercurialAuthor** - author specific for mercurial repository. When used together with _author_, this parameter has higher priority.<br />
 **svnAuthor** - author specific for svn repository. When used together with _author_, this parameter has higher priority.<br />
 **confirmationWindow** - if parameter set as `Y` then confirmation window will be displayed after successful upload. Default value is `N`.<br />
 **preferredArgSource** - if parameter set as `FILE` then arguments from _application.properties_ will be resolved as first. Default value is `CLI`. This parameter can be changed only from command line.<br />
 **skipRemote** - if parameter set as `N` then git diff will be generated only from origin (`--remotes=origin`). If set as `Y` then git diff will be generated only from local git repository. Default value is `Y`.<br />
+**fetchAll** - if parameter set as `N` then there will your repositories will not be fetched / updated before the diff generation. Default value is `Y`.<br />
 **useUI** - if parameter set as `N` application will be launched in command line mode. If set as `Y` then UI mode is launched. Default value is `Y`.<br />
 **activeTray** - used in UI, tells if tray icon should be active or not. Default value is `Y`.<br/>
 **silentMode** - used in UI, tells if application should be executed and located directly in tray icon. It is used by startup functionality. Default value is `N`.<br/>

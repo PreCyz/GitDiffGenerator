@@ -242,13 +242,6 @@ final class ArgExtractor {
         return StringUtils.getBoolean(ArgName.enableOnStartup.defaultValue());
     }
 
-    boolean isUseAsFileName() {
-        if (containsArg(ArgName.useAsFileName.name())) {
-            return StringUtils.getBoolean(getValue(ArgName.useAsFileName, ArgName.useAsFileName.defaultValue()));
-        }
-        return StringUtils.getBoolean(ArgName.useAsFileName.defaultValue());
-    }
-
     public String configurationName() {
         if (containsArg(ArgName.configurationName.name())) {
             return getValue(ArgName.configurationName, ArgName.configurationName.defaultValue());
@@ -268,5 +261,12 @@ final class ArgExtractor {
             return getValue(ArgName.loggerLevel, ArgName.loggerLevel.defaultValue());
         }
         return ArgName.loggerLevel.defaultValue();
+    }
+
+    boolean isFetchAll() {
+        if (containsArg(ArgName.fetchAll.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.fetchAll, ArgName.fetchAll.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.fetchAll.defaultValue());
     }
 }

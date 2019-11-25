@@ -3,6 +3,7 @@ package pg.gipter.dao;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.dto.NameSetting;
 import pg.gipter.utils.PasswordUtils;
@@ -16,23 +17,22 @@ class PropertiesDaoImpl implements PropertiesDao {
 
     private final Logger logger = LoggerFactory.getLogger(PropertiesDaoImpl.class);
 
-    static final String APPLICATION_PROPERTIES = "application.properties";
-    static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
-
     private final ConfigHelper configHelper;
 
     PropertiesDaoImpl() {
         this.configHelper = new ConfigHelper();
     }
 
-    Optional<Properties> loadApplicationProperties() {
-        Optional<Properties> properties = loadProperties(APPLICATION_PROPERTIES);
+    @Override
+    public Optional<Properties> loadApplicationProperties() {
+        Optional<Properties> properties = loadProperties(ApplicationProperties.APPLICATION_PROPERTIES);
         properties.ifPresent(prop -> PasswordUtils.decryptPassword(prop, ArgName.toolkitPassword.name()));
         return properties;
     }
 
-    Optional<Properties> loadUIApplicationProperties() {
-        Optional<Properties> properties = loadProperties(UI_APPLICATION_PROPERTIES);
+    @Override
+    public Optional<Properties> loadUIApplicationProperties() {
+        Optional<Properties> properties = loadProperties(ApplicationProperties.UI_APPLICATION_PROPERTIES);
         properties.ifPresent(prop -> PasswordUtils.decryptPassword(prop, ArgName.toolkitPassword.name()));
         return properties;
     }
@@ -53,7 +53,8 @@ class PropertiesDaoImpl implements PropertiesDao {
         return Optional.ofNullable(properties);
     }
 
-    void saveProperties(Properties properties, String file) {
+    @Override
+    public void saveProperties(Properties properties, String file) {
         try (OutputStream os = new FileOutputStream(file);
              Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
         ) {
@@ -68,7 +69,7 @@ class PropertiesDaoImpl implements PropertiesDao {
     public Optional<Properties> loadApplicationProperties(String configurationName) {
         Map<String, Properties> propertiesMap = loadAllApplicationProperties();
         if (StringUtils.nullOrEmpty(configurationName)) {
-            configurationName = PropertiesDaoImpl.APPLICATION_PROPERTIES;
+            configurationName = ApplicationProperties.APPLICATION_PROPERTIES;
         }
         return Optional.ofNullable(propertiesMap.get(configurationName));
     }
@@ -175,7 +176,8 @@ class PropertiesDaoImpl implements PropertiesDao {
         }
     }
 
-    JsonObject readJsonConfig() {
+    @Override
+    public JsonObject readJsonConfig() {
         try (InputStream fis = new FileInputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(isr)
@@ -211,7 +213,8 @@ class PropertiesDaoImpl implements PropertiesDao {
         }
     }
 
-    void buildAndSaveJsonConfig(Properties properties, String applicationProperties) {
+    @Override
+    public void buildAndSaveJsonConfig(Properties properties, String applicationProperties) {
         properties.put(ArgName.configurationName.name(), applicationProperties);
         PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
         JsonObject jsonObject = buildJsonConfig(properties);
@@ -283,5 +286,15 @@ class PropertiesDaoImpl implements PropertiesDao {
         }
         JsonElement jsonElement = jsonObject.get(ConfigHelper.FILE_NAME_SETTING);
         return Optional.ofNullable(new Gson().fromJson(jsonElement, NameSetting.class));
+    }
+
+    @Override
+    public void removeFileNameSetting() {
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject != null) {
+            jsonObject.remove(ConfigHelper.FILE_NAME_SETTING);
+            logger.info("File name settings removed.");
+            writeJsonConfig(jsonObject);
+        }
     }
 }
