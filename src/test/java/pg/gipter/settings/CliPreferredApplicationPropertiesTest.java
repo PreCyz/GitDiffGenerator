@@ -3,11 +3,9 @@ package pg.gipter.settings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.dao.DaoConstants;
-import pg.gipter.dao.DaoFactory;
 import pg.gipter.dao.PropertiesDao;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.dto.NamePatternValue;
-import pg.gipter.settings.dto.NameSetting;
 
 import java.io.File;
 import java.io.IOException;
@@ -1617,65 +1615,6 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenNoUseAsFileName_whenIsUseAsFileName_thenReturnDefault() {
-        applicationProperties = new CliApplicationProperties(new String[]{});
-
-        boolean actual = applicationProperties.isUseAsFileName();
-
-        assertThat(actual).isFalse();
-    }
-
-    @Test
-    void givenUseAsFileNameFromCLI_whenIsUseAsFileName_thenReturnCliUseAsFileName() {
-        applicationProperties = new CliApplicationProperties(
-                new String[]{"useAsFileName=y"}
-        );
-
-        boolean actual = applicationProperties.isUseAsFileName();
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void givenUseAsFileNameFileAndCLI_whenIsUseAsFileName_thenReturnCliUseAsFileName() {
-        String[] args = {"useAsFileName=y"};
-        Properties props = new Properties();
-        props.put("useAsFileName", "n");
-        applicationProperties = new CliApplicationProperties(args);
-        applicationProperties.init(args, mockPropertiesLoader(props));
-
-        boolean actual = applicationProperties.isUseAsFileName();
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void givenUseAsFileNameFromProperties_whenIsUseAsFileName_thenReturnUseAsFileNameFromProperties() {
-        String[] args = {};
-        Properties props = new Properties();
-        props.put("useAsFileName", "y");
-        applicationProperties = new CliApplicationProperties(args);
-        applicationProperties.init(args, mockPropertiesLoader(props));
-
-        boolean actual = applicationProperties.isUseAsFileName();
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void givenUseAsFileNameFromPropertiesAndOtherArgs_whenIsUseAsFileName_thenReturnUseAsFileNameFromProperties() {
-        String[] args = {"author=test"};
-        Properties props = new Properties();
-        props.put("useAsFileName", "y");
-        applicationProperties = new CliApplicationProperties(args);
-        applicationProperties.init(args, mockPropertiesLoader(props));
-
-        boolean actual = applicationProperties.isUseAsFileName();
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
     void givenNoConfigurationName_whenConfigurationName_thenReturnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
@@ -1893,12 +1832,8 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenFileNameSettingsAndFileNamePrefix_whenFileName_thenReturnFileNameFromPattern() {
-        NameSetting fns = new NameSetting();
-        fns.addSetting("{%1}", NamePatternValue.START_DATE_MONTH_NAME);
-        fns.addSetting("{%2}", NamePatternValue.START_DATE_YEAR);
-        DaoFactory.getPropertiesDao().saveFileNameSetting(fns);
         applicationProperties = new CliApplicationProperties(new String[]{
-                ArgName.itemFileNamePrefix + "=" + "my-{%1}-{%2}-name",
+                ArgName.itemFileNamePrefix + "=" + "my-{START_DATE_MONTH_NAME}-{START_DATE_YEAR}-name",
                 ArgName.startDate + "=2018-06-12"
         });
 

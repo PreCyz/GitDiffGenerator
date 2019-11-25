@@ -275,16 +275,6 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public boolean isUseAsFileName() {
-        if (hasProperties()) {
-            return StringUtils.getBoolean(properties.getProperty(
-                    ArgName.useAsFileName.name(), ArgName.useAsFileName.defaultValue()
-            ));
-        }
-        return argExtractor.isUseAsFileName();
-    }
-
-    @Override
     public String configurationName() {
         if (hasProperties()) {
             return properties.getProperty(ArgName.configurationName.name(), argExtractor.configurationName());

@@ -39,6 +39,7 @@ import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.ui.*;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
@@ -73,8 +74,6 @@ public class MainController extends AbstractController {
     private MenuItem applicationMenuItem;
     @FXML
     private MenuItem toolkitMenuItem;
-    @FXML
-    private MenuItem fileNameMenuItem;
     @FXML
     private MenuItem readMeMenuItem;
     @FXML
@@ -126,8 +125,6 @@ public class MainController extends AbstractController {
     private Button projectPathButton;
     @FXML
     private Button itemPathButton;
-    @FXML
-    private CheckBox useAsFileNameCheckBox;
 
     @FXML
     private DatePicker startDatePicker;
@@ -177,7 +174,10 @@ public class MainController extends AbstractController {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         this.dataDao = DaoFactory.getDataDao();
-        this.definedPatterns = new LinkedHashSet<>();
+        this.definedPatterns = EnumSet.allOf(NamePatternValue.class)
+                .stream()
+                .map(e -> String.format("{%s}", e.name()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
@@ -191,8 +191,6 @@ public class MainController extends AbstractController {
     }
 
     private void setInitValues() {
-        propertiesDao.loadFileNameSetting().ifPresent(nameSetting -> definedPatterns.addAll(nameSetting.getNameSettings().keySet()));
-
         authorsTextField.setText(String.join(",", applicationProperties.authors()));
         committerEmailTextField.setText(applicationProperties.committerEmail());
         gitAuthorTextField.setText(applicationProperties.gitAuthor());
@@ -214,7 +212,6 @@ public class MainController extends AbstractController {
         projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
         itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
-        useAsFileNameCheckBox.setSelected(applicationProperties.isUseAsFileName() && definedPatterns.isEmpty());
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
         deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
 
@@ -315,7 +312,6 @@ public class MainController extends AbstractController {
         loadProgressIndicator.setVisible(false);
         verifyProgressIndicator.setVisible(false);
         instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
-        useAsFileNameCheckBox.setDisable(!definedPatterns.isEmpty());
         setDisableDependOnConfigurations();
 
         TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
@@ -390,7 +386,6 @@ public class MainController extends AbstractController {
     private void setActions(ResourceBundle resources) {
         applicationMenuItem.setOnAction(applicationActionEventHandler());
         toolkitMenuItem.setOnAction(toolkitActionEventHandler());
-        fileNameMenuItem.setOnAction(nameSettingsActionEvent());
         readMeMenuItem.setOnAction(readMeActionEventHandler());
         instructionMenuItem.setOnAction(instructionActionEventHandler());
         upgradeMenuItem.setOnAction(upgradeActionEventHandler());
@@ -420,13 +415,6 @@ public class MainController extends AbstractController {
         return event -> {
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.showToolkitSettingsWindow();
-        };
-    }
-
-    private EventHandler<ActionEvent> nameSettingsActionEvent() {
-        return event -> {
-            uiLauncher.setApplicationProperties(applicationProperties);
-            uiLauncher.showNameSettingsWindow();
         };
     }
 
@@ -618,7 +606,6 @@ public class MainController extends AbstractController {
         if (!StringUtils.nullOrEmpty(itemFileNamePrefixTextField.getText())) {
             argList.add(ArgName.itemFileNamePrefix + "=" + itemFileNamePrefixTextField.getText());
         }
-        argList.add(ArgName.useAsFileName + "=" + useAsFileNameCheckBox.isSelected());
 
         argList.add(ArgName.startDate + "=" + startDatePicker.getValue().format(yyyy_MM_dd));
         argList.add(ArgName.endDate + "=" + endDatePicker.getValue().format(yyyy_MM_dd));

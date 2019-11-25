@@ -11,7 +11,6 @@
             <items>
               <MenuItem fx:id="applicationMenuItem" mnemonicParsing="false" text="%main.menu.settings.apps" />
                   <MenuItem fx:id="toolkitMenuItem" mnemonicParsing="false" text="%main.menu.settings.toolkit" />
-                  <MenuItem fx:id="fileNameMenuItem" mnemonicParsing="false" text="%main.menu.settings.fileName" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="%main.menu.help">
@@ -74,8 +73,7 @@
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="558.0">
                            <children>
                               <Label layoutX="10.0" layoutY="17.0" text="%paths.panel.fileNamePrefix" />
-                              <TextField fx:id="itemFileNamePrefixTextField" layoutX="101.0" layoutY="14.0" prefHeight="25.0" prefWidth="296.0" />
-                              <CheckBox fx:id="useAsFileNameCheckBox" layoutX="407.0" layoutY="17.0" mnemonicParsing="false" text="%paths.panel.useAsFileName" />
+                              <TextField fx:id="itemFileNamePrefixTextField" layoutX="105.0" layoutY="14.0" prefHeight="25.0" prefWidth="446.0" />
                               <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="50.0" prefHeight="17.0" prefWidth="127.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
@@ -126,7 +124,7 @@
                               <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="149.0" layoutY="227.0" mnemonicParsing="false" />
                               <CheckBox fx:id="skipRemoteCheckBox" layoutX="149.0" layoutY="251.0" mnemonicParsing="false" />
                               <Label layoutX="9.0" layoutY="195.0" text="%toolkit.panel.projectListNames" />
-                              <Label layoutX="10.0" layoutY="251.0" text="%csv.panel.skipRemote" />
+                              <Label layoutX="10.0" layoutY="252.0" text="%csv.panel.skipRemote" />
                               <Label layoutX="10.0" layoutY="227.0" text="%toolkit.panel.deleteFiles" />
                               <Label layoutX="10.0" layoutY="275.0" text="%csv.panel.fetchAll" />
                               <CheckBox fx:id="fetchAllCheckBox" layoutX="149.0" layoutY="275.0" mnemonicParsing="false" />

@@ -266,7 +266,7 @@ class FilePreferredApplicationPropertiesTest {
 
         String actual = appProps.fileName();
 
-        assertThat(actual).isEqualTo("custom-2017-december-20171019-20171220.txt");
+        assertThat(actual).isEqualTo("custom.txt");
     }
 
     @Test
@@ -282,7 +282,7 @@ class FilePreferredApplicationPropertiesTest {
 
         String actual = appProps.fileName();
 
-        assertThat(actual).isEqualTo("custom-2017-december-20171019-20171220.txt");
+        assertThat(actual).isEqualTo("custom.txt");
     }
 
     @Test
@@ -300,7 +300,7 @@ class FilePreferredApplicationPropertiesTest {
 
         String actual = appProps.fileName();
 
-        assertThat(actual).isEqualTo("fileName-2018-october-20181007-20181014.txt");
+        assertThat(actual).isEqualTo("fileName.txt");
     }
 
     @Test
@@ -317,7 +317,6 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(new String[]{
                 ArgName.uploadType.name() + "=" + UploadType.TOOLKIT_DOCS.name(),
                 ArgName.itemFileNamePrefix + "=my_custom_name",
-                ArgName.useAsFileName + "=Y",
         });
 
         String actual = appProps.fileName();
@@ -329,19 +328,6 @@ class FilePreferredApplicationPropertiesTest {
     void givenUseAsFileNameYAndFileNamePrefix_whenFileName_thenReturnFileNamePrefixAsNameWithTxt() {
         appProps = new FileApplicationProperties(new String[]{
                 ArgName.itemFileNamePrefix + "=my_custom_name",
-                ArgName.useAsFileName + "=Y",
-        });
-
-        String actual = appProps.fileName();
-
-        assertThat(actual).isEqualTo("my_custom_name.txt");
-    }
-
-    @Test
-    void givenUseAsFileNameYAndFileNamePrefixAndUploadAsHtml_whenFileName_thenReturnFileNamePrefixAsNameWithTxt() {
-        appProps = new FileApplicationProperties(new String[]{
-                ArgName.itemFileNamePrefix + "=my_custom_name",
-                ArgName.useAsFileName + "=Y",
         });
 
         String actual = appProps.fileName();
@@ -968,54 +954,6 @@ class FilePreferredApplicationPropertiesTest {
         appProps.init(args, mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
-
-        assertThat(actual).isFalse();
-    }
-
-    @Test
-    void givenNoProperties_whenIsUseAsFileName_thenReturnFalse() {
-        String[] args = {""};
-        appProps = new FileApplicationProperties(args);
-
-        boolean actual = appProps.isUseAsFileName();
-
-        assertThat(actual).isFalse();
-    }
-
-    @Test
-    void givenEmptyUseAsFileNameFiles_whenIsUseAsFileName_thenReturnFalse() {
-        String[] args = {""};
-        Properties props = new Properties();
-        appProps = new FileApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        boolean actual = appProps.isUseAsFileName();
-
-        assertThat(actual).isFalse();
-    }
-
-    @Test
-    void givenUseAsFileNameSetY_whenIsUseAsFileName_thenReturnTrue() {
-        String[] args = {"useAsFileName=N"};
-        Properties props = new Properties();
-        props.put("useAsFileName", "Y");
-        appProps = new FileApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        boolean actual = appProps.isUseAsFileName();
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void givenUseAsFileNameN_whenIsUseAsFileName_thenReturnFalse() {
-        String[] args = {""};
-        Properties props = new Properties();
-        props.put("useAsFileName", "n");
-        appProps = new FileApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
-
-        boolean actual = appProps.isUseAsFileName();
 
         assertThat(actual).isFalse();
     }

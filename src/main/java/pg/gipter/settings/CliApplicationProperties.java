@@ -284,16 +284,6 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public boolean isUseAsFileName() {
-        boolean useAsFileName = argExtractor.isUseAsFileName();
-        String argName = ArgName.useAsFileName.name();
-        if (!containsArg(argName) && containsProperty(argName)) {
-            useAsFileName = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(useAsFileName)));
-        }
-        return useAsFileName;
-    }
-
-    @Override
     public String configurationName() {
         String configurationName = argExtractor.configurationName();
         String argName = ArgName.configurationName.name();

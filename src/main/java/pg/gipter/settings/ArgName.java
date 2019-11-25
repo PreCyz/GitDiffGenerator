@@ -23,7 +23,6 @@ public enum ArgName {
     itemPath("NO_ITEM_PATH_GIVEN"),
     projectPath("NO_PROJECT_PATH_GIVEN"),
     itemFileNamePrefix(""),
-    useAsFileName("N"),
 
     periodInDays("7"),
     startDate(LocalDate.now().minusDays(Integer.parseInt(periodInDays.defaultValue)).format(yyyy_MM_dd)),

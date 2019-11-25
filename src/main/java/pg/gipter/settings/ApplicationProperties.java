@@ -7,7 +7,6 @@ import pg.gipter.dao.PropertiesDao;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.dto.NamePatternValue;
-import pg.gipter.settings.dto.NameSetting;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
@@ -107,16 +106,8 @@ public abstract class ApplicationProperties {
     }
 
     public final String fileName() {
-        String fileName;
-        Optional<NameSetting> fileNameSetting = propertiesDao.loadFileNameSetting();
-        if (fileNameSetting.isPresent() && !fileNameSetting.get().getNameSettings().isEmpty()
-                && !StringUtils.nullOrEmpty(itemFileNamePrefix())) {
-            fileName = itemFileNamePrefix();
-            for (Map.Entry<String, NamePatternValue> entry : fileNameSetting.get().getNameSettings().entrySet()) {
-                String pattern = "\\{" + entry.getKey().substring(1, entry.getKey().length() - 1) + "\\}";
-                fileName = fileName.replaceAll(pattern, valueFromPattern(entry.getValue()));
-            }
-        } else {
+        String fileName = itemFileNamePrefix();
+        if (fileName.isEmpty()) {
             DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
             LocalDate now = LocalDate.now();
             LocalDate endDate = endDate();
@@ -131,11 +122,11 @@ public abstract class ApplicationProperties {
                         endDate.format(yyyyMMdd)
                 ).toLowerCase();
             }
-            if (!itemFileNamePrefix().isEmpty()) {
-                if (isUseAsFileName()) {
-                    fileName = itemFileNamePrefix();
-                } else {
-                    fileName = String.format("%s-%s", itemFileNamePrefix(), fileName);
+        } else {
+            for (NamePatternValue patternValue : NamePatternValue.values()) {
+                if (fileName.contains(patternValue.name())) {
+                    String pattern = "\\{" + patternValue.name() + "\\}";
+                    fileName = fileName.replaceAll(pattern, valueFromPattern(patternValue));
                 }
             }
         }
@@ -231,7 +222,6 @@ public abstract class ApplicationProperties {
                 ", itemPath='" + itemPath() + '\'' +
                 ", fileName='" + fileName() + '\'' +
                 ", projectPath='" + String.join(",", projectPaths()) + '\'' +
-                ", useAsFileName='" + isUseAsFileName() + '\'' +
                 ", periodInDays='" + periodInDays() + '\'' +
                 ", startDate='" + startDate() + '\'' +
                 ", endDate='" + endDate() + '\'' +
@@ -263,7 +253,6 @@ public abstract class ApplicationProperties {
     public abstract String itemPath();
     public abstract Set<String> projectPaths();
     public abstract String itemFileNamePrefix();
-    public abstract boolean isUseAsFileName();
     public abstract String committerEmail();
     public abstract LocalDate startDate();
     public abstract LocalDate endDate();

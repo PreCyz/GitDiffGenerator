@@ -51,7 +51,6 @@ class ConfigHelper {
         RUN_CONFIG_PROPERTIES.add(ArgName.itemPath.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.projectPath.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.itemFileNamePrefix.name());
-        RUN_CONFIG_PROPERTIES.add(ArgName.useAsFileName.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.periodInDays.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.startDate.name());
         RUN_CONFIG_PROPERTIES.add(ArgName.endDate.name());
