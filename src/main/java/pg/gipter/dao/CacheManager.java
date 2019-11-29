@@ -54,7 +54,7 @@ public class CacheManager {
     public static void clearAllCache() {
         int size = cacheMap.size();
         cacheMap.clear();
-        logger.info("Cached cleared. [{}] entries removed.", size);
+        logger.info("Cache cleared. [{}] entries removed.", size);
     }
 
 }
