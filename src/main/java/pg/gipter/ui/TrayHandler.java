@@ -184,6 +184,10 @@ class TrayHandler {
             if (uiLauncher.isSilentMode()) {
                 uiLauncher.setSilentMode(false);
             }
+            if (!StringUtils.nullOrEmpty(applicationProperties.configurationName())) {
+                applicationProperties = CacheManager.getApplicationProperties(applicationProperties.configurationName());
+                uiLauncher.setApplicationProperties(applicationProperties);
+            }
             uiLauncher.buildAndShowMainWindow();
         });
     }
