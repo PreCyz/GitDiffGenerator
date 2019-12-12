@@ -63,16 +63,16 @@ public class StatisticService {
         Map<VersionControlSystem, Set<String>> controlSystemMap = new LinkedHashMap<>();
         for (ApplicationProperties ap : appPropertiesCollection) {
             for (String projectPath : ap.projectPaths()) {
-                VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath).toFile());
-                VCSVersionProducer vcsVersionProducer = VCSVersionProducerFactory.getInstance(vcs, projectPath);
                 try {
+                    VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath).toFile());
+                    VCSVersionProducer vcsVersionProducer = VCSVersionProducerFactory.getInstance(vcs, projectPath);
                     if (controlSystemMap.containsKey(vcs)) {
                         controlSystemMap.get(vcs).add(vcsVersionProducer.getVersion());
                     } else {
                         controlSystemMap.put(vcs, Stream.of(vcsVersionProducer.getVersion()).collect(toSet()));
                     }
-                } catch (IOException e) {
-                    logger.warn("Can not get vcs version for project [{}]", projectPath);
+                } catch (IOException | IllegalArgumentException e) {
+                    logger.warn("VCS problem. Project [{}]. Details: [{}]", projectPath, e.getMessage());
                 }
             }
         }

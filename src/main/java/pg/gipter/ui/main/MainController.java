@@ -209,6 +209,9 @@ public class MainController extends AbstractController {
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
         String itemPath = applicationProperties.itemPath().substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
         itemPathLabel.setText(itemPath);
+        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
+            itemPathLabel.setText(applicationProperties.itemPath());
+        }
         projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
         itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
@@ -300,14 +303,7 @@ public class MainController extends AbstractController {
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
 
-        endDatePicker.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        authorsTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        committerEmailTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        gitAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        svnAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        mercurialAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        fetchAllCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
+        setDisable(applicationProperties.uploadType());
 
         loadProgressIndicator.setVisible(false);
         verifyProgressIndicator.setVisible(false);
@@ -499,6 +495,7 @@ public class MainController extends AbstractController {
                 if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
                     itemPathLabel.setText(statementFile.getAbsolutePath());
                     itemPathButton.setText(resources.getString("button.open"));
+                    itemPathLabel.getTooltip().setText(statementFile.getAbsolutePath());
                 }
             } else {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -508,6 +505,7 @@ public class MainController extends AbstractController {
                 if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                     itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
                     itemPathButton.setText(resources.getString("button.change"));
+                    itemPathLabel.getTooltip().setText(itemPathDirectory.getAbsolutePath());
                 }
             }
         };
@@ -636,17 +634,22 @@ public class MainController extends AbstractController {
                 endDatePicker.setValue(LocalDate.now());
             }
             toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
-            setTooltipOnProjectListNames();
-            endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            authorsTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            committerEmailTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            gitAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            svnAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            mercurialAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            skipRemoteCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            fetchAllCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             deleteDownloadedFilesCheckBox.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
+            setDisable(uploadTypeComboBox.getValue());
+            setTooltipOnProjectListNames();
         };
+    }
+
+    private void setDisable(UploadType uploadType) {
+        endDatePicker.setDisable(uploadType == UploadType.TOOLKIT_DOCS);
+
+        authorsTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        committerEmailTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        gitAuthorTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        svnAuthorTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        mercurialAuthorTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        skipRemoteCheckBox.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        fetchAllCheckBox.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
     }
 
     private EventHandler<ActionEvent> jobActionEventHandler() {
