@@ -201,8 +201,14 @@ public class MainController extends AbstractController {
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
         fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
 
-        toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
+        if (applicationProperties.isToolkitCredentialsSet()) {
+            toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
+            toolkitPasswordField.setText(applicationProperties.toolkitPassword());
+        } else {
+            Properties properties = propertiesDao.loadToolkitCredentials();
+            toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
+            toolkitPasswordField.setText(properties.getProperty(ArgName.toolkitPassword.name()));
+        }
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
 
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
