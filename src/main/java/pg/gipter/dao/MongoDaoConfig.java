@@ -8,7 +8,6 @@ import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.service.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 
 import java.io.*;
@@ -26,12 +25,10 @@ public abstract class MongoDaoConfig {
     protected MongoCollection<Document> collection;
 
     private boolean statisticsAvailable;
-    private SecurityService securityService;
 
     protected MongoDaoConfig(String collectionName) {
         logger = LoggerFactory.getLogger(getClass());
         this.collectionName = collectionName;
-        this.securityService = new SecurityService();
         init(loadProperties().orElseGet(() -> MongoConfig.dbProperties));
     }
 
