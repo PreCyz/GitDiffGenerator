@@ -8,7 +8,8 @@ import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.utils.PasswordUtils;
+import pg.gipter.service.SecurityService;
+import pg.gipter.utils.CryptoUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -25,10 +26,12 @@ public abstract class MongoDaoConfig {
     protected MongoCollection<Document> collection;
 
     private boolean statisticsAvailable;
+    private SecurityService securityService;
 
     protected MongoDaoConfig(String collectionName) {
         logger = LoggerFactory.getLogger(getClass());
         this.collectionName = collectionName;
+        this.securityService = new SecurityService();
         init(loadProperties().orElseGet(() -> MongoConfig.dbProperties));
     }
 
@@ -50,10 +53,9 @@ public abstract class MongoDaoConfig {
 
     private void init(Properties dbConfig) {
         try {
-            PasswordUtils.decryptPassword(dbConfig, "db.password");
             String host = dbConfig.getProperty("db.host");
             String username = dbConfig.getProperty("db.username");
-            String password = dbConfig.getProperty("db.password");
+            String password = CryptoUtils.decrypt(dbConfig.getProperty("db.password"));
             String databaseName = dbConfig.getProperty("db.dbName");
 
             MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()

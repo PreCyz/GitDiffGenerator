@@ -7,4 +7,5 @@ public final class DaoConstants {
     public static final String APPLICATION_PROPERTIES_JSON = "applicationProperties.json";
     public static final String UPLOAD_STATUS_KEY = "lastUploadStatus";
     public static final String UPLOAD_DATE_TIME_KEY = "lastUploadDateTime";
+    public static final String SECURITY_JSON = "security.json";
 }

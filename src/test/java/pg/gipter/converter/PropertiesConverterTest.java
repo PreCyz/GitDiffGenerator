@@ -7,9 +7,9 @@ import pg.gipter.TestDataFactory;
 import pg.gipter.dao.DaoConstants;
 import pg.gipter.dao.DaoFactory;
 import pg.gipter.dao.PropertiesDao;
+import pg.gipter.service.SecurityService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
-import pg.gipter.utils.PasswordUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,7 +42,7 @@ class PropertiesConverterTest {
     @Test
     void givenBothApplicationProperties_whenConvertPropertiesToJson_thenCreateJsonConfigFile() {
         Properties properties = TestDataFactory.generateProperty();
-        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
+        new SecurityService().encryptPassword(properties, ArgName.toolkitPassword.name());
         propertiesDao.saveProperties(properties, ApplicationProperties.APPLICATION_PROPERTIES);
         propertiesDao.saveProperties(properties, ApplicationProperties.UI_APPLICATION_PROPERTIES);
         assertThat(Files.exists(Paths.get(ApplicationProperties.APPLICATION_PROPERTIES))).isTrue();
