@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
-
 final class SvnDiffCommand extends AbstractDiffCommand {
 
     SvnDiffCommand(ApplicationProperties appProps) {
@@ -55,11 +54,11 @@ final class SvnDiffCommand extends AbstractDiffCommand {
         List<String> authors = new LinkedList<>();
         if (StringUtils.notEmpty(appProps.svnAuthor())) {
             authors.add("--search");
-            authors.add(appProps.svnAuthor());
+            authors.add(wrapWithQuotationMarks(appProps.svnAuthor()));
         } else {
             for (String author : appProps.authors()) {
                 authors.add("--search");
-                authors.add(author);
+                authors.add(wrapWithQuotationMarks(author));
             }
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {

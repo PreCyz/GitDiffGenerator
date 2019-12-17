@@ -55,11 +55,11 @@ final class GitDiffCommand extends AbstractDiffCommand {
     List<String> authors() {
         List<String> authors = new LinkedList<>();
         if (!appProps.gitAuthor().isEmpty()) {
-            authors.add("--author=" + appProps.gitAuthor());
+            authors.add("--author=" + wrapWithQuotationMarks(appProps.gitAuthor()));
         } else {
             authors = appProps.authors()
                     .stream()
-                    .map(author -> "--author=" + author)
+                    .map(author -> "--author=" + wrapWithQuotationMarks(author))
                     .collect(toCollection(LinkedList::new));
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {

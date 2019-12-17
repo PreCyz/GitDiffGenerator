@@ -62,7 +62,7 @@ class MercurialDiffCommandTest {
         List<String> actual = command.commandAsList();
 
         assertThat(actual).containsExactly("hg", "log", "--patch",
-                "--user", author,
+                "--user", "\"" + author + "\"",
                 "--user", committerEmail,
                 "--date", "\"" + startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " to " +
                 endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "\""
@@ -85,7 +85,7 @@ class MercurialDiffCommandTest {
         List<String> actual = command.commandAsList();
 
         assertThat(actual).containsExactly("hg", "log", "--patch",
-                "--user", author,
+                "--user", "\"" + author + "\"",
                 "--date", "\"" + startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " to " +
                         endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "\""
         );
@@ -101,7 +101,7 @@ class MercurialDiffCommandTest {
 
         List<String> actual = command.authors();
 
-        assertThat(actual).containsExactly("--user", "author1", "--user", "author2");
+        assertThat(actual).containsExactly("--user", "\"author1\"", "--user", "\"author2\"");
     }
 
     @Test
@@ -114,7 +114,7 @@ class MercurialDiffCommandTest {
 
         List<String> actual = command.authors();
 
-        assertThat(actual).containsExactly("--user", "mercurialAuthor");
+        assertThat(actual).containsExactly("--user", "\"mercurialAuthor\"");
     }
 
     @Test
@@ -125,7 +125,7 @@ class MercurialDiffCommandTest {
 
         List<String> actual = command.authors();
 
-        assertThat(actual).containsExactly("--user", "mercurialAuthor", "--user", "committerEmail");
+        assertThat(actual).containsExactly("--user", "\"mercurialAuthor\"", "--user", "committerEmail");
     }
 
     @Test
