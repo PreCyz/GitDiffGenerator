@@ -30,10 +30,11 @@ public class SecurityConverter implements Converter {
     public boolean convert() {
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
         if (!cipherDetails.isPresent()) {
+            Properties properties = propertiesDao.loadToolkitCredentials();
+
             CipherDetails generatedCipher = generateCipherDetails();
             securityDao.writeCipherDetails(generatedCipher);
 
-            Properties properties = propertiesDao.loadToolkitCredentials();
             if (properties.containsKey(ArgName.toolkitPassword.name()) &&
                     !properties.getProperty(ArgName.toolkitPassword.name()).equals(ArgName.toolkitPassword.defaultValue())) {
                 propertiesDao.saveToolkitSettings(properties);
@@ -57,8 +58,8 @@ public class SecurityConverter implements Converter {
         CipherDetails cipherDetails = new CipherDetails();
         cipherDetails.setCipher(CIPHER);
         cipherDetails.setIterationCount(random.nextInt(MAX_ITERATION_COUNT) + 1);
-        cipherDetails.setKeySpecValue(String.valueOf(System.currentTimeMillis() + random.nextInt(ADDITIONAL_VALUE)));
-        cipherDetails.setSaltValue(UUID.randomUUID().toString());
+        cipherDetails.setKeySpecValue(UUID.randomUUID().toString());
+        cipherDetails.setSaltValue(String.valueOf(System.currentTimeMillis() + random.nextInt(ADDITIONAL_VALUE)));
         logger.info("Cipher details were generated.");
 
         return cipherDetails;
