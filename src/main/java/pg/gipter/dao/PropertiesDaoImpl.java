@@ -3,7 +3,6 @@ package pg.gipter.dao;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.service.SecurityService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.dto.NameSetting;
@@ -18,25 +17,19 @@ class PropertiesDaoImpl implements PropertiesDao {
     private final Logger logger = LoggerFactory.getLogger(PropertiesDaoImpl.class);
 
     private final ConfigHelper configHelper;
-    private final SecurityService securityService;
 
     PropertiesDaoImpl() {
         this.configHelper = new ConfigHelper();
-        this.securityService = new SecurityService();
     }
 
     @Override
     public Optional<Properties> loadApplicationProperties() {
-        Optional<Properties> properties = loadProperties(ApplicationProperties.APPLICATION_PROPERTIES);
-        properties.ifPresent(prop -> securityService.decryptPassword(prop, ArgName.toolkitPassword.name()));
-        return properties;
+        return loadProperties(ApplicationProperties.APPLICATION_PROPERTIES);
     }
 
     @Override
     public Optional<Properties> loadUIApplicationProperties() {
-        Optional<Properties> properties = loadProperties(ApplicationProperties.UI_APPLICATION_PROPERTIES);
-        properties.ifPresent(prop -> securityService.decryptPassword(prop, ArgName.toolkitPassword.name()));
-        return properties;
+        return loadProperties(ApplicationProperties.UI_APPLICATION_PROPERTIES);
     }
 
     private Optional<Properties> loadProperties(String fileName) {
@@ -120,7 +113,6 @@ class PropertiesDaoImpl implements PropertiesDao {
                 }
                 JsonObject runConfig = runConfigs.get(i).getAsJsonObject();
                 setProperties(runConfig, properties, ConfigHelper.RUN_CONFIG_PROPERTIES);
-                securityService.decryptPassword(properties, ArgName.toolkitPassword.name());
                 result.put(properties.getProperty(ArgName.configurationName.name()), properties);
             }
         }
@@ -154,7 +146,6 @@ class PropertiesDaoImpl implements PropertiesDao {
             logger.warn("empty configurationName. Can not save run config without configurationName.");
             return;
         }
-        securityService.encryptPassword(properties, ArgName.toolkitPassword.name());
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             jsonObject = configHelper.buildFullJson(properties);
@@ -218,7 +209,6 @@ class PropertiesDaoImpl implements PropertiesDao {
     @Override
     public void buildAndSaveJsonConfig(Properties properties, String applicationProperties) {
         properties.put(ArgName.configurationName.name(), applicationProperties);
-        securityService.encryptPassword(properties, ArgName.toolkitPassword.name());
         JsonObject jsonObject = buildJsonConfig(properties);
         writeJsonConfig(jsonObject);
         logger.info("{} converted to JSON format.", applicationProperties);
@@ -226,7 +216,6 @@ class PropertiesDaoImpl implements PropertiesDao {
 
     @Override
     public void saveAppSettings(Properties properties) {
-        securityService.encryptPassword(properties, ArgName.toolkitPassword.name());
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             jsonObject = configHelper.buildFullJson(properties);
@@ -238,7 +227,6 @@ class PropertiesDaoImpl implements PropertiesDao {
 
     @Override
     public void saveToolkitSettings(Properties properties) {
-        securityService.encryptPassword(properties, ArgName.toolkitPassword.name());
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             jsonObject = configHelper.buildFullJson(properties);
@@ -263,7 +251,6 @@ class PropertiesDaoImpl implements PropertiesDao {
             } else {
                 result.setProperty(ArgName.toolkitUsername.name(), toolkitConfig.get(ArgName.toolkitUsername.name()).getAsString());
                 result.setProperty(ArgName.toolkitPassword.name(), toolkitConfig.get(ArgName.toolkitPassword.name()).getAsString());
-                securityService.decryptPassword(result, ArgName.toolkitPassword.name());
             }
         }
         return result;

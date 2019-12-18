@@ -34,6 +34,7 @@ import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.service.GithubService;
+import pg.gipter.service.SecurityService;
 import pg.gipter.service.ToolkitService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
@@ -169,6 +170,7 @@ public class MainController extends AbstractController {
     private String inteliSense = "";
     private boolean useInteliSense = false;
     private static boolean useComboBoxValueChangeListener = true;
+    private SecurityService securityService;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -178,6 +180,7 @@ public class MainController extends AbstractController {
                 .stream()
                 .map(e -> String.format("{%s}", e.name()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+        this.securityService = new SecurityService();
     }
 
     @Override
@@ -203,7 +206,7 @@ public class MainController extends AbstractController {
 
         if (applicationProperties.isToolkitCredentialsSet()) {
             toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-            toolkitPasswordField.setText(applicationProperties.toolkitPassword());
+            toolkitPasswordField.setText(securityService.decrypt(applicationProperties.toolkitPassword()));
         } else {
             Properties properties = propertiesDao.loadToolkitCredentials();
             toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
@@ -579,7 +582,7 @@ public class MainController extends AbstractController {
         List<String> argList = new LinkedList<>();
 
         argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
-        argList.add(ArgName.toolkitPassword + "=" + toolkitPasswordField.getText());
+        argList.add(ArgName.toolkitPassword + "=" + securityService.encrypt(toolkitPasswordField.getText()));
 
         if (!StringUtils.nullOrEmpty(authorsTextField.getText())) {
             argList.add(ArgName.author + "=" + authorsTextField.getText());
@@ -835,7 +838,7 @@ public class MainController extends AbstractController {
     private void setToolkitCredentialsIfAvailable() {
         Properties properties = propertiesDao.loadToolkitCredentials();
         toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
-        toolkitPasswordField.setText(properties.getProperty(ArgName.toolkitPassword.name()));
+        toolkitPasswordField.setText(securityService.decrypt(properties.getProperty(ArgName.toolkitPassword.name())));
     }
 
     private void updateConfigurationNameComboBox(String oldValue, String newValue) {

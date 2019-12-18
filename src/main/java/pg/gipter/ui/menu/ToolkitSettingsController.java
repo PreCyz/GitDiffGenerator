@@ -10,6 +10,7 @@ import javafx.scene.input.MouseEvent;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
+import pg.gipter.service.SecurityService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
@@ -53,7 +54,7 @@ public class ToolkitSettingsController extends AbstractController {
 
     private void setInitValues() {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
+        toolkitPasswordField.setText(new SecurityService().decrypt(applicationProperties.toolkitPassword()));
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
         toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
         toolkitUrlTextField.setText(applicationProperties.toolkitUrl());

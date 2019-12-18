@@ -6,7 +6,9 @@ import pg.gipter.dao.DaoFactory;
 import pg.gipter.dao.PropertiesDao;
 import pg.gipter.dao.SecurityDao;
 import pg.gipter.security.CipherDetails;
+import pg.gipter.service.SecurityService;
 import pg.gipter.settings.ArgName;
+import pg.gipter.utils.StringUtils;
 
 import java.security.SecureRandom;
 import java.util.Optional;
@@ -18,12 +20,14 @@ public class SecurityConverter implements Converter {
 
     private PropertiesDao propertiesDao;
     private SecurityDao securityDao;
+    private SecurityService securityService;
 
     private final Logger logger = LoggerFactory.getLogger(SecurityConverter.class);
 
     public SecurityConverter() {
         propertiesDao = DaoFactory.getPropertiesDao();
         securityDao = DaoFactory.getSecurityDao();
+        securityService = new SecurityService();
     }
 
     @Override
@@ -31,12 +35,17 @@ public class SecurityConverter implements Converter {
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
         if (!cipherDetails.isPresent()) {
             Properties properties = propertiesDao.loadToolkitCredentials();
+            String password = properties.getProperty(ArgName.toolkitPassword.name());
+            String decryptedPassword = null;
+            if (!StringUtils.nullOrEmpty(password) && !password.equals(ArgName.toolkitPassword.defaultValue())) {
+                decryptedPassword = securityService.decrypt(password);
+            }
 
             CipherDetails generatedCipher = generateCipherDetails();
             securityDao.writeCipherDetails(generatedCipher);
 
-            if (properties.containsKey(ArgName.toolkitPassword.name()) &&
-                    !properties.getProperty(ArgName.toolkitPassword.name()).equals(ArgName.toolkitPassword.defaultValue())) {
+            if (!StringUtils.nullOrEmpty(decryptedPassword)) {
+                properties.replace(ArgName.toolkitPassword.name(), securityService.encrypt(decryptedPassword));
                 propertiesDao.saveToolkitSettings(properties);
                 return true;
             } else {

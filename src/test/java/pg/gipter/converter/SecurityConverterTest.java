@@ -11,6 +11,7 @@ import pg.gipter.settings.ArgName;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -20,9 +21,9 @@ class SecurityConverterTest {
 
     private SecurityConverter converter;
 
-    private void prepareApplicationProperties() {
+    private void prepareApplicationProperties() throws GeneralSecurityException {
         Properties properties = new Properties();
-        properties.setProperty(ArgName.toolkitPassword.name(), "somePassword");
+        properties.setProperty(ArgName.toolkitPassword.name(), "uPb2PFrLB6TLM8mp1HNORA\u003d\u003d");
         properties.setProperty(ArgName.toolkitUsername.name(), "someUser");
         DaoFactory.getPropertiesDao().saveToolkitSettings(properties);
     }
@@ -38,7 +39,7 @@ class SecurityConverterTest {
     }
 
     @Test
-    void givenNoJsonSecurity_whenConvert_thenCreateSecurityJsonFile() {
+    void givenNoJsonSecurity_whenConvert_thenCreateSecurityJsonFile() throws GeneralSecurityException {
         prepareApplicationProperties();
         converter = new SecurityConverter();
 

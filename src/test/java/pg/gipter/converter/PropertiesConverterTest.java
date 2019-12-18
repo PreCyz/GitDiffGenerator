@@ -42,7 +42,7 @@ class PropertiesConverterTest {
     @Test
     void givenBothApplicationProperties_whenConvertPropertiesToJson_thenCreateJsonConfigFile() {
         Properties properties = TestDataFactory.generateProperty();
-        new SecurityService().encryptPassword(properties, ArgName.toolkitPassword.name());
+        properties.replace(ArgName.toolkitPassword.name(), new SecurityService().encrypt(properties.getProperty(ArgName.toolkitPassword.name())));
         propertiesDao.saveProperties(properties, ApplicationProperties.APPLICATION_PROPERTIES);
         propertiesDao.saveProperties(properties, ApplicationProperties.UI_APPLICATION_PROPERTIES);
         assertThat(Files.exists(Paths.get(ApplicationProperties.APPLICATION_PROPERTIES))).isTrue();
