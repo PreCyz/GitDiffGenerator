@@ -50,11 +50,11 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
         List<String> authors = new LinkedList<>();
         if (!appProps.mercurialAuthor().isEmpty()) {
             authors.add("--user");
-            authors.add(appProps.mercurialAuthor());
+            authors.add(wrapWithQuotationMarks(appProps.mercurialAuthor()));
         } else {
             for (String author : appProps.authors()) {
                 authors.add("--user");
-                authors.add(author);
+                authors.add(wrapWithQuotationMarks(author));
             }
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {

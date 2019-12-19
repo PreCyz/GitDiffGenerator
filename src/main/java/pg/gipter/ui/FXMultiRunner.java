@@ -30,9 +30,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
 
-/**
- * Created by Pawel Gawedzki on 15-Jul-2019.
- */
+/** Created by Pawel Gawedzki on 15-Jul-2019. */
 public class FXMultiRunner extends Task<Void> implements Starter {
 
     private static class UploadResult {

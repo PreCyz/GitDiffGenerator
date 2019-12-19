@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.dto.NameSetting;
-import pg.gipter.utils.PasswordUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.*;
@@ -25,16 +24,12 @@ class PropertiesDaoImpl implements PropertiesDao {
 
     @Override
     public Optional<Properties> loadApplicationProperties() {
-        Optional<Properties> properties = loadProperties(ApplicationProperties.APPLICATION_PROPERTIES);
-        properties.ifPresent(prop -> PasswordUtils.decryptPassword(prop, ArgName.toolkitPassword.name()));
-        return properties;
+        return loadProperties(ApplicationProperties.APPLICATION_PROPERTIES);
     }
 
     @Override
     public Optional<Properties> loadUIApplicationProperties() {
-        Optional<Properties> properties = loadProperties(ApplicationProperties.UI_APPLICATION_PROPERTIES);
-        properties.ifPresent(prop -> PasswordUtils.decryptPassword(prop, ArgName.toolkitPassword.name()));
-        return properties;
+        return loadProperties(ApplicationProperties.UI_APPLICATION_PROPERTIES);
     }
 
     private Optional<Properties> loadProperties(String fileName) {
@@ -118,7 +113,6 @@ class PropertiesDaoImpl implements PropertiesDao {
                 }
                 JsonObject runConfig = runConfigs.get(i).getAsJsonObject();
                 setProperties(runConfig, properties, ConfigHelper.RUN_CONFIG_PROPERTIES);
-                PasswordUtils.decryptPassword(properties, ArgName.toolkitPassword.name());
                 result.put(properties.getProperty(ArgName.configurationName.name()), properties);
             }
         }
@@ -152,7 +146,6 @@ class PropertiesDaoImpl implements PropertiesDao {
             logger.warn("empty configurationName. Can not save run config without configurationName.");
             return;
         }
-        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             jsonObject = configHelper.buildFullJson(properties);
@@ -216,7 +209,6 @@ class PropertiesDaoImpl implements PropertiesDao {
     @Override
     public void buildAndSaveJsonConfig(Properties properties, String applicationProperties) {
         properties.put(ArgName.configurationName.name(), applicationProperties);
-        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
         JsonObject jsonObject = buildJsonConfig(properties);
         writeJsonConfig(jsonObject);
         logger.info("{} converted to JSON format.", applicationProperties);
@@ -224,7 +216,6 @@ class PropertiesDaoImpl implements PropertiesDao {
 
     @Override
     public void saveAppSettings(Properties properties) {
-        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             jsonObject = configHelper.buildFullJson(properties);
@@ -236,7 +227,6 @@ class PropertiesDaoImpl implements PropertiesDao {
 
     @Override
     public void saveToolkitSettings(Properties properties) {
-        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
         JsonObject jsonObject = readJsonConfig();
         if (jsonObject == null) {
             jsonObject = configHelper.buildFullJson(properties);
@@ -261,7 +251,6 @@ class PropertiesDaoImpl implements PropertiesDao {
             } else {
                 result.setProperty(ArgName.toolkitUsername.name(), toolkitConfig.get(ArgName.toolkitUsername.name()).getAsString());
                 result.setProperty(ArgName.toolkitPassword.name(), toolkitConfig.get(ArgName.toolkitPassword.name()).getAsString());
-                PasswordUtils.decryptPassword(result, ArgName.toolkitPassword.name());
             }
         }
         return result;

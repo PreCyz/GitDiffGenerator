@@ -62,7 +62,7 @@ class SvnDiffCommandTest {
         List<String> actual = command.commandAsList();
 
         assertThat(actual).containsExactly("svn", "log", "--diff",
-                "--search", author,
+                "--search", "\"" + author + "\"",
                 "--search", committerEmail,
                 "--revision", "{" + startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "}:{" +
                         endDate.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "}"
@@ -85,7 +85,7 @@ class SvnDiffCommandTest {
         List<String> actual = command.commandAsList();
 
         assertThat(actual).containsExactly("svn", "log", "--diff",
-                "--search", author,
+                "--search", "\"" + author + "\"",
                 "--revision", "{" + startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "}:{" +
                         endDate.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "}"
         );
@@ -101,7 +101,7 @@ class SvnDiffCommandTest {
 
         List<String> actual = command.authors();
 
-        assertThat(actual).containsExactly("--search", "author1", "--search", "author2");
+        assertThat(actual).containsExactly("--search", "\"author1\"", "--search", "\"author2\"");
     }
 
     @Test
@@ -114,7 +114,7 @@ class SvnDiffCommandTest {
 
         List<String> actual = command.authors();
 
-        assertThat(actual).containsExactly("--search", "svnAuthor");
+        assertThat(actual).containsExactly("--search", "\"svnAuthor\"");
     }
 
     @Test
@@ -125,7 +125,7 @@ class SvnDiffCommandTest {
 
         List<String> actual = command.authors();
 
-        assertThat(actual).containsExactly("--search", "svnAuthor", "--search", "committerEmail");
+        assertThat(actual).containsExactly("--search", "\"svnAuthor\"", "--search", "committerEmail");
     }
 
     @Test

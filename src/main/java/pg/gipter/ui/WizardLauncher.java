@@ -24,6 +24,7 @@ import pg.gipter.dao.DaoFactory;
 import pg.gipter.dao.PropertiesDao;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.producer.command.UploadType;
+import pg.gipter.service.SecurityService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -44,6 +45,7 @@ public class WizardLauncher implements Launcher {
     private PropertiesDao propertiesDao;
     private Properties wizardProperties;
     private String lastChosenConfiguration;
+    private SecurityService securityService;
 
     static final String projectLabelPropertyName = "projectLabelProperty";
 
@@ -56,6 +58,7 @@ public class WizardLauncher implements Launcher {
         this.lastChosenConfiguration = lastChosenConfiguration;
         propertiesDao = DaoFactory.getPropertiesDao();
         wizardProperties = new Properties();
+        securityService = new SecurityService();
     }
 
     @Override
@@ -142,7 +145,7 @@ public class WizardLauncher implements Launcher {
                     ApplicationProperties applicationProperties = propertiesWithCredentials();
                     if (applicationProperties.isToolkitCredentialsSet()) {
                         wizard.getSettings().put(ArgName.toolkitUsername.name(), applicationProperties.toolkitUsername());
-                        wizard.getSettings().put(ArgName.toolkitPassword.name(), applicationProperties.toolkitPassword());
+                        wizard.getSettings().put(ArgName.toolkitPassword.name(), securityService.decrypt(applicationProperties.toolkitPassword()));
                     }
                 }
                 String uploadType = wizardProperties.getProperty(ArgName.uploadType.name());
@@ -193,7 +196,7 @@ public class WizardLauncher implements Launcher {
         properties.put(ArgName.configurationName.name(), getValue(wizard, ArgName.configurationName));
         properties.put(ArgName.uploadType.name(), getValue(wizard, ArgName.uploadType));
         properties.put(ArgName.toolkitUsername.name(), getValue(wizard, ArgName.toolkitUsername).toUpperCase());
-        properties.put(ArgName.toolkitPassword.name(), getValue(wizard, ArgName.toolkitPassword));
+        properties.put(ArgName.toolkitPassword.name(), securityService.encrypt(getValue(wizard, ArgName.toolkitPassword)));
         properties.put(ArgName.author.name(), getValue(wizard, ArgName.author));
         properties.put(ArgName.committerEmail.name(), getValue(wizard, ArgName.committerEmail));
         properties.put(ArgName.itemPath.name(), getValue(wizard, ArgName.itemPath));

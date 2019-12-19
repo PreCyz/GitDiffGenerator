@@ -7,8 +7,9 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.transport.WebServiceMessageSender;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
+import pg.gipter.service.SecurityService;
 
-/**Created by Pawel Gawedzki on 12-Oct-2018.*/
+/** Created by Pawel Gawedzki on 12-Oct-2018. */
 public class SharePointConfiguration {
 
     @Bean
@@ -16,7 +17,7 @@ public class SharePointConfiguration {
                                                                    @Value("${toolkit.password}") String password,
                                                                    @Value("${toolkit.domain}") String domain) {
         HttpComponentsMessageSender httpComponentsMessageSender = new HttpComponentsMessageSender();
-        NTCredentials credentials = new NTCredentials(username, password, null, domain);
+        NTCredentials credentials = new NTCredentials(username, new SecurityService().decrypt(password), null, domain);
         httpComponentsMessageSender.setCredentials(credentials);
         return httpComponentsMessageSender;
     }
@@ -36,10 +37,10 @@ public class SharePointConfiguration {
     }
 
     @Bean
-    public SharePointSoapClient sharePointSoapClient(WebServiceMessageSender messageSender,
-                                                     @Value("${toolkit.WSUrl}") String wsUrl,
-                                                     @Value("${toolkit.copyListName}") String copyListName) {
-        return new SharePointSoapClient(webServiceTemplate(marshaller(), messageSender), wsUrl, copyListName);
+    public SharePointSoapClient sharePointSoapClient(@Value("${toolkit.WSUrl}") String wsUrl,
+                                                     @Value("${toolkit.copyListName}") String copyListName,
+                                                     WebServiceTemplate webServiceTemplate) {
+        return new SharePointSoapClient(webServiceTemplate, wsUrl, copyListName);
     }
 
 }

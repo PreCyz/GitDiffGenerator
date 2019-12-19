@@ -34,6 +34,7 @@ import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.service.GithubService;
+import pg.gipter.service.SecurityService;
 import pg.gipter.service.ToolkitService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
@@ -169,6 +170,7 @@ public class MainController extends AbstractController {
     private String inteliSense = "";
     private boolean useInteliSense = false;
     private static boolean useComboBoxValueChangeListener = true;
+    private SecurityService securityService;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -178,6 +180,7 @@ public class MainController extends AbstractController {
                 .stream()
                 .map(e -> String.format("{%s}", e.name()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+        this.securityService = new SecurityService();
     }
 
     @Override
@@ -201,14 +204,23 @@ public class MainController extends AbstractController {
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
         fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
 
-        toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
+        if (applicationProperties.isToolkitCredentialsSet()) {
+            toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
+            toolkitPasswordField.setText(securityService.decrypt(applicationProperties.toolkitPassword()));
+        } else {
+            Properties properties = propertiesDao.loadToolkitCredentials();
+            toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
+            toolkitPasswordField.setText(properties.getProperty(ArgName.toolkitPassword.name()));
+        }
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
 
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
         String itemPath = applicationProperties.itemPath().substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
         itemPathLabel.setText(itemPath);
+        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
+            itemPathLabel.setText(applicationProperties.itemPath());
+        }
         projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
         itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
         itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
@@ -300,14 +312,7 @@ public class MainController extends AbstractController {
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
 
-        endDatePicker.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        authorsTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        committerEmailTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        gitAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        svnAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        mercurialAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        fetchAllCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
+        setDisable(applicationProperties.uploadType());
 
         loadProgressIndicator.setVisible(false);
         verifyProgressIndicator.setVisible(false);
@@ -499,6 +504,7 @@ public class MainController extends AbstractController {
                 if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
                     itemPathLabel.setText(statementFile.getAbsolutePath());
                     itemPathButton.setText(resources.getString("button.open"));
+                    itemPathLabel.getTooltip().setText(statementFile.getAbsolutePath());
                 }
             } else {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -508,6 +514,7 @@ public class MainController extends AbstractController {
                 if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
                     itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
                     itemPathButton.setText(resources.getString("button.change"));
+                    itemPathLabel.getTooltip().setText(itemPathDirectory.getAbsolutePath());
                 }
             }
         };
@@ -575,7 +582,7 @@ public class MainController extends AbstractController {
         List<String> argList = new LinkedList<>();
 
         argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
-        argList.add(ArgName.toolkitPassword + "=" + toolkitPasswordField.getText());
+        argList.add(ArgName.toolkitPassword + "=" + securityService.encrypt(toolkitPasswordField.getText()));
 
         if (!StringUtils.nullOrEmpty(authorsTextField.getText())) {
             argList.add(ArgName.author + "=" + authorsTextField.getText());
@@ -636,17 +643,22 @@ public class MainController extends AbstractController {
                 endDatePicker.setValue(LocalDate.now());
             }
             toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
-            setTooltipOnProjectListNames();
-            endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            authorsTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            committerEmailTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            gitAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            svnAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            mercurialAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            skipRemoteCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            fetchAllCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
             deleteDownloadedFilesCheckBox.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
+            setDisable(uploadTypeComboBox.getValue());
+            setTooltipOnProjectListNames();
         };
+    }
+
+    private void setDisable(UploadType uploadType) {
+        endDatePicker.setDisable(uploadType == UploadType.TOOLKIT_DOCS);
+
+        authorsTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        committerEmailTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        gitAuthorTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        svnAuthorTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        mercurialAuthorTextField.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        skipRemoteCheckBox.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
+        fetchAllCheckBox.setDisable(EnumSet.of(UploadType.TOOLKIT_DOCS, UploadType.STATEMENT).contains(uploadType));
     }
 
     private EventHandler<ActionEvent> jobActionEventHandler() {
@@ -826,7 +838,7 @@ public class MainController extends AbstractController {
     private void setToolkitCredentialsIfAvailable() {
         Properties properties = propertiesDao.loadToolkitCredentials();
         toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
-        toolkitPasswordField.setText(properties.getProperty(ArgName.toolkitPassword.name()));
+        toolkitPasswordField.setText(securityService.decrypt(properties.getProperty(ArgName.toolkitPassword.name())));
     }
 
     private void updateConfigurationNameComboBox(String oldValue, String newValue) {
