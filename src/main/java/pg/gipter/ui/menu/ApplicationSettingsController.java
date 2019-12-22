@@ -4,6 +4,9 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
@@ -23,6 +26,8 @@ import java.util.ResourceBundle;
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
 public class ApplicationSettingsController extends AbstractController {
 
+    @FXML
+    private AnchorPane mainAnchorPane;
     @FXML
     private CheckBox confirmationWindowCheckBox;
     @FXML
@@ -53,6 +58,7 @@ public class ApplicationSettingsController extends AbstractController {
         setInitValues(resources);
         setProperties();
         setListeners();
+        setAccelerators();
     }
 
     private void setInitValues(ResourceBundle resources) {
@@ -142,5 +148,13 @@ public class ApplicationSettingsController extends AbstractController {
         list.add(ArgName.enableOnStartup.name() + "=" + autostartCheckBox.isSelected());
         list.add(ArgName.silentMode.name() + "=" + silentModeCheckBox.isSelected());
         return list.toArray(new String[0]);
+    }
+
+    private void setAccelerators() {
+        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (KeyCode.ESCAPE == e.getCode()) {
+                uiLauncher.closeApplicationWindow();
+            }
+        });
     }
 }

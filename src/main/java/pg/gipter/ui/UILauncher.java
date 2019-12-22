@@ -60,6 +60,7 @@ public class UILauncher implements Launcher {
     private Stage toolkitProjectsWindow;
     private Stage applicationSettingsWindow;
     private Stage upgradeWindow;
+    private Stage toolkitSettingsWindow;
     private TrayHandler trayHandler;
     private PropertiesDao propertiesDao;
     private DataDao dataDao;
@@ -429,28 +430,30 @@ public class UILauncher implements Launcher {
         applicationSettingsWindow = new Stage();
         applicationSettingsWindow.initModality(Modality.APPLICATION_MODAL);
         buildScene(applicationSettingsWindow, WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this));
-        applicationSettingsWindow.setOnCloseRequest(event -> {
-            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(applicationProperties.configurationName()));
-            applicationSettingsWindow.close();
-            execute();
-        });
+        applicationSettingsWindow.setOnCloseRequest(event -> closeWindow(applicationSettingsWindow));
         applicationSettingsWindow.showAndWait();
     }
 
-    private void createSettingsWindow(WindowFactory windowFactory) {
-        Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
-        buildScene(stage, windowFactory.createWindow(applicationProperties, this));
-        stage.setOnCloseRequest(event -> {
-            applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(applicationProperties.configurationName()));
-            stage.close();
-            execute();
-        });
-        stage.showAndWait();
+    private void closeWindow(Stage stage) {
+        applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(applicationProperties.configurationName()));
+        stage.close();
+        execute();
+    }
+
+    public void closeApplicationWindow() {
+        closeWindow(applicationSettingsWindow);
+    }
+
+    public void closeToolkitWindow() {
+        closeWindow(toolkitSettingsWindow);
     }
 
     public void showToolkitSettingsWindow() {
-        createSettingsWindow(WindowFactory.TOOLKIT_MENU);
+        toolkitSettingsWindow = new Stage();
+        toolkitSettingsWindow.initModality(Modality.APPLICATION_MODAL);
+        buildScene(toolkitSettingsWindow, WindowFactory.TOOLKIT_MENU.createWindow(applicationProperties, this));
+        toolkitSettingsWindow.setOnCloseRequest(event -> closeWindow(toolkitSettingsWindow));
+        toolkitSettingsWindow.showAndWait();
     }
 
     public void showToolkitProjectsWindow(Properties wizardProperties) {

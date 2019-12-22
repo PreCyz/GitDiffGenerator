@@ -6,7 +6,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
@@ -20,6 +23,8 @@ import java.util.ResourceBundle;
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
 public class ToolkitSettingsController extends AbstractController {
 
+    @FXML
+    private AnchorPane mainAnchorPane;
     @FXML
     private TextField toolkitUsernameTextField;
     @FXML
@@ -49,6 +54,7 @@ public class ToolkitSettingsController extends AbstractController {
         super.initialize(location, resources);
         setInitValues();
         setActions();
+        setAccelerators();
     }
 
     private void setInitValues() {
@@ -71,6 +77,14 @@ public class ToolkitSettingsController extends AbstractController {
             AppManager instance = AppManagerFactory.getInstance();
             instance.launchDefaultBrowser(applicationProperties.toolkitUserFolder());
             toolkitUserFolderHyperlink.setVisited(false);
+        });
+    }
+
+    private void setAccelerators() {
+        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (KeyCode.ESCAPE == e.getCode()) {
+                uiLauncher.closeToolkitWindow();
+            }
         });
     }
 }
