@@ -13,9 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -188,6 +186,7 @@ public class MainController extends AbstractController {
         setProperties(resources);
         setActions(resources);
         setListeners();
+        setAccelerators();
     }
 
     private void setInitValues() {
@@ -318,6 +317,38 @@ public class MainController extends AbstractController {
         setUpgradeMenuItemDisabled();
     }
 
+    private void setAccelerators() {
+        applicationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        toolkitMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        upgradeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        wizardMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
+                e.consume();
+            } else if (e.isControlDown()) {
+                switch (e.getCode()) {
+                    case ENTER:
+                        if (e.isShiftDown()) {
+                            executeAll();
+                        } else {
+                            execute();
+                        }
+                        break;
+                    case J:
+                        uiLauncher.showJobWindow();
+                        break;
+                    case W:
+                        UILauncher.platformExit();
+                        break;
+                    case M:
+                        uiLauncher.hideMainWindow();
+                        CacheManager.clearAllCache();
+                        break;
+                }
+            }
+        });
+    }
+
     private void setTooltipOnProjectListNames() {
         if (!toolkitProjectListNamesTextField.isDisabled()) {
             Tooltip tooltip = new Tooltip(BundleUtils.getMsg("toolkit.panel.projectListNames.tooltip"));
@@ -330,7 +361,7 @@ public class MainController extends AbstractController {
     }
 
     private StringConverter<LocalDate> dateConverter() {
-        return new StringConverter<LocalDate>() {
+        return new StringConverter<>() {
             @Override
             public String toString(LocalDate object) {
                 return object.format(yyyy_MM_dd);
@@ -514,24 +545,26 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> executeActionEventHandler() {
-        return event -> {
-            String[] args = createArgsFromUI();
-            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
+        return event -> execute();
+    }
 
-            FXMultiRunner runner = new FXMultiRunner(
-                    Stream.of(uiAppProperties).collect(Collectors.toList()),
-                    uiLauncher.nonUIExecutor(),
-                    RunType.EXECUTE
-            );
-            resetIndicatorProperties(runner);
-            uiLauncher.executeOutsideUIThread(() -> {
-                runner.start();
-                if (uiAppProperties.isActiveTray()) {
-                    uiLauncher.updateTray(uiAppProperties);
-                }
-                updateLastItemUploadDate();
-            });
-        };
+    private void execute() {
+        String[] args = createArgsFromUI();
+        ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
+
+        FXMultiRunner runner = new FXMultiRunner(
+                Stream.of(uiAppProperties).collect(Collectors.toList()),
+                uiLauncher.nonUIExecutor(),
+                RunType.EXECUTE
+        );
+        resetIndicatorProperties(runner);
+        uiLauncher.executeOutsideUIThread(() -> {
+            runner.start();
+            if (uiAppProperties.isActiveTray()) {
+                uiLauncher.updateTray(uiAppProperties);
+            }
+            updateLastItemUploadDate();
+        });
     }
 
     private void updateLastItemUploadDate() {
@@ -552,23 +585,25 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> executeAllActionEventHandler() {
-        return event -> {
-            String[] args = createArgsFromUI();
-            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
-            Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
-            map.put(uiAppProperties.configurationName(), uiAppProperties);
+        return event -> executeAll();
+    }
 
-            FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
-            resetIndicatorProperties(runner);
-            uiLauncher.executeOutsideUIThread(() -> {
-                runner.call();
-                String[] firstFromConfigs = propertiesDao.loadArgumentArray(new LinkedList<>(map.keySet()).getFirst());
-                ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(firstFromConfigs);
-                if (instance.isActiveTray()) {
-                    uiLauncher.updateTray(instance);
-                }
-            });
-        };
+    private void executeAll() {
+        String[] args = createArgsFromUI();
+        ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
+        Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
+        map.put(uiAppProperties.configurationName(), uiAppProperties);
+
+        FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
+        resetIndicatorProperties(runner);
+        uiLauncher.executeOutsideUIThread(() -> {
+            runner.call();
+            String[] firstFromConfigs = propertiesDao.loadArgumentArray(new LinkedList<>(map.keySet()).getFirst());
+            ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(firstFromConfigs);
+            if (instance.isActiveTray()) {
+                uiLauncher.updateTray(instance);
+            }
+        });
     }
 
     private String[] createArgsFromUI() {
@@ -856,11 +891,6 @@ public class MainController extends AbstractController {
         configurationNameTextField.textProperty().addListener(configurationNameListener());
         useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
         itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
-        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
-            if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
-                e.consume();
-            }
-        });
     }
 
     private ChangeListener<String> toolkitUsernameListener() {
