@@ -6,10 +6,10 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.converter.Converter;
 import pg.gipter.converter.ConverterFactory;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.PropertiesDao;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.launcher.LauncherFactory;
 import pg.gipter.settings.ApplicationProperties;
@@ -66,8 +66,8 @@ public class Main extends Application {
     }
 
     private void setDefaultConfig() {
-        PropertiesDao propertiesDao = DaoFactory.getPropertiesDao();
-        LinkedList<String> configs = new LinkedList<>(propertiesDao.loadAllApplicationProperties().keySet());
+        ConfigurationDao propertiesDao = DaoFactory.getConfigurationDao();
+        LinkedList<String> configs = new LinkedList<>(propertiesDao.loadAllConfigs().keySet());
         if (!configs.isEmpty()) {
             String defaultConfigName = configs.getFirst();
             String[] arguments = Arrays.copyOf(args, args.length + 1);

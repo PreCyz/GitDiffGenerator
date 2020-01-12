@@ -1,7 +1,7 @@
 package pg.gipter.utils;
 
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
+import pg.gipter.data.DataDao;
 import pg.gipter.job.upload.JobProperty;
 
 import java.util.LinkedHashSet;

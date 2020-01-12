@@ -3,9 +3,9 @@ package pg.gipter.converter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.dao.DaoConstants;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.PropertiesDao;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.settings.dto.NameSetting;
@@ -21,12 +21,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /** Created by Pawel Gawedzki on 25-Nov-2019. */
 class FileNameConverterTest {
 
-    private PropertiesDao propertiesDao;
+    private ConfigurationDao propertiesDao;
     private FileNameConverter converter;
 
     @BeforeEach
     void setUp() {
-        propertiesDao = DaoFactory.getPropertiesDao();
+        propertiesDao = DaoFactory.getConfigurationDao();
         converter = new FileNameConverter();
     }
 
@@ -59,7 +59,7 @@ class FileNameConverterTest {
         boolean actualResult = converter.convert();
 
         assertThat(actualResult).isTrue();
-        Optional<Properties> actual = propertiesDao.loadApplicationProperties(configurationName);
+        Optional<Properties> actual = propertiesDao.loadConfiguration(configurationName);
         assertThat(actual.isPresent()).isTrue();
         assertThat(actual.get().getProperty(ArgName.itemFileNamePrefix.name())).isEqualTo("y-{CURRENT_MONTH_NAME}-{CURRENT_YEAR}");
     }
@@ -84,7 +84,7 @@ class FileNameConverterTest {
         boolean actualResult = converter.convert();
 
         assertThat(actualResult).isTrue();
-        Optional<Properties> actual = propertiesDao.loadApplicationProperties(configurationName);
+        Optional<Properties> actual = propertiesDao.loadConfiguration(configurationName);
         assertThat(actual.isPresent()).isTrue();
         assertThat(actual.get().getProperty(ArgName.itemFileNamePrefix.name())).isEqualTo("y");
     }
@@ -109,7 +109,7 @@ class FileNameConverterTest {
         boolean actualResult = converter.convert();
 
         assertThat(actualResult).isTrue();
-        Optional<Properties> actual = propertiesDao.loadApplicationProperties(configurationName);
+        Optional<Properties> actual = propertiesDao.loadConfiguration(configurationName);
         assertThat(actual.isPresent()).isTrue();
         assertThat(actual.get().getProperty(ArgName.itemFileNamePrefix.name())).isNull();
     }

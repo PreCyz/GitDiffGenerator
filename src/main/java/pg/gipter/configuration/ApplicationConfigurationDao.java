@@ -1,8 +1,9 @@
-package pg.gipter.dao;
+package pg.gipter.configuration;
 
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoConstants;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.dto.NameSetting;
@@ -13,61 +14,20 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-class PropertiesDaoImpl implements PropertiesDao {
+class ApplicationConfigurationDao implements ConfigurationDao {
 
-    private final Logger logger = LoggerFactory.getLogger(PropertiesDaoImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(ApplicationConfigurationDao.class);
 
     private final ConfigHelper configHelper;
+    private JsonObject appSettings;
 
-    PropertiesDaoImpl() {
+    ApplicationConfigurationDao() {
         this.configHelper = new ConfigHelper();
     }
 
     @Override
-    public Optional<Properties> loadApplicationProperties() {
-        Optional<Properties> properties = loadProperties(ApplicationProperties.APPLICATION_PROPERTIES);
-        properties.ifPresent(prop -> PasswordUtils.decryptPassword(prop, ArgName.toolkitPassword.name()));
-        return properties;
-    }
-
-    @Override
-    public Optional<Properties> loadUIApplicationProperties() {
-        Optional<Properties> properties = loadProperties(ApplicationProperties.UI_APPLICATION_PROPERTIES);
-        properties.ifPresent(prop -> PasswordUtils.decryptPassword(prop, ArgName.toolkitPassword.name()));
-        return properties;
-    }
-
-    private Optional<Properties> loadProperties(String fileName) {
-        Properties properties;
-
-        try (InputStream fis = new FileInputStream(fileName);
-             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-             BufferedReader reader = new BufferedReader(isr)
-        ) {
-            properties = new Properties();
-            properties.load(reader);
-        } catch (IOException | NullPointerException e) {
-            logger.warn("Error when loading {}. Exception message is: {}", fileName, e.getMessage());
-            properties = null;
-        }
-        return Optional.ofNullable(properties);
-    }
-
-    @Override
-    public void saveProperties(Properties properties, String file) {
-        try (OutputStream os = new FileOutputStream(file);
-             Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
-        ) {
-            properties.store(writer, null);
-            logger.info("File {} saved.", file);
-        } catch (IOException | NullPointerException e) {
-            logger.error("Error when saving {}.", file, e);
-        }
-    }
-
-    @Override
-    public Optional<Properties> loadApplicationProperties(String configurationName) {
-        Map<String, Properties> propertiesMap = loadAllApplicationProperties();
+    public Optional<Properties> loadConfiguration(String configurationName) {
+        Map<String, Properties> propertiesMap = loadAllConfigs();
         if (StringUtils.nullOrEmpty(configurationName)) {
             configurationName = ApplicationProperties.APPLICATION_PROPERTIES;
         }
@@ -76,7 +36,7 @@ class PropertiesDaoImpl implements PropertiesDao {
 
     @Override
     public String[] loadArgumentArray(String configurationName) {
-        Optional<Properties> properties = loadApplicationProperties(configurationName);
+        Optional<Properties> properties = loadConfiguration(configurationName);
         String[] result = new String[0];
         if (properties.isPresent()) {
             result = new String[properties.get().size()];
@@ -90,7 +50,7 @@ class PropertiesDaoImpl implements PropertiesDao {
     }
 
     @Override
-    public Properties createProperties(String[] args) {
+    public Properties createConfig(String[] args) {
         Properties properties = new Properties();
         for (String arg : args) {
             String key = arg.substring(0, arg.indexOf("="));
@@ -101,7 +61,7 @@ class PropertiesDaoImpl implements PropertiesDao {
     }
 
     @Override
-    public Map<String, Properties> loadAllApplicationProperties() {
+    public Map<String, Properties> loadAllConfigs() {
         Map<String, Properties> result = new LinkedHashMap<>();
         JsonObject config = readJsonConfig();
         if (config != null) {
@@ -113,12 +73,12 @@ class PropertiesDaoImpl implements PropertiesDao {
                 if (appConfig != null) {
                     setProperties(appConfig, properties, ConfigHelper.APP_CONFIG_PROPERTIES);
                 }
-                if (toolkitConfig != null) {
+                if (toolkitConfig != null && toolkitConfig.has(ArgName.toolkitPassword.name())) {
                     setProperties(toolkitConfig, properties, ConfigHelper.TOOLKIT_CONFIG_PROPERTIES);
+                    PasswordUtils.decryptPassword(properties, ArgName.toolkitPassword.name());
                 }
                 JsonObject runConfig = runConfigs.get(i).getAsJsonObject();
                 setProperties(runConfig, properties, ConfigHelper.RUN_CONFIG_PROPERTIES);
-                PasswordUtils.decryptPassword(properties, ArgName.toolkitPassword.name());
                 result.put(properties.getProperty(ArgName.configurationName.name()), properties);
             }
         }
@@ -132,18 +92,6 @@ class PropertiesDaoImpl implements PropertiesDao {
                 properties.put(propertyName, jsonElement.getAsString());
             }
         }
-    }
-
-    private JsonObject buildJsonConfig(Properties properties) {
-        JsonObject jsonObject = readJsonConfig();
-        if (jsonObject == null) {
-            jsonObject = configHelper.buildFullJson(properties);
-        } else {
-            jsonObject.add(ConfigHelper.APP_CONFIG, configHelper.buildAppConfig(properties));
-            jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));
-            configHelper.addOrReplaceRunConfig(properties, jsonObject);
-        }
-        return jsonObject;
     }
 
     @Override
@@ -170,6 +118,7 @@ class PropertiesDaoImpl implements PropertiesDao {
         ) {
             writer.write(json);
             logger.info("File {} saved.", DaoConstants.APPLICATION_PROPERTIES_JSON);
+            appSettings = null;
         } catch (IOException e) {
             logger.error("Error when writing {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
             throw new IllegalArgumentException("Error when writing configuration into json.");
@@ -178,15 +127,17 @@ class PropertiesDaoImpl implements PropertiesDao {
 
     @Override
     public JsonObject readJsonConfig() {
-        try (InputStream fis = new FileInputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
-             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-             BufferedReader reader = new BufferedReader(isr)
-        ) {
-            return new Gson().fromJson(reader, JsonObject.class);
-        } catch (IOException | NullPointerException e) {
-            logger.warn("Warning when loading {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
+        if (appSettings == null) {
+            try (InputStream fis = new FileInputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
+                 InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+                 BufferedReader reader = new BufferedReader(isr)
+            ) {
+                appSettings = new Gson().fromJson(reader, JsonObject.class);
+            } catch (IOException | NullPointerException e) {
+                logger.warn("Warning when loading {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
+            }
         }
-        return null;
+        return appSettings;
     }
 
     @Override
@@ -211,15 +162,6 @@ class PropertiesDaoImpl implements PropertiesDao {
                 throw new IllegalStateException(errMsg);
             }
         }
-    }
-
-    @Override
-    public void buildAndSaveJsonConfig(Properties properties, String applicationProperties) {
-        properties.put(ArgName.configurationName.name(), applicationProperties);
-        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
-        JsonObject jsonObject = buildJsonConfig(properties);
-        writeJsonConfig(jsonObject);
-        logger.info("{} converted to JSON format.", applicationProperties);
     }
 
     @Override
@@ -296,5 +238,19 @@ class PropertiesDaoImpl implements PropertiesDao {
             logger.info("File name settings removed.");
             writeJsonConfig(jsonObject);
         }
+    }
+
+    @Override
+    public Optional<Properties> loadAppSettings() {
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            return Optional.empty();
+        }
+        Properties appConfigProperties = new Properties();
+        JsonObject appConfig = jsonObject.getAsJsonObject(ConfigHelper.APP_CONFIG);
+        for (String key : ConfigHelper.APP_CONFIG_PROPERTIES) {
+            appConfigProperties.put(key, appConfig.get(key).getAsString());
+        }
+        return Optional.of(appConfigProperties);
     }
 }

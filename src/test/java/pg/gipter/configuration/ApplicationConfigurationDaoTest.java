@@ -1,4 +1,4 @@
-package pg.gipter.dao;
+package pg.gipter.configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.TestDataFactory;
+import pg.gipter.dao.DaoConstants;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.settings.dto.NameSetting;
@@ -20,13 +21,13 @@ import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PropertiesDaoImplTest {
+class ApplicationConfigurationDaoTest {
 
-    private PropertiesDaoImpl propertiesDao;
+    private ApplicationConfigurationDao propertiesDao;
 
     @BeforeEach
     void setUp() {
-        propertiesDao = new PropertiesDaoImpl();
+        propertiesDao = new ApplicationConfigurationDao();
     }
 
     @AfterEach
@@ -63,7 +64,7 @@ class PropertiesDaoImplTest {
         properties.setProperty(ArgName.configurationName.name(), "other");
         createJsonConfig(properties);
 
-        Map<String, Properties> actual = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> actual = propertiesDao.loadAllConfigs();
 
         assertThat(actual).hasSize(2);
     }
@@ -98,7 +99,7 @@ class PropertiesDaoImplTest {
 
         propertiesDao.saveRunConfig(properties);
 
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllConfigs();
         assertThat(map).isEmpty();
     }
 
@@ -108,7 +109,7 @@ class PropertiesDaoImplTest {
 
         propertiesDao.saveRunConfig(properties);
 
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllConfigs();
         assertThat(map).hasSize(1);
         assertThat(map.keySet()).containsExactly(properties.getProperty(ArgName.configurationName.name()));
     }
@@ -124,7 +125,7 @@ class PropertiesDaoImplTest {
         propertiesDao.saveRunConfig(last);
 
 
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllConfigs();
         assertThat(map).hasSize(1);
         assertThat(map.keySet()).containsExactly(properties.getProperty(ArgName.configurationName.name()));
         assertThat(map.get(properties.getProperty(ArgName.configurationName.name())).getProperty(ArgName.periodInDays.name())).isEqualTo("8");
@@ -162,7 +163,7 @@ class PropertiesDaoImplTest {
         createJsonConfig(properties);
         propertiesDao.removeConfig(properties.getProperty(ArgName.configurationName.name()));
 
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllConfigs();
 
         assertThat(map).isEmpty();
     }
@@ -172,7 +173,7 @@ class PropertiesDaoImplTest {
         Properties properties = TestDataFactory.generateProperty();
 
         propertiesDao.saveRunConfig(properties);
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllConfigs();
 
         assertThat(map).hasSize(1);
     }
@@ -184,7 +185,7 @@ class PropertiesDaoImplTest {
         properties.put(ArgName.periodInDays.name(), "8");
         propertiesDao.saveRunConfig(properties);
 
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllConfigs();
         assertThat(map).hasSize(1);
         assertThat(map.get(properties.getProperty(ArgName.configurationName.name())).getProperty(ArgName.periodInDays.name())).isEqualTo("8");
     }
@@ -197,7 +198,7 @@ class PropertiesDaoImplTest {
 
         propertiesDao.saveAppSettings(properties);
 
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllConfigs();
         assertThat(map).isEmpty();
     }
 
@@ -207,7 +208,7 @@ class PropertiesDaoImplTest {
         properties.remove(ArgName.configurationName.name());
 
         propertiesDao.saveToolkitSettings(properties);
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllConfigs();
 
         assertThat(map).isEmpty();
     }

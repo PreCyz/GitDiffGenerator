@@ -1,7 +1,8 @@
-package pg.gipter.dao;
+package pg.gipter.data;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.dao.DaoConstants;
 import pg.gipter.job.upload.JobProperty;
 
 import java.io.*;
@@ -10,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.Set;
 
 class DataDaoImpl implements DataDao {
 
@@ -70,16 +70,6 @@ class DataDaoImpl implements DataDao {
             logger.info("File {} saved.", DATA_PROPERTIES);
         } catch (IOException | NullPointerException e) {
             logger.error("Error when saving {}.", DATA_PROPERTIES, e);
-        }
-    }
-
-    @Override
-    public void convertExistingJob(Set<String> configNames) {
-        Optional<Properties> properties = loadDataProperties();
-        if (properties.isPresent() && !properties.get().containsKey(JobProperty.CONFIGS.key())) {
-            Properties data = properties.get();
-            data.setProperty(JobProperty.CONFIGS.key(), String.join(",", configNames));
-            saveDataProperties(data);
         }
     }
 

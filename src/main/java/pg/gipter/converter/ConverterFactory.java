@@ -10,7 +10,6 @@ public final class ConverterFactory {
 
     public static List<Converter> getConverters() {
         return Stream.of(
-                new PropertiesConverter(),
                 new FileNameConverter()
         ).collect(Collectors.toList());
     }

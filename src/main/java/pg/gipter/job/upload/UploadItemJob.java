@@ -3,9 +3,9 @@ package pg.gipter.job.upload;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
-import pg.gipter.dao.PropertiesDao;
+import pg.gipter.data.DataDao;
 import pg.gipter.service.ToolkitService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
@@ -28,12 +28,12 @@ public class UploadItemJob implements Job {
     public static final String NAME = "Gipter-job";
     public static final String GROUP = "GipterJobGroup";
 
-    private final PropertiesDao propertiesDao;
+    private final ConfigurationDao propertiesDao;
     private final DataDao dataDao;
 
     // Instances of Job must have a public no-argument constructor.
     public UploadItemJob() {
-        propertiesDao = DaoFactory.getPropertiesDao();
+        propertiesDao = DaoFactory.getConfigurationDao();
         dataDao = DaoFactory.getDataDao();
     }
 
@@ -107,7 +107,7 @@ public class UploadItemJob implements Job {
     }
 
     private void setDatesOnConfigs(LocalDate startDate) {
-        Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> propertiesMap = propertiesDao.loadAllConfigs();
         for (Map.Entry<String, Properties> entry : propertiesMap.entrySet()) {
             Properties runConfig = entry.getValue();
             runConfig.setProperty(ArgName.startDate.name(), startDate.format(ApplicationProperties.yyyy_MM_dd));

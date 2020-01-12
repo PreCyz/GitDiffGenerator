@@ -24,10 +24,10 @@ import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
-import pg.gipter.dao.CacheManager;
+import pg.gipter.configuration.CacheManager;
 import pg.gipter.dao.DaoConstants;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
+import pg.gipter.data.DataDao;
 import pg.gipter.platform.AppManager;
 import pg.gipter.platform.AppManagerFactory;
 import pg.gipter.producer.command.UploadType;
@@ -267,7 +267,7 @@ public class MainController extends AbstractController {
     }
 
     private void initConfigurationName() {
-        Set<String> confNames = propertiesDao.loadAllApplicationProperties().keySet();
+        Set<String> confNames = propertiesDao.loadAllConfigs().keySet();
         if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
             confNames.add(configurationNameComboBox.getValue());
         }
@@ -375,7 +375,7 @@ public class MainController extends AbstractController {
     }
 
     private void setDisableDependOnConfigurations() {
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> map = propertiesDao.loadAllConfigs();
         addConfigurationButton.setDisable(map.isEmpty());
         removeConfigurationButton.setDisable(map.isEmpty());
         executeButton.setDisable(map.isEmpty());
@@ -436,10 +436,7 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
-        return event -> {
-            uiLauncher.setApplicationProperties(applicationProperties);
-            uiLauncher.showApplicationSettingsWindow();
-        };
+        return event -> uiLauncher.showApplicationSettingsWindow();
     }
 
     private EventHandler<ActionEvent> toolkitActionEventHandler() {
@@ -665,7 +662,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             boolean disableProjectButton = uploadTypeComboBox.getValue() == UploadType.STATEMENT;
-            disableProjectButton |= propertiesDao.loadAllApplicationProperties().isEmpty() && configurationNameTextField.getText().isEmpty();
+            disableProjectButton |= propertiesDao.loadAllConfigs().isEmpty() && configurationNameTextField.getText().isEmpty();
             projectPathButton.setDisable(disableProjectButton);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
                 endDatePicker.setValue(LocalDate.now());
@@ -730,7 +727,7 @@ public class MainController extends AbstractController {
     @NotNull
     private Properties getPropertiesWithoutDates() {
         String[] args = createArgsFromUI();
-        Properties properties = propertiesDao.createProperties(args);
+        Properties properties = propertiesDao.createConfig(args);
         properties.remove(ArgName.startDate.name());
         properties.remove(ArgName.endDate.name());
         return properties;
@@ -739,7 +736,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
         return event -> {
             String configurationName = configurationNameTextField.getText();
-            Optional<Properties> properties = propertiesDao.loadApplicationProperties(configurationName);
+            Optional<Properties> properties = propertiesDao.loadConfiguration(configurationName);
             boolean operationDone = false;
             if (properties.isPresent()) {
                 boolean result = new AlertWindowBuilder()
@@ -786,7 +783,7 @@ public class MainController extends AbstractController {
             try {
                 CacheManager.removeFromCache(configurationNameComboBox.getValue());
                 propertiesDao.removeConfig(configurationNameComboBox.getValue());
-                Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
+                Map<String, Properties> propertiesMap = propertiesDao.loadAllConfigs();
                 String newConfiguration = ArgName.configurationName.defaultValue();
                 if (!propertiesMap.isEmpty()) {
                     Properties currentConfig = new ArrayList<>(propertiesMap.entrySet()).get(0).getValue();

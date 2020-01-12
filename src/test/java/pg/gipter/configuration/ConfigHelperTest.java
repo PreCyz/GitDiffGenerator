@@ -1,4 +1,4 @@
-package pg.gipter.dao;
+package pg.gipter.configuration;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

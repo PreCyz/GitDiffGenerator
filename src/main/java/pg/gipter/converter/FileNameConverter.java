@@ -2,8 +2,8 @@ package pg.gipter.converter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.PropertiesDao;
 import pg.gipter.settings.ArgName;
 import pg.gipter.settings.dto.NamePatternValue;
 import pg.gipter.settings.dto.NameSetting;
@@ -17,10 +17,10 @@ class FileNameConverter implements Converter {
 
     private final Logger logger = LoggerFactory.getLogger(FileNameConverter.class);
 
-    private final PropertiesDao propertiesDao;
+    private final ConfigurationDao propertiesDao;
 
     FileNameConverter() {
-        propertiesDao = DaoFactory.getPropertiesDao();
+        propertiesDao = DaoFactory.getConfigurationDao();
     }
 
     @Override
@@ -28,7 +28,7 @@ class FileNameConverter implements Converter {
         Optional<NameSetting> nameSetting = propertiesDao.loadFileNameSetting();
 
         if (nameSetting.isPresent()) {
-            for (Map.Entry<String, Properties> entry : propertiesDao.loadAllApplicationProperties().entrySet()) {
+            for (Map.Entry<String, Properties> entry : propertiesDao.loadAllConfigs().entrySet()) {
                 String itemFileName = entry.getValue().getProperty(ArgName.itemFileNamePrefix.name());
                 if (!StringUtils.nullOrEmpty(itemFileName)) {
                     logger.info("Conversion of the old file name [{}] into new format.", itemFileName);

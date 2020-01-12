@@ -4,9 +4,9 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
-import pg.gipter.dao.PropertiesDao;
+import pg.gipter.data.DataDao;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
 import pg.gipter.settings.ApplicationProperties;
@@ -21,12 +21,12 @@ class Runner implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(Runner.class);
     private ApplicationProperties applicationProperties;
-    private final PropertiesDao propertiesDao;
+    private final ConfigurationDao propertiesDao;
     private final DataDao dataDao;
 
     Runner(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.propertiesDao = DaoFactory.getPropertiesDao();
+        this.propertiesDao = DaoFactory.getConfigurationDao();
         this.dataDao = DaoFactory.getDataDao();
     }
 

@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.dao.DaoConstants;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
+import pg.gipter.data.DataDao;
 import pg.gipter.job.JobHandler;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.job.upload.JobType;
@@ -111,7 +111,7 @@ public class JobController extends AbstractController {
         minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
         startDatePicker.setValue(LocalDate.now());
-        propertiesMap = propertiesDao.loadAllApplicationProperties();
+        propertiesMap = propertiesDao.loadAllConfigs();
         if (!propertiesMap.isEmpty() && !propertiesMap.containsKey(ArgName.configurationName.defaultValue())) {
             ObservableList<String> items = FXCollections.observableArrayList(propertiesMap.keySet());
             items.add(0, ALL_CONFIGS);

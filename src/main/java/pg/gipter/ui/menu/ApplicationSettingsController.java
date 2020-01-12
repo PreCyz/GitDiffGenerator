@@ -135,7 +135,7 @@ public class ApplicationSettingsController extends AbstractController {
 
     private void saveNewSettings() {
         String[] arguments = createArgsFromUI();
-        propertiesDao.saveAppSettings(propertiesDao.createProperties(arguments));
+        propertiesDao.saveAppSettings(propertiesDao.createConfig(arguments));
         logger.info("New application settings saved. [{}]", String.join(",", arguments));
     }
 

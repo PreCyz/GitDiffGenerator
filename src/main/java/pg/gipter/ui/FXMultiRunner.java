@@ -5,9 +5,9 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
-import pg.gipter.dao.PropertiesDao;
+import pg.gipter.data.DataDao;
 import pg.gipter.launcher.Starter;
 import pg.gipter.producer.DiffProducer;
 import pg.gipter.producer.DiffProducerFactory;
@@ -64,7 +64,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private long totalProgress;
     private AtomicLong workDone;
     private Collection<ApplicationProperties> applicationPropertiesCollection;
-    private PropertiesDao propertiesDao;
+    private ConfigurationDao propertiesDao;
     private DataDao dataDao;
     private RunType runType;
 
@@ -74,7 +74,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.totalProgress = configurationNames.size() * 5;
         this.workDone = new AtomicLong(0);
         this.applicationPropertiesCollection = Collections.emptyList();
-        this.propertiesDao = DaoFactory.getPropertiesDao();
+        this.propertiesDao = DaoFactory.getConfigurationDao();
         this.dataDao = DaoFactory.getDataDao();
         this.runType = runType;
     }

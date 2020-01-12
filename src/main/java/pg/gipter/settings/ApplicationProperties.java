@@ -2,8 +2,8 @@ package pg.gipter.settings;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.PropertiesDao;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.dto.NamePatternValue;
@@ -23,21 +23,18 @@ public abstract class ApplicationProperties {
     protected final Logger logger;
     public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ISO_DATE;
     public static final String APPLICATION_PROPERTIES = "application.properties";
-    public static final String UI_APPLICATION_PROPERTIES = "ui-application.properties";
 
     protected Properties properties;
     protected final ArgExtractor argExtractor;
     private Set<VersionControlSystem> vcs;
     private String[] args;
-    private PropertiesDao propertiesDao;
 
     public ApplicationProperties(String[] args) {
         this.args = args;
         argExtractor = new ArgExtractor(args);
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
-        propertiesDao = DaoFactory.getPropertiesDao();
-        init(args, propertiesDao);
+        init(DaoFactory.getConfigurationDao());
     }
 
     public String[] getArgs() {
@@ -52,9 +49,9 @@ public abstract class ApplicationProperties {
         return vcs;
     }
 
-    protected void init(String[] args, PropertiesDao propertiesDao) {
+    protected void init(ConfigurationDao configurationDao) {
         Optional<Properties> propsFromFile;
-        Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
+        Map<String, Properties> propertiesMap = configurationDao.loadAllConfigs();
         if (propertiesMap.isEmpty()) {
             propsFromFile = Optional.empty();
         } else if (propertiesMap.containsKey(argExtractor.configurationName())) {
@@ -68,7 +65,8 @@ public abstract class ApplicationProperties {
         } else {
             logger.warn("Can not load configuration [{}].", argExtractor.configurationName());
             logger.info("Command line argument loaded: {}.",
-                    Stream.of(args).filter(arg -> !arg.startsWith(ArgName.toolkitPassword.name())).collect(Collectors.joining(" "))
+                    Stream.of(argExtractor.getArgs()).filter(arg -> !arg.startsWith(ArgName.toolkitPassword.name()))
+                            .collect(Collectors.joining(" "))
             );
         }
         logger.info("Application properties loaded: {}.", log());

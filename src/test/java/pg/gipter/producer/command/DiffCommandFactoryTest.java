@@ -1,14 +1,21 @@
 package pg.gipter.producer.command;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pg.gipter.dao.DaoFactory;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DiffCommandFactoryTest {
 
+    @BeforeEach
+    void setup() {
+        DaoFactory.reset();
+    }
+
     @Test
-    void given_codeProtectionSTATEMENT_when_getInstance_then_returnEmptyDiffCommand() {
+    void givenCodeProtectionSTATEMENT_whenGetInstance_thenReturnEmptyDiffCommand() {
         DiffCommand instance = DiffCommandFactory.getInstance(
                 VersionControlSystem.GIT,
                 ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE", "uploadType=statement"})

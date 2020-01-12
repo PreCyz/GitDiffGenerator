@@ -194,7 +194,7 @@ public class ProjectsController extends AbstractController {
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
             String configurationName = applicationProperties.configurationName();
-            Properties properties = propertiesDao.createProperties(applicationProperties.getArgs());
+            Properties properties = propertiesDao.createConfig(applicationProperties.getArgs());
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
             properties.setProperty(ArgName.projectPath.name(), projects);
             propertiesDao.saveRunConfig(properties);

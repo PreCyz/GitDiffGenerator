@@ -22,6 +22,10 @@ final class ArgExtractor {
         this.args = args;
     }
 
+    String[] getArgs() {
+        return args;
+    }
+
     boolean containsArg(String argumentName) {
         if (args == null || args.length == 0) {
             return false;
@@ -113,7 +117,7 @@ final class ArgExtractor {
         if (containsArg(ArgName.startDate.name()) || containsArg(ArgName.periodInDays.name())) {
             date = getValue(ArgName.startDate, LocalDate.now().minusDays(periodInDays()).format(yyyy_MM_dd)).split("-");
         }
-        return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
+        return LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
     }
 
     LocalDate endDate() {
@@ -121,7 +125,7 @@ final class ArgExtractor {
         if (containsArg(ArgName.endDate.name())) {
             date = getValue(ArgName.endDate, ArgName.endDate.defaultValue()).split("-");
         }
-        return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
+        return LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
     }
 
     String itemFileNamePrefix() {

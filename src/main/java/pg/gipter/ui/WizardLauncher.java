@@ -20,8 +20,8 @@ import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.PropertiesDao;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ApplicationProperties;
@@ -41,7 +41,7 @@ public class WizardLauncher implements Launcher {
     private static final Logger logger = LoggerFactory.getLogger(WizardLauncher.class);
     private Stage primaryStage;
     private UILauncher uiLauncher;
-    private PropertiesDao propertiesDao;
+    private ConfigurationDao propertiesDao;
     private Properties wizardProperties;
     private String lastChosenConfiguration;
 
@@ -54,7 +54,7 @@ public class WizardLauncher implements Launcher {
     public WizardLauncher(Stage stage, String lastChosenConfiguration) {
         this.primaryStage = stage;
         this.lastChosenConfiguration = lastChosenConfiguration;
-        propertiesDao = DaoFactory.getPropertiesDao();
+        propertiesDao = DaoFactory.getConfigurationDao();
         wizardProperties = new Properties();
     }
 
@@ -79,12 +79,12 @@ public class WizardLauncher implements Launcher {
                 String[] args = propertiesDao.loadArgumentArray(wizardProperties.getProperty(ArgName.configurationName.name()));
                 instance = ApplicationPropertiesFactory.getInstance(args);
             } else if (result == ButtonType.CANCEL) {
-                propertiesDao.loadApplicationProperties(wizardProperties.getProperty(ArgName.configurationName.name()))
+                propertiesDao.loadConfiguration(wizardProperties.getProperty(ArgName.configurationName.name()))
                         .ifPresent(props -> propertiesDao.removeConfig(wizardProperties.getProperty(ArgName.configurationName.name())));
                 logger.info("Wizard canceled.");
                 instance = ApplicationPropertiesFactory.getInstance(new String[]{});
                 if (!StringUtils.nullOrEmpty(lastChosenConfiguration)) {
-                    Optional<Properties> lastConfiguration = propertiesDao.loadApplicationProperties(lastChosenConfiguration);
+                    Optional<Properties> lastConfiguration = propertiesDao.loadConfiguration(lastChosenConfiguration);
                     if (lastConfiguration.isPresent()) {
                         instance = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(lastChosenConfiguration));
                     }

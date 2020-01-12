@@ -5,7 +5,11 @@ import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.*;
+import pg.gipter.configuration.CacheManager;
+import pg.gipter.configuration.ConfigurationDao;
+import pg.gipter.dao.DaoConstants;
+import pg.gipter.dao.DaoFactory;
+import pg.gipter.data.DataDao;
 import pg.gipter.job.JobHandler;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.job.upload.UploadItemJob;
@@ -30,7 +34,7 @@ class TrayHandler {
     private UILauncher uiLauncher;
     private static TrayIcon trayIcon;
     private static PopupMenu trayPopupMenu;
-    private PropertiesDao propertiesDao;
+    private ConfigurationDao propertiesDao;
     private DataDao dataDao;
     private Executor executor;
 
@@ -38,7 +42,7 @@ class TrayHandler {
         this.uiLauncher = uiLauncher;
         this.applicationProperties = applicationProperties;
         this.executor = executor;
-        this.propertiesDao = DaoFactory.getPropertiesDao();
+        this.propertiesDao = DaoFactory.getConfigurationDao();
         this.dataDao = DaoFactory.getDataDao();
     }
 
@@ -198,7 +202,7 @@ class TrayHandler {
 
     private ActionListener uploadActionListener() {
         return e -> executor.execute(() ->
-                new FXMultiRunner(propertiesDao.loadAllApplicationProperties().keySet(), executor, RunType.TRAY).start()
+                new FXMultiRunner(propertiesDao.loadAllConfigs().keySet(), executor, RunType.TRAY).start()
         );
     }
 

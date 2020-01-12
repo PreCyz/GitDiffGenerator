@@ -7,7 +7,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
+import pg.gipter.data.DataDao;
 import pg.gipter.job.upgrade.UpgradeJobCreator;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.job.upload.JobType;
@@ -164,7 +164,7 @@ public class JobHandler {
                             String[] configArray = configs.split(",");
                             List<ApplicationProperties> applicationPropertiesCollection = new ArrayList<>(configArray.length);
                             for (String configName : configArray) {
-                                Optional<Properties> config = DaoFactory.getPropertiesDao().loadApplicationProperties(configName);
+                                Optional<Properties> config = DaoFactory.getConfigurationDao().loadConfiguration(configName);
                                 if (config.isPresent()) {
                                     config.get().put(ArgName.startDate.name(), startDate.format(DateTimeFormatter.ISO_DATE));
                                     String[] args = config.get().entrySet().stream()

@@ -1,8 +1,10 @@
-package pg.gipter.dao;
+package pg.gipter.configuration;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pg.gipter.dao.DaoConstants;
+import pg.gipter.dao.DaoFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
@@ -49,7 +51,7 @@ class CacheManagerTest {
         props.put(ArgName.configurationName.name(), confName);
         props.put(ArgName.toolkitPassword.name(), "somePass");
         PasswordUtils.encryptPassword(props, ArgName.toolkitPassword.name());
-        DaoFactory.getPropertiesDao().saveRunConfig(props);
+        DaoFactory.getConfigurationDao().saveRunConfig(props);
 
         ApplicationProperties applicationProperties = CacheManager.getApplicationProperties(confName);
 

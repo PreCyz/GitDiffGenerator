@@ -17,7 +17,7 @@ class UIPreferredApplicationPropertiesTest {
         String[] args = {""};
         Properties props = new Properties();
         appProps = new UIApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
+        appProps.init(mockPropertiesLoader(props));
 
         boolean actual = appProps.isActiveTray();
 
@@ -30,7 +30,7 @@ class UIPreferredApplicationPropertiesTest {
         Properties props = new Properties();
         props.put("activeTray", "Y");
         appProps = new UIApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
+        appProps.init(mockPropertiesLoader(props));
 
         boolean actual = appProps.isActiveTray();
 
@@ -43,7 +43,7 @@ class UIPreferredApplicationPropertiesTest {
         Properties props = new Properties();
         props.put("activeTray", "N");
         appProps = new UIApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
+        appProps.init(mockPropertiesLoader(props));
 
         boolean actual = appProps.isActiveTray();
 
@@ -76,7 +76,7 @@ class UIPreferredApplicationPropertiesTest {
         Properties props = new Properties();
         props.put("enableOnStartup", "t");
         appProps = new UIApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
+        appProps.init(mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
 
@@ -89,7 +89,7 @@ class UIPreferredApplicationPropertiesTest {
         Properties props = new Properties();
         props.put("enableOnStartup", "n");
         appProps = new UIApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
+        appProps.init(mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
 
@@ -102,7 +102,7 @@ class UIPreferredApplicationPropertiesTest {
         Properties props = new Properties();
         props.put("enableOnStartup", "n");
         appProps = new UIApplicationProperties(args);
-        appProps.init(args, mockPropertiesLoader(props));
+        appProps.init(mockPropertiesLoader(props));
 
         boolean actual = appProps.isEnableOnStartup();
 
