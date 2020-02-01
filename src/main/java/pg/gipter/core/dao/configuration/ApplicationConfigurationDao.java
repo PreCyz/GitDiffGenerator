@@ -41,7 +41,11 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
             logger.info("New configuration [{}] added.", runConfig.getConfigurationName());
         } else {
             boolean isNewRunConfig = true;
-            JsonArray runConfigsArray = jsonObject.get(RUN_CONFIGS).getAsJsonArray();
+            JsonElement runConfigs = jsonObject.get(RUN_CONFIGS);
+            if (runConfigs == null) {
+                runConfigs = new JsonArray();
+            }
+            JsonArray runConfigsArray = runConfigs.getAsJsonArray();
             for (int i = 0; i < runConfigsArray.size() && isNewRunConfig; ++i) {
                 RunConfig existingRunConfig = gson.fromJson(runConfigsArray.get(i), RunConfig.class);
                 if (existingRunConfig.getConfigurationName().equals(runConfig.getConfigurationName())) {

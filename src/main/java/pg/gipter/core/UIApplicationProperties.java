@@ -1,7 +1,7 @@
 package pg.gipter.core;
 
 /** Created by Pawel Gawedzki on 06-Mar-2019. */
-class UIApplicationProperties extends CliApplicationProperties {
+class UIApplicationProperties extends FileApplicationProperties {
 
     UIApplicationProperties(String[] args) {
         super(args);

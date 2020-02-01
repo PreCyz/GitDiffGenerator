@@ -44,10 +44,7 @@ import pg.gipter.ui.*;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JobHelper;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.File;
@@ -656,7 +653,7 @@ public class MainController extends AbstractController {
     private ToolkitConfig createToolkitConfigFromUI() {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername(toolkitUsernameTextField.getText());
-        toolkitConfig.setToolkitPassword(toolkitPasswordField.getText());
+        toolkitConfig.setToolkitPassword(PasswordUtils.encrypt(toolkitPasswordField.getText()));
         return toolkitConfig;
     }
 
@@ -704,7 +701,7 @@ public class MainController extends AbstractController {
             String comboConfigName = configurationNameComboBox.getValue();
 
             RunConfig runConfigFromUI = createRunConfigFromUI();
-            applicationProperties = ApplicationPropertiesFactory.getInstance(runConfigFromUI.toArgumentArray());
+            applicationProperties.updateCurrentRunConfig(runConfigFromUI);
             CacheManager.removeFromCache(applicationProperties.configurationName());
             uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
             setLastItemSubmissionDate();

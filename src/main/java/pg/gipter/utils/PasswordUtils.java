@@ -23,6 +23,15 @@ public final class PasswordUtils {
             return CryptoUtils.encrypt(value);
         } catch (GeneralSecurityException e) {
             LoggerFactory.getLogger(PasswordUtils.class).warn("Can not encrypt string.", e);
+            throw new IllegalArgumentException("Can not encrypt value.");
+        }
+    }
+
+    public static String decrypt(String value) {
+        try {
+            return CryptoUtils.decrypt(value);
+        } catch (GeneralSecurityException e) {
+            LoggerFactory.getLogger(PasswordUtils.class).warn("Can not decrypt value.", e);
             throw new IllegalArgumentException("Can not decrypt value.");
         }
     }
