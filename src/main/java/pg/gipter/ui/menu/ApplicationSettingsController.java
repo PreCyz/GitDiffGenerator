@@ -10,17 +10,15 @@ import javafx.scene.layout.AnchorPane;
 import pg.gipter.service.StartupService;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.settings.ArgName;
 import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.settings.dto.ApplicationConfig;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
@@ -98,7 +96,7 @@ public class ApplicationSettingsController extends AbstractController {
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     currentLanguage = languageComboBox.getValue();
-                    String[] arguments = propertiesDao.loadArgumentArray(uiLauncher.getConfigurationName());
+                    String[] arguments = configurationDao.loadArgumentArray(uiLauncher.getConfigurationName());
                     uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(arguments));
                     uiLauncher.changeLanguage(languageComboBox.getValue());
                 });
@@ -106,7 +104,7 @@ public class ApplicationSettingsController extends AbstractController {
         final StartupService startupService = new StartupService();
         activateTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                String[] arguments = propertiesDao.loadArgumentArray(uiLauncher.getConfigurationName());
+                String[] arguments = configurationDao.loadArgumentArray(uiLauncher.getConfigurationName());
                 uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(arguments));
                 uiLauncher.initTrayHandler();
                 uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
@@ -134,20 +132,20 @@ public class ApplicationSettingsController extends AbstractController {
     }
 
     private void saveNewSettings() {
-        String[] arguments = createArgsFromUI();
-        propertiesDao.saveAppSettings(propertiesDao.createConfig(arguments));
-        logger.info("New application settings saved. [{}]", String.join(",", arguments));
+        ApplicationConfig applicationConfig = createApplicationConfigFromUI();
+        configurationDao.saveApplicationConfig(applicationConfig);
+        logger.info("New application settings saved. [{}]", applicationConfig.toString());
     }
 
-    private String[] createArgsFromUI() {
-        List<String> list = new ArrayList<>();
-        list.add(ArgName.confirmationWindow.name() + "=" + confirmationWindowCheckBox.isSelected());
-        list.add(ArgName.preferredArgSource.name() + "=" + preferredArgSourceComboBox.getValue());
-        list.add(ArgName.useUI.name() + "=" + useUICheckBox.isSelected());
-        list.add(ArgName.activeTray.name() + "=" + activateTrayCheckBox.isSelected());
-        list.add(ArgName.enableOnStartup.name() + "=" + autostartCheckBox.isSelected());
-        list.add(ArgName.silentMode.name() + "=" + silentModeCheckBox.isSelected());
-        return list.toArray(new String[0]);
+    private ApplicationConfig createApplicationConfigFromUI() {
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setConfirmationWindow(confirmationWindowCheckBox.isSelected());
+        applicationConfig.setPreferredArgSource(preferredArgSourceComboBox.getValue());
+        applicationConfig.setUseUI(useUICheckBox.isSelected());
+        applicationConfig.setActiveTray(activateTrayCheckBox.isSelected());
+        applicationConfig.setEnableOnStartup(autostartCheckBox.isSelected());
+        applicationConfig.setSilentMode(silentModeCheckBox.isSelected());
+        return applicationConfig;
     }
 
     private void setAccelerators() {

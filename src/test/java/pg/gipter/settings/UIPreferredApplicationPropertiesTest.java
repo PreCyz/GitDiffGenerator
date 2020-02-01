@@ -1,11 +1,10 @@
 package pg.gipter.settings;
 
 import org.junit.jupiter.api.Test;
-
-import java.util.Properties;
+import pg.gipter.TestUtils;
+import pg.gipter.settings.dto.ApplicationConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static pg.gipter.TestUtils.mockPropertiesLoader;
 
 /**Created by Pawel Gawedzki on 06-Mar-2019.*/
 class UIPreferredApplicationPropertiesTest {
@@ -15,9 +14,8 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void given_emptyActiveTray_when_isActiveTray_then_returnTrue() {
         String[] args = {""};
-        Properties props = new Properties();
         appProps = new UIApplicationProperties(args);
-        appProps.init(mockPropertiesLoader(props));
+        appProps.init(TestUtils.mockConfigurtionDao(new ApplicationConfig()));
 
         boolean actual = appProps.isActiveTray();
 
@@ -27,10 +25,10 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void given_activeTrayYAndCliSetN_when_isActiveTray_then_returnFalse() {
         String[] args = {"activeTray=N"};
-        Properties props = new Properties();
-        props.put("activeTray", "Y");
         appProps = new UIApplicationProperties(args);
-        appProps.init(mockPropertiesLoader(props));
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setActiveTray(Boolean.TRUE);
+        appProps.init(TestUtils.mockConfigurtionDao(applicationConfig));
 
         boolean actual = appProps.isActiveTray();
 
@@ -40,10 +38,10 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void given_noUseUICliAndPropertySetN_when_isActiveTray_then_returnFalse() {
         String[] args = {""};
-        Properties props = new Properties();
-        props.put("activeTray", "N");
         appProps = new UIApplicationProperties(args);
-        appProps.init(mockPropertiesLoader(props));
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setActiveTray(Boolean.FALSE);
+        appProps.init(TestUtils.mockConfigurtionDao(applicationConfig));
 
         boolean actual = appProps.isActiveTray();
 
@@ -73,10 +71,10 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void givenEnableOnStartupFileAndCLI_whenIsEnableOnStartup_thenReturnCliEnableOnStartup() {
         String[] args = {"enableOnStartup=n"};
-        Properties props = new Properties();
-        props.put("enableOnStartup", "t");
         appProps = new UIApplicationProperties(args);
-        appProps.init(mockPropertiesLoader(props));
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setEnableOnStartup(Boolean.TRUE);
+        appProps.init(TestUtils.mockConfigurtionDao(applicationConfig));
 
         boolean actual = appProps.isEnableOnStartup();
 
@@ -86,10 +84,10 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void givenEnableOnStartupFromProperties_whenIsEnableOnStartup_thenReturnEnableOnStartupFromProperties() {
         String[] args = {};
-        Properties props = new Properties();
-        props.put("enableOnStartup", "n");
         appProps = new UIApplicationProperties(args);
-        appProps.init(mockPropertiesLoader(props));
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setEnableOnStartup(Boolean.FALSE);
+        appProps.init(TestUtils.mockConfigurtionDao(applicationConfig));
 
         boolean actual = appProps.isEnableOnStartup();
 
@@ -99,10 +97,10 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void givenEnableOnStartupFromPropertiesAndOtherArgs_whenIsEnableOnStartup_thenReturnEnableOnStartupFromProperties() {
         String[] args = {"author=test"};
-        Properties props = new Properties();
-        props.put("enableOnStartup", "n");
         appProps = new UIApplicationProperties(args);
-        appProps.init(mockPropertiesLoader(props));
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setEnableOnStartup(Boolean.FALSE);
+        appProps.init(TestUtils.mockConfigurtionDao(applicationConfig));
 
         boolean actual = appProps.isEnableOnStartup();
 

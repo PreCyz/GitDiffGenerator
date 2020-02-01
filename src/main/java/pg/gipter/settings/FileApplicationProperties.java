@@ -5,10 +5,9 @@ import pg.gipter.utils.StringUtils;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -23,11 +22,8 @@ class FileApplicationProperties extends ApplicationProperties {
     @Override
     public Set<String> authors() {
         Set<String> result;
-        if (hasProperties()) {
-            String authors = properties.getProperty(
-                    ArgName.author.name(), String.join(",", argExtractor.authors())
-            );
-            result = Stream.of(authors.split(","))
+        if (currentRunConfig.getAuthor() != null && !currentRunConfig.getAuthor().isEmpty()) {
+            result = Stream.of(currentRunConfig.getAuthor().split(","))
                     .filter(value -> !StringUtils.nullOrEmpty(value))
                     .collect(toCollection(LinkedHashSet::new));
         } else {
@@ -41,24 +37,24 @@ class FileApplicationProperties extends ApplicationProperties {
 
     @Override
     public String gitAuthor() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.gitAuthor.name(), argExtractor.gitAuthor());
+        if (StringUtils.notEmpty(currentRunConfig.getGitAuthor())) {
+            return currentRunConfig.getGitAuthor();
         }
         return argExtractor.gitAuthor();
     }
 
     @Override
     public String mercurialAuthor() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.mercurialAuthor.name(), argExtractor.mercurialAuthor());
+        if (StringUtils.notEmpty(currentRunConfig.getMercurialAuthor())) {
+            return currentRunConfig.getMercurialAuthor();
         }
         return argExtractor.mercurialAuthor();
     }
 
     @Override
     public String svnAuthor() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.svnAuthor.name(), argExtractor.svnAuthor());
+        if (StringUtils.notEmpty(currentRunConfig.getSvnAuthor())) {
+            return currentRunConfig.getSvnAuthor();
         }
         return argExtractor.svnAuthor();
     }
@@ -66,8 +62,8 @@ class FileApplicationProperties extends ApplicationProperties {
     @Override
     public String itemPath() {
         String itemPath = argExtractor.itemPath();
-        if (hasProperties()) {
-            itemPath = properties.getProperty(ArgName.itemPath.name(), itemPath);
+        if (StringUtils.notEmpty(currentRunConfig.getItemPath())) {
+            itemPath = currentRunConfig.getItemPath();
             if (uploadType() == UploadType.STATEMENT) {
                 return itemPath;
             }
@@ -77,163 +73,168 @@ class FileApplicationProperties extends ApplicationProperties {
 
     @Override
     public String itemFileNamePrefix() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.itemFileNamePrefix.name(), argExtractor.itemFileNamePrefix());
+        if (StringUtils.notEmpty(currentRunConfig.getItemFileNamePrefix())) {
+            return currentRunConfig.getItemFileNamePrefix();
         }
         return argExtractor.itemFileNamePrefix();
     }
 
     @Override
     public Set<String> projectPaths() {
-        if (hasProperties()) {
-            String[] projectPaths = properties.getProperty(
-                    ArgName.projectPath.name(), ArgName.projectPath.defaultValue()
-            ).split(",");
-            return new HashSet<>(Arrays.asList(projectPaths));
+        if (currentRunConfig.getProjectPath() != null && !currentRunConfig.getProjectPath().isEmpty()) {
+            return Stream.of(currentRunConfig.getProjectPath().split(","))
+                    .filter(value -> !StringUtils.nullOrEmpty(value))
+                    .collect(toCollection(LinkedHashSet::new));
         }
         return argExtractor.projectPaths();
     }
 
     @Override
     public int periodInDays() {
-        if (hasProperties()) {
-            return Math.abs(Integer.parseInt(properties.getProperty(
-                    ArgName.periodInDays.name(), String.valueOf(argExtractor.periodInDays())
-            )));
+        if (currentRunConfig.getPeriodInDays() != null) {
+            return Math.abs(currentRunConfig.getPeriodInDays());
         }
         return argExtractor.periodInDays();
     }
 
     @Override
     public String committerEmail() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.committerEmail.name(), argExtractor.committerEmail());
+        if (StringUtils.notEmpty(currentRunConfig.getCommitterEmail())) {
+            return currentRunConfig.getCommitterEmail();
         }
         return argExtractor.committerEmail();
     }
 
     @Override
     public LocalDate startDate() {
-        if (hasProperties()) {
-            String[] date = properties.getProperty(
-                    ArgName.startDate.name(), LocalDate.now().minusDays(periodInDays()).format(yyyy_MM_dd)
-            ).split("-");
-            return LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
+        if (currentRunConfig.getStartDate() == null && currentRunConfig.getPeriodInDays() != null
+                && currentRunConfig.getPeriodInDays() != Integer.parseInt(ArgName.periodInDays.defaultValue())) {
+            currentRunConfig.setStartDate(LocalDate.now().minusDays(currentRunConfig.getPeriodInDays()));
+        }
+        if (currentRunConfig.getStartDate() != null) {
+            return currentRunConfig.getStartDate();
         }
         return argExtractor.startDate();
     }
 
     @Override
     public LocalDate endDate() {
-        if (hasProperties()) {
-            String[] date = argExtractor.endDate().format(yyyy_MM_dd).split("-");
-            String endDateStr = properties.getProperty(ArgName.endDate.name());
-            if (StringUtils.notEmpty(endDateStr)) {
-                date = endDateStr.split("-");
-            }
-            return LocalDate.of(Integer.valueOf(date[0]), Integer.valueOf(date[1]), Integer.valueOf(date[2]));
+        if (currentRunConfig.getEndDate() != null) {
+            return currentRunConfig.getEndDate();
         }
         return argExtractor.endDate();
     }
 
     @Override
     public UploadType uploadType() {
-        if (hasProperties()) {
-            String codeProtected = properties.getProperty(
-                    ArgName.uploadType.name(), ArgName.uploadType.defaultValue()
-            );
-            return UploadType.valueFor(codeProtected);
+        if (currentRunConfig.getUploadType() != null) {
+            return currentRunConfig.getUploadType();
         }
         return argExtractor.uploadType();
     }
 
     @Override
     public boolean isConfirmationWindow() {
-        if (hasProperties()) {
-            return StringUtils.getBoolean(properties.getProperty(
-                    ArgName.confirmationWindow.name(), ArgName.confirmationWindow.defaultValue()
-            ));
+        if (applicationConfig.getConfirmationWindow() != null) {
+            return applicationConfig.getConfirmationWindow();
         }
         return argExtractor.isConfirmationWindow();
     }
 
     @Override
-    public String toolkitUsername() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.toolkitUsername.name(), argExtractor.toolkitUsername()).trim().toUpperCase();
-        }
-        return argExtractor.toolkitUsername();
-    }
-
-    @Override
-    public String toolkitPassword() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.toolkitPassword.name(), argExtractor.toolkitPassword());
-        }
-        return argExtractor.toolkitPassword();
-    }
-
-    @Override
-    public String toolkitDomain() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.toolkitDomain.name(), argExtractor.toolkitDomain());
-        }
-        return argExtractor.toolkitDomain();
-    }
-
-    @Override
-    public String toolkitUrl() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.toolkitUrl.name(), argExtractor.toolkitUrl());
-        }
-        return argExtractor.toolkitUrl();
-    }
-
-    @Override
-    public String toolkitCopyListName() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.toolkitCopyListName.name(), argExtractor.toolkitListName());
-        }
-        return argExtractor.toolkitListName();
-    }
-
-    @Override
     public boolean isSkipRemote() {
-        String propertyName = ArgName.skipRemote.name();
-        if (containsProperty(propertyName)) {
-            return StringUtils.getBoolean(properties.getProperty(
-                    propertyName, ArgName.skipRemote.defaultValue()
-            ));
+        if (currentRunConfig.getSkipRemote() != null) {
+            return currentRunConfig.getSkipRemote();
         }
         return argExtractor.isSkipRemote();
     }
 
     @Override
     public boolean isFetchAll() {
-        String propertyName = ArgName.fetchAll.name();
-        if (containsProperty(propertyName)) {
-            return StringUtils.getBoolean(properties.getProperty(
-                    propertyName, ArgName.fetchAll.defaultValue()
-            ));
+        if (currentRunConfig.getFetchAll() != null) {
+            return currentRunConfig.getFetchAll();
         }
         return argExtractor.isFetchAll();
     }
 
     @Override
+    public boolean isDeleteDownloadedFiles() {
+        if (currentRunConfig.getDeleteDownloadedFiles() != null) {
+            return currentRunConfig.getDeleteDownloadedFiles();
+        }
+        return argExtractor.isDeleteDownloadedFiles();
+    }
+
+    @Override
+    public String configurationName() {
+        if (StringUtils.notEmpty(currentRunConfig.getConfigurationName())) {
+            return currentRunConfig.getConfigurationName();
+        }
+        return argExtractor.configurationName();
+    }
+
+    @Override
+    public String toolkitUsername() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitUsername()) &&
+                !toolkitConfig.getToolkitUsername().equals(ArgName.toolkitUsername.defaultValue())) {
+            return toolkitConfig.getToolkitUsername().trim().toUpperCase();
+        }
+        return argExtractor.toolkitUsername();
+    }
+
+    @Override
+    public String toolkitPassword() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitPassword()) &&
+                !ArgName.toolkitPassword.defaultValue().equals(toolkitConfig.getToolkitPassword())) {
+            return toolkitConfig.getToolkitPassword();
+        }
+        return argExtractor.toolkitPassword();
+    }
+
+    @Override
+    public String toolkitDomain() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitDomain())) {
+            return toolkitConfig.getToolkitDomain();
+        }
+        return argExtractor.toolkitDomain();
+    }
+
+    @Override
+    public String toolkitUrl() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitUrl())) {
+            return toolkitConfig.getToolkitUrl();
+        }
+        return argExtractor.toolkitUrl();
+    }
+
+    @Override
+    public String toolkitCopyListName() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitCopyListName())) {
+            return toolkitConfig.getToolkitCopyListName();
+        }
+        return argExtractor.toolkitListName();
+    }
+
+    @Override
     public String toolkitUserFolder() {
-        if (hasProperties()) {
+        if (StringUtils.notEmpty(toolkitUsername())) {
             return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
         }
         return argExtractor.toolkitUserFolder();
     }
 
     @Override
+    public Set<String> toolkitProjectListNames() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitProjectListNames())) {
+            return Stream.of(toolkitConfig.getToolkitProjectListNames().split(",")).collect(Collectors.toSet());
+        }
+        return argExtractor.toolkitProjectListNames();
+    }
+
+    @Override
     public boolean isUseUI() {
-        String propertyName = ArgName.useUI.name();
-        if (containsProperty(propertyName)) {
-            return StringUtils.getBoolean(properties.getProperty(
-                    propertyName, ArgName.useUI.defaultValue()
-            ));
+        if (applicationConfig.getUseUI() != null) {
+            return applicationConfig.getUseUI();
         }
         return argExtractor.isUseUI();
     }
@@ -244,58 +245,25 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public Set<String> toolkitProjectListNames() {
-        if (hasProperties()) {
-            String[] toolkitProjectListNames = properties.getProperty(
-                    ArgName.toolkitProjectListNames.name(), ArgName.toolkitProjectListNames.defaultValue()
-            ).split(",");
-            return new HashSet<>(Arrays.asList(toolkitProjectListNames));
-        }
-        return argExtractor.toolkitProjectListNames();
-    }
-
-    @Override
-    public boolean isDeleteDownloadedFiles() {
-        if (hasProperties()) {
-            return StringUtils.getBoolean(properties.getProperty(
-                    ArgName.deleteDownloadedFiles.name(), ArgName.deleteDownloadedFiles.defaultValue()
-            ));
-        }
-        return argExtractor.isDeleteDownloadedFiles();
-    }
-
-    @Override
     public boolean isEnableOnStartup() {
-        if (hasProperties()) {
-            return StringUtils.getBoolean(properties.getProperty(
-                    ArgName.enableOnStartup.name(), ArgName.enableOnStartup.defaultValue()
-            ));
+        if (applicationConfig.getEnableOnStartup() != null) {
+            return applicationConfig.getEnableOnStartup();
         }
         return argExtractor.isEnableOnStartup();
     }
 
     @Override
-    public String configurationName() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.configurationName.name(), argExtractor.configurationName());
-        }
-        return argExtractor.configurationName();
-    }
-
-    @Override
     public boolean isUpgradeFinished() {
-        if (hasProperties()) {
-            return StringUtils.getBoolean(properties.getProperty(
-                    ArgName.upgradeFinished.name(), ArgName.upgradeFinished.defaultValue()
-            ));
+        if (applicationConfig.getUpgradeFinished() != null) {
+            return applicationConfig.getUpgradeFinished();
         }
         return argExtractor.isUpgradeFinished();
     }
 
     @Override
     public String loggerLevel() {
-        if (hasProperties()) {
-            return properties.getProperty(ArgName.loggerLevel.name(), argExtractor.loggerLevel());
+        if (applicationConfig.getLoggingLevel() != null) {
+            return applicationConfig.getLoggingLevel().toString();
         }
         return argExtractor.loggerLevel();
     }

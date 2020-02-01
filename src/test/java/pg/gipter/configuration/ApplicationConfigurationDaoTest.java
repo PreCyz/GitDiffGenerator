@@ -1,33 +1,39 @@
 package pg.gipter.configuration;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pg.gipter.TestDataFactory;
 import pg.gipter.dao.DaoConstants;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ArgName;
-import pg.gipter.settings.dto.NamePatternValue;
-import pg.gipter.settings.dto.NameSetting;
+import pg.gipter.settings.PreferredArgSource;
+import pg.gipter.settings.dto.ApplicationConfig;
+import pg.gipter.settings.dto.RunConfig;
+import pg.gipter.settings.dto.ToolkitConfig;
+import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static pg.gipter.configuration.ApplicationConfigurationDao.*;
 
 class ApplicationConfigurationDaoTest {
 
-    private ApplicationConfigurationDao propertiesDao;
+    private ApplicationConfigurationDao dao;
 
     @BeforeEach
     void setUp() {
-        propertiesDao = new ApplicationConfigurationDao();
+        dao = new ApplicationConfigurationDao();
     }
 
     @AfterEach
@@ -41,274 +47,202 @@ class ApplicationConfigurationDaoTest {
 
     @Test
     void givenGeneratedProperty_whenAddAndSave_thenCreateNewJsonFile() {
-        Properties properties = TestDataFactory.generateProperty();
-        createJsonConfig(properties);
+        dao.saveRunConfig(new RunConfig());
+        dao.saveToolkitConfig(new ToolkitConfig());
+        dao.saveApplicationConfig(new ApplicationConfig());
 
-        JsonObject actual = propertiesDao.readJsonConfig();
+        JsonObject actual = dao.readJsonConfig();
         assertThat(actual).isNotNull();
-        assertThat(actual.getAsJsonObject(ConfigHelper.APP_CONFIG)).isNotNull();
-        assertThat(actual.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG)).isNotNull();
-        assertThat(actual.getAsJsonArray(ConfigHelper.RUN_CONFIGS)).hasSize(1);
-    }
-
-    private void createJsonConfig(Properties properties) {
-        propertiesDao.saveAppSettings(properties);
-        propertiesDao.saveToolkitSettings(properties);
-        propertiesDao.saveRunConfig(properties);
+        assertThat(actual.getAsJsonObject(APP_CONFIG)).isNotNull();
+        assertThat(actual.getAsJsonObject(TOOLKIT_CONFIG)).isNotNull();
+        assertThat(actual.getAsJsonArray(RUN_CONFIGS)).hasSize(1);
     }
 
     @Test
-    void givenJsonFile_whenLoadAllApplicationProperties_thenReturnMap() {
-        Properties properties = TestDataFactory.generateProperty();
-        createJsonConfig(properties);
-        properties.setProperty(ArgName.configurationName.name(), "other");
-        createJsonConfig(properties);
+    void whenSaveRunConfig_thenNewJsonFileCreated() {
+        RunConfig runConfig = new RunConfig();
+        runConfig.setConfigurationName("test");
 
-        Map<String, Properties> actual = propertiesDao.loadAllConfigs();
+        dao.saveRunConfig(runConfig);
+
+        JsonObject jsonObject = dao.readJsonConfig();
+        JsonArray asJsonArray = jsonObject.get(RUN_CONFIGS).getAsJsonArray();
+        assertThat(asJsonArray).hasSize(1);
+        assertThat(asJsonArray.get(0).getAsJsonObject().get(ArgName.configurationName.name()).getAsString())
+                .isEqualTo(runConfig.getConfigurationName());
+    }
+
+    @Test
+    void givenExistingRunConfig_whenSaveRunConfig_thenAddNewRunConfig() {
+        RunConfig runConfig = new RunConfig();
+        runConfig.setConfigurationName("test");
+        dao.saveRunConfig(runConfig);
+
+        runConfig.setConfigurationName("test2");
+        dao.saveRunConfig(runConfig);
+
+        JsonObject jsonObject = dao.readJsonConfig();
+        JsonArray asJsonArray = jsonObject.get(RUN_CONFIGS).getAsJsonArray();
+        assertThat(asJsonArray).hasSize(2);
+        Collection<String> actualConfigNames = new HashSet<>();
+        for (JsonElement next : asJsonArray) {
+            actualConfigNames.add(next.getAsJsonObject().get(ArgName.configurationName.name()).getAsString());
+        }
+        assertThat(actualConfigNames).containsExactlyInAnyOrder("test", "test2");
+    }
+
+    @Test
+    void givenExistingRunConfig_whenSaveRunConfig_thenReplaceExistingWithNewOne() {
+        RunConfig runConfig = new RunConfig();
+        runConfig.setConfigurationName("test");
+        dao.saveRunConfig(runConfig);
+
+        runConfig.setConfigurationName("test");
+        runConfig.setCommitterEmail("test");
+        dao.saveRunConfig(runConfig);
+
+        JsonObject jsonObject = dao.readJsonConfig();
+        JsonArray asJsonArray = jsonObject.get(RUN_CONFIGS).getAsJsonArray();
+        assertThat(asJsonArray).hasSize(1);
+        assertThat(asJsonArray.get(0).getAsJsonObject().get(ArgName.committerEmail.name()).getAsString())
+                .isEqualTo(runConfig.getCommitterEmail());
+    }
+
+    @Test
+    void whenSaveToolkitConfig_thenFileWithDataSaved() {
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("ququ");
+        toolkitConfig.setToolkitPassword("ququ");
+
+        dao.saveToolkitConfig(toolkitConfig);
+        JsonObject jsonObject = dao.readJsonConfig();
+        ToolkitConfig actual = new Gson().fromJson(jsonObject.get(TOOLKIT_CONFIG), ToolkitConfig.class);
+
+        assertThat(actual.getToolkitUsername()).isEqualTo("ququ");
+        assertThat(actual.getToolkitPassword()).isEqualTo("ququ");
+    }
+
+    @Test
+    void givenToolkitCOnfig_whenSaveToolkitConfig_thenOverrideExistingOne() {
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("ququ");
+        toolkitConfig.setToolkitPassword("ququ");
+        dao.saveToolkitConfig(toolkitConfig);
+        toolkitConfig.setToolkitUsername("se");
+        toolkitConfig.setToolkitPassword("test");
+        dao.saveToolkitConfig(toolkitConfig);
+
+        JsonObject jsonObject = dao.readJsonConfig();
+        ToolkitConfig actual = new Gson().fromJson(jsonObject.get(TOOLKIT_CONFIG), ToolkitConfig.class);
+
+        assertThat(actual.getToolkitUsername()).isEqualTo("se");
+        assertThat(actual.getToolkitPassword()).isEqualTo("test");
+    }
+
+    @Test
+    void givenNoToolkitConfig_whenLoadToolkitConfig_thenReturnDefault() {
+        dao = new ApplicationConfigurationDao();
+
+        ToolkitConfig actual = dao.loadToolkitConfig();
+
+        assertThat(actual.getToolkitUsername()).isEqualTo(ArgName.toolkitUsername.defaultValue());
+        assertThat(actual.getToolkitPassword()).isEqualTo(ArgName.toolkitPassword.defaultValue());
+    }
+
+    @Test
+    void givenNoApplicationConfig_whenLoadApplicationConfig_thenReturnDefault() {
+        ApplicationConfig actual = dao.loadApplicationConfig();
+
+        assertThat(actual.getConfirmationWindow()).isEqualTo(StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue()));
+    }
+
+    @Test
+    void givenApplicationConfig_whenLoadApplicationConfig_thenReturnDefault() {
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setPreferredArgSource(PreferredArgSource.FILE);
+        dao.saveApplicationConfig(applicationConfig);
+
+        ApplicationConfig actual = dao.loadApplicationConfig();
+
+        assertThat(actual.getPreferredArgSource()).isEqualTo(PreferredArgSource.FILE);
+    }
+
+    @Test
+    void givenNoRunConfigs_whenLoadRunConfigMap_thenReturnMapWithDefaultRunConfig() {
+        Map<String, RunConfig> actual = dao.loadRunConfigMap();
+
+        assertThat(actual).hasSize(1);
+        assertThat(actual.get(ArgName.configurationName.defaultValue())).isNotNull();
+    }
+
+    @Test
+    void givenRunConfigs_whenLoadRunConfigMap_thenReturnMapWithRunConfigs() {
+        RunConfig runConfig = new RunConfig();
+        runConfig.setConfigurationName("conf1");
+        dao.saveRunConfig(runConfig);
+        runConfig.setConfigurationName("conf2");
+        dao.saveRunConfig(runConfig);
+
+        Map<String, RunConfig> actual = dao.loadRunConfigMap();
 
         assertThat(actual).hasSize(2);
+        assertThat(actual.keySet()).containsExactlyInAnyOrder("conf1", "conf2");
     }
 
     @Test
     void givenApplicationProperties_whenRemoveConfig_thenRemoveThatConfigFromFile() {
-        Properties properties = TestDataFactory.generateProperty();
-        createJsonConfig(properties);
+        dao.saveRunConfig(new RunConfig());
+        dao.saveToolkitConfig(new ToolkitConfig());
+        dao.saveApplicationConfig(new ApplicationConfig());
 
-        propertiesDao.removeConfig(properties.getProperty(ArgName.configurationName.name()));
+        dao.removeConfig("");
 
-        JsonObject actual = propertiesDao.readJsonConfig();
-        assertThat(actual.getAsJsonArray(ConfigHelper.RUN_CONFIGS)).hasSize(0);
-        assertThat(actual.getAsJsonObject(ConfigHelper.APP_CONFIG)).isNotNull();
-        assertThat(actual.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG)).isNotNull();
+        JsonObject actual = dao.readJsonConfig();
+        assertThat(actual.getAsJsonArray(RUN_CONFIGS)).hasSize(0);
+        assertThat(actual.getAsJsonObject(APP_CONFIG)).isNotNull();
+        assertThat(actual.getAsJsonObject(TOOLKIT_CONFIG)).isNotNull();
     }
 
     @Test
-    void givenApplicationProperties_whenLoadArgumentArray_thenRemoveThatConfigFromFile() {
-        Properties properties = TestDataFactory.generateProperty();
-        createJsonConfig(properties);
+    void givenArgsArray_whenGetRunConfigFromArray_thenReturnRunConfig() {
+        String[] args = new String[]{
+                "author=author",
+                "gitAuthor=gitAuthor",
+                "mercurialAuthor=mercurialAuthor",
+                "svnAuthor=svnAuthor",
+                "committerEmail=committerEmail",
+                "uploadType=SIMPLE",
+                "skipRemote=Y",
+                "fetchAll=N",
+                "itemPath=itemPath",
+                "projectPath=project1,project2",
+                "itemFileNamePrefix=123",
+                "periodInDays=6",
+                "startDate=2020-01-18",
+                "endDate=2020-01-11",
+                "configurationName=TestConfigName",
+                "toolkitProjectListNames=Dudu",
+                "deleteDownloadedFiles=N"
+        };
 
-        String[] actual = propertiesDao.loadArgumentArray(properties.getProperty(ArgName.configurationName.name()));
+        RunConfig actual = dao.getRunConfigFromArray(args);
 
-        assertThat(actual).isNotNull();
-    }
-
-    @Test
-    void givenRunConfigWithoutName_whenSaveRunConfig_thenNoRunConfigSaved() {
-        Properties properties = TestDataFactory.generateProperty();
-        properties.remove(ArgName.configurationName.name());
-
-        propertiesDao.saveRunConfig(properties);
-
-        Map<String, Properties> map = propertiesDao.loadAllConfigs();
-        assertThat(map).isEmpty();
-    }
-
-    @Test
-    void givenRunConfig_whenSaveRunConfig_thenRunConfigSaved() {
-        Properties properties = TestDataFactory.generateProperty();
-
-        propertiesDao.saveRunConfig(properties);
-
-        Map<String, Properties> map = propertiesDao.loadAllConfigs();
-        assertThat(map).hasSize(1);
-        assertThat(map.keySet()).containsExactly(properties.getProperty(ArgName.configurationName.name()));
-    }
-
-    @Test
-    void given2SameRunConfig_whenSaveRunConfig_thenLastOneRunConfigSaved() {
-        Properties properties = TestDataFactory.generateProperty();
-        Properties last = TestDataFactory.generateProperty();
-        last.setProperty(ArgName.configurationName.name(), properties.getProperty(ArgName.configurationName.name()));
-        last.setProperty(ArgName.periodInDays.name(), "8");
-
-        propertiesDao.saveRunConfig(properties);
-        propertiesDao.saveRunConfig(last);
-
-
-        Map<String, Properties> map = propertiesDao.loadAllConfigs();
-        assertThat(map).hasSize(1);
-        assertThat(map.keySet()).containsExactly(properties.getProperty(ArgName.configurationName.name()));
-        assertThat(map.get(properties.getProperty(ArgName.configurationName.name())).getProperty(ArgName.periodInDays.name())).isEqualTo("8");
-    }
-
-    @Test
-    void givenPropertiesWithoutRunConfig_whenSaveAppConfig_thenSaveIt() {
-        Properties properties = TestDataFactory.generateProperty();
-        properties.remove(ArgName.configurationName.name());
-
-        propertiesDao.saveAppSettings(properties);
-
-        JsonObject jsonObject = propertiesDao.readJsonConfig();
-        assertThat(jsonObject).isNotNull();
-        assertThat(jsonObject.has(ConfigHelper.APP_CONFIG)).isTrue();
-        assertThat(jsonObject.get(ConfigHelper.APP_CONFIG).getAsJsonObject()).isNotNull();
-    }
-
-    @Test
-    void givenPropertiesWithoutRunConfig_whenSaveToolkitConfig_thenSaveIt() {
-        Properties properties = TestDataFactory.generateProperty();
-        properties.remove(ArgName.configurationName.name());
-
-        propertiesDao.saveToolkitSettings(properties);
-
-        JsonObject jsonObject = propertiesDao.readJsonConfig();
-        assertThat(jsonObject).isNotNull();
-        assertThat(jsonObject.has(ConfigHelper.TOOLKIT_CONFIG)).isTrue();
-        assertThat(jsonObject.get(ConfigHelper.TOOLKIT_CONFIG).getAsJsonObject()).isNotNull();
-    }
-
-    @Test
-    void givenProperties_whenLoadAllApplicationProperties_thenReturnEmptyMap() {
-        Properties properties = TestDataFactory.generateProperty();
-        createJsonConfig(properties);
-        propertiesDao.removeConfig(properties.getProperty(ArgName.configurationName.name()));
-
-        Map<String, Properties> map = propertiesDao.loadAllConfigs();
-
-        assertThat(map).isEmpty();
-    }
-
-    @Test
-    void givenProperties_whenSaveRunConfig_thenReturnMap() {
-        Properties properties = TestDataFactory.generateProperty();
-
-        propertiesDao.saveRunConfig(properties);
-        Map<String, Properties> map = propertiesDao.loadAllConfigs();
-
-        assertThat(map).hasSize(1);
-    }
-
-    @Test
-    void given2sameRunConfig_whenSaveRunConfig_thenReturnMapWithOneConfig() {
-        Properties properties = TestDataFactory.generateProperty();
-        propertiesDao.saveRunConfig(properties);
-        properties.put(ArgName.periodInDays.name(), "8");
-        propertiesDao.saveRunConfig(properties);
-
-        Map<String, Properties> map = propertiesDao.loadAllConfigs();
-        assertThat(map).hasSize(1);
-        assertThat(map.get(properties.getProperty(ArgName.configurationName.name())).getProperty(ArgName.periodInDays.name())).isEqualTo("8");
-    }
-
-    @Test
-    void givenProperties_whenSaveAppSettings_thenReturnEmptyMap() {
-        propertiesDao.writeJsonConfig(new ConfigHelper().buildFullJson(new Properties()));
-        Properties properties = TestDataFactory.generateProperty();
-        properties.remove(ArgName.configurationName.name());
-
-        propertiesDao.saveAppSettings(properties);
-
-        Map<String, Properties> map = propertiesDao.loadAllConfigs();
-        assertThat(map).isEmpty();
-    }
-
-    @Test
-    void givenProperties_whenSaveToolkitSettings_thenReturnEmptyMap() {
-        Properties properties = TestDataFactory.generateProperty();
-        properties.remove(ArgName.configurationName.name());
-
-        propertiesDao.saveToolkitSettings(properties);
-        Map<String, Properties> map = propertiesDao.loadAllConfigs();
-
-        assertThat(map).isEmpty();
-    }
-
-    @Test
-    void givenNoConfig_whenLoadToolkitCredentials_thenReturnDefaults() {
-        Properties actual = propertiesDao.loadToolkitCredentials();
-
-        assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(ArgName.toolkitUsername.defaultValue());
-        assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(ArgName.toolkitPassword.defaultValue());
-    }
-
-    @Test
-    void givenConfigWithoutToolkitConfig_whenLoadToolkitCredentials_thenReturnDefaults() {
-        Properties properties = TestDataFactory.generateProperty();
-        JsonObject jsonObject = new ConfigHelper().buildFullJson(properties);
-        jsonObject.remove(ConfigHelper.TOOLKIT_CONFIG);
-        propertiesDao.writeJsonConfig(jsonObject);
-
-        Properties actual = propertiesDao.loadToolkitCredentials();
-
-        assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(ArgName.toolkitUsername.defaultValue());
-        assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(ArgName.toolkitPassword.defaultValue());
-    }
-
-    @Test
-    void givenConfigWithToolkitConfig_whenLoadToolkitCredentials_thenReturnCredentialsFromConfig() {
-        String username = "username";
-        String password = "password";
-        Properties properties = TestDataFactory.generateProperty();
-        properties.setProperty(ArgName.toolkitUsername.name(), username);
-        properties.setProperty(ArgName.toolkitPassword.name(), password);
-        propertiesDao.saveToolkitSettings(properties);
-
-        Properties actual = propertiesDao.loadToolkitCredentials();
-
-        assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(username);
-        assertThat(actual.getProperty(ArgName.toolkitPassword.name())).isEqualTo(password);
-    }
-
-    @Test
-    void givenUserNameWithPolishSigns_whenLoadToolkitCredentials_thenReturnCredentialsWithProperCoding() throws UnsupportedEncodingException {
-        String username = "ęóąśłńćźż";
-        Properties properties = TestDataFactory.generateProperty();
-        properties.setProperty(ArgName.toolkitUsername.name(), username);
-        propertiesDao.saveToolkitSettings(properties);
-
-        Properties actual = propertiesDao.loadToolkitCredentials();
-
-        assertThat(actual.getProperty(ArgName.toolkitUsername.name())).isEqualTo(username);
-    }
-
-    @Test
-    void givenFileNameSetting_whenSaveFileNameSetting_thenSettingsAreSaved() {
-        NameSetting fns = new NameSetting();
-        fns.addSetting("{CURRENT_MONTH_NAME}", NamePatternValue.CURRENT_MONTH_NAME);
-        fns.addSetting("{CURRENT_WEEK_NUMBER}", NamePatternValue.CURRENT_WEEK_NUMBER);
-        fns.addSetting("{CURRENT_YEAR}", NamePatternValue.CURRENT_YEAR);
-        fns.addSetting("{END_DATE}", NamePatternValue.END_DATE);
-        fns.addSetting("{START_DATE}", NamePatternValue.START_DATE);
-
-        propertiesDao.saveFileNameSetting(fns);
-
-        JsonObject jsonObject = propertiesDao.readJsonConfig();
-        NameSetting actual = new Gson().fromJson(jsonObject.get(ConfigHelper.FILE_NAME_SETTING), NameSetting.class);
-        Map<String, NamePatternValue> nameSettings = actual.getNameSettings();
-        assertThat(nameSettings).isNotEmpty();
-        assertThat(nameSettings.get("{CURRENT_MONTH_NAME}")).isEqualTo(fns.getNameSettings().get("{CURRENT_MONTH_NAME}"));
-        assertThat(nameSettings.get("{CURRENT_WEEK_NUMBER}")).isEqualTo(fns.getNameSettings().get("{CURRENT_WEEK_NUMBER}"));
-        assertThat(nameSettings.get("{CURRENT_YEAR}")).isEqualTo(fns.getNameSettings().get("{CURRENT_YEAR}"));
-        assertThat(nameSettings.get("{END_DATE}")).isEqualTo(fns.getNameSettings().get("{END_DATE}"));
-        assertThat(nameSettings.get("{START_DATE}")).isEqualTo(fns.getNameSettings().get("{START_DATE}"));
-    }
-
-    @Test
-    void givenFileNameSetting_whenLoadFileNameSetting_thenReturnFileNameSettings() {
-        NameSetting fns = new NameSetting();
-        fns.addSetting("{CURRENT_MONTH_NAME}", NamePatternValue.CURRENT_MONTH_NAME);
-        fns.addSetting("{CURRENT_WEEK_NUMBER}", NamePatternValue.CURRENT_WEEK_NUMBER);
-        fns.addSetting("{CURRENT_YEAR}", NamePatternValue.CURRENT_YEAR);
-        fns.addSetting("{END_DATE}", NamePatternValue.END_DATE);
-        fns.addSetting("{START_DATE}", NamePatternValue.START_DATE);
-        propertiesDao.saveFileNameSetting(fns);
-
-        Optional<NameSetting> actual = propertiesDao.loadFileNameSetting();
-
-        assertThat(actual.isPresent()).isTrue();
-        Map<String, NamePatternValue> nameSettings = actual.get().getNameSettings();
-        assertThat(nameSettings).isNotEmpty();
-        assertThat(nameSettings.get("{CURRENT_MONTH_NAME}")).isEqualTo(fns.getNameSettings().get("{CURRENT_MONTH_NAME}"));
-        assertThat(nameSettings.get("{CURRENT_WEEK_NUMBER}")).isEqualTo(fns.getNameSettings().get("{CURRENT_WEEK_NUMBER}"));
-        assertThat(nameSettings.get("{CURRENT_YEAR}")).isEqualTo(fns.getNameSettings().get("{CURRENT_YEAR}"));
-        assertThat(nameSettings.get("{END_DATE}")).isEqualTo(fns.getNameSettings().get("{END_DATE}"));
-        assertThat(nameSettings.get("{START_DATE}")).isEqualTo(fns.getNameSettings().get("{START_DATE}"));
-    }
-
-    @Test
-    void givenNoFileNameSetting_whenLoadFileNameSetting_thenReturnEmptyOptional() {
-        Optional<NameSetting> actual = propertiesDao.loadFileNameSetting();
-
-        assertThat(actual.isPresent()).isFalse();
+        assertThat(actual.getAuthor()).isEqualTo("author");
+        assertThat(actual.getGitAuthor()).isEqualTo("gitAuthor");
+        assertThat(actual.getMercurialAuthor()).isEqualTo("mercurialAuthor");
+        assertThat(actual.getSvnAuthor()).isEqualTo("svnAuthor");
+        assertThat(actual.getCommitterEmail()).isEqualTo("committerEmail");
+        assertThat(actual.getUploadType()).isEqualTo(UploadType.SIMPLE);
+        assertThat(actual.getSkipRemote()).isTrue();
+        assertThat(actual.getFetchAll()).isFalse();
+        assertThat(actual.getItemPath()).isEqualTo("itemPath");
+        assertThat(actual.getProjectPath()).isEqualTo("project1,project2");
+        assertThat(actual.getItemFileNamePrefix()).isEqualTo("123");
+        assertThat(actual.getPeriodInDays()).isEqualTo(6);
+        assertThat(actual.getStartDate()).isEqualTo(LocalDate.of(2020, 1, 18));
+        assertThat(actual.getEndDate()).isEqualTo(LocalDate.of(2020, 1, 11));
+        assertThat(actual.getConfigurationName()).isEqualTo("TestConfigName");
+        assertThat(actual.getToolkitProjectListNames()).isEqualTo("Dudu");
+        assertThat(actual.getDeleteDownloadedFiles()).isFalse();
     }
 }

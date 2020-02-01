@@ -4,129 +4,62 @@ import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.dao.DaoConstants;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.producer.command.UploadType;
 import pg.gipter.settings.ArgName;
-import pg.gipter.settings.dto.NameSetting;
-import pg.gipter.utils.PasswordUtils;
+import pg.gipter.settings.dto.ApplicationConfig;
+import pg.gipter.settings.dto.RunConfig;
+import pg.gipter.settings.dto.ToolkitConfig;
 import pg.gipter.utils.StringUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Stream;
 
-class ApplicationConfigurationDao implements ConfigurationDao {
+import static java.util.stream.Collectors.toList;
 
-    private final Logger logger = LoggerFactory.getLogger(ApplicationConfigurationDao.class);
+public class ApplicationConfigurationDao implements ConfigurationDao {
 
-    private final ConfigHelper configHelper;
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationConfigurationDao.class);
+    final static String APP_CONFIG = "appConfig";
+    final static String TOOLKIT_CONFIG = "toolkitConfig";
+    final static String RUN_CONFIGS = "runConfigs";
+    final static int NO_CONFIGURATION_FOUND = -1;
+
     private JsonObject appSettings;
 
-    ApplicationConfigurationDao() {
-        this.configHelper = new ConfigHelper();
-    }
-
     @Override
-    public Optional<Properties> loadConfiguration(String configurationName) {
-        Map<String, Properties> propertiesMap = loadAllConfigs();
-        if (StringUtils.nullOrEmpty(configurationName)) {
-            configurationName = ApplicationProperties.APPLICATION_PROPERTIES;
-        }
-        return Optional.ofNullable(propertiesMap.get(configurationName));
-    }
-
-    @Override
-    public String[] loadArgumentArray(String configurationName) {
-        Optional<Properties> properties = loadConfiguration(configurationName);
-        String[] result = new String[0];
-        if (properties.isPresent()) {
-            result = new String[properties.get().size()];
-            int idx = 0;
-            for (Object keyObj : properties.get().keySet()) {
-                String key = String.valueOf(keyObj);
-                result[idx++] = String.format("%s=%s", key, properties.get().getProperty(key));
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public Properties createConfig(String[] args) {
-        Properties properties = new Properties();
-        for (String arg : args) {
-            String key = arg.substring(0, arg.indexOf("="));
-            String value = arg.substring(arg.indexOf("=") + 1);
-            properties.setProperty(key, value);
-        }
-        return properties;
-    }
-
-    @Override
-    public Map<String, Properties> loadAllConfigs() {
-        Map<String, Properties> result = new LinkedHashMap<>();
-        JsonObject config = readJsonConfig();
-        if (config != null) {
-            JsonObject appConfig = config.getAsJsonObject(ConfigHelper.APP_CONFIG);
-            JsonObject toolkitConfig = config.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG);
-            JsonArray runConfigs = config.getAsJsonArray(ConfigHelper.RUN_CONFIGS);
-            for (int i = 0; runConfigs != null && i < runConfigs.size(); ++i) {
-                Properties properties = new Properties();
-                if (appConfig != null) {
-                    setProperties(appConfig, properties, ConfigHelper.APP_CONFIG_PROPERTIES);
-                }
-                if (toolkitConfig != null && toolkitConfig.has(ArgName.toolkitPassword.name())) {
-                    setProperties(toolkitConfig, properties, ConfigHelper.TOOLKIT_CONFIG_PROPERTIES);
-                    PasswordUtils.decryptPassword(properties, ArgName.toolkitPassword.name());
-                }
-                JsonObject runConfig = runConfigs.get(i).getAsJsonObject();
-                setProperties(runConfig, properties, ConfigHelper.RUN_CONFIG_PROPERTIES);
-                result.put(properties.getProperty(ArgName.configurationName.name()), properties);
-            }
-        }
-        return result;
-    }
-
-    private void setProperties(JsonObject jsonObject, Properties properties, Set<String> propertiesNameSet) {
-        for (String propertyName : propertiesNameSet) {
-            JsonElement jsonElement = jsonObject.get(propertyName);
-            if (jsonElement != null) {
-                properties.put(propertyName, jsonElement.getAsString());
-            }
-        }
-    }
-
-    @Override
-    public void saveRunConfig(Properties properties) {
-        if (StringUtils.nullOrEmpty(properties.getProperty(ArgName.configurationName.name()))) {
-            logger.warn("empty configurationName. Can not save run config without configurationName.");
-            return;
-        }
-        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
+    public void saveRunConfig(RunConfig runConfig) {
         JsonObject jsonObject = readJsonConfig();
+        Gson gson = new Gson();
         if (jsonObject == null) {
-            jsonObject = configHelper.buildFullJson(properties);
+            jsonObject = new JsonObject();
+            JsonElement runConfigArray = gson.toJsonTree(Stream.of(runConfig).collect(toList()));
+            jsonObject.add(RUN_CONFIGS, runConfigArray);
+            logger.info("New configuration [{}] added.", runConfig.getConfigurationName());
+        } else {
+            boolean isNewRunConfig = true;
+            JsonArray runConfigsArray = jsonObject.get(RUN_CONFIGS).getAsJsonArray();
+            for (int i = 0; i < runConfigsArray.size() && isNewRunConfig; ++i) {
+                RunConfig existingRunConfig = gson.fromJson(runConfigsArray.get(i), RunConfig.class);
+                if (existingRunConfig.getConfigurationName().equals(runConfig.getConfigurationName())) {
+                    runConfigsArray.set(i, gson.toJsonTree(runConfig));
+                    isNewRunConfig = false;
+                    logger.info("Existing configuration [{}] updated.", runConfig.getConfigurationName());
+                }
+            }
+            if (isNewRunConfig) {
+                runConfigsArray.add(gson.toJsonTree(runConfig));
+                logger.info("New configuration [{}] added to existing set.", runConfig.getConfigurationName());
+            }
+            jsonObject.add(RUN_CONFIGS, runConfigsArray);
         }
-        configHelper.addOrReplaceRunConfig(properties, jsonObject);
-        logger.info("Saving run config [{}].", properties.getProperty(ArgName.configurationName.name()));
         writeJsonConfig(jsonObject);
     }
 
-    void writeJsonConfig(JsonObject jsonObject) {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(jsonObject);
-        try (OutputStream os = new FileOutputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
-             Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
-        ) {
-            writer.write(json);
-            logger.info("File {} saved.", DaoConstants.APPLICATION_PROPERTIES_JSON);
-            appSettings = null;
-        } catch (IOException e) {
-            logger.error("Error when writing {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
-            throw new IllegalArgumentException("Error when writing configuration into json.");
-        }
-    }
-
-    @Override
-    public JsonObject readJsonConfig() {
+    JsonObject readJsonConfig() {
         if (appSettings == null) {
             try (InputStream fis = new FileInputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
                  InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
@@ -140,6 +73,97 @@ class ApplicationConfigurationDao implements ConfigurationDao {
         return appSettings;
     }
 
+    void writeJsonConfig(JsonElement jsonElement) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(jsonElement);
+        try (OutputStream os = new FileOutputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
+             Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
+        ) {
+            writer.write(json);
+            logger.info("File {} saved.", DaoConstants.APPLICATION_PROPERTIES_JSON);
+            appSettings = jsonElement.getAsJsonObject();
+        } catch (IOException e) {
+            logger.error("Error when writing {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
+            throw new IllegalArgumentException("Error when writing configuration into json.");
+        }
+    }
+
+    @Override
+    public ToolkitConfig loadToolkitConfig() {
+        JsonObject jsonObject = readJsonConfig();
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        if (jsonObject != null) {
+            toolkitConfig = new Gson().fromJson(jsonObject.get(TOOLKIT_CONFIG), ToolkitConfig.class);
+        }
+        return toolkitConfig;
+    }
+
+    @Override
+    public void saveToolkitConfig(ToolkitConfig toolkitConfig) {
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            jsonObject = new JsonObject();
+        }
+        jsonObject.add(TOOLKIT_CONFIG, new Gson().toJsonTree(toolkitConfig));
+        writeJsonConfig(jsonObject);
+    }
+
+    @Override
+    public ApplicationConfig loadApplicationConfig() {
+        JsonObject jsonObject = readJsonConfig();
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        if (jsonObject != null) {
+            applicationConfig = new Gson().fromJson(jsonObject.get(APP_CONFIG), ApplicationConfig.class);
+        }
+        return applicationConfig;
+    }
+
+    @Override
+    public void saveApplicationConfig(ApplicationConfig applicationConfig) {
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject == null) {
+            jsonObject = new JsonObject();
+        }
+        jsonObject.add(APP_CONFIG, new Gson().toJsonTree(applicationConfig));
+        writeJsonConfig(jsonObject);
+    }
+
+    @Override
+    public Map<String, RunConfig> loadRunConfigMap() {
+        Map<String, RunConfig> runConfigMap = new HashMap<>();
+        JsonObject jsonObject = readJsonConfig();
+        if (jsonObject != null) {
+            JsonArray runConfigsArray = jsonObject.get(RUN_CONFIGS).getAsJsonArray();
+            Gson gson = new Gson();
+            for (JsonElement element : runConfigsArray) {
+                runConfigMap.put(
+                        element.getAsJsonObject().get(ArgName.configurationName.name()).getAsString(),
+                        gson.fromJson(element, RunConfig.class)
+                );
+            }
+        } else {
+            RunConfig runConfig = new RunConfig();
+            runConfigMap.put(runConfig.getConfigurationName(), runConfig);
+        }
+        return runConfigMap;
+    }
+
+    @Override
+    public String[] loadArgumentArray(String configurationName) {
+        Collection<String> arguments = new LinkedHashSet<>();
+        Optional<RunConfig> runConfig = loadRunConfig(configurationName);
+        runConfig.ifPresent(config -> arguments.addAll(Arrays.asList(config.toArgumentArray())));
+        ApplicationConfig applicationConfig = loadApplicationConfig();
+        if (applicationConfig != null) {
+            arguments.addAll(Arrays.asList(applicationConfig.toArgumentArray()));
+        }
+        ToolkitConfig toolkitConfig = loadToolkitConfig();
+        if (toolkitConfig != null) {
+            arguments.addAll(Arrays.asList(toolkitConfig.toArgumentArray()));
+        }
+        return arguments.toArray(new String[0]);
+    }
+
     @Override
     public void removeConfig(String configurationName) {
         final String errMsg = "Can not remove the configuration, because it does not exists!";
@@ -148,13 +172,13 @@ class ApplicationConfigurationDao implements ConfigurationDao {
             logger.error(errMsg);
             throw new IllegalStateException(errMsg);
         } else {
-            JsonElement jsonElement = jsonObject.get(ConfigHelper.RUN_CONFIGS);
+            JsonElement jsonElement = jsonObject.get(RUN_CONFIGS);
 
-            int existingConfIdx = configHelper.getIndexOfExistingConfig(jsonElement, configurationName);
-            if (existingConfIdx > ConfigHelper.NO_CONFIGURATION_FOUND) {
+            int existingConfIdx = getIndexOfExistingConfig(jsonElement, configurationName);
+            if (existingConfIdx > NO_CONFIGURATION_FOUND) {
                 JsonArray runConfigs = jsonElement.getAsJsonArray();
                 runConfigs.remove(existingConfIdx);
-                jsonObject.add(ConfigHelper.RUN_CONFIGS, runConfigs);
+                jsonObject.add(RUN_CONFIGS, runConfigs);
                 logger.info("Removing run config [{}].", configurationName);
                 writeJsonConfig(jsonObject);
             } else {
@@ -164,93 +188,67 @@ class ApplicationConfigurationDao implements ConfigurationDao {
         }
     }
 
-    @Override
-    public void saveAppSettings(Properties properties) {
-        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
-        JsonObject jsonObject = readJsonConfig();
-        if (jsonObject == null) {
-            jsonObject = configHelper.buildFullJson(properties);
-        }
-        jsonObject.add(ConfigHelper.APP_CONFIG, configHelper.buildAppConfig(properties));
-        logger.info("Saving application settings.");
-        writeJsonConfig(jsonObject);
-    }
-
-    @Override
-    public void saveToolkitSettings(Properties properties) {
-        PasswordUtils.encryptPassword(properties, ArgName.toolkitPassword.name());
-        JsonObject jsonObject = readJsonConfig();
-        if (jsonObject == null) {
-            jsonObject = configHelper.buildFullJson(properties);
-        }
-        jsonObject.add(ConfigHelper.TOOLKIT_CONFIG, configHelper.buildToolkitConfig(properties));
-        logger.info("Saving toolkit settings.");
-        writeJsonConfig(jsonObject);
-    }
-
-    @Override
-    public Properties loadToolkitCredentials() {
-        JsonObject jsonObject = readJsonConfig();
-        Properties result = new Properties();
-        if (jsonObject == null) {
-            result.setProperty(ArgName.toolkitUsername.name(), ArgName.toolkitUsername.defaultValue());
-            result.setProperty(ArgName.toolkitPassword.name(), ArgName.toolkitPassword.defaultValue());
-        } else {
-            JsonObject toolkitConfig = jsonObject.getAsJsonObject(ConfigHelper.TOOLKIT_CONFIG);
-            if (toolkitConfig == null) {
-                result.setProperty(ArgName.toolkitUsername.name(), ArgName.toolkitUsername.defaultValue());
-                result.setProperty(ArgName.toolkitPassword.name(), ArgName.toolkitPassword.defaultValue());
-            } else {
-                result.setProperty(ArgName.toolkitUsername.name(), toolkitConfig.get(ArgName.toolkitUsername.name()).getAsString());
-                result.setProperty(ArgName.toolkitPassword.name(), toolkitConfig.get(ArgName.toolkitPassword.name()).getAsString());
-                PasswordUtils.decryptPassword(result, ArgName.toolkitPassword.name());
+    int getIndexOfExistingConfig(JsonElement jsonElement, String configurationName) {
+        JsonArray runConfigs = jsonElement.getAsJsonArray();
+        for (int i = 0; i < runConfigs.size(); ++i) {
+            JsonObject jObj = runConfigs.get(i).getAsJsonObject();
+            String existingConfName = jObj.get(ArgName.configurationName.name()).getAsString();
+            if (existingConfName.equals(configurationName)) {
+                return i;
             }
         }
-        return result;
+        return NO_CONFIGURATION_FOUND;
     }
 
     @Override
-    public void saveFileNameSetting(NameSetting fileNameSetting) {
-        JsonObject jsonObject = readJsonConfig();
-        if (jsonObject == null) {
-            jsonObject = new JsonObject();
-        }
-        jsonObject.add(ConfigHelper.FILE_NAME_SETTING, new Gson().toJsonTree(fileNameSetting));
-        logger.info("Saving file name settings {}", fileNameSetting.getNameSettings());
-        writeJsonConfig(jsonObject);
+    public Optional<RunConfig> loadRunConfig(String configurationName) {
+        Map<String, RunConfig> runConfigMap = loadRunConfigMap();
+        return Optional.ofNullable(runConfigMap.get(configurationName));
     }
 
     @Override
-    public Optional<NameSetting> loadFileNameSetting() {
-        JsonObject jsonObject = readJsonConfig();
-        if (jsonObject == null) {
-            return Optional.empty();
+    public RunConfig getRunConfigFromArray(String[] args) {
+        RunConfig runConfig = new RunConfig();
+        for (String arg : args) {
+            String[] split = arg.split("=");
+            if (split.length > 1) {
+                if (ArgName.author.name().equals(split[0])) {
+                    runConfig.setAuthor(split[1]);
+                } else if (ArgName.gitAuthor.name().equals(split[0])) {
+                    runConfig.setGitAuthor(split[1]);
+                } else if (ArgName.mercurialAuthor.name().equals(split[0])) {
+                    runConfig.setMercurialAuthor(split[1]);
+                } else if (ArgName.svnAuthor.name().equals(split[0])) {
+                    runConfig.setSvnAuthor(split[1]);
+                } else if (ArgName.committerEmail.name().equals(split[0])) {
+                    runConfig.setCommitterEmail(split[1]);
+                } else if (ArgName.uploadType.name().equals(split[0])) {
+                    runConfig.setUploadType(UploadType.valueFor(split[1]));
+                } else if (ArgName.skipRemote.name().equals(split[0])) {
+                    runConfig.setSkipRemote(StringUtils.getBoolean(split[1]));
+                } else if (ArgName.fetchAll.name().equals(split[0])) {
+                    runConfig.setFetchAll(StringUtils.getBoolean(split[1]));
+                } else if (ArgName.itemPath.name().equals(split[0])) {
+                    runConfig.setItemPath(split[1]);
+                } else if (ArgName.projectPath.name().equals(split[0])) {
+                    runConfig.setProjectPath(split[1]);
+                } else if (ArgName.itemFileNamePrefix.name().equals(split[0])) {
+                    runConfig.setItemFileNamePrefix(split[1]);
+                } else if (ArgName.periodInDays.name().equals(split[0])) {
+                    runConfig.setPeriodInDays(Integer.valueOf(split[1]));
+                } else if (ArgName.startDate.name().equals(split[0])) {
+                    runConfig.setStartDate(LocalDate.parse(split[1], DateTimeFormatter.ISO_DATE));
+                } else if (ArgName.endDate.name().equals(split[0])) {
+                    runConfig.setEndDate(LocalDate.parse(split[1], DateTimeFormatter.ISO_DATE));
+                } else if (ArgName.configurationName.name().equals(split[0])) {
+                    runConfig.setConfigurationName(split[1]);
+                } else if (ArgName.toolkitProjectListNames.name().equals(split[0])) {
+                    runConfig.setToolkitProjectListNames(split[1]);
+                } else if (ArgName.deleteDownloadedFiles.name().equals(split[0])) {
+                    runConfig.setDeleteDownloadedFiles(StringUtils.getBoolean(split[1]));
+                }
+            }
         }
-        JsonElement jsonElement = jsonObject.get(ConfigHelper.FILE_NAME_SETTING);
-        return Optional.ofNullable(new Gson().fromJson(jsonElement, NameSetting.class));
-    }
-
-    @Override
-    public void removeFileNameSetting() {
-        JsonObject jsonObject = readJsonConfig();
-        if (jsonObject != null) {
-            jsonObject.remove(ConfigHelper.FILE_NAME_SETTING);
-            logger.info("File name settings removed.");
-            writeJsonConfig(jsonObject);
-        }
-    }
-
-    @Override
-    public Optional<Properties> loadAppSettings() {
-        JsonObject jsonObject = readJsonConfig();
-        if (jsonObject == null) {
-            return Optional.empty();
-        }
-        Properties appConfigProperties = new Properties();
-        JsonObject appConfig = jsonObject.getAsJsonObject(ConfigHelper.APP_CONFIG);
-        for (String key : ConfigHelper.APP_CONFIG_PROPERTIES) {
-            appConfigProperties.put(key, appConfig.get(key).getAsString());
-        }
-        return Optional.of(appConfigProperties);
+        return runConfig;
     }
 }

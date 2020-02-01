@@ -6,7 +6,10 @@ import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.dao.DaoFactory;
 import pg.gipter.producer.command.UploadType;
 import pg.gipter.producer.command.VersionControlSystem;
+import pg.gipter.settings.dto.ApplicationConfig;
 import pg.gipter.settings.dto.NamePatternValue;
+import pg.gipter.settings.dto.RunConfig;
+import pg.gipter.settings.dto.ToolkitConfig;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
@@ -22,23 +25,36 @@ public abstract class ApplicationProperties {
 
     protected final Logger logger;
     public static final DateTimeFormatter yyyy_MM_dd = DateTimeFormatter.ISO_DATE;
-    public static final String APPLICATION_PROPERTIES = "application.properties";
 
-    protected Properties properties;
+    protected ApplicationConfig applicationConfig;
+    protected ToolkitConfig toolkitConfig;
+    protected Map<String, RunConfig> runConfigMap;
+    protected RunConfig currentRunConfig;
     protected final ArgExtractor argExtractor;
     private Set<VersionControlSystem> vcs;
     private String[] args;
+    private ConfigurationDao configurationDao;
 
     public ApplicationProperties(String[] args) {
         this.args = args;
         argExtractor = new ArgExtractor(args);
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
-        init(DaoFactory.getConfigurationDao());
+        configurationDao = DaoFactory.getConfigurationDao();
+        init(configurationDao);
     }
 
     public String[] getArgs() {
         return args;
+    }
+
+    public void loadRunConfig(String configurationName) {
+        runConfigMap = configurationDao.loadRunConfigMap();
+        if (!runConfigMap.isEmpty() && runConfigMap.containsKey(configurationName)) {
+            currentRunConfig = runConfigMap.get(configurationName);
+        } else {
+            currentRunConfig = new RunConfig();
+        }
     }
 
     public final void setVcs(Set<VersionControlSystem> vcs) {
@@ -50,17 +66,17 @@ public abstract class ApplicationProperties {
     }
 
     protected void init(ConfigurationDao configurationDao) {
-        Optional<Properties> propsFromFile;
-        Map<String, Properties> propertiesMap = configurationDao.loadAllConfigs();
-        if (propertiesMap.isEmpty()) {
-            propsFromFile = Optional.empty();
-        } else if (propertiesMap.containsKey(argExtractor.configurationName())) {
-            propsFromFile = Optional.of(propertiesMap.get(argExtractor.configurationName()));
+        applicationConfig = configurationDao.loadApplicationConfig();
+        toolkitConfig = configurationDao.loadToolkitConfig();
+        runConfigMap = configurationDao.loadRunConfigMap();
+        if (runConfigMap.isEmpty()) {
+            currentRunConfig = new RunConfig();
+        } else if (runConfigMap.containsKey(argExtractor.configurationName())) {
+            currentRunConfig = runConfigMap.get(argExtractor.configurationName());
         } else {
-            propsFromFile = Optional.of(new ArrayList<>(propertiesMap.entrySet()).get(0).getValue());
+            currentRunConfig = new ArrayList<>(runConfigMap.entrySet()).get(0).getValue();
         }
-        if (propsFromFile.isPresent()) {
-            properties = propsFromFile.get();
+        if (currentRunConfig != null) {
             logger.info("Configuration [{}] loaded.", argExtractor.configurationName());
         } else {
             logger.warn("Can not load configuration [{}].", argExtractor.configurationName());
@@ -78,14 +94,6 @@ public abstract class ApplicationProperties {
         isNoOtherAuthors &= StringUtils.nullOrEmpty(svnAuthor());
         isNoOtherAuthors &= StringUtils.nullOrEmpty(mercurialAuthor());
         return !isNoOtherAuthors;
-    }
-
-    protected final boolean hasProperties() {
-        return properties != null;
-    }
-
-    protected final boolean containsProperty(String key) {
-        return hasProperties() && properties.containsKey(key);
     }
 
     protected final boolean containsArg(String argName) {
@@ -212,40 +220,48 @@ public abstract class ApplicationProperties {
     }
 
     protected final String log() {
-        return  "version='" + version() + '\'' +
-                ", configurationName='" + configurationName() + '\'' +
-                ", authors='" + String.join(",", authors()) + '\'' +
-                ", gitAuthor='" + gitAuthor() + '\'' +
-                ", mercurialAuthor='" + mercurialAuthor() + '\'' +
-                ", svnAuthor='" + svnAuthor() + '\'' +
-                ", committerEmail='" + committerEmail() + '\'' +
-                ", itemPath='" + itemPath() + '\'' +
-                ", fileName='" + fileName() + '\'' +
-                ", projectPath='" + String.join(",", projectPaths()) + '\'' +
-                ", periodInDays='" + periodInDays() + '\'' +
-                ", startDate='" + startDate() + '\'' +
-                ", endDate='" + endDate() + '\'' +
-                ", uploadType='" + uploadType() + '\'' +
-                ", preferredArgSource='" + preferredArgSource() + '\'' +
-                ", skipRemote='" + isSkipRemote() + '\'' +
-                ", fetchAll='" + isFetchAll() + '\'' +
-                ", useUI='" + isUseUI() + '\'' +
-                ", silentMode='" + isSilentMode() + '\'' +
-                ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
-                ", toolkitUsername='" + toolkitUsername() + '\'' +
-                ", toolkitUrl='" + toolkitUrl() + '\'' +
-                ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
-                ", toolkitDomain='" + toolkitDomain() + '\'' +
-                ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
-                ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
-                ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + '\'' +
-                ", deleteDownloadedFiles='" + isDeleteDownloadedFiles() + '\'' +
-                ", enableOnStartup='" + isEnableOnStartup() + '\'' +
-                ", upgradeFinished='" + isUpgradeFinished() + '\'' +
-                ", loggerLevel='" + loggerLevel() + '\''
-        ;
+        String log = "version='" + version() + '\'';
+        if (currentRunConfig != null) {
+            log += ", configurationName='" + configurationName() + '\'' +
+                    ", authors='" + String.join(",", authors()) + '\'' +
+                    ", gitAuthor='" + gitAuthor() + '\'' +
+                    ", mercurialAuthor='" + mercurialAuthor() + '\'' +
+                    ", svnAuthor='" + svnAuthor() + '\'' +
+                    ", committerEmail='" + committerEmail() + '\'' +
+                    ", itemPath='" + itemPath() + '\'' +
+                    ", fileName='" + fileName() + '\'' +
+                    ", projectPath='" + String.join(",", projectPaths()) + '\'' +
+                    ", periodInDays='" + periodInDays() + '\'' +
+                    ", startDate='" + startDate() + '\'' +
+                    ", endDate='" + endDate() + '\'' +
+                    ", uploadType='" + uploadType() + '\'' +
+                    ", skipRemote='" + isSkipRemote() + '\'' +
+                    ", fetchAll='" + isFetchAll() + '\'' +
+                    ", deleteDownloadedFiles='" + isDeleteDownloadedFiles() + '\'';
+        }
+        if (applicationConfig != null) {
+            log += ", preferredArgSource='" + preferredArgSource() + '\'' +
+                    ", useUI='" + isUseUI() + '\'' +
+                    ", silentMode='" + isSilentMode() + '\'' +
+                    ", enableOnStartup='" + isEnableOnStartup() + '\'' +
+                    ", upgradeFinished='" + isUpgradeFinished() + '\'' +
+                    ", loggerLevel='" + loggerLevel() + '\'';
+        }
+        if (toolkitConfig != null) {
+            log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
+                    ", toolkitUsername='" + toolkitUsername() + '\'' +
+                    ", toolkitUrl='" + toolkitUrl() + '\'' +
+                    ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
+                    ", toolkitDomain='" + toolkitDomain() + '\'' +
+                    ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
+                    ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
+                    ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames());
+
+        }
+        return  log;
     }
 
+    public abstract String configurationName();
     public abstract Set<String> authors();
     public abstract String gitAuthor();
     public abstract String mercurialAuthor();
@@ -258,21 +274,23 @@ public abstract class ApplicationProperties {
     public abstract LocalDate endDate();
     public abstract int periodInDays();
     public abstract UploadType uploadType();
-    public abstract boolean isConfirmationWindow();
+    public abstract boolean isDeleteDownloadedFiles();
+    public abstract boolean isSkipRemote();
+
+    public abstract boolean isFetchAll();
     public abstract String toolkitUsername();
     public abstract String toolkitPassword();
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
     public abstract String toolkitCopyListName();
     public abstract Set<String> toolkitProjectListNames();
+
     public abstract String toolkitUrl();
-    public abstract boolean isSkipRemote();
-    public abstract boolean isFetchAll();
-    public abstract boolean isUseUI();
+    public abstract boolean isConfirmationWindow();
     public abstract boolean isActiveTray();
-    public abstract boolean isDeleteDownloadedFiles();
     public abstract boolean isEnableOnStartup();
-    public abstract String configurationName();
-    public abstract boolean isUpgradeFinished();
+    public abstract boolean isUseUI();
     public abstract String loggerLevel();
+
+    public abstract boolean isUpgradeFinished();
 }

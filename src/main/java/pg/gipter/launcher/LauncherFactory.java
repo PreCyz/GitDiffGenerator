@@ -11,8 +11,8 @@ public class LauncherFactory {
     private LauncherFactory() {}
 
     public static Launcher getLauncher(ApplicationProperties applicationProperties, Stage stage) {
-        ConfigurationDao propertiesDao = DaoFactory.getConfigurationDao();
-        if (propertiesDao.loadAllConfigs().isEmpty()) {
+        ConfigurationDao configurationDao = DaoFactory.getConfigurationDao();
+        if (configurationDao.loadRunConfigMap().isEmpty()) {
             return new WizardLauncher(stage);
         }
         if (applicationProperties.isUseUI()) {

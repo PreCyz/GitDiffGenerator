@@ -18,6 +18,7 @@ import pg.gipter.producer.command.VersionControlSystem;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.settings.ArgName;
+import pg.gipter.settings.dto.RunConfig;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
@@ -194,14 +195,16 @@ public class ProjectsController extends AbstractController {
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
             String configurationName = applicationProperties.configurationName();
-            Properties properties = propertiesDao.createConfig(applicationProperties.getArgs());
-            String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-            properties.setProperty(ArgName.projectPath.name(), projects);
-            propertiesDao.saveRunConfig(properties);
+            Optional<RunConfig> runConfig = configurationDao.loadRunConfig(configurationName);
+            final String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
+            runConfig.ifPresent(rc -> {
+                rc.setProjectPath(projects);
+                configurationDao.saveRunConfig(rc);
+            });
 
             uiLauncher.hideProjectsWindow();
             if (uiLauncher.isInvokeExecute()) {
-                applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationName));
+                applicationProperties = ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configurationName));
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
             } else {

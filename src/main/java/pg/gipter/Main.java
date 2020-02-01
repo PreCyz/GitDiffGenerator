@@ -67,7 +67,7 @@ public class Main extends Application {
 
     private void setDefaultConfig() {
         ConfigurationDao propertiesDao = DaoFactory.getConfigurationDao();
-        LinkedList<String> configs = new LinkedList<>(propertiesDao.loadAllConfigs().keySet());
+        LinkedList<String> configs = new LinkedList<>(propertiesDao.loadRunConfigMap().keySet());
         if (!configs.isEmpty()) {
             String defaultConfigName = configs.getFirst();
             String[] arguments = Arrays.copyOf(args, args.length + 1);

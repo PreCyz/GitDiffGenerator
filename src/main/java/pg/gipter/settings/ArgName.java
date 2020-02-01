@@ -8,7 +8,7 @@ import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
 
 public enum ArgName {
 
-    author("NO_AUTHORS_GIVEN"),
+    author("NO_AUTHORS"),
     gitAuthor(""),
     mercurialAuthor(""),
     svnAuthor(""),
@@ -20,8 +20,8 @@ public enum ArgName {
     deleteDownloadedFiles("Y"),
     configurationName(""),
 
-    itemPath("NO_ITEM_PATH_GIVEN"),
-    projectPath("NO_PROJECT_PATH_GIVEN"),
+    itemPath("NO_ITEM_PATH"),
+    projectPath("NO_PROJECT_PATH"),
     itemFileNamePrefix(""),
 
     periodInDays("7"),
@@ -37,8 +37,8 @@ public enum ArgName {
     enableOnStartup("Y"),
     loggerLevel(""),
 
-    toolkitUsername("NO_TOOLKIT_USERNAME_GIVEN"),
-    toolkitPassword("NO_TOOLKIT_PASSWORD_GIVEN"),
+    toolkitUsername("UNKNOWN_USER"),
+    toolkitPassword("UNKNOWN"),
     toolkitDomain("NCDMZ"),
     toolkitCopyListName("WorkItems"),
     toolkitUrl("https://goto.netcompany.com"),

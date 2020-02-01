@@ -1,7 +1,5 @@
 package pg.gipter.settings;
 
-import pg.gipter.utils.StringUtils;
-
 /** Created by Pawel Gawedzki on 06-Mar-2019. */
 class UIApplicationProperties extends CliApplicationProperties {
 
@@ -18,8 +16,8 @@ class UIApplicationProperties extends CliApplicationProperties {
     public boolean isActiveTray() {
         boolean activeTray = argExtractor.isActiveTray();
         String argName = ArgName.activeTray.name();
-        if (!containsArg(argName) && containsProperty(argName)) {
-            activeTray = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(activeTray)));
+        if (!containsArg(argName) && applicationConfig.getActiveTray() != null) {
+            activeTray = applicationConfig.getActiveTray();
         }
         return activeTray;
     }
@@ -28,8 +26,8 @@ class UIApplicationProperties extends CliApplicationProperties {
     public boolean isEnableOnStartup() {
         boolean enableOnStartup = argExtractor.isEnableOnStartup();
         String argName = ArgName.enableOnStartup.name();
-        if (!containsArg(argName) && containsProperty(argName)) {
-            enableOnStartup = StringUtils.getBoolean(properties.getProperty(argName, String.valueOf(enableOnStartup)));
+        if (!containsArg(argName) && applicationConfig.getEnableOnStartup() != null) {
+            enableOnStartup = applicationConfig.getEnableOnStartup();
         }
         return enableOnStartup;
     }

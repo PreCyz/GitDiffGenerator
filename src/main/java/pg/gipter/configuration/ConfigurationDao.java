@@ -1,26 +1,22 @@
 package pg.gipter.configuration;
 
-import com.google.gson.JsonObject;
-import pg.gipter.settings.dto.NameSetting;
+import pg.gipter.settings.dto.ApplicationConfig;
+import pg.gipter.settings.dto.RunConfig;
+import pg.gipter.settings.dto.ToolkitConfig;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 
 public interface ConfigurationDao {
 
-    Map<String, Properties> loadAllConfigs();
-    Optional<Properties> loadConfiguration(String configurationName);
-    Properties createConfig(String[] args);
-    void saveRunConfig(Properties properties);
+    void saveRunConfig(RunConfig runConfig);
     void removeConfig(String configurationName);
     String[] loadArgumentArray(String configurationName);
-    JsonObject readJsonConfig();
-    void saveAppSettings(Properties properties);
-    Optional<Properties> loadAppSettings();
-    void saveToolkitSettings(Properties properties);
-    Properties loadToolkitCredentials();
-    void saveFileNameSetting(NameSetting fileNameSetting);
-    Optional<NameSetting> loadFileNameSetting();
-    void removeFileNameSetting();
+    ToolkitConfig loadToolkitConfig();
+    void saveToolkitConfig(ToolkitConfig toolkitConfig);
+    ApplicationConfig loadApplicationConfig();
+    void saveApplicationConfig(ApplicationConfig applicationConfig);
+    Map<String, RunConfig> loadRunConfigMap();
+    Optional<RunConfig> loadRunConfig(String configurationName);
+    RunConfig getRunConfigFromArray(String[] args);
 }

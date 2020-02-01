@@ -15,13 +15,13 @@ class ArgExtractorTest {
     private ArgExtractor argExtractor;
 
     @Test
-    void given_noAuthor_when_authors_then_returnDefaultValue() {
+    void givenNoAuthor_whenAuthors_thenReturnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
         Set<String> actual = argExtractor.authors();
 
         assertThat(actual).hasSize(1);
-        assertThat(actual).containsExactly("NO_AUTHORS_GIVEN");
+        assertThat(actual).containsExactly("NO_AUTHORS");
     }
 
     @Test
@@ -125,12 +125,12 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_noItemPath_when_itemPath_then_returnDefaultValue() {
+    void givenNoItemPath_whenItemPath_thenReturnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
         String actual = argExtractor.itemPath();
 
-        assertThat(actual).isEqualTo("NO_ITEM_PATH_GIVEN");
+        assertThat(actual).isEqualTo("NO_ITEM_PATH");
     }
 
     @Test
@@ -143,12 +143,12 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_noProjectPaths_when_projectPaths_then_returnDefaultValue() {
+    void givenNoProjectPaths_whenProjectPaths_thenReturnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
         Set<String> actual = argExtractor.projectPaths();
 
-        assertThat(actual).containsExactly("NO_PROJECT_PATH_GIVEN");
+        assertThat(actual).containsExactly("NO_PROJECT_PATH");
     }
 
     @Test
@@ -354,12 +354,12 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_noToolkitUsername_when_toolkitUsername_then_returnDefaultValue() {
+    void givenNoToolkitUsername_whenToolkitUsername_thenReturnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
         String actual = argExtractor.toolkitUsername();
 
-        assertThat(actual).isEqualTo("NO_TOOLKIT_USERNAME_GIVEN");
+        assertThat(actual).isEqualTo("UNKNOWN_USER");
     }
 
     @Test
@@ -372,12 +372,12 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_noToolkitPassword_when_toolkitPassword_then_returnDefaultValue() {
+    void givenNoToolkitPassword_whenToolkitPassword_thenReturnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
         String actual = argExtractor.toolkitPassword();
 
-        assertThat(actual).isEqualTo("NO_TOOLKIT_PASSWORD_GIVEN");
+        assertThat(actual).isEqualTo("UNKNOWN");
     }
 
     @Test

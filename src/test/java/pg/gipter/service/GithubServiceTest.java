@@ -64,6 +64,18 @@ class GithubServiceTest {
     }
 
     @Test
+    @Disabled
+    void givenOldVersionInGithub_whenIsNewVersion_thenReturnFalse() {
+        when(mockAppProps.version()).thenReturn("3.7");
+        spyGithubService = spy(new GithubService(mockAppProps.version()));
+        doReturn(Optional.of("3.6.14")).when(spyGithubService).getLatestVersion();
+
+        boolean actual = spyGithubService.isNewVersion();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
     void givenNewVersionInGithub2_whenIsNewVersion_thenReturnTrue() {
         when(mockAppProps.version()).thenReturn("1.3");
         spyGithubService = spy(new GithubService(mockAppProps.version()));

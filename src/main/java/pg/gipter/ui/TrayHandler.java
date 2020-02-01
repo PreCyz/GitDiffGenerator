@@ -34,7 +34,7 @@ class TrayHandler {
     private UILauncher uiLauncher;
     private static TrayIcon trayIcon;
     private static PopupMenu trayPopupMenu;
-    private ConfigurationDao propertiesDao;
+    private ConfigurationDao configurationDao;
     private DataDao dataDao;
     private Executor executor;
 
@@ -42,7 +42,7 @@ class TrayHandler {
         this.uiLauncher = uiLauncher;
         this.applicationProperties = applicationProperties;
         this.executor = executor;
-        this.propertiesDao = DaoFactory.getConfigurationDao();
+        this.configurationDao = DaoFactory.getConfigurationDao();
         this.dataDao = DaoFactory.getDataDao();
     }
 
@@ -202,7 +202,7 @@ class TrayHandler {
 
     private ActionListener uploadActionListener() {
         return e -> executor.execute(() ->
-                new FXMultiRunner(propertiesDao.loadAllConfigs().keySet(), executor, RunType.TRAY).start()
+                new FXMultiRunner(configurationDao.loadRunConfigMap().keySet(), executor, RunType.TRAY).start()
         );
     }
 

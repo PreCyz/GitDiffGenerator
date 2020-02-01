@@ -17,12 +17,12 @@ public abstract class AbstractController implements Initializable {
     protected final UILauncher uiLauncher;
     protected final Logger logger;
     protected URL location;
-    protected ConfigurationDao propertiesDao;
+    protected ConfigurationDao configurationDao;
 
     protected AbstractController(UILauncher uiLauncher) {
         this.uiLauncher = uiLauncher;
         this.logger = LoggerFactory.getLogger(getClass());
-        this.propertiesDao = DaoFactory.getConfigurationDao();
+        this.configurationDao = DaoFactory.getConfigurationDao();
     }
 
     @Override

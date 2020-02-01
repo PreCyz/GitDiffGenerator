@@ -5,17 +5,17 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.dao.DaoFactory;
 import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.settings.ApplicationPropertiesFactory;
+import pg.gipter.settings.dto.RunConfig;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 
 public class CacheManager {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheManager.class);
 
     static final Map<String, ApplicationProperties> cacheMap = new LinkedHashMap<>();
-    private static final ConfigurationDao propertiesDao = DaoFactory.getConfigurationDao();
+    private static final ConfigurationDao configurationDao = DaoFactory.getConfigurationDao();
 
     private CacheManager() { }
 
@@ -24,14 +24,14 @@ public class CacheManager {
             logger.info("Configuration [{}] is taken from cache.", configName);
             return cacheMap.get(configName);
         }
-        return ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configName));
+        return ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configName));
     }
 
     public static Map<String, ApplicationProperties> getAllApplicationProperties() {
         Map<String, ApplicationProperties> result = new LinkedHashMap<>();
 
-        Map<String, Properties> map = propertiesDao.loadAllConfigs();
-        for (Map.Entry<String, Properties> entry : map.entrySet()) {
+        Map<String, RunConfig> map = configurationDao.loadRunConfigMap();
+        for (Map.Entry<String, RunConfig> entry : map.entrySet()) {
             if (cacheMap.containsKey(entry.getKey())) {
                 logger.info("Configuration [{}] is taken from cache.", entry.getKey());
                 result.put(entry.getKey(), cacheMap.get(entry.getKey()));
