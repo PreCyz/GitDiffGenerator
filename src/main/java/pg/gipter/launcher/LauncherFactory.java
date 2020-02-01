@@ -1,9 +1,9 @@
 package pg.gipter.launcher;
 
 import javafx.stage.Stage;
-import pg.gipter.configuration.ConfigurationDao;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.WizardLauncher;
 

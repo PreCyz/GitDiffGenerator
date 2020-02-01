@@ -1,10 +1,10 @@
 package pg.gipter;
 
 import org.mockito.stubbing.Answer;
-import pg.gipter.configuration.ConfigurationDao;
-import pg.gipter.settings.dto.ApplicationConfig;
-import pg.gipter.settings.dto.RunConfig;
-import pg.gipter.settings.dto.ToolkitConfig;
+import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dto.ApplicationConfig;
+import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.dto.ToolkitConfig;
 
 import java.util.HashMap;
 import java.util.Map;

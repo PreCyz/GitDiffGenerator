@@ -6,14 +6,14 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.configuration.ConfigurationDao;
 import pg.gipter.converter.Converter;
 import pg.gipter.converter.ConverterFactory;
-import pg.gipter.dao.DaoFactory;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.launcher.LauncherFactory;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.utils.StringUtils;
 
 import java.util.Arrays;
@@ -73,7 +73,7 @@ public class Main extends Application {
             String[] arguments = Arrays.copyOf(args, args.length + 1);
             arguments[arguments.length - 1] = defaultConfigName;
             applicationProperties = ApplicationPropertiesFactory.getInstance(arguments);
-            logger.info("Configuration '{}' is set as default one.", defaultConfigName);
+            logger.info("Default configuration set as [{}].", defaultConfigName);
         }
     }
 }

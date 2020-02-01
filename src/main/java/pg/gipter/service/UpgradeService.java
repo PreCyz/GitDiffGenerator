@@ -6,7 +6,7 @@ import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.settings.ArgName;
+import pg.gipter.core.ArgName;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;

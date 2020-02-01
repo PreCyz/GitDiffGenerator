@@ -1,7 +1,7 @@
 package pg.gipter;
 
 import org.jetbrains.annotations.NotNull;
-import pg.gipter.settings.ArgName;
+import pg.gipter.core.ArgName;
 import pg.gipter.utils.StringUtils;
 
 import java.util.Properties;

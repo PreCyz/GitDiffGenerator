@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 
 import java.io.*;
 import java.util.Optional;

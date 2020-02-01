@@ -2,8 +2,8 @@ package pg.gipter.toolkit.sharepoint.rest;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import pg.gipter.producer.command.UploadType;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.io.IOException;

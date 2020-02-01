@@ -24,22 +24,22 @@ import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
-import pg.gipter.configuration.CacheManager;
-import pg.gipter.dao.DaoConstants;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.data.DataDao;
-import pg.gipter.platform.AppManager;
-import pg.gipter.platform.AppManagerFactory;
-import pg.gipter.producer.command.UploadType;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.configuration.CacheManager;
+import pg.gipter.core.dao.data.DataDao;
+import pg.gipter.core.dto.NamePatternValue;
+import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.dto.ToolkitConfig;
+import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.ToolkitService;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.settings.ArgName;
-import pg.gipter.settings.PreferredArgSource;
-import pg.gipter.settings.dto.NamePatternValue;
-import pg.gipter.settings.dto.RunConfig;
-import pg.gipter.settings.dto.ToolkitConfig;
+import pg.gipter.service.platform.AppManager;
+import pg.gipter.service.platform.AppManagerFactory;
 import pg.gipter.ui.*;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
-import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
+import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
 

@@ -6,8 +6,8 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
-import pg.gipter.dao.MongoDaoConfig;
-import pg.gipter.producer.command.VersionControlSystem;
+import pg.gipter.core.dao.MongoDaoConfig;
+import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.statistic.Statistic;
 import pg.gipter.utils.StringUtils;
 
