@@ -110,7 +110,7 @@ public class ToolkitProjectsController extends AbstractController {
     private void initValues() {
         downloadAvailableProjectNames();
         Set<String> projects = applicationProperties.projectPaths();
-        String[] args = configurationDao.loadArgumentArray(applicationProperties.configurationName());
+        String[] args = applicationProperties.getCurrentRunConfig().toArgumentArray();
         if (args.length == 0) {
             projects.clear();
             projects.add(ProjectDetails.DEFAULT.getName());
@@ -244,13 +244,14 @@ public class ToolkitProjectsController extends AbstractController {
         return event -> {
             String configurationName = applicationProperties.configurationName();
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-            RunConfig runConfig = configurationDao.getRunConfigFromArray(applicationProperties.getArgs());
+            RunConfig runConfig = applicationProperties.getCurrentRunConfig();
             runConfig.setProjectPath(projects);
-            configurationDao.saveRunConfig(runConfig);
+            applicationProperties.updateCurrentRunConfig(runConfig);
+            applicationProperties.save();
 
             uiLauncher.hideToolkitProjectsWindow();
             if (uiLauncher.isInvokeExecute()) {
-                applicationProperties = ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configurationName));
+                applicationProperties = ApplicationPropertiesFactory.getInstance(applicationProperties.getArgs());
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
             } else {

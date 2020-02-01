@@ -5,8 +5,6 @@ import javafx.fxml.Initializable;
 import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dao.configuration.ConfigurationDao;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,12 +15,10 @@ public abstract class AbstractController implements Initializable {
     protected final UILauncher uiLauncher;
     protected final Logger logger;
     protected URL location;
-    protected ConfigurationDao configurationDao;
 
     protected AbstractController(UILauncher uiLauncher) {
         this.uiLauncher = uiLauncher;
         this.logger = LoggerFactory.getLogger(getClass());
-        this.configurationDao = DaoFactory.getConfigurationDao();
     }
 
     @Override

@@ -44,30 +44,6 @@ public abstract class ApplicationProperties {
         init(configurationDao);
     }
 
-    public String[] getArgs() {
-        return args;
-    }
-
-    public void setApplicationConfig(ApplicationConfig applicationConfig) {
-        this.applicationConfig = applicationConfig;
-    }
-
-    public void setToolkitConfig(ToolkitConfig toolkitConfig) {
-        this.toolkitConfig = toolkitConfig;
-    }
-
-    public void setCurrentRunConfig(RunConfig currentRunConfig) {
-        this.currentRunConfig = currentRunConfig;
-    }
-
-    public final void setVcs(Set<VersionControlSystem> vcs) {
-        this.vcs = vcs;
-    }
-
-    public final Set<VersionControlSystem> vcsSet() {
-        return vcs;
-    }
-
     protected void init(ConfigurationDao configurationDao) {
         applicationConfig = configurationDao.loadApplicationConfig();
         toolkitConfig = configurationDao.loadToolkitConfig();
@@ -89,6 +65,67 @@ public abstract class ApplicationProperties {
             );
         }
         logger.info("Application properties loaded: {}.", log());
+    }
+
+    public String[] getArgs() {
+        return args;
+    }
+
+    public final void updateApplicationConfig(ApplicationConfig applicationConfig) {
+        this.applicationConfig = applicationConfig;
+        updateArgs();
+    }
+
+    private void updateArgs() {
+        Collection<String> updatedArgs = new LinkedHashSet<>();
+        if (applicationConfig != null) {
+            updatedArgs.addAll(Arrays.asList(applicationConfig.toArgumentArray()));
+        }
+        if (toolkitConfig != null) {
+            updatedArgs.addAll(Arrays.asList(toolkitConfig.toArgumentArray()));
+        }
+        if (currentRunConfig != null) {
+            updatedArgs.addAll(Arrays.asList(currentRunConfig.toArgumentArray()));
+        }
+        args = updatedArgs.toArray(new String[0]);
+    }
+
+    public final void updateToolkitConfig(ToolkitConfig toolkitConfig) {
+        this.toolkitConfig = toolkitConfig;
+        updateArgs();
+    }
+
+    public final void updateCurrentRunConfig(RunConfig currentRunConfig) {
+        this.currentRunConfig = currentRunConfig;
+        updateArgs();
+    }
+
+    public final void setVcs(Set<VersionControlSystem> vcs) {
+        this.vcs = vcs;
+    }
+
+    public final Set<VersionControlSystem> vcsSet() {
+        return vcs;
+    }
+
+    public final Set<String> configurationNames() {
+        return configurationDao.loadRunConfigMap().keySet();
+    }
+
+    public final Map<String, RunConfig> getRunConfigMap() {
+        return runConfigMap;
+    }
+
+    public final Optional<RunConfig> getRunConfig(String configurationName) {
+        return Optional.ofNullable(runConfigMap.get(configurationName));
+    }
+
+    public RunConfig getCurrentRunConfig() {
+        return currentRunConfig;
+    }
+
+    public final ToolkitConfig getToolkitConfig() {
+        return toolkitConfig;
     }
 
     protected boolean isOtherAuthorsExists() {
@@ -226,6 +263,11 @@ public abstract class ApplicationProperties {
         configurationDao.saveApplicationConfig(applicationConfig);
         configurationDao.saveRunConfig(currentRunConfig);
         configurationDao.saveToolkitConfig(toolkitConfig);
+    }
+
+    public final void removeConfig(String configurationName) {
+        configurationDao.removeConfig(configurationName);
+        runConfigMap.remove(configurationName);
     }
 
     protected final String log() {

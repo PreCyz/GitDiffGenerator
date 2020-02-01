@@ -87,9 +87,11 @@ public class JobController extends AbstractController {
     private final DataDao dataDao;
     private final String NOT_AVAILABLE = "N/A";
     private final String ALL_CONFIGS = "all-configs";
+    private final ApplicationProperties applicationProperties;
 
-    public JobController(UILauncher uiLauncher) {
+    public JobController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
+        this.applicationProperties = applicationProperties;
         dataDao = DaoFactory.getDataDao();
     }
 
@@ -112,7 +114,7 @@ public class JobController extends AbstractController {
         minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
         startDatePicker.setValue(LocalDate.now());
-        runConfigMap = configurationDao.loadRunConfigMap();
+        runConfigMap = applicationProperties.getRunConfigMap();
         if (!runConfigMap.isEmpty() && !runConfigMap.containsKey(ArgName.configurationName.defaultValue())) {
             ObservableList<String> items = FXCollections.observableArrayList(runConfigMap.keySet());
             items.add(0, ALL_CONFIGS);

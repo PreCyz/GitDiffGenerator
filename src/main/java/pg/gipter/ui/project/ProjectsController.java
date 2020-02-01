@@ -14,9 +14,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
-import pg.gipter.core.dto.RunConfig;
 import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
@@ -194,17 +192,12 @@ public class ProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            String configurationName = applicationProperties.configurationName();
-            Optional<RunConfig> runConfig = configurationDao.loadRunConfig(configurationName);
             final String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-            runConfig.ifPresent(rc -> {
-                rc.setProjectPath(projects);
-                configurationDao.saveRunConfig(rc);
-            });
+            applicationProperties.getCurrentRunConfig().setProjectPath(projects);
+            applicationProperties.save();
 
             uiLauncher.hideProjectsWindow();
             if (uiLauncher.isInvokeExecute()) {
-                applicationProperties = ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configurationName));
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
             } else {

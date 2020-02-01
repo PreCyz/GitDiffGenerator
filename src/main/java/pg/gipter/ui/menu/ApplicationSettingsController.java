@@ -8,7 +8,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dto.ApplicationConfig;
 import pg.gipter.service.StartupService;
@@ -96,16 +95,14 @@ public class ApplicationSettingsController extends AbstractController {
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     currentLanguage = languageComboBox.getValue();
-                    String[] arguments = configurationDao.loadArgumentArray(uiLauncher.getConfigurationName());
-                    uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(arguments));
+                    uiLauncher.setApplicationProperties(applicationProperties);
                     uiLauncher.changeLanguage(languageComboBox.getValue());
                 });
 
         final StartupService startupService = new StartupService();
         activateTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                String[] arguments = configurationDao.loadArgumentArray(uiLauncher.getConfigurationName());
-                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(arguments));
+                uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.initTrayHandler();
                 uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
                 autostartCheckBox.setDisable(false);
@@ -133,7 +130,8 @@ public class ApplicationSettingsController extends AbstractController {
 
     private void saveNewSettings() {
         ApplicationConfig applicationConfig = createApplicationConfigFromUI();
-        configurationDao.saveApplicationConfig(applicationConfig);
+        applicationProperties.updateApplicationConfig(applicationConfig);
+        applicationProperties.save();
         logger.info("New application settings saved. [{}]", applicationConfig.toString());
     }
 

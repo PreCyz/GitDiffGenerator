@@ -269,7 +269,7 @@ public class MainController extends AbstractController {
     }
 
     private void initConfigurationName() {
-        Set<String> confNames = configurationDao.loadRunConfigMap().keySet();
+        Set<String> confNames = applicationProperties.configurationNames();
         if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
             confNames.add(configurationNameComboBox.getValue());
         }
@@ -377,7 +377,7 @@ public class MainController extends AbstractController {
     }
 
     private void setDisableDependOnConfigurations() {
-        Map<String, RunConfig> runConfigMap = configurationDao.loadRunConfigMap();
+        Map<String, RunConfig> runConfigMap = applicationProperties.getRunConfigMap();
         addConfigurationButton.setDisable(runConfigMap.isEmpty());
         removeConfigurationButton.setDisable(runConfigMap.isEmpty());
         executeButton.setDisable(runConfigMap.isEmpty());
@@ -601,8 +601,7 @@ public class MainController extends AbstractController {
         resetIndicatorProperties(runner);
         uiLauncher.executeOutsideUIThread(() -> {
             runner.call();
-            String[] firstFromConfigs = configurationDao.loadArgumentArray(new LinkedList<>(map.keySet()).getFirst());
-            ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(firstFromConfigs);
+            ApplicationProperties instance = new LinkedList<>(map.values()).getFirst();
             if (instance.isActiveTray()) {
                 uiLauncher.updateTray(instance);
             }
@@ -672,7 +671,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             boolean disableProjectButton = uploadTypeComboBox.getValue() == UploadType.STATEMENT;
-            disableProjectButton |= configurationDao.loadRunConfigMap().isEmpty() && configurationNameTextField.getText().isEmpty();
+            disableProjectButton |= applicationProperties.getRunConfigMap().isEmpty() && configurationNameTextField.getText().isEmpty();
             projectPathButton.setDisable(disableProjectButton);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
                 endDatePicker.setValue(LocalDate.now());
@@ -723,22 +722,22 @@ public class MainController extends AbstractController {
 
     private void updateRunConfig(String oldConfigName, String newConfigName) {
         ToolkitConfig toolkitConfigFromUI = createToolkitConfigFromUI();
-        configurationDao.saveToolkitConfig(toolkitConfigFromUI);
+        applicationProperties.updateToolkitConfig(toolkitConfigFromUI);
         if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
             RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
-            configurationDao.saveRunConfig(runConfigWithoutDates);
+            applicationProperties.updateCurrentRunConfig(runConfigWithoutDates);
             new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
             setDisableDependOnConfigurations();
         }
+        applicationProperties.save();
         if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
-            configurationDao.removeConfig(oldConfigName);
+            applicationProperties.removeConfig(oldConfigName);
         }
     }
 
     @NotNull
     private RunConfig getRunConfigWithoutDates() {
         RunConfig runConfigFromUI = createRunConfigFromUI();
-        runConfigFromUI = configurationDao.getRunConfigFromArray(runConfigFromUI.toArgumentArray());
         runConfigFromUI.setStartDate(null);
         runConfigFromUI.setEndDate(null);
         return runConfigFromUI;
@@ -747,7 +746,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
         return event -> {
             String configurationName = configurationNameTextField.getText();
-            Optional<RunConfig> runConfig = configurationDao.loadRunConfig(configurationName);
+            Optional<RunConfig> runConfig = applicationProperties.getRunConfig(configurationName);
             boolean operationDone = false;
             if (runConfig.isPresent()) {
                 boolean result = new AlertWindowBuilder()
@@ -766,7 +765,8 @@ public class MainController extends AbstractController {
                     configurationNameTextField.setText(configurationNameComboBox.getValue());
                 }
             } else {
-                configurationDao.saveRunConfig(getRunConfigWithoutDates());
+                applicationProperties.updateCurrentRunConfig(getRunConfigWithoutDates());
+                applicationProperties.save();
                 updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), configurationName);
                 operationDone = true;
             }
@@ -785,7 +785,8 @@ public class MainController extends AbstractController {
     private void saveNewConfig(String configurationName) {
         RunConfig currentRunConfig = getRunConfigWithoutDates();
         currentRunConfig.setConfigurationName(configurationName);
-        configurationDao.saveRunConfig(currentRunConfig);
+        applicationProperties.updateCurrentRunConfig(currentRunConfig);
+        applicationProperties.save();
     }
 
     private EventHandler<ActionEvent> removeConfigurationEventHandler() {
@@ -793,8 +794,8 @@ public class MainController extends AbstractController {
             AlertWindowBuilder alertWindowBuilder;
             try {
                 CacheManager.removeFromCache(configurationNameComboBox.getValue());
-                configurationDao.removeConfig(configurationNameComboBox.getValue());
-                Map<String, RunConfig> propertiesMap = configurationDao.loadRunConfigMap();
+                applicationProperties.removeConfig(configurationNameComboBox.getValue());
+                Map<String, RunConfig> propertiesMap = applicationProperties.getRunConfigMap();
                 String newConfiguration = ArgName.configurationName.defaultValue();
                 if (!propertiesMap.isEmpty()) {
                     RunConfig currentConfig = new ArrayList<>(propertiesMap.entrySet()).get(0).getValue();
@@ -868,7 +869,7 @@ public class MainController extends AbstractController {
     }
 
     private void setToolkitCredentialsIfAvailable() {
-        ToolkitConfig toolkitConfig = configurationDao.loadToolkitConfig();
+        ToolkitConfig toolkitConfig = applicationProperties.getToolkitConfig();
         toolkitUsernameTextField.setText(toolkitConfig.getToolkitUsername());
         toolkitPasswordField.setText(toolkitConfig.getToolkitPassword());
     }
