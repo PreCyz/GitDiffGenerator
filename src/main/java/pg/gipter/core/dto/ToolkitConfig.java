@@ -1,13 +1,17 @@
 package pg.gipter.core.dto;
 
+import com.google.gson.annotations.JsonAdapter;
 import pg.gipter.core.ArgName;
+import pg.gipter.utils.PasswordUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
+@JsonAdapter(PasswordDeserializer.class)
 public class ToolkitConfig {
 
     private String toolkitUsername;
+    @JsonAdapter(PasswordSerializer.class)
     private String toolkitPassword;
     private transient String toolkitDomain;
     private transient String toolkitCopyListName;
@@ -131,5 +135,51 @@ public class ToolkitConfig {
             arguments.add(ArgName.toolkitProjectListNames.name() + "=" + getToolkitProjectListNames());
         }
         return arguments.toArray(new String[0]);
+    }
+
+    public static ToolkitConfig valueFrom(String[] args) {
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        for (String arg : args) {
+            String[] split = arg.split("=");
+            if (split.length > 1) {
+                String argumentName = split[0];
+                String argumentValue = split[1];
+                if (ArgName.toolkitUsername.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitUsername(argumentValue);
+                } else if (ArgName.toolkitPassword.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitPassword(argumentValue);
+                } else if (ArgName.toolkitDomain.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitDomain(argumentValue);
+                } else if (ArgName.toolkitCopyListName.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitCopyListName(argumentValue);
+                } else if (ArgName.toolkitUrl.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitUrl(argumentValue);
+                } else if (ArgName.toolkitCopyCase.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitCopyCase(argumentValue);
+                } else if (ArgName.toolkitWSUrl.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitWSUrl(argumentValue);
+                } else if (ArgName.toolkitUserFolder.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitUserFolder(argumentValue);
+                } else if (ArgName.toolkitProjectListNames.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitProjectListNames(argumentValue);
+                }
+            }
+        }
+        return toolkitConfig;
+    }
+
+    @Override
+    public String toString() {
+        return "ToolkitConfig{" +
+                "toolkitUsername='" + toolkitUsername + '\'' +
+                ", toolkitPassword='" + PasswordUtils.encrypt(toolkitPassword) + '\'' +
+                ", toolkitDomain='" + toolkitDomain + '\'' +
+                ", toolkitCopyListName='" + toolkitCopyListName + '\'' +
+                ", toolkitUrl='" + toolkitUrl + '\'' +
+                ", toolkitCopyCase='" + toolkitCopyCase + '\'' +
+                ", toolkitWSUrl='" + toolkitWSUrl + '\'' +
+                ", toolkitUserFolder='" + toolkitUserFolder + '\'' +
+                ", toolkitProjectListNames='" + toolkitProjectListNames + '\'' +
+                '}';
     }
 }

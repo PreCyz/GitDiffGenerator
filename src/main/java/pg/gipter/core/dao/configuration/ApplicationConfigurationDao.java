@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public class ApplicationConfigurationDao implements ConfigurationDao {
 
@@ -69,7 +70,10 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
                  InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
                  BufferedReader reader = new BufferedReader(isr)
             ) {
-                appSettings = new Gson().fromJson(reader, JsonObject.class);
+                appSettings = new GsonBuilder()
+                        //.registerTypeAdapter(JsonObject.class, new PasswordDeserializer())
+                        .create()
+                        .fromJson(reader, JsonObject.class);
             } catch (IOException | NullPointerException e) {
                 logger.warn("Warning when loading {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
             }
@@ -149,7 +153,10 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
             RunConfig runConfig = new RunConfig();
             runConfigMap.put(runConfig.getConfigurationName(), runConfig);
         }
-        return runConfigMap;
+        return runConfigMap.entrySet()
+                .stream()
+                .filter(entry -> !ArgName.configurationName.defaultValue().equals(entry.getKey()))
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
