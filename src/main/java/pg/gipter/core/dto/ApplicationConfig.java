@@ -123,6 +123,35 @@ public class ApplicationConfig {
         return arguments.toArray(new String[0]);
     }
 
+    public static ApplicationConfig valueFrom(String[] args) {
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        for (String arg : args) {
+            String[] split = arg.split("=");
+            if (split.length > 1) {
+                String argumentName = split[0];
+                String argumentValue = split[1];
+                if (ArgName.confirmationWindow.name().equals(argumentName)) {
+                    applicationConfig.setConfirmationWindow(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.preferredArgSource.name().equals(argumentName)) {
+                    applicationConfig.setPreferredArgSource(PreferredArgSource.valueFor(argumentValue));
+                } else if (ArgName.useUI.name().equals(argumentName)) {
+                    applicationConfig.setUseUI(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.activeTray.name().equals(argumentName)) {
+                    applicationConfig.setActiveTray(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.silentMode.name().equals(argumentName)) {
+                    applicationConfig.setSilentMode(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.enableOnStartup.name().equals(argumentName)) {
+                    applicationConfig.setEnableOnStartup(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.loggerLevel.name().equals(argumentName)) {
+                    applicationConfig.setLoggingLevel(Level.valueOf(argumentValue.toUpperCase()));
+                } else if (ArgName.upgradeFinished.name().equals(argumentName)) {
+                    applicationConfig.setUpgradeFinished(StringUtils.getBoolean(argumentValue));
+                }
+            }
+        }
+        return applicationConfig;
+    }
+
     @Override
     public String toString() {
         return "ApplicationConfig{" +

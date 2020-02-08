@@ -9,7 +9,6 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CacheManager;
-import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.job.JobHandler;
 import pg.gipter.job.upload.JobProperty;
@@ -34,7 +33,6 @@ class TrayHandler {
     private UILauncher uiLauncher;
     private static TrayIcon trayIcon;
     private static PopupMenu trayPopupMenu;
-    private ConfigurationDao configurationDao;
     private DataDao dataDao;
     private Executor executor;
 
@@ -42,7 +40,6 @@ class TrayHandler {
         this.uiLauncher = uiLauncher;
         this.applicationProperties = applicationProperties;
         this.executor = executor;
-        this.configurationDao = DaoFactory.getConfigurationDao();
         this.dataDao = DaoFactory.getDataDao();
     }
 
@@ -202,7 +199,7 @@ class TrayHandler {
 
     private ActionListener uploadActionListener() {
         return e -> executor.execute(() ->
-                new FXMultiRunner(configurationDao.loadRunConfigMap().keySet(), executor, RunType.TRAY).start()
+                new FXMultiRunner(applicationProperties.getRunConfigMap().keySet(), executor, RunType.TRAY).start()
         );
     }
 

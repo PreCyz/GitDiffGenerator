@@ -23,8 +23,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
-import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dto.ApplicationConfig;
 import pg.gipter.core.dto.RunConfig;
 import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.core.producer.command.UploadType;
@@ -43,21 +42,21 @@ public class WizardLauncher implements Launcher {
     private static final Logger logger = LoggerFactory.getLogger(WizardLauncher.class);
     private Stage primaryStage;
     private UILauncher uiLauncher;
-    private ConfigurationDao configurationDao;
     private Properties wizardProperties;
     private String lastChosenConfiguration;
+    private ApplicationProperties applicationProperties;
 
     static final String projectLabelPropertyName = "projectLabelProperty";
 
     public WizardLauncher(Stage stage) {
-        this(stage, "");
+        this(stage, ArgName.configurationName.defaultValue());
     }
 
     public WizardLauncher(Stage stage, String lastChosenConfiguration) {
         this.primaryStage = stage;
         this.lastChosenConfiguration = lastChosenConfiguration;
-        configurationDao = DaoFactory.getConfigurationDao();
         wizardProperties = new Properties();
+        applicationProperties = ApplicationPropertiesFactory.getInstance(new String[]{});
     }
 
     @Override
@@ -78,15 +77,21 @@ public class WizardLauncher implements Launcher {
             ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(new String[]{});
             if (result == ButtonType.FINISH) {
                 logger.info("Wizard finished.");
-                String[] args = configurationDao.loadArgumentArray(wizardProperties.getProperty(ArgName.configurationName.name()));
-                instance = ApplicationPropertiesFactory.getInstance(args);
+                String[] args = wizardProperties.entrySet().stream()
+                        .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
+                        .toArray(String[]::new);
+                applicationProperties.updateCurrentRunConfig(RunConfig.valueFrom(args));
+                applicationProperties.updateToolkitConfig(ToolkitConfig.valueFrom(args));
+                applicationProperties.updateApplicationConfig(ApplicationConfig.valueFrom(args));
+                applicationProperties.save();
             } else if (result == ButtonType.CANCEL) {
-                configurationDao.loadRunConfig(wizardProperties.getProperty(ArgName.configurationName.name()))
-                        .ifPresent(props -> configurationDao.removeConfig(wizardProperties.getProperty(ArgName.configurationName.name())));
+                final String configurationName = wizardProperties.getProperty(ArgName.configurationName.name());
+                applicationProperties.getRunConfig(configurationName)
+                        .ifPresent(runConfig -> applicationProperties.removeConfig(configurationName));
                 logger.info("Wizard canceled.");
-                instance = ApplicationPropertiesFactory.getInstance(new String[]{});
+                applicationProperties = ApplicationPropertiesFactory.getInstance(new String[]{});
                 if (!StringUtils.nullOrEmpty(lastChosenConfiguration)) {
-                    Optional<RunConfig> lastConfiguration = configurationDao.loadRunConfig(lastChosenConfiguration);
+                    Optional<RunConfig> lastConfiguration = applicationProperties.getRunConfig(lastChosenConfiguration);
                     if (lastConfiguration.isPresent()) {
                         instance = ApplicationPropertiesFactory.getInstance(lastConfiguration.get().toArgumentArray());
                     }
@@ -159,9 +164,11 @@ public class WizardLauncher implements Launcher {
     }
 
     private ApplicationProperties propertiesWithCredentials() {
-        ToolkitConfig toolkitConfig = configurationDao.loadToolkitConfig();
-        String[] args = toolkitConfig.toArgumentArray();
-        return ApplicationPropertiesFactory.getInstance(args);
+        ToolkitConfig toolkitConfig = applicationProperties.getToolkitConfig();
+        if (toolkitConfig == null) {
+            applicationProperties.updateToolkitConfig(new ToolkitConfig());
+        }
+        return applicationProperties;
     }
 
     private WizardPane buildToolkitCredentialsPage(short step) {
@@ -329,22 +336,15 @@ public class WizardLauncher implements Launcher {
 
     private EventHandler<ActionEvent> addProjectEventHandler() {
         return event -> {
-            RunConfig runConfig = new RunConfig();
-            runConfig.setConfigurationName(wizardProperties.getProperty(ArgName.configurationName.name()));
-            runConfig.setUploadType(UploadType.valueFor(wizardProperties.getProperty(ArgName.uploadType.name())));
-            runConfig.setAuthor(wizardProperties.getProperty(ArgName.author.name()));
-            runConfig.setCommitterEmail(wizardProperties.getProperty(ArgName.committerEmail.name()));
-            runConfig.setItemPath(wizardProperties.getProperty(ArgName.itemPath.name()));
-            configurationDao.saveRunConfig(runConfig);
-            /*
-            properties.put(ArgName.toolkitUsername.name(), getValue(wizard, ArgName.toolkitUsername).toUpperCase());
-            properties.put(ArgName.toolkitPassword.name(), getValue(wizard, ArgName.toolkitPassword));
-            configurationDao.saveToolkitConfig();
-*/
             String[] args = wizardProperties.entrySet().stream()
                     .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
                     .toArray(String[]::new);
-            ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+            RunConfig runConfig = RunConfig.valueFrom(args);
+            ToolkitConfig toolkitConfig = ToolkitConfig.valueFrom(args);
+            applicationProperties.updateCurrentRunConfig(runConfig);
+            applicationProperties.updateToolkitConfig(toolkitConfig);
+            applicationProperties.save();
+
             uiLauncher = new UILauncher(primaryStage, applicationProperties);
             if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
                 uiLauncher.showToolkitProjectsWindow(wizardProperties);
@@ -388,19 +388,14 @@ public class WizardLauncher implements Launcher {
 
             @Override
             public void onExitingPage(Wizard wizard) {
-
-                RunConfig runConfig = new RunConfig();
-                runConfig.setConfigurationName(wizardProperties.getProperty(ArgName.configurationName.name()));
-                runConfig.setUploadType(UploadType.valueFor(wizardProperties.getProperty(ArgName.uploadType.name())));
-                runConfig.setAuthor(wizardProperties.getProperty(ArgName.author.name()));
-                runConfig.setCommitterEmail(wizardProperties.getProperty(ArgName.committerEmail.name()));
-                runConfig.setItemPath(wizardProperties.getProperty(ArgName.itemPath.name()));
-                configurationDao.saveRunConfig(runConfig);
-
-                ToolkitConfig toolkitConfig = new ToolkitConfig();
-                toolkitConfig.setToolkitUsername(wizardProperties.getProperty(ArgName.toolkitUsername.name()));
-                toolkitConfig.setToolkitPassword(wizardProperties.getProperty(ArgName.toolkitPassword.name()));
-                configurationDao.saveToolkitConfig(toolkitConfig);
+                String[] args = wizardProperties.entrySet().stream()
+                        .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
+                        .toArray(String[]::new);
+                RunConfig runConfig = RunConfig.valueFrom(args);
+                ToolkitConfig toolkitConfig = ToolkitConfig.valueFrom(args);
+                applicationProperties.updateCurrentRunConfig(runConfig);
+                applicationProperties.updateToolkitConfig(toolkitConfig);
+                applicationProperties.save();
             }
         };
         wizardPane.setHeaderText(BundleUtils.getMsg("wizard.finish.text", String.valueOf(step)));

@@ -10,8 +10,7 @@ import pg.gipter.converter.Converter;
 import pg.gipter.converter.ConverterFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.ArgName;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.launcher.LauncherFactory;
 import pg.gipter.utils.StringUtils;
@@ -66,12 +65,11 @@ public class Main extends Application {
     }
 
     private void setDefaultConfig() {
-        ConfigurationDao propertiesDao = DaoFactory.getConfigurationDao();
-        LinkedList<String> configs = new LinkedList<>(propertiesDao.loadRunConfigMap().keySet());
+        LinkedList<String> configs = new LinkedList<>(Main.applicationProperties.getRunConfigMap().keySet());
         if (!configs.isEmpty()) {
             String defaultConfigName = configs.getFirst();
             String[] arguments = Arrays.copyOf(args, args.length + 1);
-            arguments[arguments.length - 1] = defaultConfigName;
+            arguments[arguments.length - 1] = ArgName.configurationName.name() + "=" + defaultConfigName;
             applicationProperties = ApplicationPropertiesFactory.getInstance(arguments);
             logger.info("Default configuration set as [{}].", defaultConfigName);
         }

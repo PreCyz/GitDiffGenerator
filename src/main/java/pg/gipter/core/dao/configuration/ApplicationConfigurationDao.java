@@ -61,7 +61,7 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
             }
             jsonObject.add(RUN_CONFIGS, runConfigsArray);
         }
-        writeJsonConfig(jsonObject);
+        writeJsonConfig(jsonObject, RunConfig.class);
     }
 
     JsonObject readJsonConfig() {
@@ -70,10 +70,7 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
                  InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
                  BufferedReader reader = new BufferedReader(isr)
             ) {
-                appSettings = new GsonBuilder()
-                        //.registerTypeAdapter(JsonObject.class, new PasswordDeserializer())
-                        .create()
-                        .fromJson(reader, JsonObject.class);
+                appSettings = new GsonBuilder().create().fromJson(reader, JsonObject.class);
             } catch (IOException | NullPointerException e) {
                 logger.warn("Warning when loading {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
             }
@@ -81,14 +78,14 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
         return appSettings;
     }
 
-    void writeJsonConfig(JsonElement jsonElement) {
+    void writeJsonConfig(JsonElement jsonElement, Class<?> clazz) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(jsonElement);
         try (OutputStream os = new FileOutputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
              Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
         ) {
             writer.write(json);
-            logger.info("File {} saved.", DaoConstants.APPLICATION_PROPERTIES_JSON);
+            logger.info("File {} updated with {}.", DaoConstants.APPLICATION_PROPERTIES_JSON, clazz.getName());
             appSettings = jsonElement.getAsJsonObject();
         } catch (IOException e) {
             logger.error("Error when writing {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
@@ -113,7 +110,7 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
             jsonObject = new JsonObject();
         }
         jsonObject.add(TOOLKIT_CONFIG, new Gson().toJsonTree(toolkitConfig));
-        writeJsonConfig(jsonObject);
+        writeJsonConfig(jsonObject, ToolkitConfig.class);
     }
 
     @Override
@@ -133,7 +130,7 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
             jsonObject = new JsonObject();
         }
         jsonObject.add(APP_CONFIG, new Gson().toJsonTree(applicationConfig));
-        writeJsonConfig(jsonObject);
+        writeJsonConfig(jsonObject, ApplicationConfig.class);
     }
 
     @Override
@@ -191,7 +188,7 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
                 runConfigs.remove(existingConfIdx);
                 jsonObject.add(RUN_CONFIGS, runConfigs);
                 logger.info("Removing run config [{}].", configurationName);
-                writeJsonConfig(jsonObject);
+                writeJsonConfig(jsonObject, ApplicationConfig.class);
             } else {
                 logger.error(errMsg);
                 throw new IllegalStateException(errMsg);

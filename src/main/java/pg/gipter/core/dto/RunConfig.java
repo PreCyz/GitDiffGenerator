@@ -3,6 +3,7 @@ package pg.gipter.core.dto;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -277,5 +278,78 @@ public class RunConfig {
             arguments.add(ArgName.preferredArgSource.name() + "=" + getPreferredArgSource());
         }
         return arguments.toArray(new String[0]);
+    }
+
+    public static RunConfig valueFrom(String[] args) {
+        RunConfig runConfig = new RunConfig();
+        for (String arg : args) {
+            String[] split = arg.split("=");
+            if (split.length > 1) {
+                String argumentName = split[0];
+                String argumentValue = split[1];
+                if (ArgName.author.name().equals(argumentName)) {
+                    runConfig.setAuthor(argumentValue);
+                } else if (ArgName.gitAuthor.name().equals(argumentName)) {
+                    runConfig.setGitAuthor(argumentValue);
+                } else if (ArgName.mercurialAuthor.name().equals(argumentName)) {
+                    runConfig.setMercurialAuthor(argumentValue);
+                } else if (ArgName.svnAuthor.name().equals(argumentName)) {
+                    runConfig.setSvnAuthor(argumentValue);
+                } else if (ArgName.committerEmail.name().equals(argumentName)) {
+                    runConfig.setCommitterEmail(argumentValue);
+                } else if (ArgName.uploadType.name().equals(argumentName)) {
+                    runConfig.setUploadType(UploadType.valueFor(argumentValue));
+                } else if (ArgName.skipRemote.name().equals(argumentName)) {
+                    runConfig.setSkipRemote(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.fetchAll.name().equals(argumentName)) {
+                    runConfig.setFetchAll(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.itemPath.name().equals(argumentName)) {
+                    runConfig.setItemPath(argumentValue);
+                } else if (ArgName.projectPath.name().equals(argumentName)) {
+                    runConfig.setProjectPath(argumentValue);
+                } else if (ArgName.itemFileNamePrefix.name().equals(argumentName)) {
+                    runConfig.setItemFileNamePrefix(argumentValue);
+                } else if (ArgName.periodInDays.name().equals(argumentName)) {
+                    runConfig.setPeriodInDays(Integer.parseInt(argumentValue));
+                } else if (ArgName.startDate.name().equals(argumentName)) {
+                    runConfig.setStartDate(LocalDate.parse(argumentValue, DateTimeFormatter.ISO_DATE));
+                } else if (ArgName.endDate.name().equals(argumentName)) {
+                    runConfig.setEndDate(LocalDate.parse(argumentValue, DateTimeFormatter.ISO_DATE));
+                } else if (ArgName.configurationName.name().equals(argumentName)) {
+                    runConfig.setConfigurationName(argumentValue);
+                } else if (ArgName.toolkitProjectListNames.name().equals(argumentName)) {
+                    runConfig.setToolkitProjectListNames(argumentValue);
+                } else if (ArgName.deleteDownloadedFiles.name().equals(argumentName)) {
+                    runConfig.setDeleteDownloadedFiles(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.preferredArgSource.name().equals(argumentName)) {
+                    runConfig.setPreferredArgSource(PreferredArgSource.valueFor(argumentValue));
+                }
+            }
+        }
+        return runConfig;
+    }
+
+    @Override
+    public String toString() {
+        return "RunConfig{" +
+                "author='" + author + '\'' +
+                ", gitAuthor='" + gitAuthor + '\'' +
+                ", mercurialAuthor='" + mercurialAuthor + '\'' +
+                ", svnAuthor='" + svnAuthor + '\'' +
+                ", committerEmail='" + committerEmail + '\'' +
+                ", uploadType=" + uploadType +
+                ", skipRemote=" + skipRemote +
+                ", fetchAll=" + fetchAll +
+                ", itemPath='" + itemPath + '\'' +
+                ", projectPath='" + projectPath + '\'' +
+                ", itemFileNamePrefix='" + itemFileNamePrefix + '\'' +
+                ", periodInDays=" + periodInDays +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", configurationName='" + configurationName + '\'' +
+                ", toolkitProjectListNames='" + toolkitProjectListNames + '\'' +
+                ", deleteDownloadedFiles=" + deleteDownloadedFiles +
+                ", preferredArgSource=" + preferredArgSource +
+                '}';
     }
 }

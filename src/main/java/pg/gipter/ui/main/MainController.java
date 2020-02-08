@@ -44,7 +44,10 @@ import pg.gipter.ui.*;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;
-import pg.gipter.utils.*;
+import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.JobHelper;
+import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
 import java.io.File;
@@ -495,7 +498,8 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
         return event -> {
             RunConfig runConfig = createRunConfigFromUI();
-            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(runConfig.toArgumentArray()));
+            applicationProperties.updateCurrentRunConfig(runConfig);
+            uiLauncher.setApplicationProperties(applicationProperties);
             String configurationName = configurationNameTextField.getText();
             updateConfigurationNameComboBox(configurationName, configurationName);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
@@ -653,11 +657,11 @@ public class MainController extends AbstractController {
     private ToolkitConfig createToolkitConfigFromUI() {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername(toolkitUsernameTextField.getText());
-        toolkitConfig.setToolkitPassword(PasswordUtils.encrypt(toolkitPasswordField.getText()));
+        toolkitConfig.setToolkitPassword(toolkitPasswordField.getText());
         return toolkitConfig;
     }
 
-    private void resetIndicatorProperties(Task task) {
+    private void resetIndicatorProperties(Task<?> task) {
         loadProgressIndicator.setVisible(true);
         loadProgressIndicator.progressProperty().unbind();
         loadProgressIndicator.progressProperty().bind(task.progressProperty());
@@ -792,11 +796,9 @@ public class MainController extends AbstractController {
             try {
                 CacheManager.removeFromCache(configurationNameComboBox.getValue());
                 applicationProperties.removeConfig(configurationNameComboBox.getValue());
-                Map<String, RunConfig> propertiesMap = applicationProperties.getRunConfigMap();
                 String newConfiguration = ArgName.configurationName.defaultValue();
-                if (!propertiesMap.isEmpty()) {
-                    RunConfig currentConfig = new ArrayList<>(propertiesMap.entrySet()).get(0).getValue();
-                    newConfiguration = currentConfig.getConfigurationName();
+                if (!applicationProperties.getRunConfigMap().isEmpty()) {
+                    newConfiguration = applicationProperties.getCurrentConfigurationName();
                 }
                 removeConfigurationNameFromComboBox(configurationNameComboBox.getValue(), newConfiguration);
 

@@ -73,31 +73,14 @@ public abstract class ApplicationProperties {
 
     public final void updateApplicationConfig(ApplicationConfig applicationConfig) {
         this.applicationConfig = applicationConfig;
-        updateArgs();
-    }
-
-    private void updateArgs() {
-        Collection<String> updatedArgs = new LinkedHashSet<>();
-        if (applicationConfig != null) {
-            updatedArgs.addAll(Arrays.asList(applicationConfig.toArgumentArray()));
-        }
-        if (toolkitConfig != null) {
-            updatedArgs.addAll(Arrays.asList(toolkitConfig.toArgumentArray()));
-        }
-        if (currentRunConfig != null) {
-            updatedArgs.addAll(Arrays.asList(currentRunConfig.toArgumentArray()));
-        }
-        args = updatedArgs.toArray(new String[0]);
     }
 
     public final void updateToolkitConfig(ToolkitConfig toolkitConfig) {
         this.toolkitConfig = toolkitConfig;
-        updateArgs();
     }
 
     public final void updateCurrentRunConfig(RunConfig currentRunConfig) {
         this.currentRunConfig = currentRunConfig;
-        updateArgs();
     }
 
     public final void setVcs(Set<VersionControlSystem> vcs) {
@@ -122,6 +105,10 @@ public abstract class ApplicationProperties {
 
     public RunConfig getCurrentRunConfig() {
         return currentRunConfig;
+    }
+
+    public String getCurrentConfigurationName() {
+        return currentRunConfig.getConfigurationName();
     }
 
     public final ToolkitConfig getToolkitConfig() {
@@ -263,11 +250,16 @@ public abstract class ApplicationProperties {
         configurationDao.saveApplicationConfig(applicationConfig);
         configurationDao.saveRunConfig(currentRunConfig);
         configurationDao.saveToolkitConfig(toolkitConfig);
+        runConfigMap.put(currentRunConfig.getConfigurationName(), currentRunConfig);
     }
 
     public final void removeConfig(String configurationName) {
         configurationDao.removeConfig(configurationName);
         runConfigMap.remove(configurationName);
+        currentRunConfig = new RunConfig();
+        if (!runConfigMap.isEmpty()) {
+            currentRunConfig = new LinkedList<>(runConfigMap.entrySet()).getFirst().getValue();
+        }
     }
 
     protected final String log() {
