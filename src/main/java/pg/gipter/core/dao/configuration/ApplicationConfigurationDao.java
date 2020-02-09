@@ -85,7 +85,7 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
              Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
         ) {
             writer.write(json);
-            logger.info("File {} updated with {}.", DaoConstants.APPLICATION_PROPERTIES_JSON, clazz.getName());
+            logger.info("File {} updated with {}.", DaoConstants.APPLICATION_PROPERTIES_JSON, clazz.getSimpleName());
             appSettings = jsonElement.getAsJsonObject();
         } catch (IOException e) {
             logger.error("Error when writing {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
