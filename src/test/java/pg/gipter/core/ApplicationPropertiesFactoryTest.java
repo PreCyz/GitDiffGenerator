@@ -7,15 +7,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ApplicationPropertiesFactoryTest {
 
     @Test
-    void given_noArg_when_getInstance_then_returnCliApplicationProperties() {
+    void givenNoArg_whenGetInstance_thenReturnUIApplicationProperties() {
         ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{});
 
-        assertThat(actual).isInstanceOf(CliApplicationProperties.class);
+        assertThat(actual).isInstanceOf(UIApplicationProperties.class);
     }
 
     @Test
-    void given_cliPreferredArgSource_when_getInstance_then_returnCliApplicationProperties() {
+    void givenCliPreferredArgSourceWithNoUseUI_whenGetInstance_thenReturnUIApplicationProperties() {
         ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=cli"});
+
+        assertThat(actual).isInstanceOf(UIApplicationProperties.class);
+    }
+
+    @Test
+    void givenCliPreferredArgSourceAndUseUINo_whenGetInstance_thenReturnUIApplicationProperties() {
+        ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{
+                ArgName.preferredArgSource.name() + "=cli",
+                ArgName.useUI.name() + "=n",
+        });
 
         assertThat(actual).isInstanceOf(CliApplicationProperties.class);
     }
@@ -28,9 +38,9 @@ class ApplicationPropertiesFactoryTest {
     }
 
     @Test
-    void given_uiPreferredArgSource_when_getInstance_then_returnCliApplicationProperties() {
+    void givenUIPreferredArgSource_whenGetInstance_thenReturnUIApplicationProperties() {
         ApplicationProperties actual = ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=ui"});
 
-        assertThat(actual).isInstanceOf(CliApplicationProperties.class);
+        assertThat(actual).isInstanceOf(UIApplicationProperties.class);
     }
 }

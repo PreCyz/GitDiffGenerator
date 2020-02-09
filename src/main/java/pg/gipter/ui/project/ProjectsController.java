@@ -193,7 +193,7 @@ public class ProjectsController extends AbstractController {
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
             final String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-            applicationProperties.getCurrentRunConfig().setProjectPath(projects);
+            applicationProperties.addProjectPath(projects);
             applicationProperties.save();
 
             uiLauncher.hideProjectsWindow();

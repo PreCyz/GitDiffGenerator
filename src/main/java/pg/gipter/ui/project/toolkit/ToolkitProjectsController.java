@@ -11,11 +11,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
-import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
-import pg.gipter.core.dto.RunConfig;
 import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.service.ToolkitService;
 import pg.gipter.service.platform.AppManager;
@@ -110,7 +108,7 @@ public class ToolkitProjectsController extends AbstractController {
     private void initValues() {
         downloadAvailableProjectNames();
         Set<String> projects = applicationProperties.projectPaths();
-        String[] args = applicationProperties.getCurrentRunConfig().toArgumentArray();
+        String[] args = applicationProperties.getCurrentRunConfigArray();
         if (args.length == 0) {
             projects.clear();
             projects.add(ProjectDetails.DEFAULT.getName());
@@ -191,7 +189,6 @@ public class ToolkitProjectsController extends AbstractController {
         };
     }
 
-    @NotNull
     private EventHandler<MouseEvent> checkProjectsMouseClickEventHandler() {
         return event -> Platform.runLater(() -> {
             String projectUrl = String.format("%s%s%s/%s/default.aspx",
@@ -206,7 +203,6 @@ public class ToolkitProjectsController extends AbstractController {
         });
     }
 
-    @NotNull
     private EventHandler<ActionEvent> addActionEventHandler() {
         return event -> {
             String name = projectIdTextField.getText() + "/" + projectNameTextField.getText();
@@ -226,7 +222,6 @@ public class ToolkitProjectsController extends AbstractController {
         };
     }
 
-    @NotNull
     private EventHandler<ActionEvent> removeButtonActionEventHandler() {
         return event -> {
             LinkedHashSet<ProjectDetails> projectsToDelete = new LinkedHashSet<>(projectsTableView.getSelectionModel().getSelectedItems());
@@ -239,19 +234,15 @@ public class ToolkitProjectsController extends AbstractController {
         };
     }
 
-    @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            String configurationName = applicationProperties.configurationName();
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-            RunConfig runConfig = applicationProperties.getCurrentRunConfig();
-            runConfig.setProjectPath(projects);
-            applicationProperties.updateCurrentRunConfig(runConfig);
+            applicationProperties.addProjectPath(projects);
             applicationProperties.save();
 
             uiLauncher.hideToolkitProjectsWindow();
             if (uiLauncher.isInvokeExecute()) {
-                applicationProperties = ApplicationPropertiesFactory.getInstance(applicationProperties.getArgs());
+                applicationProperties = ApplicationPropertiesFactory.getInstance(applicationProperties.getCliArgs());
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
             } else {
@@ -264,7 +255,7 @@ public class ToolkitProjectsController extends AbstractController {
         saveButton.setDisable(projectsTableView.getItems().contains(ProjectDetails.DEFAULT));
     }
 
-    private void resetIndicatorProperties(Task task) {
+    private void resetIndicatorProperties(Task<?> task) {
         downloadProgressIndicator.setVisible(true);
         downloadProgressIndicator.progressProperty().unbind();
         downloadProgressIndicator.progressProperty().bind(task.progressProperty());

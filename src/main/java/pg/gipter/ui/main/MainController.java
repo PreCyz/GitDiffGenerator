@@ -798,7 +798,7 @@ public class MainController extends AbstractController {
                 applicationProperties.removeConfig(configurationNameComboBox.getValue());
                 String newConfiguration = ArgName.configurationName.defaultValue();
                 if (!applicationProperties.getRunConfigMap().isEmpty()) {
-                    newConfiguration = applicationProperties.getCurrentConfigurationName();
+                    newConfiguration = applicationProperties.configurationName();
                 }
                 removeConfigurationNameFromComboBox(configurationNameComboBox.getValue(), newConfiguration);
 
@@ -868,9 +868,8 @@ public class MainController extends AbstractController {
     }
 
     private void setToolkitCredentialsIfAvailable() {
-        ToolkitConfig toolkitConfig = applicationProperties.getToolkitConfig();
-        toolkitUsernameTextField.setText(toolkitConfig.getToolkitUsername());
-        toolkitPasswordField.setText(toolkitConfig.getToolkitPassword());
+        toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
+        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
     }
 
     private void updateConfigurationNameComboBox(String oldValue, String newValue) {

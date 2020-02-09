@@ -168,11 +168,10 @@ class ApplicationConfigurationDaoTest {
     }
 
     @Test
-    void givenNoRunConfigs_whenLoadRunConfigMap_thenReturnMapWithDefaultRunConfig() {
+    void givenNoRunConfigs_whenLoadRunConfigMap_thenReturnEmptyMap() {
         Map<String, RunConfig> actual = dao.loadRunConfigMap();
 
-        assertThat(actual).hasSize(1);
-        assertThat(actual.get(ArgName.configurationName.defaultValue())).isNotNull();
+        assertThat(actual).hasSize(0);
     }
 
     @Test

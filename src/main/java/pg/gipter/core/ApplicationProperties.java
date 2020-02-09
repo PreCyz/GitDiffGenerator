@@ -32,19 +32,19 @@ public abstract class ApplicationProperties {
     protected RunConfig currentRunConfig;
     protected final ArgExtractor argExtractor;
     private Set<VersionControlSystem> vcs;
-    private String[] args;
+    private String[] cliArgs;
     private ConfigurationDao configurationDao;
 
-    public ApplicationProperties(String[] args) {
-        this.args = args;
-        argExtractor = new ArgExtractor(args);
+    public ApplicationProperties(String[] cliArgs) {
+        this.cliArgs = cliArgs;
+        argExtractor = new ArgExtractor(cliArgs);
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
         configurationDao = DaoFactory.getConfigurationDao();
         init(configurationDao);
     }
 
-    protected void init(ConfigurationDao configurationDao) {
+    protected final void init(ConfigurationDao configurationDao) {
         applicationConfig = configurationDao.loadApplicationConfig();
         toolkitConfig = configurationDao.loadToolkitConfig();
         runConfigMap = configurationDao.loadRunConfigMap();
@@ -67,8 +67,8 @@ public abstract class ApplicationProperties {
         logger.info("Application properties loaded: {}.", log());
     }
 
-    public String[] getArgs() {
-        return args;
+    public final String[] getCliArgs() {
+        return cliArgs;
     }
 
     public final void updateApplicationConfig(ApplicationConfig applicationConfig) {
@@ -103,19 +103,19 @@ public abstract class ApplicationProperties {
         return Optional.ofNullable(runConfigMap.get(configurationName));
     }
 
-    public RunConfig getCurrentRunConfig() {
-        return currentRunConfig;
+    public final String[] getCurrentRunConfigArray() {
+        return currentRunConfig.toArgumentArray();
     }
 
-    public String getCurrentConfigurationName() {
-        return currentRunConfig.getConfigurationName();
+    public final void addProjectPath(String projects) {
+        currentRunConfig.setProjectPath(projects);
     }
 
-    public final ToolkitConfig getToolkitConfig() {
-        return toolkitConfig;
+    public final boolean isToolkitConfigExists() {
+        return toolkitConfig != null;
     }
 
-    protected boolean isOtherAuthorsExists() {
+    protected final boolean isOtherAuthorsExists() {
         boolean isNoOtherAuthors = StringUtils.nullOrEmpty(committerEmail());
         isNoOtherAuthors &= StringUtils.nullOrEmpty(gitAuthor());
         isNoOtherAuthors &= StringUtils.nullOrEmpty(svnAuthor());
@@ -169,12 +169,12 @@ public abstract class ApplicationProperties {
         return fileName + "." + extension;
     }
 
-    public int getWeekNumber(LocalDate localDate) {
+    public final int getWeekNumber(LocalDate localDate) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         return localDate.get(weekFields.weekOfWeekBasedYear());
     }
 
-    String valueFromPattern(NamePatternValue patternValue) {
+    final String valueFromPattern(NamePatternValue patternValue) {
         if (patternValue == null) {
             return "";
         }
@@ -215,7 +215,7 @@ public abstract class ApplicationProperties {
         }
     }
 
-    String getFileExtension() {
+    final String getFileExtension() {
         String extension = "txt";
         if (uploadType() == UploadType.TOOLKIT_DOCS) {
             extension = "zip";
@@ -223,7 +223,7 @@ public abstract class ApplicationProperties {
         return extension;
     }
 
-    public PreferredArgSource preferredArgSource() {
+    public final PreferredArgSource preferredArgSource() {
         return argExtractor.preferredArgSource();
     }
 

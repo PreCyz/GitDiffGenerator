@@ -164,8 +164,7 @@ public class WizardLauncher implements Launcher {
     }
 
     private ApplicationProperties propertiesWithCredentials() {
-        ToolkitConfig toolkitConfig = applicationProperties.getToolkitConfig();
-        if (toolkitConfig == null) {
+        if (!applicationProperties.isToolkitConfigExists()) {
             applicationProperties.updateToolkitConfig(new ToolkitConfig());
         }
         return applicationProperties;
