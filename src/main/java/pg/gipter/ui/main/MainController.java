@@ -339,12 +339,15 @@ public class MainController extends AbstractController {
                     case J:
                         uiLauncher.showJobWindow();
                         break;
-                    case W:
+                    case ESCAPE:
                         UILauncher.platformExit();
                         break;
                     case M:
                         uiLauncher.hideMainWindow();
                         CacheManager.clearAllCache();
+                        break;
+                    case S:
+                        saveConfiguration();
                         break;
                 }
             }
@@ -700,25 +703,27 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> saveConfigurationActionEventHandler() {
-        return event -> {
-            String configurationName = configurationNameTextField.getText();
-            String comboConfigName = configurationNameComboBox.getValue();
+        return event -> saveConfiguration();
+    }
 
-            RunConfig runConfigFromUI = createRunConfigFromUI();
-            applicationProperties.updateCurrentRunConfig(runConfigFromUI);
-            CacheManager.removeFromCache(applicationProperties.configurationName());
-            uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
-            setLastItemSubmissionDate();
+    private void saveConfiguration() {
+        String configurationName = configurationNameTextField.getText();
+        String comboConfigName = configurationNameComboBox.getValue();
 
-            updateConfigurationNameComboBox(comboConfigName, configurationName);
-            uiLauncher.updateTray(applicationProperties);
-            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("main.config.changed"))
-                    .withAlertType(Alert.AlertType.INFORMATION)
-                    .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                    .withImage(ImageFile.FINGER_UP_PNG);
-            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-        };
+        RunConfig runConfigFromUI = createRunConfigFromUI();
+        applicationProperties.updateCurrentRunConfig(runConfigFromUI);
+        CacheManager.removeFromCache(applicationProperties.configurationName());
+        uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
+        setLastItemSubmissionDate();
+
+        updateConfigurationNameComboBox(comboConfigName, configurationName);
+        uiLauncher.updateTray(applicationProperties);
+        AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                .withHeaderText(BundleUtils.getMsg("main.config.changed"))
+                .withAlertType(Alert.AlertType.INFORMATION)
+                .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                .withImage(ImageFile.FINGER_UP_PNG);
+        Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
     }
 
     private void updateRunConfig(String oldConfigName, String newConfigName) {
