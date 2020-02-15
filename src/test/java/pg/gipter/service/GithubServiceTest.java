@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.core.ApplicationProperties;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,13 +109,6 @@ class GithubServiceTest {
         assertThat(actual).isFalse();
     }
 
-    void mockDownloadLastDistributionDetails() throws FileNotFoundException {
-        String json = String.format(".%ssrc%stest%sjava%sresources%slatestDistributionDetails.json",
-                File.separator, File.separator, File.separator, File.separator, File.separator);
-        Reader reader = new BufferedReader(new FileReader(json));
-        doReturn(Optional.of(new Gson().fromJson(reader, JsonObject.class))).when(spyGithubService).downloadLatestDistributionDetails();
-    }
-
     @Test
     void givenLatestDistroDetails_whenGetDownloadLink_thenFileDownloaded() throws FileNotFoundException {
         spyGithubService = spy(new GithubService("1.0"));
@@ -128,4 +122,23 @@ class GithubServiceTest {
         assertThat(spyGithubService.distributionName).isEqualTo("11+Gipter_v3.6.6.7z");
     }
 
+    @Test
+    void qq() throws Exception{
+        ProcessBuilder processBuilder = new ProcessBuilder("powershell.exe", "-Command", "git status");
+        processBuilder.directory(Paths.get("C:\\Workspace\\GitDiffGenerator").toFile());
+        processBuilder.environment().put("LANG", "pl_PL.UTF-8");
+        Process process = processBuilder.start();
+
+        try (InputStream is = process.getInputStream();
+             InputStreamReader isr = new InputStreamReader(is);
+             BufferedReader br = new BufferedReader(isr)) {
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (Exception ex) {
+            throw new IOException(ex);
+        }
+    }
 }
