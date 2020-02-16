@@ -215,5 +215,11 @@ uploadType=STATEMENT
 ### Download
 To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
 
+### Development
+In order to execute the application from the IDE for Java 11+ use the following as VM options:
+```
+-p {PATH-TO-JAVAFX-SDK}\lib --add-modules=javafx.fxml,javafx.controls,javafx.media,javafx.web,javafx.swing --add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED
+```
+
 ### License
 MIT - please read the file [LICENSE](https://github.com/PreCyz/GitDiffGenerator/blob/master/LICENSE).
