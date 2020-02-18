@@ -366,7 +366,7 @@ public class MainController extends AbstractController {
     }
 
     private StringConverter<LocalDate> dateConverter() {
-        return new StringConverter<>() {
+        return new StringConverter<LocalDate>() {
             @Override
             public String toString(LocalDate object) {
                 return object.format(yyyy_MM_dd);
