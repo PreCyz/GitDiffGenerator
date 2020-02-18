@@ -21,7 +21,7 @@ public final class CryptoUtils {
 
     private CryptoUtils() { }
 
-    public static String encrypt(String property) throws GeneralSecurityException {
+    static String encrypt(String property) throws GeneralSecurityException {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(CIPHER);
         SecretKey key = keyFactory.generateSecret(new PBEKeySpec(KEY_SPEC));
         Cipher pbeCipher = Cipher.getInstance(CIPHER);
@@ -29,11 +29,11 @@ public final class CryptoUtils {
         return base64Encode(pbeCipher.doFinal(property.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public static String base64Encode(byte[] bytes) {
+    private static String base64Encode(byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
-    public static String decrypt(String property) throws GeneralSecurityException {
+    static String decrypt(String property) throws GeneralSecurityException {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(CIPHER);
         SecretKey key = keyFactory.generateSecret(new PBEKeySpec(KEY_SPEC));
         Cipher pbeCipher = Cipher.getInstance(CIPHER);
