@@ -4,7 +4,7 @@ import mslinks.ShellLink;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.settings.ArgName;
+import pg.gipter.core.ArgName;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.SystemUtils;

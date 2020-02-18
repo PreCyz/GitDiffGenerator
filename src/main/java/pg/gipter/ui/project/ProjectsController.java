@@ -13,11 +13,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import org.jetbrains.annotations.NotNull;
-import pg.gipter.producer.command.UploadType;
-import pg.gipter.producer.command.VersionControlSystem;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.settings.ArgName;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alert.AlertWindowBuilder;
@@ -193,15 +192,12 @@ public class ProjectsController extends AbstractController {
     @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
-            String configurationName = applicationProperties.configurationName();
-            Properties properties = propertiesDao.createProperties(applicationProperties.getArgs());
-            String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
-            properties.setProperty(ArgName.projectPath.name(), projects);
-            propertiesDao.saveRunConfig(properties);
+            final String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
+            applicationProperties.addProjectPath(projects);
+            applicationProperties.save();
 
             uiLauncher.hideProjectsWindow();
             if (uiLauncher.isInvokeExecute()) {
-                applicationProperties = ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationName));
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
             } else {

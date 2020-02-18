@@ -17,8 +17,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.service.SecurityService;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -28,11 +27,9 @@ public class HttpRequester {
     protected static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
 
     private final ApplicationProperties applicationProperties;
-    private SecurityService securityService;
 
     public HttpRequester(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        securityService = new SecurityService();
     }
 
     private String replaceSpaces(String fileReference) {
@@ -64,7 +61,7 @@ public class HttpRequester {
                 new AuthScope(AuthScope.ANY),
                 new NTCredentials(
                         applicationProperties.toolkitUsername(),
-                        securityService.decrypt(applicationProperties.toolkitPassword()),
+                        applicationProperties.toolkitPassword(),
                         applicationProperties.toolkitUrl(),
                         applicationProperties.toolkitDomain()
                 )

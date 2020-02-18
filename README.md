@@ -29,6 +29,11 @@ For *Linux*
 java -jar Gipter.jar useUI=N author="Anakin Skywalker" itemPath="/home/wall-e/Path/to/git/diff/item"
 projectPath="/home/eva/Path/to/git/project1,/home/eva/Path/to/git/project2"
 ```
+### java -jar for 11+ distribution
+```
+%JFX11% = path to javafx distribution version 11+.
+java -jar --module-path %JFX11% --add-modules="javafx.fxml,javafx.controls,javafx.media,javafx.web,javafx.swing" --add-exports="javafx.base/com.sun.javafx.event=ALL-UNNAMED" Gipter.jar
+```
 ### java -jar + application.properties at at the same location as jar file
 If there are _application.properties_ file at the same location as your jar file then program can be run as follows: `java -jar Gipter.jar useUI=N`
 #### Tips
@@ -209,6 +214,12 @@ uploadType=STATEMENT
 **To all above examples toolkit parameters (_toolkitUsername_ & _toolkitPassword_) has to be set up.** 
 ### Download
 To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
+
+### Development
+In order to execute the application from the IDE for Java 11+ use the following as VM options:
+```
+-p {PATH-TO-JAVAFX-SDK}\lib --add-modules=javafx.fxml,javafx.controls,javafx.media,javafx.web,javafx.swing --add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED
+```
 
 ### License
 MIT - please read the file [LICENSE](https://github.com/PreCyz/GitDiffGenerator/blob/master/LICENSE).

@@ -1,18 +1,18 @@
 package pg.gipter.launcher;
 
 import javafx.stage.Stage;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.PropertiesDao;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.WizardLauncher;
+
+import java.util.Set;
 
 public class LauncherFactory {
     private LauncherFactory() {}
 
     public static Launcher getLauncher(ApplicationProperties applicationProperties, Stage stage) {
-        PropertiesDao propertiesDao = DaoFactory.getPropertiesDao();
-        if (propertiesDao.loadAllApplicationProperties().isEmpty()) {
+        Set<String> configNameSet = applicationProperties.getRunConfigMap().keySet();
+        if (configNameSet.isEmpty()) {
             return new WizardLauncher(stage);
         }
         if (applicationProperties.isUseUI()) {

@@ -4,9 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,6 +65,18 @@ class GithubServiceTest {
     }
 
     @Test
+    @Disabled
+    void givenOldVersionInGithub_whenIsNewVersion_thenReturnFalse() {
+        when(mockAppProps.version()).thenReturn("3.7");
+        spyGithubService = spy(new GithubService(mockAppProps.version()));
+        doReturn(Optional.of("3.6.14")).when(spyGithubService).getLatestVersion();
+
+        boolean actual = spyGithubService.isNewVersion();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
     void givenNewVersionInGithub2_whenIsNewVersion_thenReturnTrue() {
         when(mockAppProps.version()).thenReturn("1.3");
         spyGithubService = spy(new GithubService(mockAppProps.version()));
@@ -96,13 +109,6 @@ class GithubServiceTest {
         assertThat(actual).isFalse();
     }
 
-    void mockDownloadLastDistributionDetails() throws FileNotFoundException {
-        String json = String.format(".%ssrc%stest%sjava%sresources%slatestDistributionDetails.json",
-                File.separator, File.separator, File.separator, File.separator, File.separator);
-        Reader reader = new BufferedReader(new FileReader(json));
-        doReturn(Optional.of(new Gson().fromJson(reader, JsonObject.class))).when(spyGithubService).downloadLatestDistributionDetails();
-    }
-
     @Test
     void givenLatestDistroDetails_whenGetDownloadLink_thenFileDownloaded() throws FileNotFoundException {
         spyGithubService = spy(new GithubService("1.0"));
@@ -113,7 +119,26 @@ class GithubServiceTest {
         Optional<String> fileName = spyGithubService.getDownloadLink(new Gson().fromJson(reader, JsonObject.class));
 
         assertThat(fileName.isPresent()).isTrue();
-        assertThat("Gipter_v3.6.6.7z").isEqualTo(spyGithubService.distributionName);
+        assertThat(spyGithubService.distributionName).isEqualTo("11+Gipter_v3.6.6.7z");
     }
 
+    @Test
+    void qq() throws Exception{
+        ProcessBuilder processBuilder = new ProcessBuilder("powershell.exe", "-Command", "git status");
+        processBuilder.directory(Paths.get("C:\\Workspace\\GitDiffGenerator").toFile());
+        processBuilder.environment().put("LANG", "pl_PL.UTF-8");
+        Process process = processBuilder.start();
+
+        try (InputStream is = process.getInputStream();
+             InputStreamReader isr = new InputStreamReader(is);
+             BufferedReader br = new BufferedReader(isr)) {
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (Exception ex) {
+            throw new IOException(ex);
+        }
+    }
 }

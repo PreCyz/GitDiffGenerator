@@ -1,6 +1,6 @@
 package pg.gipter.statistic.dto;
 
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.UploadStatus;
 

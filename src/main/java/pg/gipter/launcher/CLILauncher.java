@@ -2,7 +2,7 @@ package pg.gipter.launcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 
 class CLILauncher implements Launcher {
 

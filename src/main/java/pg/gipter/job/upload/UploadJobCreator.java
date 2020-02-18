@@ -2,7 +2,7 @@ package pg.gipter.job.upload;
 
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 
 import java.text.ParseException;
 import java.time.DayOfWeek;

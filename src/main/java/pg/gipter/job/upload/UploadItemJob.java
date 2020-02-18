@@ -3,14 +3,14 @@ package pg.gipter.job.upload;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
-import pg.gipter.dao.PropertiesDao;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dao.data.DataDao;
+import pg.gipter.core.dto.RunConfig;
 import pg.gipter.service.ToolkitService;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.settings.ArgName;
-import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.UILauncher;
@@ -28,12 +28,12 @@ public class UploadItemJob implements Job {
     public static final String NAME = "Gipter-job";
     public static final String GROUP = "GipterJobGroup";
 
-    private final PropertiesDao propertiesDao;
+    private final ConfigurationDao configurationDao;
     private final DataDao dataDao;
 
     // Instances of Job must have a public no-argument constructor.
     public UploadItemJob() {
-        propertiesDao = DaoFactory.getPropertiesDao();
+        configurationDao = DaoFactory.getConfigurationDao();
         dataDao = DaoFactory.getDataDao();
     }
 
@@ -56,7 +56,7 @@ public class UploadItemJob implements Job {
         dataDao.saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                propertiesDao.loadArgumentArray(configurationNames.getFirst())
+                configurationDao.loadArgumentArray(configurationNames.getFirst())
         );
         uiLauncher.updateTray(applicationProperties);
         if (applicationProperties.isToolkitCredentialsSet()) {
@@ -107,13 +107,13 @@ public class UploadItemJob implements Job {
     }
 
     private void setDatesOnConfigs(LocalDate startDate) {
-        Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
-        for (Map.Entry<String, Properties> entry : propertiesMap.entrySet()) {
-            Properties runConfig = entry.getValue();
-            runConfig.setProperty(ArgName.startDate.name(), startDate.format(ApplicationProperties.yyyy_MM_dd));
-            runConfig.setProperty(ArgName.endDate.name(), LocalDate.now().format(ApplicationProperties.yyyy_MM_dd));
-            runConfig.setProperty(ArgName.preferredArgSource.name(), PreferredArgSource.UI.name());
-            propertiesDao.saveRunConfig(runConfig);
+        Map<String, RunConfig> runConfigMap = configurationDao.loadRunConfigMap();
+        for (Map.Entry<String, RunConfig> entry : runConfigMap.entrySet()) {
+            RunConfig runConfig = entry.getValue();
+            runConfig.setStartDate(startDate);
+            runConfig.setEndDate(LocalDate.now());
+            runConfig.setPreferredArgSource(PreferredArgSource.UI);
+            configurationDao.saveRunConfig(runConfig);
         }
     }
 

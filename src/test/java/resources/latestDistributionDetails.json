@@ -66,7 +66,41 @@
       "created_at": "2019-08-22T09:23:15Z",
       "updated_at": "2019-08-22T09:23:19Z",
       "browser_download_url": "https://github.com/PreCyz/GitDiffGenerator/releases/download/v3.6.6/Gipter_v3.6.6.7z"
-    }
+    },
+    {
+          "url": "https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/assets/14512232",
+          "id": 14512232,
+          "node_id": "MDEyOlJlbGVhc2VBc3NldDE0NTEyMjMy",
+          "name": "11+Gipter_v3.6.6.7z",
+          "label": null,
+          "uploader": {
+            "login": "PreCyz",
+            "id": 22101589,
+            "node_id": "MDQ6VXNlcjIyMTAxNTg5",
+            "avatar_url": "https://avatars1.githubusercontent.com/u/22101589?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/PreCyz",
+            "html_url": "https://github.com/PreCyz",
+            "followers_url": "https://api.github.com/users/PreCyz/followers",
+            "following_url": "https://api.github.com/users/PreCyz/following{/other_user}",
+            "gists_url": "https://api.github.com/users/PreCyz/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/PreCyz/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/PreCyz/subscriptions",
+            "organizations_url": "https://api.github.com/users/PreCyz/orgs",
+            "repos_url": "https://api.github.com/users/PreCyz/repos",
+            "events_url": "https://api.github.com/users/PreCyz/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/PreCyz/received_events",
+            "type": "User",
+            "site_admin": false
+          },
+          "content_type": "application/octet-stream",
+          "state": "uploaded",
+          "size": 13839147,
+          "download_count": 33,
+          "created_at": "2019-08-22T09:23:15Z",
+          "updated_at": "2019-08-22T09:23:19Z",
+          "browser_download_url": "https://github.com/PreCyz/GitDiffGenerator/releases/download/v3.6.6/11+Gipter_v3.6.6.7z"
+        }
   ],
   "tarball_url": "https://api.github.com/repos/PreCyz/GitDiffGenerator/tarball/v3.6.6",
   "zipball_url": "https://api.github.com/repos/PreCyz/GitDiffGenerator/zipball/v3.6.6",
