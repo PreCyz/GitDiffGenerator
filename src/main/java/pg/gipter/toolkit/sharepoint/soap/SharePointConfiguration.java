@@ -8,7 +8,7 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.transport.WebServiceMessageSender;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 
-/** Created by Pawel Gawedzki on 12-Oct-2018. */
+/**Created by Pawel Gawedzki on 12-Oct-2018.*/
 public class SharePointConfiguration {
 
     @Bean
@@ -36,10 +36,10 @@ public class SharePointConfiguration {
     }
 
     @Bean
-    public SharePointSoapClient sharePointSoapClient(@Value("${toolkit.WSUrl}") String wsUrl,
-                                                     @Value("${toolkit.copyListName}") String copyListName,
-                                                     WebServiceTemplate webServiceTemplate) {
-        return new SharePointSoapClient(webServiceTemplate, wsUrl, copyListName);
+    public SharePointSoapClient sharePointSoapClient(WebServiceMessageSender messageSender,
+                                                     @Value("${toolkit.WSUrl}") String wsUrl,
+                                                     @Value("${toolkit.copyListName}") String copyListName) {
+        return new SharePointSoapClient(webServiceTemplate(marshaller(), messageSender), wsUrl, copyListName);
     }
 
 }
