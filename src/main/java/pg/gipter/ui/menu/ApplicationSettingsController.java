@@ -4,25 +4,27 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.dto.ApplicationConfig;
 import pg.gipter.service.StartupService;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.settings.ArgName;
-import pg.gipter.settings.PreferredArgSource;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
 public class ApplicationSettingsController extends AbstractController {
 
+    @FXML
+    private AnchorPane mainAnchorPane;
     @FXML
     private CheckBox confirmationWindowCheckBox;
     @FXML
@@ -53,6 +55,7 @@ public class ApplicationSettingsController extends AbstractController {
         setInitValues(resources);
         setProperties();
         setListeners();
+        setAccelerators();
     }
 
     private void setInitValues(ResourceBundle resources) {
@@ -92,16 +95,14 @@ public class ApplicationSettingsController extends AbstractController {
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     currentLanguage = languageComboBox.getValue();
-                    String[] arguments = propertiesDao.loadArgumentArray(uiLauncher.getConfigurationName());
-                    uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(arguments));
+                    uiLauncher.setApplicationProperties(applicationProperties);
                     uiLauncher.changeLanguage(languageComboBox.getValue());
                 });
 
         final StartupService startupService = new StartupService();
         activateTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                String[] arguments = propertiesDao.loadArgumentArray(uiLauncher.getConfigurationName());
-                uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(arguments));
+                uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.initTrayHandler();
                 uiLauncher.currentWindow().setOnCloseRequest(uiLauncher.trayOnCloseEventHandler());
                 autostartCheckBox.setDisable(false);
@@ -128,19 +129,28 @@ public class ApplicationSettingsController extends AbstractController {
     }
 
     private void saveNewSettings() {
-        String[] arguments = createArgsFromUI();
-        propertiesDao.saveAppSettings(propertiesDao.createProperties(arguments));
-        logger.info("New application settings saved. [{}]", String.join(",", arguments));
+        ApplicationConfig applicationConfig = createApplicationConfigFromUI();
+        applicationProperties.updateApplicationConfig(applicationConfig);
+        applicationProperties.save();
+        logger.info("New application settings saved. [{}]", applicationConfig.toString());
     }
 
-    private String[] createArgsFromUI() {
-        List<String> list = new ArrayList<>();
-        list.add(ArgName.confirmationWindow.name() + "=" + confirmationWindowCheckBox.isSelected());
-        list.add(ArgName.preferredArgSource.name() + "=" + preferredArgSourceComboBox.getValue());
-        list.add(ArgName.useUI.name() + "=" + useUICheckBox.isSelected());
-        list.add(ArgName.activeTray.name() + "=" + activateTrayCheckBox.isSelected());
-        list.add(ArgName.enableOnStartup.name() + "=" + autostartCheckBox.isSelected());
-        list.add(ArgName.silentMode.name() + "=" + silentModeCheckBox.isSelected());
-        return list.toArray(new String[0]);
+    private ApplicationConfig createApplicationConfigFromUI() {
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setConfirmationWindow(confirmationWindowCheckBox.isSelected());
+        applicationConfig.setPreferredArgSource(preferredArgSourceComboBox.getValue());
+        applicationConfig.setUseUI(useUICheckBox.isSelected());
+        applicationConfig.setActiveTray(activateTrayCheckBox.isSelected());
+        applicationConfig.setEnableOnStartup(autostartCheckBox.isSelected());
+        applicationConfig.setSilentMode(silentModeCheckBox.isSelected());
+        return applicationConfig;
+    }
+
+    private void setAccelerators() {
+        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (KeyCode.ESCAPE == e.getCode()) {
+                uiLauncher.closeApplicationWindow();
+            }
+        });
     }
 }

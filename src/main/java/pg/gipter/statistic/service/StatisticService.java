@@ -2,13 +2,13 @@ package pg.gipter.statistic.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.StatisticDao;
-import pg.gipter.producer.command.VersionControlSystem;
-import pg.gipter.producer.version.VCSVersionProducer;
-import pg.gipter.producer.version.VCSVersionProducerFactory;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.producer.command.VersionControlSystem;
+import pg.gipter.core.producer.version.VCSVersionProducer;
+import pg.gipter.core.producer.version.VCSVersionProducerFactory;
 import pg.gipter.statistic.Statistic;
+import pg.gipter.statistic.dao.StatisticDao;
 import pg.gipter.statistic.dto.RunDetails;
 import pg.gipter.ui.UploadStatus;
 

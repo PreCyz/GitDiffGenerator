@@ -6,28 +6,21 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.data.DataDao;
+import pg.gipter.core.dto.RunConfig;
 import pg.gipter.job.upgrade.UpgradeJobCreator;
-import pg.gipter.job.upload.JobProperty;
-import pg.gipter.job.upload.JobType;
-import pg.gipter.job.upload.UploadItemJobBuilder;
-import pg.gipter.job.upload.UploadJobCreator;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.settings.ArgName;
+import pg.gipter.job.upload.*;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.RunType;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
+import pg.gipter.ui.alert.*;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -164,14 +157,11 @@ public class JobHandler {
                             String[] configArray = configs.split(",");
                             List<ApplicationProperties> applicationPropertiesCollection = new ArrayList<>(configArray.length);
                             for (String configName : configArray) {
-                                Optional<Properties> config = DaoFactory.getPropertiesDao().loadApplicationProperties(configName);
-                                if (config.isPresent()) {
-                                    config.get().put(ArgName.startDate.name(), startDate.format(DateTimeFormatter.ISO_DATE));
-                                    String[] args = config.get().entrySet().stream()
-                                            .map(entry -> entry.getKey() + "=" + entry.getValue())
-                                            .toArray(String[]::new);
+                                Optional<RunConfig> runConfig = DaoFactory.getConfigurationDao().loadRunConfig(configName);
+                                if (runConfig.isPresent()) {
+                                    runConfig.get().setStartDate(startDate);
                                     applicationPropertiesCollection.add(
-                                            ApplicationPropertiesFactory.getInstance(args)
+                                            ApplicationPropertiesFactory.getInstance(runConfig.get().toArgumentArray())
                                     );
                                 }
                             }

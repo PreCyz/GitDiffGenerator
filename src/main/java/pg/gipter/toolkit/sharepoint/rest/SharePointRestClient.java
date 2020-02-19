@@ -2,17 +2,15 @@ package pg.gipter.toolkit.sharepoint.rest;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import pg.gipter.producer.command.UploadType;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 import static java.util.stream.Collectors.joining;

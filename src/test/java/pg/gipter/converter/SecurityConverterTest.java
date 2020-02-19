@@ -2,18 +2,15 @@ package pg.gipter.converter;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pg.gipter.dao.DaoConstants;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.SecurityDao;
+import pg.gipter.core.dao.*;
+import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.security.CipherDetails;
-import pg.gipter.settings.ArgName;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.Optional;
-import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,11 +18,11 @@ class SecurityConverterTest {
 
     private SecurityConverter converter;
 
-    private void prepareApplicationProperties() throws GeneralSecurityException {
-        Properties properties = new Properties();
-        properties.setProperty(ArgName.toolkitPassword.name(), "uPb2PFrLB6TLM8mp1HNORA\u003d\u003d");
-        properties.setProperty(ArgName.toolkitUsername.name(), "someUser");
-        DaoFactory.getPropertiesDao().saveToolkitSettings(properties);
+    private void prepareApplicationProperties() {
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitPassword("uPb2PFrLB6TLM8mp1HNORA\u003d\u003d");
+        toolkitConfig.setToolkitUsername("someUser");
+        DaoFactory.getConfigurationDao().saveToolkitConfig(toolkitConfig);
     }
 
     @AfterEach

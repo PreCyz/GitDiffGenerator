@@ -8,17 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.converter.Converter;
 import pg.gipter.converter.ConverterFactory;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.PropertiesDao;
+import pg.gipter.core.*;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.launcher.LauncherFactory;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.utils.StringUtils;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -66,14 +61,13 @@ public class Main extends Application {
     }
 
     private void setDefaultConfig() {
-        PropertiesDao propertiesDao = DaoFactory.getPropertiesDao();
-        LinkedList<String> configs = new LinkedList<>(propertiesDao.loadAllApplicationProperties().keySet());
+        LinkedList<String> configs = new LinkedList<>(Main.applicationProperties.getRunConfigMap().keySet());
         if (!configs.isEmpty()) {
             String defaultConfigName = configs.getFirst();
             String[] arguments = Arrays.copyOf(args, args.length + 1);
-            arguments[arguments.length - 1] = defaultConfigName;
+            arguments[arguments.length - 1] = ArgName.configurationName.name() + "=" + defaultConfigName;
             applicationProperties = ApplicationPropertiesFactory.getInstance(arguments);
-            logger.info("Configuration '{}' is set as default one.", defaultConfigName);
+            logger.info("Default configuration set as [{}].", defaultConfigName);
         }
     }
 }

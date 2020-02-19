@@ -3,15 +3,13 @@ package pg.gipter.ui.menu;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.AnchorPane;
 import org.jetbrains.annotations.NotNull;
-import pg.gipter.platform.AppManager;
-import pg.gipter.platform.AppManagerFactory;
-import pg.gipter.service.SecurityService;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.service.platform.AppManager;
+import pg.gipter.service.platform.AppManagerFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 
@@ -21,6 +19,8 @@ import java.util.ResourceBundle;
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
 public class ToolkitSettingsController extends AbstractController {
 
+    @FXML
+    private AnchorPane mainAnchorPane;
     @FXML
     private TextField toolkitUsernameTextField;
     @FXML
@@ -50,11 +50,12 @@ public class ToolkitSettingsController extends AbstractController {
         super.initialize(location, resources);
         setInitValues();
         setActions();
+        setAccelerators();
     }
 
     private void setInitValues() {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(new SecurityService().decrypt(applicationProperties.toolkitPassword()));
+        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
         toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
         toolkitUrlTextField.setText(applicationProperties.toolkitUrl());
@@ -72,6 +73,14 @@ public class ToolkitSettingsController extends AbstractController {
             AppManager instance = AppManagerFactory.getInstance();
             instance.launchDefaultBrowser(applicationProperties.toolkitUserFolder());
             toolkitUserFolderHyperlink.setVisited(false);
+        });
+    }
+
+    private void setAccelerators() {
+        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (KeyCode.ESCAPE == e.getCode()) {
+                uiLauncher.closeToolkitWindow();
+            }
         });
     }
 }

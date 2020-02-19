@@ -5,20 +5,18 @@ import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
-import pg.gipter.dao.PropertiesDao;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dao.data.DataDao;
+import pg.gipter.core.producer.DiffProducer;
+import pg.gipter.core.producer.DiffProducerFactory;
 import pg.gipter.launcher.Starter;
-import pg.gipter.producer.DiffProducer;
-import pg.gipter.producer.DiffProducerFactory;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
 import pg.gipter.statistic.dto.RunDetails;
 import pg.gipter.statistic.service.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
+import pg.gipter.ui.alert.*;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
@@ -62,7 +60,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private long totalProgress;
     private AtomicLong workDone;
     private Collection<ApplicationProperties> applicationPropertiesCollection;
-    private PropertiesDao propertiesDao;
+    private ConfigurationDao configurationDao;
     private DataDao dataDao;
     private RunType runType;
 
@@ -72,7 +70,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.totalProgress = configurationNames.size() * 5;
         this.workDone = new AtomicLong(0);
         this.applicationPropertiesCollection = Collections.emptyList();
-        this.propertiesDao = DaoFactory.getPropertiesDao();
+        this.configurationDao = DaoFactory.getConfigurationDao();
         this.dataDao = DaoFactory.getDataDao();
         this.runType = runType;
     }
@@ -167,26 +165,26 @@ public class FXMultiRunner extends Task<Void> implements Starter {
 
     private boolean isConfirmationWindow() {
         return ApplicationPropertiesFactory.getInstance(
-                propertiesDao.loadArgumentArray(configurationNames.getFirst())
+                configurationDao.loadArgumentArray(configurationNames.getFirst())
         ).isConfirmationWindow();
     }
 
     private String toolkitUserFolder() {
-        return ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationNames.getFirst()))
+        return ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configurationNames.getFirst()))
                 .toolkitUserFolder();
     }
 
     private boolean isToolkitCredentialsSet() {
         if (toolkitCredentialsSet == null) {
             toolkitCredentialsSet = ApplicationPropertiesFactory.getInstance(
-                    propertiesDao.loadArgumentArray(configurationNames.getFirst())
+                    configurationDao.loadArgumentArray(configurationNames.getFirst())
             ).isToolkitCredentialsSet();
         }
         return toolkitCredentialsSet;
     }
 
     private ApplicationProperties getApplicationProperties(String configurationName) {
-        return ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configurationName));
+        return ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configurationName));
     }
 
     private ApplicationProperties produce(ApplicationProperties applicationProperties) {
@@ -236,7 +234,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             LinkedList<ApplicationProperties> appProps = new LinkedList<>(applicationPropertiesCollection);
             if (appProps.isEmpty()) {
                 for (String configName : configurationNames) {
-                    appProps.add(ApplicationPropertiesFactory.getInstance(propertiesDao.loadArgumentArray(configName)));
+                    appProps.add(ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configName)));
                 }
             }
             statisticService.updateStatistics(new RunDetails(appProps, status, runType));

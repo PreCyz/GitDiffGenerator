@@ -1,12 +1,10 @@
 package pg.gipter.utils;
 
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.job.upload.JobProperty;
 
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;

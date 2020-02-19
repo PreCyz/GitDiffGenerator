@@ -2,30 +2,28 @@ package pg.gipter.converter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.PropertiesDao;
-import pg.gipter.dao.SecurityDao;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.SecurityDao;
+import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.security.CipherDetails;
 import pg.gipter.service.SecurityService;
-import pg.gipter.settings.ArgName;
 import pg.gipter.utils.StringUtils;
 
 import java.security.SecureRandom;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class SecurityConverter implements Converter {
 
-    private PropertiesDao propertiesDao;
+    private ConfigurationDao configurationDao;
     private SecurityDao securityDao;
     private SecurityService securityService;
 
     private final Logger logger = LoggerFactory.getLogger(SecurityConverter.class);
 
     public SecurityConverter() {
-        propertiesDao = DaoFactory.getPropertiesDao();
+        configurationDao = DaoFactory.getConfigurationDao();
         securityDao = DaoFactory.getSecurityDao();
         securityService = new SecurityService();
     }
@@ -33,9 +31,9 @@ public class SecurityConverter implements Converter {
     @Override
     public boolean convert() {
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
-        if (!cipherDetails.isPresent()) {
-            Properties properties = propertiesDao.loadToolkitCredentials();
-            String password = properties.getProperty(ArgName.toolkitPassword.name());
+        if (cipherDetails.isEmpty()) {
+            ToolkitConfig toolkitConfig = configurationDao.loadToolkitConfig();
+            String password = toolkitConfig.getToolkitPassword();
             String decryptedPassword = null;
             if (!StringUtils.nullOrEmpty(password) && !password.equals(ArgName.toolkitPassword.defaultValue())) {
                 decryptedPassword = securityService.decrypt(password);
@@ -45,8 +43,8 @@ public class SecurityConverter implements Converter {
             securityDao.writeCipherDetails(generatedCipher);
 
             if (!StringUtils.nullOrEmpty(decryptedPassword)) {
-                properties.replace(ArgName.toolkitPassword.name(), securityService.encrypt(decryptedPassword));
-                propertiesDao.saveToolkitSettings(properties);
+                toolkitConfig.setToolkitPassword(decryptedPassword);
+                configurationDao.saveToolkitConfig(toolkitConfig);
                 return true;
             } else {
                 return false;

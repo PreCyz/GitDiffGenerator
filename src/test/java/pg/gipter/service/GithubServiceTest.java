@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 
 import java.io.*;
 import java.util.Optional;
@@ -64,6 +64,18 @@ class GithubServiceTest {
     }
 
     @Test
+    @Disabled
+    void givenOldVersionInGithub_whenIsNewVersion_thenReturnFalse() {
+        when(mockAppProps.version()).thenReturn("3.7");
+        spyGithubService = spy(new GithubService(mockAppProps.version()));
+        doReturn(Optional.of("3.6.14")).when(spyGithubService).getLatestVersion();
+
+        boolean actual = spyGithubService.isNewVersion();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
     void givenNewVersionInGithub2_whenIsNewVersion_thenReturnTrue() {
         when(mockAppProps.version()).thenReturn("1.3");
         spyGithubService = spy(new GithubService(mockAppProps.version()));
@@ -94,13 +106,6 @@ class GithubServiceTest {
         boolean actual = spyGithubService.isNewVersion();
 
         assertThat(actual).isFalse();
-    }
-
-    void mockDownloadLastDistributionDetails() throws FileNotFoundException {
-        String json = String.format(".%ssrc%stest%sjava%sresources%slatestDistributionDetails.json",
-                File.separator, File.separator, File.separator, File.separator, File.separator);
-        Reader reader = new BufferedReader(new FileReader(json));
-        doReturn(Optional.of(new Gson().fromJson(reader, JsonObject.class))).when(spyGithubService).downloadLatestDistributionDetails();
     }
 
     @Test

@@ -2,18 +2,12 @@ package pg.gipter.job.upload;
 
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 
 import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 import static org.quartz.TriggerBuilder.newTrigger;
 

@@ -2,7 +2,7 @@ package pg.gipter.ui.project;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import pg.gipter.settings.ArgName;
+import pg.gipter.core.ArgName;
 
 import java.util.Objects;
 

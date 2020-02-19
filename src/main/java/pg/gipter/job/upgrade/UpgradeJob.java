@@ -6,13 +6,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.core.*;
 import pg.gipter.service.GithubService;
-import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.settings.ArgName;
-import pg.gipter.settings.PreferredArgSource;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
+import pg.gipter.ui.alert.*;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDateTime;

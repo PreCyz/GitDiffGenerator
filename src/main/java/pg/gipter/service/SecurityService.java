@@ -2,14 +2,12 @@ package pg.gipter.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.SecurityDao;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.SecurityDao;
 import pg.gipter.security.CipherDetails;
 import pg.gipter.utils.CryptoUtils;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import java.nio.charset.StandardCharsets;

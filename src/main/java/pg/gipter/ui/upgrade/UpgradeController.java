@@ -6,8 +6,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import pg.gipter.core.ApplicationProperties;
 import pg.gipter.service.UpgradeService;
-import pg.gipter.settings.ApplicationProperties;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 

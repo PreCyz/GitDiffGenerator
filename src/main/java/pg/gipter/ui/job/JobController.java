@@ -13,24 +13,18 @@ import javafx.util.StringConverter;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.DaoConstants;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.data.DataDao;
+import pg.gipter.core.dto.RunConfig;
 import pg.gipter.job.JobHandler;
-import pg.gipter.job.upload.JobProperty;
-import pg.gipter.job.upload.JobType;
-import pg.gipter.job.upload.UploadItemJobBuilder;
-import pg.gipter.job.upload.UploadJobCreator;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ArgName;
+import pg.gipter.job.upload.*;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.ui.alert.*;
+import pg.gipter.utils.*;
 
 import java.net.URL;
 import java.text.ParseException;
@@ -82,13 +76,15 @@ public class JobController extends AbstractController {
     @FXML
     private Label configsLabel;
 
-    private Map<String, Properties> propertiesMap;
+    private Map<String, RunConfig> runConfigMap;
     private final DataDao dataDao;
     private final String NOT_AVAILABLE = "N/A";
     private final String ALL_CONFIGS = "all-configs";
+    private final ApplicationProperties applicationProperties;
 
-    public JobController(UILauncher uiLauncher) {
+    public JobController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
+        this.applicationProperties = applicationProperties;
         dataDao = DaoFactory.getDataDao();
     }
 
@@ -111,13 +107,13 @@ public class JobController extends AbstractController {
         minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
         startDatePicker.setValue(LocalDate.now());
-        propertiesMap = propertiesDao.loadAllApplicationProperties();
-        if (!propertiesMap.isEmpty() && !propertiesMap.containsKey(ArgName.configurationName.defaultValue())) {
-            ObservableList<String> items = FXCollections.observableArrayList(propertiesMap.keySet());
+        runConfigMap = applicationProperties.getRunConfigMap();
+        if (!runConfigMap.isEmpty() && !runConfigMap.containsKey(ArgName.configurationName.defaultValue())) {
+            ObservableList<String> items = FXCollections.observableArrayList(runConfigMap.keySet());
             items.add(0, ALL_CONFIGS);
             configurationNameComboBox.setItems(items);
             configurationNameComboBox.setValue(configurationNameComboBox.getItems().get(0));
-            configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, propertiesMap.keySet()));
+            configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, runConfigMap.keySet()));
         }
         setDefaultsForJobDetailsControls();
         Optional<Properties> data = dataDao.loadDataProperties();
@@ -207,10 +203,10 @@ public class JobController extends AbstractController {
         cancelJobButton.setVisible(false);
         nextExecutionLabel.setText("");
         configsLabel.setAlignment(Pos.TOP_LEFT);
-        if (propertiesMap.isEmpty()) {
+        if (runConfigMap.isEmpty()) {
             configsLabel.setText(NOT_AVAILABLE);
         } else {
-            configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, propertiesMap.keySet()));
+            configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, runConfigMap.keySet()));
         }
     }
 
@@ -219,7 +215,7 @@ public class JobController extends AbstractController {
         startDatePicker.setDayCellFactory(datePickerDateCellCallback());
         startDatePicker.setDisable(true);
         dayOfMonthComboBox.setDisable(true);
-        scheduleButton.setDisable(propertiesMap.isEmpty());
+        scheduleButton.setDisable(runConfigMap.isEmpty());
     }
 
     private Callback<DatePicker, DateCell> datePickerDateCellCallback() {
@@ -322,7 +318,7 @@ public class JobController extends AbstractController {
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     if (ALL_CONFIGS.equals(newValue)) {
-                        configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, propertiesMap.keySet()));
+                        configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, runConfigMap.keySet()));
                     } else if (oldValue.equals(ALL_CONFIGS)) {
                         configsLabel.setText(newValue);
                     } else {

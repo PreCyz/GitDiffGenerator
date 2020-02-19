@@ -4,16 +4,13 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
-import pg.gipter.dao.PropertiesDao;
-import pg.gipter.producer.DiffProducer;
-import pg.gipter.producer.DiffProducerFactory;
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.data.DataDao;
+import pg.gipter.core.producer.DiffProducer;
+import pg.gipter.core.producer.DiffProducerFactory;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
+import pg.gipter.ui.alert.*;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
@@ -21,12 +18,10 @@ class Runner implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(Runner.class);
     private ApplicationProperties applicationProperties;
-    private final PropertiesDao propertiesDao;
     private final DataDao dataDao;
 
     Runner(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.propertiesDao = DaoFactory.getPropertiesDao();
         this.dataDao = DaoFactory.getDataDao();
     }
 

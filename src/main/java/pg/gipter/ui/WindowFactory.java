@@ -1,14 +1,11 @@
 package pg.gipter.ui;
 
-import pg.gipter.settings.ApplicationProperties;
+import pg.gipter.core.ApplicationProperties;
 import pg.gipter.ui.job.JobController;
 import pg.gipter.ui.job.JobWindow;
 import pg.gipter.ui.main.MainController;
 import pg.gipter.ui.main.MainWindow;
-import pg.gipter.ui.menu.ApplicationSettingsController;
-import pg.gipter.ui.menu.ApplicationSettingsWindow;
-import pg.gipter.ui.menu.ToolkitSettingsController;
-import pg.gipter.ui.menu.ToolkitSettingsWindow;
+import pg.gipter.ui.menu.*;
 import pg.gipter.ui.project.ProjectsController;
 import pg.gipter.ui.project.ProjectsWindow;
 import pg.gipter.ui.project.toolkit.ToolkitProjectsController;
@@ -27,7 +24,7 @@ public enum WindowFactory {
     JOB {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new JobWindow(new JobController(uiLauncher));
+            return new JobWindow(new JobController(applicationProperties, uiLauncher));
         }
     },
     PROJECTS {

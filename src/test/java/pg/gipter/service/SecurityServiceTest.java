@@ -2,8 +2,8 @@ package pg.gipter.service;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import pg.gipter.dao.DaoConstants;
-import pg.gipter.dao.DaoFactory;
+import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.security.CipherDetails;
 
 import java.io.IOException;

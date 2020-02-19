@@ -13,9 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -26,29 +24,20 @@ import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
-import pg.gipter.dao.CacheManager;
-import pg.gipter.dao.DaoConstants;
-import pg.gipter.dao.DaoFactory;
-import pg.gipter.dao.DataDao;
-import pg.gipter.platform.AppManager;
-import pg.gipter.platform.AppManagerFactory;
-import pg.gipter.producer.command.UploadType;
+import pg.gipter.core.*;
+import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.configuration.CacheManager;
+import pg.gipter.core.dao.data.DataDao;
+import pg.gipter.core.dto.*;
+import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.service.GithubService;
-import pg.gipter.service.SecurityService;
 import pg.gipter.service.ToolkitService;
-import pg.gipter.settings.ApplicationProperties;
-import pg.gipter.settings.ApplicationPropertiesFactory;
-import pg.gipter.settings.ArgName;
-import pg.gipter.settings.PreferredArgSource;
-import pg.gipter.settings.dto.NamePatternValue;
+import pg.gipter.service.platform.AppManager;
+import pg.gipter.service.platform.AppManagerFactory;
 import pg.gipter.ui.*;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JobHelper;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.ui.alert.*;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.File;
@@ -64,7 +53,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
-import static pg.gipter.settings.ApplicationProperties.yyyy_MM_dd;
+import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
 
@@ -170,7 +159,6 @@ public class MainController extends AbstractController {
     private String inteliSense = "";
     private boolean useInteliSense = false;
     private static boolean useComboBoxValueChangeListener = true;
-    private SecurityService securityService;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -180,7 +168,6 @@ public class MainController extends AbstractController {
                 .stream()
                 .map(e -> String.format("{%s}", e.name()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-        this.securityService = new SecurityService();
     }
 
     @Override
@@ -191,6 +178,7 @@ public class MainController extends AbstractController {
         setProperties(resources);
         setActions(resources);
         setListeners();
+        setAccelerators();
     }
 
     private void setInitValues() {
@@ -204,14 +192,8 @@ public class MainController extends AbstractController {
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
         fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
 
-        if (applicationProperties.isToolkitCredentialsSet()) {
-            toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-            toolkitPasswordField.setText(securityService.decrypt(applicationProperties.toolkitPassword()));
-        } else {
-            Properties properties = propertiesDao.loadToolkitCredentials();
-            toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
-            toolkitPasswordField.setText(properties.getProperty(ArgName.toolkitPassword.name()));
-        }
+        toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
+        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
 
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
@@ -280,7 +262,7 @@ public class MainController extends AbstractController {
     }
 
     private void initConfigurationName() {
-        Set<String> confNames = propertiesDao.loadAllApplicationProperties().keySet();
+        Set<String> confNames = applicationProperties.configurationNames();
         if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
             confNames.add(configurationNameComboBox.getValue());
         }
@@ -323,6 +305,41 @@ public class MainController extends AbstractController {
         setUpgradeMenuItemDisabled();
     }
 
+    private void setAccelerators() {
+        applicationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        toolkitMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        upgradeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        wizardMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
+                e.consume();
+            } else if (e.isControlDown()) {
+                switch (e.getCode()) {
+                    case ENTER:
+                        if (e.isShiftDown()) {
+                            executeAll();
+                        } else {
+                            execute();
+                        }
+                        break;
+                    case J:
+                        uiLauncher.showJobWindow();
+                        break;
+                    case ESCAPE:
+                        UILauncher.platformExit();
+                        break;
+                    case M:
+                        uiLauncher.hideMainWindow();
+                        CacheManager.clearAllCache();
+                        break;
+                    case S:
+                        saveConfiguration();
+                        break;
+                }
+            }
+        });
+    }
+
     private void setTooltipOnProjectListNames() {
         if (!toolkitProjectListNamesTextField.isDisabled()) {
             Tooltip tooltip = new Tooltip(BundleUtils.getMsg("toolkit.panel.projectListNames.tooltip"));
@@ -335,7 +352,7 @@ public class MainController extends AbstractController {
     }
 
     private StringConverter<LocalDate> dateConverter() {
-        return new StringConverter<LocalDate>() {
+        return new StringConverter<>() {
             @Override
             public String toString(LocalDate object) {
                 return object.format(yyyy_MM_dd);
@@ -349,14 +366,14 @@ public class MainController extends AbstractController {
     }
 
     private void setDisableDependOnConfigurations() {
-        Map<String, Properties> map = propertiesDao.loadAllApplicationProperties();
-        addConfigurationButton.setDisable(map.isEmpty());
-        removeConfigurationButton.setDisable(map.isEmpty());
-        executeButton.setDisable(map.isEmpty());
-        executeAllButton.setDisable(map.isEmpty());
-        jobButton.setDisable(map.isEmpty());
-        configurationNameComboBox.setDisable(map.isEmpty());
-        projectPathButton.setDisable(map.isEmpty() || uploadTypeComboBox.getValue() == UploadType.STATEMENT);
+        Map<String, RunConfig> runConfigMap = applicationProperties.getRunConfigMap();
+        addConfigurationButton.setDisable(runConfigMap.isEmpty());
+        removeConfigurationButton.setDisable(runConfigMap.isEmpty());
+        executeButton.setDisable(runConfigMap.isEmpty());
+        executeAllButton.setDisable(runConfigMap.isEmpty());
+        jobButton.setDisable(runConfigMap.isEmpty());
+        configurationNameComboBox.setDisable(runConfigMap.isEmpty());
+        projectPathButton.setDisable(runConfigMap.isEmpty() || uploadTypeComboBox.getValue() == UploadType.STATEMENT);
     }
 
     private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
@@ -410,10 +427,7 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
-        return event -> {
-            uiLauncher.setApplicationProperties(applicationProperties);
-            uiLauncher.showApplicationSettingsWindow();
-        };
+        return event -> uiLauncher.showApplicationSettingsWindow();
     }
 
     private EventHandler<ActionEvent> toolkitActionEventHandler() {
@@ -472,8 +486,9 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
         return event -> {
-            String[] argsFromUI = createArgsFromUI();
-            uiLauncher.setApplicationProperties(ApplicationPropertiesFactory.getInstance(argsFromUI));
+            RunConfig runConfig = createRunConfigFromUI();
+            applicationProperties.updateCurrentRunConfig(runConfig);
+            uiLauncher.setApplicationProperties(applicationProperties);
             String configurationName = configurationNameTextField.getText();
             updateConfigurationNameComboBox(configurationName, configurationName);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
@@ -521,24 +536,30 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> executeActionEventHandler() {
-        return event -> {
-            String[] args = createArgsFromUI();
-            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
+        return event -> execute();
+    }
 
-            FXMultiRunner runner = new FXMultiRunner(
-                    Stream.of(uiAppProperties).collect(Collectors.toList()),
-                    uiLauncher.nonUIExecutor(),
-                    RunType.EXECUTE
-            );
-            resetIndicatorProperties(runner);
-            uiLauncher.executeOutsideUIThread(() -> {
-                runner.start();
-                if (uiAppProperties.isActiveTray()) {
-                    uiLauncher.updateTray(uiAppProperties);
-                }
-                updateLastItemUploadDate();
-            });
-        };
+    private void execute() {
+        RunConfig runConfig = createRunConfigFromUI();
+        ToolkitConfig toolkitConfig = createToolkitConfigFromUI();
+        ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(Stream.concat(
+                Arrays.stream(runConfig.toArgumentArray()),
+                Arrays.stream(toolkitConfig.toArgumentArray())
+        ).toArray(String[]::new));
+
+        FXMultiRunner runner = new FXMultiRunner(
+                Stream.of(uiAppProperties).collect(Collectors.toList()),
+                uiLauncher.nonUIExecutor(),
+                RunType.EXECUTE
+        );
+        resetIndicatorProperties(runner);
+        uiLauncher.executeOutsideUIThread(() -> {
+            runner.start();
+            if (uiAppProperties.isActiveTray()) {
+                uiLauncher.updateTray(uiAppProperties);
+            }
+            updateLastItemUploadDate();
+        });
     }
 
     private void updateLastItemUploadDate() {
@@ -559,74 +580,79 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> executeAllActionEventHandler() {
-        return event -> {
-            String[] args = createArgsFromUI();
-            ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(args);
-            Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
-            map.put(uiAppProperties.configurationName(), uiAppProperties);
-
-            FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
-            resetIndicatorProperties(runner);
-            uiLauncher.executeOutsideUIThread(() -> {
-                runner.call();
-                String[] firstFromConfigs = propertiesDao.loadArgumentArray(new LinkedList<>(map.keySet()).getFirst());
-                ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(firstFromConfigs);
-                if (instance.isActiveTray()) {
-                    uiLauncher.updateTray(instance);
-                }
-            });
-        };
+        return event -> executeAll();
     }
 
-    private String[] createArgsFromUI() {
-        List<String> argList = new LinkedList<>();
+    private void executeAll() {
+        RunConfig runConfig = createRunConfigFromUI();
+        ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(runConfig.toArgumentArray());
+        Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
+        map.put(uiAppProperties.configurationName(), uiAppProperties);
 
-        argList.add(ArgName.toolkitUsername + "=" + toolkitUsernameTextField.getText());
-        argList.add(ArgName.toolkitPassword + "=" + securityService.encrypt(toolkitPasswordField.getText()));
+        FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
+        resetIndicatorProperties(runner);
+        uiLauncher.executeOutsideUIThread(() -> {
+            runner.call();
+            ApplicationProperties instance = new LinkedList<>(map.values()).getFirst();
+            if (instance.isActiveTray()) {
+                uiLauncher.updateTray(instance);
+            }
+        });
+    }
+
+    private RunConfig createRunConfigFromUI() {
+        RunConfig runConfig = new RunConfig();
 
         if (!StringUtils.nullOrEmpty(authorsTextField.getText())) {
-            argList.add(ArgName.author + "=" + authorsTextField.getText());
+            runConfig.setAuthor(authorsTextField.getText());
         }
         if (!StringUtils.nullOrEmpty(committerEmailTextField.getText())) {
-            argList.add(ArgName.committerEmail + "=" + committerEmailTextField.getText());
+            runConfig.setCommitterEmail(committerEmailTextField.getText());
         }
         if (!StringUtils.nullOrEmpty(gitAuthorTextField.getText())) {
-            argList.add(ArgName.gitAuthor + "=" + gitAuthorTextField.getText());
+            runConfig.setGitAuthor(gitAuthorTextField.getText());
         }
         if (!StringUtils.nullOrEmpty(mercurialAuthorTextField.getText())) {
-            argList.add(ArgName.mercurialAuthor + "=" + mercurialAuthorTextField.getText());
+            runConfig.setMercurialAuthor(mercurialAuthorTextField.getText());
         }
         if (!StringUtils.nullOrEmpty(svnAuthorTextField.getText())) {
-            argList.add(ArgName.svnAuthor + "=" + svnAuthorTextField.getText());
+            runConfig.setSvnAuthor(svnAuthorTextField.getText());
         }
-        argList.add(ArgName.uploadType + "=" + uploadTypeComboBox.getValue());
-        argList.add(ArgName.skipRemote + "=" + skipRemoteCheckBox.isSelected());
-        argList.add(ArgName.fetchAll + "=" + fetchAllCheckBox.isSelected());
+        runConfig.setUploadType(uploadTypeComboBox.getValue());
+        runConfig.setSkipRemote(skipRemoteCheckBox.isSelected());
+        runConfig.setFetchAll(fetchAllCheckBox.isSelected());
 
         if (!StringUtils.nullOrEmpty(toolkitProjectListNamesTextField.getText())) {
-            argList.add(ArgName.toolkitProjectListNames + "=" + toolkitProjectListNamesTextField.getText());
+            runConfig.setToolkitProjectListNames(toolkitProjectListNamesTextField.getText());
         }
-        argList.add(ArgName.deleteDownloadedFiles + "=" + deleteDownloadedFilesCheckBox.isSelected());
+        runConfig.setDeleteDownloadedFiles(deleteDownloadedFilesCheckBox.isSelected());
 
-        argList.add(ArgName.projectPath + "=" + projectPathLabel.getText());
-        argList.add(ArgName.itemPath + "=" + itemPathLabel.getText());
+        runConfig.setProjectPath(projectPathLabel.getText());
+        runConfig.setItemPath(itemPathLabel.getText());
         if (!StringUtils.nullOrEmpty(itemFileNamePrefixTextField.getText())) {
-            argList.add(ArgName.itemFileNamePrefix + "=" + itemFileNamePrefixTextField.getText());
+            runConfig.setItemFileNamePrefix(itemFileNamePrefixTextField.getText());
         }
 
-        argList.add(ArgName.startDate + "=" + startDatePicker.getValue().format(yyyy_MM_dd));
-        argList.add(ArgName.endDate + "=" + endDatePicker.getValue().format(yyyy_MM_dd));
+        runConfig.setStartDate(startDatePicker.getValue());
+        runConfig.setEndDate(endDatePicker.getValue());
         if (!ArgName.periodInDays.defaultValue().equals(periodInDaysTextField.getText())) {
-            argList.add(ArgName.periodInDays + "=" + periodInDaysTextField.getText());
+            runConfig.setPeriodInDays(Integer.parseInt(periodInDaysTextField.getText()));
         }
 
-        argList.add(ArgName.configurationName + "=" + configurationNameTextField.getText());
-        argList.add(ArgName.preferredArgSource + "=" + PreferredArgSource.UI);
+        runConfig.setConfigurationName(configurationNameTextField.getText());
+        runConfig.setPreferredArgSource(PreferredArgSource.UI);
 
-        return argList.toArray(new String[0]);
+        return runConfig;
     }
 
-    private void resetIndicatorProperties(Task task) {
+    private ToolkitConfig createToolkitConfigFromUI() {
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername(toolkitUsernameTextField.getText());
+        toolkitConfig.setToolkitPassword(toolkitPasswordField.getText());
+        return toolkitConfig;
+    }
+
+    private void resetIndicatorProperties(Task<?> task) {
         loadProgressIndicator.setVisible(true);
         loadProgressIndicator.progressProperty().unbind();
         loadProgressIndicator.progressProperty().bind(task.progressProperty());
@@ -637,7 +663,7 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             boolean disableProjectButton = uploadTypeComboBox.getValue() == UploadType.STATEMENT;
-            disableProjectButton |= propertiesDao.loadAllApplicationProperties().isEmpty() && configurationNameTextField.getText().isEmpty();
+            disableProjectButton |= applicationProperties.getRunConfigMap().isEmpty() && configurationNameTextField.getText().isEmpty();
             projectPathButton.setDisable(disableProjectButton);
             if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
                 endDatePicker.setValue(LocalDate.now());
@@ -670,55 +696,58 @@ public class MainController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> saveConfigurationActionEventHandler() {
-        return event -> {
-            String configurationName = configurationNameTextField.getText();
-            String comboConfigName = configurationNameComboBox.getValue();
+        return event -> saveConfiguration();
+    }
 
-            String[] args = createArgsFromUI();
-            applicationProperties = ApplicationPropertiesFactory.getInstance(args);
-            CacheManager.removeFromCache(applicationProperties.configurationName());
-            uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
-            setLastItemSubmissionDate();
+    private void saveConfiguration() {
+        String configurationName = configurationNameTextField.getText();
+        String comboConfigName = configurationNameComboBox.getValue();
 
-            updateConfigurationNameComboBox(comboConfigName, configurationName);
-            uiLauncher.updateTray(applicationProperties);
-            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("main.config.changed"))
-                    .withAlertType(Alert.AlertType.INFORMATION)
-                    .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                    .withImage(ImageFile.FINGER_UP_PNG);
-            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-        };
+        RunConfig runConfigFromUI = createRunConfigFromUI();
+        applicationProperties.updateCurrentRunConfig(runConfigFromUI);
+        CacheManager.removeFromCache(applicationProperties.configurationName());
+        uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
+        setLastItemSubmissionDate();
+
+        updateConfigurationNameComboBox(comboConfigName, configurationName);
+        uiLauncher.updateTray(applicationProperties);
+        AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                .withHeaderText(BundleUtils.getMsg("main.config.changed"))
+                .withAlertType(Alert.AlertType.INFORMATION)
+                .withWindowType(WindowType.CONFIRMATION_WINDOW)
+                .withImage(ImageFile.FINGER_UP_PNG);
+        Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
     }
 
     private void updateRunConfig(String oldConfigName, String newConfigName) {
-        Properties properties = getPropertiesWithoutDates();
-        propertiesDao.saveToolkitSettings(properties);
+        ToolkitConfig toolkitConfigFromUI = createToolkitConfigFromUI();
+        applicationProperties.updateToolkitConfig(toolkitConfigFromUI);
         if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
-            propertiesDao.saveRunConfig(properties);
+            RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
+            applicationProperties.updateCurrentRunConfig(runConfigWithoutDates);
             new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
             setDisableDependOnConfigurations();
         }
+        applicationProperties.save();
         if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
-            propertiesDao.removeConfig(oldConfigName);
+            applicationProperties.removeConfig(oldConfigName);
         }
     }
 
     @NotNull
-    private Properties getPropertiesWithoutDates() {
-        String[] args = createArgsFromUI();
-        Properties properties = propertiesDao.createProperties(args);
-        properties.remove(ArgName.startDate.name());
-        properties.remove(ArgName.endDate.name());
-        return properties;
+    private RunConfig getRunConfigWithoutDates() {
+        RunConfig runConfigFromUI = createRunConfigFromUI();
+        runConfigFromUI.setStartDate(null);
+        runConfigFromUI.setEndDate(null);
+        return runConfigFromUI;
     }
 
     private EventHandler<ActionEvent> addConfigurationEventHandler() {
         return event -> {
             String configurationName = configurationNameTextField.getText();
-            Optional<Properties> properties = propertiesDao.loadApplicationProperties(configurationName);
+            Optional<RunConfig> runConfig = applicationProperties.getRunConfig(configurationName);
             boolean operationDone = false;
-            if (properties.isPresent()) {
+            if (runConfig.isPresent()) {
                 boolean result = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.overrideProperties.message", configurationName))
                         .withAlertType(Alert.AlertType.CONFIRMATION)
@@ -735,7 +764,8 @@ public class MainController extends AbstractController {
                     configurationNameTextField.setText(configurationNameComboBox.getValue());
                 }
             } else {
-                propertiesDao.saveRunConfig(getPropertiesWithoutDates());
+                applicationProperties.updateCurrentRunConfig(getRunConfigWithoutDates());
+                applicationProperties.save();
                 updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), configurationName);
                 operationDone = true;
             }
@@ -752,9 +782,10 @@ public class MainController extends AbstractController {
     }
 
     private void saveNewConfig(String configurationName) {
-        Properties currentProperties = getPropertiesWithoutDates();
-        currentProperties.put(ArgName.configurationName.name(), configurationName);
-        propertiesDao.saveRunConfig(currentProperties);
+        RunConfig currentRunConfig = getRunConfigWithoutDates();
+        currentRunConfig.setConfigurationName(configurationName);
+        applicationProperties.updateCurrentRunConfig(currentRunConfig);
+        applicationProperties.save();
     }
 
     private EventHandler<ActionEvent> removeConfigurationEventHandler() {
@@ -762,12 +793,10 @@ public class MainController extends AbstractController {
             AlertWindowBuilder alertWindowBuilder;
             try {
                 CacheManager.removeFromCache(configurationNameComboBox.getValue());
-                propertiesDao.removeConfig(configurationNameComboBox.getValue());
-                Map<String, Properties> propertiesMap = propertiesDao.loadAllApplicationProperties();
+                applicationProperties.removeConfig(configurationNameComboBox.getValue());
                 String newConfiguration = ArgName.configurationName.defaultValue();
-                if (!propertiesMap.isEmpty()) {
-                    Properties currentConfig = new ArrayList<>(propertiesMap.entrySet()).get(0).getValue();
-                    newConfiguration = currentConfig.getProperty(ArgName.configurationName.name());
+                if (!applicationProperties.getRunConfigMap().isEmpty()) {
+                    newConfiguration = applicationProperties.configurationName();
                 }
                 removeConfigurationNameFromComboBox(configurationNameComboBox.getValue(), newConfiguration);
 
@@ -798,7 +827,8 @@ public class MainController extends AbstractController {
             Task<Void> task = new Task<Void>() {
                 @Override
                 public Void call() {
-                    ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(createArgsFromUI());
+                    RunConfig runConfigFromUI = createRunConfigFromUI();
+                    ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(runConfigFromUI.toArgumentArray());
                     boolean hasProperCredentials = new ToolkitService(uiAppProps).hasProperCredentials();
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
                     if (hasProperCredentials) {
@@ -836,9 +866,8 @@ public class MainController extends AbstractController {
     }
 
     private void setToolkitCredentialsIfAvailable() {
-        Properties properties = propertiesDao.loadToolkitCredentials();
-        toolkitUsernameTextField.setText(properties.getProperty(ArgName.toolkitUsername.name()));
-        toolkitPasswordField.setText(securityService.decrypt(properties.getProperty(ArgName.toolkitPassword.name())));
+        toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
+        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
     }
 
     private void updateConfigurationNameComboBox(String oldValue, String newValue) {
@@ -868,11 +897,6 @@ public class MainController extends AbstractController {
         configurationNameTextField.textProperty().addListener(configurationNameListener());
         useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
         itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
-        mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
-            if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
-                e.consume();
-            }
-        });
     }
 
     private ChangeListener<String> toolkitUsernameListener() {
@@ -885,8 +909,8 @@ public class MainController extends AbstractController {
     private ChangeListener<String> configurationNameComboBoxListener() {
         return (options, oldValue, newValue) -> {
             if (useComboBoxValueChangeListener) {
-                String[] args = createArgsFromUI();
-                ApplicationProperties uiApplicationProperties = ApplicationPropertiesFactory.getInstance(args);
+                RunConfig runConfigFromUI = createRunConfigFromUI();
+                ApplicationProperties uiApplicationProperties = ApplicationPropertiesFactory.getInstance(runConfigFromUI.toArgumentArray());
                 CacheManager.addToCache(oldValue, uiApplicationProperties);
 
                 applicationProperties = CacheManager.getApplicationProperties(newValue);
