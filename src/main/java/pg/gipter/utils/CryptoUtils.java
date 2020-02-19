@@ -1,10 +1,9 @@
 package pg.gipter.utils;
 
+import org.slf4j.LoggerFactory;
 import pg.gipter.service.SecurityService;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import java.nio.charset.StandardCharsets;
@@ -38,6 +37,24 @@ public final class CryptoUtils {
         Cipher pbeCipher = Cipher.getInstance(CIPHER);
         pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(SALT, ITERATION_COUNT));
         return new String(pbeCipher.doFinal(securityService.base64Decode(property)), StandardCharsets.UTF_8);
+    }
+
+    public static String encryptSafe(String value) {
+        try {
+            return encrypt(value);
+        } catch (GeneralSecurityException e) {
+            LoggerFactory.getLogger(CryptoUtils.class).warn("Can not encrypt string.", e);
+            throw new IllegalArgumentException("Can not encrypt value.");
+        }
+    }
+
+    public static String decryptSafe(String value) {
+        try {
+            return decrypt(value);
+        } catch (GeneralSecurityException e) {
+            LoggerFactory.getLogger(CryptoUtils.class).warn("Can not decrypt value.", e);
+            throw new IllegalArgumentException("Can not decrypt value.");
+        }
     }
 
 }

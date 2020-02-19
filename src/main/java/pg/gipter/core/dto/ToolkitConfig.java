@@ -2,7 +2,7 @@ package pg.gipter.core.dto;
 
 import com.google.gson.annotations.JsonAdapter;
 import pg.gipter.core.ArgName;
-import pg.gipter.utils.PasswordUtils;
+import pg.gipter.utils.CryptoUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -172,7 +172,7 @@ public class ToolkitConfig {
     public String toString() {
         return "ToolkitConfig{" +
                 "toolkitUsername='" + toolkitUsername + '\'' +
-                ", toolkitPassword='" + PasswordUtils.encrypt(toolkitPassword) + '\'' +
+                ", toolkitPassword='" + CryptoUtils.encryptSafe(toolkitPassword) + '\'' +
                 ", toolkitDomain='" + toolkitDomain + '\'' +
                 ", toolkitCopyListName='" + toolkitCopyListName + '\'' +
                 ", toolkitUrl='" + toolkitUrl + '\'' +
