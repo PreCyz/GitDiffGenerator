@@ -1,57 +1,85 @@
 package pg.gipter.converter;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.SecurityDao;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dto.Configuration;
 import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.security.CipherDetails;
-import pg.gipter.service.SecurityService;
+import pg.gipter.utils.CryptoUtils;
 import pg.gipter.utils.StringUtils;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 public class SecurityConverter implements Converter {
 
     private ConfigurationDao configurationDao;
     private SecurityDao securityDao;
-    private SecurityService securityService;
 
     private final Logger logger = LoggerFactory.getLogger(SecurityConverter.class);
 
     public SecurityConverter() {
         configurationDao = DaoFactory.getConfigurationDao();
         securityDao = DaoFactory.getSecurityDao();
-        securityService = new SecurityService();
     }
 
     @Override
     public boolean convert() {
+        boolean result = false;
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
         if (cipherDetails.isEmpty()) {
-            ToolkitConfig toolkitConfig = configurationDao.loadToolkitConfig();
-            String password = toolkitConfig.getToolkitPassword();
-            String decryptedPassword = null;
-            if (!StringUtils.nullOrEmpty(password) && !password.equals(ArgName.toolkitPassword.defaultValue())) {
-                decryptedPassword = securityService.decrypt(password);
-            }
-
             CipherDetails generatedCipher = generateCipherDetails();
             securityDao.writeCipherDetails(generatedCipher);
 
-            if (!StringUtils.nullOrEmpty(decryptedPassword)) {
-                toolkitConfig.setToolkitPassword(decryptedPassword);
-                configurationDao.saveToolkitConfig(toolkitConfig);
-                return true;
+            Optional<ToolkitConfig> toolkitConfig = readToolkitConfig();
+            if (toolkitConfig.isPresent()) {
+                String password = toolkitConfig.get().getToolkitPassword();
+                String decryptedPassword = null;
+                if (!StringUtils.nullOrEmpty(password) && !ArgName.toolkitPassword.defaultValue().equals(password)) {
+                    decryptedPassword = CryptoUtils.decryptSafe(password);
+                }
+
+                if (!StringUtils.nullOrEmpty(decryptedPassword)) {
+                    toolkitConfig.get().setToolkitPassword(decryptedPassword);
+                    configurationDao.saveToolkitConfig(toolkitConfig.get());
+                    result = true;
+                }
             } else {
-                return false;
+                logger.info("There is not toolkit credentials to convert.");
             }
+        } else {
+            logger.info("Security file detected.");
+            result = true;
         }
-        logger.info("Security file detected.");
-        return false;
+        return result;
+    }
+
+    Optional<ToolkitConfig> readToolkitConfig() {
+        Optional<ToolkitConfig> result = Optional.empty();
+        try (InputStream fis = new FileInputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
+             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(isr)
+        ) {
+            Gson gson = new GsonBuilder().create();
+            JsonObject config = gson.fromJson(reader, JsonObject.class);
+            JsonObject toolkitConfigJsonObject = config.getAsJsonObject(Configuration.TOOLKIT_CONFIG);
+            result = Optional.ofNullable(gson.fromJson(toolkitConfigJsonObject, ToolkitConfig.class));
+        } catch (IOException | NullPointerException e) {
+            logger.warn("Could not read toolkit config. {}", e.getMessage());
+        }
+        return result;
     }
 
     CipherDetails generateCipherDetails() {

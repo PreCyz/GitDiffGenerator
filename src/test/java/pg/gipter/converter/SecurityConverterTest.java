@@ -1,8 +1,10 @@
 package pg.gipter.converter;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.dao.*;
+import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.SecurityDao;
 import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.security.CipherDetails;
 
@@ -25,7 +27,7 @@ class SecurityConverterTest {
         DaoFactory.getConfigurationDao().saveToolkitConfig(toolkitConfig);
     }
 
-    @AfterEach
+    @BeforeEach
     void tearDown() {
         try {
             Files.deleteIfExists(Paths.get(DaoConstants.SECURITY_JSON));
@@ -83,7 +85,7 @@ class SecurityConverterTest {
 
         SecurityDao securityDao = DaoFactory.getSecurityDao();
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
         assertThat(cipherDetails.isPresent()).isTrue();
         assertThat(cipherDetails.get().getCipher()).isEqualTo("someAlgorithm");
     }

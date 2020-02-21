@@ -1,17 +1,14 @@
 package pg.gipter.core.dto;
 
-import com.google.gson.annotations.JsonAdapter;
 import pg.gipter.core.ArgName;
 import pg.gipter.utils.CryptoUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-@JsonAdapter(PasswordDeserializer.class)
 public class ToolkitConfig {
 
     private String toolkitUsername;
-    @JsonAdapter(PasswordSerializer.class)
     private String toolkitPassword;
     private transient String toolkitDomain;
     private transient String toolkitCopyListName;
@@ -24,13 +21,12 @@ public class ToolkitConfig {
     public ToolkitConfig() {
         toolkitUsername = ArgName.toolkitUsername.defaultValue();
         toolkitPassword = ArgName.toolkitPassword.defaultValue();
-        /*toolkitDomain = ArgName.toolkitDomain.defaultValue();
-        toolkitCopyListName = ArgName.toolkitCopyListName.defaultValue();
-        toolkitUrl = ArgName.toolkitUrl.defaultValue();
-        toolkitCopyCase = ArgName.toolkitCopyCase.defaultValue();
-        toolkitWSUrl = ArgName.toolkitWSUrl.defaultValue();
-        toolkitUserFolder = ArgName.toolkitUserFolder.defaultValue();
-        toolkitProjectListNames = ArgName.toolkitProjectListNames.defaultValue();*/
+    }
+
+    public ToolkitConfig(ToolkitConfig toolkitConfig) {
+        toolkitUsername = toolkitConfig.getToolkitUsername();
+        toolkitPassword = toolkitConfig.getToolkitPassword();
+        toolkitProjectListNames = toolkitConfig.getToolkitProjectListNames();
     }
 
     public String getToolkitUsername() {

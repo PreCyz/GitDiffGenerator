@@ -3,14 +3,19 @@ package pg.gipter.core;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dto.*;
+import pg.gipter.core.dto.ApplicationConfig;
+import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.dto.RunConfigBuilder;
+import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.core.producer.command.UploadType;
 
 import java.io.File;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -993,12 +998,13 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void givenFewDates_whenGetCurrentWeekNumber_thenReturnProperNumber() {
+        Locale.setDefault(Locale.UK);
         String[] args = {""};
         appProps = new FileApplicationProperties(args);
 
         assertThat(appProps.getWeekNumber(LocalDate.of(2019, 6, 1))).isEqualTo(22);
         assertThat(appProps.getWeekNumber(LocalDate.of(2019, 10, 26))).isEqualTo(43);//Saturday
-        assertThat(appProps.getWeekNumber(LocalDate.of(2019, 10, 27))).isEqualTo(44);//Sunday
+        assertThat(appProps.getWeekNumber(LocalDate.of(2019, 10, 27))).isEqualTo(43);//Sunday
         assertThat(appProps.getWeekNumber(LocalDate.of(2019, 10, 28))).isEqualTo(44);//Monday
 
     }

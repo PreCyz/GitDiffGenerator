@@ -1,11 +1,14 @@
 package pg.gipter.core.dao.configuration;
 
-import com.google.gson.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.core.dto.*;
+import pg.gipter.core.dto.ApplicationConfig;
+import pg.gipter.core.dto.Configuration;
+import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.utils.StringUtils;
 
@@ -13,10 +16,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
+import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static pg.gipter.core.dao.configuration.ApplicationConfigurationDao.*;
 
 class ApplicationConfigurationDaoTest {
 
@@ -25,10 +29,6 @@ class ApplicationConfigurationDaoTest {
     @BeforeEach
     void setUp() {
         dao = new ApplicationConfigurationDao();
-    }
-
-    @AfterEach
-    void tearDown() {
         try {
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
         } catch (IOException e) {
@@ -42,11 +42,11 @@ class ApplicationConfigurationDaoTest {
         dao.saveToolkitConfig(new ToolkitConfig());
         dao.saveApplicationConfig(new ApplicationConfig());
 
-        JsonObject actual = dao.readJsonConfig();
-        assertThat(actual).isNotNull();
-        assertThat(actual.getAsJsonObject(APP_CONFIG)).isNotNull();
-        assertThat(actual.getAsJsonObject(TOOLKIT_CONFIG)).isNotNull();
-        assertThat(actual.getAsJsonArray(RUN_CONFIGS)).hasSize(1);
+        Configuration configuration = dao.readJsonConfig();
+        assertThat(configuration).isNotNull();
+        assertThat(configuration.getAppConfig()).isNotNull();
+        assertThat(configuration.getRunConfigs()).hasSize(1);
+        assertThat(configuration.getToolkitConfig()).isNotNull();
     }
 
     @Test
@@ -56,11 +56,9 @@ class ApplicationConfigurationDaoTest {
 
         dao.saveRunConfig(runConfig);
 
-        JsonObject jsonObject = dao.readJsonConfig();
-        JsonArray asJsonArray = jsonObject.get(RUN_CONFIGS).getAsJsonArray();
-        assertThat(asJsonArray).hasSize(1);
-        assertThat(asJsonArray.get(0).getAsJsonObject().get(ArgName.configurationName.name()).getAsString())
-                .isEqualTo(runConfig.getConfigurationName());
+        Configuration configuration = dao.readJsonConfig();
+        assertThat(configuration.getRunConfigs()).hasSize(1);
+        assertThat(configuration.getRunConfigs().get(0).getConfigurationName()).isEqualTo(runConfig.getConfigurationName());
     }
 
     @Test
@@ -69,16 +67,16 @@ class ApplicationConfigurationDaoTest {
         runConfig.setConfigurationName("test");
         dao.saveRunConfig(runConfig);
 
+        runConfig = new RunConfig();
         runConfig.setConfigurationName("test2");
         dao.saveRunConfig(runConfig);
 
-        JsonObject jsonObject = dao.readJsonConfig();
-        JsonArray asJsonArray = jsonObject.get(RUN_CONFIGS).getAsJsonArray();
-        assertThat(asJsonArray).hasSize(2);
-        Collection<String> actualConfigNames = new HashSet<>();
-        for (JsonElement next : asJsonArray) {
-            actualConfigNames.add(next.getAsJsonObject().get(ArgName.configurationName.name()).getAsString());
-        }
+        Configuration configuration = dao.readJsonConfig();
+        assertThat(configuration.getRunConfigs()).hasSize(2);
+        Collection<String> actualConfigNames = configuration.getRunConfigs()
+                .stream()
+                .map(RunConfig::getConfigurationName)
+                .collect(toSet());
         assertThat(actualConfigNames).containsExactlyInAnyOrder("test", "test2");
     }
 
@@ -92,11 +90,9 @@ class ApplicationConfigurationDaoTest {
         runConfig.setCommitterEmail("test");
         dao.saveRunConfig(runConfig);
 
-        JsonObject jsonObject = dao.readJsonConfig();
-        JsonArray asJsonArray = jsonObject.get(RUN_CONFIGS).getAsJsonArray();
-        assertThat(asJsonArray).hasSize(1);
-        assertThat(asJsonArray.get(0).getAsJsonObject().get(ArgName.committerEmail.name()).getAsString())
-                .isEqualTo(runConfig.getCommitterEmail());
+        Configuration configuration = dao.readJsonConfig();
+        assertThat(configuration.getRunConfigs()).hasSize(1);
+        assertThat(configuration.getRunConfigs().get(0).getCommitterEmail()).isEqualTo(runConfig.getCommitterEmail());
     }
 
     @Test
@@ -106,9 +102,9 @@ class ApplicationConfigurationDaoTest {
         toolkitConfig.setToolkitPassword("ququ");
 
         dao.saveToolkitConfig(toolkitConfig);
-        JsonObject jsonObject = dao.readJsonConfig();
-        ToolkitConfig actual = new Gson().fromJson(jsonObject.get(TOOLKIT_CONFIG), ToolkitConfig.class);
 
+        Configuration configuration = dao.readJsonConfig();
+        ToolkitConfig actual = configuration.getToolkitConfig();
         assertThat(actual.getToolkitUsername()).isEqualTo("ququ");
         assertThat(actual.getToolkitPassword()).isEqualTo("ququ");
     }
@@ -119,12 +115,13 @@ class ApplicationConfigurationDaoTest {
         toolkitConfig.setToolkitUsername("ququ");
         toolkitConfig.setToolkitPassword("ququ");
         dao.saveToolkitConfig(toolkitConfig);
+        toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("se");
         toolkitConfig.setToolkitPassword("test");
         dao.saveToolkitConfig(toolkitConfig);
 
-        JsonObject jsonObject = dao.readJsonConfig();
-        ToolkitConfig actual = new Gson().fromJson(jsonObject.get(TOOLKIT_CONFIG), ToolkitConfig.class);
+        Configuration configuration = dao.readJsonConfig();
+        ToolkitConfig actual = configuration.getToolkitConfig();
 
         assertThat(actual.getToolkitUsername()).isEqualTo("se");
         assertThat(actual.getToolkitPassword()).isEqualTo("test");
@@ -170,6 +167,7 @@ class ApplicationConfigurationDaoTest {
         RunConfig runConfig = new RunConfig();
         runConfig.setConfigurationName("conf1");
         dao.saveRunConfig(runConfig);
+        runConfig = new RunConfig();
         runConfig.setConfigurationName("conf2");
         dao.saveRunConfig(runConfig);
 
@@ -187,10 +185,10 @@ class ApplicationConfigurationDaoTest {
 
         dao.removeConfig("");
 
-        JsonObject actual = dao.readJsonConfig();
-        assertThat(actual.getAsJsonArray(RUN_CONFIGS)).hasSize(0);
-        assertThat(actual.getAsJsonObject(APP_CONFIG)).isNotNull();
-        assertThat(actual.getAsJsonObject(TOOLKIT_CONFIG)).isNotNull();
+        Configuration configuration = dao.readJsonConfig();
+        assertThat(configuration.getRunConfigs()).hasSize(0);
+        assertThat(configuration.getAppConfig()).isNotNull();
+        assertThat(configuration.getToolkitConfig()).isNotNull();
     }
 
     @Test
