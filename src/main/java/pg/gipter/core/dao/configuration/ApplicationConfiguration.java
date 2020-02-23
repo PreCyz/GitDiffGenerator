@@ -1,22 +1,13 @@
 package pg.gipter.core.dao.configuration;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import pg.gipter.core.ArgName;
-import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dto.ApplicationConfig;
-import pg.gipter.core.dto.Configuration;
 import pg.gipter.core.dto.RunConfig;
 import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.utils.StringUtils;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -24,28 +15,28 @@ import java.util.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-public class ApplicationConfigurationDao implements ConfigurationDao {
+public class ApplicationConfiguration extends ApplicationJsonReader implements ConfigurationDao {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationConfigurationDao.class);
-    private final JsonSerializer<Configuration> passwordSerializer;
-    private final JsonDeserializer<Configuration> passwordDeserializer;
+    private ApplicationConfiguration() {
+        super();
+    }
 
-    private Configuration configuration;
+    private static class ApplicationConfigurationHolder {
+        private static final ApplicationConfiguration INSTANCE = new ApplicationConfiguration();
+    }
 
-    public ApplicationConfigurationDao() {
-        passwordSerializer = new PasswordSerializer();
-        passwordDeserializer = new PasswordDeserializer();
+    public static ApplicationConfiguration getInstance() {
+        return ApplicationConfigurationHolder.INSTANCE;
     }
 
     @Override
     public void saveRunConfig(RunConfig runConfig) {
-        Configuration conf = readJsonConfig();
-        if (conf == null) {
-            conf = new Configuration();
-            conf.addRunConfig(runConfig);
+        Configuration configuration = readJsonConfig();
+        if (configuration.getRunConfigs() == null) {
+            configuration.addRunConfig(runConfig);
             logger.info("New configuration [{}] added.", runConfig.getConfigurationName());
         } else {
-            List<RunConfig> runConfigs = conf.getRunConfigs();
+            List<RunConfig> runConfigs = configuration.getRunConfigs();
             if (runConfigs == null) {
                 runConfigs = new ArrayList<>();
             }
@@ -56,67 +47,25 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
                         .filter(rc -> !rc.getConfigurationName().equals(runConfig.getConfigurationName()))
                         .collect(toList());
                 runConfigs.add(runConfig);
-                conf.setRunConfigs(runConfigs);
+                configuration.setRunConfigs(runConfigs);
                 logger.info("Existing configuration [{}] updated.", runConfig.getConfigurationName());
             } else {
-                conf.addRunConfig(runConfig);
+                configuration.addRunConfig(runConfig);
                 logger.info("New configuration [{}] added to existing set.", runConfig.getConfigurationName());
             }
         }
-        writeJsonConfig(conf, RunConfig.class);
-    }
-
-    Configuration readJsonConfig() {
-        if (configuration == null) {
-            try (InputStream fis = new FileInputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
-                 InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-                 BufferedReader reader = new BufferedReader(isr)
-            ) {
-                configuration = new GsonBuilder()
-                        .registerTypeAdapter(Configuration.class, passwordDeserializer)
-                        .create()
-                        .fromJson(reader, Configuration.class);
-            } catch (IOException | NullPointerException e) {
-                logger.warn("Warning when loading {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
-            }
-        }
-        return configuration;
-    }
-
-    void writeJsonConfig(Configuration configuration, Class<?> clazz) {
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(Configuration.class, passwordSerializer)
-                .create();
-        String json = gson.toJson(configuration, Configuration.class);
-        try (OutputStream os = new FileOutputStream(DaoConstants.APPLICATION_PROPERTIES_JSON);
-             Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
-        ) {
-            writer.write(json);
-            logger.info("File {} updated with {}.", DaoConstants.APPLICATION_PROPERTIES_JSON, clazz.getSimpleName());
-            this.configuration = configuration;
-        } catch (IOException e) {
-            logger.error("Error when writing {}. Exception message is: {}", DaoConstants.APPLICATION_PROPERTIES_JSON, e.getMessage());
-            throw new IllegalArgumentException("Error when writing configuration into json.");
-        }
+        writeJsonConfig(configuration, RunConfig.class);
     }
 
     @Override
     public ToolkitConfig loadToolkitConfig() {
         Configuration configuration = readJsonConfig();
-        ToolkitConfig result = new ToolkitConfig();
-        if (configuration != null) {
-            result = Optional.ofNullable(configuration.getToolkitConfig()).orElseGet(ToolkitConfig::new);
-        }
-        return result;
+        return Optional.ofNullable(configuration.getToolkitConfig()).orElseGet(ToolkitConfig::new);
     }
 
     @Override
     public void saveToolkitConfig(ToolkitConfig toolkitConfig) {
         Configuration configuration = readJsonConfig();
-        if (configuration == null) {
-            configuration = new Configuration();
-        }
         configuration.setToolkitConfig(toolkitConfig);
         writeJsonConfig(configuration, ToolkitConfig.class);
     }
@@ -124,19 +73,12 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
     @Override
     public ApplicationConfig loadApplicationConfig() {
         Configuration configuration = readJsonConfig();
-        ApplicationConfig applicationConfig = new ApplicationConfig();
-        if (configuration != null) {
-            applicationConfig = configuration.getAppConfig();
-        }
-        return applicationConfig;
+        return Optional.ofNullable(configuration.getAppConfig()).orElseGet(ApplicationConfig::new);
     }
 
     @Override
     public void saveApplicationConfig(ApplicationConfig applicationConfig) {
         Configuration configuration = readJsonConfig();
-        if (configuration == null) {
-            configuration = new Configuration();
-        }
         configuration.setAppConfig(applicationConfig);
         writeJsonConfig(configuration, ApplicationConfig.class);
     }
@@ -146,12 +88,8 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
         Map<String, RunConfig> runConfigMap = new HashMap<>();
         Configuration configuration = readJsonConfig();
         boolean useDefault = false;
-        if (configuration != null) {
-            if (configuration.getRunConfigs() != null) {
-                runConfigMap = configuration.getRunConfigs().stream().collect(toMap(RunConfig::getConfigurationName, rc -> rc));
-            } else {
-                useDefault = true;
-            }
+        if (configuration.getRunConfigs() != null) {
+            runConfigMap = configuration.getRunConfigs().stream().collect(toMap(RunConfig::getConfigurationName, rc -> rc));
         } else {
             useDefault = true;
         }
@@ -183,22 +121,15 @@ public class ApplicationConfigurationDao implements ConfigurationDao {
 
     @Override
     public void removeConfig(String configurationName) {
-        final String errMsg = "Can not remove the configuration, because it does not exists!";
         Configuration configuration = readJsonConfig();
-        if (configuration == null) {
+        if (!CollectionUtils.isEmpty(configuration.getRunConfigs())) {
+            configuration.removeRunConfig(configurationName);
+            logger.info("Removing run config [{}].", configurationName);
+            writeJsonConfig(configuration, ApplicationConfig.class);
+        } else {
+            String errMsg = "Can not remove the configuration, because it does not exists!";
             logger.error(errMsg);
             throw new IllegalStateException(errMsg);
-        } else {
-
-
-            if (!configuration.getRunConfigs().isEmpty()) {
-                configuration.removeRunConfig(configurationName);
-                logger.info("Removing run config [{}].", configurationName);
-                writeJsonConfig(configuration, ApplicationConfig.class);
-            } else {
-                logger.error(errMsg);
-                throw new IllegalStateException(errMsg);
-            }
         }
     }
 

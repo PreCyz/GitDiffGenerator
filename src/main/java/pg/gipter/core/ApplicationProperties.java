@@ -3,8 +3,12 @@ package pg.gipter.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.configuration.CachedConfiguration;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.dto.*;
+import pg.gipter.core.dto.ApplicationConfig;
+import pg.gipter.core.dto.NamePatternValue;
+import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.utils.StringUtils;
@@ -30,15 +34,15 @@ public abstract class ApplicationProperties {
     protected final ArgExtractor argExtractor;
     private Set<VersionControlSystem> vcs;
     private String[] cliArgs;
-    private ConfigurationDao configurationDao;
+    private CachedConfiguration cachedConfiguration;
 
     public ApplicationProperties(String[] cliArgs) {
         this.cliArgs = cliArgs;
         argExtractor = new ArgExtractor(cliArgs);
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
-        configurationDao = DaoFactory.getConfigurationDao();
-        init(configurationDao);
+        cachedConfiguration = DaoFactory.getCachedConfiguration();
+        init(cachedConfiguration);
     }
 
     protected final void init(ConfigurationDao configurationDao) {
@@ -89,7 +93,7 @@ public abstract class ApplicationProperties {
     }
 
     public final Set<String> configurationNames() {
-        return configurationDao.loadRunConfigMap().keySet();
+        return cachedConfiguration.loadRunConfigMap().keySet();
     }
 
     public final Map<String, RunConfig> getRunConfigMap() {
@@ -244,14 +248,14 @@ public abstract class ApplicationProperties {
     }
 
     public final void save() {
-        configurationDao.saveApplicationConfig(applicationConfig);
-        configurationDao.saveRunConfig(currentRunConfig);
-        configurationDao.saveToolkitConfig(toolkitConfig);
+        cachedConfiguration.saveApplicationConfig(applicationConfig);
+        cachedConfiguration.saveRunConfig(currentRunConfig);
+        cachedConfiguration.saveToolkitConfig(toolkitConfig);
         runConfigMap.put(currentRunConfig.getConfigurationName(), currentRunConfig);
     }
 
     public final void removeConfig(String configurationName) {
-        configurationDao.removeConfig(configurationName);
+        cachedConfiguration.removeConfig(configurationName);
         runConfigMap.remove(configurationName);
         currentRunConfig = new RunConfig();
         if (!runConfigMap.isEmpty()) {

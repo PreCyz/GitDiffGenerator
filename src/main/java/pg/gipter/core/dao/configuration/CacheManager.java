@@ -15,7 +15,7 @@ public class CacheManager {
     private static final Logger logger = LoggerFactory.getLogger(CacheManager.class);
 
     static final Map<String, ApplicationProperties> cacheMap = new LinkedHashMap<>();
-    private static final ConfigurationDao configurationDao = DaoFactory.getConfigurationDao();
+    private static final ConfigurationDao configurationDao = DaoFactory.getCachedConfiguration();
 
     private CacheManager() { }
 

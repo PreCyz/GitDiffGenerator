@@ -1,51 +1,64 @@
-package pg.gipter.core.dto;
+package pg.gipter.core.dao.configuration;
+
+import pg.gipter.core.dto.ApplicationConfig;
+import pg.gipter.core.dto.CipherDetails;
+import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.dto.ToolkitConfig;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Configuration {
-    public static final String TOOLKIT_CONFIG = "toolkitConfig";
+class Configuration {
     private ApplicationConfig appConfig;
     private List<RunConfig> runConfigs;
     private ToolkitConfig toolkitConfig;
+    private CipherDetails cipher;
 
-    public ApplicationConfig getAppConfig() {
+    ApplicationConfig getAppConfig() {
         return appConfig;
     }
 
-    public void setAppConfig(ApplicationConfig appConfig) {
+    void setAppConfig(ApplicationConfig appConfig) {
         this.appConfig = appConfig;
     }
 
-    public List<RunConfig> getRunConfigs() {
+    List<RunConfig> getRunConfigs() {
         return runConfigs;
     }
 
-    public void setRunConfigs(List<RunConfig> runConfigs) {
+    void setRunConfigs(List<RunConfig> runConfigs) {
         this.runConfigs = runConfigs;
     }
 
-    public ToolkitConfig getToolkitConfig() {
+    ToolkitConfig getToolkitConfig() {
         return toolkitConfig;
     }
 
-    public void setToolkitConfig(ToolkitConfig toolkitConfig) {
+    void setToolkitConfig(ToolkitConfig toolkitConfig) {
         this.toolkitConfig = toolkitConfig;
     }
 
-    public void addRunConfig(RunConfig runConfig) {
+    void addRunConfig(RunConfig runConfig) {
         if (runConfigs == null) {
             runConfigs = new LinkedList<>();
         }
         runConfigs.add(runConfig);
     }
 
-    public void removeRunConfig(String configurationName) {
+    void removeRunConfig(String configurationName) {
         if (runConfigs != null && configurationName != null) {
             runConfigs = runConfigs.stream()
                     .filter(rc -> !rc.getConfigurationName().equals(configurationName))
                     .collect(Collectors.toList());
         }
+    }
+
+    public CipherDetails getCipher() {
+        return cipher;
+    }
+
+    public void setCipher(CipherDetails cipher) {
+        this.cipher = cipher;
     }
 }

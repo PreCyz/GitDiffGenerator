@@ -3,16 +3,22 @@ package pg.gipter.job.upload;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dto.RunConfig;
 import pg.gipter.service.ToolkitService;
-import pg.gipter.ui.*;
+import pg.gipter.ui.FXMultiRunner;
+import pg.gipter.ui.RunType;
+import pg.gipter.ui.UILauncher;
 
 import java.text.ParseException;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -27,7 +33,7 @@ public class UploadItemJob implements Job {
 
     // Instances of Job must have a public no-argument constructor.
     public UploadItemJob() {
-        configurationDao = DaoFactory.getConfigurationDao();
+        configurationDao = DaoFactory.getCachedConfiguration();
         dataDao = DaoFactory.getDataDao();
     }
 

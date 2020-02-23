@@ -2,24 +2,30 @@ package pg.gipter.core.dao.configuration;
 
 import com.google.gson.*;
 import pg.gipter.core.ArgName;
-import pg.gipter.core.dto.Configuration;
+import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.service.SecurityService;
 
 import java.lang.reflect.Type;
 
 class PasswordDeserializer implements JsonDeserializer<Configuration> {
 
-    private SecurityService securityService;
+    private PasswordDeserializer() { }
 
-    PasswordDeserializer() {
-        securityService = new SecurityService();
+    private static class PasswordDeserializerHolder {
+        private static final PasswordDeserializer INSTANCE = new PasswordDeserializer();
+    }
+
+    public static PasswordDeserializer getInstance() {
+        return PasswordDeserializerHolder.INSTANCE;
     }
 
     @Override
-    public Configuration deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext deserializationContext) throws JsonParseException {
+    public Configuration deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext deserializationContext)
+            throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
-        JsonObject toolkitConfig = jsonObject.getAsJsonObject(Configuration.TOOLKIT_CONFIG);
-        String decryptedPassword = securityService.decrypt(toolkitConfig.get(ArgName.toolkitPassword.name()).getAsString());
+        JsonObject toolkitConfig = jsonObject.getAsJsonObject(ToolkitConfig.TOOLKIT_CONFIG);
+        String password = toolkitConfig.get(ArgName.toolkitPassword.name()).getAsString();
+        String decryptedPassword = SecurityService.getInstance().decrypt(password);
         jsonObject.addProperty(ArgName.toolkitPassword.name(), decryptedPassword);
         return new Gson().fromJson(jsonObject, Configuration.class);
     }

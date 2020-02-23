@@ -2,70 +2,101 @@ package pg.gipter.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dao.SecurityDao;
-import pg.gipter.security.CipherDetails;
+import pg.gipter.core.dao.configuration.SecurityProvider;
+import pg.gipter.core.dto.CipherDetails;
 import pg.gipter.utils.CryptoUtils;
 
-import javax.crypto.*;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.Base64;
+import java.security.SecureRandom;
 import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 public class SecurityService {
 
     private static final Logger logger = LoggerFactory.getLogger(SecurityService.class);
 
-    private SecurityDao securityDao;
+    private static class SecurityServiceHolder {
+        public static final SecurityService INSTANCE = new SecurityService();
+    }
 
-    public SecurityService() {
-        securityDao = DaoFactory.getSecurityDao();
+    private SecurityProvider securityProvider;
+
+    private SecurityService() {
+        securityProvider = DaoFactory.getSecurityProvider();
+    }
+
+    public static SecurityService getInstance() {
+        return SecurityServiceHolder.INSTANCE;
     }
 
     public String encrypt(String value) {
         try {
-            Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
+            Optional<CipherDetails> cipherDetails = readCipherDetails();
             if (cipherDetails.isPresent()) {
                 SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(cipherDetails.get().getCipher());
                 SecretKey key = keyFactory.generateSecret(new PBEKeySpec(cipherDetails.get().getKeySpec()));
                 Cipher pbeCipher = Cipher.getInstance(cipherDetails.get().getCipher());
                 pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(cipherDetails.get().getSalt(), cipherDetails.get().getIterationCount()));
-                return base64Encode(pbeCipher.doFinal(value.getBytes(StandardCharsets.UTF_8)));
+                return CryptoUtils.base64Encode(pbeCipher.doFinal(value.getBytes(StandardCharsets.UTF_8)));
             } else {
                 return CryptoUtils.encrypt(value);
             }
         } catch (GeneralSecurityException e) {
             logger.warn("Can not encrypt password. {}", e.getMessage(), e);
         }
-        return null;
-    }
-
-    public String base64Encode(byte[] bytes) {
-        return Base64.getEncoder().encodeToString(bytes);
+        return ArgName.toolkitPassword.defaultValue();
     }
 
     public String decrypt(String value) {
         try {
-            Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
+            Optional<CipherDetails> cipherDetails = readCipherDetails();
             if (cipherDetails.isPresent()) {
                 SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(cipherDetails.get().getCipher());
                 SecretKey key = keyFactory.generateSecret(new PBEKeySpec(cipherDetails.get().getKeySpec()));
                 Cipher pbeCipher = Cipher.getInstance(cipherDetails.get().getCipher());
                 pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(cipherDetails.get().getSalt(), cipherDetails.get().getIterationCount()));
-                return new String(pbeCipher.doFinal(base64Decode(value)), StandardCharsets.UTF_8);
+                return new String(pbeCipher.doFinal(CryptoUtils.base64Decode(value)), StandardCharsets.UTF_8);
             } else {
                 return CryptoUtils.decrypt(value);
             }
         } catch (GeneralSecurityException e) {
             logger.warn("Can not decrypt password. {}", e.getMessage(), e);
         }
-        return null;
+        return ArgName.toolkitPassword.defaultValue();
     }
 
-    public byte[] base64Decode(String property) {
-        return Base64.getDecoder().decode(property);
+    public Optional<CipherDetails> readCipherDetails() {
+        return securityProvider.readCipherDetails();
+    }
+
+    public void writeCipherDetails(CipherDetails cipherDetails) {
+        securityProvider.writeCipherDetails(cipherDetails);
+    }
+
+    public CipherDetails generateCipherDetails() {
+        final int MAX_ITERATION_COUNT = 50;
+        final int ADDITIONAL_VALUE = 1000;
+        final String CIPHER = "PBEWithMD5AndDES";
+
+        logger.info("Generating cipher details.");
+        Random random = new SecureRandom();
+        random.setSeed(ADDITIONAL_VALUE);
+        CipherDetails cipherDetails = new CipherDetails();
+        cipherDetails.setCipher(CIPHER);
+        cipherDetails.setIterationCount(random.nextInt(MAX_ITERATION_COUNT) + 1);
+        cipherDetails.setKeySpecValue(UUID.randomUUID().toString());
+        cipherDetails.setSaltValue(String.valueOf(System.currentTimeMillis() + random.nextInt(ADDITIONAL_VALUE)));
+        logger.info("Cipher details were generated.");
+
+        return cipherDetails;
     }
 }

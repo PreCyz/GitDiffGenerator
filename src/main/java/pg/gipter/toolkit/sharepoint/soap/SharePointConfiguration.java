@@ -17,7 +17,7 @@ public class SharePointConfiguration {
                                                                    @Value("${toolkit.password}") String password,
                                                                    @Value("${toolkit.domain}") String domain) {
         HttpComponentsMessageSender httpComponentsMessageSender = new HttpComponentsMessageSender();
-        NTCredentials credentials = new NTCredentials(username, new SecurityService().decrypt(password), null, domain);
+        NTCredentials credentials = new NTCredentials(username, SecurityService.getInstance().decrypt(password), null, domain);
         httpComponentsMessageSender.setCredentials(credentials);
         return httpComponentsMessageSender;
     }

@@ -4,14 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dao.SecurityDao;
+import pg.gipter.core.dao.configuration.SecurityProvider;
+import pg.gipter.core.dto.CipherDetails;
 import pg.gipter.core.dto.ToolkitConfig;
-import pg.gipter.security.CipherDetails;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.GeneralSecurityException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,30 +21,30 @@ class SecurityConverterTest {
 
     private void prepareApplicationProperties() {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("uPb2PFrLB6TLM8mp1HNORA\u003d\u003d");
+        toolkitConfig.setToolkitPassword("somePassword");
         toolkitConfig.setToolkitUsername("someUser");
-        DaoFactory.getConfigurationDao().saveToolkitConfig(toolkitConfig);
+        DaoFactory.getCachedConfiguration().saveToolkitConfig(toolkitConfig);
     }
 
     @BeforeEach
-    void tearDown() {
+    void setup() {
         try {
-            Files.deleteIfExists(Paths.get(DaoConstants.SECURITY_JSON));
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
+            DaoFactory.getCachedConfiguration().resetCache();
         } catch (IOException e) {
             System.out.println("There is something weird going on.");
         }
     }
 
     @Test
-    void givenNoJsonSecurity_whenConvert_thenCreateSecurityJsonFile() throws GeneralSecurityException {
+    void givenNoJsonSecurity_whenConvert_thenCreateSecurityJsonFile() {
         prepareApplicationProperties();
         converter = new SecurityConverter();
 
         boolean actual = converter.convert();
 
-        SecurityDao securityDao = DaoFactory.getSecurityDao();
-        Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
+        SecurityProvider securityProvider = DaoFactory.getSecurityProvider();
+        Optional<CipherDetails> cipherDetails = securityProvider.readCipherDetails();
         assertThat(actual).isTrue();
         assertThat(cipherDetails.isPresent()).isTrue();
         assertThat(cipherDetails.get().getCipher()).isEqualTo("PBEWithMD5AndDES");
@@ -62,7 +61,7 @@ class SecurityConverterTest {
 
         boolean actual = converter.convert();
 
-        SecurityDao securityDao = DaoFactory.getSecurityDao();
+        SecurityProvider securityDao = DaoFactory.getSecurityProvider();
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
         assertThat(actual).isFalse();
         assertThat(cipherDetails.isPresent()).isTrue();
@@ -78,12 +77,12 @@ class SecurityConverterTest {
     void givenJsonSecurity_whenConvert_thenDoNothing() {
         CipherDetails givenCipherDetails = new CipherDetails();
         givenCipherDetails.setCipher("someAlgorithm");
-        DaoFactory.getSecurityDao().writeCipherDetails(givenCipherDetails);
+        DaoFactory.getSecurityProvider().writeCipherDetails(givenCipherDetails);
         converter = new SecurityConverter();
 
         boolean actual = converter.convert();
 
-        SecurityDao securityDao = DaoFactory.getSecurityDao();
+        SecurityProvider securityDao = DaoFactory.getSecurityProvider();
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
         assertThat(actual).isTrue();
         assertThat(cipherDetails.isPresent()).isTrue();

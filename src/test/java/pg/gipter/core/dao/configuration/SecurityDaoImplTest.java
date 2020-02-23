@@ -1,7 +1,10 @@
-package pg.gipter.core.dao;
+package pg.gipter.core.dao.configuration;
 
-import org.junit.jupiter.api.*;
-import pg.gipter.security.CipherDetails;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.dto.CipherDetails;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,17 +15,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SecurityDaoImplTest {
 
-    private SecurityDaoImpl securityDao;
+    private CipherDetailsReader securityDao;
 
     @BeforeEach
     void setUp() {
-        securityDao = new SecurityDaoImpl();
+        securityDao = CipherDetailsReader.getInstance();
     }
 
     @AfterEach
     void tearDown() {
         try {
-            Files.deleteIfExists(Paths.get(DaoConstants.SECURITY_JSON));
+            Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
         } catch (IOException e) {
             System.out.println("There is something weird going on.");
         }
@@ -32,7 +35,7 @@ class SecurityDaoImplTest {
     void givenDao_whenWriteCipherDetails_thenFileExists() {
         securityDao.writeCipherDetails(new CipherDetails());
 
-        assertThat(Files.exists(Paths.get(DaoConstants.SECURITY_JSON))).isTrue();
+        assertThat(Files.exists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON))).isTrue();
     }
 
     @Test

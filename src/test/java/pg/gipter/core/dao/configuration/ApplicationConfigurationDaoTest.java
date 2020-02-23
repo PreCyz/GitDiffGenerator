@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dto.ApplicationConfig;
-import pg.gipter.core.dto.Configuration;
 import pg.gipter.core.dto.RunConfig;
 import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.core.producer.command.UploadType;
@@ -24,12 +24,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ApplicationConfigurationDaoTest {
 
-    private ApplicationConfigurationDao dao;
+    private ApplicationConfiguration dao;
 
     @BeforeEach
     void setUp() {
-        dao = new ApplicationConfigurationDao();
         try {
+            dao = ApplicationConfiguration.getInstance();
+            final ConfigurationDao configurationDao = DaoFactory.getCachedConfiguration();
+            configurationDao.saveApplicationConfig(null);
+            configurationDao.saveToolkitConfig(null);
+            configurationDao.loadRunConfigMap().forEach((key, value) -> configurationDao.removeConfig(key));
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
         } catch (IOException e) {
             System.out.println("There is something weird going on.");
@@ -129,7 +133,7 @@ class ApplicationConfigurationDaoTest {
 
     @Test
     void givenNoToolkitConfig_whenLoadToolkitConfig_thenReturnDefault() {
-        dao = new ApplicationConfigurationDao();
+        dao = ApplicationConfiguration.getInstance();
 
         ToolkitConfig actual = dao.loadToolkitConfig();
 

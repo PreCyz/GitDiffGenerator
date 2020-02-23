@@ -12,11 +12,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Properties;
 
-class DataDaoImpl implements DataDao {
+class DataAccess implements DataDao {
 
-    private final Logger logger = LoggerFactory.getLogger(DataDaoImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(DataAccess.class);
 
     private static final String DATA_PROPERTIES = "data.properties";
+
+    private DataAccess() { }
+
+    private static class DataAccessHolder {
+        private static final DataAccess INSTANCE = new DataAccess();
+    }
+
+    static DataAccess getInstance() {
+        return DataAccessHolder.INSTANCE;
+    }
 
     @Override
     public Optional<Properties> loadDataProperties() {

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.security.CipherDetails;
+import pg.gipter.core.dto.CipherDetails;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,7 +23,7 @@ class SecurityServiceTest {
     @AfterEach
     void tearDown() {
         try {
-            Files.deleteIfExists(Paths.get(DaoConstants.SECURITY_JSON));
+            Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
         } catch (IOException e) {
             System.out.println("There is something weird going on.");
         }
@@ -38,13 +38,13 @@ class SecurityServiceTest {
         cipherDetails.setKeySpecValue(String.valueOf(System.currentTimeMillis() + random.nextInt(3)));
         cipherDetails.setSaltValue(UUID.randomUUID().toString());
 
-        DaoFactory.getSecurityDao().writeCipherDetails(cipherDetails);
+        DaoFactory.getSecurityProvider().writeCipherDetails(cipherDetails);
     }
 
     @Test
     void givenCipherDetails_whenEncrypt_thenReturnEncryptedValue() throws GeneralSecurityException {
         createCipherDetails();
-        securityService = new SecurityService();
+        securityService = SecurityService.getInstance();
 
         String actual = securityService.encrypt("someValue");
 
@@ -53,7 +53,7 @@ class SecurityServiceTest {
 
     @Test
     void givenDefaultCipherAndCipherDetails_whenEncrypt_thenValuesAreDifferent() throws GeneralSecurityException {
-        securityService = new SecurityService();
+        securityService = SecurityService.getInstance();
         String valueToEncrypt = "someValue";
         String actualDefault = securityService.encrypt(valueToEncrypt);
 

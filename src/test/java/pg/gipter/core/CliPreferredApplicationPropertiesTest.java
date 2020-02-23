@@ -1,6 +1,6 @@
 package pg.gipter.core;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
@@ -16,7 +16,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,11 +26,11 @@ class CliPreferredApplicationPropertiesTest {
 
     private CliApplicationProperties applicationProperties;
 
-    @AfterEach
-    void tearDown() {
+    @BeforeEach
+    void setup() {
         try {
-            DaoFactory.reset();
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
+            DaoFactory.getCachedConfiguration().resetCache();
         } catch (IOException e) {
             System.out.println("There is something weird going on.");
         }

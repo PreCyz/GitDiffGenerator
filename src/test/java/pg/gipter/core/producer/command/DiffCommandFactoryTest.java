@@ -1,18 +1,11 @@
 package pg.gipter.core.producer.command;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.dao.DaoFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DiffCommandFactoryTest {
-
-    @BeforeEach
-    void setup() {
-        DaoFactory.reset();
-    }
 
     @Test
     void givenCodeProtectionSTATEMENT_whenGetInstance_thenReturnEmptyDiffCommand() {

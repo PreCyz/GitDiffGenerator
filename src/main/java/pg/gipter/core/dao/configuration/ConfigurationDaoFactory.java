@@ -3,7 +3,11 @@ package pg.gipter.core.dao.configuration;
 public final class ConfigurationDaoFactory {
     private ConfigurationDaoFactory() {}
 
-    public static ConfigurationDao getConfigurationDao() {
-        return new ApplicationConfigurationDao();
+    static ConfigurationDao getConfigurationDao() {
+        return ApplicationConfiguration.getInstance();
+    }
+
+    public static CachedConfiguration getCachedConfigurationDao() {
+        return CachedConfigurationProxy.getInstance();
     }
 }

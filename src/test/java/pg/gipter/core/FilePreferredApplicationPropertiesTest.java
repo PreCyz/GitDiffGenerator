@@ -1,7 +1,8 @@
 package pg.gipter.core;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dto.ApplicationConfig;
 import pg.gipter.core.dto.RunConfig;
@@ -10,6 +11,9 @@ import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.core.producer.command.UploadType;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
@@ -26,9 +30,14 @@ class FilePreferredApplicationPropertiesTest {
 
     private FileApplicationProperties appProps;
 
-    @AfterEach
-    void tearDown() {
-        DaoFactory.reset();
+    @BeforeEach
+    void setUp() {
+        try {
+            Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
+            DaoFactory.getCachedConfiguration().resetCache();
+        } catch (IOException e) {
+            System.out.println("There is something weird going on.");
+        }
     }
 
     @Test

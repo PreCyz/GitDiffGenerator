@@ -8,6 +8,8 @@ import java.util.LinkedHashSet;
 
 public class ToolkitConfig {
 
+    public static final String TOOLKIT_CONFIG = "toolkitConfig";
+
     private String toolkitUsername;
     private String toolkitPassword;
     private transient String toolkitDomain;

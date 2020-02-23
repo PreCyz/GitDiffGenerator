@@ -3,7 +3,6 @@ package pg.gipter.core;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.core.dao.DaoFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,7 +15,6 @@ class ApplicationPropertiesFactoryTest {
     @BeforeEach
     void tearDown() {
         try {
-            DaoFactory.reset();
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
         } catch (IOException e) {
             System.out.println("There is something weird going on.");

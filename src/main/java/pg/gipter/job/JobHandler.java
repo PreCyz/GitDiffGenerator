@@ -12,15 +12,22 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dto.RunConfig;
 import pg.gipter.job.upgrade.UpgradeJobCreator;
-import pg.gipter.job.upload.*;
+import pg.gipter.job.upload.JobProperty;
+import pg.gipter.job.upload.JobType;
+import pg.gipter.job.upload.UploadItemJobBuilder;
+import pg.gipter.job.upload.UploadJobCreator;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.RunType;
-import pg.gipter.ui.alert.*;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.text.ParseException;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -157,7 +164,7 @@ public class JobHandler {
                             String[] configArray = configs.split(",");
                             List<ApplicationProperties> applicationPropertiesCollection = new ArrayList<>(configArray.length);
                             for (String configName : configArray) {
-                                Optional<RunConfig> runConfig = DaoFactory.getConfigurationDao().loadRunConfig(configName);
+                                Optional<RunConfig> runConfig = DaoFactory.getCachedConfiguration().loadRunConfig(configName);
                                 if (runConfig.isPresent()) {
                                     runConfig.get().setStartDate(startDate);
                                     applicationPropertiesCollection.add(

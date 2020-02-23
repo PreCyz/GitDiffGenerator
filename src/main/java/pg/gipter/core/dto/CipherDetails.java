@@ -1,4 +1,4 @@
-package pg.gipter.security;
+package pg.gipter.core.dto;
 
 import com.google.gson.annotations.Expose;
 

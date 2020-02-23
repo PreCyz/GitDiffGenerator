@@ -16,7 +16,9 @@ import pg.gipter.launcher.Starter;
 import pg.gipter.statistic.dto.RunDetails;
 import pg.gipter.statistic.service.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.ui.alert.*;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
@@ -70,7 +72,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.totalProgress = configurationNames.size() * 5;
         this.workDone = new AtomicLong(0);
         this.applicationPropertiesCollection = Collections.emptyList();
-        this.configurationDao = DaoFactory.getConfigurationDao();
+        this.configurationDao = DaoFactory.getCachedConfiguration();
         this.dataDao = DaoFactory.getDataDao();
         this.runType = runType;
     }
