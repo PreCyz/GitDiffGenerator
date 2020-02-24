@@ -12,6 +12,7 @@
     <properties>
         <java.version>11</java.version>
         <javaFX.version>11.0.2</javaFX.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <build>
@@ -43,31 +44,25 @@
             </plugin>
 
             <plugin>
-                <groupId>org.jvnet.jaxb2.maven2</groupId>
-                <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.13.2</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>2.5.0</version>
+
                 <executions>
                     <execution>
+                        <id>toolkit-sharepoint</id>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>xjc</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <schemaLanguage>WSDL</schemaLanguage>
-                    <generatePackage>pg.gipter.toolkit.ws</generatePackage>
-                    <schemas>
-                        <schema>
-                            <fileset>
-                                <!-- Defaults to schemaDirectory. -->
-                                <directory>${basedir}/src/main/resources/wsdl</directory>
-                                <!-- Defaults to schemaIncludes. -->
-                                <includes>
-                                    <include>*.wsdl</include>
-                                </includes>
-                            </fileset>
-                        </schema>
-                    </schemas>
+                    <!-- The package of your generated sources -->
+                    <packageName>pg.gipter.toolkit.ws</packageName>
+                    <sourceType>wsdl</sourceType>
+                    <sources>
+                        <source>${basedir}/src/main/resources/wsdl</source>
+                    </sources>
                 </configuration>
             </plugin>
 
