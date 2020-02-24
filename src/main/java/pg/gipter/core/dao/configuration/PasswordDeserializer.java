@@ -24,9 +24,11 @@ class PasswordDeserializer implements JsonDeserializer<Configuration> {
             throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonObject toolkitConfig = jsonObject.getAsJsonObject(ToolkitConfig.TOOLKIT_CONFIG);
-        String password = toolkitConfig.get(ArgName.toolkitPassword.name()).getAsString();
-        String decryptedPassword = SecurityService.getInstance().decrypt(password);
-        jsonObject.addProperty(ArgName.toolkitPassword.name(), decryptedPassword);
+        if (toolkitConfig != null) {
+            String password = toolkitConfig.get(ArgName.toolkitPassword.name()).getAsString();
+            String decryptedPassword = SecurityService.getInstance().decrypt(password);
+            toolkitConfig.addProperty(ArgName.toolkitPassword.name(), decryptedPassword);
+        }
         return new Gson().fromJson(jsonObject, Configuration.class);
     }
 }

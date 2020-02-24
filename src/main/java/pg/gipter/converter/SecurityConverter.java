@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dao.configuration.CachedConfiguration;
 import pg.gipter.core.dto.CipherDetails;
 import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.service.SecurityService;
@@ -21,13 +21,13 @@ import java.util.Optional;
 
 public class SecurityConverter implements Converter {
 
-    private ConfigurationDao configurationDao;
+    private CachedConfiguration cachedConfiguration;
     private SecurityService securityService;
 
     private final Logger logger = LoggerFactory.getLogger(SecurityConverter.class);
 
     public SecurityConverter() {
-        configurationDao = DaoFactory.getCachedConfiguration();
+        cachedConfiguration = DaoFactory.getCachedConfiguration();
         securityService = SecurityService.getInstance();
     }
 
@@ -49,7 +49,7 @@ public class SecurityConverter implements Converter {
 
                 if (!StringUtils.nullOrEmpty(decryptedPassword)) {
                     toolkitConfig.get().setToolkitPassword(decryptedPassword);
-                    configurationDao.saveToolkitConfig(toolkitConfig.get());
+                    cachedConfiguration.saveToolkitConfig(toolkitConfig.get());
                     result = true;
                 }
             } else {

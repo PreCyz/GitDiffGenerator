@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dto.ApplicationConfig;
 import pg.gipter.core.dto.RunConfig;
 import pg.gipter.core.dto.ToolkitConfig;
@@ -30,10 +29,6 @@ class ApplicationConfigurationDaoTest {
     void setUp() {
         try {
             dao = ApplicationConfiguration.getInstance();
-            final ConfigurationDao configurationDao = DaoFactory.getCachedConfiguration();
-            configurationDao.saveApplicationConfig(null);
-            configurationDao.saveToolkitConfig(null);
-            configurationDao.loadRunConfigMap().forEach((key, value) -> configurationDao.removeConfig(key));
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
         } catch (IOException e) {
             System.out.println("There is something weird going on.");
@@ -114,7 +109,7 @@ class ApplicationConfigurationDaoTest {
     }
 
     @Test
-    void givenToolkitCOnfig_whenSaveToolkitConfig_thenOverrideExistingOne() {
+    void givenToolkitConfig_whenSaveToolkitConfig_thenOverrideExistingOne() {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("ququ");
         toolkitConfig.setToolkitPassword("ququ");

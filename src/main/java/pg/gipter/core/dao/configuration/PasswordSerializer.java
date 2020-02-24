@@ -34,6 +34,7 @@ class PasswordSerializer implements JsonSerializer<Configuration> {
                 result.setToolkitConfig(toolkitConfig);
                 result.setAppConfig(configuration.getAppConfig());
                 result.setRunConfigs(configuration.getRunConfigs());
+                result.setCipher(configuration.getCipher());
             }
         }
         return new Gson().toJsonTree(result, Configuration.class);
