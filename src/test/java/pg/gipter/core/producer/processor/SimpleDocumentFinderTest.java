@@ -2,14 +2,24 @@ package pg.gipter.core.producer.processor;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.utils.StringUtils;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,6 +34,11 @@ class SimpleDocumentFinderTest {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
         Gson gson = new Gson();
         return gson.fromJson(bufferedReader, JsonObject.class);
+    }
+
+    @BeforeEach
+    void setUp() {
+        ConfigurationDaoFactory.getCachedConfigurationDao().resetCache();
     }
 
     @Test
