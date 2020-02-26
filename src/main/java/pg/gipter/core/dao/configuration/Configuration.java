@@ -13,7 +13,7 @@ class Configuration {
     private ApplicationConfig appConfig;
     private List<RunConfig> runConfigs;
     private ToolkitConfig toolkitConfig;
-    private CipherDetails cipher;
+    private CipherDetails cipherDetails;
 
     ApplicationConfig getAppConfig() {
         return appConfig;
@@ -54,11 +54,11 @@ class Configuration {
         }
     }
 
-    public CipherDetails getCipher() {
-        return cipher;
+    public CipherDetails getCipherDetails() {
+        return cipherDetails;
     }
 
-    public void setCipher(CipherDetails cipher) {
-        this.cipher = cipher;
+    public void setCipherDetails(CipherDetails cipherDetails) {
+        this.cipherDetails = cipherDetails;
     }
 }

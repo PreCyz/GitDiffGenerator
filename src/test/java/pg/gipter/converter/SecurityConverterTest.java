@@ -47,7 +47,7 @@ class SecurityConverterTest {
         Optional<CipherDetails> cipherDetails = securityProvider.readCipherDetails();
         assertThat(actual).isTrue();
         assertThat(cipherDetails.isPresent()).isTrue();
-        assertThat(cipherDetails.get().getCipher()).isEqualTo("PBEWithMD5AndDES");
+        assertThat(cipherDetails.get().getCipherName()).isEqualTo("PBEWithMD5AndDES");
         assertThat(cipherDetails.get().getIterationCount()).isBetween(0, 50);
         assertThat(cipherDetails.get().getKeySpecValue()).isNotBlank();
         assertThat(cipherDetails.get().getKeySpec()).hasSizeGreaterThan(0);
@@ -65,7 +65,7 @@ class SecurityConverterTest {
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
         assertThat(actual).isFalse();
         assertThat(cipherDetails.isPresent()).isTrue();
-        assertThat(cipherDetails.get().getCipher()).isEqualTo("PBEWithMD5AndDES");
+        assertThat(cipherDetails.get().getCipherName()).isEqualTo("PBEWithMD5AndDES");
         assertThat(cipherDetails.get().getIterationCount()).isBetween(0, 50);
         assertThat(cipherDetails.get().getKeySpecValue()).isNotBlank();
         assertThat(cipherDetails.get().getKeySpec()).hasSizeGreaterThan(0);
@@ -76,7 +76,7 @@ class SecurityConverterTest {
     @Test
     void givenJsonSecurity_whenConvert_thenDoNothing() {
         CipherDetails givenCipherDetails = new CipherDetails();
-        givenCipherDetails.setCipher("someAlgorithm");
+        givenCipherDetails.setCipherName("someAlgorithm");
         DaoFactory.getSecurityProvider().writeCipherDetails(givenCipherDetails);
         converter = new SecurityConverter();
 
@@ -86,6 +86,6 @@ class SecurityConverterTest {
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
         assertThat(actual).isTrue();
         assertThat(cipherDetails.isPresent()).isTrue();
-        assertThat(cipherDetails.get().getCipher()).isEqualTo("someAlgorithm");
+        assertThat(cipherDetails.get().getCipherName()).isEqualTo("someAlgorithm");
     }
 }

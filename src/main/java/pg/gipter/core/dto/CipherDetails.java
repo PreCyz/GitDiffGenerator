@@ -1,26 +1,22 @@
 package pg.gipter.core.dto;
 
-import com.google.gson.annotations.Expose;
-
 import java.nio.charset.StandardCharsets;
 
 public class CipherDetails {
 
-    @Expose
-    private String cipher;
-    @Expose
+    public static final String CIPHER_DETAILS = "cipherDetails";
+
+    private String cipherName;
     private int iterationCount;
-    @Expose
     private String keySpecValue;
-    @Expose
     private String saltValue;
 
-    public String getCipher() {
-        return cipher;
+    public String getCipherName() {
+        return cipherName;
     }
 
-    public void setCipher(String cipher) {
-        this.cipher = cipher;
+    public void setCipherName(String cipherName) {
+        this.cipherName = cipherName;
     }
 
     public int getIterationCount() {

@@ -116,7 +116,7 @@ class CachedConfigurationProxy extends ApplicationJsonReader implements CachedCo
         } else if (value instanceof RunConfig) {
             cachedConfiguration.addRunConfig((RunConfig) value);
         } else if (value instanceof CipherDetails) {
-            cachedConfiguration.setCipher((CipherDetails) value);
+            cachedConfiguration.setCipherDetails((CipherDetails) value);
         }
     }
 }

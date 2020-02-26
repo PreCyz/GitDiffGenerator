@@ -42,14 +42,23 @@ public class SecurityService {
         try {
             Optional<CipherDetails> cipherDetails = readCipherDetails();
             if (cipherDetails.isPresent()) {
-                SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(cipherDetails.get().getCipher());
-                SecretKey key = keyFactory.generateSecret(new PBEKeySpec(cipherDetails.get().getKeySpec()));
-                Cipher pbeCipher = Cipher.getInstance(cipherDetails.get().getCipher());
-                pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(cipherDetails.get().getSalt(), cipherDetails.get().getIterationCount()));
-                return CryptoUtils.base64Encode(pbeCipher.doFinal(value.getBytes(StandardCharsets.UTF_8)));
+                return encrypt(value, cipherDetails.get());
             } else {
                 return CryptoUtils.encrypt(value);
             }
+        } catch (GeneralSecurityException e) {
+            logger.warn("Can not encrypt password. {}", e.getMessage(), e);
+        }
+        return ArgName.toolkitPassword.defaultValue();
+    }
+
+    public String encrypt(String value, CipherDetails cipherDetails) {
+        try {
+            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(cipherDetails.getCipherName());
+            SecretKey key = keyFactory.generateSecret(new PBEKeySpec(cipherDetails.getKeySpec()));
+            Cipher pbeCipher = Cipher.getInstance(cipherDetails.getCipherName());
+            pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(cipherDetails.getSalt(), cipherDetails.getIterationCount()));
+            return CryptoUtils.base64Encode(pbeCipher.doFinal(value.getBytes(StandardCharsets.UTF_8)));
         } catch (GeneralSecurityException e) {
             logger.warn("Can not encrypt password. {}", e.getMessage(), e);
         }
@@ -60,14 +69,23 @@ public class SecurityService {
         try {
             Optional<CipherDetails> cipherDetails = readCipherDetails();
             if (cipherDetails.isPresent()) {
-                SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(cipherDetails.get().getCipher());
-                SecretKey key = keyFactory.generateSecret(new PBEKeySpec(cipherDetails.get().getKeySpec()));
-                Cipher pbeCipher = Cipher.getInstance(cipherDetails.get().getCipher());
-                pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(cipherDetails.get().getSalt(), cipherDetails.get().getIterationCount()));
-                return new String(pbeCipher.doFinal(CryptoUtils.base64Decode(value)), StandardCharsets.UTF_8);
+                return decrypt(value, cipherDetails.get());
             } else {
                 return CryptoUtils.decrypt(value);
             }
+        } catch (GeneralSecurityException e) {
+            logger.warn("Can not decrypt password. {}", e.getMessage(), e);
+        }
+        return ArgName.toolkitPassword.defaultValue();
+    }
+
+    public String decrypt(String value, CipherDetails cipherDetails) {
+        try {
+            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(cipherDetails.getCipherName());
+            SecretKey key = keyFactory.generateSecret(new PBEKeySpec(cipherDetails.getKeySpec()));
+            Cipher pbeCipher = Cipher.getInstance(cipherDetails.getCipherName());
+            pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(cipherDetails.getSalt(), cipherDetails.getIterationCount()));
+            return new String(pbeCipher.doFinal(CryptoUtils.base64Decode(value)), StandardCharsets.UTF_8);
         } catch (GeneralSecurityException e) {
             logger.warn("Can not decrypt password. {}", e.getMessage(), e);
         }
@@ -91,7 +109,7 @@ public class SecurityService {
         Random random = new SecureRandom();
         random.setSeed(ADDITIONAL_VALUE);
         CipherDetails cipherDetails = new CipherDetails();
-        cipherDetails.setCipher(CIPHER);
+        cipherDetails.setCipherName(CIPHER);
         cipherDetails.setIterationCount(random.nextInt(MAX_ITERATION_COUNT) + 1);
         cipherDetails.setKeySpecValue(UUID.randomUUID().toString());
         cipherDetails.setSaltValue(String.valueOf(System.currentTimeMillis() + random.nextInt(ADDITIONAL_VALUE)));

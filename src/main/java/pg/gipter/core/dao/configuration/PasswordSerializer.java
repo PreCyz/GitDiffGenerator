@@ -6,6 +6,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import pg.gipter.core.dto.ToolkitConfig;
 import pg.gipter.service.SecurityService;
+import pg.gipter.utils.CryptoUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.lang.reflect.Type;
@@ -29,12 +30,16 @@ class PasswordSerializer implements JsonSerializer<Configuration> {
             ToolkitConfig toolkitConfig = new ToolkitConfig(configuration.getToolkitConfig());
             String password = toolkitConfig.getToolkitPassword();
             if (!StringUtils.nullOrEmpty(password)) {
-                toolkitConfig.setToolkitPassword(SecurityService.getInstance().encrypt(password));
+                if (configuration.getCipherDetails() != null) {
+                    toolkitConfig.setToolkitPassword(SecurityService.getInstance().encrypt(password, configuration.getCipherDetails()));
+                } else {
+                    toolkitConfig.setToolkitPassword(CryptoUtils.encryptSafe(password));
+                }
                 result = new Configuration();
                 result.setToolkitConfig(toolkitConfig);
                 result.setAppConfig(configuration.getAppConfig());
                 result.setRunConfigs(configuration.getRunConfigs());
-                result.setCipher(configuration.getCipher());
+                result.setCipherDetails(configuration.getCipherDetails());
             }
         }
         return new Gson().toJsonTree(result, Configuration.class);

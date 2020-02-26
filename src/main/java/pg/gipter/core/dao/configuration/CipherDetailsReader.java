@@ -25,7 +25,7 @@ class CipherDetailsReader extends ApplicationJsonReader implements SecurityProvi
         Optional<CipherDetails> cipherDetailsOpt = Optional.empty();
         Configuration configuration = readJsonConfig();
         if (configuration != null) {
-            cipherDetailsOpt = Optional.ofNullable(configuration.getCipher());
+            cipherDetailsOpt = Optional.ofNullable(configuration.getCipherDetails());
         }
         return cipherDetailsOpt;
     }
@@ -37,7 +37,7 @@ class CipherDetailsReader extends ApplicationJsonReader implements SecurityProvi
             return;
         }
         Configuration configuration = Optional.ofNullable(readJsonConfig()).orElseGet(Configuration::new);
-        configuration.setCipher(cipherDetails);
+        configuration.setCipherDetails(cipherDetails);
         writeJsonConfig(configuration, CipherDetails.class);
     }
 
