@@ -9,7 +9,7 @@ import pg.gipter.core.model.ApplicationConfig;
 import pg.gipter.core.model.NamePatternValue;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.utils.StringUtils;
 
@@ -218,7 +218,7 @@ public abstract class ApplicationProperties {
 
     final String getFileExtension() {
         String extension = "txt";
-        if (uploadType() == UploadType.TOOLKIT_DOCS) {
+        if (uploadType() == ItemType.TOOLKIT_DOCS) {
             extension = "zip";
         }
         return extension;
@@ -317,7 +317,7 @@ public abstract class ApplicationProperties {
     public abstract LocalDate startDate();
     public abstract LocalDate endDate();
     public abstract int periodInDays();
-    public abstract UploadType uploadType();
+    public abstract ItemType uploadType();
     public abstract boolean isDeleteDownloadedFiles();
     public abstract boolean isSkipRemote();
 

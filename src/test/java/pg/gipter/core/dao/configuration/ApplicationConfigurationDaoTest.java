@@ -8,7 +8,7 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.model.ApplicationConfig;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
@@ -219,7 +219,7 @@ class ApplicationConfigurationDaoTest {
         assertThat(actual.getMercurialAuthor()).isEqualTo("mercurialAuthor");
         assertThat(actual.getSvnAuthor()).isEqualTo("svnAuthor");
         assertThat(actual.getCommitterEmail()).isEqualTo("committerEmail");
-        assertThat(actual.getUploadType()).isEqualTo(UploadType.SIMPLE);
+        assertThat(actual.getItemType()).isEqualTo(ItemType.SIMPLE);
         assertThat(actual.getSkipRemote()).isTrue();
         assertThat(actual.getFetchAll()).isFalse();
         assertThat(actual.getItemPath()).isEqualTo("itemPath");

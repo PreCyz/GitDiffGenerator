@@ -1,6 +1,6 @@
 package pg.gipter.core;
 
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 
 import java.time.LocalDate;
 
@@ -13,7 +13,7 @@ public enum ArgName {
     mercurialAuthor(""),
     svnAuthor(""),
     committerEmail(""),
-    uploadType(UploadType.SIMPLE.name()),
+    uploadType(ItemType.SIMPLE.name()),
     skipRemote("Y"),
     fetchAll("Y"),
     toolkitProjectListNames("Deliverables"),

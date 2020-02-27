@@ -7,7 +7,7 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.model.*;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 
 import java.io.File;
 import java.io.IOException;
@@ -767,9 +767,9 @@ class CliPreferredApplicationPropertiesTest {
     void given_noCodeProtection_when_uploadType_then_returnCodeProtection() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(UploadType.SIMPLE);
+        assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
 
     @Test
@@ -778,9 +778,9 @@ class CliPreferredApplicationPropertiesTest {
                 new String[]{"uploadType=protected"}
         );
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(UploadType.PROTECTED);
+        assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
@@ -788,13 +788,13 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"uploadType=PROTECTED"};
         applicationProperties = new CliApplicationProperties(args);
         RunConfig runConfig = new RunConfigBuilder()
-                .withUploadType(UploadType.STATEMENT)
+                .withItemType(ItemType.STATEMENT)
                 .create();
         applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(UploadType.PROTECTED);
+        assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
@@ -802,13 +802,13 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         applicationProperties = new CliApplicationProperties(args);
         RunConfig runConfig = new RunConfigBuilder()
-                .withUploadType(UploadType.STATEMENT)
+                .withItemType(ItemType.STATEMENT)
                 .create();
         applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(UploadType.STATEMENT);
+        assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }
 
     @Test
@@ -816,13 +816,13 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         applicationProperties = new CliApplicationProperties(args);
         RunConfig runConfig = new RunConfigBuilder()
-                .withUploadType(UploadType.STATEMENT)
+                .withItemType(ItemType.STATEMENT)
                 .create();
         applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.uploadType();
 
-        assertThat(actual).isEqualTo(UploadType.STATEMENT);
+        assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }
 
     @Test

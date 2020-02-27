@@ -8,7 +8,7 @@ import pg.gipter.core.model.ApplicationConfig;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.RunConfigBuilder;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 
 import java.io.File;
 import java.io.IOException;
@@ -256,7 +256,7 @@ class FilePreferredApplicationPropertiesTest {
         props.put("itemFileNamePrefix", "custom");
 
         RunConfig runConfig = new RunConfigBuilder()
-                .withUploadType(UploadType.STATEMENT)
+                .withItemType(ItemType.STATEMENT)
                 .withStartDate(LocalDate.of(2017, 10, 19))
                 .withEndDate(LocalDate.of(2017, 12, 20))
                 .withItemFileNamePrefix("custom")
@@ -315,7 +315,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenUseAsFileNameYAndFileNamePrefixAndToolkitDocs_whenFileName_thenReturnFileNamePrefixAsNameWithZip() {
         appProps = new FileApplicationProperties(new String[]{
-                ArgName.uploadType.name() + "=" + UploadType.TOOLKIT_DOCS.name(),
+                ArgName.uploadType.name() + "=" + ItemType.TOOLKIT_DOCS.name(),
                 ArgName.itemFileNamePrefix + "=my_custom_name",
         });
 
@@ -560,30 +560,30 @@ class FilePreferredApplicationPropertiesTest {
     void given_noCodeProtection_when_uploadType_then_returnDefaultValueNONE() {
         appProps = new FileApplicationProperties(new String[]{});
 
-        UploadType actual = appProps.uploadType();
+        ItemType actual = appProps.uploadType();
 
-        assertThat(actual).isEqualTo(UploadType.SIMPLE);
+        assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
 
     @Test
     void given_uploadType_when_uploadType_then_returnThatCodeProtection() {
         appProps = new FileApplicationProperties(new String[]{"uploadType=protected"});
 
-        UploadType actual = appProps.uploadType();
+        ItemType actual = appProps.uploadType();
 
-        assertThat(actual).isEqualTo(UploadType.PROTECTED);
+        assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
     void given_uploadTypeFromPropertiesAndCommandLine_when_uploadType_then_returnCodeProtectionFromProperties() {
         String[] args = {"uploadType=Simple"};
         appProps = new FileApplicationProperties(args);
-        RunConfig runConfig = new RunConfigBuilder().withUploadType(UploadType.STATEMENT).create();
+        RunConfig runConfig = new RunConfigBuilder().withItemType(ItemType.STATEMENT).create();
         appProps.init(mockConfigurtionDao(runConfig));
 
-        UploadType actual = appProps.uploadType();
+        ItemType actual = appProps.uploadType();
 
-        assertThat(actual).isEqualTo(UploadType.STATEMENT);
+        assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }
 
     @Test

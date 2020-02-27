@@ -5,7 +5,7 @@ import pg.gipter.core.ArgName;
 import pg.gipter.core.model.ApplicationConfig;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
@@ -156,7 +156,7 @@ public class ApplicationConfiguration extends ApplicationJsonReader implements C
                 } else if (ArgName.committerEmail.name().equals(split[0])) {
                     runConfig.setCommitterEmail(split[1]);
                 } else if (ArgName.uploadType.name().equals(split[0])) {
-                    runConfig.setUploadType(UploadType.valueFor(split[1]));
+                    runConfig.setItemType(ItemType.valueFor(split[1]));
                 } else if (ArgName.skipRemote.name().equals(split[0])) {
                     runConfig.setSkipRemote(StringUtils.getBoolean(split[1]));
                 } else if (ArgName.fetchAll.name().equals(split[0])) {

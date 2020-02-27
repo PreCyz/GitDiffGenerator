@@ -11,20 +11,26 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
-import pg.gipter.core.*;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.service.ToolkitService;
 import pg.gipter.service.platform.AppManager;
 import pg.gipter.service.platform.AppManagerFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alert.*;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.ui.project.ProjectDetails;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -114,7 +120,7 @@ public class ToolkitProjectsController extends AbstractController {
             for (String path : projects) {
                 if (path.startsWith(CASES)) {
                     String name = path.replace(CASES, "");
-                    projectsPaths.add(new ProjectDetails(name, UploadType.TOOLKIT_DOCS.name(), path));
+                    projectsPaths.add(new ProjectDetails(name, ItemType.TOOLKIT_DOCS.name(), path));
                 }
             }
             if (projectsPaths.isEmpty()) {
@@ -137,7 +143,7 @@ public class ToolkitProjectsController extends AbstractController {
                     }
                     projects.addAll(links.stream()
                             .map(link -> link.substring(link.indexOf(CASES)))
-                            .map(p -> new ProjectDetails(p.replace(CASES, ""), UploadType.TOOLKIT_DOCS.name(), p))
+                            .map(p -> new ProjectDetails(p.replace(CASES, ""), ItemType.TOOLKIT_DOCS.name(), p))
                             .collect(toList()));
                     projectsTableView.setItems(FXCollections.observableArrayList(projects));
                     saveButton.setDisable(false);
@@ -201,7 +207,7 @@ public class ToolkitProjectsController extends AbstractController {
         return event -> {
             String name = projectIdTextField.getText() + "/" + projectNameTextField.getText();
             String path = CASES + name;
-            ProjectDetails pd = new ProjectDetails(name, UploadType.TOOLKIT_DOCS.name(), path);
+            ProjectDetails pd = new ProjectDetails(name, ItemType.TOOLKIT_DOCS.name(), path);
             if (projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
                 projectsTableView.setItems(FXCollections.observableArrayList(pd));
             } else {

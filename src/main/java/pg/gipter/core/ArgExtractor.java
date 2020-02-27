@@ -1,10 +1,13 @@
 package pg.gipter.core;
 
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -132,12 +135,12 @@ final class ArgExtractor {
         return ArgName.itemFileNamePrefix.defaultValue();
     }
 
-    UploadType uploadType() {
+    ItemType uploadType() {
         if (containsArg(ArgName.uploadType.name())) {
             String codeProtection = getValue(ArgName.uploadType, ArgName.uploadType.defaultValue());
-            return UploadType.valueFor(codeProtection);
+            return ItemType.valueFor(codeProtection);
         }
-        return UploadType.valueFor(ArgName.uploadType.defaultValue());
+        return ItemType.valueFor(ArgName.uploadType.defaultValue());
     }
 
     boolean isConfirmationWindow() {

@@ -8,7 +8,9 @@ import pg.gipter.core.ApplicationProperties;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -24,7 +26,7 @@ class MercurialDiffCommandTest {
 
     @Test
     void given_codeProtectionNONE_when_getInitialCommand_then_returnInitialCommandForProtectionNONE() {
-        when(applicationProperties.uploadType()).thenReturn(UploadType.SIMPLE);
+        when(applicationProperties.uploadType()).thenReturn(ItemType.SIMPLE);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -34,7 +36,7 @@ class MercurialDiffCommandTest {
 
     @Test
     void given_codeProtectionSIMPLE_when_getInitialCommand_then_returnInitialCommandForProtectionSIMPLE() {
-        when(applicationProperties.uploadType()).thenReturn(UploadType.PROTECTED);
+        when(applicationProperties.uploadType()).thenReturn(ItemType.PROTECTED);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -48,7 +50,7 @@ class MercurialDiffCommandTest {
         String committerEmail="test@email.com";
         LocalDate startDate = LocalDate.now().minusDays(7);
         LocalDate endDate = LocalDate.now();
-        UploadType uploadType = UploadType.SIMPLE;
+        ItemType uploadType = ItemType.SIMPLE;
 
         when(applicationProperties.mercurialAuthor()).thenReturn(author);
         when(applicationProperties.committerEmail()).thenReturn(committerEmail);
@@ -72,7 +74,7 @@ class MercurialDiffCommandTest {
         String author = "testAuthor";
         LocalDate startDate = LocalDate.now().minusDays(7);
         LocalDate endDate = LocalDate.now();
-        UploadType uploadType = UploadType.SIMPLE;
+        ItemType uploadType = ItemType.SIMPLE;
 
         when(applicationProperties.mercurialAuthor()).thenReturn(author);
         when(applicationProperties.startDate()).thenReturn(startDate);

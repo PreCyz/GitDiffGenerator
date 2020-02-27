@@ -2,7 +2,7 @@ package pg.gipter.core.model;
 
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ public class RunConfig {
     private String mercurialAuthor;
     private String svnAuthor;
     private String committerEmail;
-    private UploadType uploadType;
+    private ItemType itemType;
     private Boolean skipRemote;
     private Boolean fetchAll;
     private String itemPath;
@@ -30,39 +30,23 @@ public class RunConfig {
     private String toolkitProjectListNames;
     private Boolean deleteDownloadedFiles;
     private PreferredArgSource preferredArgSource;
+    private SharePointConfig sharePointConfig;
 
     public RunConfig() {
         configurationName = ArgName.configurationName.defaultValue();
-        /*author = ArgName.author.defaultValue();
-        gitAuthor = ArgName.gitAuthor.defaultValue();
-        mercurialAuthor = ArgName.mercurialAuthor.defaultValue();
-        svnAuthor = ArgName.svnAuthor.defaultValue();
-        committerEmail = ArgName.committerEmail.defaultValue();
-        uploadType = UploadType.valueFor(ArgName.uploadType.defaultValue());
-        skipRemote = StringUtils.getBoolean(ArgName.skipRemote.defaultValue());
-        fetchAll = StringUtils.getBoolean(ArgName.fetchAll.defaultValue());
-        itemPath = ArgName.itemPath.defaultValue();
-        projectPath = ArgName.projectPath.defaultValue();
-        itemFileNamePrefix = ArgName.itemFileNamePrefix.defaultValue();
-        periodInDays = Integer.parseInt(ArgName.periodInDays.defaultValue());
-        startDate = LocalDate.now().minusDays(periodInDays);
-        endDate = LocalDate.now();
-        toolkitProjectListNames = ArgName.toolkitProjectListNames.defaultValue();
-        deleteDownloadedFiles = StringUtils.getBoolean(ArgName.deleteDownloadedFiles.defaultValue());
-        preferredArgSource = PreferredArgSource.valueFor(ArgName.preferredArgSource.defaultValue());*/
     }
 
     public RunConfig(String author, String gitAuthor, String mercurialAuthor, String svnAuthor, String committerEmail,
-              UploadType uploadType, Boolean skipRemote, Boolean fetchAll, String itemPath, String projectPath,
-              String itemFileNamePrefix, Integer periodInDays, LocalDate startDate, LocalDate endDate,
-              String configurationName, String toolkitProjectListNames, Boolean deleteDownloadedFiles,
-              PreferredArgSource preferredArgSource) {
+                     ItemType itemType, Boolean skipRemote, Boolean fetchAll, String itemPath, String projectPath,
+                     String itemFileNamePrefix, Integer periodInDays, LocalDate startDate, LocalDate endDate,
+                     String configurationName, String toolkitProjectListNames, Boolean deleteDownloadedFiles,
+                     PreferredArgSource preferredArgSource, SharePointConfig sharePointConfig) {
         this.author = author;
         this.gitAuthor = gitAuthor;
         this.mercurialAuthor = mercurialAuthor;
         this.svnAuthor = svnAuthor;
         this.committerEmail = committerEmail;
-        this.uploadType = uploadType;
+        this.itemType = itemType;
         this.skipRemote = skipRemote;
         this.fetchAll = fetchAll;
         this.itemPath = itemPath;
@@ -75,6 +59,7 @@ public class RunConfig {
         this.toolkitProjectListNames = toolkitProjectListNames;
         this.deleteDownloadedFiles = deleteDownloadedFiles;
         this.preferredArgSource = preferredArgSource;
+        this.sharePointConfig = sharePointConfig;
     }
 
     public String getAuthor() {
@@ -117,12 +102,12 @@ public class RunConfig {
         this.committerEmail = committerEmail;
     }
 
-    public UploadType getUploadType() {
-        return uploadType;
+    public ItemType getItemType() {
+        return itemType;
     }
 
-    public void setUploadType(UploadType uploadType) {
-        this.uploadType = uploadType;
+    public void setItemType(ItemType itemType) {
+        this.itemType = itemType;
     }
 
     public Boolean getSkipRemote() {
@@ -221,6 +206,14 @@ public class RunConfig {
         this.preferredArgSource = preferredArgSource;
     }
 
+    public SharePointConfig getSharePointConfig() {
+        return sharePointConfig;
+    }
+
+    public void setSharePointConfig(SharePointConfig sharePointConfig) {
+        this.sharePointConfig = sharePointConfig;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getAuthor() != null) {
@@ -238,8 +231,8 @@ public class RunConfig {
         if (getCommitterEmail() != null) {
             arguments.add(ArgName.committerEmail.name() + "=" + getCommitterEmail());
         }
-        if (getUploadType() != null) {
-            arguments.add(ArgName.uploadType.name() + "=" + getUploadType());
+        if (getItemType() != null) {
+            arguments.add(ArgName.uploadType.name() + "=" + getItemType());
         }
         if (getSkipRemote() != null) {
             arguments.add(ArgName.skipRemote.name() + "=" + getSkipRemote());
@@ -298,7 +291,7 @@ public class RunConfig {
                 } else if (ArgName.committerEmail.name().equals(argumentName)) {
                     runConfig.setCommitterEmail(argumentValue);
                 } else if (ArgName.uploadType.name().equals(argumentName)) {
-                    runConfig.setUploadType(UploadType.valueFor(argumentValue));
+                    runConfig.setItemType(ItemType.valueFor(argumentValue));
                 } else if (ArgName.skipRemote.name().equals(argumentName)) {
                     runConfig.setSkipRemote(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.fetchAll.name().equals(argumentName)) {
@@ -337,7 +330,7 @@ public class RunConfig {
                 ", mercurialAuthor='" + mercurialAuthor + '\'' +
                 ", svnAuthor='" + svnAuthor + '\'' +
                 ", committerEmail='" + committerEmail + '\'' +
-                ", uploadType=" + uploadType +
+                ", uploadType=" + itemType +
                 ", skipRemote=" + skipRemote +
                 ", fetchAll=" + fetchAll +
                 ", itemPath='" + itemPath + '\'' +

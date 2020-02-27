@@ -15,11 +15,13 @@ import javafx.stage.DirectoryChooser;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alert.*;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 
 import java.io.File;
@@ -96,14 +98,14 @@ public class ProjectsController extends AbstractController {
             for (String path : projects) {
                 File project = new File(path);
                 Optional<String> supportedVcs = getSupportedVcs(project);
-                if (!supportedVcs.isPresent() && applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
+                if (!supportedVcs.isPresent() && applicationProperties.uploadType() == ItemType.TOOLKIT_DOCS) {
                     ProjectDetails pd = new ProjectDetails(
                             project.getName(),
                             applicationProperties.uploadType().name(),
                             path
                     );
                     projectsPaths.add(pd);
-                } else if (supportedVcs.isPresent() && applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS) {
+                } else if (supportedVcs.isPresent() && applicationProperties.uploadType() != ItemType.TOOLKIT_DOCS) {
                     ProjectDetails pd = new ProjectDetails(
                             project.getName(),
                             supportedVcs.get(),
@@ -136,7 +138,7 @@ public class ProjectsController extends AbstractController {
     }
 
     private void setProperties(ResourceBundle resources) {
-        if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
+        if (applicationProperties.uploadType() == ItemType.TOOLKIT_DOCS) {
             searchProjectsButton.setDisable(true);
             Tooltip tooltip = new Tooltip();
             tooltip.setTextAlignment(TextAlignment.LEFT);

@@ -1,6 +1,6 @@
 package pg.gipter.core;
 
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -64,11 +64,11 @@ class FileApplicationProperties extends ApplicationProperties {
         String itemPath = argExtractor.itemPath();
         if (StringUtils.notEmpty(currentRunConfig.getItemPath())) {
             itemPath = currentRunConfig.getItemPath();
-            if (uploadType() == UploadType.STATEMENT) {
+            if (uploadType() == ItemType.STATEMENT) {
                 return itemPath;
             }
         }
-        return uploadType() == UploadType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
+        return uploadType() == ItemType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
     }
 
     @Override
@@ -126,9 +126,9 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public UploadType uploadType() {
-        if (currentRunConfig.getUploadType() != null) {
-            return currentRunConfig.getUploadType();
+    public ItemType uploadType() {
+        if (currentRunConfig.getItemType() != null) {
+            return currentRunConfig.getItemType();
         }
         return argExtractor.uploadType();
     }

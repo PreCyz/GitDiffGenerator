@@ -3,14 +3,16 @@ package pg.gipter.toolkit.sharepoint.rest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 import static java.util.stream.Collectors.joining;
@@ -31,8 +33,8 @@ public class SharePointRestClient {
         String title = fileName.substring(0, fileName.indexOf("."));
         String allVcs = applicationProperties.vcsSet().stream().map(Enum::name).collect(joining(","));
         String description = String.format("%s diff file.", allVcs);
-        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
-            description = String.format("%s file.", UploadType.STATEMENT);
+        if (applicationProperties.uploadType() == ItemType.STATEMENT) {
+            description = String.format("%s file.", ItemType.STATEMENT);
         }
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 
@@ -113,8 +115,8 @@ public class SharePointRestClient {
         String allVcs = applicationProperties.vcsSet().stream().map(Enum::name).collect(joining(","));
         //String description = String.format("\u003cp\u003e%s diff file.\u003c/p\u003e", allVcs);
         String description = URLEncoder.encode(String.format("<p>%s diff file.</p>", allVcs), StandardCharsets.UTF_8.name());
-        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
-            description = String.format("%s file.", UploadType.STATEMENT);
+        if (applicationProperties.uploadType() == ItemType.STATEMENT) {
+            description = String.format("%s file.", ItemType.STATEMENT);
         }
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 

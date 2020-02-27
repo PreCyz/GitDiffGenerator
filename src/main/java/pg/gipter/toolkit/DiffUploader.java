@@ -5,12 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.toolkit.helper.ListViewId;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.toolkit.sharepoint.soap.SharePointSoapClient;
 
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,9 +83,9 @@ public class DiffUploader {
 
     private String description(String allVcs) {
         String description = String.format("%s diff file.", allVcs);
-        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
-            description = String.format("%s file.", UploadType.STATEMENT);
-        } else if (applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS) {
+        if (applicationProperties.uploadType() == ItemType.STATEMENT) {
+            description = String.format("%s file.", ItemType.STATEMENT);
+        } else if (applicationProperties.uploadType() == ItemType.TOOLKIT_DOCS) {
             description = "Item as zipped file with changed documents.";
         }
         return description;

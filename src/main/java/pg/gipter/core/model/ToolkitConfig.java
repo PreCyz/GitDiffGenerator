@@ -10,15 +10,15 @@ public class ToolkitConfig {
 
     public static final String TOOLKIT_CONFIG = "toolkitConfig";
 
-    private String toolkitUsername;
-    private String toolkitPassword;
+    protected String toolkitUsername;
+    protected String toolkitPassword;
     private transient String toolkitDomain;
     private transient String toolkitCopyListName;
     private transient String toolkitUrl;
     private transient String toolkitCopyCase;
     private transient String toolkitWSUrl;
     private transient String toolkitUserFolder;
-    private String toolkitProjectListNames;
+    protected String toolkitProjectListNames;
 
     public ToolkitConfig() {
         toolkitUsername = ArgName.toolkitUsername.defaultValue();

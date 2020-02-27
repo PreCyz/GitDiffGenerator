@@ -2,7 +2,7 @@ package pg.gipter.core.producer.processor;
 
 import com.google.gson.JsonObject;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.utils.StringUtils;
 
@@ -10,7 +10,10 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -34,7 +37,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
                 .filter(dd -> !StringUtils.nullOrEmpty(dd.getDocType()))
                 .collect(toList());
         if (documentDetails.isEmpty()) {
-            logger.error("Can not find [{}] to upload as your copyright items.", UploadType.TOOLKIT_DOCS);
+            logger.error("Can not find [{}] to upload as your copyright items.", ItemType.TOOLKIT_DOCS);
             throw new IllegalArgumentException("Can not find items to upload.");
         }
         Map<String, String> filesToDownload = new HashMap<>(getFilesToDownload(documentDetails));

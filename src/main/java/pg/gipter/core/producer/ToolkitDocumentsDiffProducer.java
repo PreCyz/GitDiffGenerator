@@ -2,11 +2,14 @@ package pg.gipter.core.producer;
 
 import org.apache.commons.io.FileUtils;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.core.producer.processor.DocumentFinder;
 import pg.gipter.core.producer.processor.DocumentFinderFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -29,11 +32,11 @@ class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
             throw new IllegalArgumentException("Given projects do not contain any items.");
         }
 
-        logger.info("Upload type set as {}. Documents will be zipped and uploaded.", UploadType.TOOLKIT_DOCS);
+        logger.info("Upload type set as {}. Documents will be zipped and uploaded.", ItemType.TOOLKIT_DOCS);
         DocumentFinder documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
         List<File> documents = documentFinder.find();
         if (documents.isEmpty()) {
-            logger.warn("No documents to zip is no item to upload. [{}].", UploadType.TOOLKIT_DOCS);
+            logger.warn("No documents to zip is no item to upload. [{}].", ItemType.TOOLKIT_DOCS);
             throw new IllegalArgumentException("Given projects do not contain any items.");
         }
 

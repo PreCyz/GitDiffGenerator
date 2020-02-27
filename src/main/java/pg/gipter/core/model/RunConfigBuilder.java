@@ -1,7 +1,7 @@
 package pg.gipter.core.model;
 
 import pg.gipter.core.PreferredArgSource;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producer.command.ItemType;
 
 import java.time.LocalDate;
 
@@ -12,7 +12,7 @@ public class RunConfigBuilder {
     private String mercurialAuthor;
     private String svnAuthor;
     private String committerEmail;
-    private UploadType uploadType;
+    private ItemType itemType;
     private Boolean skipRemote;
     private Boolean fetchAll;
     private String itemPath;
@@ -25,7 +25,7 @@ public class RunConfigBuilder {
     private String toolkitProjectListNames;
     private Boolean deleteDownloadedFiles;
     private PreferredArgSource preferredArgSource;
-
+    private SharePointConfig sharePointConfig;
 
     public RunConfigBuilder withAuthor(String author) {
         this.author = author;
@@ -52,8 +52,8 @@ public class RunConfigBuilder {
         return this;
     }
 
-    public RunConfigBuilder withUploadType(UploadType uploadType) {
-        this.uploadType = uploadType;
+    public RunConfigBuilder withItemType(ItemType itemType) {
+        this.itemType = itemType;
         return this;
     }
 
@@ -117,9 +117,14 @@ public class RunConfigBuilder {
         return this;
     }
 
+    public RunConfigBuilder withSharePointConfig(SharePointConfig sharePointConfig) {
+        this.sharePointConfig = sharePointConfig;
+        return this;
+    }
+
     public RunConfig create() {
-        return new RunConfig(author, gitAuthor, mercurialAuthor, svnAuthor, committerEmail, uploadType, skipRemote, fetchAll,
+        return new RunConfig(author, gitAuthor, mercurialAuthor, svnAuthor, committerEmail, itemType, skipRemote, fetchAll,
                 itemPath, projectPath, itemFileNamePrefix, periodInDays, startDate, endDate, configurationName, toolkitProjectListNames,
-                deleteDownloadedFiles, preferredArgSource);
+                deleteDownloadedFiles, preferredArgSource, sharePointConfig);
     }
 }

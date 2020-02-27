@@ -7,7 +7,7 @@ public class DiffCommandFactory {
     private DiffCommandFactory() { }
 
     public static DiffCommand getInstance(VersionControlSystem vcs, ApplicationProperties applicationProperties) {
-        if (applicationProperties.uploadType() == UploadType.STATEMENT) {
+        if (applicationProperties.uploadType() == ItemType.STATEMENT) {
             return new EmptyDiffCommand(applicationProperties);
         }
         switch (vcs) {
