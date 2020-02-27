@@ -28,13 +28,14 @@ public class StartupService {
                     systemUsername
             );
 
+            String target = AlertHelper.getJarFile().map(File::getAbsolutePath).orElse("");
             if (!new File(shortcutLnkPath).exists()) {
-                logger.info("Creating shortcut and placing it in startup folder.");
+                logger.info("Creating shortcut to [{}] and placing it in Windows startup folder. [{}]", target, shortcutLnkPath);
                 try {
                     String workingDir = AlertHelper.homeDirectoryPath().orElse("");
 
                     int iconNumber = 130;
-                    ShellLink shellLink = ShellLink.createLink(AlertHelper.getJarFile().map(File::getAbsolutePath).orElse(""))
+                    ShellLink shellLink = ShellLink.createLink(target)
                             .setWorkingDir(workingDir)
                             .setIconLocation("%SystemRoot%\\system32\\SHELL32.dll")
                             .setCMDArgs(ArgName.silentMode.name() + "=" + Boolean.TRUE);
@@ -46,7 +47,7 @@ public class StartupService {
                     logger.info("Link arguments [{}]", shellLink.getCMDArgs());
                     logger.info("Shortcut created and placed in Windows startup folder.");
                 } catch (IOException e) {
-                    logger.warn("Can not create shortcut file and place it startup folder.", e);
+                    logger.warn("Can not create shortcut to [{}] file and place it in Windows startup folder. [{}]", target, shortcutLnkPath, e);
                 }
             } else {
                 logger.info("Gipter have already been set to start on startup. Shortcut already exists [{}]. ", shortcutLnkPath);
