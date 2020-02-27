@@ -767,32 +767,32 @@ class CliPreferredApplicationPropertiesTest {
     void given_noCodeProtection_when_uploadType_then_returnCodeProtection() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        ItemType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
         assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
 
     @Test
-    void given_uploadTypeFromCLI_when_uploadType_then_returnCliCodeProtection() {
+    void givenItemTypeFromCLI_whenItemType_thenReturnCliCodeProtection() {
         applicationProperties = new CliApplicationProperties(
-                new String[]{"uploadType=protected"}
+                new String[]{"itemType=protected"}
         );
 
-        ItemType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
         assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
-    void given_uploadTypeFileAndCLI_when_uploadType_then_returnCliCodeProtection() {
-        String[] args = {"uploadType=PROTECTED"};
+    void givenItemTypeFileAndCLI_whenItemType_thenReturnCliCodeProtection() {
+        String[] args = {"itemType=PROTECTED"};
         applicationProperties = new CliApplicationProperties(args);
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemType(ItemType.STATEMENT)
                 .create();
         applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
 
-        ItemType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
         assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
@@ -806,7 +806,7 @@ class CliPreferredApplicationPropertiesTest {
                 .create();
         applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
 
-        ItemType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
         assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }
@@ -820,7 +820,7 @@ class CliPreferredApplicationPropertiesTest {
                 .create();
         applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
 
-        ItemType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
         assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }

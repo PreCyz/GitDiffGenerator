@@ -98,14 +98,14 @@ public class ProjectsController extends AbstractController {
             for (String path : projects) {
                 File project = new File(path);
                 Optional<String> supportedVcs = getSupportedVcs(project);
-                if (!supportedVcs.isPresent() && applicationProperties.uploadType() == ItemType.TOOLKIT_DOCS) {
+                if (!supportedVcs.isPresent() && applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
                     ProjectDetails pd = new ProjectDetails(
                             project.getName(),
-                            applicationProperties.uploadType().name(),
+                            applicationProperties.itemType().name(),
                             path
                     );
                     projectsPaths.add(pd);
-                } else if (supportedVcs.isPresent() && applicationProperties.uploadType() != ItemType.TOOLKIT_DOCS) {
+                } else if (supportedVcs.isPresent() && applicationProperties.itemType() != ItemType.TOOLKIT_DOCS) {
                     ProjectDetails pd = new ProjectDetails(
                             project.getName(),
                             supportedVcs.get(),
@@ -138,7 +138,7 @@ public class ProjectsController extends AbstractController {
     }
 
     private void setProperties(ResourceBundle resources) {
-        if (applicationProperties.uploadType() == ItemType.TOOLKIT_DOCS) {
+        if (applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
             searchProjectsButton.setDisable(true);
             Tooltip tooltip = new Tooltip();
             tooltip.setTextAlignment(TextAlignment.LEFT);

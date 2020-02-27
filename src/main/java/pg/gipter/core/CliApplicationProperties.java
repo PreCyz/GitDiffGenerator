@@ -67,7 +67,7 @@ class CliApplicationProperties extends ApplicationProperties {
         if (!containsArg(argName) && StringUtils.notEmpty(currentRunConfig.getItemPath())) {
             itemPath = currentRunConfig.getItemPath();
         }
-        return uploadType() == ItemType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
+        return itemType() == ItemType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
     }
 
     @Override
@@ -128,9 +128,9 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public ItemType uploadType() {
-        ItemType uploadType = argExtractor.uploadType();
-        if (!containsArg(ArgName.uploadType.name()) && currentRunConfig.getItemType() != null) {
+    public ItemType itemType() {
+        ItemType uploadType = argExtractor.itemType();
+        if (!containsArg(ArgName.itemType.name()) && currentRunConfig.getItemType() != null) {
             uploadType = currentRunConfig.getItemType();
         }
         return uploadType;

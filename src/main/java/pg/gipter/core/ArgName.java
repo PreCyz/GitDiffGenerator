@@ -13,7 +13,7 @@ public enum ArgName {
     mercurialAuthor(""),
     svnAuthor(""),
     committerEmail(""),
-    uploadType(ItemType.SIMPLE.name()),
+    itemType(ItemType.SIMPLE.name()),
     skipRemote("Y"),
     fetchAll("Y"),
     toolkitProjectListNames("Deliverables"),

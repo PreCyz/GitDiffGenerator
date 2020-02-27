@@ -198,7 +198,7 @@ public class MainController extends AbstractController {
         mercurialAuthorTextField.setText(applicationProperties.mercurialAuthor());
         svnAuthorTextField.setText(applicationProperties.svnAuthor());
         uploadTypeComboBox.setItems(FXCollections.observableArrayList(ItemType.values()));
-        uploadTypeComboBox.setValue(applicationProperties.uploadType());
+        uploadTypeComboBox.setValue(applicationProperties.itemType());
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
         fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
 
@@ -210,7 +210,7 @@ public class MainController extends AbstractController {
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
         String itemPath = applicationProperties.itemPath().substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
         itemPathLabel.setText(itemPath);
-        if (applicationProperties.uploadType() == ItemType.STATEMENT) {
+        if (applicationProperties.itemType() == ItemType.STATEMENT) {
             itemPathLabel.setText(applicationProperties.itemPath());
         }
         projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
@@ -285,9 +285,9 @@ public class MainController extends AbstractController {
 
     private void setProperties(ResourceBundle resources) {
         toolkitDomainTextField.setEditable(false);
-        toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != ItemType.TOOLKIT_DOCS);
+        toolkitProjectListNamesTextField.setDisable(applicationProperties.itemType() != ItemType.TOOLKIT_DOCS);
         setTooltipOnProjectListNames();
-        deleteDownloadedFilesCheckBox.setDisable(applicationProperties.uploadType() != ItemType.TOOLKIT_DOCS);
+        deleteDownloadedFilesCheckBox.setDisable(applicationProperties.itemType() != ItemType.TOOLKIT_DOCS);
 
         if (applicationProperties.projectPaths().isEmpty()) {
             projectPathButton.setText(resources.getString("button.add"));
@@ -304,7 +304,7 @@ public class MainController extends AbstractController {
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
 
-        setDisable(applicationProperties.uploadType());
+        setDisable(applicationProperties.itemType());
 
         loadProgressIndicator.setVisible(false);
         verifyProgressIndicator.setVisible(false);

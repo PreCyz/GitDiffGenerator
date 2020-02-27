@@ -118,7 +118,7 @@
                               <Label layoutX="9.0" layoutY="104.0" text="%csv.panel.mercurialAuthor" />
                               <TextField fx:id="svnAuthorTextField" layoutX="109.0" layoutY="131.0" prefWidth="160.0" />
                               <Label layoutX="9.0" layoutY="134.0" text="%csv.panel.svnAuthor" />
-                              <Label layoutX="10.0" layoutY="164.0" text="%csv.panel.uploadType" />
+                              <Label layoutX="10.0" layoutY="164.0" text="%csv.panel.itemType" />
                               <ComboBox fx:id="uploadTypeComboBox" layoutX="109.0" layoutY="161.0" prefWidth="160.0" />
                               <TextField fx:id="toolkitProjectListNamesTextField" layoutX="109.0" layoutY="191.0" prefHeight="25.0" prefWidth="160.0" />
                               <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="149.0" layoutY="227.0" mnemonicParsing="false" />

@@ -198,7 +198,7 @@ class ApplicationConfigurationDaoTest {
                 "mercurialAuthor=mercurialAuthor",
                 "svnAuthor=svnAuthor",
                 "committerEmail=committerEmail",
-                "uploadType=SIMPLE",
+                "itemType=SIMPLE",
                 "skipRemote=Y",
                 "fetchAll=N",
                 "itemPath=itemPath",

@@ -15,9 +15,9 @@ public final class DiffProducerFactory {
 
     public static DiffProducer getInstance(ApplicationProperties applicationProperties) {
         logger.info("Running on platform [{}].", SystemUtils.OS);
-        if (applicationProperties.uploadType() == ItemType.STATEMENT) {
+        if (applicationProperties.itemType() == ItemType.STATEMENT) {
             return new StatementDiffProducer(applicationProperties);
-        } else if (applicationProperties.uploadType() == ItemType.TOOLKIT_DOCS) {
+        } else if (applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
             return new ToolkitDocumentsDiffProducer(applicationProperties);
         } else if (SystemUtils.isUnix()) {
             return new LinuxDiffProducer(applicationProperties);

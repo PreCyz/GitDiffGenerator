@@ -26,7 +26,7 @@ class GitDiffCommandTest {
 
     @Test
     void given_codeProtectionNONE_when_getInitialCommand_then_returnInitialCommandForNotProtectionNONE() {
-        when(applicationProperties.uploadType()).thenReturn(ItemType.SIMPLE);
+        when(applicationProperties.itemType()).thenReturn(ItemType.SIMPLE);
         command = new GitDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -36,7 +36,7 @@ class GitDiffCommandTest {
 
     @Test
     void given_codeProtectionSIMPLE_when_getInitialCommand_then_returnInitialCommandForProtectionSIMPLE() {
-        when(applicationProperties.uploadType()).thenReturn(ItemType.PROTECTED);
+        when(applicationProperties.itemType()).thenReturn(ItemType.PROTECTED);
         command = new GitDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -46,7 +46,7 @@ class GitDiffCommandTest {
 
     @Test
     void given_skipRemoteTrue_when_getInitialCommand_then_returnInitialCommandWithoutRemotes() {
-        when(applicationProperties.uploadType()).thenReturn(ItemType.PROTECTED);
+        when(applicationProperties.itemType()).thenReturn(ItemType.PROTECTED);
         when(applicationProperties.isSkipRemote()).thenReturn(true);
         command = new GitDiffCommand(applicationProperties);
 
@@ -67,7 +67,7 @@ class GitDiffCommandTest {
         when(applicationProperties.committerEmail()).thenReturn(committerEmail);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
-        when(applicationProperties.uploadType()).thenReturn(uploadType);
+        when(applicationProperties.itemType()).thenReturn(uploadType);
         command = new GitDiffCommand(applicationProperties);
 
         List<String> actual = command.commandAsList();
@@ -91,7 +91,7 @@ class GitDiffCommandTest {
         when(applicationProperties.gitAuthor()).thenReturn(author);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
-        when(applicationProperties.uploadType()).thenReturn(uploadType);
+        when(applicationProperties.itemType()).thenReturn(uploadType);
         when(applicationProperties.isSkipRemote()).thenReturn(skipRemote);
         command = new GitDiffCommand(applicationProperties);
 

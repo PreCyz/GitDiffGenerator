@@ -305,7 +305,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_uploadTypeToolkitDocs_whenFileName_thenReturnFileNameWithZip() {
-        appProps = new FileApplicationProperties(new String[]{"uploadType=toolkit_docs"});
+        appProps = new FileApplicationProperties(new String[]{"itemType=toolkit_docs"});
 
         String actual = appProps.fileName();
 
@@ -315,7 +315,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenUseAsFileNameYAndFileNamePrefixAndToolkitDocs_whenFileName_thenReturnFileNamePrefixAsNameWithZip() {
         appProps = new FileApplicationProperties(new String[]{
-                ArgName.uploadType.name() + "=" + ItemType.TOOLKIT_DOCS.name(),
+                ArgName.itemType.name() + "=" + ItemType.TOOLKIT_DOCS.name(),
                 ArgName.itemFileNamePrefix + "=my_custom_name",
         });
 
@@ -560,28 +560,28 @@ class FilePreferredApplicationPropertiesTest {
     void given_noCodeProtection_when_uploadType_then_returnDefaultValueNONE() {
         appProps = new FileApplicationProperties(new String[]{});
 
-        ItemType actual = appProps.uploadType();
+        ItemType actual = appProps.itemType();
 
         assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
 
     @Test
-    void given_uploadType_when_uploadType_then_returnThatCodeProtection() {
-        appProps = new FileApplicationProperties(new String[]{"uploadType=protected"});
+    void givenItemType_whenItemType_thenReturnThatCodeProtection() {
+        appProps = new FileApplicationProperties(new String[]{"itemType=protected"});
 
-        ItemType actual = appProps.uploadType();
+        ItemType actual = appProps.itemType();
 
         assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
-    void given_uploadTypeFromPropertiesAndCommandLine_when_uploadType_then_returnCodeProtectionFromProperties() {
+    void givenItemTypeFromPropertiesAndCommandLine_whenItemType_thenReturnCodeProtectionFromProperties() {
         String[] args = {"uploadType=Simple"};
         appProps = new FileApplicationProperties(args);
         RunConfig runConfig = new RunConfigBuilder().withItemType(ItemType.STATEMENT).create();
         appProps.init(mockConfigurtionDao(runConfig));
 
-        ItemType actual = appProps.uploadType();
+        ItemType actual = appProps.itemType();
 
         assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }

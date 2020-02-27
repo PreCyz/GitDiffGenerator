@@ -218,7 +218,7 @@ public abstract class ApplicationProperties {
 
     final String getFileExtension() {
         String extension = "txt";
-        if (uploadType() == ItemType.TOOLKIT_DOCS) {
+        if (itemType() == ItemType.TOOLKIT_DOCS) {
             extension = "zip";
         }
         return extension;
@@ -278,7 +278,7 @@ public abstract class ApplicationProperties {
                     ", periodInDays='" + periodInDays() + '\'' +
                     ", startDate='" + startDate() + '\'' +
                     ", endDate='" + endDate() + '\'' +
-                    ", uploadType='" + uploadType() + '\'' +
+                    ", uploadType='" + itemType() + '\'' +
                     ", skipRemote='" + isSkipRemote() + '\'' +
                     ", fetchAll='" + isFetchAll() + '\'' +
                     ", deleteDownloadedFiles='" + isDeleteDownloadedFiles() + '\'';
@@ -317,7 +317,7 @@ public abstract class ApplicationProperties {
     public abstract LocalDate startDate();
     public abstract LocalDate endDate();
     public abstract int periodInDays();
-    public abstract ItemType uploadType();
+    public abstract ItemType itemType();
     public abstract boolean isDeleteDownloadedFiles();
     public abstract boolean isSkipRemote();
 

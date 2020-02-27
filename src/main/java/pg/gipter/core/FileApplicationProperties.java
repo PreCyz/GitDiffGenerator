@@ -64,11 +64,11 @@ class FileApplicationProperties extends ApplicationProperties {
         String itemPath = argExtractor.itemPath();
         if (StringUtils.notEmpty(currentRunConfig.getItemPath())) {
             itemPath = currentRunConfig.getItemPath();
-            if (uploadType() == ItemType.STATEMENT) {
+            if (itemType() == ItemType.STATEMENT) {
                 return itemPath;
             }
         }
-        return uploadType() == ItemType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
+        return itemType() == ItemType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
     }
 
     @Override
@@ -126,11 +126,11 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public ItemType uploadType() {
+    public ItemType itemType() {
         if (currentRunConfig.getItemType() != null) {
             return currentRunConfig.getItemType();
         }
-        return argExtractor.uploadType();
+        return argExtractor.itemType();
     }
 
     @Override

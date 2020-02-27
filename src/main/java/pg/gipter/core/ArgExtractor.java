@@ -135,12 +135,12 @@ final class ArgExtractor {
         return ArgName.itemFileNamePrefix.defaultValue();
     }
 
-    ItemType uploadType() {
-        if (containsArg(ArgName.uploadType.name())) {
-            String codeProtection = getValue(ArgName.uploadType, ArgName.uploadType.defaultValue());
+    ItemType itemType() {
+        if (containsArg(ArgName.itemType.name())) {
+            String codeProtection = getValue(ArgName.itemType, ArgName.itemType.defaultValue());
             return ItemType.valueFor(codeProtection);
         }
-        return ItemType.valueFor(ArgName.uploadType.defaultValue());
+        return ItemType.valueFor(ArgName.itemType.defaultValue());
     }
 
     boolean isConfirmationWindow() {

@@ -83,9 +83,9 @@ public class DiffUploader {
 
     private String description(String allVcs) {
         String description = String.format("%s diff file.", allVcs);
-        if (applicationProperties.uploadType() == ItemType.STATEMENT) {
+        if (applicationProperties.itemType() == ItemType.STATEMENT) {
             description = String.format("%s file.", ItemType.STATEMENT);
-        } else if (applicationProperties.uploadType() == ItemType.TOOLKIT_DOCS) {
+        } else if (applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
             description = "Item as zipped file with changed documents.";
         }
         return description;

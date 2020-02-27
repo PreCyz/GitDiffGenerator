@@ -130,14 +130,14 @@ public class WizardLauncher implements Launcher {
         TextField configurationName = createTextField(ArgName.configurationName.name());
         gridPane.add(configurationName, 1, row++);
 
-        gridPane.add(new Label(BundleUtils.getMsg("csv.panel.uploadType")), 0, row);
-        ComboBox<ItemType> comboBox = createUploadTypeComboBox(ArgName.uploadType.name());
+        gridPane.add(new Label(BundleUtils.getMsg("csv.panel.itemType")), 0, row);
+        ComboBox<ItemType> comboBox = createUploadTypeComboBox(ArgName.itemType.name());
         gridPane.add(comboBox, 1, row);
 
         WizardPane wizardPane = new WizardPane() {
             @Override
             public void onEnteringPage(Wizard wizard) {
-                wizardProperties.putIfAbsent(ArgName.uploadType.name(), ItemType.SIMPLE.name());
+                wizardProperties.putIfAbsent(ArgName.itemType.name(), ItemType.SIMPLE.name());
             }
 
             @Override
@@ -152,9 +152,9 @@ public class WizardLauncher implements Launcher {
                         wizard.getSettings().put(ArgName.toolkitPassword.name(), applicationProperties.toolkitPassword());
                     }
                 }
-                String uploadType = wizardProperties.getProperty(ArgName.uploadType.name());
+                String uploadType = wizardProperties.getProperty(ArgName.itemType.name());
                 if (StringUtils.nullOrEmpty(uploadType)) {
-                    wizardProperties.put(ArgName.uploadType.name(), comboBox.getValue().name());
+                    wizardProperties.put(ArgName.itemType.name(), comboBox.getValue().name());
                 }
             }
         };
@@ -199,7 +199,7 @@ public class WizardLauncher implements Launcher {
 
     private void updateProperties(Wizard wizard, Properties properties) {
         properties.put(ArgName.configurationName.name(), getValue(wizard, ArgName.configurationName));
-        properties.put(ArgName.uploadType.name(), getValue(wizard, ArgName.uploadType));
+        properties.put(ArgName.itemType.name(), getValue(wizard, ArgName.itemType));
         properties.put(ArgName.toolkitUsername.name(), getValue(wizard, ArgName.toolkitUsername).toUpperCase());
         properties.put(ArgName.toolkitPassword.name(), getValue(wizard, ArgName.toolkitPassword));
         properties.put(ArgName.author.name(), getValue(wizard, ArgName.author));
@@ -231,7 +231,7 @@ public class WizardLauncher implements Launcher {
         comboBox.setValue(ItemType.SIMPLE);
         comboBox.setItems(FXCollections.observableArrayList(ItemType.values()));
         comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            wizardProperties.put(ArgName.uploadType.name(), newValue.name());
+            wizardProperties.put(ArgName.itemType.name(), newValue.name());
         });
         Tooltip tooltip = new Tooltip(BundleUtils.getMsg("wizard.uploadType.description"));
         tooltip.setTextAlignment(TextAlignment.LEFT);
@@ -304,7 +304,7 @@ public class WizardLauncher implements Launcher {
                 itemPathStringProperty.setValue(BundleUtils.getMsg("wizard.item.location"));
                 projectLabel.setVisible(true);
                 projectButton.setVisible(true);
-                if (ItemType.valueFor(getValue(wizard, ArgName.uploadType)) == ItemType.STATEMENT) {
+                if (ItemType.valueFor(getValue(wizard, ArgName.itemType)) == ItemType.STATEMENT) {
                     itemPathStringProperty.setValue(BundleUtils.getMsg("wizard.item.statement.location"));
                     projectLabel.setVisible(false);
                     projectButton.setVisible(false);
@@ -345,7 +345,7 @@ public class WizardLauncher implements Launcher {
             applicationProperties.save();
 
             uiLauncher = new UILauncher(primaryStage, applicationProperties);
-            if (applicationProperties.uploadType() == ItemType.TOOLKIT_DOCS) {
+            if (applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
                 uiLauncher.showToolkitProjectsWindow(wizardProperties);
             } else {
                 uiLauncher.showProjectsWindow(wizardProperties);
@@ -355,7 +355,7 @@ public class WizardLauncher implements Launcher {
 
     private EventHandler<ActionEvent> addItemEventHandler(StringProperty itemPathStringProperty) {
         return event -> {
-            ItemType uploadType = ItemType.valueFor(wizardProperties.getProperty(ArgName.uploadType.name()));
+            ItemType uploadType = ItemType.valueFor(wizardProperties.getProperty(ArgName.itemType.name()));
             if (uploadType == ItemType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setInitialDirectory(new File("."));
@@ -449,7 +449,7 @@ public class WizardLauncher implements Launcher {
             }
 
             private WizardPane flowAdvanceLogic() {
-                String property = wizardProperties.getProperty(ArgName.uploadType.name());
+                String property = wizardProperties.getProperty(ArgName.itemType.name());
                 if (StringUtils.nullOrEmpty(property)) {
                     return committerPage;
                 }

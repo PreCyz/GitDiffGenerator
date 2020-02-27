@@ -155,7 +155,7 @@ public class ApplicationConfiguration extends ApplicationJsonReader implements C
                     runConfig.setSvnAuthor(split[1]);
                 } else if (ArgName.committerEmail.name().equals(split[0])) {
                     runConfig.setCommitterEmail(split[1]);
-                } else if (ArgName.uploadType.name().equals(split[0])) {
+                } else if (ArgName.itemType.name().equals(split[0])) {
                     runConfig.setItemType(ItemType.valueFor(split[1]));
                 } else if (ArgName.skipRemote.name().equals(split[0])) {
                     runConfig.setSkipRemote(StringUtils.getBoolean(split[1]));

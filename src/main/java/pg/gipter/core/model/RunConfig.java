@@ -232,7 +232,7 @@ public class RunConfig {
             arguments.add(ArgName.committerEmail.name() + "=" + getCommitterEmail());
         }
         if (getItemType() != null) {
-            arguments.add(ArgName.uploadType.name() + "=" + getItemType());
+            arguments.add(ArgName.itemType.name() + "=" + getItemType());
         }
         if (getSkipRemote() != null) {
             arguments.add(ArgName.skipRemote.name() + "=" + getSkipRemote());
@@ -290,7 +290,7 @@ public class RunConfig {
                     runConfig.setSvnAuthor(argumentValue);
                 } else if (ArgName.committerEmail.name().equals(argumentName)) {
                     runConfig.setCommitterEmail(argumentValue);
-                } else if (ArgName.uploadType.name().equals(argumentName)) {
+                } else if (ArgName.itemType.name().equals(argumentName)) {
                     runConfig.setItemType(ItemType.valueFor(argumentValue));
                 } else if (ArgName.skipRemote.name().equals(argumentName)) {
                     runConfig.setSkipRemote(StringUtils.getBoolean(argumentValue));

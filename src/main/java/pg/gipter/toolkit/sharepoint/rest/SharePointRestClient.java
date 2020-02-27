@@ -33,7 +33,7 @@ public class SharePointRestClient {
         String title = fileName.substring(0, fileName.indexOf("."));
         String allVcs = applicationProperties.vcsSet().stream().map(Enum::name).collect(joining(","));
         String description = String.format("%s diff file.", allVcs);
-        if (applicationProperties.uploadType() == ItemType.STATEMENT) {
+        if (applicationProperties.itemType() == ItemType.STATEMENT) {
             description = String.format("%s file.", ItemType.STATEMENT);
         }
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
@@ -115,7 +115,7 @@ public class SharePointRestClient {
         String allVcs = applicationProperties.vcsSet().stream().map(Enum::name).collect(joining(","));
         //String description = String.format("\u003cp\u003e%s diff file.\u003c/p\u003e", allVcs);
         String description = URLEncoder.encode(String.format("<p>%s diff file.</p>", allVcs), StandardCharsets.UTF_8.name());
-        if (applicationProperties.uploadType() == ItemType.STATEMENT) {
+        if (applicationProperties.itemType() == ItemType.STATEMENT) {
             description = String.format("%s file.", ItemType.STATEMENT);
         }
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());

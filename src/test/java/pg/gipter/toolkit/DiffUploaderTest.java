@@ -60,9 +60,9 @@ class DiffUploaderTest {
     }
 
     @Test
-    void given_codeProtectionStatement_when_buildAttributesMap_then_return_properMap() {
+    void givenCodeProtectionStatement_whenBuildAttributesMap_thenReturnProperMap() {
         ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(new String[]{
-                "uploadType=STATEMENT",
+                "itemType=STATEMENT",
                 "startDate=2017-10-19",
                 "endDate=2017-12-20",
                 "itemFileNamePrefix=custom",

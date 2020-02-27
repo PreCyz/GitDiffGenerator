@@ -321,7 +321,7 @@ class ArgExtractorTest {
     void given_noCodeProtection_when_codeProtection_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
-        ItemType actual = argExtractor.uploadType();
+        ItemType actual = argExtractor.itemType();
 
         assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
@@ -330,25 +330,25 @@ class ArgExtractorTest {
     void given_uploadTypeSetAsNone_when_codeProtection_then_returnEnum() {
         argExtractor = new ArgExtractor(new String[]{"uploadType=simple"});
 
-        ItemType actual = argExtractor.uploadType();
+        ItemType actual = argExtractor.itemType();
 
         assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
 
     @Test
-    void given_uploadTypeSetAsSimple_when_codeProtection_then_returnEnum() {
-        argExtractor = new ArgExtractor(new String[]{"uploadType=protected"});
+    void givenItemTypeSetAsSimple_whenCodeProtection_thenReturnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"itemType=protected"});
 
-        ItemType actual = argExtractor.uploadType();
+        ItemType actual = argExtractor.itemType();
 
         assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
-    void given_uploadTypeSetAsStatement_when_codeProtection_then_returnEnum() {
-        argExtractor = new ArgExtractor(new String[]{"uploadType=STaTeMeNt"});
+    void givenItemTypeSetAsStatement_whenCodeProtection_thenReturnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"itemType=STaTeMeNt"});
 
-        ItemType actual = argExtractor.uploadType();
+        ItemType actual = argExtractor.itemType();
 
         assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }

@@ -26,7 +26,7 @@ class MercurialDiffCommandTest {
 
     @Test
     void given_codeProtectionNONE_when_getInitialCommand_then_returnInitialCommandForProtectionNONE() {
-        when(applicationProperties.uploadType()).thenReturn(ItemType.SIMPLE);
+        when(applicationProperties.itemType()).thenReturn(ItemType.SIMPLE);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -36,7 +36,7 @@ class MercurialDiffCommandTest {
 
     @Test
     void given_codeProtectionSIMPLE_when_getInitialCommand_then_returnInitialCommandForProtectionSIMPLE() {
-        when(applicationProperties.uploadType()).thenReturn(ItemType.PROTECTED);
+        when(applicationProperties.itemType()).thenReturn(ItemType.PROTECTED);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.getInitialCommand();
@@ -56,7 +56,7 @@ class MercurialDiffCommandTest {
         when(applicationProperties.committerEmail()).thenReturn(committerEmail);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
-        when(applicationProperties.uploadType()).thenReturn(uploadType);
+        when(applicationProperties.itemType()).thenReturn(uploadType);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.commandAsList();
@@ -79,7 +79,7 @@ class MercurialDiffCommandTest {
         when(applicationProperties.mercurialAuthor()).thenReturn(author);
         when(applicationProperties.startDate()).thenReturn(startDate);
         when(applicationProperties.endDate()).thenReturn(endDate);
-        when(applicationProperties.uploadType()).thenReturn(uploadType);
+        when(applicationProperties.itemType()).thenReturn(uploadType);
         command = new MercurialDiffCommand(applicationProperties);
 
         List<String> actual = command.commandAsList();

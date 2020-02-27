@@ -3,7 +3,9 @@ package pg.gipter.core.producer.command;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.utils.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -37,7 +39,7 @@ final class SvnDiffCommand extends AbstractDiffCommand {
     @Override
     List<String> getInitialCommand() {
         LinkedList<String> initialCommand = new LinkedList<>(Arrays.asList("svn", "log"));
-        switch (appProps.uploadType()) {
+        switch (appProps.itemType()) {
             case SIMPLE:
                 initialCommand.add("--diff");
                 break;

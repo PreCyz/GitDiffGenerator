@@ -3,7 +3,9 @@ package pg.gipter.core.producer.command;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.utils.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -37,7 +39,7 @@ final class GitDiffCommand extends AbstractDiffCommand {
         if (!appProps.isSkipRemote()) {
             initialCommand.add("--remotes=origin*");
         }
-        switch (appProps.uploadType()) {
+        switch (appProps.itemType()) {
             case SIMPLE:
                 initialCommand.add("--patch");
                 break;
