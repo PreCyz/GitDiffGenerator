@@ -6,7 +6,7 @@ import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.dto.*;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producer.command.UploadType;
 
 import java.io.File;

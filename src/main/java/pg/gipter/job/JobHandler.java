@@ -10,7 +10,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.model.RunConfig;
 import pg.gipter.job.upgrade.UpgradeJobCreator;
 import pg.gipter.job.upload.JobProperty;
 import pg.gipter.job.upload.JobType;

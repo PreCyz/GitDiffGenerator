@@ -2,7 +2,7 @@ package pg.gipter;
 
 import org.mockito.stubbing.Answer;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.dto.*;
+import pg.gipter.core.model.*;
 
 import java.util.*;
 

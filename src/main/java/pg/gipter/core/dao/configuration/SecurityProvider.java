@@ -1,6 +1,6 @@
 package pg.gipter.core.dao.configuration;
 
-import pg.gipter.core.dto.CipherDetails;
+import pg.gipter.core.model.CipherDetails;
 
 import java.util.Optional;
 

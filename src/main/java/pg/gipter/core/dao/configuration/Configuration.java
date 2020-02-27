@@ -1,9 +1,9 @@
 package pg.gipter.core.dao.configuration;
 
-import pg.gipter.core.dto.ApplicationConfig;
-import pg.gipter.core.dto.CipherDetails;
-import pg.gipter.core.dto.RunConfig;
-import pg.gipter.core.dto.ToolkitConfig;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.model.CipherDetails;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.ToolkitConfig;
 
 import java.util.LinkedList;
 import java.util.List;

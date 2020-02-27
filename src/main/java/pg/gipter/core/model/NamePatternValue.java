@@ -1,4 +1,4 @@
-package pg.gipter.core.dto;
+package pg.gipter.core.model;
 
 public enum NamePatternValue {
     CURRENT_DATE,

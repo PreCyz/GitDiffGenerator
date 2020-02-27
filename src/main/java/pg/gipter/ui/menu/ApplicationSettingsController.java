@@ -9,7 +9,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.PreferredArgSource;
-import pg.gipter.core.dto.ApplicationConfig;
+import pg.gipter.core.model.ApplicationConfig;
 import pg.gipter.service.StartupService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;

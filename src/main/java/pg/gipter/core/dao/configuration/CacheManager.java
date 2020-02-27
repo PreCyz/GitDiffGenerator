@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.model.RunConfig;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

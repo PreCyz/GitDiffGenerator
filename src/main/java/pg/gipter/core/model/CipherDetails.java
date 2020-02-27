@@ -1,4 +1,4 @@
-package pg.gipter.core.dto;
+package pg.gipter.core.model;
 
 import java.nio.charset.StandardCharsets;
 

@@ -7,8 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.core.dto.CipherDetails;
-import pg.gipter.core.dto.ToolkitConfig;
+import pg.gipter.core.model.CipherDetails;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.service.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 

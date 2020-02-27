@@ -18,7 +18,7 @@ import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.model.RunConfig;
 import pg.gipter.job.JobHandler;
 import pg.gipter.job.upload.*;
 import pg.gipter.ui.AbstractController;

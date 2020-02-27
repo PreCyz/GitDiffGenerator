@@ -8,10 +8,10 @@ import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dto.ApplicationConfig;
-import pg.gipter.core.dto.RunConfig;
-import pg.gipter.core.dto.RunConfigBuilder;
-import pg.gipter.core.dto.ToolkitConfig;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.RunConfigBuilder;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.utils.CryptoUtils;
 
 import java.io.IOException;

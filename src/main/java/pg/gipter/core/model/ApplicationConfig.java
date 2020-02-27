@@ -1,4 +1,4 @@
-package pg.gipter.core.dto;
+package pg.gipter.core.model;
 
 import org.slf4j.event.Level;
 import pg.gipter.core.ArgName;

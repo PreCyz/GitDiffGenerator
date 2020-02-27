@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.SecurityProvider;
-import pg.gipter.core.dto.CipherDetails;
-import pg.gipter.core.dto.ToolkitConfig;
+import pg.gipter.core.model.CipherDetails;
+import pg.gipter.core.model.ToolkitConfig;
 
 import java.io.IOException;
 import java.nio.file.Files;

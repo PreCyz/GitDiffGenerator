@@ -19,7 +19,7 @@ import org.controlsfx.dialog.WizardPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.*;
-import pg.gipter.core.dto.*;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.ui.alert.ImageFile;

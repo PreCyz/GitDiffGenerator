@@ -29,7 +29,7 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.core.dto.*;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.ToolkitService;

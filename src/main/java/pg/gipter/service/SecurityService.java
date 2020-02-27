@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.SecurityProvider;
-import pg.gipter.core.dto.CipherDetails;
+import pg.gipter.core.model.CipherDetails;
 import pg.gipter.utils.CryptoUtils;
 
 import javax.crypto.Cipher;

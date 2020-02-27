@@ -1,4 +1,4 @@
-package pg.gipter.core.dto;
+package pg.gipter.core.model;
 
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.producer.command.UploadType;

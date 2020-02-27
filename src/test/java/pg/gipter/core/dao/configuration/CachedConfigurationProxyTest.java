@@ -3,7 +3,7 @@ package pg.gipter.core.dao.configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.model.RunConfig;
 
 import java.io.IOException;
 import java.nio.file.Files;

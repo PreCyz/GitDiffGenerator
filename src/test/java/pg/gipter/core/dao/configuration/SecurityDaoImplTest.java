@@ -4,7 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.core.dto.CipherDetails;
+import pg.gipter.core.model.CipherDetails;
 
 import java.io.IOException;
 import java.nio.file.Files;

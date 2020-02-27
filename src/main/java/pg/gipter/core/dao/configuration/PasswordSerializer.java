@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import pg.gipter.core.dto.ToolkitConfig;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.service.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 import pg.gipter.utils.StringUtils;

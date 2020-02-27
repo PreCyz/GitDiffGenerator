@@ -2,9 +2,9 @@ package pg.gipter.core.dao.configuration;
 
 import org.springframework.util.CollectionUtils;
 import pg.gipter.core.ArgName;
-import pg.gipter.core.dto.ApplicationConfig;
-import pg.gipter.core.dto.RunConfig;
-import pg.gipter.core.dto.ToolkitConfig;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producer.command.UploadType;
 import pg.gipter.utils.StringUtils;
 

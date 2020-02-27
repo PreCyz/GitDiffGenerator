@@ -1,6 +1,6 @@
 package pg.gipter.core.dao.configuration;
 
-import pg.gipter.core.dto.*;
+import pg.gipter.core.model.*;
 
 import java.util.Map;
 import java.util.Optional;
