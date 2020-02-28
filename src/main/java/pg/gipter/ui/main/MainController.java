@@ -29,13 +29,12 @@ import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CacheManager;
-import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.NamePatternValue;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.service.DataService;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.ToolkitService;
 import pg.gipter.service.platform.AppManager;
@@ -94,7 +93,7 @@ public class MainController extends AbstractController {
     @FXML
     private TextField svnAuthorTextField;
     @FXML
-    private ComboBox<ItemType> uploadTypeComboBox;
+    private ComboBox<ItemType> itemTypeComboBox;
     @FXML
     private CheckBox skipRemoteCheckBox;
     @FXML
@@ -159,9 +158,11 @@ public class MainController extends AbstractController {
     private CheckBox useLastItemDateCheckbox;
     @FXML
     private Label currentWeekNumberLabel;
+    @FXML
+    private Button sharePointConfigButton;
 
     private ApplicationProperties applicationProperties;
-    private DataDao dataDao;
+    private DataService dataService;
 
     private String userFolderUrl;
     private Set<String> definedPatterns;
@@ -173,7 +174,7 @@ public class MainController extends AbstractController {
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        this.dataDao = DaoFactory.getDataDao();
+        this.dataService = DataService.getInstance();
         this.definedPatterns = EnumSet.allOf(NamePatternValue.class)
                 .stream()
                 .map(e -> String.format("{%s}", e.name()))
@@ -197,8 +198,8 @@ public class MainController extends AbstractController {
         gitAuthorTextField.setText(applicationProperties.gitAuthor());
         mercurialAuthorTextField.setText(applicationProperties.mercurialAuthor());
         svnAuthorTextField.setText(applicationProperties.svnAuthor());
-        uploadTypeComboBox.setItems(FXCollections.observableArrayList(ItemType.values()));
-        uploadTypeComboBox.setValue(applicationProperties.itemType());
+        itemTypeComboBox.setItems(FXCollections.observableArrayList(ItemType.values()));
+        itemTypeComboBox.setValue(applicationProperties.itemType());
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
         fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
 
@@ -285,9 +286,13 @@ public class MainController extends AbstractController {
 
     private void setProperties(ResourceBundle resources) {
         toolkitDomainTextField.setEditable(false);
-        toolkitProjectListNamesTextField.setDisable(applicationProperties.itemType() != ItemType.TOOLKIT_DOCS);
+        toolkitProjectListNamesTextField.setDisable(
+                !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(applicationProperties.itemType())
+        );
         setTooltipOnProjectListNames();
-        deleteDownloadedFilesCheckBox.setDisable(applicationProperties.itemType() != ItemType.TOOLKIT_DOCS);
+        deleteDownloadedFilesCheckBox.setDisable(
+                !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(applicationProperties.itemType())
+        );
 
         if (applicationProperties.projectPaths().isEmpty()) {
             projectPathButton.setText(resources.getString("button.add"));
@@ -383,7 +388,8 @@ public class MainController extends AbstractController {
         executeAllButton.setDisable(runConfigMap.isEmpty());
         jobButton.setDisable(runConfigMap.isEmpty());
         configurationNameComboBox.setDisable(runConfigMap.isEmpty());
-        projectPathButton.setDisable(runConfigMap.isEmpty() || uploadTypeComboBox.getValue() == ItemType.STATEMENT);
+        projectPathButton.setDisable(runConfigMap.isEmpty() || itemTypeComboBox.getValue() == ItemType.STATEMENT);
+        sharePointConfigButton.setDisable(itemTypeComboBox.getValue() != ItemType.SHARE_POINT_DOCS);
     }
 
     private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
@@ -424,7 +430,7 @@ public class MainController extends AbstractController {
         wizardMenuItem.setOnAction(launchWizardActionEventHandler());
         projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
-        uploadTypeComboBox.setOnAction(uploadTypeActionEventHandler());
+        itemTypeComboBox.setOnAction(uploadTypeActionEventHandler());
         executeButton.setOnAction(executeActionEventHandler());
         executeAllButton.setOnAction(executeAllActionEventHandler());
         jobButton.setOnAction(jobActionEventHandler());
@@ -434,6 +440,7 @@ public class MainController extends AbstractController {
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
         verifyCredentialsHyperlink.setOnMouseClicked(verifyCredentialsHyperlinkOnMouseClickEventHandler());
         itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
+        sharePointConfigButton.setOnAction(sharePointConfigActionEventHandler());
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
@@ -501,7 +508,7 @@ public class MainController extends AbstractController {
             uiLauncher.setApplicationProperties(applicationProperties);
             String configurationName = configurationNameTextField.getText();
             updateConfigurationNameComboBox(configurationName, configurationName);
-            if (uploadTypeComboBox.getValue() == ItemType.TOOLKIT_DOCS) {
+            if (itemTypeComboBox.getValue() == ItemType.TOOLKIT_DOCS) {
                 uiLauncher.showToolkitProjectsWindow(new Properties());
             } else {
                 uiLauncher.showProjectsWindow(new Properties());
@@ -521,7 +528,7 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
         return event -> {
-            if (uploadTypeComboBox.getValue() == ItemType.STATEMENT) {
+            if (itemTypeComboBox.getValue() == ItemType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setInitialDirectory(new File("."));
                 fileChooser.setTitle(resources.getString("directory.item.statement.title"));
@@ -574,7 +581,7 @@ public class MainController extends AbstractController {
 
     private void updateLastItemUploadDate() {
         try {
-            Optional<Properties> dataProperties = dataDao.loadDataProperties();
+            Optional<Properties> dataProperties = dataService.loadDataProperties();
             if (dataProperties.isPresent() && dataProperties.get().containsKey(DaoConstants.UPLOAD_STATUS_KEY)) {
                 UploadStatus status = UploadStatus.valueOf(dataProperties.get().getProperty(DaoConstants.UPLOAD_STATUS_KEY));
                 if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(status)) {
@@ -628,7 +635,7 @@ public class MainController extends AbstractController {
         if (!StringUtils.nullOrEmpty(svnAuthorTextField.getText())) {
             runConfig.setSvnAuthor(svnAuthorTextField.getText());
         }
-        runConfig.setItemType(uploadTypeComboBox.getValue());
+        runConfig.setItemType(itemTypeComboBox.getValue());
         runConfig.setSkipRemote(skipRemoteCheckBox.isSelected());
         runConfig.setFetchAll(fetchAllCheckBox.isSelected());
 
@@ -672,29 +679,31 @@ public class MainController extends AbstractController {
 
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
-            boolean disableProjectButton = uploadTypeComboBox.getValue() == ItemType.STATEMENT;
+            boolean disableProjectButton = itemTypeComboBox.getValue() == ItemType.STATEMENT;
             disableProjectButton |= applicationProperties.getRunConfigMap().isEmpty() && configurationNameTextField.getText().isEmpty();
             projectPathButton.setDisable(disableProjectButton);
-            if (uploadTypeComboBox.getValue() == ItemType.TOOLKIT_DOCS) {
+            if (itemTypeComboBox.getValue() == ItemType.TOOLKIT_DOCS) {
                 endDatePicker.setValue(LocalDate.now());
             }
-            toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != ItemType.TOOLKIT_DOCS);
-            deleteDownloadedFilesCheckBox.setDisable(uploadTypeComboBox.getValue() != ItemType.TOOLKIT_DOCS);
-            setDisable(uploadTypeComboBox.getValue());
+            toolkitProjectListNamesTextField.setDisable(itemTypeComboBox.getValue() != ItemType.TOOLKIT_DOCS);
+            deleteDownloadedFilesCheckBox.setDisable(
+                    !EnumSet.of(ItemType.TOOLKIT_DOCS,  ItemType.SHARE_POINT_DOCS).contains(itemTypeComboBox.getValue())
+            );
+            setDisable(itemTypeComboBox.getValue());
             setTooltipOnProjectListNames();
         };
     }
 
     private void setDisable(ItemType uploadType) {
-        endDatePicker.setDisable(uploadType == ItemType.TOOLKIT_DOCS);
-
-        authorsTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT).contains(uploadType));
-        committerEmailTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT).contains(uploadType));
-        gitAuthorTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT).contains(uploadType));
-        svnAuthorTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT).contains(uploadType));
-        mercurialAuthorTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT).contains(uploadType));
-        skipRemoteCheckBox.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT).contains(uploadType));
-        fetchAllCheckBox.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT).contains(uploadType));
+        endDatePicker.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(uploadType));
+        authorsTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(uploadType));
+        committerEmailTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(uploadType));
+        gitAuthorTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(uploadType));
+        svnAuthorTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(uploadType));
+        mercurialAuthorTextField.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(uploadType));
+        skipRemoteCheckBox.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(uploadType));
+        fetchAllCheckBox.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(uploadType));
+        sharePointConfigButton.setDisable(uploadType != ItemType.SHARE_POINT_DOCS || applicationProperties.getRunConfigMap().isEmpty());
     }
 
     private EventHandler<ActionEvent> jobActionEventHandler() {
@@ -872,6 +881,13 @@ public class MainController extends AbstractController {
                 itemFileNamePrefixTextField.setText(currentItemName);
                 itemFileNamePrefixTextField.positionCaret(currentItemName.length());
             }
+        };
+    }
+
+    private EventHandler<ActionEvent> sharePointConfigActionEventHandler() {
+        return actionEvent -> {
+            uiLauncher.hideMainWindow();
+            uiLauncher.showSharePointConfigWindow();
         };
     }
 

@@ -94,7 +94,7 @@ class CachedConfigurationProxy extends ApplicationJsonReader implements CachedCo
         return Optional.ofNullable(cachedConfiguration.getRunConfigs())
                 .orElseGet(ArrayList::new)
                 .stream()
-                .collect(toMap(RunConfig::getConfigurationName, rc -> rc));
+                .collect(toMap(RunConfig::getConfigurationName, rc -> rc, (v1, v2) -> v1));
     }
 
     @Override

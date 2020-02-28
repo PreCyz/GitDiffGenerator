@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class RunConfig {
 
@@ -30,7 +31,7 @@ public class RunConfig {
     private String toolkitProjectListNames;
     private Boolean deleteDownloadedFiles;
     private PreferredArgSource preferredArgSource;
-    private SharePointConfig sharePointConfig;
+    private Set<SharePointConfig> sharePointConfigs;
 
     public RunConfig() {
         configurationName = ArgName.configurationName.defaultValue();
@@ -40,7 +41,7 @@ public class RunConfig {
                      ItemType itemType, Boolean skipRemote, Boolean fetchAll, String itemPath, String projectPath,
                      String itemFileNamePrefix, Integer periodInDays, LocalDate startDate, LocalDate endDate,
                      String configurationName, String toolkitProjectListNames, Boolean deleteDownloadedFiles,
-                     PreferredArgSource preferredArgSource, SharePointConfig sharePointConfig) {
+                     PreferredArgSource preferredArgSource, Set<SharePointConfig> sharePointConfigs) {
         this.author = author;
         this.gitAuthor = gitAuthor;
         this.mercurialAuthor = mercurialAuthor;
@@ -59,7 +60,7 @@ public class RunConfig {
         this.toolkitProjectListNames = toolkitProjectListNames;
         this.deleteDownloadedFiles = deleteDownloadedFiles;
         this.preferredArgSource = preferredArgSource;
-        this.sharePointConfig = sharePointConfig;
+        this.sharePointConfigs = sharePointConfigs;
     }
 
     public String getAuthor() {
@@ -206,12 +207,25 @@ public class RunConfig {
         this.preferredArgSource = preferredArgSource;
     }
 
-    public SharePointConfig getSharePointConfig() {
-        return sharePointConfig;
+    public Set<SharePointConfig> getSharePointConfigs() {
+        return sharePointConfigs;
     }
 
-    public void setSharePointConfig(SharePointConfig sharePointConfig) {
-        this.sharePointConfig = sharePointConfig;
+    public void setSharePointConfigs(Set<SharePointConfig> sharePointConfigs) {
+        this.sharePointConfigs = sharePointConfigs;
+    }
+
+    public void addSharePointConfig(SharePointConfig sharePointConfig) {
+        if (sharePointConfigs == null) {
+            sharePointConfigs = new LinkedHashSet<>();
+        }
+        sharePointConfigs.add(sharePointConfig);
+    }
+
+    public void removeSharePointConfig(SharePointConfig sharePointConfig) {
+        if (sharePointConfigs != null) {
+            sharePointConfigs.remove(sharePointConfig);
+        }
     }
 
     public String[] toArgumentArray() {

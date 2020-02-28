@@ -4,6 +4,8 @@ import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.producer.command.ItemType;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class RunConfigBuilder {
 
@@ -25,7 +27,7 @@ public class RunConfigBuilder {
     private String toolkitProjectListNames;
     private Boolean deleteDownloadedFiles;
     private PreferredArgSource preferredArgSource;
-    private SharePointConfig sharePointConfig;
+    private Set<SharePointConfig> sharePointConfigs;
 
     public RunConfigBuilder withAuthor(String author) {
         this.author = author;
@@ -117,14 +119,14 @@ public class RunConfigBuilder {
         return this;
     }
 
-    public RunConfigBuilder withSharePointConfig(SharePointConfig sharePointConfig) {
-        this.sharePointConfig = sharePointConfig;
+    public RunConfigBuilder withSharePointConfigs(Set<SharePointConfig> sharePointConfigs) {
+        this.sharePointConfigs = new LinkedHashSet<>(sharePointConfigs);
         return this;
     }
 
     public RunConfig create() {
         return new RunConfig(author, gitAuthor, mercurialAuthor, svnAuthor, committerEmail, itemType, skipRemote, fetchAll,
                 itemPath, projectPath, itemFileNamePrefix, periodInDays, startDate, endDate, configurationName, toolkitProjectListNames,
-                deleteDownloadedFiles, preferredArgSource, sharePointConfig);
+                deleteDownloadedFiles, preferredArgSource, sharePointConfigs);
     }
 }

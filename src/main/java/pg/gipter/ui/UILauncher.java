@@ -62,6 +62,7 @@ public class UILauncher implements Launcher {
     private Stage applicationSettingsWindow;
     private Stage upgradeWindow;
     private Stage toolkitSettingsWindow;
+    private Stage sharePointConfigWindow;
     private TrayHandler trayHandler;
     private ConfigurationDao configurationDao;
     private DataDao dataDao;
@@ -507,5 +508,25 @@ public class UILauncher implements Launcher {
 
     public boolean isInvokeExecute() {
         return wizardProperties == null || wizardProperties.isEmpty();
+    }
+
+    public void showSharePointConfigWindow() {
+        Platform.runLater(() -> {
+            sharePointConfigWindow = new Stage();
+            sharePointConfigWindow.initModality(Modality.APPLICATION_MODAL);
+            buildScene(sharePointConfigWindow, WindowFactory.SHARE_POINT_CONFIG.createWindow(applicationProperties, this));
+            sharePointConfigWindow.setOnCloseRequest(event -> {
+                hideSharePointConfigWindow();
+                if (isInvokeExecute()) {
+                    execute();
+                }
+            });
+            sharePointConfigWindow.showAndWait();
+        });
+    }
+
+    private void hideSharePointConfigWindow() {
+        sharePointConfigWindow.close();
+        sharePointConfigWindow = null;
     }
 }

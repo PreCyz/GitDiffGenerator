@@ -436,11 +436,11 @@ public class WizardLauncher implements Launcher {
                     }
                     ApplicationProperties applicationProperties = propertiesWithCredentials();
                     if (applicationProperties.isToolkitCredentialsSet()) {
-                        return flowAdvanceLogic();
+                        return flowAdvancedLogic();
                     }
                     return toolkitCredentialsPage;
                 } else if (currentPage == toolkitCredentialsPage) {
-                    return flowAdvanceLogic();
+                    return flowAdvancedLogic();
                 } else if (currentPage == committerPage) {
                     return projectPage;
                 } else {
@@ -448,7 +448,7 @@ public class WizardLauncher implements Launcher {
                 }
             }
 
-            private WizardPane flowAdvanceLogic() {
+            private WizardPane flowAdvancedLogic() {
                 String property = wizardProperties.getProperty(ArgName.itemType.name());
                 if (StringUtils.nullOrEmpty(property)) {
                     return committerPage;
@@ -456,6 +456,7 @@ public class WizardLauncher implements Launcher {
                 switch (ItemType.valueFor(property)) {
                     case TOOLKIT_DOCS:
                     case STATEMENT:
+                    case SHARE_POINT_DOCS:
                         return projectPage;
                     default:
                         return committerPage;
