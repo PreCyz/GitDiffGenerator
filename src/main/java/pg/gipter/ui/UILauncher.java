@@ -6,45 +6,30 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import pg.gipter.core.*;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.job.JobHandler;
-import pg.gipter.job.upload.JobProperty;
-import pg.gipter.job.upload.JobType;
-import pg.gipter.job.upload.UploadItemJob;
-import pg.gipter.job.upload.UploadItemJobBuilder;
+import pg.gipter.job.upload.*;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.StartupService;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.ui.alert.*;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.time.*;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
@@ -404,7 +389,7 @@ public class UILauncher implements Launcher {
         mainWindow.hide();
     }
 
-    public void showProjectsWindow(Properties wizardProperties) {
+    private void showProjectsWindow(Properties wizardProperties) {
         this.wizardProperties = wizardProperties;
         Platform.runLater(() -> {
             projectsWindow = new Stage();
@@ -412,7 +397,7 @@ public class UILauncher implements Launcher {
             buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
             projectsWindow.setOnCloseRequest(event -> {
                 hideProjectsWindow();
-                if (isInvokeExecute()) {
+                if (hasNoWizardProperties()) {
                     execute();
                 }
             });
@@ -467,7 +452,7 @@ public class UILauncher implements Launcher {
         toolkitSettingsWindow.showAndWait();
     }
 
-    public void showToolkitProjectsWindow(Properties wizardProperties) {
+    private void showToolkitProjectsWindow(Properties wizardProperties) {
         this.wizardProperties = wizardProperties;
         Platform.runLater(() -> {
             toolkitProjectsWindow = new Stage();
@@ -475,7 +460,7 @@ public class UILauncher implements Launcher {
             buildScene(toolkitProjectsWindow, WindowFactory.TOOLKIT_PROJECTS.createWindow(applicationProperties, this));
             toolkitProjectsWindow.setOnCloseRequest(event -> {
                 hideToolkitProjectsWindow();
-                if (isInvokeExecute()) {
+                if (hasNoWizardProperties()) {
                     execute();
                 }
             });
@@ -506,18 +491,23 @@ public class UILauncher implements Launcher {
         upgradeWindow.close();
     }
 
-    public boolean isInvokeExecute() {
-        return wizardProperties == null || wizardProperties.isEmpty();
+    private boolean hasNoWizardProperties() {
+        return !hasWizardProperties();
     }
 
-    public void showSharePointConfigWindow() {
+    public boolean hasWizardProperties() {
+        return wizardProperties != null && !wizardProperties.isEmpty();
+    }
+
+    private void showSharePointProjectWindow(Properties wizardProperties) {
+        this.wizardProperties = wizardProperties;
         Platform.runLater(() -> {
             sharePointConfigWindow = new Stage();
             sharePointConfigWindow.initModality(Modality.APPLICATION_MODAL);
-            buildScene(sharePointConfigWindow, WindowFactory.SHARE_POINT_CONFIG.createWindow(applicationProperties, this));
+            buildScene(sharePointConfigWindow, WindowFactory.SHARE_POINT_PROJECTS.createWindow(applicationProperties, this));
             sharePointConfigWindow.setOnCloseRequest(event -> {
                 hideSharePointConfigWindow();
-                if (isInvokeExecute()) {
+                if (hasNoWizardProperties()) {
                     execute();
                 }
             });
@@ -528,5 +518,22 @@ public class UILauncher implements Launcher {
     private void hideSharePointConfigWindow() {
         sharePointConfigWindow.close();
         sharePointConfigWindow = null;
+    }
+
+    public void showProject(ItemType itemType) {
+        showProject(itemType, new Properties());
+    }
+
+    public void showProject(ItemType itemType, Properties properties) {
+        switch (itemType) {
+            case TOOLKIT_DOCS:
+                showToolkitProjectsWindow(properties);
+                break;
+            case SHARE_POINT_DOCS:
+                showSharePointProjectWindow(properties);
+                break;
+            default:
+                showProjectsWindow(properties);
+        }
     }
 }

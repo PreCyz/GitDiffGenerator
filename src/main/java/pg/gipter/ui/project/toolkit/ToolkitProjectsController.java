@@ -11,26 +11,20 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import pg.gipter.core.*;
 import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.service.ToolkitService;
 import pg.gipter.service.platform.AppManager;
 import pg.gipter.service.platform.AppManagerFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
+import pg.gipter.ui.alert.*;
 import pg.gipter.ui.project.ProjectDetails;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -241,12 +235,12 @@ public class ToolkitProjectsController extends AbstractController {
             applicationProperties.save();
 
             uiLauncher.hideToolkitProjectsWindow();
-            if (uiLauncher.isInvokeExecute()) {
+            if (uiLauncher.hasWizardProperties()) {
+                uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
+            } else {
                 applicationProperties = ApplicationPropertiesFactory.getInstance(applicationProperties.getCliArgs());
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
-            } else {
-                uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
             }
         };
     }

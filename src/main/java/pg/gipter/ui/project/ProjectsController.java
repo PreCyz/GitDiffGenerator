@@ -19,9 +19,7 @@ import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
+import pg.gipter.ui.alert.*;
 import pg.gipter.utils.AlertHelper;
 
 import java.io.File;
@@ -197,11 +195,11 @@ public class ProjectsController extends AbstractController {
             applicationProperties.save();
 
             uiLauncher.hideProjectsWindow();
-            if (uiLauncher.isInvokeExecute()) {
+            if (uiLauncher.hasWizardProperties()) {
+                uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
+            } else {
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
-            } else {
-                uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
             }
         };
     }

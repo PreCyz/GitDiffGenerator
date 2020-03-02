@@ -1,4 +1,4 @@
-package pg.gipter.ui.sharepoint;
+package pg.gipter.ui.project.sharepoint;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.util.StringConverter;
 import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.service.platform.AppManager;
@@ -19,17 +20,13 @@ import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.*;
+import java.util.function.*;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
 
-public class SharePointConfigController extends AbstractController {
+public class SharePointProjectController extends AbstractController {
 
     @FXML
     private TextField usernameTextField;
@@ -46,7 +43,7 @@ public class SharePointConfigController extends AbstractController {
     @FXML
     private Hyperlink sharePointLink;
     @FXML
-    private ComboBox<SharePointConfig> sharePointUrlsComboBox;
+    private ComboBox<SharePointConfig> sharePointProjectsComboBox;
     @FXML
     private Button addConfigButton;
     @FXML
@@ -58,7 +55,7 @@ public class SharePointConfigController extends AbstractController {
     private RunConfig currentRunConfig;
     private LinkedHashSet<SharePointConfig> sharePointConfigSet;
 
-    public SharePointConfigController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+    public SharePointProjectController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         this.currentRunConfig = applicationProperties.getRunConfig(applicationProperties.configurationName())
@@ -84,23 +81,26 @@ public class SharePointConfigController extends AbstractController {
             sharePointConfig = Optional.of(sharePointConfigSet)
                     .map(set -> new LinkedList<>(set).getFirst())
                     .orElseGet(SharePointConfig::new);
-            usernameTextField.setText(sharePointConfig.getUsername());
-            passwordField.setText(sharePointConfig.getPassword());
-            domainTextField.setText(sharePointConfig.getDomain());
-            urlTextField.setText(sharePointConfig.getUrl());
-            projectTextField.setText(sharePointConfig.getProject());
-            listNameTextField.setText(sharePointConfig.getListName());
-            sharePointLink.setText(calculateFullLink());
-            sharePointUrlsComboBox.setItems(FXCollections.observableArrayList(sharePointConfigSet));
-            sharePointUrlsComboBox.setValue(sharePointConfig);
+            updateUIControls(sharePointConfig);
+            sharePointProjectsComboBox.setItems(FXCollections.observableArrayList(sharePointConfigSet));
         } else {
             sharePointConfig = new SharePointConfig();
-            sharePointUrlsComboBox.setItems(FXCollections.observableArrayList(sharePointConfig));
-            sharePointUrlsComboBox.setValue(sharePointConfig);
+            sharePointProjectsComboBox.setItems(FXCollections.observableArrayList(sharePointConfig));
         }
+        sharePointProjectsComboBox.setValue(sharePointConfig);
         numberOfConfigsLabel.setText(
                 BundleUtils.getMsg("sharepoint.numberOfConfigs", String.valueOf(sharePointConfigSet.size()))
         );
+    }
+
+    private void updateUIControls(SharePointConfig valueToSelect) {
+        usernameTextField.setText(valueToSelect.getUsername());
+        passwordField.setText(valueToSelect.getPassword());
+        domainTextField.setText(valueToSelect.getDomain());
+        urlTextField.setText(valueToSelect.getUrl());
+        projectTextField.setText(valueToSelect.getProject());
+        listNameTextField.setText(valueToSelect.getListName());
+        sharePointLink.setText(calculateFullLink());
     }
 
     private String calculateFullLink() {
@@ -129,8 +129,8 @@ public class SharePointConfigController extends AbstractController {
     }
 
     private void setProperties() {
-        sharePointUrlsComboBox.setConverter(comboBoxStringConverter());
-        sharePointUrlsComboBox.setDisable(sharePointConfigSet.isEmpty());
+        sharePointProjectsComboBox.setConverter(comboBoxStringConverter());
+        sharePointProjectsComboBox.setDisable(sharePointConfigSet.isEmpty());
         removeConfigButton.setDisable(sharePointConfigSet.isEmpty());
     }
 
@@ -159,6 +159,7 @@ public class SharePointConfigController extends AbstractController {
         addConfigButton.setOnAction(addConfigActionEventHandler());
         removeConfigButton.setOnAction(removeConfigActionEventHandler(resources));
         sharePointLink.setOnMouseClicked(sharePointLinkMouseClickEventHandler());
+        sharePointProjectsComboBox.setOnAction(sharePointProjectsComboBoxActionEventHandler());
     }
 
     private EventHandler<ActionEvent> addConfigActionEventHandler() {
@@ -173,10 +174,18 @@ public class SharePointConfigController extends AbstractController {
 
             sharePointConfigSet.add(sharePointConfig);
 
-            sharePointUrlsComboBox.setItems(FXCollections.observableArrayList(sharePointConfigSet));
-            sharePointUrlsComboBox.setValue(sharePointConfig);
-            sharePointUrlsComboBox.setDisable(sharePointConfigSet.isEmpty());
+            sharePointProjectsComboBox.setItems(FXCollections.observableArrayList(sharePointConfigSet));
+            sharePointProjectsComboBox.setValue(sharePointConfig);
+            sharePointProjectsComboBox.setDisable(sharePointConfigSet.isEmpty());
 
+            String projects = Optional.ofNullable(currentRunConfig.getProjectPath()).orElseGet(() -> "");
+            if (projects.isEmpty()) {
+                projects = sharePointConfig.getProject();
+            } else {
+                projects += "," + sharePointConfig.getProject();
+            }
+
+            currentRunConfig.setProjectPath(projects);
             currentRunConfig.addSharePointConfig(sharePointConfig);
             applicationProperties.updateCurrentRunConfig(currentRunConfig);
             applicationProperties.save();
@@ -186,15 +195,21 @@ public class SharePointConfigController extends AbstractController {
             numberOfConfigsLabel.setText(
                     BundleUtils.getMsg("sharepoint.numberOfConfigs", String.valueOf(sharePointConfigSet.size()))
             );
+
+            if (uiLauncher.hasWizardProperties()) {
+                uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
+            }
         };
     }
 
     private EventHandler<ActionEvent> removeConfigActionEventHandler(ResourceBundle resources) {
         return actionEvent -> {
-            sharePointConfigSet.remove(sharePointUrlsComboBox.getValue());
+            SharePointConfig valueToRemove = sharePointProjectsComboBox.getValue();
+            sharePointConfigSet.remove(valueToRemove);
 
+            String projects = "";
             if (sharePointConfigSet.isEmpty()) {
-                sharePointUrlsComboBox.setItems(FXCollections.emptyObservableList());
+                sharePointProjectsComboBox.setItems(FXCollections.emptyObservableList());
                 usernameTextField.setText("");
                 passwordField.setText("");
                 domainTextField.setText("");
@@ -202,27 +217,26 @@ public class SharePointConfigController extends AbstractController {
                 projectTextField.setText("");
                 listNameTextField.setText("");
                 sharePointLink.setText(resources.getString("sharepoint.fullLink.default"));
-                sharePointUrlsComboBox.setDisable(sharePointConfigSet.isEmpty());
+                sharePointProjectsComboBox.setDisable(sharePointConfigSet.isEmpty());
                 removeConfigButton.setDisable(sharePointConfigSet.isEmpty());
             } else {
-                sharePointUrlsComboBox.setItems(FXCollections.observableArrayList(sharePointConfigSet));
+                sharePointProjectsComboBox.setItems(FXCollections.observableArrayList(sharePointConfigSet));
                 SharePointConfig valueToSelect = new LinkedList<>(sharePointConfigSet).getFirst();
-                sharePointUrlsComboBox.setValue(valueToSelect);
-                usernameTextField.setText(valueToSelect.getUsername());
-                passwordField.setText(valueToSelect.getPassword());
-                domainTextField.setText(valueToSelect.getDomain());
-                urlTextField.setText(valueToSelect.getUrl());
-                projectTextField.setText(valueToSelect.getProject());
-                listNameTextField.setText(valueToSelect.getListName());
-                sharePointLink.setText(calculateFullLink());
+                sharePointProjectsComboBox.setValue(valueToSelect);
+                updateUIControls(valueToSelect);
+                projects = sharePointConfigSet.stream().map(SharePointConfig::getProject).collect(joining(","));
             }
             numberOfConfigsLabel.setText(
                     BundleUtils.getMsg("sharepoint.numberOfConfigs", String.valueOf(sharePointConfigSet.size()))
             );
 
+            currentRunConfig.setProjectPath(projects);
             currentRunConfig.setSharePointConfigs(sharePointConfigSet);
             applicationProperties.updateCurrentRunConfig(currentRunConfig);
             applicationProperties.save();
+            if (uiLauncher.hasWizardProperties()) {
+                uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
+            }
         };
     }
 
@@ -232,6 +246,15 @@ public class SharePointConfigController extends AbstractController {
                 AppManager instance = AppManagerFactory.getInstance();
                 instance.launchDefaultBrowser(calculateFullLink());
                 sharePointLink.setVisited(false);
+            }
+        };
+    }
+
+    private EventHandler<ActionEvent> sharePointProjectsComboBoxActionEventHandler() {
+        return actionEvent -> {
+            SharePointConfig selectedValue = sharePointProjectsComboBox.getValue();
+            if (selectedValue != null) {
+                updateUIControls(selectedValue);
             }
         };
     }

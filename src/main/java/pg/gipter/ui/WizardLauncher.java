@@ -13,25 +13,17 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.*;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.ResourceUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.io.File;
 import java.util.Optional;
@@ -335,22 +327,21 @@ public class WizardLauncher implements Launcher {
 
     private EventHandler<ActionEvent> addProjectEventHandler() {
         return event -> {
-            String[] args = wizardProperties.entrySet().stream()
-                    .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
-                    .toArray(String[]::new);
-            RunConfig runConfig = RunConfig.valueFrom(args);
-            ToolkitConfig toolkitConfig = ToolkitConfig.valueFrom(args);
-            applicationProperties.updateCurrentRunConfig(runConfig);
-            applicationProperties.updateToolkitConfig(toolkitConfig);
-            applicationProperties.save();
-
+            saveConfiguration();
             uiLauncher = new UILauncher(primaryStage, applicationProperties);
-            if (applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
-                uiLauncher.showToolkitProjectsWindow(wizardProperties);
-            } else {
-                uiLauncher.showProjectsWindow(wizardProperties);
-            }
+            uiLauncher.showProject(applicationProperties.itemType(), wizardProperties);
         };
+    }
+
+    public void saveConfiguration() {
+        String[] args = wizardProperties.entrySet().stream()
+                .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
+                .toArray(String[]::new);
+        RunConfig runConfig = RunConfig.valueFrom(args);
+        ToolkitConfig toolkitConfig = ToolkitConfig.valueFrom(args);
+        applicationProperties.updateCurrentRunConfig(runConfig);
+        applicationProperties.updateToolkitConfig(toolkitConfig);
+        applicationProperties.save();
     }
 
     private EventHandler<ActionEvent> addItemEventHandler(StringProperty itemPathStringProperty) {
@@ -387,14 +378,7 @@ public class WizardLauncher implements Launcher {
 
             @Override
             public void onExitingPage(Wizard wizard) {
-                String[] args = wizardProperties.entrySet().stream()
-                        .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
-                        .toArray(String[]::new);
-                RunConfig runConfig = RunConfig.valueFrom(args);
-                ToolkitConfig toolkitConfig = ToolkitConfig.valueFrom(args);
-                applicationProperties.updateCurrentRunConfig(runConfig);
-                applicationProperties.updateToolkitConfig(toolkitConfig);
-                applicationProperties.save();
+                saveConfiguration();
             }
         };
         wizardPane.setHeaderText(BundleUtils.getMsg("wizard.finish.text", String.valueOf(step)));

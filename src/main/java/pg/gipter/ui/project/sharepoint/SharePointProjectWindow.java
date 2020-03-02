@@ -1,12 +1,12 @@
-package pg.gipter.ui.sharepoint;
+package pg.gipter.ui.project.sharepoint;
 
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
 import pg.gipter.ui.alert.ImageFile;
 
-public class SharePointConfigWindow extends AbstractWindow {
+public class SharePointProjectWindow extends AbstractWindow {
 
-    public SharePointConfigWindow(AbstractController controller) {
+    public SharePointProjectWindow(AbstractController controller) {
         super(controller);
     }
 

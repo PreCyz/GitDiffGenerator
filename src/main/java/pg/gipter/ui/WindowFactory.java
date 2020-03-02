@@ -5,16 +5,13 @@ import pg.gipter.ui.job.JobController;
 import pg.gipter.ui.job.JobWindow;
 import pg.gipter.ui.main.MainController;
 import pg.gipter.ui.main.MainWindow;
-import pg.gipter.ui.menu.ApplicationSettingsController;
-import pg.gipter.ui.menu.ApplicationSettingsWindow;
-import pg.gipter.ui.menu.ToolkitSettingsController;
-import pg.gipter.ui.menu.ToolkitSettingsWindow;
+import pg.gipter.ui.menu.*;
 import pg.gipter.ui.project.ProjectsController;
 import pg.gipter.ui.project.ProjectsWindow;
+import pg.gipter.ui.project.sharepoint.SharePointProjectController;
+import pg.gipter.ui.project.sharepoint.SharePointProjectWindow;
 import pg.gipter.ui.project.toolkit.ToolkitProjectsController;
 import pg.gipter.ui.project.toolkit.ToolkitProjectsWindow;
-import pg.gipter.ui.sharepoint.SharePointConfigController;
-import pg.gipter.ui.sharepoint.SharePointConfigWindow;
 import pg.gipter.ui.upgrade.UpgradeController;
 import pg.gipter.ui.upgrade.UpgradeWindow;
 
@@ -62,10 +59,10 @@ public enum WindowFactory {
             return new UpgradeWindow(new UpgradeController(applicationProperties, uiLauncher));
         }
     },
-    SHARE_POINT_CONFIG{
+    SHARE_POINT_PROJECTS {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new SharePointConfigWindow(new SharePointConfigController(applicationProperties, uiLauncher));
+            return new SharePointProjectWindow(new SharePointProjectController(applicationProperties, uiLauncher));
         }
     };
 

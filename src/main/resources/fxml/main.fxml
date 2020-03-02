@@ -128,7 +128,6 @@
                               <Label layoutX="10.0" layoutY="227.0" text="%toolkit.panel.deleteFiles" />
                               <Label layoutX="10.0" layoutY="275.0" text="%csv.panel.fetchAll" />
                               <CheckBox fx:id="fetchAllCheckBox" layoutX="149.0" layoutY="275.0" mnemonicParsing="false" />
-                              <Button fx:id="sharePointConfigButton" layoutX="178.0" layoutY="223.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="91.0" text="%main.sharepoint.config" />
                            </children>
                         </AnchorPane>
                      </content>
