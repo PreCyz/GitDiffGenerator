@@ -24,17 +24,29 @@ import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.CacheManager;
-import pg.gipter.core.model.*;
+import pg.gipter.core.model.NamePatternValue;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producer.command.ItemType;
-import pg.gipter.service.*;
+import pg.gipter.service.DataService;
+import pg.gipter.service.GithubService;
+import pg.gipter.service.ToolkitService;
 import pg.gipter.service.platform.AppManager;
 import pg.gipter.service.platform.AppManagerFactory;
 import pg.gipter.ui.*;
-import pg.gipter.ui.alert.*;
-import pg.gipter.utils.*;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alert.WindowType;
+import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.JobHelper;
+import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
 import java.io.File;
@@ -273,7 +285,7 @@ public class MainController extends AbstractController {
     private void setProperties(ResourceBundle resources) {
         toolkitDomainTextField.setEditable(false);
         toolkitProjectListNamesTextField.setDisable(
-                !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(applicationProperties.itemType())
+                !EnumSet.of(ItemType.TOOLKIT_DOCS).contains(applicationProperties.itemType())
         );
         setTooltipOnProjectListNames();
         deleteDownloadedFilesCheckBox.setDisable(

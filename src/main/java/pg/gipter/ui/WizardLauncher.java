@@ -13,21 +13,34 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.*;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.*;
-import pg.gipter.core.model.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.utils.*;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.ResourceUtils;
+import pg.gipter.utils.StringUtils;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Properties;
+
+import static java.util.stream.Collectors.toCollection;
 
 public class WizardLauncher implements Launcher {
 
@@ -69,13 +82,7 @@ public class WizardLauncher implements Launcher {
             ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(new String[]{});
             if (result == ButtonType.FINISH) {
                 logger.info("Wizard finished.");
-                String[] args = wizardProperties.entrySet().stream()
-                        .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
-                        .toArray(String[]::new);
-                applicationProperties.updateCurrentRunConfig(RunConfig.valueFrom(args));
-                applicationProperties.updateToolkitConfig(ToolkitConfig.valueFrom(args));
-                applicationProperties.updateApplicationConfig(ApplicationConfig.valueFrom(args));
-                applicationProperties.save();
+                saveConfiguration();
             } else if (result == ButtonType.CANCEL) {
                 final String configurationName = wizardProperties.getProperty(ArgName.configurationName.name());
                 applicationProperties.getRunConfig(configurationName)
@@ -134,7 +141,7 @@ public class WizardLauncher implements Launcher {
 
             @Override
             public void onExitingPage(Wizard wizard) {
-                if (StringUtils.nullOrEmpty(getValue(wizard, ArgName.configurationName))) {
+                if (StringUtils.nullOrEmpty(getValue(wizard, ArgName.configurationName.name()))) {
                     wizard.getSettings().put(ArgName.configurationName.name(), "wizard-config");
                 }
                 if (!StringUtils.nullOrEmpty(lastChosenConfiguration)) {
@@ -190,17 +197,24 @@ public class WizardLauncher implements Launcher {
     }
 
     private void updateProperties(Wizard wizard, Properties properties) {
-        properties.put(ArgName.configurationName.name(), getValue(wizard, ArgName.configurationName));
-        properties.put(ArgName.itemType.name(), getValue(wizard, ArgName.itemType));
-        properties.put(ArgName.toolkitUsername.name(), getValue(wizard, ArgName.toolkitUsername).toUpperCase());
-        properties.put(ArgName.toolkitPassword.name(), getValue(wizard, ArgName.toolkitPassword));
-        properties.put(ArgName.author.name(), getValue(wizard, ArgName.author));
-        properties.put(ArgName.committerEmail.name(), getValue(wizard, ArgName.committerEmail));
-        properties.put(ArgName.itemPath.name(), getValue(wizard, ArgName.itemPath));
+        properties.put(ArgName.configurationName.name(), getValue(wizard, ArgName.configurationName.name()));
+        properties.put(ArgName.itemType.name(), getValue(wizard, ArgName.itemType.name()));
+        properties.put(ArgName.toolkitUsername.name(), getValue(wizard, ArgName.toolkitUsername.name()).toUpperCase());
+        properties.put(ArgName.toolkitPassword.name(), getValue(wizard, ArgName.toolkitPassword.name()));
+        properties.put(ArgName.author.name(), getValue(wizard, ArgName.author.name()));
+        properties.put(ArgName.committerEmail.name(), getValue(wizard, ArgName.committerEmail.name()));
+        properties.put(ArgName.itemPath.name(), getValue(wizard, ArgName.itemPath.name()));
+        LinkedHashSet<SharePointConfig> sharePointConfigs =
+                Optional.ofNullable(wizard.getSettings().get(SharePointConfig.SHARE_POINT_CONFIG))
+                .map(value -> (LinkedHashSet<SharePointConfig>) value)
+                .orElseGet(LinkedHashSet::new);
+        if (!sharePointConfigs.isEmpty()) {
+            properties.put(SharePointConfig.SHARE_POINT_CONFIG, sharePointConfigs);
+        }
     }
 
-    private String getValue(Wizard wizard, ArgName argName) {
-        return Optional.ofNullable(wizard.getSettings().get(argName.name())).map(String::valueOf).orElseGet(() -> "");
+    private String getValue(Wizard wizard, String argName) {
+        return Optional.ofNullable(wizard.getSettings().get(argName)).map(String::valueOf).orElseGet(() -> "");
     }
 
     private TextField createTextField(String id) {
@@ -289,6 +303,8 @@ public class WizardLauncher implements Launcher {
         pageGrid.add(projectButton, 0, row);
         pageGrid.add(projectLabel, 1, row);
 
+        wizardProperties.put(SharePointConfig.SHARE_POINT_CONFIG, new LinkedHashSet<>());
+
         WizardPane wizardPane = new WizardPane() {
             @Override
             public void onEnteringPage(Wizard wizard) {
@@ -296,7 +312,7 @@ public class WizardLauncher implements Launcher {
                 itemPathStringProperty.setValue(BundleUtils.getMsg("wizard.item.location"));
                 projectLabel.setVisible(true);
                 projectButton.setVisible(true);
-                if (ItemType.valueFor(getValue(wizard, ArgName.itemType)) == ItemType.STATEMENT) {
+                if (ItemType.valueFor(getValue(wizard, ArgName.itemType.name())) == ItemType.STATEMENT) {
                     itemPathStringProperty.setValue(BundleUtils.getMsg("wizard.item.statement.location"));
                     projectLabel.setVisible(false);
                     projectButton.setVisible(false);
@@ -317,6 +333,8 @@ public class WizardLauncher implements Launcher {
             @Override
             public void onExitingPage(Wizard wizard) {
                 wizard.getSettings().put(ArgName.itemPath.name(), itemPathStringProperty.getValue());
+                wizard.getSettings().put(ArgName.projectPath.name(), projectLabelStringProperty.getValue());
+                wizard.getSettings().put(SharePointConfig.SHARE_POINT_CONFIG, wizardProperties.get(SharePointConfig.SHARE_POINT_CONFIG));
             }
         };
         wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + " (" + step + "/6)");
@@ -335,12 +353,25 @@ public class WizardLauncher implements Launcher {
 
     public void saveConfiguration() {
         String[] args = wizardProperties.entrySet().stream()
+                .filter(entry -> !SharePointConfig.SHARE_POINT_CONFIG.equals(entry.getKey()))
                 .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
                 .toArray(String[]::new);
         RunConfig runConfig = RunConfig.valueFrom(args);
+
+        LinkedHashSet<SharePointConfig> sharePointConfigs = wizardProperties.entrySet()
+                    .stream()
+                    .filter(entry -> SharePointConfig.SHARE_POINT_CONFIG.equals(entry.getKey()))
+                    .map(entry -> (LinkedHashSet<SharePointConfig>) entry.getValue())
+                    .flatMap(Collection::stream)
+                    .collect(toCollection(LinkedHashSet::new));
+        if (!sharePointConfigs.isEmpty()) {
+            runConfig.setSharePointConfigs(sharePointConfigs);
+        }
+
         ToolkitConfig toolkitConfig = ToolkitConfig.valueFrom(args);
         applicationProperties.updateCurrentRunConfig(runConfig);
         applicationProperties.updateToolkitConfig(toolkitConfig);
+        applicationProperties.updateApplicationConfig(ApplicationConfig.valueFrom(args));
         applicationProperties.save();
     }
 

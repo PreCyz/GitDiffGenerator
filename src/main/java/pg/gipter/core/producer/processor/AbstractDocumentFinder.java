@@ -1,10 +1,17 @@
 package pg.gipter.core.producer.processor;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.toolkit.dto.*;
+import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.toolkit.dto.DocumentDetails;
+import pg.gipter.toolkit.dto.DocumentDetailsBuilder;
+import pg.gipter.toolkit.dto.User;
+import pg.gipter.toolkit.dto.VersionDetails;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -12,6 +19,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static java.util.stream.Collectors.toCollection;
 
 abstract class AbstractDocumentFinder implements DocumentFinder {
 
@@ -25,8 +34,8 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
         parallelProcessor = new ParallelProcessor(applicationProperties);
     }
 
-    List<JsonObject> getItems(List<String> urls) {
-        return parallelProcessor.processUrls(urls);
+    List<JsonObject> getItems(List<SharePointConfig> sharePointConfigs) {
+        return parallelProcessor.processConfigs(sharePointConfigs);
     }
 
     List<DocumentDetails> convertToDocumentDetails(JsonObject object) {
@@ -132,11 +141,11 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
             } else if (tClazz == JsonObject.class) {
                 return (T) element.getAsJsonObject();
             } else if (tClazz == Integer.class) {
-                return (T) new Integer(0);
+                return (T) Integer.valueOf(0);
             }
         }
         if (element == null && tClazz == Integer.class) {
-            return (T) new Integer(0);
+            return (T) Integer.valueOf(0);
         }
         return null;
     }
@@ -244,11 +253,23 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
         return String.format("%s%s", applicationProperties.toolkitUrl(), fileReference);
     }
 
-    List<File> downloadDocuments(Map<String, String> filesToDownload) {
-        if (filesToDownload.isEmpty()) {
+    List<File> downloadDocuments(List<DownloadDetails> downloadDetails) {
+        if (downloadDetails.isEmpty()) {
             throw new IllegalArgumentException("No files to download.");
         }
-        return parallelProcessor.downloadFiles(filesToDownload);
+        return parallelProcessor.downloadFiles(downloadDetails);
+    }
+
+    List<DownloadDetails> createDownloadDetails(List<SharePointConfig> sharePointConfigs, Map<String, String> filesToDownload) {
+        List<DownloadDetails> result = new LinkedList<>();
+        for (Map.Entry<String, String> entry : filesToDownload.entrySet()) {
+            SharePointConfig sharePointConfig = sharePointConfigs.stream()
+                    .filter(sc -> entry.getValue().contains(sc.getProject()))
+                    .collect(toCollection(LinkedList::new))
+                    .getFirst();
+            result.add(new DownloadDetails(entry.getKey(), entry.getValue(), sharePointConfig));
+        }
+        return result;
     }
 
     public abstract List<File> find();

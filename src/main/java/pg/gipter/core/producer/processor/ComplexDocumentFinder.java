@@ -2,6 +2,7 @@ package pg.gipter.core.producer.processor;
 
 import com.google.gson.JsonObject;
 import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.utils.StringUtils;
@@ -28,9 +29,9 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
     @Override
     public List<File> find() {
         List<ItemCountResponse> itemCounts = getItemCount();
-        List<String> urls = buildUrls(itemCounts);
+        List<SharePointConfig> sharePointConfigs = buildSharePointConfigs(itemCounts);
 
-        List<JsonObject> items = getItems(urls);
+        List<JsonObject> items = getItems(sharePointConfigs);
         List<DocumentDetails> documentDetails = items.stream()
                 .map(this::convertToDocumentDetails)
                 .flatMap(List::stream)
@@ -41,7 +42,8 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
             throw new IllegalArgumentException("Can not find items to upload.");
         }
         Map<String, String> filesToDownload = new HashMap<>(getFilesToDownload(documentDetails));
-        return downloadDocuments(filesToDownload);
+        List<DownloadDetails> downloadDetails = createDownloadDetails(sharePointConfigs, filesToDownload);
+        return downloadDocuments(downloadDetails);
     }
 
     List<ItemCountResponse> getItemCount() {
@@ -60,8 +62,8 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
         return parallelProcessor.processMap(projectUrlsMap);
     }
 
-    List<String> buildUrls(List<ItemCountResponse> responses) {
-        List<String> urls = new LinkedList<>();
+    List<SharePointConfig> buildSharePointConfigs(List<ItemCountResponse> responses) {
+        List<SharePointConfig> sharePointConfigs = new LinkedList<>();
         for (ItemCountResponse response : responses) {
             if (response.getItemCount() > 0) {
                 int numberOfPages = response.getItemCount() / TOP_LIMIT;
@@ -69,11 +71,19 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
                     ++numberOfPages;
                 }
                 for (int i = 0; i < numberOfPages; ++i) {
-                    urls.add(buildPageableUrl(response.getProject(), response.getListName(), TOP_LIMIT * i));
+                    String fullRequestUrl = buildPageableUrl(response.getProject(), response.getListName(), TOP_LIMIT * i);
+                    SharePointConfig sharePointConfig = new SharePointConfig(
+                            applicationProperties.toolkitUsername(),
+                            applicationProperties.toolkitPassword(),
+                            applicationProperties.toolkitDomain(),
+                            applicationProperties.toolkitUrl(),
+                            fullRequestUrl
+                    );
+                    sharePointConfigs.add(sharePointConfig);
                 }
             }
         }
-        return urls;
+        return sharePointConfigs;
     }
 
     String buildPageableUrl(String project, String listTitle, int documentId) {
@@ -100,6 +110,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
         if (documentId == 0) {
             paging = "";
         }
-        return String.format("%s?%s&%s&%s&%s%s", url, select, filter, expand, top, paging);
+        String pagableUrl = String.format("%s?%s&%s&%s&%s%s", url, select, filter, expand, top, paging);
+        return pagableUrl;
     }
 }

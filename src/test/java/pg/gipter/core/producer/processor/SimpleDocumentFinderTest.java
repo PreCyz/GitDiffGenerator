@@ -9,6 +9,7 @@ import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
+import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helper.XmlHelper;
 import pg.gipter.utils.StringUtils;
@@ -17,7 +18,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ import static org.assertj.core.api.Assertions.fail;
 
 class SimpleDocumentFinderTest {
 
-    private SimpleDocumentFinder finder;
+    private ToolkitDocumentFinder finder;
 
     private JsonObject getJsonObject(String s) throws FileNotFoundException {
         String path = XmlHelper.getFullXmlPath(s);
@@ -43,7 +44,7 @@ class SimpleDocumentFinderTest {
 
     @Test
     void givenItemsJson_whenExtractItemDetails_thenReturnListOfItemDetails() throws FileNotFoundException {
-        finder = new SimpleDocumentFinder(ApplicationPropertiesFactory.getInstance(new String[]{}));
+        finder = new ToolkitDocumentFinder(ApplicationPropertiesFactory.getInstance(new String[]{}));
         JsonObject js = getJsonObject("items.json");
 
         List<DocumentDetails> actual = finder.convertToDocumentDetails(js);
@@ -61,7 +62,7 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
         JsonObject js = getJsonObject("customItem.json");
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
@@ -79,10 +80,10 @@ class SimpleDocumentFinderTest {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name()}
         );
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
 
         try {
-            finder.downloadDocuments(new HashMap<>());
+            finder.downloadDocuments(Collections.emptyList());
             fail("Should throw IllegalArgumentException");
         }catch (IllegalArgumentException ex) {
             assertThat(true).isTrue();
@@ -99,7 +100,7 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
         JsonObject js = getJsonObject("Item-case-1.json");
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
@@ -126,7 +127,7 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
         JsonObject js = getJsonObject("Item-case-2.json");
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
@@ -147,7 +148,7 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
         JsonObject js = getJsonObject("Item-case-3.json");
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
@@ -174,7 +175,7 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
         JsonObject js = getJsonObject("Item-case-4.json");
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
@@ -195,7 +196,7 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
         JsonObject js = getJsonObject("Item-case-5.json");
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
@@ -214,7 +215,7 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
         JsonObject js = getJsonObject("Item-case-6.json");
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
@@ -235,7 +236,7 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
         JsonObject js = getJsonObject("Item-case-7.json");
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js);
 
@@ -258,7 +259,7 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
         JsonObject js = getJsonObject("Item-case-8.json");
         List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js).stream()
                 .filter(dd -> !StringUtils.nullOrEmpty(dd.getDocType()))
@@ -287,20 +288,20 @@ class SimpleDocumentFinderTest {
                         ArgName.toolkitUsername + "=pawg",
                         ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
                 });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
 
-        List<String> actual = finder.buildFullUrls();
+        List<SharePointConfig> actual = finder.buildSharePointConfigs();
 
         assertThat(actual).hasSize(1);
-        assertThat(actual.get(0)).startsWith("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items?$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString,File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel,File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email,File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email,File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel,File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email&$filter=Modified+ge+datetime'2019-04-06");
-        assertThat(actual.get(0)).contains("+and+Modified+le+datetime'2019-04-13");
-        assertThat(actual.get(0)).endsWith("&$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy");
+        assertThat(actual.get(0).getFullRequestUrl()).startsWith("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items?$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString,File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel,File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email,File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email,File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel,File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email&$filter=Modified+ge+datetime'2019-04-06");
+        assertThat(actual.get(0).getFullRequestUrl()).contains("+and+Modified+le+datetime'2019-04-13");
+        assertThat(actual.get(0).getFullRequestUrl()).endsWith("&$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy");
     }
 
     @Test
     void givenValueWithListName_whenGetProject_thenReturnProject() {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(new String[]{});
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
 
         String actual = finder.getProject("/cases/GTE440/TOEDNLD/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
 
@@ -312,7 +313,7 @@ class SimpleDocumentFinderTest {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(new String[]{
                 ArgName.toolkitProjectListNames + "=SlutProdukter"
         });
-        finder = new SimpleDocumentFinder(applicationProperties);
+        finder = new ToolkitDocumentFinder(applicationProperties);
 
         String actual = finder.getProject("/cases/GTE440/TOEDNLD/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
 

@@ -3,6 +3,7 @@ package pg.gipter.toolkit.sharepoint.rest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 
@@ -90,8 +91,15 @@ public class SharePointRestClient {
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
         );
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitUsername(),
+                applicationProperties.toolkitPassword(),
+                applicationProperties.toolkitDomain(),
+                applicationProperties.toolkitUrl(),
+                fullUrl
+        );
 
-        JsonObject jsonObject = httpRequester.executePOST(fullUrl, createItemJson());
+        JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, createItemJson());
 
         System.out.println(jsonObject.toString());
     }
@@ -102,8 +110,15 @@ public class SharePointRestClient {
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
         );
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitUsername(),
+                applicationProperties.toolkitPassword(),
+                applicationProperties.toolkitDomain(),
+                applicationProperties.toolkitUrl(),
+                fullUrl
+        );
 
-        JsonObject jsonObject = httpRequester.executePOST2010(fullUrl, createItemJson2010());
+        JsonObject jsonObject = httpRequester.executePOST2010(sharePointConfig, createItemJson2010());
 
         System.out.println(jsonObject.toString());
     }

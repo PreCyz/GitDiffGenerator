@@ -38,7 +38,7 @@ class CachedConfigurationProxy extends ApplicationJsonReader implements CachedCo
         initializeCacheIfEmpty();
         configurationDao.saveRunConfig(runConfig);
         cachedConfiguration.addRunConfig(runConfig);
-        logger.info("Configuration cache updated.");
+        logger.info("Run configuration with name {} was updated in cache.", runConfig.getConfigurationName());
     }
 
     private void initializeCacheIfEmpty() {

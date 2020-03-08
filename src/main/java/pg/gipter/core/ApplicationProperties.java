@@ -57,7 +57,7 @@ public abstract class ApplicationProperties {
             currentRunConfig = new ArrayList<>(runConfigMap.entrySet()).get(0).getValue();
         }
         if (currentRunConfig != null) {
-            logger.info("Configuration [{}] loaded.", argExtractor.configurationName());
+            logger.info("Configuration [{}] loaded.", currentRunConfig.getConfigurationName());
         } else {
             logger.warn("Can not load configuration [{}].", argExtractor.configurationName());
             logger.info("Command line argument loaded: {}.",

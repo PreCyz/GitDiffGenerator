@@ -20,8 +20,14 @@ import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.util.*;
-import java.util.function.*;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
@@ -99,7 +105,7 @@ public class SharePointProjectController extends AbstractController {
         domainTextField.setText(valueToSelect.getDomain());
         urlTextField.setText(valueToSelect.getUrl());
         projectTextField.setText(valueToSelect.getProject());
-        listNameTextField.setText(valueToSelect.getListName());
+        listNameTextField.setText(String.join(",", valueToSelect.getListNames()));
         sharePointLink.setText(calculateFullLink());
     }
 
@@ -108,14 +114,9 @@ public class SharePointProjectController extends AbstractController {
         Predicate<String> notEmptyStringPredicate = str -> !"".equals(str.trim());
         Function<String, String> addSlashFunction = value -> value.startsWith("/") ? value : "/" + value;
 
-        String fullLink = Optional.ofNullable(urlTextField.getText()).orElseGet(emptyStringSupplier)
-                +
+        String fullLink =
+                Optional.ofNullable(urlTextField.getText()).orElseGet(emptyStringSupplier) +
                 Optional.ofNullable(projectTextField.getText())
-                        .filter(notEmptyStringPredicate)
-                        .map(addSlashFunction)
-                        .orElseGet(emptyStringSupplier)
-                +
-                Optional.ofNullable(listNameTextField.getText())
                         .filter(notEmptyStringPredicate)
                         .map(addSlashFunction)
                         .orElseGet(emptyStringSupplier);
@@ -139,16 +140,16 @@ public class SharePointProjectController extends AbstractController {
             @Override
             public String toString(SharePointConfig sharePointConfig) {
                 SharePointConfig sc = Optional.ofNullable(sharePointConfig).orElseGet(SharePointConfig::new);
-                if (StringUtils.nullOrEmpty(sc.getProject()) && StringUtils.nullOrEmpty(sc.getListName())) {
+                if (StringUtils.nullOrEmpty(sc.getProject())) {
                     return "";
                 }
-                return String.format("%s - %s", sc.getProject(), sc.getListName()).trim();
+                return Optional.ofNullable(sc.getProject()).orElseGet(() -> "").trim();
             }
 
             @Override
             public SharePointConfig fromString(final String string) {
                 return sharePointConfigSet.stream()
-                        .filter(sc -> String.format("%s - %s", sc.getProject(), sc.getListName()).trim().equals(string))
+                        .filter(sc -> sc.getProject().trim().equals(string))
                         .collect(toCollection(LinkedList::new))
                         .getFirst();
             }
@@ -170,7 +171,11 @@ public class SharePointProjectController extends AbstractController {
             sharePointConfig.setDomain(domainTextField.getText());
             sharePointConfig.setUrl(urlTextField.getText());
             sharePointConfig.setProject(projectTextField.getText());
-            sharePointConfig.setListName(listNameTextField.getText());
+            sharePointConfig.setListNames(
+                    Optional.ofNullable(listNameTextField.getText())
+                            .map(s -> Stream.of(listNameTextField.getText().split(",")).collect(toCollection(LinkedHashSet::new)))
+                            .orElseGet(LinkedHashSet::new)
+            );
 
             sharePointConfigSet.add(sharePointConfig);
 
@@ -198,6 +203,7 @@ public class SharePointProjectController extends AbstractController {
 
             if (uiLauncher.hasWizardProperties()) {
                 uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
+                uiLauncher.addPropertyToWizard(SharePointConfig.SHARE_POINT_CONFIG, sharePointConfigSet);
             }
         };
     }

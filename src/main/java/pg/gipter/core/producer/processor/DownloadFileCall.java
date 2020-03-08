@@ -8,18 +8,16 @@ import java.util.concurrent.Callable;
 
 class DownloadFileCall implements Callable<File> {
 
-    private String fullUrl;
-    private String downloadedFileName;
+    private DownloadDetails downloadDetails;
     private HttpRequester httpRequester;
 
-    DownloadFileCall(String fullUrl, String downloadedFileName, ApplicationProperties applicationProperties) {
-        this.fullUrl = fullUrl;
-        this.downloadedFileName = downloadedFileName;
+    DownloadFileCall(DownloadDetails downloadDetails, ApplicationProperties applicationProperties) {
+        this.downloadDetails = downloadDetails;
         httpRequester = new HttpRequester(applicationProperties);
     }
 
     @Override
     public File call() throws Exception {
-        return httpRequester.downloadFile(fullUrl, downloadedFileName);
+        return httpRequester.downloadFile(downloadDetails);
     }
 }

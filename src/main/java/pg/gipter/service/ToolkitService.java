@@ -1,6 +1,8 @@
 package pg.gipter.service;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.concurrent.Task;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,13 +11,16 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producer.processor.GETCall;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by Pawel Gawedzki on 26-Jul-2019.
@@ -38,7 +43,15 @@ public class ToolkitService extends Task<Set<String>> {
         Set<String> result = new LinkedHashSet<>();
         try {
             updateMessage(BundleUtils.getMsg("toolkit.projects.downloading"));
-            String html = httpRequester.downloadPageSource(applicationProperties.toolkitUrl() + "/toolkit/default.aspx");
+            SharePointConfig sharePointConfig = new SharePointConfig(
+                    applicationProperties.toolkitUsername(),
+                    applicationProperties.toolkitPassword(),
+                    applicationProperties.toolkitDomain(),
+                    applicationProperties.toolkitUrl(),
+                    applicationProperties.toolkitUrl() + "/toolkit/default.aspx"
+            );
+
+            String html = httpRequester.downloadPageSource(sharePointConfig);
             if (!StringUtils.notEmpty(html)) {
                 throw new IOException("Downloaded source page is empty.");
             }
@@ -83,8 +96,16 @@ public class ToolkitService extends Task<Set<String>> {
                 orderBy,
                 top
         );
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitUsername(),
+                applicationProperties.toolkitPassword(),
+                applicationProperties.toolkitDomain(),
+                applicationProperties.toolkitUrl(),
+                url
+        );
+
         try {
-            JsonObject jsonObject = new GETCall(url, applicationProperties).call();
+            JsonObject jsonObject = new GETCall(sharePointConfig, applicationProperties).call();
             if (jsonObject == null) {
                 throw new IllegalArgumentException("Null response from toolkit.");
             }
@@ -122,8 +143,15 @@ public class ToolkitService extends Task<Set<String>> {
                 top
         );
 
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitUsername(),
+                applicationProperties.toolkitPassword(),
+                applicationProperties.toolkitDomain(),
+                applicationProperties.toolkitUrl(),
+                url
+        );
         try {
-            result = new GETCall(url, applicationProperties).call() != null;
+            result = new GETCall(sharePointConfig, applicationProperties).call() != null;
         } catch (Exception ex) {
             logger.error("Toolkit credentials are not valid. {}", ex.getMessage());
             result = false;

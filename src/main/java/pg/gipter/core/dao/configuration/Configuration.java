@@ -43,6 +43,9 @@ class Configuration {
         if (runConfigs == null) {
             runConfigs = new LinkedList<>();
         }
+        runConfigs = runConfigs.stream()
+                .filter(rc -> !rc.getConfigurationName().equals(runConfig.getConfigurationName()))
+                .collect(Collectors.toCollection(LinkedList::new));
         runConfigs.add(runConfig);
     }
 

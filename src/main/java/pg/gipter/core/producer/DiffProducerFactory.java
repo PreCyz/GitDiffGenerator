@@ -19,6 +19,8 @@ public final class DiffProducerFactory {
             return new StatementDiffProducer(applicationProperties);
         } else if (applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
             return new ToolkitDocumentsDiffProducer(applicationProperties);
+        } else if (applicationProperties.itemType() == ItemType.SHARE_POINT_DOCS) {
+            return new SharePointDocumentsDiffProducer(ItemType.SHARE_POINT_DOCS, applicationProperties);
         } else if (SystemUtils.isUnix()) {
             return new LinuxDiffProducer(applicationProperties);
         } else if (SystemUtils.isWindows()) {

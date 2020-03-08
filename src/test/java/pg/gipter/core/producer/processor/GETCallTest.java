@@ -1,9 +1,14 @@
 package pg.gipter.core.producer.processor;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.model.SharePointConfig;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -31,9 +36,16 @@ class GETCallTest {
                 applicationProperties.toolkitUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
-        ) + select + "&" + orderBy + "&" + top
-                ;
-        JsonObject jsonObject = new GETCall(url, applicationProperties).call();
+        ) + select + "&" + orderBy + "&" + top;
+
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitUsername(),
+                applicationProperties.toolkitPassword(),
+                applicationProperties.toolkitDomain(),
+                applicationProperties.toolkitUrl(),
+                url
+        );
+        JsonObject jsonObject = new GETCall(sharePointConfig, applicationProperties).call();
 
         assertThat(jsonObject).isNotNull();
 

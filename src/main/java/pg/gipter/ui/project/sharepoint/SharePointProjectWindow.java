@@ -12,7 +12,7 @@ public class SharePointProjectWindow extends AbstractWindow {
 
     @Override
     protected String fxmlFileName() {
-        return "sharepoint.fxml";
+        return "sharepointProject.fxml";
     }
 
     @Override
@@ -22,7 +22,7 @@ public class SharePointProjectWindow extends AbstractWindow {
 
     @Override
     protected String cssFileName() {
-        return "sharepoint.css";
+        return "sharepointProject.css";
     }
 
     @Override

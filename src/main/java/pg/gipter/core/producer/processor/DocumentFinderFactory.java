@@ -12,6 +12,13 @@ public final class DocumentFinderFactory {
         if (LocalDate.now().isAfter(applicationProperties.endDate())) {
             //return new ComplexDocumentFinder(applicationProperties);
         }
-        return new SimpleDocumentFinder(applicationProperties);
+        switch (applicationProperties.itemType()) {
+            case SHARE_POINT_DOCS:
+                return new SharePointDocumentFinder(applicationProperties);
+            case TOOLKIT_DOCS:
+                return new ToolkitDocumentFinder(applicationProperties);
+            default:
+                return null;
+        }
     }
 }

@@ -344,7 +344,7 @@ public class RunConfig {
                 ", mercurialAuthor='" + mercurialAuthor + '\'' +
                 ", svnAuthor='" + svnAuthor + '\'' +
                 ", committerEmail='" + committerEmail + '\'' +
-                ", uploadType=" + itemType +
+                ", itemType=" + itemType +
                 ", skipRemote=" + skipRemote +
                 ", fetchAll=" + fetchAll +
                 ", itemPath='" + itemPath + '\'' +

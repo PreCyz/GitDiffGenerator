@@ -6,29 +6,43 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.stage.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.job.JobHandler;
-import pg.gipter.job.upload.*;
+import pg.gipter.job.upload.JobProperty;
+import pg.gipter.job.upload.JobType;
+import pg.gipter.job.upload.UploadItemJob;
+import pg.gipter.job.upload.UploadItemJobBuilder;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.StartupService;
-import pg.gipter.ui.alert.*;
-import pg.gipter.utils.*;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alert.WindowType;
+import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -93,6 +107,10 @@ public class UILauncher implements Launcher {
         StringProperty projectLabelProperty = (StringProperty) wizardProperties.get(WizardLauncher.projectLabelPropertyName);
         projectLabelProperty.setValue(StringUtils.trimTo50(value));
         wizardProperties.put(WizardLauncher.projectLabelPropertyName, projectLabelProperty);
+    }
+
+    public void addPropertyToWizard(String key, Collection<SharePointConfig> value) {
+        wizardProperties.put(key, new LinkedHashSet<>(value));
     }
 
     public void executeOutsideUIThread(Runnable runnable) {

@@ -3,7 +3,12 @@ package pg.gipter.core.model;
 import pg.gipter.core.ArgName;
 import pg.gipter.utils.CryptoUtils;
 
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toCollection;
 
 public class SharePointConfig {
 
@@ -15,11 +20,13 @@ public class SharePointConfig {
     private String domain;
     private String url;
     private String project;
-    protected String listName;
+    private Set<String> listNames;
+    private transient String fullRequestUrl;
 
     public SharePointConfig() {
         username = ArgName.toolkitUsername.defaultValue();
         password = ArgName.toolkitPassword.defaultValue();
+        listNames = Stream.of(ArgName.toolkitProjectListNames.defaultValue()).collect(toCollection(LinkedHashSet::new));
     }
 
     public SharePointConfig(SharePointConfig sharePointConfig) {
@@ -28,7 +35,16 @@ public class SharePointConfig {
         domain = sharePointConfig.getDomain();
         url = sharePointConfig.getUrl();
         project = sharePointConfig.getProject();
-        listName = sharePointConfig.getListName();
+        listNames = sharePointConfig.getListNames();
+        fullRequestUrl = sharePointConfig.getFullRequestUrl();
+    }
+
+    public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl) {
+        this.username = username;
+        this.password = password;
+        this.domain = domain;
+        this.url = url;
+        this.fullRequestUrl = fullRequestUrl;
     }
 
     public String getUsername() {
@@ -71,12 +87,20 @@ public class SharePointConfig {
         this.project = project;
     }
 
-    public String getListName() {
-        return listName;
+    public Set<String> getListNames() {
+        return listNames;
     }
 
-    public void setListName(String listName) {
-        this.listName = listName;
+    public void setListNames(Set<String> listNames) {
+        this.listNames = listNames;
+    }
+
+    public String getFullRequestUrl() {
+        return fullRequestUrl;
+    }
+
+    public void setFullRequestUrl(String fullRequestUrl) {
+        this.fullRequestUrl = fullRequestUrl;
     }
 
     @Override
@@ -89,12 +113,12 @@ public class SharePointConfig {
                 Objects.equals(getDomain(), that.getDomain()) &&
                 Objects.equals(getUrl(), that.getUrl()) &&
                 Objects.equals(getProject(), that.getProject()) &&
-                Objects.equals(getListName(), that.getListName());
+                Objects.equals(getListNames(), that.getListNames());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getPassword(), getDomain(), getUrl(), getProject(), getListName());
+        return Objects.hash(getUsername(), getPassword(), getDomain(), getUrl(), getProject(), getListNames());
     }
 
     @Override
@@ -105,7 +129,8 @@ public class SharePointConfig {
                 ", domain='" + getDomain() + '\'' +
                 ", url='" + getUrl() + '\'' +
                 ", project='" + getProject() + '\'' +
-                ", listName='" + getListName() + '\'' +
+                ", listName='" + getListNames() + '\'' +
+                ", fullRequestUrl='" + getFullRequestUrl() + '\'' +
                 '}';
     }
 }

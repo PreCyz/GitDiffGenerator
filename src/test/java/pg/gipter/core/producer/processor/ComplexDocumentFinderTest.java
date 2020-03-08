@@ -3,11 +3,18 @@ package pg.gipter.core.producer.processor;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helper.XmlHelper;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -257,14 +264,14 @@ class ComplexDocumentFinderTest {
                 itemCount
         )).collect(Collectors.toList());
 
-        List<String> actual = finder.buildUrls(responses);
+        List<SharePointConfig> actual = finder.buildSharePointConfigs(responses);
 
         assertThat(actual).hasSize(12);
         for (int i = 0; i < actual.size(); ++i) {
             if (i == 0) {
-                assertThat(actual.get(i)).doesNotEndWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=");
+                assertThat(actual.get(i).getFullRequestUrl()).doesNotEndWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=");
             } else {
-                assertThat(actual.get(i)).endsWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=" + 100 * i);
+                assertThat(actual.get(i).getFullRequestUrl()).endsWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=" + 100 * i);
             }
         }
     }
