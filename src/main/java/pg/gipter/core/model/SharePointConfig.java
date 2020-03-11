@@ -12,7 +12,8 @@ import static java.util.stream.Collectors.toCollection;
 
 public class SharePointConfig {
 
-    public static final String SHARE_POINT_CONFIG = "sharePointConfig";
+    public static final String SHARE_POINT_CONFIGS = "sharePointConfigs";
+    public static final String PASSWORD_MEMBER_NAME = "password";
     public static final String URL_SUFFIX = "/Forms/AllItems.aspx";
 
     private String username;

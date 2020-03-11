@@ -13,6 +13,8 @@ import java.util.Set;
 
 public class RunConfig {
 
+    public static final String RUN_CONFIGS = "runConfigs";
+
     private String author;
     private String gitAuthor;
     private String mercurialAuthor;

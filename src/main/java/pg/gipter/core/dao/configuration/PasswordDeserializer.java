@@ -3,6 +3,8 @@ package pg.gipter.core.dao.configuration;
 import com.google.gson.*;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.model.CipherDetails;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.service.SecurityService;
 import pg.gipter.utils.CryptoUtils;
@@ -28,19 +30,46 @@ class PasswordDeserializer implements JsonDeserializer<Configuration> {
         JsonObject toolkitConfig = configuration.getAsJsonObject(ToolkitConfig.TOOLKIT_CONFIG);
         Gson gson = new Gson();
         if (toolkitConfig != null && toolkitConfig.get(ArgName.toolkitPassword.name()) != null) {
-            SecurityService securityService = SecurityService.getInstance();
             String password = toolkitConfig.get(ArgName.toolkitPassword.name()).getAsString();
-            String decryptedPassword = "";
-            if (configuration.get(CipherDetails.CIPHER_DETAILS) != null) {
-                CipherDetails cipherDetails = gson.fromJson(
-                        configuration.get(CipherDetails.CIPHER_DETAILS).getAsJsonObject(), CipherDetails.class
-                );
-                decryptedPassword = securityService.decrypt(password, cipherDetails);
-            } else {
-                decryptedPassword = CryptoUtils.decryptSafe(password);
-            }
+            String decryptedPassword = decryptPassword(configuration, password);
             toolkitConfig.addProperty(ArgName.toolkitPassword.name(), decryptedPassword);
         }
+
+        JsonArray runConfigs = configuration.getAsJsonArray(RunConfig.RUN_CONFIGS);
+        if (runConfigs != null && runConfigs.size() > 0) {
+            for (int rci = 0; rci < runConfigs.size(); ++rci) {
+                JsonElement runConfig = runConfigs.get(rci);
+                if (runConfig != null) {
+                    JsonElement sharePointConfigs = runConfig.getAsJsonObject().get(SharePointConfig.SHARE_POINT_CONFIGS);
+                    if (sharePointConfigs != null) {
+                        JsonArray spcArray = sharePointConfigs.getAsJsonArray();
+                        for (int i = 0; i < spcArray.size(); ++i) {
+                            JsonObject spc = spcArray.get(i).getAsJsonObject();
+                            JsonElement encryptedPassword = spc.get(SharePointConfig.PASSWORD_MEMBER_NAME);
+                            if (encryptedPassword != null) {
+                                spc.addProperty(
+                                        SharePointConfig.PASSWORD_MEMBER_NAME,
+                                        decryptPassword(configuration, encryptedPassword.getAsString())
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return gson.fromJson(configuration, Configuration.class);
+    }
+
+    private String decryptPassword(JsonObject configuration, String password) {
+        String decryptedPassword;
+        if (configuration.get(CipherDetails.CIPHER_DETAILS) != null) {
+            CipherDetails cipherDetails = new Gson().fromJson(
+                    configuration.get(CipherDetails.CIPHER_DETAILS).getAsJsonObject(), CipherDetails.class
+            );
+            decryptedPassword = SecurityService.getInstance().decrypt(password, cipherDetails);
+        } else {
+            decryptedPassword = CryptoUtils.decryptSafe(password);
+        }
+        return decryptedPassword;
     }
 }

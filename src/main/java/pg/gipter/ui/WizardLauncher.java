@@ -205,11 +205,11 @@ public class WizardLauncher implements Launcher {
         properties.put(ArgName.committerEmail.name(), getValue(wizard, ArgName.committerEmail.name()));
         properties.put(ArgName.itemPath.name(), getValue(wizard, ArgName.itemPath.name()));
         LinkedHashSet<SharePointConfig> sharePointConfigs =
-                Optional.ofNullable(wizard.getSettings().get(SharePointConfig.SHARE_POINT_CONFIG))
+                Optional.ofNullable(wizard.getSettings().get(SharePointConfig.SHARE_POINT_CONFIGS))
                 .map(value -> (LinkedHashSet<SharePointConfig>) value)
                 .orElseGet(LinkedHashSet::new);
         if (!sharePointConfigs.isEmpty()) {
-            properties.put(SharePointConfig.SHARE_POINT_CONFIG, sharePointConfigs);
+            properties.put(SharePointConfig.SHARE_POINT_CONFIGS, sharePointConfigs);
         }
     }
 
@@ -303,7 +303,7 @@ public class WizardLauncher implements Launcher {
         pageGrid.add(projectButton, 0, row);
         pageGrid.add(projectLabel, 1, row);
 
-        wizardProperties.put(SharePointConfig.SHARE_POINT_CONFIG, new LinkedHashSet<>());
+        wizardProperties.put(SharePointConfig.SHARE_POINT_CONFIGS, new LinkedHashSet<>());
 
         WizardPane wizardPane = new WizardPane() {
             @Override
@@ -334,7 +334,7 @@ public class WizardLauncher implements Launcher {
             public void onExitingPage(Wizard wizard) {
                 wizard.getSettings().put(ArgName.itemPath.name(), itemPathStringProperty.getValue());
                 wizard.getSettings().put(ArgName.projectPath.name(), projectLabelStringProperty.getValue());
-                wizard.getSettings().put(SharePointConfig.SHARE_POINT_CONFIG, wizardProperties.get(SharePointConfig.SHARE_POINT_CONFIG));
+                wizard.getSettings().put(SharePointConfig.SHARE_POINT_CONFIGS, wizardProperties.get(SharePointConfig.SHARE_POINT_CONFIGS));
             }
         };
         wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + " (" + step + "/6)");
@@ -353,14 +353,14 @@ public class WizardLauncher implements Launcher {
 
     public void saveConfiguration() {
         String[] args = wizardProperties.entrySet().stream()
-                .filter(entry -> !SharePointConfig.SHARE_POINT_CONFIG.equals(entry.getKey()))
+                .filter(entry -> !SharePointConfig.SHARE_POINT_CONFIGS.equals(entry.getKey()))
                 .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
                 .toArray(String[]::new);
         RunConfig runConfig = RunConfig.valueFrom(args);
 
         LinkedHashSet<SharePointConfig> sharePointConfigs = wizardProperties.entrySet()
                     .stream()
-                    .filter(entry -> SharePointConfig.SHARE_POINT_CONFIG.equals(entry.getKey()))
+                    .filter(entry -> SharePointConfig.SHARE_POINT_CONFIGS.equals(entry.getKey()))
                     .map(entry -> (LinkedHashSet<SharePointConfig>) entry.getValue())
                     .flatMap(Collection::stream)
                     .collect(toCollection(LinkedHashSet::new));

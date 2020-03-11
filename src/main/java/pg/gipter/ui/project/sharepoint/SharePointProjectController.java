@@ -203,7 +203,7 @@ public class SharePointProjectController extends AbstractController {
 
             if (uiLauncher.hasWizardProperties()) {
                 uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
-                uiLauncher.addPropertyToWizard(SharePointConfig.SHARE_POINT_CONFIG, sharePointConfigSet);
+                uiLauncher.addPropertyToWizard(SharePointConfig.SHARE_POINT_CONFIGS, sharePointConfigSet);
             }
         };
     }

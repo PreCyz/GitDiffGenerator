@@ -8,14 +8,21 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.model.CipherDetails;
+import pg.gipter.core.model.RunConfigBuilder;
+import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.service.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PasswordDeserializerTest {
@@ -88,5 +95,59 @@ class PasswordDeserializerTest {
 
         assertThat(actual.getToolkitConfig()).isNotNull();
         assertThat(actual.getToolkitConfig().getToolkitPassword()).isEqualTo(decryptedPassword);
+    }
+
+    @Test
+    void givenConfigurationWithoutSharePointConfig_whenDeserialize_thenDoNotDecryptTheSharePointConfigPassword() {
+        Configuration configuration = new Configuration();
+        configuration.addRunConfig(new RunConfigBuilder()
+                .withConfigurationName("name")
+                .withItemType(ItemType.SHARE_POINT_DOCS)
+                .create()
+        );
+        Configuration actual = deserializer.deserialize(new Gson().toJsonTree(configuration), Configuration.class, null);
+
+        assertThat(actual).isNotNull();
+    }
+
+    @Test
+    void givenConfigurationWithEmptySharePointConfig_whenDeserialize_thenReturnSharePointConfigPasswordIsDefault() {
+        Configuration configuration = new Configuration();
+        SharePointConfig sharePointConfig = new SharePointConfig();
+        sharePointConfig.setPassword(CryptoUtils.encryptSafe(sharePointConfig.getPassword()));
+        configuration.addRunConfig(new RunConfigBuilder()
+                .withConfigurationName("name")
+                .withItemType(ItemType.SHARE_POINT_DOCS)
+                .withSharePointConfigs(Stream.of(sharePointConfig).collect(toCollection(LinkedHashSet::new)))
+                .create()
+        );
+        Configuration actual = deserializer.deserialize(new Gson().toJsonTree(configuration), Configuration.class, null);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getRunConfigs()).hasSize(1);
+        assertThat(actual.getRunConfigs().get(0).getSharePointConfigs()).hasSize(1);
+        assertThat(new LinkedList<>(actual.getRunConfigs().get(0).getSharePointConfigs()).getFirst().getPassword())
+                .isEqualTo(ArgName.toolkitPassword.defaultValue());
+    }
+
+    @Test
+    void givenConfigurationWithEmptySharePointConfig_whenDeserialize_thenDecryptSharePointConfigPasswordProperly() {
+        String testPassword = "testPassword";
+        Configuration configuration = new Configuration();
+        SharePointConfig sharePointConfig = new SharePointConfig();
+        sharePointConfig.setPassword(CryptoUtils.encryptSafe(testPassword));
+        configuration.addRunConfig(new RunConfigBuilder()
+                .withConfigurationName("name")
+                .withItemType(ItemType.SHARE_POINT_DOCS)
+                .withSharePointConfigs(Stream.of(sharePointConfig).collect(toCollection(LinkedHashSet::new)))
+                .create()
+        );
+        Configuration actual = deserializer.deserialize(new Gson().toJsonTree(configuration), Configuration.class, null);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getRunConfigs()).hasSize(1);
+        assertThat(actual.getRunConfigs().get(0).getSharePointConfigs()).hasSize(1);
+        assertThat(new LinkedList<>(actual.getRunConfigs().get(0).getSharePointConfigs()).getFirst().getPassword())
+                .isEqualTo(testPassword);
     }
 }
