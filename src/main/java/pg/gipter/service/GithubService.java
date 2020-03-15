@@ -22,29 +22,32 @@ public class GithubService {
 
     public static final String GITHUB_URL = "https://github.com/PreCyz/GitDiffGenerator";
 
-    private final String currentVersion;
+    private final SemanticVersioning currentVersion;
 
     private static final Logger logger = LoggerFactory.getLogger(GithubService.class);
-    private String strippedVersion;
     private static JsonObject latestReleaseDetails;
+    private SemanticVersioning serverVersion;
     String distributionName;
-    private final String tagSuffix = "v";
+    private final String JSON_TAG_NAME = "tag_name";
+    private final String ELEVEN_PLUS = "11+";
 
-    public GithubService(String currentVersion) {
-        this.currentVersion = currentVersion;
+    public GithubService(SemanticVersioning semanticVersioning) {
+        this.currentVersion = semanticVersioning;
     }
 
-    public String getStrippedVersion() {
-        return strippedVersion;
+    public String getServerVersion() {
+        return serverVersion.getVersion();
     }
 
-    Optional<String> getLatestVersion() {
-        Optional<String> latestVersion = Optional.empty();
+    Optional<SemanticVersioning> getLatestVersion() {
+        Optional<SemanticVersioning> latestVersion = Optional.empty();
 
         Optional<JsonObject> latestDistroDetails = downloadLatestDistributionDetails();
         if (latestDistroDetails.isPresent()) {
             latestReleaseDetails = latestDistroDetails.get();
-            latestVersion = Optional.ofNullable(latestDistroDetails.get().get("tag_name").getAsString());
+            latestVersion = Optional.of(SemanticVersioning.getSemanticVersioning(
+                    latestDistroDetails.get().get(JSON_TAG_NAME).getAsString()
+            ));
         }
 
         return latestVersion;
@@ -52,30 +55,10 @@ public class GithubService {
 
     public boolean isNewVersion() {
         boolean result = false;
-        Optional<String> latestVersion = getLatestVersion();
+        Optional<SemanticVersioning> latestVersion = getLatestVersion();
         if (latestVersion.isPresent()) {
-            String version = latestVersion.get();
-            strippedVersion = version.substring(version.indexOf(tagSuffix) + 1);
-
-            String[] newVersion = strippedVersion.split("\\.");
-            String[] currentVersionArray = currentVersion.split("\\.");
-
-            result = newVersion.length != currentVersionArray.length;
-
-            if (!result) {
-                for (int i = 0; i < newVersion.length; i++) {
-                    try {
-                        if (Integer.parseInt(newVersion[i]) > Integer.parseInt(currentVersionArray[i])) {
-                            result = true;
-                            break;
-                        }
-                    } catch (NumberFormatException ex) {
-                        logger.warn("Versions contains more than only numbers. {}", ex.getMessage());
-                        result = false;
-                        break;
-                    }
-                }
-            }
+            serverVersion = latestVersion.get();
+            result = currentVersion.isNewerVersion(serverVersion);
         }
         return result;
     }
@@ -194,7 +177,7 @@ public class GithubService {
     private boolean isProperAsset(String name, JsonElement assetName) {
         boolean result = assetName != null;
         result &= !assetName.isJsonNull();
-        result &= assetName.getAsString().startsWith("11+");
+        result &= assetName.getAsString().startsWith(ELEVEN_PLUS);
         result &= assetName.getAsString().contains(name);
         return result;
     }
@@ -221,11 +204,9 @@ public class GithubService {
     }
 
     private String getLastVersion() {
-        String version = "";
-        if (latestReleaseDetails != null && latestReleaseDetails.get("tag_name") != null) {
-            version = latestReleaseDetails.get("tag_name").getAsString();
-            strippedVersion = version = version.substring(version.indexOf(tagSuffix) + 1);
+        if (latestReleaseDetails != null && latestReleaseDetails.get(JSON_TAG_NAME) != null) {
+            serverVersion = SemanticVersioning.getSemanticVersioning(latestReleaseDetails.get(JSON_TAG_NAME).getAsString());
         }
-        return version;
+        return serverVersion.getVersion();
     }
 }

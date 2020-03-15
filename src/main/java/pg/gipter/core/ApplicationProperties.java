@@ -11,6 +11,7 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.core.producer.command.VersionControlSystem;
+import pg.gipter.service.SemanticVersioning;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
@@ -228,7 +229,7 @@ public abstract class ApplicationProperties {
         return argExtractor.preferredArgSource();
     }
 
-    public String version() {
+    public SemanticVersioning version() {
         String version = "";
 
         InputStream is = getClass().getClassLoader().getResourceAsStream("version.txt");
@@ -240,7 +241,7 @@ public abstract class ApplicationProperties {
                 version = scan.nextLine();
             }
         }
-        return version;
+        return SemanticVersioning.getSemanticVersioning(version);
     }
 
     public final boolean isSilentMode() {

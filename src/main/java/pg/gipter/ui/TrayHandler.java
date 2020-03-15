@@ -57,7 +57,9 @@ class TrayHandler {
         addMenuItemsToMenu(trayPopupMenu);
 
         trayIcon = new TrayIcon(
-                createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), trayPopupMenu
+                createTrayImage(),
+                BundleUtils.getMsg("main.title", applicationProperties.version().getVersion()),
+                trayPopupMenu
         );
         trayIcon.addActionListener(showActionListener());
         trayIcon.setImageAutoSize(true);

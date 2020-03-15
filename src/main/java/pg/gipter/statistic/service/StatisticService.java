@@ -54,7 +54,7 @@ public class StatisticService {
             statistic.setLastSuccessDate(now);
         }
         statistic.setControlSystemMap(createControlSystemMap(runDetails.getApplicationPropertiesCollection()));
-        statistic.setApplicationVersion(appProperties.version());
+        statistic.setApplicationVersion(appProperties.version().getVersion());
 
         return statistic;
     }

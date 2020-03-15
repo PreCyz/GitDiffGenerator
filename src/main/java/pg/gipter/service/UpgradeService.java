@@ -12,7 +12,10 @@ import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -25,7 +28,7 @@ public class UpgradeService extends TaskService<Void> {
 
     private GithubService githubService;
 
-    public UpgradeService(String currentVersion) {
+    public UpgradeService(SemanticVersioning currentVersion) {
         super();
         githubService = new GithubService(currentVersion);
     }

@@ -410,7 +410,7 @@ public class MainController extends AbstractController {
             GithubService service = new GithubService(applicationProperties.version());
             final boolean newVersion = service.isNewVersion();
             if (newVersion) {
-                logger.info("New version [{}] available.", service.getStrippedVersion());
+                logger.info("New version [{}] available.", service.getServerVersion());
             } else {
                 logger.info("This version is up to date.");
             }

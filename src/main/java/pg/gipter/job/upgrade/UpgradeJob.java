@@ -6,9 +6,13 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.PreferredArgSource;
 import pg.gipter.service.GithubService;
-import pg.gipter.ui.alert.*;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDateTime;
@@ -34,9 +38,9 @@ public class UpgradeJob implements Job {
 
     private void checkUpgrades() {
         if (githubService.isNewVersion()) {
-            logger.info("New version available: {}.", githubService.getStrippedVersion());
+            logger.info("New version available: {}.", githubService.getServerVersion());
             Platform.runLater(() -> new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", githubService.getStrippedVersion()))
+                    .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", githubService.getServerVersion()))
                     .withLink(GithubService.GITHUB_URL + "/releases/latest")
                     .withWindowType(WindowType.BROWSER_WINDOW)
                     .withAlertType(Alert.AlertType.INFORMATION)

@@ -20,9 +20,9 @@ class GithubServiceTest {
 
     @Test
     void givenNewerVersionInGithub_whenIsNewVersion_thenReturnTrue() {
-        when(mockAppProps.version()).thenReturn("3.6");
+        when(mockAppProps.version()).thenReturn(SemanticVersioning.getSemanticVersioning("3.6"));
         spyGithubService = spy(new GithubService(mockAppProps.version()));
-        doReturn(Optional.of("3.6.2")).when(spyGithubService).getLatestVersion();
+        doReturn(Optional.of(SemanticVersioning.getSemanticVersioning("3.6.2"))).when(spyGithubService).getLatestVersion();
 
         boolean actual = spyGithubService.isNewVersion();
 
@@ -31,9 +31,9 @@ class GithubServiceTest {
 
     @Test
     void givenNewerVersionInGithubV2_whenIsNewVersion_thenReturnTrue() {
-        when(mockAppProps.version()).thenReturn("3.5.5");
+        when(mockAppProps.version()).thenReturn(SemanticVersioning.getSemanticVersioning("3.5.5"));
         spyGithubService = spy(new GithubService(mockAppProps.version()));
-        doReturn(Optional.of("3.6")).when(spyGithubService).getLatestVersion();
+        doReturn(Optional.of(SemanticVersioning.getSemanticVersioning("3.6"))).when(spyGithubService).getLatestVersion();
 
         boolean actual = spyGithubService.isNewVersion();
 
@@ -43,9 +43,9 @@ class GithubServiceTest {
     @Test
     @Disabled("This case should not be possible.")
     void givenOlderVersionInGithub_whenIsNewVersion_thenReturnFalse() {
-        when(mockAppProps.version()).thenReturn("3.6.1");
+        when(mockAppProps.version()).thenReturn(new SemanticVersioning(3, 6, 1));
         spyGithubService = spy(new GithubService(mockAppProps.version()));
-        doReturn(Optional.of("3.6")).when(spyGithubService).getLatestVersion();
+        doReturn(Optional.of(SemanticVersioning.getSemanticVersioning("3.6"))).when(spyGithubService).getLatestVersion();
 
         boolean actual = spyGithubService.isNewVersion();
 
@@ -54,9 +54,9 @@ class GithubServiceTest {
 
     @Test
     void givenNewVersionInGithub_whenIsNewVersion_thenReturnTrue() {
-        when(mockAppProps.version()).thenReturn("3.6.12");
+        when(mockAppProps.version()).thenReturn(SemanticVersioning.getSemanticVersioning("3.6.12"));
         spyGithubService = spy(new GithubService(mockAppProps.version()));
-        doReturn(Optional.of("3.7")).when(spyGithubService).getLatestVersion();
+        doReturn(Optional.of(SemanticVersioning.getSemanticVersioning("3.7"))).when(spyGithubService).getLatestVersion();
 
         boolean actual = spyGithubService.isNewVersion();
 
@@ -66,9 +66,9 @@ class GithubServiceTest {
     @Test
     @Disabled
     void givenOldVersionInGithub_whenIsNewVersion_thenReturnFalse() {
-        when(mockAppProps.version()).thenReturn("3.7");
+        when(mockAppProps.version()).thenReturn(SemanticVersioning.getSemanticVersioning("3.7"));
         spyGithubService = spy(new GithubService(mockAppProps.version()));
-        doReturn(Optional.of("3.6.14")).when(spyGithubService).getLatestVersion();
+        doReturn(Optional.of(SemanticVersioning.getSemanticVersioning("3.6.14"))).when(spyGithubService).getLatestVersion();
 
         boolean actual = spyGithubService.isNewVersion();
 
@@ -77,9 +77,9 @@ class GithubServiceTest {
 
     @Test
     void givenNewVersionInGithub2_whenIsNewVersion_thenReturnTrue() {
-        when(mockAppProps.version()).thenReturn("1.3");
+        when(mockAppProps.version()).thenReturn(SemanticVersioning.getSemanticVersioning("1.3"));
         spyGithubService = spy(new GithubService(mockAppProps.version()));
-        doReturn(Optional.of("3.7")).when(spyGithubService).getLatestVersion();
+        doReturn(Optional.of(SemanticVersioning.getSemanticVersioning("3.7"))).when(spyGithubService).getLatestVersion();
 
         boolean actual = spyGithubService.isNewVersion();
 
@@ -88,9 +88,9 @@ class GithubServiceTest {
 
     @Test
     void givenTheSameVersion_whenIsNewVersion_thenReturnFalse() {
-        when(mockAppProps.version()).thenReturn("3.6.2");
+        when(mockAppProps.version()).thenReturn(SemanticVersioning.getSemanticVersioning("3.6.2"));
         spyGithubService = spy(new GithubService(mockAppProps.version()));
-        doReturn(Optional.of("3.6.2")).when(spyGithubService).getLatestVersion();
+        doReturn(Optional.of(SemanticVersioning.getSemanticVersioning("3.6.2"))).when(spyGithubService).getLatestVersion();
 
         boolean actual = spyGithubService.isNewVersion();
 
@@ -99,9 +99,9 @@ class GithubServiceTest {
 
     @Test
     void givenVersionWithLetters_whenIsNewVersion_thenReturnFalse() {
-        when(mockAppProps.version()).thenReturn("3.6.6-alpha");
+        when(mockAppProps.version()).thenReturn(SemanticVersioning.getSemanticVersioning("3.6.6-alpha"));
         spyGithubService = spy(new GithubService(mockAppProps.version()));
-        doReturn(Optional.of("3.6.5")).when(spyGithubService).getLatestVersion();
+        doReturn(Optional.of(SemanticVersioning.getSemanticVersioning("3.6.5"))).when(spyGithubService).getLatestVersion();
 
         boolean actual = spyGithubService.isNewVersion();
 
@@ -110,7 +110,7 @@ class GithubServiceTest {
 
     @Test
     void givenLatestDistroDetails_whenGetDownloadLink_thenFileDownloaded() throws FileNotFoundException {
-        spyGithubService = spy(new GithubService("1.0"));
+        spyGithubService = spy(new GithubService(SemanticVersioning.getSemanticVersioning("1.0")));
         String json = String.format(".%ssrc%stest%sjava%sresources%slatestDistributionDetails.json",
                 File.separator, File.separator, File.separator, File.separator, File.separator);
         Reader reader = new BufferedReader(new FileReader(json));

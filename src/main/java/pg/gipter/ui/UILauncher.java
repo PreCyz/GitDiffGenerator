@@ -167,9 +167,9 @@ public class UILauncher implements Launcher {
             executor.execute(() -> {
                 GithubService service = new GithubService(applicationProperties.version());
                 if (service.isNewVersion()) {
-                    logger.info("New version available: {}.", service.getStrippedVersion());
+                    logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
-                            .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getStrippedVersion()))
+                            .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
                             .withLink(GithubService.GITHUB_URL + "/releases/latest")
                             .withWindowType(WindowType.BROWSER_WINDOW)
                             .withAlertType(Alert.AlertType.INFORMATION)
@@ -216,7 +216,7 @@ public class UILauncher implements Launcher {
         }
         try {
             stage.setTitle(BundleUtils.getMsg(
-                    window.windowTitleBundle(), applicationProperties.version()
+                    window.windowTitleBundle(), applicationProperties.version().getVersion()
             ));
             stage.setResizable(window.resizable());
             Scene scene = new Scene(window.root());

@@ -8,6 +8,7 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.service.SemanticVersioning;
 
 import java.io.File;
 import java.io.IOException;
@@ -1422,10 +1423,11 @@ class CliPreferredApplicationPropertiesTest {
     void given_versionTxt_when_version_then_returnVersion() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        String actual = applicationProperties.version();
+        SemanticVersioning actual = applicationProperties.version();
 
-        assertThat(actual).isNotEmpty();
-        assertThat(actual).isNotBlank();
+        assertThat(actual).isNotNull();
+        assertThat(actual.getVersion()).isNotEmpty();
+        assertThat(actual.getVersion()).isNotBlank();
     }
 
     @Test
