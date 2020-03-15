@@ -113,7 +113,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitConfigExists() {
-        return toolkitConfig != null;
+        return toolkitConfig != null && toolkitConfig.isToolkitCredentialsSet();
     }
 
     protected final boolean isOtherAuthorsExists() {

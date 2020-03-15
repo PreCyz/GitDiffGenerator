@@ -368,9 +368,11 @@ public class WizardLauncher implements Launcher {
             runConfig.setSharePointConfigs(sharePointConfigs);
         }
 
-        ToolkitConfig toolkitConfig = ToolkitConfig.valueFrom(args);
         applicationProperties.updateCurrentRunConfig(runConfig);
-        applicationProperties.updateToolkitConfig(toolkitConfig);
+        ToolkitConfig toolkitConfig = ToolkitConfig.valueFrom(args);
+        if (toolkitConfig.isToolkitCredentialsSet()) {
+            applicationProperties.updateToolkitConfig(toolkitConfig);
+        }
         applicationProperties.updateApplicationConfig(ApplicationConfig.valueFrom(args));
         applicationProperties.save();
     }
@@ -378,9 +380,10 @@ public class WizardLauncher implements Launcher {
     private EventHandler<ActionEvent> addItemEventHandler(StringProperty itemPathStringProperty) {
         return event -> {
             ItemType uploadType = ItemType.valueFor(wizardProperties.getProperty(ArgName.itemType.name()));
+            File currentDirectory = new File(".");
             if (uploadType == ItemType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
-                fileChooser.setInitialDirectory(new File("."));
+                fileChooser.setInitialDirectory(currentDirectory);
                 fileChooser.setTitle(BundleUtils.getMsg("directory.item.statement.title"));
                 File statementFile = fileChooser.showOpenDialog(primaryStage);
                 if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
@@ -389,7 +392,7 @@ public class WizardLauncher implements Launcher {
                 }
             } else {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setInitialDirectory(new File("."));
+                directoryChooser.setInitialDirectory(currentDirectory);
                 directoryChooser.setTitle(BundleUtils.getMsg("directory.item.store"));
                 File itemPathDirectory = directoryChooser.showDialog(primaryStage);
                 if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
@@ -446,9 +449,6 @@ public class WizardLauncher implements Launcher {
                 } else if (currentPage == welcomePage) {
                     return configurationPage;
                 } else if (currentPage == configurationPage) {
-                    if (StringUtils.nullOrEmpty(lastChosenConfiguration)) {
-                        return toolkitCredentialsPage;
-                    }
                     ApplicationProperties applicationProperties = propertiesWithCredentials();
                     if (applicationProperties.isToolkitCredentialsSet()) {
                         return flowAdvancedLogic();

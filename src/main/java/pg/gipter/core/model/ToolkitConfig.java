@@ -2,6 +2,7 @@ package pg.gipter.core.model;
 
 import pg.gipter.core.ArgName;
 import pg.gipter.utils.CryptoUtils;
+import pg.gipter.utils.StringUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -164,6 +165,11 @@ public class ToolkitConfig {
             }
         }
         return toolkitConfig;
+    }
+
+    public final boolean isToolkitCredentialsSet() {
+        return StringUtils.notEmpty(toolkitUsername) && !ArgName.toolkitUsername.defaultValue().equals(toolkitUsername)
+                && StringUtils.notEmpty(toolkitPassword) && !ArgName.toolkitPassword.defaultValue().equals(toolkitPassword);
     }
 
     @Override
