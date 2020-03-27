@@ -1771,7 +1771,8 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_MONTH_NUMBER);
 
-        assertThat(actual).isEqualTo(String.valueOf(LocalDate.now().getMonthValue()));
+        assertThat(actual.length()).isEqualTo(2);
+        assertThat(actual).contains(String.valueOf(LocalDate.now().getMonthValue()));
     }
 
     @Test
@@ -1821,7 +1822,8 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_MONTH_NUMBER);
 
-        assertThat(actual).isEqualTo(String.valueOf(Month.JUNE.getValue()));
+        assertThat(actual.length()).isEqualTo(2);
+        assertThat(actual).contains(String.valueOf(Month.JUNE.getValue()));
     }
 
     @Test
@@ -1872,7 +1874,8 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_MONTH_NUMBER);
 
-        assertThat(actual).isEqualTo(String.valueOf(Month.JUNE.getValue()));
+        assertThat(actual.length()).isEqualTo(2);
+        assertThat(actual).contains(String.valueOf(Month.JUNE.getValue()));
     }
 
     @Test
