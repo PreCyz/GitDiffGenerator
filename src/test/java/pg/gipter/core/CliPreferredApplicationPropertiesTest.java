@@ -1959,4 +1959,31 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).isTrue();
     }
+
+    @Test
+    void givenCurrent_month_name_whenValueFromPattern_thenReturnMonthNameLowerCase() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.current_month_name);
+
+        assertThat(actual).isEqualTo(LocalDate.now().getMonth().name().toLowerCase());
+    }
+
+    @Test
+    void givenStart_date_month_name_whenValueFromPattern_thenReturnMonthNameLowerCase() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.start_date_month_name);
+
+        assertThat(actual).isEqualTo(LocalDate.now().getMonth().name().toLowerCase());
+    }
+
+    @Test
+    void givenEnd_date_month_name_whenValueFromPattern_thenReturnMonthNameLowerCase() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.end_date_month_name);
+
+        assertThat(actual).isEqualTo(LocalDate.now().getMonth().name().toLowerCase());
+    }
 }

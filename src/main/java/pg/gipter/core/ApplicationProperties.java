@@ -188,6 +188,8 @@ public abstract class ApplicationProperties {
                 return String.valueOf(LocalDate.now().getYear());
             case CURRENT_MONTH_NAME:
                 return LocalDate.now().getMonth().name();
+            case current_month_name:
+                return LocalDate.now().getMonth().name().toLowerCase();
             case CURRENT_MONTH_NUMBER:
                 return String.format("%2d", LocalDate.now().getMonthValue()).replace(" ", "0");
             case CURRENT_WEEK_NUMBER:
@@ -198,6 +200,8 @@ public abstract class ApplicationProperties {
                 return String.valueOf(startDate().getYear());
             case START_DATE_MONTH_NAME:
                 return startDate().getMonth().name();
+            case start_date_month_name:
+                return startDate().getMonth().name().toLowerCase();
             case START_DATE_MONTH_NUMBER:
                 return String.format("%2d", startDate().getMonthValue()).replace(" ", "0");
             case START_DATE_WEEK_NUMBER:
@@ -208,6 +212,8 @@ public abstract class ApplicationProperties {
                 return String.valueOf(endDate().getYear());
             case END_DATE_MONTH_NAME:
                 return endDate().getMonth().name();
+            case end_date_month_name:
+                return endDate().getMonth().name().toLowerCase();
             case END_DATE_MONTH_NUMBER:
                 return String.format("%2d", endDate().getMonthValue()).replace(" ", "0");
             case END_DATE_WEEK_NUMBER:
