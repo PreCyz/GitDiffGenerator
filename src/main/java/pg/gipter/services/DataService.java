@@ -1,4 +1,4 @@
-package pg.gipter.service;
+package pg.gipter.services;
 
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;

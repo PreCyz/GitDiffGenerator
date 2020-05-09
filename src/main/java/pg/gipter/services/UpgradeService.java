@@ -1,4 +1,4 @@
-package pg.gipter.service;
+package pg.gipter.services;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;

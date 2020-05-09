@@ -6,7 +6,7 @@ import pg.gipter.core.model.CipherDetails;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.service.SecurityService;
+import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 
 import java.lang.reflect.Type;

@@ -1,4 +1,4 @@
-package pg.gipter.service;
+package pg.gipter.services;
 
 import mslinks.ShellLink;
 import org.apache.commons.io.FileUtils;

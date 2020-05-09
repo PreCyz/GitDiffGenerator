@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
-import pg.gipter.service.GithubService;
+import pg.gipter.services.GithubService;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
 import pg.gipter.ui.alert.WindowType;

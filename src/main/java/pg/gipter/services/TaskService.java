@@ -1,4 +1,4 @@
-package pg.gipter.service;
+package pg.gipter.services;
 
 import javafx.concurrent.Task;
 import org.slf4j.Logger;

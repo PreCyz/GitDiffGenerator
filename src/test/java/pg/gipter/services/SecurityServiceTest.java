@@ -1,4 +1,4 @@
-package pg.gipter.service;
+package pg.gipter.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

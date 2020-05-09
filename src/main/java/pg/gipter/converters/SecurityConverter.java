@@ -11,7 +11,7 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CachedConfiguration;
 import pg.gipter.core.model.CipherDetails;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.service.SecurityService;
+import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 import pg.gipter.utils.StringUtils;
 

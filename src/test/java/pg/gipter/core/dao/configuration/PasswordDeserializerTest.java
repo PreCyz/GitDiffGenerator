@@ -12,7 +12,7 @@ import pg.gipter.core.model.RunConfigBuilder;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producer.command.ItemType;
-import pg.gipter.service.SecurityService;
+import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 
 import java.io.IOException;

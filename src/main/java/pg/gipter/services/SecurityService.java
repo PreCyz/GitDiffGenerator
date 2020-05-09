@@ -1,4 +1,4 @@
-package pg.gipter.service;
+package pg.gipter.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

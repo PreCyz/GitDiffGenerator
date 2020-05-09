@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producer.command.ItemType;
-import pg.gipter.service.SecurityService;
+import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 
 import java.util.Collections;

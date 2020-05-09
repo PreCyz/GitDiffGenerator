@@ -8,7 +8,7 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producer.command.ItemType;
-import pg.gipter.service.SemanticVersioning;
+import pg.gipter.services.SemanticVersioning;
 
 import java.io.File;
 import java.io.IOException;

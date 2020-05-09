@@ -10,7 +10,7 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
-import pg.gipter.service.ToolkitService;
+import pg.gipter.services.ToolkitService;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.UILauncher;

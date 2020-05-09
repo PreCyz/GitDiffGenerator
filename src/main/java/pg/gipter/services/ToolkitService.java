@@ -1,4 +1,4 @@
-package pg.gipter.service;
+package pg.gipter.services;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

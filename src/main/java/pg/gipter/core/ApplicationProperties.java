@@ -11,7 +11,7 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.core.producer.command.VersionControlSystem;
-import pg.gipter.service.SemanticVersioning;
+import pg.gipter.services.SemanticVersioning;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package pg.gipter.service.platform;
+package pg.gipter.services.platform;
 
 public interface AppManager {
     void launchFileManagerForLogs();
