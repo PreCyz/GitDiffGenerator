@@ -14,7 +14,7 @@ import pg.gipter.core.producer.DiffProducer;
 import pg.gipter.core.producer.DiffProducerFactory;
 import pg.gipter.launchers.Starter;
 import pg.gipter.statistics.dto.RunDetails;
-import pg.gipter.statistics.service.StatisticService;
+import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alert.AlertWindowBuilder;
 import pg.gipter.ui.alert.ImageFile;
