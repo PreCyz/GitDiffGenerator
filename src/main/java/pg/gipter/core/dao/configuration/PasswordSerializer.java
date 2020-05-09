@@ -15,6 +15,7 @@ import pg.gipter.utils.StringUtils;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -26,7 +27,8 @@ class PasswordSerializer implements JsonSerializer<Configuration> {
         private static final PasswordSerializer INSTANCE = new PasswordSerializer();
     }
 
-    private PasswordSerializer() { }
+    private PasswordSerializer() {
+    }
 
     public static PasswordSerializer getInstance() {
         return PasswordSerializerHolder.INSTANCE;
@@ -55,6 +57,7 @@ class PasswordSerializer implements JsonSerializer<Configuration> {
                 rc.getSharePointConfigs() != null && !rc.getSharePointConfigs().isEmpty();
         if (runConfigs != null && !runConfigs.isEmpty() && runConfigs.stream().anyMatch(isValidSharePointConfig)) {
             Set<SharePointConfig> sharePointConfigs = runConfigs.stream()
+                    .filter(rc -> Objects.nonNull(rc.getSharePointConfigs()))
                     .map(RunConfig::getSharePointConfigs)
                     .flatMap(Collection::stream)
                     .collect(toSet());
