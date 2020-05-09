@@ -1,4 +1,4 @@
-package pg.gipter.job.upload;
+package pg.gipter.jobs.upload;
 
 class JobPair {
     private final String name;

@@ -1,4 +1,4 @@
-package pg.gipter.job.upgrade;
+package pg.gipter.jobs.upgrade;
 
 import org.quartz.*;
 

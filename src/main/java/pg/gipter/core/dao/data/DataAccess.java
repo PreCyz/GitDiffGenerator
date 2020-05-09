@@ -3,7 +3,7 @@ package pg.gipter.core.dao.data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.job.upload.JobProperty;
+import pg.gipter.jobs.upload.JobProperty;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

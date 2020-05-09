@@ -1,4 +1,4 @@
-package pg.gipter.job;
+package pg.gipter.jobs;
 
 import javafx.scene.control.Alert;
 import org.quartz.Scheduler;
@@ -11,11 +11,11 @@ import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
-import pg.gipter.job.upgrade.UpgradeJobCreator;
-import pg.gipter.job.upload.JobProperty;
-import pg.gipter.job.upload.JobType;
-import pg.gipter.job.upload.UploadItemJobBuilder;
-import pg.gipter.job.upload.UploadJobCreator;
+import pg.gipter.jobs.upgrade.UpgradeJobCreator;
+import pg.gipter.jobs.upload.JobProperty;
+import pg.gipter.jobs.upload.JobType;
+import pg.gipter.jobs.upload.UploadItemJobBuilder;
+import pg.gipter.jobs.upload.UploadJobCreator;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.alert.AlertWindowBuilder;

@@ -1,4 +1,4 @@
-package pg.gipter.job.upload;
+package pg.gipter.jobs.upload;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

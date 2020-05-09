@@ -1,4 +1,4 @@
-package pg.gipter.job.upload;
+package pg.gipter.jobs.upload;
 
 public enum JobProperty {
 
