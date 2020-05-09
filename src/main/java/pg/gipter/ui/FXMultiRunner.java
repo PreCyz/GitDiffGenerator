@@ -12,7 +12,7 @@ import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.producer.DiffProducer;
 import pg.gipter.core.producer.DiffProducerFactory;
-import pg.gipter.launcher.Starter;
+import pg.gipter.launchers.Starter;
 import pg.gipter.statistic.dto.RunDetails;
 import pg.gipter.statistic.service.StatisticService;
 import pg.gipter.toolkit.DiffUploader;

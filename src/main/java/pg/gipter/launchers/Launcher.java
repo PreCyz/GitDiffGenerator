@@ -1,4 +1,4 @@
-package pg.gipter.launcher;
+package pg.gipter.launchers;
 
 public interface Launcher {
 

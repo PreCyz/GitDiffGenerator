@@ -1,4 +1,4 @@
-package pg.gipter.launcher;
+package pg.gipter.launchers;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -10,7 +10,9 @@ import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.producer.DiffProducer;
 import pg.gipter.core.producer.DiffProducerFactory;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.ui.alert.*;
+import pg.gipter.ui.alert.AlertWindowBuilder;
+import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alert.WindowType;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 

@@ -1,4 +1,4 @@
-package pg.gipter.launcher;
+package pg.gipter.launchers;
 
 import javafx.stage.Stage;
 import pg.gipter.core.ApplicationProperties;

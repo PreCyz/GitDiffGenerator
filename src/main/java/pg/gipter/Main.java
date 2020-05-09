@@ -11,8 +11,8 @@ import pg.gipter.converters.ConverterFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
-import pg.gipter.launcher.Launcher;
-import pg.gipter.launcher.LauncherFactory;
+import pg.gipter.launchers.Launcher;
+import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.utils.StringUtils;
 
 import java.util.Arrays;

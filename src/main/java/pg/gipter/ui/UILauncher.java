@@ -26,7 +26,7 @@ import pg.gipter.jobs.upload.JobProperty;
 import pg.gipter.jobs.upload.JobType;
 import pg.gipter.jobs.upload.UploadItemJob;
 import pg.gipter.jobs.upload.UploadItemJobBuilder;
-import pg.gipter.launcher.Launcher;
+import pg.gipter.launchers.Launcher;
 import pg.gipter.service.GithubService;
 import pg.gipter.service.StartupService;
 import pg.gipter.ui.alert.AlertWindowBuilder;
