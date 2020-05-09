@@ -34,8 +34,8 @@ public abstract class ApplicationProperties {
     protected RunConfig currentRunConfig;
     protected final ArgExtractor argExtractor;
     private Set<VersionControlSystem> vcs;
-    private String[] cliArgs;
-    private CachedConfiguration cachedConfiguration;
+    private final String[] cliArgs;
+    private final CachedConfiguration cachedConfiguration;
 
     public ApplicationProperties(String[] cliArgs) {
         this.cliArgs = cliArgs;
