@@ -1,4 +1,4 @@
-package pg.gipter.core.producer.version;
+package pg.gipter.core.producer.vcs;
 
 import pg.gipter.core.producer.command.VersionControlSystem;
 

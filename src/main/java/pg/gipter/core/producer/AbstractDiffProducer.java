@@ -3,13 +3,17 @@ package pg.gipter.core.producer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.producer.command.*;
-import pg.gipter.core.producer.version.VCSVersionProducer;
-import pg.gipter.core.producer.version.VCSVersionProducerFactory;
+import pg.gipter.core.producer.command.DiffCommand;
+import pg.gipter.core.producer.command.DiffCommandFactory;
+import pg.gipter.core.producer.command.VersionControlSystem;
+import pg.gipter.core.producer.vcs.VCSVersionProducer;
+import pg.gipter.core.producer.vcs.VCSVersionProducerFactory;
 
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 abstract class AbstractDiffProducer implements DiffProducer {
 
