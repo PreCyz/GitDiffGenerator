@@ -39,7 +39,7 @@ class SharePointSoapClientTest {
     private SharePointSoapClient client;
 
     @BeforeEach
-    private void setutp() {
+    private void setup() {
         client = spy(new SharePointSoapClient(webServiceTemplate, wsUrl, listName));
     }
 
