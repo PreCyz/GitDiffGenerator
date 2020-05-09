@@ -6,8 +6,8 @@ import pg.gipter.core.dao.configuration.SecurityProvider;
 import pg.gipter.core.dao.configuration.SecurityProviderFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.DataDaoFactory;
-import pg.gipter.statistic.dao.StatisticDao;
-import pg.gipter.statistic.dao.StatisticDaoFactory;
+import pg.gipter.statistics.dao.StatisticDao;
+import pg.gipter.statistics.dao.StatisticDaoFactory;
 
 public final class DaoFactory {
 

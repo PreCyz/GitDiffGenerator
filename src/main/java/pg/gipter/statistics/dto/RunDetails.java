@@ -1,4 +1,4 @@
-package pg.gipter.statistic.dto;
+package pg.gipter.statistics.dto;
 
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.ui.RunType;

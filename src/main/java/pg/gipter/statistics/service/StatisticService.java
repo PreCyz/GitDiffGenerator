@@ -1,4 +1,4 @@
-package pg.gipter.statistic.service;
+package pg.gipter.statistics.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,9 +7,9 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.core.producer.vcs.VCSVersionProducer;
 import pg.gipter.core.producer.vcs.VCSVersionProducerFactory;
-import pg.gipter.statistic.Statistic;
-import pg.gipter.statistic.dao.StatisticDao;
-import pg.gipter.statistic.dto.RunDetails;
+import pg.gipter.statistics.Statistic;
+import pg.gipter.statistics.dao.StatisticDao;
+import pg.gipter.statistics.dto.RunDetails;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.IOException;

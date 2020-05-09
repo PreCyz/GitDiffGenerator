@@ -1,4 +1,4 @@
-package pg.gipter.statistic;
+package pg.gipter.statistics;
 
 import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.ui.RunType;

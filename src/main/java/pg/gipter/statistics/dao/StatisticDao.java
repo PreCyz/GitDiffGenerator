@@ -1,6 +1,6 @@
-package pg.gipter.statistic.dao;
+package pg.gipter.statistics.dao;
 
-import pg.gipter.statistic.Statistic;
+import pg.gipter.statistics.Statistic;
 
 public interface StatisticDao {
 

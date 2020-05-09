@@ -1,4 +1,4 @@
-package pg.gipter.statistic.dao;
+package pg.gipter.statistics.dao;
 
 public final class StatisticDaoFactory {
     private StatisticDaoFactory() { }

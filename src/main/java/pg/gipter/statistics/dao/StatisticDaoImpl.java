@@ -1,4 +1,4 @@
-package pg.gipter.statistic.dao;
+package pg.gipter.statistics.dao;
 
 import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
@@ -8,7 +8,7 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import pg.gipter.core.dao.MongoDaoConfig;
 import pg.gipter.core.producer.command.VersionControlSystem;
-import pg.gipter.statistic.Statistic;
+import pg.gipter.statistics.Statistic;
 import pg.gipter.utils.StringUtils;
 
 import java.util.*;
