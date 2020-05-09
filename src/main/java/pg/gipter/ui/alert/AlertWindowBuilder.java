@@ -9,7 +9,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import pg.gipter.services.platform.AppManagerFactory;
+import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.ResourceUtils;
 import pg.gipter.utils.StringUtils;

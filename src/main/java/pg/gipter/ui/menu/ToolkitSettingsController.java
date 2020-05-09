@@ -12,8 +12,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.services.platform.AppManager;
-import pg.gipter.services.platform.AppManagerFactory;
+import pg.gipter.services.platforms.AppManager;
+import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 
