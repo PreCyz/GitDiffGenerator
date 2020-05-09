@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.helper;
+package pg.gipter.toolkit.helpers;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;

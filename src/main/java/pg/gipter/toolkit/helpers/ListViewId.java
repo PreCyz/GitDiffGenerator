@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.helper;
+package pg.gipter.toolkit.helpers;
 
 public class ListViewId {
     private final String listId;

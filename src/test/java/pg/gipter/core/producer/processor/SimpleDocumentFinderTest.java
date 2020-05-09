@@ -12,7 +12,7 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.toolkit.dto.DocumentDetails;
-import pg.gipter.toolkit.helper.XmlHelper;
+import pg.gipter.toolkit.helpers.XmlHelper;
 import pg.gipter.utils.StringUtils;
 
 import java.io.BufferedReader;

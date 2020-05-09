@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.helper;
+package pg.gipter.toolkit.helpers;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;

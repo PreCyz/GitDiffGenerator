@@ -9,7 +9,7 @@ import pg.gipter.MockitoExtension;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.producer.command.VersionControlSystem;
-import pg.gipter.toolkit.helper.XmlHelper;
+import pg.gipter.toolkit.helpers.XmlHelper;
 import pg.gipter.toolkit.sharepoint.soap.SharePointSoapClient;
 
 import javax.xml.transform.Source;

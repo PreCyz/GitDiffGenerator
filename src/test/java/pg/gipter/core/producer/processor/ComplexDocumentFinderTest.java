@@ -9,7 +9,7 @@ import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.toolkit.dto.DocumentDetails;
-import pg.gipter.toolkit.helper.XmlHelper;
+import pg.gipter.toolkit.helpers.XmlHelper;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
