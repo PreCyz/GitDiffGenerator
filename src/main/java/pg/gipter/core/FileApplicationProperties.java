@@ -1,6 +1,6 @@
 package pg.gipter.core;
 
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;

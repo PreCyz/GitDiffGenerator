@@ -1,7 +1,7 @@
 package pg.gipter.core.model;
 
 import pg.gipter.core.PreferredArgSource;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;

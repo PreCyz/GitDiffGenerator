@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.io.IOException;

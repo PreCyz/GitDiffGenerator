@@ -8,7 +8,7 @@ import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.MockitoExtension;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.producer.command.VersionControlSystem;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.toolkit.helpers.XmlHelper;
 import pg.gipter.toolkit.sharepoint.soap.SharePointSoapClient;
 

@@ -1,7 +1,7 @@
 package pg.gipter.core;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 
 import java.time.LocalDate;
 import java.util.Set;

@@ -20,7 +20,7 @@ import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.jobs.JobHandler;
 import pg.gipter.jobs.upload.JobProperty;
 import pg.gipter.jobs.upload.JobType;

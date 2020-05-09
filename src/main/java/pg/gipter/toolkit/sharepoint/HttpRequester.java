@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.core.producer.processor.DownloadDetails;
+import pg.gipter.core.producers.processor.DownloadDetails;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

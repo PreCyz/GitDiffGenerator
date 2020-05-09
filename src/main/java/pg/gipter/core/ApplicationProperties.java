@@ -9,8 +9,8 @@ import pg.gipter.core.model.ApplicationConfig;
 import pg.gipter.core.model.NamePatternValue;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.core.producer.command.ItemType;
-import pg.gipter.core.producer.command.VersionControlSystem;
+import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.SemanticVersioning;
 import pg.gipter.utils.StringUtils;
 

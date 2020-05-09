@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.core.producer.processor.GETCall;
+import pg.gipter.core.producers.processor.GETCall;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;

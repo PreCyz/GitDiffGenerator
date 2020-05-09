@@ -8,7 +8,7 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.model.ApplicationConfig;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;

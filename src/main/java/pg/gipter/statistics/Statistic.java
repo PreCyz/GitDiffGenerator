@@ -1,6 +1,6 @@
 package pg.gipter.statistics;
 
-import pg.gipter.core.producer.command.VersionControlSystem;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.UploadStatus;
 

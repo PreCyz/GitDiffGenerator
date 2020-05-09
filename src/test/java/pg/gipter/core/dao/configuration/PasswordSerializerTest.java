@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.model.*;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 

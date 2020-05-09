@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.toolkit.helpers.ListViewId;
 import pg.gipter.toolkit.helpers.XmlHelper;
 import pg.gipter.toolkit.sharepoint.soap.SharePointSoapClient;

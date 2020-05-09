@@ -11,7 +11,7 @@ import pg.gipter.core.model.CipherDetails;
 import pg.gipter.core.model.RunConfigBuilder;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 

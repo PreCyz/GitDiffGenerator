@@ -33,7 +33,7 @@ import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.model.NamePatternValue;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.DataService;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.ToolkitService;

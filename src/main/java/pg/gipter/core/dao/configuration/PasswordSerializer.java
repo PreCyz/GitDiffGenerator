@@ -7,7 +7,7 @@ import com.google.gson.JsonSerializer;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.core.producer.command.ItemType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 import pg.gipter.utils.StringUtils;

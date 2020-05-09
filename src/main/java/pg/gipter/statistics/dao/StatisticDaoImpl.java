@@ -7,7 +7,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import pg.gipter.core.dao.MongoDaoConfig;
-import pg.gipter.core.producer.command.VersionControlSystem;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.statistics.Statistic;
 import pg.gipter.utils.StringUtils;
 
