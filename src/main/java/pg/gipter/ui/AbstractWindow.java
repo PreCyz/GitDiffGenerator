@@ -2,7 +2,7 @@ package pg.gipter.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.ResourceUtils;
 

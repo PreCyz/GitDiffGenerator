@@ -19,7 +19,9 @@ import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.core.producer.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alert.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
+import pg.gipter.ui.alerts.WindowType;
 import pg.gipter.utils.AlertHelper;
 
 import java.io.File;

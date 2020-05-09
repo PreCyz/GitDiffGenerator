@@ -29,7 +29,7 @@ import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producer.command.ItemType;
 import pg.gipter.launchers.Launcher;
-import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.ResourceUtils;
 import pg.gipter.utils.StringUtils;

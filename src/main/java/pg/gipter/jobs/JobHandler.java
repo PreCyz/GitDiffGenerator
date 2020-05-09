@@ -18,9 +18,9 @@ import pg.gipter.jobs.upload.UploadItemJobBuilder;
 import pg.gipter.jobs.upload.UploadJobCreator;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.RunType;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
+import pg.gipter.ui.alerts.WindowType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 

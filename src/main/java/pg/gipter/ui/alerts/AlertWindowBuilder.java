@@ -1,4 +1,4 @@
-package pg.gipter.ui.alert;
+package pg.gipter.ui.alerts;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
