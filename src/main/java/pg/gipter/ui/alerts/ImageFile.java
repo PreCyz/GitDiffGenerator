@@ -26,11 +26,14 @@ public enum ImageFile {
     FIRE_BACK_GIF("gif/fire-back.gif"),
     MCGONAGAL_GIF("gif/mcgonagal.gif"),
     SNAPE_GIF("gif/snape.gif"),
-    KYLO_REN_PUSH_GIF("gif/kylo_ren_push.gif"),
-    KYLO_APPROVES_GIF("gif/kylo_approves.gif"),
+    KYLO_REN_PUSH_GIF("gif/kylo-ren-push.gif"),
+    PICARD_DANCE_GIF("gif/picard-dance.gif"),
+    PICARD_NIGHT_GIF("gif/picard-night.gif"),
+    PICARD_GOOD_GIF("gif/picard-good.gif"),
+    VENTURA_DANCE_GIF("gif/ventura-dance.gif"),
     ;
 
-    private String fileName;
+    private final String fileName;
 
     ImageFile(String fileName) {
         this.fileName = fileName;
@@ -48,14 +51,14 @@ public enum ImageFile {
 
     public static ImageFile randomPartialSuccessImage() {
         return randomImage(EnumSet.of(
-                ALMOST_ALL_PNG, MINION_BOMB_GIF, MINION_FART_GIF, MINION_CROWD_GIF, BABY_YODA_GIF
+                ALMOST_ALL_PNG, MINION_BOMB_GIF, MINION_FART_GIF, MINION_CROWD_GIF, BABY_YODA_GIF, PICARD_GOOD_GIF
         ));
     }
 
     public static ImageFile randomSuccessImage() {
         return randomImage(EnumSet.of(
                 GOOD_JOB_PNG, MINION_AAAA_GIF, MINION_DISCO_GIF, MINION_AAAA_2_GIF, MINION_APPLAUSE_GIF, MCGONAGAL_GIF,
-                KYLO_APPROVES_GIF
+                PICARD_DANCE_GIF, PICARD_NIGHT_GIF, VENTURA_DANCE_GIF
         ));
     }
 

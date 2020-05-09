@@ -306,7 +306,7 @@ public abstract class ApplicationProperties {
                     ", toolkitDomain='" + toolkitDomain() + '\'' +
                     ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
                     ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
-                    ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames());
+                    ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + "'";
 
         }
         return  log;

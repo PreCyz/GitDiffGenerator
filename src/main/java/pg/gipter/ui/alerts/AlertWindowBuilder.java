@@ -80,7 +80,6 @@ public class AlertWindowBuilder {
     public void buildAndDisplayWindow() {
         Alert alert = buildDefaultAlert();
         Hyperlink hyperLink = buildHyperlink(alert);
-        //FlowPane flowPane = buildFlowPane(hyperLink);
         GridPane gridPane = buildGridPane(hyperLink);
 
         alert.getDialogPane().contentProperty().set(gridPane);
