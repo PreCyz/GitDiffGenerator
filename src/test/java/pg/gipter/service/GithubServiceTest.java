@@ -109,6 +109,17 @@ class GithubServiceTest {
     }
 
     @Test
+    void givenServerVersionOlderThenCurrentVersion_whenIsNewVersion_thenReturnFalse() {
+        when(mockAppProps.version()).thenReturn(SemanticVersioning.getSemanticVersioning("4.0.0"));
+        spyGithubService = spy(new GithubService(mockAppProps.version()));
+        doReturn(Optional.of(SemanticVersioning.getSemanticVersioning("3.6.14"))).when(spyGithubService).getLatestVersion();
+
+        boolean actual = spyGithubService.isNewVersion();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
     void givenLatestDistroDetails_whenGetDownloadLink_thenFileDownloaded() throws FileNotFoundException {
         spyGithubService = spy(new GithubService(SemanticVersioning.getSemanticVersioning("1.0")));
         String json = String.format(".%ssrc%stest%sjava%sresources%slatestDistributionDetails.json",

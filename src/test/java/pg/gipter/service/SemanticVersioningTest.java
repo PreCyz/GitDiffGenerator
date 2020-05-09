@@ -7,11 +7,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SemanticVersioningTest {
 
     @Test
+    void givenOldVersionAndNewVersion_whenIsNewerVersion_thenReturnFalse() {
+        SemanticVersioning oldVersion = new SemanticVersioning(0, 0, 0);
+        SemanticVersioning newVersion = new SemanticVersioning(1, 0, 0);
+
+        boolean actual = oldVersion.isNewerVersionThan(newVersion);
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
     void givenNewerMajor_whenIsNewerVersion_thenReturnTrue() {
         SemanticVersioning oldVersion = new SemanticVersioning(0, 0, 0);
         SemanticVersioning newVersion = new SemanticVersioning(1, 0, 0);
 
-        boolean actual = oldVersion.isNewerVersion(newVersion);
+        boolean actual = newVersion.isNewerVersionThan(oldVersion);
 
         assertThat(actual).isTrue();
     }
@@ -21,7 +31,7 @@ class SemanticVersioningTest {
         SemanticVersioning oldVersion = new SemanticVersioning(1, 0, 0);
         SemanticVersioning newVersion = new SemanticVersioning(1, 1, 0);
 
-        boolean actual = oldVersion.isNewerVersion(newVersion);
+        boolean actual = newVersion.isNewerVersionThan(oldVersion);
 
         assertThat(actual).isTrue();
     }
@@ -31,7 +41,7 @@ class SemanticVersioningTest {
         SemanticVersioning oldVersion = new SemanticVersioning(1, 1, 0);
         SemanticVersioning newVersion = new SemanticVersioning(1, 1, 1);
 
-        boolean actual = oldVersion.isNewerVersion(newVersion);
+        boolean actual = newVersion.isNewerVersionThan(oldVersion);
 
         assertThat(actual).isTrue();
     }
@@ -42,7 +52,7 @@ class SemanticVersioningTest {
         SemanticVersioning newVersion = new SemanticVersioning(1, 1, 1);
         newVersion.setAdditionalLabel("alpha");
 
-        boolean actual = oldVersion.isNewerVersion(newVersion);
+        boolean actual = newVersion.isNewerVersionThan(oldVersion);
 
         assertThat(actual).isTrue();
     }
@@ -54,7 +64,7 @@ class SemanticVersioningTest {
         SemanticVersioning newVersion = new SemanticVersioning(1, 1, 1);
         newVersion.setAdditionalLabel("beta");
 
-        boolean actual = oldVersion.isNewerVersion(newVersion);
+        boolean actual = oldVersion.isNewerVersionThan(newVersion);
 
         assertThat(actual).isTrue();
     }
@@ -66,17 +76,47 @@ class SemanticVersioningTest {
         SemanticVersioning newVersion = new SemanticVersioning(1, 1, 1);
         newVersion.setAdditionalLabel("alpha");
 
-        boolean actual = oldVersion.isNewerVersion(newVersion);
+        boolean actual = oldVersion.isNewerVersionThan(newVersion);
 
         assertThat(actual).isFalse();
     }
 
     @Test
-    void givenSameVersionWithouLabels_whenIsNewerVersion_thenReturnFalse() {
+    void givenSameVersionWithoutLabels_whenIsNewerVersion_thenReturnFalse() {
         SemanticVersioning oldVersion = new SemanticVersioning(1, 1, 1);
         SemanticVersioning newVersion = new SemanticVersioning(1, 1, 1);
 
-        boolean actual = oldVersion.isNewerVersion(newVersion);
+        boolean actual = oldVersion.isNewerVersionThan(newVersion);
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenOldVersionLowerThanNewVersionOnMajorLevel_whenIsNewerVersion_thenReturnFalse() {
+        SemanticVersioning oldVersion = new SemanticVersioning(3, 6, 14);
+        SemanticVersioning newVersion = new SemanticVersioning(4, 0, 0);
+
+        boolean actual = oldVersion.isNewerVersionThan(newVersion);
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenOldVersionLowerThanNewVersionOnMinorLevel_whenIsNewerVersion_thenReturnFalse() {
+        SemanticVersioning oldVersion = new SemanticVersioning(3, 6, 14);
+        SemanticVersioning newVersion = new SemanticVersioning(3, 7, 14);
+
+        boolean actual = oldVersion.isNewerVersionThan(newVersion);
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenOldVersionLowerThanNewVersionOnPatchLevel_whenIsNewerVersion_thenReturnFalse() {
+        SemanticVersioning oldVersion = new SemanticVersioning(3, 6, 14);
+        SemanticVersioning newVersion = new SemanticVersioning(3, 6, 15);
+
+        boolean actual = oldVersion.isNewerVersionThan(newVersion);
 
         assertThat(actual).isFalse();
     }

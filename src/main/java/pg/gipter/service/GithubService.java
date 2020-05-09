@@ -58,7 +58,7 @@ public class GithubService {
         Optional<SemanticVersioning> latestVersion = getLatestVersion();
         if (latestVersion.isPresent()) {
             serverVersion = latestVersion.get();
-            result = currentVersion.isNewerVersion(serverVersion);
+            result = serverVersion.isNewerVersionThan(currentVersion);
         }
         return result;
     }
@@ -176,9 +176,11 @@ public class GithubService {
 
     private boolean isProperAsset(String name, JsonElement assetName) {
         boolean result = assetName != null;
-        result &= !assetName.isJsonNull();
-        result &= assetName.getAsString().startsWith(ELEVEN_PLUS);
-        result &= assetName.getAsString().contains(name);
+        if (result) {
+            result = !assetName.isJsonNull();
+            result &= assetName.getAsString().startsWith(ELEVEN_PLUS);
+            result &= assetName.getAsString().contains(name);
+        }
         return result;
     }
 

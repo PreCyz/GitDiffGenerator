@@ -3,9 +3,9 @@ package pg.gipter.service;
 import pg.gipter.utils.StringUtils;
 
 public class SemanticVersioning {
-    private int major;
-    private int minor;
-    private int patch;
+    private final int major;
+    private final int minor;
+    private final int patch;
     private String additionalLabel;
     private static final String TAG_SUFFIX = "v";
 
@@ -39,21 +39,22 @@ public class SemanticVersioning {
         return String.format("%d.%d.%d%s", major, minor, patch, additionalLabel);
     }
 
-    public boolean isNewerVersion(SemanticVersioning semanticVersioning) {
+    public boolean isNewerVersionThan(SemanticVersioning otherVersion) {
         Boolean newVersion = null;
-        if (semanticVersioning.getMajor() > getMajor()) {
+        if (getMajor() > otherVersion.getMajor()) {
             newVersion = Boolean.TRUE;
         }
-        if (newVersion == null && semanticVersioning.getMinor() > getMinor()) {
+        boolean isMajorEquals = getMajor() == otherVersion.getMajor();
+        if (newVersion == null && isMajorEquals && getMinor() > otherVersion.getMinor()) {
             newVersion = Boolean.TRUE;
         }
-        if (newVersion == null && semanticVersioning.getPatch() > getPatch()) {
+        boolean isMinorEquals = getMinor() == otherVersion.getMinor();
+        if (newVersion == null && isMajorEquals && isMinorEquals && getPatch() > otherVersion.getPatch()) {
             newVersion = Boolean.TRUE;
         }
         if (newVersion == null) {
-            newVersion = StringUtils.notEmpty(semanticVersioning.getAdditionalLabel()) &&
-                    !semanticVersioning.getAdditionalLabel().equalsIgnoreCase(getAdditionalLabel());
-
+            newVersion = StringUtils.notEmpty(getAdditionalLabel()) &&
+                    !getAdditionalLabel().equalsIgnoreCase(otherVersion.getAdditionalLabel());
         }
 
         return newVersion;
