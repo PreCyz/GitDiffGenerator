@@ -21,8 +21,8 @@ import java.util.Optional;
 
 public class SecurityConverter implements Converter {
 
-    private CachedConfiguration cachedConfiguration;
-    private SecurityService securityService;
+    private final CachedConfiguration cachedConfiguration;
+    private final SecurityService securityService;
 
     private final Logger logger = LoggerFactory.getLogger(SecurityConverter.class);
 

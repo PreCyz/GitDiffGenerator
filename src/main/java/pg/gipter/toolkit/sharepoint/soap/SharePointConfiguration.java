@@ -7,7 +7,6 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.transport.WebServiceMessageSender;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
-import pg.gipter.service.SecurityService;
 
 /** Created by Pawel Gawedzki on 12-Oct-2018. */
 public class SharePointConfiguration {
@@ -17,7 +16,7 @@ public class SharePointConfiguration {
                                                                    @Value("${toolkit.password}") String password,
                                                                    @Value("${toolkit.domain}") String domain) {
         HttpComponentsMessageSender httpComponentsMessageSender = new HttpComponentsMessageSender();
-        NTCredentials credentials = new NTCredentials(username, SecurityService.getInstance().decrypt(password), null, domain);
+        NTCredentials credentials = new NTCredentials(username, password, null, domain);
         httpComponentsMessageSender.setCredentials(credentials);
         return httpComponentsMessageSender;
     }

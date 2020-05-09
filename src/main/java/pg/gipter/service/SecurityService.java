@@ -28,7 +28,7 @@ public class SecurityService {
         public static final SecurityService INSTANCE = new SecurityService();
     }
 
-    private SecurityProvider securityProvider;
+    private final SecurityProvider securityProvider;
 
     private SecurityService() {
         securityProvider = DaoFactory.getSecurityProvider();
