@@ -8,6 +8,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.toolkit.dto.DocumentDetails;
@@ -18,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +43,11 @@ class SimpleDocumentFinderTest {
     @BeforeEach
     void setUp() {
         ConfigurationDaoFactory.getCachedConfigurationDao().resetCache();
+        try {
+            Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
+        } catch (IOException e) {
+            System.out.println("There is something weird going on.");
+        }
     }
 
     @Test

@@ -1,4 +1,4 @@
-package pg.gipter.converter;
+package pg.gipter.converters;
 
 import java.util.List;
 import java.util.stream.Collectors;

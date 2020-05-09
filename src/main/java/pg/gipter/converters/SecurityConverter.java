@@ -1,4 +1,4 @@
-package pg.gipter.converter;
+package pg.gipter.converters;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

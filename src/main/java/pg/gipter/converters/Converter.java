@@ -1,4 +1,4 @@
-package pg.gipter.converter;
+package pg.gipter.converters;
 
 public interface Converter {
     boolean convert();

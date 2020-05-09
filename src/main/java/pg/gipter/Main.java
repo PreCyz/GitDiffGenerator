@@ -6,14 +6,18 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.converter.Converter;
-import pg.gipter.converter.ConverterFactory;
-import pg.gipter.core.*;
+import pg.gipter.converters.Converter;
+import pg.gipter.converters.ConverterFactory;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.launcher.Launcher;
 import pg.gipter.launcher.LauncherFactory;
 import pg.gipter.utils.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
