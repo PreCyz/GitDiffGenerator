@@ -271,7 +271,7 @@ public abstract class ApplicationProperties {
     }
 
     protected final String log() {
-        String log = "version='" + version() + '\'';
+        String log = "version='" + version().getVersion() + '\'';
         if (currentRunConfig != null) {
             log += ", configurationName='" + configurationName() + '\'' +
                     ", authors='" + String.join(",", authors()) + '\'' +

@@ -153,7 +153,7 @@ public class UILauncher implements Launcher {
     }
 
     private void displayUpgradeInfo() {
-        logger.info("Upgrade to version {} finished [{}].", applicationProperties.version(), applicationProperties.isUpgradeFinished());
+        logger.info("Upgrade to version {} finished [{}].", applicationProperties.version().getVersion(), applicationProperties.isUpgradeFinished());
         new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
                 .withWindowType(WindowType.CONFIRMATION_WINDOW)

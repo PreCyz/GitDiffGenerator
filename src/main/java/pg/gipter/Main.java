@@ -39,7 +39,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         applicationProperties = ApplicationPropertiesFactory.getInstance(args);
         setLoggerLevel(applicationProperties.loggerLevel());
-        logger.info("Version of application '{}'.", applicationProperties.version());
+        logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
         logger.info("Gipter can use '{}' threads.", Runtime.getRuntime().availableProcessors());
         runConverters();
         setDefaultConfig();
