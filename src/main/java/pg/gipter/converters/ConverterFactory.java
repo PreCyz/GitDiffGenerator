@@ -10,6 +10,7 @@ public final class ConverterFactory {
 
     public static List<Converter> getConverters() {
         return Stream.of(
+                new ItemTypeConverter(),
                 new SecurityConverter()
         ).collect(Collectors.toList());
     }
