@@ -24,29 +24,17 @@ import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
-import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.*;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.CacheManager;
-import pg.gipter.core.model.NamePatternValue;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.DataService;
-import pg.gipter.services.GithubService;
-import pg.gipter.services.ToolkitService;
+import pg.gipter.services.*;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.*;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JobHelper;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.ui.alerts.*;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.File;
@@ -160,10 +148,10 @@ public class MainController extends AbstractController {
     private Label currentWeekNumberLabel;
 
     private ApplicationProperties applicationProperties;
-    private DataService dataService;
+    private final DataService dataService;
 
     private String userFolderUrl;
-    private Set<String> definedPatterns;
+    private final Set<String> definedPatterns;
     private String currentItemName = "";
     private String inteliSense = "";
     private boolean useInteliSense = false;

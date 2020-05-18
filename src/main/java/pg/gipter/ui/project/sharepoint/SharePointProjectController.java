@@ -211,12 +211,12 @@ public class SharePointProjectController extends AbstractController {
             String projects = "";
             if (sharePointConfigSet.isEmpty()) {
                 sharePointProjectsComboBox.setItems(FXCollections.emptyObservableList());
-                usernameTextField.setText("");
-                passwordField.setText("");
-                domainTextField.setText("");
-                urlTextField.setText("");
-                projectTextField.setText("");
-                listNameTextField.setText("");
+                usernameTextField.clear();
+                passwordField.clear();
+                domainTextField.clear();
+                urlTextField.clear();
+                projectTextField.clear();
+                listNameTextField.clear();
                 sharePointLink.setText(resources.getString("sharepoint.fullLink.default"));
                 sharePointProjectsComboBox.setDisable(sharePointConfigSet.isEmpty());
                 removeConfigButton.setDisable(sharePointConfigSet.isEmpty());
