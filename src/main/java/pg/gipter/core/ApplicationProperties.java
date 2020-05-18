@@ -3,12 +3,8 @@ package pg.gipter.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dao.configuration.CachedConfiguration;
-import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.NamePatternValue;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.dao.configuration.*;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.SemanticVersioning;
@@ -255,9 +251,18 @@ public abstract class ApplicationProperties {
     }
 
     public final void save() {
-        cachedConfiguration.saveApplicationConfig(applicationConfig);
-        cachedConfiguration.saveRunConfig(currentRunConfig);
-        cachedConfiguration.saveToolkitConfig(toolkitConfig);
+        Map<String, RunConfig> tmpRunConfigs = new HashMap<>(runConfigMap);
+        tmpRunConfigs.put(currentRunConfig.getConfigurationName(), currentRunConfig);
+
+        Configuration configuration = new Configuration(
+                applicationConfig,
+                toolkitConfig, new LinkedList<>(tmpRunConfigs.values()),
+                SecurityProviderFactory.getSecurityProvider()
+                        .readCipherDetails()
+                        .orElseThrow(() -> new IllegalStateException("There is no CipherDetails"))
+        );
+
+        cachedConfiguration.saveConfiguration(configuration);
         runConfigMap.put(currentRunConfig.getConfigurationName(), currentRunConfig);
     }
 

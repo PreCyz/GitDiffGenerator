@@ -1,13 +1,8 @@
 package pg.gipter.core.dao.configuration;
 
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.CipherDetails;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.model.*;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -31,14 +26,6 @@ class CachedConfigurationProxy extends ApplicationJsonReader implements CachedCo
     @Override
     public void resetCache() {
         cachedConfiguration = null;
-    }
-
-    @Override
-    public void saveRunConfig(RunConfig runConfig) {
-        initializeCacheIfEmpty();
-        configurationDao.saveRunConfig(runConfig);
-        cachedConfiguration.addRunConfig(runConfig);
-        logger.info("Run configuration with name {} was updated in cache.", runConfig.getConfigurationName());
     }
 
     private void initializeCacheIfEmpty() {
@@ -81,14 +68,6 @@ class CachedConfigurationProxy extends ApplicationJsonReader implements CachedCo
     }
 
     @Override
-    public void saveApplicationConfig(ApplicationConfig applicationConfig) {
-        initializeCacheIfEmpty();
-        configurationDao.saveApplicationConfig(applicationConfig);
-        cachedConfiguration.setAppConfig(applicationConfig);
-        logger.info("Configuration cache updated.");
-    }
-
-    @Override
     public Map<String, RunConfig> loadRunConfigMap() {
         initializeCacheIfEmpty();
         return Optional.ofNullable(cachedConfiguration.getRunConfigs())
@@ -105,6 +84,13 @@ class CachedConfigurationProxy extends ApplicationJsonReader implements CachedCo
     @Override
     public RunConfig getRunConfigFromArray(String[] args) {
         return configurationDao.getRunConfigFromArray(args);
+    }
+
+    @Override
+    public void saveConfiguration(Configuration configuration) {
+        initializeCacheIfEmpty();
+        configurationDao.saveConfiguration(configuration);
+        cachedConfiguration = configuration;
     }
 
     public <T> void updateCachedConfiguration(T value) {

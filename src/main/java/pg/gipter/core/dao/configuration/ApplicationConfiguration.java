@@ -2,9 +2,7 @@ package pg.gipter.core.dao.configuration;
 
 import org.springframework.util.CollectionUtils;
 import pg.gipter.core.ArgName;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
@@ -12,7 +10,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public class ApplicationConfiguration extends ApplicationJsonReader implements ConfigurationDao {
@@ -27,34 +24,6 @@ public class ApplicationConfiguration extends ApplicationJsonReader implements C
 
     public static ApplicationConfiguration getInstance() {
         return ApplicationConfigurationHolder.INSTANCE;
-    }
-
-    @Override
-    public void saveRunConfig(RunConfig runConfig) {
-        Configuration configuration = readJsonConfig();
-        if (configuration.getRunConfigs() == null) {
-            configuration.addRunConfig(runConfig);
-            logger.info("New configuration [{}] added.", runConfig.getConfigurationName());
-        } else {
-            List<RunConfig> runConfigs = configuration.getRunConfigs();
-            if (runConfigs == null) {
-                runConfigs = new ArrayList<>();
-            }
-            boolean runConfigExists = runConfigs.stream()
-                    .anyMatch(rc -> rc.getConfigurationName().equals(runConfig.getConfigurationName()));
-            if (runConfigExists) {
-                runConfigs = runConfigs.stream()
-                        .filter(rc -> !rc.getConfigurationName().equals(runConfig.getConfigurationName()))
-                        .collect(toList());
-                runConfigs.add(runConfig);
-                configuration.setRunConfigs(runConfigs);
-                logger.info("Existing configuration [{}] updated.", runConfig.getConfigurationName());
-            } else {
-                configuration.addRunConfig(runConfig);
-                logger.info("New configuration [{}] added to existing set.", runConfig.getConfigurationName());
-            }
-        }
-        writeJsonConfig(configuration, RunConfig.class);
     }
 
     @Override
@@ -74,13 +43,6 @@ public class ApplicationConfiguration extends ApplicationJsonReader implements C
     public ApplicationConfig loadApplicationConfig() {
         Configuration configuration = readJsonConfig();
         return Optional.ofNullable(configuration.getAppConfig()).orElseGet(ApplicationConfig::new);
-    }
-
-    @Override
-    public void saveApplicationConfig(ApplicationConfig applicationConfig) {
-        Configuration configuration = readJsonConfig();
-        configuration.setAppConfig(applicationConfig);
-        writeJsonConfig(configuration, ApplicationConfig.class);
     }
 
     @Override
@@ -183,5 +145,10 @@ public class ApplicationConfiguration extends ApplicationJsonReader implements C
             }
         }
         return runConfig;
+    }
+
+    @Override
+    public void saveConfiguration(Configuration configuration) {
+        writeJsonConfig(configuration, Configuration.class);
     }
 }

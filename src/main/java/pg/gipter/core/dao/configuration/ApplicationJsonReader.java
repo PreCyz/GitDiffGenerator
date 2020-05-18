@@ -1,12 +1,10 @@
 package pg.gipter.core.dao.configuration;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.model.Configuration;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

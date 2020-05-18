@@ -1,22 +1,16 @@
 package pg.gipter.core.dao.configuration;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import org.junit.jupiter.api.*;
+import pg.gipter.core.*;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.RunConfigBuilder;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.model.*;
 import pg.gipter.utils.CryptoUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,12 +45,12 @@ class CacheManagerTest {
     void givenEmptyCache_whenGetApplicationProperties_thenCacheEmptyAndReturnResult() {
         String confName = "confName";
         RunConfig runConfig = new RunConfigBuilder().withConfigurationName(confName).create();
-        DaoFactory.getCachedConfiguration().saveRunConfig(runConfig);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitPassword(CryptoUtils.encryptSafe("somePassword"));
-        DaoFactory.getCachedConfiguration().saveToolkitConfig(toolkitConfig);
         ApplicationConfig applicationConfig = new ApplicationConfig();
-        DaoFactory.getCachedConfiguration().saveApplicationConfig(applicationConfig);
+        DaoFactory.getCachedConfiguration().saveConfiguration(
+                new Configuration(applicationConfig, toolkitConfig, Arrays.asList(runConfig), null)
+        );
 
         ApplicationProperties applicationProperties = CacheManager.getApplicationProperties(confName);
 

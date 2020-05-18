@@ -3,6 +3,7 @@ package pg.gipter.core.dao.configuration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import pg.gipter.core.model.CipherDetails;
+import pg.gipter.core.model.Configuration;
 
 import java.util.Optional;
 

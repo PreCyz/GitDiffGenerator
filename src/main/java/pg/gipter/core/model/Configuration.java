@@ -1,45 +1,50 @@
-package pg.gipter.core.dao.configuration;
-
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.CipherDetails;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.ToolkitConfig;
+package pg.gipter.core.model;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class Configuration {
+public class Configuration {
     private ApplicationConfig appConfig;
     private List<RunConfig> runConfigs;
     private ToolkitConfig toolkitConfig;
     private CipherDetails cipherDetails;
 
-    ApplicationConfig getAppConfig() {
+    public Configuration() { }
+
+    public Configuration(ApplicationConfig appConfig, ToolkitConfig toolkitConfig, List<RunConfig> runConfigs,
+                         CipherDetails cipherDetails) {
+        this.appConfig = appConfig;
+        this.runConfigs = runConfigs;
+        this.toolkitConfig = toolkitConfig;
+        this.cipherDetails = cipherDetails;
+    }
+
+    public ApplicationConfig getAppConfig() {
         return appConfig;
     }
 
-    void setAppConfig(ApplicationConfig appConfig) {
+    public void setAppConfig(ApplicationConfig appConfig) {
         this.appConfig = appConfig;
     }
 
-    List<RunConfig> getRunConfigs() {
+    public List<RunConfig> getRunConfigs() {
         return runConfigs;
     }
 
-    void setRunConfigs(List<RunConfig> runConfigs) {
+    public void setRunConfigs(List<RunConfig> runConfigs) {
         this.runConfigs = runConfigs;
     }
 
-    ToolkitConfig getToolkitConfig() {
+    public ToolkitConfig getToolkitConfig() {
         return toolkitConfig;
     }
 
-    void setToolkitConfig(ToolkitConfig toolkitConfig) {
+    public void setToolkitConfig(ToolkitConfig toolkitConfig) {
         this.toolkitConfig = toolkitConfig;
     }
 
-    void addRunConfig(RunConfig runConfig) {
+    public void addRunConfig(RunConfig runConfig) {
         if (runConfigs == null) {
             runConfigs = new LinkedList<>();
         }
@@ -49,7 +54,7 @@ class Configuration {
         runConfigs.add(runConfig);
     }
 
-    void removeRunConfig(String configurationName) {
+    public void removeRunConfig(String configurationName) {
         if (runConfigs != null && configurationName != null) {
             runConfigs = runConfigs.stream()
                     .filter(rc -> !rc.getConfigurationName().equals(configurationName))

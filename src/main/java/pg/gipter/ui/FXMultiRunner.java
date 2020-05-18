@@ -16,15 +16,13 @@ import pg.gipter.launchers.Starter;
 import pg.gipter.statistics.dto.RunDetails;
 import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.WindowType;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
+import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -58,15 +56,20 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private final LinkedList<String> configurationNames;
     private final Executor executor;
     private static Boolean toolkitCredentialsSet = null;
-    private Map<String, UploadResult> resultMap = new LinkedHashMap<>();
-    private long totalProgress;
-    private AtomicLong workDone;
+    private final Map<String, UploadResult> resultMap = new LinkedHashMap<>();
+    private final long totalProgress;
+    private final AtomicLong workDone;
     private Collection<ApplicationProperties> applicationPropertiesCollection;
-    private ConfigurationDao configurationDao;
-    private DataDao dataDao;
-    private RunType runType;
+    private final ConfigurationDao configurationDao;
+    private final DataDao dataDao;
+    private final RunType runType;
+    private final LocalDate startDate;
 
     public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType) {
+        this(configurationNames, executor, runType, null);
+    }
+
+    public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType, LocalDate startDate) {
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
         this.totalProgress = configurationNames.size() * 5;
@@ -75,6 +78,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.configurationDao = DaoFactory.getCachedConfiguration();
         this.dataDao = DaoFactory.getDataDao();
         this.runType = runType;
+        this.startDate = startDate;
     }
 
     public FXMultiRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor, RunType runType) {
@@ -125,18 +129,25 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         }
     }
 
-    private void executeForNames() throws InterruptedException, java.util.concurrent.ExecutionException {
+    private void executeForNames() throws InterruptedException, ExecutionException {
         List<CompletableFuture<Boolean>> tasks = new LinkedList<>();
         for (String configName : configurationNames) {
             if (isToolkitCredentialsSet()) {
-                CompletableFuture<Boolean> withUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
+                CompletableFuture<Boolean> withUpload = CompletableFuture
+                        .supplyAsync(() -> getApplicationProperties(configName), executor)
                         .thenApply(this::produce).thenApply(this::upload)
-                        .handle((isUploaded, throwable) -> handleUploadResult(configName, throwable == null, throwable));
+                        .handle((isUploaded, throwable) -> handleUploadResult(
+                                configName, throwable == null, throwable)
+                        );
+
                 tasks.add(withUpload);
             } else {
-                CompletableFuture<Boolean> withoutUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
+                CompletableFuture<Boolean> withoutUpload = CompletableFuture
+                        .supplyAsync(() -> getApplicationProperties(configName), executor)
                         .thenApply(this::produce)
-                        .handle((isUploaded, throwable) -> handleUploadResult(configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")));
+                        .handle((isUploaded, throwable) -> handleUploadResult(
+                                configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")
+                        ));
 
                 tasks.add(withoutUpload);
             }
@@ -144,20 +155,25 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         CompletableFuture.allOf(tasks.toArray(new CompletableFuture<?>[0])).get();
     }
 
-    private void executeForApplicationProperties() throws InterruptedException, java.util.concurrent.ExecutionException {
+    private void executeForApplicationProperties() throws InterruptedException, ExecutionException {
         List<CompletableFuture<Boolean>> tasks = new LinkedList<>();
 
         for (ApplicationProperties applicationProperties : applicationPropertiesCollection) {
             String configName = applicationProperties.configurationName();
             if (applicationProperties.isToolkitCredentialsSet()) {
-                CompletableFuture<Boolean> withUpload = CompletableFuture.supplyAsync(() -> applicationProperties, executor)
+                CompletableFuture<Boolean> withUpload = CompletableFuture
+                        .supplyAsync(() -> applicationProperties, executor)
                         .thenApply(this::produce).thenApply(this::upload)
                         .handle((isUploaded, throwable) -> handleUploadResult(configName, throwable == null, throwable));
+
                 tasks.add(withUpload);
             } else {
-                CompletableFuture<Boolean> withoutUpload = CompletableFuture.supplyAsync(() -> getApplicationProperties(configName), executor)
+                CompletableFuture<Boolean> withoutUpload = CompletableFuture
+                        .supplyAsync(() -> getApplicationProperties(configName), executor)
                         .thenApply(this::produce)
-                        .handle((isUploaded, throwable) -> handleUploadResult(configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")));
+                        .handle((isUploaded, throwable) -> handleUploadResult(
+                                configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")
+                        ));
 
                 tasks.add(withoutUpload);
             }
@@ -186,7 +202,11 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     }
 
     private ApplicationProperties getApplicationProperties(String configurationName) {
-        return ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configurationName));
+        final ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configurationName));
+        if (startDate != null) {
+            instance.getRunConfigMap().values().forEach(rc -> rc.setStartDate(startDate));
+        }
+        return instance;
     }
 
     private ApplicationProperties produce(ApplicationProperties applicationProperties) {

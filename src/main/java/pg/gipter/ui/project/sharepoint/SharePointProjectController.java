@@ -20,13 +20,8 @@ import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.*;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -57,9 +52,9 @@ public class SharePointProjectController extends AbstractController {
     @FXML
     private Label numberOfConfigsLabel;
 
-    private ApplicationProperties applicationProperties;
-    private RunConfig currentRunConfig;
-    private LinkedHashSet<SharePointConfig> sharePointConfigSet;
+    private final ApplicationProperties applicationProperties;
+    private final RunConfig currentRunConfig;
+    private final LinkedHashSet<SharePointConfig> sharePointConfigSet;
 
     public SharePointProjectController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);

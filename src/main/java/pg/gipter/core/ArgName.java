@@ -47,7 +47,7 @@ public enum ArgName {
     toolkitUserFolder(toolkitUrl.defaultValue + toolkitCopyCase.defaultValue + "/Lists/" + toolkitCopyListName.defaultValue + "/")
     ;
 
-    private String defaultValue;
+    private final String defaultValue;
 
     ArgName(String defaultValue) {
         this.defaultValue = defaultValue;

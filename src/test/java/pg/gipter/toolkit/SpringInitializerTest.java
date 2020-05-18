@@ -3,15 +3,13 @@ package pg.gipter.toolkit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.env.*;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.model.Configuration;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,10 +26,7 @@ class SpringInitializerTest {
         try {
             SpringInitializer.destroyContext();
             final ConfigurationDao configurationDao = DaoFactory.getCachedConfiguration();
-            configurationDao.saveApplicationConfig(null);
-            configurationDao.saveToolkitConfig(null);
-            configurationDao.loadRunConfigMap().forEach((key, value) -> configurationDao.removeConfig(key));
-            DaoFactory.getSecurityProvider().writeCipherDetails(null);
+            configurationDao.saveConfiguration(new Configuration());
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
         } catch (IOException e) {
             System.out.println("There is something weird going on.");

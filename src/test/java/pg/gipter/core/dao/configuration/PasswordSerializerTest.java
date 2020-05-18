@@ -1,8 +1,6 @@
 package pg.gipter.core.dao.configuration;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.model.*;
@@ -175,6 +173,6 @@ class PasswordSerializerTest {
         JsonArray actualElement = actual.getAsJsonObject().getAsJsonArray(RunConfig.RUN_CONFIGS);
         assertThat(actualElement).hasSize(1);
         JsonElement element = actualElement.get(0).getAsJsonObject().get(SharePointConfig.SHARE_POINT_CONFIGS);
-        assertThat(element).isNull();
+        assertThat(element).isNotNull();
     }
 }

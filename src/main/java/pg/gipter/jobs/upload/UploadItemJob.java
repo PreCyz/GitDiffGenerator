@@ -5,20 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.core.model.RunConfig;
 import pg.gipter.services.ToolkitService;
-import pg.gipter.ui.FXMultiRunner;
-import pg.gipter.ui.RunType;
-import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.*;
 
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -30,6 +24,8 @@ public class UploadItemJob implements Job {
 
     private final ConfigurationDao configurationDao;
     private final DataDao dataDao;
+    private LocalDateTime nextUploadDate;
+    private LocalDate startDate;
 
     // Instances of Job must have a public no-argument constructor.
     public UploadItemJob() {
@@ -40,7 +36,7 @@ public class UploadItemJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
-        LocalDateTime nextUploadDate = calculateAndSetDates(jobDataMap);
+        calculateDates(jobDataMap);
 
         logger.info("{} initialized and triggered at {}.",
                 NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
@@ -50,7 +46,12 @@ public class UploadItemJob implements Job {
         LinkedList<String> configurationNames = new LinkedList<>(Arrays.asList(configNames.split(UploadJobCreator.CONFIG_DELIMITER)));
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
 
-        new FXMultiRunner(new LinkedHashSet<>(configurationNames), uiLauncher.nonUIExecutor(), RunType.UPLOAD_ITEM_JOB).start();
+        new FXMultiRunner(
+                new LinkedHashSet<>(configurationNames),
+                uiLauncher.nonUIExecutor(),
+                RunType.UPLOAD_ITEM_JOB,
+                startDate
+        ).start();
 
         logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         dataDao.saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
@@ -67,10 +68,10 @@ public class UploadItemJob implements Job {
         }
     }
 
-    private LocalDateTime calculateAndSetDates(JobDataMap jobDataMap) throws JobExecutionException {
+    private void calculateDates(JobDataMap jobDataMap) throws JobExecutionException {
         JobType jobType = JobType.valueOf(jobDataMap.getString(JobProperty.TYPE.key()));
-        LocalDate startDate = LocalDate.now();
-        LocalDateTime nextUploadDate = LocalDateTime.now();
+        startDate = LocalDate.now();
+        nextUploadDate = LocalDateTime.now();
         switch (jobType) {
             case EVERY_WEEK:
                 startDate = startDate.minusDays(7);
@@ -99,21 +100,6 @@ public class UploadItemJob implements Job {
                 startDate = startDate.minusDays(differenceInDays);
                 nextUploadDate = LocalDateTime.ofInstant(nextValidTimeAfter.toInstant(), ZoneId.systemDefault());
                 break;
-        }
-
-        setDatesOnConfigs(startDate);
-
-        return nextUploadDate;
-    }
-
-    private void setDatesOnConfigs(LocalDate startDate) {
-        Map<String, RunConfig> runConfigMap = configurationDao.loadRunConfigMap();
-        for (Map.Entry<String, RunConfig> entry : runConfigMap.entrySet()) {
-            RunConfig runConfig = entry.getValue();
-            runConfig.setStartDate(startDate);
-            runConfig.setEndDate(LocalDate.now());
-            runConfig.setPreferredArgSource(PreferredArgSource.UI);
-            configurationDao.saveRunConfig(runConfig);
         }
     }
 

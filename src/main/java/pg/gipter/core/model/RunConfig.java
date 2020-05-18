@@ -7,9 +7,7 @@ import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 public class RunConfig {
 
@@ -63,6 +61,30 @@ public class RunConfig {
         this.deleteDownloadedFiles = deleteDownloadedFiles;
         this.preferredArgSource = preferredArgSource;
         this.sharePointConfigs = sharePointConfigs;
+    }
+
+    public RunConfig(RunConfig runConfig) {
+        author = runConfig.getAuthor();
+        gitAuthor = runConfig.getGitAuthor();
+        mercurialAuthor = runConfig.getMercurialAuthor();
+        svnAuthor = runConfig.getSvnAuthor();
+        committerEmail = runConfig.getCommitterEmail();
+        itemType = runConfig.getItemType();
+        skipRemote = runConfig.getSkipRemote();
+        fetchAll = runConfig.getFetchAll();
+        itemPath = runConfig.getItemPath();
+        projectPath = runConfig.getProjectPath();
+        itemFileNamePrefix = runConfig.getItemFileNamePrefix();
+        periodInDays = runConfig.getPeriodInDays();
+        startDate = runConfig.getStartDate();
+        endDate = runConfig.getEndDate();
+        configurationName = runConfig.getConfigurationName();
+        toolkitProjectListNames = runConfig.getToolkitProjectListNames();
+        deleteDownloadedFiles = runConfig.getDeleteDownloadedFiles();
+        preferredArgSource = runConfig.getPreferredArgSource();
+        sharePointConfigs = Optional.ofNullable(runConfig.getSharePointConfigs())
+                .map(LinkedHashSet::new)
+                .orElseGet(LinkedHashSet::new);
     }
 
     public String getAuthor() {

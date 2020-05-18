@@ -1,17 +1,11 @@
 package pg.gipter.core.producers.processor;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.toolkit.dto.DocumentDetails;
-import pg.gipter.toolkit.dto.DocumentDetailsBuilder;
-import pg.gipter.toolkit.dto.User;
-import pg.gipter.toolkit.dto.VersionDetails;
+import pg.gipter.toolkit.dto.*;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -137,15 +131,15 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
     private <T> T getNullForNull(JsonElement element, Class<T> tClazz) {
         if (element != null && !(element instanceof JsonNull)) {
             if (tClazz == String.class) {
-                return (T) element.getAsString();
+                return tClazz.cast(element.getAsString());
             } else if (tClazz == JsonObject.class) {
-                return (T) element.getAsJsonObject();
+                return tClazz.cast(element.getAsJsonObject());
             } else if (tClazz == Integer.class) {
-                return (T) Integer.valueOf(0);
+                return tClazz.cast(0);
             }
         }
         if (element == null && tClazz == Integer.class) {
-            return (T) Integer.valueOf(0);
+            return tClazz.cast(0);
         }
         return null;
     }
@@ -193,7 +187,8 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
     final Map<String, String> getFilesToDownload(List<DocumentDetails> documentDetails) {
         Map<String, String> filesToDownloadMap = new HashMap<>();
         for (DocumentDetails dd : documentDetails) {
-            if (dd.getVersions().isEmpty() && dd.getLastModifier().getLoginName().equals(applicationProperties.toolkitUsername())) {
+            final String author = applicationProperties.toolkitUsername();
+            if (dd.getVersions().isEmpty() && dd.getLastModifier().getLoginName().equals(author)) {
                 filesToDownloadMap.put(dd.getCurrentVersion() + "v-" + dd.getFileLeafRef(), getFullDownloadUrl(dd.getFileRef()));
             } else if (!dd.getVersions().isEmpty()) {
                 Optional<VersionDetails> minMe;
@@ -201,7 +196,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
                 do {
                     final double currentVersion = minMeCurrentVersion;
                     minMe = dd.getVersions().stream()
-                            .filter(vd -> vd.getCreator().getLoginName().equalsIgnoreCase(applicationProperties.toolkitUsername()))
+                            .filter(vd -> vd.getCreator().getLoginName().equalsIgnoreCase(author))
                             .filter(vd -> vd.getCreated().isAfter(LocalDateTime.of(applicationProperties.startDate(), LocalTime.now())))
                             .filter(vd -> vd.getCreated().isBefore(LocalDateTime.of(applicationProperties.endDate(), LocalTime.now())))
                             .filter(vd -> vd.getVersionLabel() > currentVersion)
@@ -210,7 +205,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
                     if (minMe.isPresent()) {
                         final VersionDetails minMeV = minMe.get();
                         dd.getVersions().stream()
-                                .filter(vd -> !vd.getCreator().getLoginName().equalsIgnoreCase(applicationProperties.toolkitUsername()))
+                                .filter(vd -> !vd.getCreator().getLoginName().equalsIgnoreCase(author))
                                 .filter(vd -> vd.getVersionLabel() < minMeV.getVersionLabel())
                                 .max(Comparator.comparingDouble(VersionDetails::getVersionLabel))
                                 .ifPresent(versionDetails -> filesToDownloadMap.put(
@@ -222,7 +217,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
                         do {
                             final double diff = ++difference;
                             nextMinMe = dd.getVersions().stream()
-                                    .filter(vd -> vd.getCreator().getLoginName().equalsIgnoreCase(applicationProperties.toolkitUsername()))
+                                    .filter(vd -> vd.getCreator().getLoginName().equalsIgnoreCase(author))
                                     .filter(vd -> vd.getCreated().isAfter(LocalDateTime.of(applicationProperties.startDate(), LocalTime.now())))
                                     .filter(vd -> vd.getCreated().isBefore(LocalDateTime.of(applicationProperties.endDate(), LocalTime.now())))
                                     .filter(vd -> vd.getVersionLabel() > minMeV.getVersionLabel())
