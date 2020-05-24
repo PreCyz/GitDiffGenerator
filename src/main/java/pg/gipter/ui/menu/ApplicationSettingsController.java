@@ -40,8 +40,6 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private ComboBox<String> languageComboBox;
 
-    private ApplicationProperties applicationProperties;
-
     private static String currentLanguage;
 
     public ApplicationSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {

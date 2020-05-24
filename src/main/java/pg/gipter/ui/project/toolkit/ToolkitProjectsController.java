@@ -11,26 +11,20 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import pg.gipter.core.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.ToolkitService;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.WindowType;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.ui.project.ProjectDetails;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -58,7 +52,6 @@ public class ToolkitProjectsController extends AbstractController {
     @FXML
     private Label downloadLabel;
 
-    private ApplicationProperties applicationProperties;
     private final String CASES = "/cases/";
 
     public ToolkitProjectsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {

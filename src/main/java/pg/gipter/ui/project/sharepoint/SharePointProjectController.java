@@ -52,7 +52,6 @@ public class SharePointProjectController extends AbstractController {
     @FXML
     private Label numberOfConfigsLabel;
 
-    private final ApplicationProperties applicationProperties;
     private final RunConfig currentRunConfig;
     private final LinkedHashSet<SharePointConfig> sharePointConfigSet;
 

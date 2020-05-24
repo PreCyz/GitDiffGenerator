@@ -147,7 +147,6 @@ public class MainController extends AbstractController {
     @FXML
     private Label currentWeekNumberLabel;
 
-    private ApplicationProperties applicationProperties;
     private final DataService dataService;
 
     private String userFolderUrl;

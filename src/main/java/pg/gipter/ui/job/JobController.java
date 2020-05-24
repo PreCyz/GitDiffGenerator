@@ -20,18 +20,11 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.jobs.JobHandler;
-import pg.gipter.jobs.upload.JobProperty;
-import pg.gipter.jobs.upload.JobType;
-import pg.gipter.jobs.upload.UploadItemJobBuilder;
-import pg.gipter.jobs.upload.UploadJobCreator;
+import pg.gipter.jobs.upload.*;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.ui.alerts.*;
+import pg.gipter.utils.*;
 
 import java.net.URL;
 import java.text.ParseException;
@@ -87,7 +80,6 @@ public class JobController extends AbstractController {
     private final DataDao dataDao;
     private final String NOT_AVAILABLE = "N/A";
     private final String ALL_CONFIGS = "all-configs";
-    private final ApplicationProperties applicationProperties;
 
     public JobController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);

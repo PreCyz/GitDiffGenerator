@@ -21,7 +21,7 @@ public class UpgradeController  extends AbstractController {
     @FXML
     private Label upgradeLabel;
 
-    private Task<Void> upgradeService;
+    private final Task<Void> upgradeService;
 
     public UpgradeController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);

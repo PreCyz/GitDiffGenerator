@@ -19,7 +19,7 @@ public abstract class AbstractWindow {
         this.controller = controller;
     }
 
-    Parent root() throws IOException {
+    public Parent root() throws IOException {
         FXMLLoader loader = new FXMLLoader(url(), BundleUtils.loadBundle());
         loader.setController(controller);
         return loader.load();
@@ -37,7 +37,7 @@ public abstract class AbstractWindow {
         return false;
     }
 
-    String css() {
+    public String css() {
         Optional<URL> css = ResourceUtils.getCssResource(cssFileName());
         String result = "";
         if (css.isPresent()) {
