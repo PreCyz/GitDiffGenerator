@@ -1,8 +1,6 @@
 package pg.gipter.converters;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
@@ -35,7 +33,7 @@ public class SecurityConverter implements Converter {
     public boolean convert() {
         boolean result = false;
         Optional<CipherDetails> cipherDetails = securityService.readCipherDetails();
-        if (cipherDetails.isEmpty()) {
+        if (!cipherDetails.isPresent()) {
             CipherDetails generatedCipher = securityService.generateCipherDetails();
             securityService.writeCipherDetails(generatedCipher);
 

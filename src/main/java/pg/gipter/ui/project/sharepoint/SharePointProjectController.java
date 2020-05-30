@@ -137,7 +137,7 @@ public class SharePointProjectController extends AbstractController {
     }
 
     private StringConverter<SharePointConfig> comboBoxStringConverter() {
-        return new StringConverter<>() {
+        return new StringConverter<SharePointConfig>() {
             @Override
             public String toString(SharePointConfig sharePointConfig) {
                 SharePointConfig sc = Optional.ofNullable(sharePointConfig).orElseGet(SharePointConfig::new);
