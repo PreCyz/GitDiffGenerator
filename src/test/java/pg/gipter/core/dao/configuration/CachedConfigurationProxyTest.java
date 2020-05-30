@@ -41,6 +41,6 @@ class CachedConfigurationProxyTest {
         cachedConfiguration.removeConfig(configurationName);
 
         Optional<RunConfig> actual = cachedConfiguration.loadRunConfig(configurationName);
-        assertThat(actual.isEmpty()).isTrue();
+        assertThat(actual.isPresent()).isFalse();
     }
 }
