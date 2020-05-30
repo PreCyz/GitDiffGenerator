@@ -258,7 +258,7 @@ public class MainController extends AbstractController {
     }
 
     private void initConfigurationName() {
-        Set<String> confNames = applicationProperties.configurationNames();
+        Set<String> confNames = new HashSet<>(applicationProperties.configurationNames());
         if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
             confNames.add(configurationNameComboBox.getValue());
         }
