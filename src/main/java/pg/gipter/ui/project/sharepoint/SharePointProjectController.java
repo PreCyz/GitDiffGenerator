@@ -99,7 +99,11 @@ public class SharePointProjectController extends AbstractController {
         domainTextField.setText(valueToSelect.getDomain());
         urlTextField.setText(valueToSelect.getUrl());
         projectTextField.setText(valueToSelect.getProject());
-        listNameTextField.setText(String.join(",", valueToSelect.getListNames()));
+        listNameTextField.setText(
+                Optional.ofNullable(valueToSelect)
+                        .map(array -> String.join(",", array.getListNames()))
+                        .orElseGet(() -> "")
+        );
         sharePointLink.setText(calculateFullLink());
     }
 
@@ -110,10 +114,10 @@ public class SharePointProjectController extends AbstractController {
 
         String fullLink =
                 Optional.ofNullable(urlTextField.getText()).orElseGet(emptyStringSupplier) +
-                Optional.ofNullable(projectTextField.getText())
-                        .filter(notEmptyStringPredicate)
-                        .map(addSlashFunction)
-                        .orElseGet(emptyStringSupplier);
+                        Optional.ofNullable(projectTextField.getText())
+                                .filter(notEmptyStringPredicate)
+                                .map(addSlashFunction)
+                                .orElseGet(emptyStringSupplier);
 
         if (StringUtils.notEmpty(fullLink)) {
             fullLink += SharePointConfig.URL_SUFFIX;
