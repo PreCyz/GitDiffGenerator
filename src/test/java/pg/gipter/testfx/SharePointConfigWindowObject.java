@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public class SharePointConfigWindowObject {
 
+    private final String nameId = "#nameTextField";
     private final String usernameId = "#usernameTextField";
     private final String passwordId = "#passwordField";
     private final String domainId = "#domainTextField";
@@ -28,6 +29,11 @@ public class SharePointConfigWindowObject {
 
     public SharePointConfigWindowObject(FxRobot robot) {
         this.robot = robot;
+    }
+
+    public SharePointConfigWindowObject writeName(String value) {
+        clickAndWrite(nameId, value);
+        return this;
     }
 
     public SharePointConfigWindowObject writeUsername(String value) {
@@ -87,9 +93,17 @@ public class SharePointConfigWindowObject {
         return sharePointLink.getText();
     }
 
+    public String getName() {
+        return getTextFieldText(nameId);
+    }
+
+    private String getTextFieldText(String nameId) {
+        final TextField name = robot.lookup(nameId).queryAs(TextField.class);
+        return name.getText();
+    }
+
     public String getUsername() {
-        final TextField username = robot.lookup(usernameId).queryAs(TextField.class);
-        return username.getText();
+        return getTextFieldText(usernameId);
     }
 
     public String getPassword() {
@@ -98,22 +112,18 @@ public class SharePointConfigWindowObject {
     }
 
     public String getDomain() {
-        final TextField domain = robot.lookup(domainId).queryAs(TextField.class);
-        return domain.getText();
+        return getTextFieldText(domainId);
     }
 
     public String getUrl() {
-        final TextField url = robot.lookup(urlId).queryAs(TextField.class);
-        return url.getText();
+        return getTextFieldText(urlId);
     }
 
     public String getProject() {
-        final TextField project = robot.lookup(projectId).queryAs(TextField.class);
-        return project.getText();
+        return getTextFieldText(projectId);
     }
 
     public String getListNames() {
-        final TextField listName = robot.lookup(listNameId).queryAs(TextField.class);
-        return listName.getText();
+        return getTextFieldText(listNameId);
     }
 }

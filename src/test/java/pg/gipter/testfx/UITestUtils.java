@@ -22,6 +22,7 @@ public final class UITestUtils {
                     UUID.randomUUID().toString(),
                     UUID.randomUUID().toString(),
                     UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString(),
                     UUID.randomUUID().toString()
             );
             spc.setProject(UUID.randomUUID().toString());
@@ -39,7 +40,7 @@ public final class UITestUtils {
         configuration.setRunConfigs(Stream.of(
                 new RunConfigBuilder()
                         .withConfigurationName("testConfiguration")
-                        .withSharePointConfigs(UITestUtils.generateSharePointConfig(spcSize))
+                        .withSharePointConfigs(generateSharePointConfig(spcSize))
                         .create()
         ).collect(toList()));
         DaoFactory.getCachedConfiguration().saveConfiguration(configuration);

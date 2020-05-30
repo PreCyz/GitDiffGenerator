@@ -3,28 +3,30 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="355.0" prefWidth="440.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="385.0" prefWidth="440.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TextField fx:id="usernameTextField" layoutX="101.0" layoutY="11.0" prefWidth="220.0" />
-      <Label layoutX="14.0" layoutY="15.0" text="%sharepoint.username" />
-      <Label layoutX="14.0" layoutY="50.0" text="%sharepoint.password" />
-      <PasswordField fx:id="passwordField" layoutX="101.0" layoutY="46.0" prefWidth="220.0" />
-      <Label layoutX="14.0" layoutY="85.0" text="%sharepoint.domain" />
-      <TextField fx:id="domainTextField" layoutX="101.0" layoutY="81.0" prefWidth="220.0" />
-      <TextField fx:id="urlTextField" layoutX="101.0" layoutY="117.0" prefHeight="25.0" prefWidth="220.0" text="https://netcompany.sharepoint.com" />
-      <Label layoutX="14.0" layoutY="121.0" text="%sharepoint.url" />
-      <TextField fx:id="projectTextField" layoutX="101.0" layoutY="152.0" prefHeight="25.0" prefWidth="220.0" text="/sites/TrueBlue/Delte dokumenter" />
-      <Label layoutX="14.0" layoutY="156.0" text="%sharepoint.project" />
-      <Label layoutX="14.0" layoutY="191.0" text="%sharepoint.listName" />
-      <TextField fx:id="listNameTextField" layoutX="101.0" layoutY="187.0" prefHeight="25.0" prefWidth="220.0" text="Deliverables" />
-      <Button id="add-button" fx:id="addConfigButton" layoutX="402.0" layoutY="280.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/sharepointProject.css" />
-      <ComboBox fx:id="sharePointProjectsComboBox" layoutX="142.0" layoutY="280.0" prefHeight="25.0" prefWidth="250.0" />
-      <Button id="remove-button" fx:id="removeConfigButton" layoutX="402.0" layoutY="316.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/sharepointProject.css" />
-      <Label fx:id="numberOfConfigsLabel" layoutX="14.0" layoutY="284.0" text="%sharepoint.numberOfConfigs" />
-      <Hyperlink fx:id="sharePointLink" alignment="TOP_CENTER" layoutX="14.0" layoutY="223.0" prefHeight="42.0" prefWidth="389.0" text="%sharepoint.fullLink.default" textAlignment="CENTER" textOverrun="CENTER_ELLIPSIS" wrapText="true">
+      <TextField fx:id="usernameTextField" layoutX="101.0" layoutY="40.0" prefWidth="220.0" />
+      <Label layoutX="14.0" layoutY="44.0" text="%sharepoint.username" />
+      <Label layoutX="14.0" layoutY="74.0" text="%sharepoint.password" />
+      <PasswordField fx:id="passwordField" layoutX="101.0" layoutY="70.0" prefWidth="220.0" />
+      <Label layoutX="14.0" layoutY="104.0" text="%sharepoint.domain" />
+      <TextField fx:id="domainTextField" layoutX="101.0" layoutY="100.0" prefWidth="220.0" />
+      <TextField fx:id="urlTextField" layoutX="101.0" layoutY="130.0" prefHeight="25.0" prefWidth="220.0" text="https://netcompany.sharepoint.com" />
+      <Label layoutX="14.0" layoutY="134.0" text="%sharepoint.url" />
+      <TextField fx:id="projectTextField" layoutX="101.0" layoutY="160.0" prefHeight="25.0" prefWidth="220.0" text="/sites/TrueBlue/Delte dokumenter" />
+      <Label layoutX="14.0" layoutY="164.0" text="%sharepoint.project" />
+      <Label layoutX="14.0" layoutY="194.0" text="%sharepoint.listName" />
+      <TextField fx:id="listNameTextField" layoutX="101.0" layoutY="190.0" prefHeight="25.0" prefWidth="220.0" text="Deliverables" />
+      <Button id="add-button" fx:id="addConfigButton" layoutX="402.0" layoutY="271.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/sharepointProject.css" />
+      <ComboBox fx:id="sharePointProjectsComboBox" layoutX="142.0" layoutY="271.0" prefHeight="25.0" prefWidth="250.0" />
+      <Button id="remove-button" fx:id="removeConfigButton" layoutX="402.0" layoutY="307.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/sharepointProject.css" />
+      <Label fx:id="numberOfConfigsLabel" layoutX="14.0" layoutY="275.0" text="%sharepoint.numberOfConfigs" />
+      <Hyperlink fx:id="sharePointLink" alignment="TOP_CENTER" layoutX="14.0" layoutY="220.0" prefHeight="42.0" prefWidth="389.0" text="%sharepoint.fullLink.default" textAlignment="CENTER" textOverrun="CENTER_ELLIPSIS" wrapText="true">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Hyperlink>
+      <TextField fx:id="nameTextField" layoutX="101.0" layoutY="10.0" prefWidth="220.0" />
+      <Label layoutX="14.0" layoutY="14.0" text="%sharepoint.name" />
    </children>
 </AnchorPane>

@@ -3,9 +3,7 @@ package pg.gipter.core.model;
 import pg.gipter.core.ArgName;
 import pg.gipter.utils.CryptoUtils;
 
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -16,6 +14,7 @@ public class SharePointConfig {
     public static final String PASSWORD_MEMBER_NAME = "password";
     public static final String URL_SUFFIX = "/Forms/AllItems.aspx";
 
+    private String name;
     private String username;
     private String password;
     private String domain;
@@ -31,6 +30,7 @@ public class SharePointConfig {
     }
 
     public SharePointConfig(SharePointConfig sharePointConfig) {
+        name = sharePointConfig.getName();
         username = sharePointConfig.getUsername();
         password = sharePointConfig.getPassword();
         domain = sharePointConfig.getDomain();
@@ -41,11 +41,24 @@ public class SharePointConfig {
     }
 
     public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl) {
+        this("", username, password, domain, url, fullRequestUrl);
+    }
+
+    public SharePointConfig(String name, String username, String password, String domain, String url, String fullRequestUrl) {
+        this.name = name;
         this.username = username;
         this.password = password;
         this.domain = domain;
         this.url = url;
         this.fullRequestUrl = fullRequestUrl;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getUsername() {
@@ -109,7 +122,8 @@ public class SharePointConfig {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SharePointConfig that = (SharePointConfig) o;
-        return Objects.equals(getUsername(), that.getUsername()) &&
+        return Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getUsername(), that.getUsername()) &&
                 Objects.equals(getPassword(), that.getPassword()) &&
                 Objects.equals(getDomain(), that.getDomain()) &&
                 Objects.equals(getUrl(), that.getUrl()) &&
@@ -119,13 +133,13 @@ public class SharePointConfig {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getPassword(), getDomain(), getUrl(), getProject(), getListNames());
+        return Objects.hash(getName(), getUsername(), getPassword(), getDomain(), getUrl(), getProject(), getListNames());
     }
 
-    @Override
-    public String toString() {
+    public String toString2() {
         return "SharePointConfig{" +
-                "username='" + getUsername() + '\'' +
+                "name='" + getName() + '\'' +
+                ", username='" + getUsername() + '\'' +
                 ", password='" + CryptoUtils.encryptSafe(getPassword()) + '\'' +
                 ", domain='" + getDomain() + '\'' +
                 ", url='" + getUrl() + '\'' +

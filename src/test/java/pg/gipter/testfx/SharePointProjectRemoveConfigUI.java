@@ -82,6 +82,7 @@ class SharePointProjectRemoveConfigUI {
         actualItemsSize = windowObject.clickRemoveButton().getComboBoxSize();
         assertThat(actualItemsSize).isEqualTo(0);
 
+        assertThat(windowObject.getName()).isEmpty();
         assertThat(windowObject.getUsername()).isEmpty();
         assertThat(windowObject.getPassword()).isEmpty();
         assertThat(windowObject.getDomain()).isEmpty();

@@ -79,6 +79,7 @@ class SharePointProjectAddConfigUI {
         when(uiLauncherMock.hasWizardProperties()).thenReturn(false);
 
         final SharePointConfigWindowObject windowObject = new SharePointConfigWindowObject(robot)
+                .writeName("someName")
                 .writeUsername("someUser")
                 .writePassword("somePassword")
                 .writeDomain("someDomain")
@@ -90,6 +91,7 @@ class SharePointProjectAddConfigUI {
         runConfig.ifPresent(rc -> {
             assertThat(rc.getSharePointConfigs()).hasSize(1);
             final SharePointConfig spc = new LinkedList<>(rc.getSharePointConfigs()).getFirst();
+            assertThat(spc.getName()).isEqualTo("someName");
             assertThat(spc.getUsername()).isEqualTo("someUser");
             assertThat(spc.getPassword()).isNotNull();
             assertThat(spc.getDomain()).isEqualTo("someDomain");

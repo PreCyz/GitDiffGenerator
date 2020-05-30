@@ -30,6 +30,8 @@ import static java.util.stream.Collectors.toCollection;
 public class SharePointProjectController extends AbstractController {
 
     @FXML
+    private TextField nameTextField;
+    @FXML
     private TextField usernameTextField;
     @FXML
     private PasswordField passwordField;
@@ -94,6 +96,7 @@ public class SharePointProjectController extends AbstractController {
     }
 
     private void updateUIControls(SharePointConfig valueToSelect) {
+        nameTextField.setText(valueToSelect.getName());
         usernameTextField.setText(valueToSelect.getUsername());
         passwordField.setText(valueToSelect.getPassword());
         domainTextField.setText(valueToSelect.getDomain());
@@ -138,16 +141,16 @@ public class SharePointProjectController extends AbstractController {
             @Override
             public String toString(SharePointConfig sharePointConfig) {
                 SharePointConfig sc = Optional.ofNullable(sharePointConfig).orElseGet(SharePointConfig::new);
-                if (StringUtils.nullOrEmpty(sc.getProject())) {
+                if (StringUtils.nullOrEmpty(sc.getName())) {
                     return "";
                 }
-                return Optional.ofNullable(sc.getProject()).orElseGet(() -> "").trim();
+                return Optional.ofNullable(sc.getName()).orElseGet(() -> "").trim();
             }
 
             @Override
             public SharePointConfig fromString(final String string) {
                 return sharePointConfigSet.stream()
-                        .filter(sc -> sc.getProject().trim().equals(string))
+                        .filter(sc -> sc.getName().trim().equals(string))
                         .collect(toCollection(LinkedList::new))
                         .getFirst();
             }
@@ -164,6 +167,7 @@ public class SharePointProjectController extends AbstractController {
     private EventHandler<ActionEvent> addConfigActionEventHandler() {
         return actionEvent -> {
             SharePointConfig sharePointConfig = new SharePointConfig();
+            sharePointConfig.setName(nameTextField.getText());
             sharePointConfig.setUsername(usernameTextField.getText());
             sharePointConfig.setPassword(passwordField.getText());
             sharePointConfig.setDomain(domainTextField.getText());
@@ -214,6 +218,7 @@ public class SharePointProjectController extends AbstractController {
             String projects = "";
             if (sharePointConfigSet.isEmpty()) {
                 sharePointProjectsComboBox.setItems(FXCollections.emptyObservableList());
+                nameTextField.clear();
                 usernameTextField.clear();
                 passwordField.clear();
                 domainTextField.clear();
@@ -246,7 +251,7 @@ public class SharePointProjectController extends AbstractController {
 
     private EventHandler<? super MouseEvent> sharePointLinkMouseClickEventHandler() {
         return event -> {
-            if (!sharePointLink.getText().equals(BundleUtils.getMsg("sharepoint.fullLink.default"))) {
+            if (!BundleUtils.getMsg("sharepoint.fullLink.default").equals(sharePointLink.getText())) {
                 AppManager instance = AppManagerFactory.getInstance();
                 instance.launchDefaultBrowser(calculateFullLink());
                 sharePointLink.setVisited(false);
