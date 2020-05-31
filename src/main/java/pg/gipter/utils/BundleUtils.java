@@ -57,4 +57,8 @@ public final class BundleUtils {
     public static boolean isLanguageSupported(String language) {
         return Arrays.asList(SUPPORTED_LANGUAGES).contains(language);
     }
+
+    public static String getBundleName() {
+        return bundle.getBaseBundleName();
+    }
 }

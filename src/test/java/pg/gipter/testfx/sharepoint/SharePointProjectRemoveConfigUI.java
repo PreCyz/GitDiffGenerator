@@ -1,4 +1,4 @@
-package pg.gipter.testfx;
+package pg.gipter.testfx.sharepoint;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -14,6 +14,7 @@ import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
+import pg.gipter.testfx.UITestUtils;
 import pg.gipter.ui.*;
 import pg.gipter.utils.StringUtils;
 

@@ -1,4 +1,4 @@
-package pg.gipter.testfx;
+package pg.gipter.testfx.sharepoint;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
