@@ -1,6 +1,7 @@
 package pg.gipter.core;
 
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -266,6 +267,15 @@ class FileApplicationProperties extends ApplicationProperties {
             return applicationConfig.getLoggingLevel().toString();
         }
         return argExtractor.loggerLevel();
+    }
+
+    @Override
+    public String uiLanguage() {
+        if (StringUtils.notEmpty(applicationConfig.getUiLanguage())
+                && BundleUtils.isLanguageSupported(applicationConfig.getUiLanguage())) {
+            return applicationConfig.getUiLanguage();
+        }
+        return argExtractor.uiLanguage();
     }
 
 }

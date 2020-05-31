@@ -36,4 +36,7 @@ public abstract class AbstractController implements Initializable {
         this.applicationProperties = applicationProperties;
     }
 
+    public final String getUiLanguage() {
+        return applicationProperties.uiLanguage();
+    }
 }

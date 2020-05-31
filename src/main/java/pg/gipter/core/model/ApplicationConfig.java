@@ -3,6 +3,7 @@ package pg.gipter.core.model;
 import org.slf4j.event.Level;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.util.Collection;
@@ -18,6 +19,7 @@ public class ApplicationConfig {
     private Boolean enableOnStartup;
     private transient Level loggingLevel;
     private Boolean upgradeFinished;
+    private String uiLanguage;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -28,6 +30,7 @@ public class ApplicationConfig {
         enableOnStartup = StringUtils.getBoolean(ArgName.enableOnStartup.defaultValue());
         loggingLevel = Level.INFO;
         upgradeFinished = StringUtils.getBoolean(ArgName.upgradeFinished.defaultValue());
+        uiLanguage = BundleUtils.getDefaultLanguage();
     }
 
     public Boolean getConfirmationWindow() {
@@ -94,6 +97,14 @@ public class ApplicationConfig {
         this.upgradeFinished = upgradeFinished;
     }
 
+    public String getUiLanguage() {
+        return uiLanguage;
+    }
+
+    public void setUiLanguage(String uiLanguage) {
+        this.uiLanguage = uiLanguage;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -119,6 +130,9 @@ public class ApplicationConfig {
         }
         if (getSilentMode() != null) {
             arguments.add(ArgName.silentMode.name() + "=" + getSilentMode());
+        }
+        if (getUiLanguage() != null) {
+            arguments.add(ArgName.uiLanguage.name() + "=" + getUiLanguage());
         }
         return arguments.toArray(new String[0]);
     }
@@ -146,6 +160,8 @@ public class ApplicationConfig {
                     applicationConfig.setLoggingLevel(Level.valueOf(argumentValue.toUpperCase()));
                 } else if (ArgName.upgradeFinished.name().equals(argumentName)) {
                     applicationConfig.setUpgradeFinished(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.uiLanguage.name().equals(argumentName)) {
+                    applicationConfig.setUiLanguage(argumentValue);
                 }
             }
         }
@@ -163,6 +179,7 @@ public class ApplicationConfig {
                 ", enableOnStartup=" + enableOnStartup +
                 ", loggingLevel=" + loggingLevel +
                 ", upgradeFinished=" + upgradeFinished +
+                ", uiLanguage=" + uiLanguage +
                 '}';
     }
 }

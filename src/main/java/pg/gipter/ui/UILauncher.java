@@ -6,15 +6,11 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import pg.gipter.core.*;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
@@ -22,27 +18,18 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.jobs.JobHandler;
-import pg.gipter.jobs.upload.JobProperty;
-import pg.gipter.jobs.upload.JobType;
-import pg.gipter.jobs.upload.UploadItemJob;
-import pg.gipter.jobs.upload.UploadItemJobBuilder;
+import pg.gipter.jobs.upload.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.StartupService;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.ui.alerts.*;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -63,13 +50,13 @@ public class UILauncher implements Launcher {
     private Stage toolkitSettingsWindow;
     private Stage sharePointConfigWindow;
     private TrayHandler trayHandler;
-    private ConfigurationDao configurationDao;
-    private DataDao dataDao;
+    private final ConfigurationDao configurationDao;
+    private final DataDao dataDao;
     private boolean silentMode;
     private boolean upgradeChecked = false;
     private LocalDateTime lastItemSubmissionDate;
-    private Executor executor;
-    private JobHandler jobHandler;
+    private final Executor executor;
+    private final JobHandler jobHandler;
     private Properties wizardProperties;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
@@ -238,13 +225,6 @@ public class UILauncher implements Launcher {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(imgPath)) {
             return new Image(is);
         }
-    }
-
-    public void changeLanguage(String language) {
-        applicationSettingsWindow.close();
-        mainWindow.close();
-        BundleUtils.changeBundle(language);
-        execute();
     }
 
     public static void platformExit() {
@@ -432,9 +412,10 @@ public class UILauncher implements Launcher {
     }
 
     public void showApplicationSettingsWindow() {
+        mainWindow.close();
+
         applicationSettingsWindow = new Stage();
         applicationSettingsWindow.initModality(Modality.APPLICATION_MODAL);
-
         buildScene(applicationSettingsWindow, WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this));
         applicationSettingsWindow.setOnCloseRequest(event -> closeWindow(applicationSettingsWindow));
         applicationSettingsWindow.showAndWait();
@@ -553,5 +534,12 @@ public class UILauncher implements Launcher {
             default:
                 showProjectsWindow(properties);
         }
+    }
+
+    public void changeApplicationSettingsWindowTitle() {
+        final AbstractWindow window = WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this);
+        applicationSettingsWindow.setTitle(BundleUtils.getMsg(
+                window.windowTitleBundle(), applicationProperties.version().getVersion()
+        ));
     }
 }

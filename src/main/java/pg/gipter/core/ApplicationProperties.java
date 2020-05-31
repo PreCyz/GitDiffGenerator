@@ -331,9 +331,9 @@ public abstract class ApplicationProperties {
     public abstract int periodInDays();
     public abstract ItemType itemType();
     public abstract boolean isDeleteDownloadedFiles();
+    public abstract boolean isFetchAll();
     public abstract boolean isSkipRemote();
 
-    public abstract boolean isFetchAll();
     public abstract String toolkitUsername();
     public abstract String toolkitPassword();
     public abstract String toolkitDomain();
@@ -347,6 +347,7 @@ public abstract class ApplicationProperties {
     public abstract boolean isEnableOnStartup();
     public abstract boolean isUseUI();
     public abstract String loggerLevel();
+    public abstract String uiLanguage();
 
     public abstract boolean isUpgradeFinished();
 }

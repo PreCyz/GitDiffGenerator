@@ -20,6 +20,7 @@ public abstract class AbstractWindow {
     }
 
     public Parent root() throws IOException {
+        BundleUtils.changeBundle(controller.getUiLanguage());
         FXMLLoader loader = new FXMLLoader(url(), BundleUtils.loadBundle());
         loader.setController(controller);
         return loader.load();
