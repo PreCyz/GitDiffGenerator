@@ -3,9 +3,7 @@ package pg.gipter.testfx.sharepoint;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
 import org.testfx.api.FxRobot;
-import org.testfx.api.FxRobotInterface;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.testfx.AbstractWindowObject;
 
@@ -14,15 +12,15 @@ import java.util.Optional;
 
 public class SharePointConfigWindowObject extends AbstractWindowObject {
 
-    private final String nameId = "#nameTextField";
-    private final String usernameId = "#usernameTextField";
-    private final String passwordId = "#passwordField";
-    private final String domainId = "#domainTextField";
-    private final String addButtonId = "#add-button";
-    private final String removeButtonId = "#remove-button";
-    private final String urlId = "#urlTextField";
-    private final String projectId = "#projectTextField";
-    private final String listNameId = "#listNameTextField";
+    private final String nameId = "nameTextField";
+    private final String usernameId = "usernameTextField";
+    private final String passwordId = "passwordField";
+    private final String domainId = "domainTextField";
+    private final String addButtonId = "add-button";
+    private final String removeButtonId = "remove-button";
+    private final String urlId = "urlTextField";
+    private final String projectId = "projectTextField";
+    private final String listNameId = "listNameTextField";
     private final String sharePointProjectsComboBoxId = "sharePointProjectsComboBox";
     private final String sharePointLinkId = "sharePointLink";
 
@@ -40,11 +38,6 @@ public class SharePointConfigWindowObject extends AbstractWindowObject {
         return this;
     }
 
-    private void clickAndWrite(String nodeId, String value) {
-        robot.clickOn(nodeId);
-        robot.write(value);
-    }
-
     public SharePointConfigWindowObject writePassword(String value) {
         clickAndWrite(passwordId, value);
         return this;
@@ -56,24 +49,19 @@ public class SharePointConfigWindowObject extends AbstractWindowObject {
     }
 
     public SharePointConfigWindowObject clickAddButton() {
-        final Button addConfigButton = robot.lookup(addButtonId).queryAs(Button.class);
+        final Button addConfigButton = getButton(addButtonId);
         robot.clickOn(addConfigButton);
         return this;
     }
 
     public SharePointConfigWindowObject clickRemoveButton() {
-        final Button removeConfiguration = robot.lookup(removeButtonId).queryAs(Button.class);
+        final Button removeConfiguration = getButton(removeButtonId);
         robot.clickOn(removeConfiguration);
         return this;
     }
 
     public SharePointConfigWindowObject chooseComboBoxEntry(int entryIndex) {
-        final ComboBox<SharePointConfig> comboBox = getComboBox(sharePointProjectsComboBoxId);
-        final FxRobotInterface fxRobotInterface = robot.clickOn(comboBox);
-        for (int idx = 1; idx <= entryIndex; ++idx) {
-            fxRobotInterface.type(KeyCode.DOWN);
-        }
-        fxRobotInterface.type(KeyCode.ENTER);
+        choseComboBoxEntry(sharePointProjectsComboBoxId, entryIndex);
         return this;
     }
 
@@ -93,36 +81,30 @@ public class SharePointConfigWindowObject extends AbstractWindowObject {
     }
 
     public String getName() {
-        return getTextFieldText(nameId);
-    }
-
-    private String getTextFieldText(String nameId) {
-        final TextField name = robot.lookup(nameId).queryAs(TextField.class);
-        return name.getText();
+        return getTextField(nameId).getText();
     }
 
     public String getUsername() {
-        return getTextFieldText(usernameId);
+        return getTextField(usernameId).getText();
     }
 
     public String getPassword() {
-        final PasswordField username = robot.lookup(passwordId).queryAs(PasswordField.class);
-        return username.getText();
+        return getPasswordField(passwordId).getText();
     }
 
     public String getDomain() {
-        return getTextFieldText(domainId);
+        return getTextField(domainId).getText();
     }
 
     public String getUrl() {
-        return getTextFieldText(urlId);
+        return getTextField(urlId).getText();
     }
 
     public String getProject() {
-        return getTextFieldText(projectId);
+        return getTextField(projectId).getText();
     }
 
     public String getListNames() {
-        return getTextFieldText(listNameId);
+        return getTextField(listNameId).getText();
     }
 }

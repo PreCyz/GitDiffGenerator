@@ -45,4 +45,11 @@ public final class UITestUtils {
         ).collect(toList()));
         DaoFactory.getCachedConfiguration().saveConfiguration(configuration);
     }
+
+    public static void generateDefaultConfig() {
+        Configuration configuration = new Configuration(
+                new ApplicationConfig(), new ToolkitConfig(), null, SecurityService.getInstance().generateCipherDetails()
+        );
+        DaoFactory.getCachedConfiguration().saveConfiguration(configuration);
+    }
 }

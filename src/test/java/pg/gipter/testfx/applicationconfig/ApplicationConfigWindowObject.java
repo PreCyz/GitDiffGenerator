@@ -12,12 +12,12 @@ import java.util.Iterator;
 public class ApplicationConfigWindowObject extends AbstractWindowObject {
 
     private final String languageId = "languageComboBox";
-    private final String languageLabelId = "#languageLabel";
-    private final String activateTrayCheckBoxId = "#activateTrayCheckBox";
-    private final String confirmationWindowCheckBoxId = "#confirmationWindowCheckBox";
-    private final String autostartCheckBoxId = "#autostartCheckBox";
+    private final String languageLabelId = "languageLabel";
+    private final String activateTrayCheckBoxId = "activateTrayCheckBox";
+    private final String confirmationWindowCheckBoxId = "confirmationWindowCheckBox";
+    private final String autostartCheckBoxId = "autostartCheckBox";
     private final String preferredArgSourceComboBoxId = "preferredArgSourceComboBox";
-    private final String useUICheckBoxId = "#useUICheckBox";
+    private final String useUICheckBoxId = "useUICheckBox";
 
     public ApplicationConfigWindowObject(FxRobot robot) {
         super(robot);
@@ -43,7 +43,7 @@ public class ApplicationConfigWindowObject extends AbstractWindowObject {
     }
 
     public String getLanguageLabelText() {
-        final Label label = robot.lookup(languageLabelId).queryAs(Label.class);
+        final Label label = getLabel(languageLabelId);
         return label.getText();
     }
 
@@ -62,37 +62,21 @@ public class ApplicationConfigWindowObject extends AbstractWindowObject {
         return this;
     }
 
-    private void selectCheckBox(String checkBoxId) {
-        final CheckBox checkBox = robot.lookup(checkBoxId).queryAs(CheckBox.class);
-        robot.clickOn(checkBox);
-        if (!checkBox.isSelected()) {
-            robot.clickOn(checkBox);
-        }
-    }
-
     public ApplicationConfigWindowObject deselectConfirmationWindow() {
         deselectCheckBox(confirmationWindowCheckBoxId);
         return this;
     }
 
-    private void deselectCheckBox(String checkBoxId) {
-        final CheckBox checkBox = robot.lookup(checkBoxId).queryAs(CheckBox.class);
-        robot.clickOn(checkBox);
-        if (checkBox.isSelected()) {
-            robot.clickOn(checkBox);
-        }
-    }
-
     public CheckBox getActiveTrayCheckBox() {
-        return robot.lookup(activateTrayCheckBoxId).queryAs(CheckBox.class);
+        return getCheckBox(activateTrayCheckBoxId);
     }
 
     public CheckBox getAutostartCheckBox() {
-        return robot.lookup(autostartCheckBoxId).queryAs(CheckBox.class);
+        return getCheckBox(autostartCheckBoxId);
     }
 
     public CheckBox getUseUICheckBox() {
-        return robot.lookup(useUICheckBoxId).queryAs(CheckBox.class);
+        return getCheckBox(useUICheckBoxId);
     }
 
     public ComboBox<PreferredArgSource> getPreferredArgSourceCheckbox() {
