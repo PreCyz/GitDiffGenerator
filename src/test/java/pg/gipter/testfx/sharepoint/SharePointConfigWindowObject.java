@@ -7,11 +7,12 @@ import javafx.scene.input.KeyCode;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxRobotInterface;
 import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.testfx.AbstractWindowObject;
 
 import java.util.List;
 import java.util.Optional;
 
-public class SharePointConfigWindowObject {
+public class SharePointConfigWindowObject extends AbstractWindowObject {
 
     private final String nameId = "#nameTextField";
     private final String usernameId = "#usernameTextField";
@@ -19,16 +20,14 @@ public class SharePointConfigWindowObject {
     private final String domainId = "#domainTextField";
     private final String addButtonId = "#add-button";
     private final String removeButtonId = "#remove-button";
-    private final String comboBoxId = ".combo-box";
-    private final String sharePointLinkId = ".hyperlink";
     private final String urlId = "#urlTextField";
     private final String projectId = "#projectTextField";
     private final String listNameId = "#listNameTextField";
-
-    private final FxRobot robot;
+    private final String sharePointProjectsComboBoxId = "sharePointProjectsComboBox";
+    private final String sharePointLinkId = "sharePointLink";
 
     public SharePointConfigWindowObject(FxRobot robot) {
-        this.robot = robot;
+        super(robot);
     }
 
     public SharePointConfigWindowObject writeName(String value) {
@@ -69,7 +68,7 @@ public class SharePointConfigWindowObject {
     }
 
     public SharePointConfigWindowObject chooseComboBoxEntry(int entryIndex) {
-        final ComboBox<SharePointConfig> comboBox = robot.lookup(comboBoxId).queryAs(ComboBox.class);
+        final ComboBox<SharePointConfig> comboBox = getComboBox(sharePointProjectsComboBoxId);
         final FxRobotInterface fxRobotInterface = robot.clickOn(comboBox);
         for (int idx = 1; idx <= entryIndex; ++idx) {
             fxRobotInterface.type(KeyCode.DOWN);
@@ -79,17 +78,17 @@ public class SharePointConfigWindowObject {
     }
 
     public int getComboBoxSize() {
-        final ComboBox<SharePointConfig> comboBox = robot.lookup(comboBoxId).queryAs(ComboBox.class);
+        final ComboBox<SharePointConfig> comboBox = getComboBox(sharePointProjectsComboBoxId);
         return Optional.ofNullable(comboBox.getItems()).map(List::size).orElseGet(() -> 0);
     }
 
     public ObservableList<SharePointConfig> getComboBoxItems() {
-        final ComboBox<SharePointConfig> comboBox = robot.lookup(comboBoxId).queryAs(ComboBox.class);
+        final ComboBox<SharePointConfig> comboBox = getComboBox(sharePointProjectsComboBoxId);
         return Optional.ofNullable(comboBox.getItems()).orElseGet(FXCollections::observableArrayList);
     }
 
     public String getSharePointLink() {
-        final Hyperlink sharePointLink = robot.lookup(sharePointLinkId).queryAs(Hyperlink.class);
+        final Hyperlink sharePointLink = getHyperLink(sharePointLinkId);
         return sharePointLink.getText();
     }
 

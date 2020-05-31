@@ -5,19 +5,12 @@ import javafx.scene.input.KeyCode;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxRobotInterface;
 import pg.gipter.core.PreferredArgSource;
+import pg.gipter.testfx.AbstractWindowObject;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Iterator;
 
-public class ApplicationConfigWindowObject {
+public class ApplicationConfigWindowObject extends AbstractWindowObject {
 
-    private CheckBox useUICheckBox;
-    private CheckBox activateTrayCheckBox;
-    private CheckBox autostartCheckBox;
-    private CheckBox silentModeCheckBox;
-    private ComboBox<String> languageComboBox;
-
-    private final String comboBoxId = ".combo-box";
     private final String languageId = "languageComboBox";
     private final String languageLabelId = "#languageLabel";
     private final String activateTrayCheckBoxId = "#activateTrayCheckBox";
@@ -26,10 +19,8 @@ public class ApplicationConfigWindowObject {
     private final String preferredArgSourceComboBoxId = "preferredArgSourceComboBox";
     private final String useUICheckBoxId = "#useUICheckBox";
 
-    private final FxRobot robot;
-
     public ApplicationConfigWindowObject(FxRobot robot) {
-        this.robot = robot;
+        super(robot);
     }
 
     public ApplicationConfigWindowObject chooseLanguage(String language) {
@@ -49,16 +40,6 @@ public class ApplicationConfigWindowObject {
         }
         fxRobotInterface.type(KeyCode.ENTER);
         return this;
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private <T> ComboBox<T> getComboBox(String id) {
-        final Set<ComboBox> comboBoxes = robot.lookup(comboBoxId).queryAllAs(ComboBox.class);
-        return (ComboBox<T>) Optional.of(
-                comboBoxes.stream()
-                        .filter(cb -> id.equals(cb.getId()))
-                        .collect(Collectors.toCollection(LinkedList::new))
-        ).map(LinkedList::getFirst).orElseThrow(NoSuchElementException::new);
     }
 
     public String getLanguageLabelText() {
