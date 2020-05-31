@@ -253,6 +253,7 @@ public abstract class ApplicationProperties {
     public final void save() {
         Map<String, RunConfig> tmpRunConfigs = new HashMap<>(runConfigMap);
         tmpRunConfigs.put(currentRunConfig.getConfigurationName(), currentRunConfig);
+        tmpRunConfigs.remove(ArgName.configurationName.defaultValue());
 
         Configuration configuration = new Configuration(
                 applicationConfig,
@@ -264,6 +265,7 @@ public abstract class ApplicationProperties {
 
         cachedConfiguration.saveConfiguration(configuration);
         runConfigMap.put(currentRunConfig.getConfigurationName(), currentRunConfig);
+        runConfigMap.remove(ArgName.configurationName.defaultValue());
     }
 
     public final void removeConfig(String configurationName) {
