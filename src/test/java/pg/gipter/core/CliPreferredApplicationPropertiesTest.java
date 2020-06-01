@@ -17,9 +17,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.WeekFields;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1971,7 +1969,9 @@ class CliPreferredApplicationPropertiesTest {
 
     @Test
     void givenStart_date_month_name_whenValueFromPattern_thenReturnMonthNameLowerCase() {
-        applicationProperties = new CliApplicationProperties(new String[]{});
+        applicationProperties = new CliApplicationProperties(new String[]{
+                ArgName.startDate.name() + "=2020-06-01"
+        });
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.start_date_month_name);
 
