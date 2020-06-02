@@ -248,4 +248,13 @@ public class MainUI {
         assertThat(windowObject.getItemTypeComboBox().getValue()).isEqualTo(ItemType.TOOLKIT_DOCS);
         assertThat(windowObject.getToolkitProjectListNamesTextField().getText()).isEqualTo("Deliverables,General");
     }
+
+    @Test
+    void givenWrongToolkitCredentials_whenClickVerifyCredentials_thenAlertWithErrorMsg(FxRobot robot) {
+        final MainWindowObject windowObject = new MainWindowObject(robot)
+                .clickVerifyCredentialsHyperlink()
+                .pressOkOnPopup();
+
+        assertThat(windowObject.getVerifyCredentialsHyperLink().isVisited()).isTrue();
+    }
 }

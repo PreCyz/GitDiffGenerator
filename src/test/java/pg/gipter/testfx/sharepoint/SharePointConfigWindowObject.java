@@ -5,12 +5,12 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import org.testfx.api.FxRobot;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.testfx.AbstractWindowObject;
+import pg.gipter.testfx.BaseWindowObject;
 
 import java.util.List;
 import java.util.Optional;
 
-public class SharePointConfigWindowObject extends AbstractWindowObject {
+public class SharePointConfigWindowObject extends BaseWindowObject {
 
     private final String nameId = "nameTextField";
     private final String usernameId = "usernameTextField";

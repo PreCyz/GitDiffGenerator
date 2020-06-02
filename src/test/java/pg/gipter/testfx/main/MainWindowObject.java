@@ -4,9 +4,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import org.testfx.api.FxRobot;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.testfx.AbstractWindowObject;
+import pg.gipter.testfx.BaseWindowObject;
 
-public class MainWindowObject extends AbstractWindowObject {
+public class MainWindowObject extends BaseWindowObject {
 
     private final String jobButtonId = "jobButton";
     private final String executeButtonId = "executeButton";
@@ -33,6 +33,8 @@ public class MainWindowObject extends AbstractWindowObject {
 
     private final String endDatePickerId = "endDatePicker";
     private final String startDatePickerId = "startDatePicker";
+
+    private final String verifyCredentialsHyperlinkId = "verifyCredentialsHyperlink";
 
     public MainWindowObject(FxRobot robot) {
         super(robot);
@@ -98,6 +100,11 @@ public class MainWindowObject extends AbstractWindowObject {
 
     public MainWindowObject chooseConfiguration(String value) {
         choseComboBoxEntry(configurationNameComboBoxId, value);
+        return this;
+    }
+
+    public MainWindowObject clickVerifyCredentialsHyperlink() {
+        clickHyperLink(verifyCredentialsHyperlinkId);
         return this;
     }
 
@@ -175,5 +182,18 @@ public class MainWindowObject extends AbstractWindowObject {
 
     public ComboBox<ItemType> getItemTypeComboBox() {
         return getComboBox(itemTypeComboBoxId);
+    }
+
+    public Hyperlink getVerifyCredentialsHyperLink() {
+        return getHyperLink(verifyCredentialsHyperlinkId);
+    }
+
+    public MainWindowObject waitForPopup(int seconds) {
+        try {
+            Thread.sleep(1000 * seconds);
+        } catch (InterruptedException e) {
+            System.err.printf("Could not wait. Something went wrong %s\n", e.getMessage());
+        }
+        return this;
     }
 }

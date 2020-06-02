@@ -5,11 +5,11 @@ import javafx.scene.input.KeyCode;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxRobotInterface;
 import pg.gipter.core.PreferredArgSource;
-import pg.gipter.testfx.AbstractWindowObject;
+import pg.gipter.testfx.BaseWindowObject;
 
 import java.util.Iterator;
 
-public class ApplicationConfigWindowObject extends AbstractWindowObject {
+public class ApplicationConfigWindowObject extends BaseWindowObject {
 
     private final String languageId = "languageComboBox";
     private final String languageLabelId = "languageLabel";

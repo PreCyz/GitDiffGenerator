@@ -11,11 +11,11 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toCollection;
 
-public abstract class AbstractWindowObject {
+public class BaseWindowObject {
 
     protected final FxRobot robot;
 
-    protected AbstractWindowObject(FxRobot robot) {
+    protected BaseWindowObject(FxRobot robot) {
         this.robot = robot;
     }
 
@@ -141,6 +141,11 @@ public abstract class AbstractWindowObject {
     protected PasswordField getPasswordField(String id) {
         final Set<PasswordField> passwordFields = robot.lookup(".password-field").queryAllAs(PasswordField.class);
         return getNode(passwordFields, id);
+    }
+
+    protected void clickHyperLink(String hyperlinkId) {
+        final Hyperlink hyperLink = getHyperLink(hyperlinkId);
+        robot.clickOn(hyperLink);
     }
 
 }

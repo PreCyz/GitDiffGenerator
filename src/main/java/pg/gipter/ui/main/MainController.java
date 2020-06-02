@@ -822,7 +822,7 @@ public class MainController extends AbstractController {
 
     private EventHandler<MouseEvent> verifyCredentialsHyperlinkOnMouseClickEventHandler() {
         return event -> {
-            Task<Void> task = new Task<Void>() {
+            Task<Void> task = new Task<>() {
                 @Override
                 public Void call() {
                     RunConfig runConfigFromUI = createRunConfigFromUI();
