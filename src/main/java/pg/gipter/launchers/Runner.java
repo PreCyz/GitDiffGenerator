@@ -10,16 +10,15 @@ import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.producers.DiffProducer;
 import pg.gipter.core.producers.DiffProducerFactory;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.WindowType;
+import pg.gipter.ui.UploadStatus;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
 class Runner implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(Runner.class);
-    private ApplicationProperties applicationProperties;
+    private final ApplicationProperties applicationProperties;
     private final DataDao dataDao;
 
     Runner(ApplicationProperties applicationProperties) {
@@ -57,7 +56,7 @@ class Runner implements Starter {
                     .buildAndDisplayWindow()
             );
         } finally {
-            dataDao.saveUploadStatus(error ? "FAIL" : "SUCCESS");
+            dataDao.saveUploadStatus(error ? UploadStatus.FAIL : UploadStatus.SUCCESS);
             logger.info("{} ended.", this.getClass().getName());
         }
         if (!error && applicationProperties.isConfirmationWindow()) {

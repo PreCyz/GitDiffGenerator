@@ -54,7 +54,7 @@ public class UploadItemJob implements Job {
         ).start();
 
         logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        dataDao.saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
+        dataDao.saveNextUploadDateTime(nextUploadDate);
 
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 configurationDao.loadArgumentArray(configurationNames.getFirst())

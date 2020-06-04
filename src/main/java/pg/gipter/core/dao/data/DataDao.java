@@ -1,12 +1,17 @@
 package pg.gipter.core.dao.data;
 
+import pg.gipter.jobs.upload.JobParam;
+import pg.gipter.ui.UploadStatus;
+
+import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Properties;
 
 public interface DataDao {
 
-    Optional<Properties> loadDataProperties();
-    void saveUploadStatus(String status);
-    void saveNextUpload(String nextUploadDateTime);
-    void saveDataProperties(Properties properties);
+    Optional<JobParam> loadJobParam();
+    ProgramData readProgramData();
+    void saveJobParam(JobParam jobParam);
+    void saveUploadStatus(UploadStatus uploadStatus);
+    void saveNextUploadDateTime(LocalDateTime nextUploadDateTime);
+    void removeJobParam();
 }

@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.testfx.api.FxAssert.verifyThat;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
-public class MainUI {
+public class MainTestUI {
 
     @Mock
     private UILauncher uiLauncherMock;

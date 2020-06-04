@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
-class SharePointProjectAddConfigUI {
+class SharePointProjectAddConfigTestUI {
 
     @Mock
     private UILauncher uiLauncherMock;
@@ -50,7 +50,7 @@ class SharePointProjectAddConfigUI {
     @Start
     public void start(Stage stage) {
         try {
-            UITestUtils.generateAndSaveConfiguration(0);
+            UITestUtils.generateConfigurationWithSPC(0);
             createWindow(stage);
         } catch (Exception ex) {
             System.err.printf("UPS !!! %s", ex.getMessage());

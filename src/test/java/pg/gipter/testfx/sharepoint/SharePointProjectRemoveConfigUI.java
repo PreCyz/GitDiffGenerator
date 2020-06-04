@@ -45,7 +45,7 @@ class SharePointProjectRemoveConfigUI {
     @Start
     public void start(Stage stage) {
         try {
-            UITestUtils.generateAndSaveConfiguration(2);
+            UITestUtils.generateConfigurationWithSPC(2);
             createWindow(stage);
         } catch (Exception ex) {
             System.err.printf("UPS !!! %s", ex.getMessage());

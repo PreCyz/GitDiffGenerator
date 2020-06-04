@@ -15,9 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
-import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
+import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.jobs.JobHandler;
 import pg.gipter.jobs.upload.*;
@@ -28,8 +28,8 @@ import pg.gipter.utils.*;
 
 import java.net.URL;
 import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -78,7 +78,6 @@ public class JobController extends AbstractController {
 
     private Map<String, RunConfig> runConfigMap;
     private final DataDao dataDao;
-    private final String NOT_AVAILABLE = "N/A";
     private final String ALL_CONFIGS = "all-configs";
 
     public JobController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
@@ -115,56 +114,71 @@ public class JobController extends AbstractController {
             configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, runConfigMap.keySet()));
         }
         setDefaultsForJobDetailsControls();
-        Optional<Properties> data = dataDao.loadDataProperties();
-        if (data.isPresent()) {
-            setDefinedJobDetails(data.get());
-            setExecutionDetails(data.get());
+        final ProgramData programData = dataDao.readProgramData();
+        JobParam jobParam = programData.getJobParam();
+        if (jobParam != null) {
+            setDefinedJobDetails(jobParam);
+            setExecutionDetails(programData);
         } else {
             lastExecutionLabel.setText("");
             nextExecutionLabel.setText("");
-        }
-    }
-
-    private void setExecutionDetails(Properties data) {
-        if (data.containsKey(DaoConstants.UPLOAD_STATUS_KEY) && data.containsKey(DaoConstants.UPLOAD_DATE_TIME_KEY)) {
-            String uploadInfo = String.format("%s [%s]",
-                    data.getProperty(DaoConstants.UPLOAD_DATE_TIME_KEY),
-                    data.getProperty(DaoConstants.UPLOAD_STATUS_KEY)
-            );
-            lastExecutionLabel.setText(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
-        }
-        if (data.containsKey(JobProperty.NEXT_FIRE_DATE.key()) &&
-                !StringUtils.nullOrEmpty(data.getProperty(JobProperty.NEXT_FIRE_DATE.key(), ""))) {
-            nextExecutionLabel.setText(BundleUtils.getMsg(
-                    "tray.item.nextUpdate",
-                    data.getProperty(JobProperty.NEXT_FIRE_DATE.key())
+            jobTypeLabel.setText(JobType.EVERY_WEEK.name());
+            jobDetailsLabel.setText(String.format("SCHEDULE_START: %s%nDAY_OF_WEEK: %s%nHOUR_OF_THE_DAY: %s",
+                    LocalDate.now().format(DateTimeFormatter.ISO_DATE),
+                    DayOfWeek.FRIDAY.name(),
+                    LocalTime.of(hourOfDayComboBox.getValue(), minuteComboBox.getValue())
+                            .format(DateTimeFormatter.ofPattern("H:mm"))
             ));
         }
     }
 
-    private void setDefinedJobDetails(Properties dataProp) {
-        if (dataProp.containsKey(JobProperty.TYPE.key())) {
-            cancelJobButton.setVisible(true);
-            jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
-            JobType jobType = JobType.valueOf(dataProp.getProperty(JobProperty.TYPE.key()));
-            jobTypeLabel.setText(jobType.name());
-            String details;
-            if (jobType == JobType.CRON) {
-                details = BundleUtils.getMsg("job.cron.expression", dataProp.getProperty(JobProperty.CRON.key()));
-            } else {
-                details = buildLabel(dataProp, JobProperty.SCHEDULE_START).map(value -> value + "\n").orElse("");
-                details += buildLabel(dataProp, JobProperty.DAY_OF_MONTH).map(value -> value + "\n").orElse("");
-                details += buildLabel(dataProp, JobProperty.DAY_OF_WEEK).map(value -> value + "\n").orElse("");
-                details += buildLabel(dataProp, JobProperty.HOUR_OF_THE_DAY).orElse("");
-            }
-            jobDetailsLabel.setText(details);
-            configsLabel.setText(dataProp.getProperty(JobProperty.CONFIGS.key()));
+    private void setExecutionDetails(ProgramData programData) {
+        if (programData.getUploadStatus() != null && programData.getLastUploadDateTime() != null) {
+            String uploadInfo = String.format("%s [%s]",
+                    programData.getLastUploadDateTime(),
+                    programData.getUploadStatus().name()
+            );
+            lastExecutionLabel.setText(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+        }
+        final JobParam jobParam = programData.getJobParam();
+        if (jobParam.getNextFireDate() != null) {
+            nextExecutionLabel.setText(BundleUtils.getMsg(
+                    "tray.item.nextUpdate",
+                    jobParam.getNextFireDate().format(DateTimeFormatter.ISO_DATE_TIME)
+            ));
         }
     }
 
-    public static Optional<String> buildLabel(Properties data, JobProperty key) {
-        if (data.containsKey(key.key())) {
-            String value = data.getProperty(key.key());
+    private void setDefinedJobDetails(JobParam jobParam) {
+        if (jobParam.getJobType() != null) {
+            cancelJobButton.setVisible(true);
+            jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
+            jobTypeLabel.setText(jobParam.getJobType().name());
+            String details;
+            if (jobParam.getJobType() == JobType.CRON) {
+                details = BundleUtils.getMsg("job.cron.expression", jobParam.getCronExpression());
+            } else {
+                details = buildLabel(
+                        jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE_TIME),
+                        JobProperty.SCHEDULE_START
+                ).map(value -> value + "\n")
+                        .orElse("");
+                details += buildLabel(String.valueOf(jobParam.getDayOfMonth()), JobProperty.DAY_OF_MONTH)
+                        .map(value -> value + "\n")
+                        .orElse("");
+                details += buildLabel(jobParam.getDayOfWeek().name(), JobProperty.DAY_OF_WEEK)
+                        .map(value -> value + "\n")
+                        .orElse("");
+                details += buildLabel(String.valueOf(jobParam.getHourOfDay()), JobProperty.HOUR_OF_THE_DAY)
+                        .orElse("");
+            }
+            jobDetailsLabel.setText(details);
+            configsLabel.setText(jobParam.getConfigsStr());
+        }
+    }
+
+    public static Optional<String> buildLabel(String value, JobProperty key) {
+        if (value != null) {
             if (key == JobProperty.HOUR_OF_THE_DAY) {
                 String minuetOfHour = value.substring(value.indexOf(":") + 1);
                 if (minuetOfHour.length() == 1) {
@@ -195,6 +209,7 @@ public class JobController extends AbstractController {
     }
 
     private void setDefaultsForJobDetailsControls() {
+        String NOT_AVAILABLE = "N/A";
         jobTypeLabel.setText(NOT_AVAILABLE);
         jobTypeLabel.setAlignment(Pos.CENTER);
         jobDetailsLabel.setText(NOT_AVAILABLE);
@@ -232,6 +247,7 @@ public class JobController extends AbstractController {
             startDatePicker.setDisable(true);
             dayNameComboBox.setDisable(true);
             dayOfMonthComboBox.setDisable(false);
+            jobTypeLabel.setText(JobType.EVERY_MONTH.name());
         };
     }
 
@@ -240,6 +256,7 @@ public class JobController extends AbstractController {
             startDatePicker.setDisable(false);
             dayNameComboBox.setDisable(true);
             dayOfMonthComboBox.setDisable(true);
+            jobTypeLabel.setText(JobType.EVERY_2_WEEKS.name());
         };
     }
 
@@ -248,11 +265,12 @@ public class JobController extends AbstractController {
             startDatePicker.setDisable(true);
             dayNameComboBox.setDisable(false);
             dayOfMonthComboBox.setDisable(true);
+            jobTypeLabel.setText(JobType.EVERY_WEEK.name());
         };
     }
 
     private StringConverter<LocalDate> startDateConverter() {
-        return new StringConverter<LocalDate>() {
+        return new StringConverter<>() {
             @Override
             public String toString(LocalDate object) {
                 return object != null ? object.format(ApplicationProperties.yyyy_MM_dd) : "";
@@ -279,9 +297,9 @@ public class JobController extends AbstractController {
 
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), uiLauncher);
-                Properties data = dataDao.loadDataProperties().orElseGet(Properties::new);
+                JobParam jobParam = dataDao.loadJobParam().orElseGet(JobParam::new);
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
-                        .withData(data)
+                        .withJobParam(jobParam)
                         .withJobType(jobType)
                         .withStartDateTime(startDatePicker.getValue())
                         .withDayOfMonth(dayOfMonthComboBox.getValue())
@@ -293,7 +311,7 @@ public class JobController extends AbstractController {
 
                 JobHandler jobHandler = uiLauncher.getJobHandler();
                 jobHandler.scheduleUploadJob(builder, additionalJobParams);
-                dataDao.saveDataProperties(jobHandler.getDataProperties());
+                dataDao.saveJobParam(jobHandler.getJobParam());
 
                 uiLauncher.hideJobWindow();
                 uiLauncher.updateTray();
@@ -326,6 +344,45 @@ public class JobController extends AbstractController {
                                 .collect(toCollection(LinkedHashSet::new));
                         currentSelection.add(newValue);
                         configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, currentSelection));
+                    }
+                });
+        dayNameComboBox.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observableValue, dayOfWeek, newDayOfWeek) -> {
+                    if (cronExpressionTextField.getText().isEmpty()) {
+                        final String jobDetails = String.format("SCHEDULE_START: %s%nDAY_OF_WEEK: %s%nHOUR_OF_THE_DAY: %d:%02d",
+                                startDatePicker.getValue().format(DateTimeFormatter.ISO_DATE),
+                                newDayOfWeek.name(),
+                                hourOfDayComboBox.getValue(),
+                                minuteComboBox.getValue()
+                        );
+                        jobDetailsLabel.setText(jobDetails);
+                    }
+                });
+        hourOfDayComboBox.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observableValue, hourOfDay, newHourOfDay) -> {
+                    if (cronExpressionTextField.getText().isEmpty()) {
+                        final String jobDetails = String.format("SCHEDULE_START: %s%nDAY_OF_WEEK: %s%nHOUR_OF_THE_DAY: %d:%02d",
+                                startDatePicker.getValue().format(DateTimeFormatter.ISO_DATE),
+                                dayNameComboBox.getValue().name(),
+                                newHourOfDay,
+                                minuteComboBox.getValue()
+                        );
+                        jobDetailsLabel.setText(jobDetails);
+                    }
+                });
+        minuteComboBox.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observableValue, minute, newMinute) -> {
+                    if (cronExpressionTextField.getText().isEmpty()) {
+                        final String jobDetails = String.format("SCHEDULE_START: %s%nDAY_OF_WEEK: %s%nHOUR_OF_THE_DAY: %d:%02d",
+                                startDatePicker.getValue().format(DateTimeFormatter.ISO_DATE),
+                                dayNameComboBox.getValue().name(),
+                                hourOfDayComboBox.getValue(),
+                                newMinute
+                        );
+                        jobDetailsLabel.setText(jobDetails);
                     }
                 });
     }

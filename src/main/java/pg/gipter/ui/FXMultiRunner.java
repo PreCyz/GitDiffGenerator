@@ -278,7 +278,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     }
 
     private void saveUploadStatus(UploadStatus status) {
-        dataDao.saveUploadStatus(status.name());
+        dataDao.saveUploadStatus(status);
         updateProgress(totalProgress, totalProgress);
         updateMessage(BundleUtils.getMsg("progress.finished", status.name()));
         logger.info("{} ended.", this.getClass().getName());

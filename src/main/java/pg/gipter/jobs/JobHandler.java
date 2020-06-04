@@ -12,22 +12,14 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.jobs.upgrade.UpgradeJobCreator;
-import pg.gipter.jobs.upload.JobProperty;
-import pg.gipter.jobs.upload.JobType;
-import pg.gipter.jobs.upload.UploadItemJobBuilder;
-import pg.gipter.jobs.upload.UploadJobCreator;
+import pg.gipter.jobs.upload.*;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.RunType;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.WindowType;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
 
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -112,21 +104,21 @@ public class JobHandler {
         return scheduler.getClass().getName();
     }
 
-    public Properties getDataProperties() {
-        return uploadJobCreator.getDataProperties();
+    public JobParam getJobParam() {
+        return uploadJobCreator.getJobParam();
     }
 
     public void executeUploadJobIfMissed(Executor executor) {
         try {
             DataDao dataDao = DaoFactory.getDataDao();
-            Optional<Properties> data = dataDao.loadDataProperties();
-            if (data.isPresent() && isMissedJobExecution(data.get())) {
-                String savedNextFireDate = data.get().getProperty(JobProperty.NEXT_FIRE_DATE.key());
+            final Optional<JobParam> jobParamOpt = dataDao.loadJobParam();
+            if (jobParamOpt.isPresent() && isMissedJobExecution(jobParamOpt.get())) {
+                final JobParam jobParam = jobParamOpt.get();
+                String savedNextFireDate = jobParam.getNextFireDate().format(DateTimeFormatter.ISO_DATE_TIME);
                 logger.warn("Missed a job execution at [{}].", savedNextFireDate);
-                JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.key()));
                 LocalDate startDate = null;
                 Date nextFireDate = new Date();
-                switch (jobType) {
+                switch (jobParam.getJobType()) {
                     case CRON:
                         nextFireDate = scheduler.getTrigger(UploadJobCreator.CRON_TRIGGER_KEY).getNextFireTime();
                         logger.warn("Calculation startDate from cron expression is not supported. Overdue job will not be executed.");
@@ -158,12 +150,10 @@ public class JobHandler {
                             .buildAndDisplayOverrideWindow();
 
                     if (shouldExecute) {
-                        String configs = data.get().getProperty(JobProperty.CONFIGS.key());
-                        if (!StringUtils.nullOrEmpty(configs)) {
-                            logger.info("Fixing missed job execution for following configs [{}].", configs);
-                            String[] configArray = configs.split(",");
-                            List<ApplicationProperties> applicationPropertiesCollection = new ArrayList<>(configArray.length);
-                            for (String configName : configArray) {
+                        if (!jobParam.getConfigs().isEmpty()) {
+                            logger.info("Fixing missed job execution for following configs [{}].", jobParam.getConfigs());
+                            List<ApplicationProperties> applicationPropertiesCollection = new ArrayList<>(jobParam.getConfigs().size());
+                            for (String configName : jobParam.getConfigs()) {
                                 Optional<RunConfig> runConfig = DaoFactory.getCachedConfiguration().loadRunConfig(configName);
                                 if (runConfig.isPresent()) {
                                     runConfig.get().setStartDate(startDate);
@@ -177,8 +167,7 @@ public class JobHandler {
                             logger.warn("From some reason the job is defined but without any specific configurations. I do not know how this happened and can do nothing with it.");
                         }
                     }
-                    String nextFireStr = LocalDateTime.ofInstant(nextFireDate.toInstant(), ZoneId.systemDefault()).format(DateTimeFormatter.ISO_DATE_TIME);
-                    dataDao.saveNextUpload(nextFireStr);
+                    dataDao.saveNextUploadDateTime(LocalDateTime.ofInstant(nextFireDate.toInstant(), ZoneId.systemDefault()));
                 }
             }
         } catch (Exception ex) {
@@ -186,12 +175,10 @@ public class JobHandler {
         }
     }
 
-    private boolean isMissedJobExecution(Properties data) {
+    private boolean isMissedJobExecution(JobParam jobParam) {
         boolean result = false;
-        Object nextFire = data.get(JobProperty.NEXT_FIRE_DATE.key());
-        if (Objects.nonNull(nextFire)) {
-            LocalDateTime nextFireDate = LocalDateTime.parse(String.valueOf(nextFire), DateTimeFormatter.ISO_DATE_TIME);
-            result = nextFireDate.isBefore(LocalDateTime.now());
+        if (jobParam.getNextFireDate() != null) {
+            result = jobParam.getNextFireDate().isBefore(LocalDateTime.now());
         }
         return result;
     }

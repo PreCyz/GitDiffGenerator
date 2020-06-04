@@ -49,7 +49,7 @@ public class ApplicationConfigUI {
     @Start
     public void start(Stage stage) {
         try {
-            UITestUtils.generateAndSaveConfiguration(0);
+            UITestUtils.generateConfigurationWithSPC(0);
             createWindow(stage);
         } catch (Exception ex) {
             System.err.printf("UPS !!! %s", ex.getMessage());

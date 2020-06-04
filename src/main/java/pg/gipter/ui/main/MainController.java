@@ -25,8 +25,8 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.*;
-import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.CacheManager;
+import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.*;
@@ -560,15 +560,14 @@ public class MainController extends AbstractController {
 
     private void updateLastItemUploadDate() {
         try {
-            Optional<Properties> dataProperties = dataService.loadDataProperties();
-            if (dataProperties.isPresent() && dataProperties.get().containsKey(DaoConstants.UPLOAD_STATUS_KEY)) {
-                UploadStatus status = UploadStatus.valueOf(dataProperties.get().getProperty(DaoConstants.UPLOAD_STATUS_KEY));
-                if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(status)) {
-                    uiLauncher.setLastItemSubmissionDate(null);
-                }
+            ProgramData programData = dataService.loadProgramData();
+            if (programData.getUploadStatus() != null &&
+                    EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(programData.getUploadStatus())) {
+                uiLauncher.setLastItemSubmissionDate(null);
             }
         } catch (Exception ex) {
-            logger.warn("Could not determine the status of the upload. {}. Forcing to refresh last upload date.", ex.getMessage());
+            logger.warn("Could not determine the status of the upload. {}. Forcing to refresh last upload date.",
+                    ex.getMessage());
             uiLauncher.setLastItemSubmissionDate(null);
         } finally {
             setLastItemSubmissionDate();
@@ -666,7 +665,7 @@ public class MainController extends AbstractController {
             }
             toolkitProjectListNamesTextField.setDisable(itemTypeComboBox.getValue() != ItemType.TOOLKIT_DOCS);
             deleteDownloadedFilesCheckBox.setDisable(
-                    !EnumSet.of(ItemType.TOOLKIT_DOCS,  ItemType.SHARE_POINT_DOCS).contains(itemTypeComboBox.getValue())
+                    !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(itemTypeComboBox.getValue())
             );
             setDisable(itemTypeComboBox.getValue());
             setTooltipOnProjectListNames();

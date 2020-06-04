@@ -29,11 +29,10 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.time.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.stream.Stream;
 
 /** Created by Gawa 2017-10-04 */
 public class UILauncher implements Launcher {
@@ -291,11 +290,7 @@ public class UILauncher implements Launcher {
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } finally {
-            Optional<Properties> data = dataDao.loadDataProperties();
-            if (data.isPresent()) {
-                data.ifPresent(properties -> Stream.of(JobProperty.values()).forEach(jobKey -> properties.remove(jobKey.key())));
-                dataDao.saveDataProperties(data.get());
-            }
+            dataDao.removeJobParam();
 
             logger.info("{} canceled.", UploadItemJob.NAME);
             updateTray();
@@ -303,50 +298,23 @@ public class UILauncher implements Launcher {
     }
 
     private void scheduleUploadJob() {
-        Optional<Properties> data = dataDao.loadDataProperties();
-        if (data.isPresent() && !jobHandler.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.key())) {
+        final Optional<JobParam> jobParamOpt = dataDao.loadJobParam();
+        if (!jobHandler.isSchedulerInitiated() && jobParamOpt.isPresent() && jobParamOpt.get().getJobType() != null) {
+            JobParam jobParam = jobParamOpt.get();
             logger.info("Setting up the job.");
             try {
-                JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.key()));
-
-                LocalDate scheduleStart = null;
-                if (data.get().containsKey(JobProperty.SCHEDULE_START.key())) {
-                    scheduleStart = LocalDate.parse(
-                            data.get().getProperty(JobProperty.SCHEDULE_START.key()),
-                            ApplicationProperties.yyyy_MM_dd
-                    );
-                }
-                int dayOfMonth = 0;
-                if (data.get().containsKey(JobProperty.DAY_OF_MONTH.key())) {
-                    dayOfMonth = Integer.parseInt(data.get().getProperty(JobProperty.DAY_OF_MONTH.key()));
-                }
-                int hourOfDay = 0;
-                int minuteOfHour = 0;
-                if (data.get().containsKey(JobProperty.HOUR_OF_THE_DAY.key())) {
-                    String hourOfDayString = data.get().getProperty(JobProperty.HOUR_OF_THE_DAY.key());
-                    hourOfDay = Integer.parseInt(hourOfDayString.substring(0, hourOfDayString.lastIndexOf(":")));
-                    minuteOfHour = Integer.parseInt(hourOfDayString.substring(hourOfDayString.lastIndexOf(":") + 1));
-                }
-                DayOfWeek dayOfWeek = null;
-                if (data.get().containsKey(JobProperty.DAY_OF_WEEK.key())) {
-                    dayOfWeek = DayOfWeek.valueOf(data.get().getProperty(JobProperty.DAY_OF_WEEK.key()));
-                }
-                String cronExpression = data.get().getProperty(JobProperty.CRON.key());
-                String configs = data.get().getProperty(JobProperty.CONFIGS.key());
-
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), this);
 
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
-                        .withData(data.get())
-                        .withJobType(jobType)
-                        .withStartDateTime(scheduleStart)
-                        .withDayOfMonth(dayOfMonth)
-                        .withHourOfDay(hourOfDay)
-                        .withMinuteOfHour(minuteOfHour)
-                        .withDayOfWeek(dayOfWeek)
-                        .withCronExpression(cronExpression)
-                        .withConfigs(configs);
+                        .withJobType(jobParam.getJobType())
+                        .withStartDateTime(jobParam.getScheduleStart().toLocalDate())
+                        .withDayOfMonth(jobParam.getDayOfMonth())
+                        .withHourOfDay(jobParam.getHourOfDay())
+                        .withMinuteOfHour(jobParam.getMinuteOfHour())
+                        .withDayOfWeek(jobParam.getDayOfWeek())
+                        .withCronExpression(jobParam.getCronExpression())
+                        .withConfigs(String.join(",", jobParam.getConfigs()));
                 jobHandler.scheduleUploadJob(builder, additionalJobParams);
                 logger.info("Job set up successfully.");
 

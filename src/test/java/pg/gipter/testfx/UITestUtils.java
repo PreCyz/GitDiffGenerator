@@ -2,6 +2,7 @@ package pg.gipter.testfx;
 
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.model.*;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SecurityService;
 
 import java.util.Set;
@@ -13,7 +14,8 @@ import static java.util.stream.Collectors.toSet;
 
 public final class UITestUtils {
 
-    private UITestUtils() { }
+    private UITestUtils() {
+    }
 
     public static Set<SharePointConfig> generateSharePointConfig(int size) {
         return Stream.generate(() -> {
@@ -33,7 +35,7 @@ public final class UITestUtils {
                 .collect(toSet());
     }
 
-    public static void generateAndSaveConfiguration(int spcSize) {
+    public static void generateConfigurationWithSPC(int spcSize) {
         Configuration configuration = new Configuration(
                 new ApplicationConfig(), new ToolkitConfig(), null, SecurityService.getInstance().generateCipherDetails()
         );
@@ -49,6 +51,22 @@ public final class UITestUtils {
     public static void generateDefaultConfig() {
         Configuration configuration = new Configuration(
                 new ApplicationConfig(), new ToolkitConfig(), null, SecurityService.getInstance().generateCipherDetails()
+        );
+        DaoFactory.getCachedConfiguration().saveConfiguration(configuration);
+    }
+
+    public static void generateSimpleConfigurations(int runConfigSize) {
+        Configuration configuration = new Configuration(
+                new ApplicationConfig(), new ToolkitConfig(), null, SecurityService.getInstance().generateCipherDetails()
+        );
+        configuration.setRunConfigs(
+                Stream.generate(() -> new RunConfigBuilder()
+                        .withConfigurationName(UUID.randomUUID().toString().substring(0, 8))
+                        .withItemType(ItemType.SIMPLE)
+                        .create()
+                )
+                        .limit(runConfigSize)
+                        .collect(toList())
         );
         DaoFactory.getCachedConfiguration().saveConfiguration(configuration);
     }

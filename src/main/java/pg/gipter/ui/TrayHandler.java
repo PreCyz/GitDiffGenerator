@@ -6,13 +6,12 @@ import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.DataDao;
+import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.jobs.JobHandler;
-import pg.gipter.jobs.upload.JobProperty;
-import pg.gipter.jobs.upload.UploadItemJob;
+import pg.gipter.jobs.upload.*;
 import pg.gipter.ui.job.JobController;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -21,8 +20,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.net.URL;
-import java.util.Optional;
-import java.util.Properties;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Executor;
 
 class TrayHandler {
@@ -30,11 +28,11 @@ class TrayHandler {
     private static final Logger logger = LoggerFactory.getLogger(TrayHandler.class);
 
     private ApplicationProperties applicationProperties;
-    private UILauncher uiLauncher;
+    private final UILauncher uiLauncher;
     private static TrayIcon trayIcon;
     private static PopupMenu trayPopupMenu;
-    private DataDao dataDao;
-    private Executor executor;
+    private final DataDao dataDao;
+    private final Executor executor;
 
     TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties, Executor executor) {
         this.uiLauncher = uiLauncher;
@@ -78,38 +76,43 @@ class TrayHandler {
     private void addMenuItemsToMenu(PopupMenu popupMenu) {
         executor.execute(() -> {
             JobHandler jobHandler = uiLauncher.getJobHandler();
-            Optional<Properties> data = dataDao.loadDataProperties();
-            if (data.isPresent()) {
+            ProgramData programData = dataDao.readProgramData();
+            if (programData.getJobParam() != null) {
+                JobParam jobParam = programData.getJobParam();
 
                 boolean addSeparator = false;
 
-                if (data.get().containsKey(DaoConstants.UPLOAD_DATE_TIME_KEY) && data.get().containsKey(DaoConstants.UPLOAD_STATUS_KEY)) {
+                if (programData.getLastUploadDateTime() != null && programData.getUploadStatus() != null) {
                     String uploadInfo = String.format("%s [%s]",
-                            data.get().getProperty(DaoConstants.UPLOAD_DATE_TIME_KEY),
-                            data.get().getProperty(DaoConstants.UPLOAD_STATUS_KEY)
+                            programData.getLastUploadDateTime().format(DateTimeFormatter.ISO_DATE_TIME),
+                            programData.getUploadStatus()
                     );
                     popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
                     addSeparator = true;
                 }
-                if (data.get().containsKey(JobProperty.NEXT_FIRE_DATE.key()) &&
-                        !StringUtils.nullOrEmpty(data.get().getProperty(JobProperty.NEXT_FIRE_DATE.key(), ""))) {
+                if (jobParam.getNextFireDate() != null) {
                     popupMenu.add(BundleUtils.getMsg(
                             "tray.item.nextUpdate",
-                            data.get().getProperty(JobProperty.NEXT_FIRE_DATE.key())
+                            jobParam.getNextFireDate().format(DateTimeFormatter.ISO_DATE_TIME)
                     ));
                     addSeparator = true;
                 }
 
-                if (data.get().containsKey(JobProperty.TYPE.key())) {
+                if (jobParam.getJobType() != null) {
                     Menu jobMenu = new Menu(
-                            String.format("%s %s", UploadItemJob.NAME, data.get().getProperty(JobProperty.TYPE.key()))
+                            String.format("%s %s", UploadItemJob.NAME, jobParam.getJobType())
                     );
-                    JobController.buildLabel(data.get(), JobProperty.DAY_OF_WEEK).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.DAY_OF_MONTH).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.SCHEDULE_START).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.CRON).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.CONFIGS).ifPresent(jobMenu::add);
+                    JobController.buildLabel(jobParam.getDayOfWeek().name(), JobProperty.DAY_OF_WEEK)
+                            .ifPresent(jobMenu::add);
+                    JobController.buildLabel(String.valueOf(jobParam.getHourOfDay()), JobProperty.HOUR_OF_THE_DAY)
+                            .ifPresent(jobMenu::add);
+                    JobController.buildLabel(String.valueOf(jobParam.getDayOfMonth()), JobProperty.DAY_OF_MONTH)
+                            .ifPresent(jobMenu::add);
+                    JobController.buildLabel(
+                            jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE_TIME), JobProperty.SCHEDULE_START)
+                            .ifPresent(jobMenu::add);
+                    JobController.buildLabel(jobParam.getCronExpression(), JobProperty.CRON).ifPresent(jobMenu::add);
+                    JobController.buildLabel(jobParam.getConfigsStr(), JobProperty.CONFIGS).ifPresent(jobMenu::add);
                     jobMenu.addSeparator();
 
                     MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));

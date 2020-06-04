@@ -143,9 +143,19 @@ public class BaseWindowObject {
         return getNode(passwordFields, id);
     }
 
+    protected RadioButton getRadioButton(String radioButtonId) {
+        final Set<RadioButton> radioButtons = robot.lookup(".radio-button").queryAllAs(RadioButton.class);
+        return getNode(radioButtons, radioButtonId);
+    }
+
     protected void clickHyperLink(String hyperlinkId) {
         final Hyperlink hyperLink = getHyperLink(hyperlinkId);
         robot.clickOn(hyperLink);
+    }
+
+    protected void clickOnRadioButton(String radioButtonId) {
+        RadioButton radioButton = getRadioButton(radioButtonId);
+        robot.clickOn(radioButton);
     }
 
 }

@@ -1,13 +1,16 @@
 package pg.gipter.jobs.upload;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.Properties;
+import java.time.*;
+import java.util.*;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 public class UploadItemJobBuilder {
-    private Properties data;
+    private JobParam jobParam;
     private JobType jobType;
     private LocalDate startDateTime;
+    private LocalDateTime nextFireDateTime;
     private int dayOfMonth;
     private int hourOfDay;
     private int minuteOfHour;
@@ -15,8 +18,8 @@ public class UploadItemJobBuilder {
     private String cronExpression;
     private String configs;
 
-    public UploadItemJobBuilder withData(Properties data) {
-        this.data = data;
+    public UploadItemJobBuilder withJobParam(JobParam jobParam) {
+        this.jobParam = jobParam;
         return this;
     }
 
@@ -27,6 +30,11 @@ public class UploadItemJobBuilder {
 
     public UploadItemJobBuilder withStartDateTime(LocalDate startDateTime) {
         this.startDateTime = startDateTime;
+        return this;
+    }
+
+    public UploadItemJobBuilder withNextFireDateTime(LocalDateTime nextFireDateTime) {
+        this.nextFireDateTime = nextFireDateTime;
         return this;
     }
 
@@ -61,6 +69,18 @@ public class UploadItemJobBuilder {
     }
 
     public UploadJobCreator createJobCreator() {
-        return new UploadJobCreator(data, jobType, startDateTime, dayOfMonth, hourOfDay, minuteOfHour, dayOfWeek, cronExpression, configs);
+        return new UploadJobCreator(jobParam, jobType, startDateTime, dayOfMonth, hourOfDay, minuteOfHour, dayOfWeek,
+                cronExpression, configs);
+    }
+
+    public JobParam createJobParam() {
+        Set<String> configSet = Optional.ofNullable(configs)
+                .map(s-> Stream.of(s.split(",")).collect(toSet()))
+                .orElseGet(Collections::emptySet);
+        LocalDateTime scheduleDateTime = Optional.ofNullable(startDateTime)
+                .map(s -> s.atTime(hourOfDay, minuteOfHour))
+                .orElseGet(() -> null);
+        return new JobParam(minuteOfHour, hourOfDay, dayOfMonth, dayOfWeek, cronExpression, jobType, scheduleDateTime,
+                nextFireDateTime, configSet);
     }
 }
