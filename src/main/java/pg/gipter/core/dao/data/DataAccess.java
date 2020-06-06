@@ -108,4 +108,9 @@ class DataAccess implements DataDao {
         writeToJson(programData);
     }
 
+    @Override
+    public void saveProgramData(ProgramData programData) {
+        writeToJson(programData);
+    }
+
 }

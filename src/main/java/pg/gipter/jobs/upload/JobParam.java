@@ -1,7 +1,6 @@
 package pg.gipter.jobs.upload;
 
-import java.time.DayOfWeek;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -15,14 +14,15 @@ public class JobParam {
     private DayOfWeek dayOfWeek;
     private String cronExpression;
     private JobType jobType;
-    private LocalDateTime scheduleStart;
+    private LocalDate scheduleStart;
     private LocalDateTime nextFireDate;
     private Set<String> configs;
 
     public JobParam() { }
 
     JobParam(int minuteOfHour, int hourOfDay, int dayOfMonth, DayOfWeek dayOfWeek, String cronExpression, JobType jobType,
-             LocalDateTime scheduleStart, LocalDateTime nextFireDate, Set<String> configs) {
+             LocalDate scheduleStart, LocalDateTime nextFireDate, Set<String> configs) {
+        this.minuteOfHour = minuteOfHour;
         this.hourOfDay = hourOfDay;
         this.dayOfMonth = dayOfMonth;
         this.dayOfWeek = dayOfWeek;
@@ -81,11 +81,11 @@ public class JobParam {
         this.jobType = jobType;
     }
 
-    public LocalDateTime getScheduleStart() {
+    public LocalDate getScheduleStart() {
         return scheduleStart;
     }
 
-    public void setScheduleStart(LocalDateTime scheduleStart) {
+    public void setScheduleStart(LocalDate scheduleStart) {
         this.scheduleStart = scheduleStart;
     }
 

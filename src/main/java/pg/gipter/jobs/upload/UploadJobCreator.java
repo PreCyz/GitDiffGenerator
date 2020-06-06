@@ -53,7 +53,7 @@ public class UploadJobCreator {
         clearProperties();
         jobParam.setJobType(JobType.EVERY_MONTH);
         jobParam.setDayOfMonth(dayOfMonth);
-        jobParam.setScheduleStart(startDateTime.atStartOfDay());
+        jobParam.setScheduleStart(startDateTime);
         jobParam.setHourOfDay(hourOfDay);
         jobParam.setMinuteOfHour(minuteOfHour);
         jobParam.setConfigsStr(configs);
@@ -71,7 +71,7 @@ public class UploadJobCreator {
         jobParam.setJobType(JobType.EVERY_2_WEEKS);
         jobParam.setHourOfDay(hourOfDay);
         jobParam.setMinuteOfHour(minuteOfHour);
-        jobParam.setScheduleStart(startDateTime.atStartOfDay());
+        jobParam.setScheduleStart(startDateTime);
         jobParam.setConfigsStr(configs);
 
         int second = 0;
@@ -105,7 +105,7 @@ public class UploadJobCreator {
         jobParam.setJobType(JobType.EVERY_WEEK);
         jobParam.setDayOfWeek(dayOfWeek);
         jobParam.setHourOfDay(hourOfDay);
-        jobParam.setScheduleStart(LocalDate.now().atStartOfDay());
+        jobParam.setScheduleStart(LocalDate.now());
         jobParam.setConfigsStr(configs);
 
         //0 0 12 ? * FRI - Every Friday at noon

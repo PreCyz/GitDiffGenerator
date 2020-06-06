@@ -77,10 +77,8 @@ public class UploadItemJobBuilder {
         Set<String> configSet = Optional.ofNullable(configs)
                 .map(s-> Stream.of(s.split(",")).collect(toSet()))
                 .orElseGet(Collections::emptySet);
-        LocalDateTime scheduleDateTime = Optional.ofNullable(startDateTime)
-                .map(s -> s.atTime(hourOfDay, minuteOfHour))
-                .orElseGet(() -> null);
-        return new JobParam(minuteOfHour, hourOfDay, dayOfMonth, dayOfWeek, cronExpression, jobType, scheduleDateTime,
+        LocalDate scheduleDate = Optional.ofNullable(startDateTime).orElseGet(() -> null);
+        return new JobParam(minuteOfHour, hourOfDay, dayOfMonth, dayOfWeek, cronExpression, jobType, scheduleDate,
                 nextFireDateTime, configSet);
     }
 }

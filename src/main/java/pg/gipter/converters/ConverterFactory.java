@@ -11,7 +11,8 @@ public final class ConverterFactory {
     public static List<Converter> getConverters() {
         return Stream.of(
                 new ItemTypeConverter(),
-                new SecurityConverter()
+                new SecurityConverter(),
+                new ProgramDataConverter()
         ).collect(Collectors.toList());
     }
 }

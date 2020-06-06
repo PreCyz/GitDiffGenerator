@@ -11,7 +11,7 @@ public enum JobProperty {
     NEXT_FIRE_DATE("job.nextUploadDateTime"),
     CONFIGS("job.configurationNames");
 
-    private String value;
+    private final String value;
 
     JobProperty(String value) {
         this.value = value;

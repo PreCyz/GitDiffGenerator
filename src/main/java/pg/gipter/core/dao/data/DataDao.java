@@ -14,4 +14,5 @@ public interface DataDao {
     void saveUploadStatus(UploadStatus uploadStatus);
     void saveNextUploadDateTime(LocalDateTime nextUploadDateTime);
     void removeJobParam();
+    void saveProgramData(ProgramData programData);
 }
