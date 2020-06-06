@@ -6,16 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.jobs.upload.JobParam;
-import pg.gipter.jobs.upload.JobProperty;
 import pg.gipter.jobs.upload.json.LocalDateTimeAdapter;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import java.util.Properties;
 
 class DataAccess implements DataDao {
 
@@ -31,57 +28,6 @@ class DataAccess implements DataDao {
 
     static DataAccess getInstance() {
         return DataAccessHolder.INSTANCE;
-    }
-
-    public Optional<Properties> loadDataProperties() {
-        Properties properties;
-
-        try (InputStream fis = new FileInputStream(DaoConstants.DATA_PROPERTIES);
-             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-             BufferedReader reader = new BufferedReader(isr)
-        ) {
-            properties = new Properties();
-            properties.load(reader);
-        } catch (IOException | NullPointerException e) {
-            logger.warn("Error when loading {}. Exception message is: {}", DaoConstants.DATA_PROPERTIES, e.getMessage());
-            properties = null;
-        }
-        return Optional.ofNullable(properties);
-    }
-
-    void saveProperties(Properties properties) {
-        try (OutputStream os = new FileOutputStream(DaoConstants.DATA_PROPERTIES);
-             Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
-        ) {
-            properties.store(writer, null);
-            logger.info("File {} saved.", DaoConstants.DATA_PROPERTIES);
-        } catch (IOException | NullPointerException e) {
-            logger.error("Error when saving {}.", DaoConstants.DATA_PROPERTIES, e);
-        }
-    }
-
-    public void saveUploadStatus(String status) {
-        Properties data = loadDataProperties().orElseGet(Properties::new);
-        data.put(DaoConstants.UPLOAD_DATE_TIME_KEY, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        data.put(DaoConstants.UPLOAD_STATUS_KEY, status);
-        saveProperties(data);
-    }
-
-    public void saveNextUpload(String nextUploadDateTime) {
-        Properties data = loadDataProperties().orElseGet(Properties::new);
-        data.put(JobProperty.NEXT_FIRE_DATE.key(), nextUploadDateTime);
-        saveProperties(data);
-    }
-
-    public void saveDataProperties(Properties properties) {
-        try (OutputStream os = new FileOutputStream(DaoConstants.DATA_PROPERTIES);
-             Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
-        ) {
-            properties.store(writer, null);
-            logger.info("File {} saved.", DaoConstants.DATA_PROPERTIES);
-        } catch (IOException | NullPointerException e) {
-            logger.error("Error when saving {}.", DaoConstants.DATA_PROPERTIES, e);
-        }
     }
 
     @Override
@@ -134,7 +80,7 @@ class DataAccess implements DataDao {
         } catch (IOException e) {
             logger.error("Error when writing {}. Exception message is: {}",
                     DaoConstants.DATA_JSON, e.getMessage());
-            throw new IllegalArgumentException("Error when writing jobParam into json.");
+            throw new IllegalArgumentException("Error when writing program data into json.");
         }
     }
 

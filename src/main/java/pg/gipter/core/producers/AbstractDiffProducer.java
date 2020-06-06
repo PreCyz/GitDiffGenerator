@@ -3,17 +3,15 @@ package pg.gipter.core.producers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.producers.command.DiffCommand;
-import pg.gipter.core.producers.command.DiffCommandFactory;
-import pg.gipter.core.producers.command.VersionControlSystem;
+import pg.gipter.core.dao.command.CustomCommand;
+import pg.gipter.core.dao.command.CustomCommandDao;
+import pg.gipter.core.producers.command.*;
 import pg.gipter.core.producers.vcs.VCSVersionProducer;
 import pg.gipter.core.producers.vcs.VCSVersionProducerFactory;
 
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 abstract class AbstractDiffProducer implements DiffProducer {
 
@@ -44,10 +42,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
                     updateRepositories(projectPath, diffCommand);
                 }
 
-                List<String> cmd = diffCommand.commandAsList();
-                logger.info("{} command: {}", vcs.name(), String.join(" ", cmd));
-                cmd = getFullCommand(cmd);
-                logger.info("Platform full command: {}", String.join(" ", cmd));
+                List<String> cmd = calculateCommand(diffCommand, vcs);
 
                 writeItemToFile(fw, projectPath, cmd);
                 vcsSet.add(vcs);
@@ -66,6 +61,23 @@ abstract class AbstractDiffProducer implements DiffProducer {
             logger.error("Error when producing diff.", ex);
             throw new IllegalArgumentException(ex.getMessage(), ex);
         }
+    }
+
+    protected List<String> calculateCommand(DiffCommand diffCommand, VersionControlSystem vcs) {
+        List<String> cmd;
+        final Optional<CustomCommand> customCommand = CustomCommandDao.readCustomCommand();
+        if (customCommand.isPresent() && customCommand.get().containsCommand(vcs)) {
+            logger.info("Custom command is used.");
+            cmd = customCommand.get().fullCommand(applicationProperties);
+            logger.info("{} command: {}", vcs.name(), String.join(" ", cmd));
+        } else {
+            cmd = diffCommand.commandAsList();
+            logger.info("{} command: {}", vcs.name(), String.join(" ", cmd));
+            cmd = getFullCommand(cmd);
+        }
+
+        logger.info("Platform full command: {}", String.join(" ", cmd));
+        return cmd;
     }
 
     private void updateRepositories(String projectPath, DiffCommand diffCommand) throws IOException {
