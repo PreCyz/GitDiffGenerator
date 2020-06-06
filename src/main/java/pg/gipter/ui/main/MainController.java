@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
@@ -544,7 +545,7 @@ public class MainController extends AbstractController {
         ).toArray(String[]::new));
 
         FXMultiRunner runner = new FXMultiRunner(
-                Stream.of(uiAppProperties).collect(Collectors.toList()),
+                Stream.of(uiAppProperties).collect(toList()),
                 uiLauncher.nonUIExecutor(),
                 RunType.EXECUTE
         );
@@ -824,9 +825,11 @@ public class MainController extends AbstractController {
             Task<Void> task = new Task<>() {
                 @Override
                 public Void call() {
-                    RunConfig runConfigFromUI = createRunConfigFromUI();
-                    ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(runConfigFromUI.toArgumentArray());
-                    boolean hasProperCredentials = new ToolkitService(uiAppProps).hasProperCredentials();
+                    final List<String> arguments = Stream.of(createToolkitConfigFromUI().toArgumentArray()).collect(toList());
+                    arguments.add(ArgName.preferredArgSource.name() + "=" + ArgName.preferredArgSource.defaultValue());
+                    arguments.add(ArgName.useUI.name() + "=N");
+                    final ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(arguments.toArray(String[]::new));
+                    boolean hasProperCredentials = new ToolkitService(instance).hasProperCredentials();
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
                     if (hasProperCredentials) {
                         alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
