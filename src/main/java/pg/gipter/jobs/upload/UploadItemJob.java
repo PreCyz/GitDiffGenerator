@@ -69,10 +69,10 @@ public class UploadItemJob implements Job {
     }
 
     private void calculateDates(JobDataMap jobDataMap) throws JobExecutionException {
-        JobType jobType = JobType.valueOf(jobDataMap.getString(JobProperty.TYPE.key()));
+        final JobParam jobParam = (JobParam) jobDataMap.get(JobParam.class.getSimpleName());
         startDate = LocalDate.now();
         nextUploadDate = LocalDateTime.now();
-        switch (jobType) {
+        switch (jobParam.getJobType()) {
             case EVERY_WEEK:
                 startDate = startDate.minusDays(7);
                 nextUploadDate = nextUploadDate.plusDays(7);
@@ -87,11 +87,10 @@ public class UploadItemJob implements Job {
                 break;
             case CRON:
                 CronExpression cronExpression;
-                String cronString = jobDataMap.getString(JobProperty.CRON.key());
                 try {
-                    cronExpression = new CronExpression(cronString);
+                    cronExpression = new CronExpression(jobParam.getCronExpression());
                 } catch (ParseException e) {
-                    throw new JobExecutionException(String.format("Invalid cron expression [%s]", cronString));
+                    throw new JobExecutionException(String.format("Invalid cron expression [%s]", jobParam.getCronExpression()));
                 }
                 Date now = new Date(System.currentTimeMillis());
                 Date nextValidTimeAfter = cronExpression.getNextValidTimeAfter(now);

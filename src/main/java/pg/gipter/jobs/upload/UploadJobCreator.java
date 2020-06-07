@@ -99,8 +99,6 @@ public class UploadJobCreator {
     }
 
     private Trigger createTriggerEveryWeek() {
-        String hourOfThDay = String.format("%s:%s", hourOfDay, minuteOfHour);
-
         clearProperties();
         jobParam.setJobType(JobType.EVERY_WEEK);
         jobParam.setDayOfWeek(dayOfWeek);
@@ -108,18 +106,9 @@ public class UploadJobCreator {
         jobParam.setScheduleStart(LocalDate.now());
         jobParam.setConfigsStr(configs);
 
-        //0 0 12 ? * FRI - Every Friday at noon
-        /*String cronExpr = "0" + " " +
-                minuteOfHour + " " +
-                hourOfDay + " " +
-                "? " +
-                "* " +
-                dayOfWeek.name().substring(0, 3);
-        CronExpression expression = new CronExpression(cronExpr);*/
         return newTrigger()
                 .withIdentity(EVERY_WEEK_TRIGGER_KEY)
                 .startNow()
-                //.withSchedule(CronScheduleBuilder.cronSchedule(expression))
                 .withSchedule(CronScheduleBuilder.weeklyOnDayAndHourAndMinute(
                         convertToDateBuilder(dayOfWeek), hourOfDay, minuteOfHour)
                 )
@@ -176,20 +165,17 @@ public class UploadJobCreator {
         switch (jobType) {
             case CRON:
                 trigger = createCronTrigger();
-                jobDetail = createJobDetail();
                 break;
             case EVERY_MONTH:
                 trigger = createTriggerEveryMonth();
-                jobDetail = createJobDetail();
                 break;
             case EVERY_2_WEEKS:
                 trigger = createTriggerEvery2Weeks();
-                jobDetail = createJobDetail();
                 break;
-            default:
+            case EVERY_WEEK:
                 trigger = createTriggerEveryWeek();
-                jobDetail = createJobDetail();
         }
+        jobDetail = createJobDetail();
     }
 
     public JobParam getJobParam() {
