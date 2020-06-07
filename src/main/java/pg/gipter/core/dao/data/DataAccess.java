@@ -6,11 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.jobs.upload.JobParam;
+import pg.gipter.jobs.upload.json.LocalDateAdapter;
 import pg.gipter.jobs.upload.json.LocalDateTimeAdapter;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -44,6 +46,7 @@ class DataAccess implements DataDao {
         }
         final Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter().nullSafe())
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe())
                 .create();
         ProgramData programData = new ProgramData();
         try (InputStream fis = new FileInputStream(DaoConstants.DATA_JSON);
@@ -69,6 +72,8 @@ class DataAccess implements DataDao {
     private void writeToJson(ProgramData programData) {
         final Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter().nullSafe())
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter().nullSafe())
+                .setPrettyPrinting()
                 .create();
         String json = gson.toJson(programData, ProgramData.class);
         try (OutputStream os = new FileOutputStream(DaoConstants.DATA_JSON);

@@ -308,7 +308,7 @@ public class UILauncher implements Launcher {
 
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
                         .withJobType(jobParam.getJobType())
-                        .withStartDateTime(jobParam.getScheduleStart())
+                        .withStartDate(jobParam.getScheduleStart())
                         .withDayOfMonth(jobParam.getDayOfMonth())
                         .withHourOfDay(jobParam.getHourOfDay())
                         .withMinuteOfHour(jobParam.getMinuteOfHour())

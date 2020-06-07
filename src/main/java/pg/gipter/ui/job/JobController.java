@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.ProgramData;
@@ -96,15 +97,7 @@ public class JobController extends AbstractController {
     }
 
     private void setInitValues() {
-        dayNameComboBox.setItems(FXCollections.observableList(new ArrayList<>(EnumSet.allOf(DayOfWeek.class))));
-        dayNameComboBox.setValue(DayOfWeek.FRIDAY);
-        dayOfMonthComboBox.setItems(FXCollections.observableList(IntStream.range(1, 29).boxed().collect(toList())));
-        dayOfMonthComboBox.setValue(dayOfMonthComboBox.getItems().get(0));
-        hourOfDayComboBox.setItems(FXCollections.observableList(IntStream.range(7, 18).boxed().collect(toList())));
-        hourOfDayComboBox.setValue(hourOfDayComboBox.getItems().get(0));
-        minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
-        minuteComboBox.setValue(minuteComboBox.getItems().get(0));
-        startDatePicker.setValue(LocalDate.now());
+        initValues();
         runConfigMap = applicationProperties.getRunConfigMap();
         if (!runConfigMap.isEmpty() && !runConfigMap.containsKey(ArgName.configurationName.defaultValue())) {
             ObservableList<String> items = FXCollections.observableArrayList(runConfigMap.keySet());
@@ -120,22 +113,38 @@ public class JobController extends AbstractController {
             setDefinedJobDetails(jobParam);
             setExecutionDetails(programData);
         } else {
-            lastExecutionLabel.setText("");
-            nextExecutionLabel.setText("");
             jobTypeLabel.setText(JobType.EVERY_WEEK.name());
-            jobDetailsLabel.setText(String.format("SCHEDULE_START: %s%nDAY_OF_WEEK: %s%nHOUR_OF_THE_DAY: %s",
+            everyWeekSwitch();
+            jobDetailsLabel.setText(String.format("%s: %s%n%s: %s%n%s: %s",
+                    JobProperty.SCHEDULE_START,
                     LocalDate.now().format(DateTimeFormatter.ISO_DATE),
+                    JobProperty.DAY_OF_WEEK,
                     DayOfWeek.FRIDAY.name(),
+                    JobProperty.HOUR_OF_THE_DAY,
                     LocalTime.of(hourOfDayComboBox.getValue(), minuteComboBox.getValue())
                             .format(DateTimeFormatter.ofPattern("H:mm"))
             ));
+            lastExecutionLabel.setText("");
+            nextExecutionLabel.setText("");
         }
+    }
+
+    private void initValues() {
+        dayNameComboBox.setItems(FXCollections.observableList(new ArrayList<>(EnumSet.allOf(DayOfWeek.class))));
+        dayNameComboBox.setValue(DayOfWeek.FRIDAY);
+        dayOfMonthComboBox.setItems(FXCollections.observableList(IntStream.range(1, 29).boxed().collect(toList())));
+        dayOfMonthComboBox.setValue(dayOfMonthComboBox.getItems().get(0));
+        hourOfDayComboBox.setItems(FXCollections.observableList(IntStream.range(7, 18).boxed().collect(toList())));
+        hourOfDayComboBox.setValue(hourOfDayComboBox.getItems().get(0));
+        minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
+        minuteComboBox.setValue(minuteComboBox.getItems().get(0));
+        startDatePicker.setValue(LocalDate.now());
     }
 
     private void setExecutionDetails(ProgramData programData) {
         if (programData.getUploadStatus() != null && programData.getLastUploadDateTime() != null) {
             String uploadInfo = String.format("%s [%s]",
-                    programData.getLastUploadDateTime(),
+                    programData.getLastUploadDateTime().format(DaoConstants.DATE_TIME_FORMATTER),
                     programData.getUploadStatus().name()
             );
             lastExecutionLabel.setText(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
@@ -144,7 +153,7 @@ public class JobController extends AbstractController {
         if (jobParam.getNextFireDate() != null) {
             nextExecutionLabel.setText(BundleUtils.getMsg(
                     "tray.item.nextUpdate",
-                    jobParam.getNextFireDate().format(DateTimeFormatter.ISO_DATE_TIME)
+                    jobParam.getNextFireDate().format(DaoConstants.DATE_TIME_FORMATTER)
             ));
         }
     }
@@ -153,44 +162,54 @@ public class JobController extends AbstractController {
         if (jobParam.getJobType() != null) {
             cancelJobButton.setVisible(true);
             jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
-            jobTypeLabel.setText(jobParam.getJobType().name());
-            String details;
-            if (jobParam.getJobType() == JobType.CRON) {
-                details = BundleUtils.getMsg("job.cron.expression", jobParam.getCronExpression());
-            } else {
-                details = buildLabel(
-                        jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE_TIME),
-                        JobProperty.SCHEDULE_START
-                ).map(value -> value + "\n")
-                        .orElse("");
-                details += buildLabel(String.valueOf(jobParam.getDayOfMonth()), JobProperty.DAY_OF_MONTH)
-                        .map(value -> value + "\n")
-                        .orElse("");
-                details += buildLabel(jobParam.getDayOfWeek().name(), JobProperty.DAY_OF_WEEK)
-                        .map(value -> value + "\n")
-                        .orElse("");
-                details += buildLabel(String.valueOf(jobParam.getHourOfDay()), JobProperty.HOUR_OF_THE_DAY)
-                        .orElse("");
+            updateJobDetails(jobParam);
+            switch (jobParam.getJobType()) {
+                case EVERY_MONTH:
+                    everyMonthRadioButton.setSelected(true);
+                    hourOfDayComboBox.setValue(jobParam.getHourOfDay());
+                    minuteComboBox.setValue(jobParam.getMinuteOfHour());
+                    startDatePicker.setValue(jobParam.getScheduleStart());
+                    dayOfMonthComboBox.setValue(jobParam.getDayOfMonth());
+
+                    everyMonthSwitch();
+                    break;
+                case EVERY_2_WEEKS:
+                    every2WeeksRadioButton.setSelected(true);
+                    hourOfDayComboBox.setValue(jobParam.getHourOfDay());
+                    minuteComboBox.setValue(jobParam.getMinuteOfHour());
+                    startDatePicker.setValue(jobParam.getScheduleStart());
+
+                    every2WeeksSwitch();
+                    break;
+                case EVERY_WEEK:
+                    everyWeekRadioButton.setSelected(true);
+                    hourOfDayComboBox.setValue(jobParam.getHourOfDay());
+                    minuteComboBox.setValue(jobParam.getMinuteOfHour());
+                    startDatePicker.setValue(jobParam.getScheduleStart());
+                    dayNameComboBox.setValue(jobParam.getDayOfWeek());
+
+                    everyWeekSwitch();
+                    break;
             }
-            jobDetailsLabel.setText(details);
-            configsLabel.setText(jobParam.getConfigsStr());
         }
     }
 
-    public static Optional<String> buildLabel(String value, JobProperty key) {
-        if (value != null) {
-            if (key == JobProperty.HOUR_OF_THE_DAY) {
-                String minuetOfHour = value.substring(value.indexOf(":") + 1);
-                if (minuetOfHour.length() == 1) {
-                    value = value.substring(0, value.indexOf(":") + 1) + "0" + minuetOfHour;
-                }
-            }
-            if (value.length() == 1 && Character.isDigit(value.charAt(0))) {
-                value = "0" + value;
-            }
-            return Optional.of(String.format("%s: %s", key, value));
-        }
-        return Optional.empty();
+    private void everyMonthSwitch() {
+        startDatePicker.setDisable(true);
+        dayNameComboBox.setDisable(true);
+        dayOfMonthComboBox.setDisable(false);
+    }
+
+    private void every2WeeksSwitch() {
+        startDatePicker.setDisable(false);
+        dayNameComboBox.setDisable(true);
+        dayOfMonthComboBox.setDisable(true);
+    }
+
+    private void everyWeekSwitch() {
+        startDatePicker.setDisable(true);
+        dayNameComboBox.setDisable(false);
+        dayOfMonthComboBox.setDisable(true);
     }
 
     private void setActions() {
@@ -205,6 +224,7 @@ public class JobController extends AbstractController {
         return event -> {
             uiLauncher.cancelJob();
             setDefaultsForJobDetailsControls();
+            initValues();
         };
     }
 
@@ -227,8 +247,6 @@ public class JobController extends AbstractController {
     private void setProperties() {
         startDatePicker.setConverter(startDateConverter());
         startDatePicker.setDayCellFactory(datePickerDateCellCallback());
-        startDatePicker.setDisable(true);
-        dayOfMonthComboBox.setDisable(true);
         scheduleButton.setDisable(runConfigMap.isEmpty());
     }
 
@@ -244,28 +262,52 @@ public class JobController extends AbstractController {
 
     private EventHandler<ActionEvent> everyMonthAction() {
         return event -> {
-            startDatePicker.setDisable(true);
-            dayNameComboBox.setDisable(true);
-            dayOfMonthComboBox.setDisable(false);
+            everyMonthSwitch();
             jobTypeLabel.setText(JobType.EVERY_MONTH.name());
+            UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                    .withJobType(JobType.EVERY_MONTH)
+                    .withStartDate(startDatePicker.getValue())
+                    .withDayOfMonth(dayOfMonthComboBox.getValue())
+                    .withHourOfDay(hourOfDayComboBox.getValue())
+                    .withMinuteOfHour(minuteComboBox.getValue())
+                    .withDayOfWeek(dayNameComboBox.getValue())
+                    .withCronExpression(cronExpressionTextField.getText())
+                    .withConfigs(configsLabel.getText());
+            updateJobDetails(builder.createJobParam());
         };
     }
 
     private EventHandler<ActionEvent> every2WeeksActionEvent() {
         return event -> {
-            startDatePicker.setDisable(false);
-            dayNameComboBox.setDisable(true);
-            dayOfMonthComboBox.setDisable(true);
+            every2WeeksSwitch();
             jobTypeLabel.setText(JobType.EVERY_2_WEEKS.name());
+            UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                    .withJobType(JobType.EVERY_2_WEEKS)
+                    .withStartDate(startDatePicker.getValue())
+                    .withDayOfMonth(dayOfMonthComboBox.getValue())
+                    .withHourOfDay(hourOfDayComboBox.getValue())
+                    .withMinuteOfHour(minuteComboBox.getValue())
+                    .withDayOfWeek(dayNameComboBox.getValue())
+                    .withCronExpression(cronExpressionTextField.getText())
+                    .withConfigs(configsLabel.getText());
+            updateJobDetails(builder.createJobParam());
         };
     }
 
     private EventHandler<ActionEvent> everyWeekActionEvent() {
         return event -> {
-            startDatePicker.setDisable(true);
-            dayNameComboBox.setDisable(false);
-            dayOfMonthComboBox.setDisable(true);
+            everyWeekSwitch();
             jobTypeLabel.setText(JobType.EVERY_WEEK.name());
+            UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                    .withJobType(JobType.EVERY_WEEK)
+                    .withStartDate(startDatePicker.getValue())
+                    .withDayOfMonth(dayOfMonthComboBox.getValue())
+                    .withHourOfDay(hourOfDayComboBox.getValue())
+                    .withMinuteOfHour(minuteComboBox.getValue())
+                    .withDayOfWeek(dayNameComboBox.getValue())
+                    .withCronExpression(cronExpressionTextField.getText())
+                    .withConfigs(configsLabel.getText());
+            updateJobDetails(builder.createJobParam());
         };
     }
 
@@ -286,22 +328,13 @@ public class JobController extends AbstractController {
     private EventHandler<ActionEvent> scheduleJobActionEvent() {
         return event -> {
             try {
-                JobType jobType = JobType.EVERY_WEEK;
-                if (!StringUtils.nullOrEmpty(cronExpressionTextField.getText())) {
-                    jobType = JobType.CRON;
-                } else if (everyMonthRadioButton.isSelected()) {
-                    jobType = JobType.EVERY_MONTH;
-                } else if (every2WeeksRadioButton.isSelected()) {
-                    jobType = JobType.EVERY_2_WEEKS;
-                }
-
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), uiLauncher);
                 JobParam jobParam = dataDao.loadJobParam().orElseGet(JobParam::new);
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
                         .withJobParam(jobParam)
-                        .withJobType(jobType)
-                        .withStartDateTime(startDatePicker.getValue())
+                        .withJobType(calculateJobType())
+                        .withStartDate(startDatePicker.getValue())
                         .withDayOfMonth(dayOfMonthComboBox.getValue())
                         .withHourOfDay(hourOfDayComboBox.getValue())
                         .withMinuteOfHour(minuteComboBox.getValue())
@@ -330,6 +363,18 @@ public class JobController extends AbstractController {
         };
     }
 
+    private JobType calculateJobType() {
+        JobType jobType = JobType.EVERY_WEEK;
+        if (!StringUtils.nullOrEmpty(cronExpressionTextField.getText())) {
+            jobType = JobType.CRON;
+        } else if (everyMonthRadioButton.isSelected()) {
+            jobType = JobType.EVERY_MONTH;
+        } else if (every2WeeksRadioButton.isSelected()) {
+            jobType = JobType.EVERY_2_WEEKS;
+        }
+        return jobType;
+    }
+
     private void setListeners() {
         configurationNameComboBox.getSelectionModel()
                 .selectedItemProperty()
@@ -349,42 +394,125 @@ public class JobController extends AbstractController {
         dayNameComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((observableValue, dayOfWeek, newDayOfWeek) -> {
-                    if (cronExpressionTextField.getText().isEmpty()) {
-                        final String jobDetails = String.format("SCHEDULE_START: %s%nDAY_OF_WEEK: %s%nHOUR_OF_THE_DAY: %d:%02d",
-                                startDatePicker.getValue().format(DateTimeFormatter.ISO_DATE),
-                                newDayOfWeek.name(),
-                                hourOfDayComboBox.getValue(),
-                                minuteComboBox.getValue()
-                        );
-                        jobDetailsLabel.setText(jobDetails);
-                    }
+                    UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                            .withJobType(calculateJobType())
+                            .withStartDate(startDatePicker.getValue())
+                            .withDayOfMonth(dayOfMonthComboBox.getValue())
+                            .withHourOfDay(hourOfDayComboBox.getValue())
+                            .withMinuteOfHour(minuteComboBox.getValue())
+                            .withDayOfWeek(newDayOfWeek)
+                            .withCronExpression(cronExpressionTextField.getText())
+                            .withConfigs(configsLabel.getText());
+                    updateJobDetails(builder.createJobParam());
                 });
         hourOfDayComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((observableValue, hourOfDay, newHourOfDay) -> {
-                    if (cronExpressionTextField.getText().isEmpty()) {
-                        final String jobDetails = String.format("SCHEDULE_START: %s%nDAY_OF_WEEK: %s%nHOUR_OF_THE_DAY: %d:%02d",
-                                startDatePicker.getValue().format(DateTimeFormatter.ISO_DATE),
-                                dayNameComboBox.getValue().name(),
-                                newHourOfDay,
-                                minuteComboBox.getValue()
-                        );
-                        jobDetailsLabel.setText(jobDetails);
-                    }
+                    UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                            .withJobType(calculateJobType())
+                            .withStartDate(startDatePicker.getValue())
+                            .withDayOfMonth(dayOfMonthComboBox.getValue())
+                            .withHourOfDay(newHourOfDay)
+                            .withMinuteOfHour(minuteComboBox.getValue())
+                            .withDayOfWeek(dayNameComboBox.getValue())
+                            .withCronExpression(cronExpressionTextField.getText())
+                            .withConfigs(configsLabel.getText());
+                    updateJobDetails(builder.createJobParam());
                 });
         minuteComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((observableValue, minute, newMinute) -> {
-                    if (cronExpressionTextField.getText().isEmpty()) {
-                        final String jobDetails = String.format("SCHEDULE_START: %s%nDAY_OF_WEEK: %s%nHOUR_OF_THE_DAY: %d:%02d",
-                                startDatePicker.getValue().format(DateTimeFormatter.ISO_DATE),
-                                dayNameComboBox.getValue().name(),
-                                hourOfDayComboBox.getValue(),
-                                newMinute
-                        );
-                        jobDetailsLabel.setText(jobDetails);
-                    }
+                    UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                            .withJobType(calculateJobType())
+                            .withStartDate(startDatePicker.getValue())
+                            .withDayOfMonth(dayOfMonthComboBox.getValue())
+                            .withHourOfDay(hourOfDayComboBox.getValue())
+                            .withMinuteOfHour(newMinute)
+                            .withDayOfWeek(dayNameComboBox.getValue())
+                            .withCronExpression(cronExpressionTextField.getText())
+                            .withConfigs(configsLabel.getText());
+                    updateJobDetails(builder.createJobParam());
                 });
+        startDatePicker.valueProperty()
+                .addListener((observableValue, localDate, newLocalDate) -> {
+                    UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                            .withJobType(calculateJobType())
+                            .withStartDate(newLocalDate)
+                            .withDayOfMonth(dayOfMonthComboBox.getValue())
+                            .withHourOfDay(hourOfDayComboBox.getValue())
+                            .withMinuteOfHour(minuteComboBox.getValue())
+                            .withDayOfWeek(dayNameComboBox.getValue())
+                            .withCronExpression(cronExpressionTextField.getText())
+                            .withConfigs(configsLabel.getText());
+                    updateJobDetails(builder.createJobParam());
+                });
+        dayOfMonthComboBox.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((observableValue, oldDayOfMonth, newDayOfMonth) -> {
+                    UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                            .withJobType(calculateJobType())
+                            .withStartDate(startDatePicker.getValue())
+                            .withDayOfMonth(newDayOfMonth)
+                            .withHourOfDay(hourOfDayComboBox.getValue())
+                            .withMinuteOfHour(minuteComboBox.getValue())
+                            .withDayOfWeek(dayNameComboBox.getValue())
+                            .withCronExpression(cronExpressionTextField.getText())
+                            .withConfigs(configsLabel.getText());
+                    updateJobDetails(builder.createJobParam());
+                });
+    }
+
+    private void updateJobDetails(JobParam jobParam) {
+        String details = calculateDetails(jobParam);
+        jobTypeLabel.setText(jobParam.getJobType().name());
+        configsLabel.setText(jobParam.getConfigsStr());
+        jobDetailsLabel.setText(details);
+    }
+
+    private static String calculateDetails(JobParam jobParam) {
+        String details = "";
+        switch (jobParam.getJobType()) {
+            case CRON:
+                details = String.format("%s: %s", JobProperty.CRON, jobParam.getCronExpression());
+                break;
+            case EVERY_WEEK:
+                details = String.format("%s: %s%n%s: %s%n%s: %d:%02d",
+                        JobProperty.SCHEDULE_START,
+                        jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE),
+                        JobProperty.DAY_OF_WEEK,
+                        jobParam.getDayOfWeek(),
+                        JobProperty.HOUR_OF_THE_DAY,
+                        jobParam.getHourOfDay(),
+                        jobParam.getMinuteOfHour()
+                );
+                break;
+            case EVERY_2_WEEKS:
+                details = String.format("%s: %s%n%s: %d:%02d",
+                        JobProperty.SCHEDULE_START,
+                        jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE),
+                        JobProperty.HOUR_OF_THE_DAY,
+                        jobParam.getHourOfDay(),
+                        jobParam.getMinuteOfHour()
+                );
+                break;
+            case EVERY_MONTH:
+                details = String.format("%s: %s%n%s: %s%n%s: %d:%02d",
+                        JobProperty.SCHEDULE_START,
+                        jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE),
+                        JobProperty.DAY_OF_MONTH,
+                        jobParam.getDayOfMonth(),
+                        JobProperty.HOUR_OF_THE_DAY,
+                        jobParam.getHourOfDay(),
+                        jobParam.getMinuteOfHour()
+                );
+                break;
+        }
+        return details;
+    }
+
+    public static LinkedList<String> jobTrayLabels(JobParam jobParam) {
+        final String details = calculateDetails(jobParam);
+        return Stream.of(details.split("\n")).collect(toCollection(LinkedList::new));
     }
 
 }

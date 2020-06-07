@@ -7,13 +7,14 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.producers.command.VersionControlSystem;
-import pg.gipter.jobs.upload.json.LocalDateTimeAdapter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +33,7 @@ class CustomCommandDaoTest {
 
     private void writeToFile(CustomCommand customCommand) {
         final Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter().nullSafe())
+                .setPrettyPrinting()
                 .create();
         String json = gson.toJson(customCommand, CustomCommand.class);
         try (OutputStream os = new FileOutputStream(DaoConstants.CUSTOM_COMMAND_JSON);
@@ -49,6 +50,7 @@ class CustomCommandDaoTest {
         CustomCommand customCommand = new CustomCommand();
         customCommand.setVcs(VersionControlSystem.SVN);
         customCommand.setCommand("git log");
+        customCommand.setCommandList(Arrays.asList("git","log"));
 
         writeToFile(customCommand);
 
@@ -59,12 +61,15 @@ class CustomCommandDaoTest {
 
     @Test
     void givenNotExistingFile_whenReadCustomCommand_thenReturnEmptyOptional() {
-        CustomCommand customCommand = new CustomCommand();
-        customCommand.setVcs(VersionControlSystem.SVN);
-        customCommand.setCommand("git log");
-
         final Optional<CustomCommand> actual = CustomCommandDao.readCustomCommand();
 
         assertThat(actual.isPresent()).isFalse();
+    }
+
+    @Test
+    void name() {
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 }

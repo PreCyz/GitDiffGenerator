@@ -8,9 +8,9 @@ import static java.util.stream.Collectors.toSet;
 
 public class JobParam {
 
-    private int minuteOfHour;
-    private int hourOfDay;
-    private int dayOfMonth;
+    private Integer minuteOfHour;
+    private Integer hourOfDay;
+    private Integer dayOfMonth;
     private DayOfWeek dayOfWeek;
     private String cronExpression;
     private JobType jobType;
@@ -20,8 +20,8 @@ public class JobParam {
 
     public JobParam() { }
 
-    JobParam(int minuteOfHour, int hourOfDay, int dayOfMonth, DayOfWeek dayOfWeek, String cronExpression, JobType jobType,
-             LocalDate scheduleStart, LocalDateTime nextFireDate, Set<String> configs) {
+    JobParam(Integer minuteOfHour, Integer hourOfDay, Integer dayOfMonth, DayOfWeek dayOfWeek, String cronExpression,
+             JobType jobType, LocalDate scheduleStart, LocalDateTime nextFireDate, Set<String> configs) {
         this.minuteOfHour = minuteOfHour;
         this.hourOfDay = hourOfDay;
         this.dayOfMonth = dayOfMonth;
@@ -33,32 +33,39 @@ public class JobParam {
         this.configs = configs;
     }
 
-    public int getMinuteOfHour() {
+    public Integer getMinuteOfHour() {
         return minuteOfHour;
     }
 
-    public void setMinuteOfHour(int minuteOfHour) {
+    public void setMinuteOfHour(Integer minuteOfHour) {
         this.minuteOfHour = minuteOfHour;
     }
 
-    public int getHourOfDay() {
+    public Integer getHourOfDay() {
         return hourOfDay;
     }
 
-    public void setHourOfDay(int hourOfDay) {
+    public void setHourOfDay(Integer hourOfDay) {
         this.hourOfDay = hourOfDay;
     }
 
-    public int getDayOfMonth() {
+    public Integer getDayOfMonth() {
         return dayOfMonth;
     }
 
-    public void setDayOfMonth(int dayOfMonth) {
+    public void setDayOfMonth(Integer dayOfMonth) {
         this.dayOfMonth = dayOfMonth;
     }
 
     public DayOfWeek getDayOfWeek() {
         return dayOfWeek;
+    }
+
+    public String getDayOfWeekStr() {
+        if (dayOfWeek != null) {
+            return dayOfWeek.name();
+        }
+        return null;
     }
 
     public void setDayOfWeek(DayOfWeek dayOfWeek) {

@@ -21,9 +21,9 @@ public class UploadJobCreator {
     private static JobParam jobParam;
     private final JobType jobType;
     private final LocalDate startDateTime;
-    private final int dayOfMonth;
-    private final int hourOfDay;
-    private final int minuteOfHour;
+    private final Integer dayOfMonth;
+    private final Integer hourOfDay;
+    private final Integer minuteOfHour;
     private final DayOfWeek dayOfWeek;
     private final String cronExpression;
     private final String configs;
@@ -31,8 +31,8 @@ public class UploadJobCreator {
     private Trigger trigger;
     private JobDetail jobDetail;
 
-    UploadJobCreator(JobParam jobParam, JobType jobType, LocalDate startDateTime, int dayOfMonth, int hourOfDay, int minuteOfHour,
-                     DayOfWeek dayOfWeek, String cronExpression, String configs) {
+    UploadJobCreator(JobParam jobParam, JobType jobType, LocalDate startDateTime, Integer dayOfMonth, Integer hourOfDay,
+                     Integer minuteOfHour, DayOfWeek dayOfWeek, String cronExpression, String configs) {
         UploadJobCreator.jobParam = jobParam;
         this.jobType = jobType;
         this.startDateTime = startDateTime;

@@ -6,12 +6,14 @@ import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.jobs.JobHandler;
-import pg.gipter.jobs.upload.*;
+import pg.gipter.jobs.upload.JobParam;
+import pg.gipter.jobs.upload.UploadItemJob;
 import pg.gipter.ui.job.JobController;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -20,7 +22,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.net.URL;
-import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
 import java.util.concurrent.Executor;
 
 class TrayHandler {
@@ -84,7 +86,7 @@ class TrayHandler {
 
                 if (programData.getLastUploadDateTime() != null && programData.getUploadStatus() != null) {
                     String uploadInfo = String.format("%s [%s]",
-                            programData.getLastUploadDateTime().format(DateTimeFormatter.ISO_DATE_TIME),
+                            programData.getLastUploadDateTime().format(DaoConstants.DATE_TIME_FORMATTER),
                             programData.getUploadStatus()
                     );
                     popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
@@ -93,26 +95,16 @@ class TrayHandler {
                 if (jobParam.getNextFireDate() != null) {
                     popupMenu.add(BundleUtils.getMsg(
                             "tray.item.nextUpdate",
-                            jobParam.getNextFireDate().format(DateTimeFormatter.ISO_DATE_TIME)
+                            jobParam.getNextFireDate().format(DaoConstants.DATE_TIME_FORMATTER)
                     ));
                     addSeparator = true;
                 }
 
                 if (jobParam.getJobType() != null) {
-                    Menu jobMenu = new Menu(
-                            String.format("%s %s", UploadItemJob.NAME, jobParam.getJobType())
-                    );
-                    JobController.buildLabel(jobParam.getDayOfWeek().name(), JobProperty.DAY_OF_WEEK)
-                            .ifPresent(jobMenu::add);
-                    JobController.buildLabel(String.valueOf(jobParam.getHourOfDay()), JobProperty.HOUR_OF_THE_DAY)
-                            .ifPresent(jobMenu::add);
-                    JobController.buildLabel(String.valueOf(jobParam.getDayOfMonth()), JobProperty.DAY_OF_MONTH)
-                            .ifPresent(jobMenu::add);
-                    JobController.buildLabel(
-                            jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE_TIME), JobProperty.SCHEDULE_START)
-                            .ifPresent(jobMenu::add);
-                    JobController.buildLabel(jobParam.getCronExpression(), JobProperty.CRON).ifPresent(jobMenu::add);
-                    JobController.buildLabel(jobParam.getConfigsStr(), JobProperty.CONFIGS).ifPresent(jobMenu::add);
+                    Menu jobMenu = new Menu(String.format("%s %s", UploadItemJob.NAME, jobParam.getJobType()));
+
+                    LinkedList<String> labels = JobController.jobTrayLabels(jobParam);
+                    labels.forEach(jobMenu::add);
                     jobMenu.addSeparator();
 
                     MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));

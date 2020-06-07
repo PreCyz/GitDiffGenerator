@@ -11,9 +11,9 @@ public class UploadItemJobBuilder {
     private JobType jobType;
     private LocalDate startDateTime;
     private LocalDateTime nextFireDateTime;
-    private int dayOfMonth;
-    private int hourOfDay;
-    private int minuteOfHour;
+    private Integer dayOfMonth;
+    private Integer hourOfDay;
+    private Integer minuteOfHour;
     private DayOfWeek dayOfWeek;
     private String cronExpression;
     private String configs;
@@ -28,7 +28,7 @@ public class UploadItemJobBuilder {
         return this;
     }
 
-    public UploadItemJobBuilder withStartDateTime(LocalDate startDateTime) {
+    public UploadItemJobBuilder withStartDate(LocalDate startDateTime) {
         this.startDateTime = startDateTime;
         return this;
     }
@@ -38,17 +38,17 @@ public class UploadItemJobBuilder {
         return this;
     }
 
-    public UploadItemJobBuilder withDayOfMonth(int dayOfMonth) {
+    public UploadItemJobBuilder withDayOfMonth(Integer dayOfMonth) {
         this.dayOfMonth = dayOfMonth;
         return this;
     }
 
-    public UploadItemJobBuilder withHourOfDay(int hourOfDay) {
+    public UploadItemJobBuilder withHourOfDay(Integer hourOfDay) {
         this.hourOfDay = hourOfDay;
         return this;
     }
 
-    public UploadItemJobBuilder withMinuteOfHour(int minuteOfHour) {
+    public UploadItemJobBuilder withMinuteOfHour(Integer minuteOfHour) {
         this.minuteOfHour = minuteOfHour;
         return this;
     }
