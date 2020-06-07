@@ -73,6 +73,7 @@ class ProgramDataConverterTest {
         assertThat(programData.getJobParam().getMinuteOfHour()).isEqualTo(2);
         assertThat(programData.getJobParam().getHourOfDay()).isEqualTo(1);
         assertThat(programData.getJobParam().getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
+        assertThat(programData.getJobParam().getDayOfMonth()).isEqualTo(1);
         assertThat(programData.getJobParam().getCronExpression()).isEqualTo("0 0 12 */3 * ?");
         assertThat(programData.getJobParam().getJobType()).isEqualTo(JobType.EVERY_WEEK);
         assertThat(programData.getJobParam().getScheduleStart()).isEqualTo(scheduleStart);
@@ -93,8 +94,9 @@ class ProgramDataConverterTest {
         assertThat(programData).isNotNull();
         assertThat(programData.getUploadStatus()).isEqualTo(UploadStatus.SUCCESS);
         assertThat(programData.getLastUploadDateTime()).isEqualTo(uploadDateTime);
-        assertThat(programData.getJobParam().getMinuteOfHour()).isEqualTo(0);
-        assertThat(programData.getJobParam().getHourOfDay()).isEqualTo(0);
+        assertThat(programData.getJobParam().getMinuteOfHour()).isNull();
+        assertThat(programData.getJobParam().getHourOfDay()).isNull();
+        assertThat(programData.getJobParam().getDayOfMonth()).isEqualTo(1);
         assertThat(programData.getJobParam().getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
         assertThat(programData.getJobParam().getCronExpression()).isEqualTo("0 0 12 */3 * ?");
         assertThat(programData.getJobParam().getJobType()).isEqualTo(JobType.EVERY_WEEK);
