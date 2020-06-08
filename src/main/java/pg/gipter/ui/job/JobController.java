@@ -134,7 +134,7 @@ public class JobController extends AbstractController {
         dayNameComboBox.setValue(DayOfWeek.FRIDAY);
         dayOfMonthComboBox.setItems(FXCollections.observableList(IntStream.range(1, 29).boxed().collect(toList())));
         dayOfMonthComboBox.setValue(dayOfMonthComboBox.getItems().get(0));
-        hourOfDayComboBox.setItems(FXCollections.observableList(IntStream.range(7, 18).boxed().collect(toList())));
+        hourOfDayComboBox.setItems(FXCollections.observableList(IntStream.range(7, 24).boxed().collect(toList())));
         hourOfDayComboBox.setValue(hourOfDayComboBox.getItems().get(0));
         minuteComboBox.setItems(FXCollections.observableList(IntStream.range(0, 60).boxed().collect(toList())));
         minuteComboBox.setValue(minuteComboBox.getItems().get(0));
@@ -330,9 +330,7 @@ public class JobController extends AbstractController {
             try {
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), uiLauncher);
-                JobParam jobParam = dataDao.loadJobParam().orElseGet(JobParam::new);
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
-                        .withJobParam(jobParam)
                         .withJobType(calculateJobType())
                         .withStartDate(startDatePicker.getValue())
                         .withDayOfMonth(dayOfMonthComboBox.getValue())
@@ -344,7 +342,7 @@ public class JobController extends AbstractController {
 
                 JobHandler jobHandler = uiLauncher.getJobHandler();
                 jobHandler.scheduleUploadJob(builder, additionalJobParams);
-                dataDao.saveJobParam(jobHandler.getJobParam());
+                dataDao.saveJobParam(builder.createJobParam());
 
                 uiLauncher.hideJobWindow();
                 uiLauncher.updateTray();

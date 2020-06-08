@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toSet;
 
 public class UploadItemJobBuilder {
-    private JobParam jobParam;
     private JobType jobType;
     private LocalDate startDateTime;
     private LocalDateTime nextFireDateTime;
@@ -17,11 +16,6 @@ public class UploadItemJobBuilder {
     private DayOfWeek dayOfWeek;
     private String cronExpression;
     private String configs;
-
-    public UploadItemJobBuilder withJobParam(JobParam jobParam) {
-        this.jobParam = jobParam;
-        return this;
-    }
 
     public UploadItemJobBuilder withJobType(JobType jobType) {
         this.jobType = jobType;
@@ -69,8 +63,7 @@ public class UploadItemJobBuilder {
     }
 
     public UploadJobCreator createJobCreator() {
-        return new UploadJobCreator(jobParam, jobType, startDateTime, dayOfMonth, hourOfDay, minuteOfHour, dayOfWeek,
-                cronExpression, configs);
+        return new UploadJobCreator(createJobParam());
     }
 
     public JobParam createJobParam() {
