@@ -31,7 +31,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
-public class ApplicationConfigUI {
+public class ApplicationConfigTraySupportedUI {
 
     @Mock
     private UILauncher uiLauncherMock;
@@ -60,6 +60,7 @@ public class ApplicationConfigUI {
 
     private void createWindow(Stage stage) throws IOException {
         when(uiLauncherMock.isTrayActivated()).thenReturn(true);
+        when(uiLauncherMock.isTraySupported()).thenReturn(true);
         AbstractWindow window = WindowFactory.APPLICATION_MENU.createWindow(
                 ApplicationPropertiesFactory.getInstance(new String[]{ArgName.configurationName + "=testConfiguration"}),
                 uiLauncherMock
@@ -93,26 +94,6 @@ public class ApplicationConfigUI {
         final ApplicationConfig applicationConfig = DaoFactory.getCachedConfiguration().loadApplicationConfig();
 
         assertThat(applicationConfig.getConfirmationWindow()).isFalse();
-    }
-
-    @Test
-    void whenSelectActivateTray_thenConfigurationIsSaved(FxRobot robot) {
-        when(uiLauncherMock.isTrayActivated()).thenReturn(true);
-        new ApplicationConfigWindowObject(robot).selectActivateTray();
-
-        final ApplicationConfig applicationConfig = DaoFactory.getCachedConfiguration().loadApplicationConfig();
-
-        assertThat(applicationConfig.getActiveTray()).isTrue();
-    }
-
-    @Test
-    void whenNoTraySupport_thenActiveTrayAndEnableOnStartupDisabled(FxRobot robot) {
-        when(uiLauncherMock.isTrayActivated()).thenReturn(false);
-
-        final ApplicationConfigWindowObject windowObject = new ApplicationConfigWindowObject(robot);
-
-        assertThat(windowObject.getActiveTrayCheckBox().isDisabled()).isTrue();
-        assertThat(windowObject.getAutostartCheckBox().isDisabled()).isTrue();
     }
 
     @Test
