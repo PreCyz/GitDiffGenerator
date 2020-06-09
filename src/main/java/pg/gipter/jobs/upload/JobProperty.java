@@ -1,6 +1,6 @@
 package pg.gipter.jobs.upload;
 
-@Deprecated(forRemoval = true, since="4.0.0")
+@Deprecated
 /** Use {@link JobParam} instead  */
 public enum JobProperty {
 

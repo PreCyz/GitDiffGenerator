@@ -2,9 +2,7 @@ package pg.gipter.utils;
 
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import java.nio.charset.StandardCharsets;
@@ -23,7 +21,7 @@ public final class CryptoUtils {
 
     private CryptoUtils() { }
 
-    static String encrypt(String property) throws GeneralSecurityException {
+    public static String encrypt(String property) throws GeneralSecurityException {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(CIPHER);
         SecretKey key = keyFactory.generateSecret(new PBEKeySpec(KEY_SPEC));
         Cipher pbeCipher = Cipher.getInstance(CIPHER);
@@ -31,11 +29,11 @@ public final class CryptoUtils {
         return base64Encode(pbeCipher.doFinal(property.getBytes(StandardCharsets.UTF_8)));
     }
 
-    private static String base64Encode(byte[] bytes) {
+    public static String base64Encode(byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
-    static String decrypt(String property) throws GeneralSecurityException {
+    public static String decrypt(String property) throws GeneralSecurityException {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(CIPHER);
         SecretKey key = keyFactory.generateSecret(new PBEKeySpec(KEY_SPEC));
         Cipher pbeCipher = Cipher.getInstance(CIPHER);
