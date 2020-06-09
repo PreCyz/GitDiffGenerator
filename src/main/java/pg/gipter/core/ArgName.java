@@ -1,6 +1,7 @@
 package pg.gipter.core;
 
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDate;
 
@@ -36,6 +37,7 @@ public enum ArgName {
     upgradeFinished("N"),
     enableOnStartup("Y"),
     loggerLevel(""),
+    uiLanguage(BundleUtils.getDefaultLanguage()),
 
     toolkitUsername("UNKNOWN_USER"),
     toolkitPassword("UNKNOWN"),

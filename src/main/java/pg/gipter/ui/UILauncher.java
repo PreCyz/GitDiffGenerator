@@ -6,15 +6,11 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import pg.gipter.core.*;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
@@ -22,31 +18,21 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.jobs.JobHandler;
-import pg.gipter.jobs.upload.JobProperty;
-import pg.gipter.jobs.upload.JobType;
-import pg.gipter.jobs.upload.UploadItemJob;
-import pg.gipter.jobs.upload.UploadItemJobBuilder;
+import pg.gipter.jobs.upload.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.StartupService;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.ui.alerts.*;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.stream.Stream;
 
 /** Created by Gawa 2017-10-04 */
 public class UILauncher implements Launcher {
@@ -63,13 +49,13 @@ public class UILauncher implements Launcher {
     private Stage toolkitSettingsWindow;
     private Stage sharePointConfigWindow;
     private TrayHandler trayHandler;
-    private ConfigurationDao configurationDao;
-    private DataDao dataDao;
+    private final ConfigurationDao configurationDao;
+    private final DataDao dataDao;
     private boolean silentMode;
     private boolean upgradeChecked = false;
     private LocalDateTime lastItemSubmissionDate;
-    private Executor executor;
-    private JobHandler jobHandler;
+    private final Executor executor;
+    private final JobHandler jobHandler;
     private Properties wizardProperties;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
@@ -240,13 +226,6 @@ public class UILauncher implements Launcher {
         }
     }
 
-    public void changeLanguage(String language) {
-        applicationSettingsWindow.close();
-        mainWindow.close();
-        BundleUtils.changeBundle(language);
-        execute();
-    }
-
     public static void platformExit() {
         Platform.exit();
         System.exit(0);
@@ -311,11 +290,7 @@ public class UILauncher implements Launcher {
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } finally {
-            Optional<Properties> data = dataDao.loadDataProperties();
-            if (data.isPresent()) {
-                data.ifPresent(properties -> Stream.of(JobProperty.values()).forEach(jobKey -> properties.remove(jobKey.key())));
-                dataDao.saveDataProperties(data.get());
-            }
+            dataDao.removeJobParam();
 
             logger.info("{} canceled.", UploadItemJob.NAME);
             updateTray();
@@ -323,50 +298,23 @@ public class UILauncher implements Launcher {
     }
 
     private void scheduleUploadJob() {
-        Optional<Properties> data = dataDao.loadDataProperties();
-        if (data.isPresent() && !jobHandler.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.key())) {
+        final Optional<JobParam> jobParamOpt = dataDao.loadJobParam();
+        if (!jobHandler.isSchedulerInitiated() && jobParamOpt.isPresent() && jobParamOpt.get().getJobType() != null) {
+            JobParam jobParam = jobParamOpt.get();
             logger.info("Setting up the job.");
             try {
-                JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.key()));
-
-                LocalDate scheduleStart = null;
-                if (data.get().containsKey(JobProperty.SCHEDULE_START.key())) {
-                    scheduleStart = LocalDate.parse(
-                            data.get().getProperty(JobProperty.SCHEDULE_START.key()),
-                            ApplicationProperties.yyyy_MM_dd
-                    );
-                }
-                int dayOfMonth = 0;
-                if (data.get().containsKey(JobProperty.DAY_OF_MONTH.key())) {
-                    dayOfMonth = Integer.parseInt(data.get().getProperty(JobProperty.DAY_OF_MONTH.key()));
-                }
-                int hourOfDay = 0;
-                int minuteOfHour = 0;
-                if (data.get().containsKey(JobProperty.HOUR_OF_THE_DAY.key())) {
-                    String hourOfDayString = data.get().getProperty(JobProperty.HOUR_OF_THE_DAY.key());
-                    hourOfDay = Integer.parseInt(hourOfDayString.substring(0, hourOfDayString.lastIndexOf(":")));
-                    minuteOfHour = Integer.parseInt(hourOfDayString.substring(hourOfDayString.lastIndexOf(":") + 1));
-                }
-                DayOfWeek dayOfWeek = null;
-                if (data.get().containsKey(JobProperty.DAY_OF_WEEK.key())) {
-                    dayOfWeek = DayOfWeek.valueOf(data.get().getProperty(JobProperty.DAY_OF_WEEK.key()));
-                }
-                String cronExpression = data.get().getProperty(JobProperty.CRON.key());
-                String configs = data.get().getProperty(JobProperty.CONFIGS.key());
-
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), this);
 
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
-                        .withData(data.get())
-                        .withJobType(jobType)
-                        .withStartDateTime(scheduleStart)
-                        .withDayOfMonth(dayOfMonth)
-                        .withHourOfDay(hourOfDay)
-                        .withMinuteOfHour(minuteOfHour)
-                        .withDayOfWeek(dayOfWeek)
-                        .withCronExpression(cronExpression)
-                        .withConfigs(configs);
+                        .withJobType(jobParam.getJobType())
+                        .withStartDate(jobParam.getScheduleStart())
+                        .withDayOfMonth(jobParam.getDayOfMonth())
+                        .withHourOfDay(jobParam.getHourOfDay())
+                        .withMinuteOfHour(jobParam.getMinuteOfHour())
+                        .withDayOfWeek(jobParam.getDayOfWeek())
+                        .withCronExpression(jobParam.getCronExpression())
+                        .withConfigs(String.join(",", jobParam.getConfigs()));
                 jobHandler.scheduleUploadJob(builder, additionalJobParams);
                 logger.info("Job set up successfully.");
 
@@ -432,9 +380,10 @@ public class UILauncher implements Launcher {
     }
 
     public void showApplicationSettingsWindow() {
+        mainWindow.close();
+
         applicationSettingsWindow = new Stage();
         applicationSettingsWindow.initModality(Modality.APPLICATION_MODAL);
-
         buildScene(applicationSettingsWindow, WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this));
         applicationSettingsWindow.setOnCloseRequest(event -> closeWindow(applicationSettingsWindow));
         applicationSettingsWindow.showAndWait();
@@ -553,5 +502,12 @@ public class UILauncher implements Launcher {
             default:
                 showProjectsWindow(properties);
         }
+    }
+
+    public void changeApplicationSettingsWindowTitle() {
+        final AbstractWindow window = WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this);
+        applicationSettingsWindow.setTitle(BundleUtils.getMsg(
+                window.windowTitleBundle(), applicationProperties.version().getVersion()
+        ));
     }
 }

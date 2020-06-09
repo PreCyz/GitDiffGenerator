@@ -14,7 +14,7 @@ import pg.gipter.ui.*;
 import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Date;
 
 public class UploadItemJob implements Job {
 
@@ -36,28 +36,23 @@ public class UploadItemJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
-        calculateDates(jobDataMap);
+        final JobParam jobParam = (JobParam) jobDataMap.get(JobParam.class.getSimpleName());
+        calculateDates(jobParam);
 
         logger.info("{} initialized and triggered at {}.",
                 NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
         );
 
-        String configNames = jobDataMap.getString(JobProperty.CONFIGS.key());
-        LinkedList<String> configurationNames = new LinkedList<>(Arrays.asList(configNames.split(UploadJobCreator.CONFIG_DELIMITER)));
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
 
-        new FXMultiRunner(
-                new LinkedHashSet<>(configurationNames),
-                uiLauncher.nonUIExecutor(),
-                RunType.UPLOAD_ITEM_JOB,
-                startDate
-        ).start();
+        new FXMultiRunner(jobParam.getConfigs(), uiLauncher.nonUIExecutor(), RunType.UPLOAD_ITEM_JOB, startDate)
+                .start();
 
         logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        dataDao.saveNextUpload(nextUploadDate.format(DateTimeFormatter.ISO_DATE_TIME));
+        dataDao.saveNextUploadDateTime(nextUploadDate);
 
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                configurationDao.loadArgumentArray(configurationNames.getFirst())
+                configurationDao.loadArgumentArray(jobParam.getConfigs().iterator().next())
         );
         uiLauncher.updateTray(applicationProperties);
         if (applicationProperties.isToolkitCredentialsSet()) {
@@ -68,11 +63,10 @@ public class UploadItemJob implements Job {
         }
     }
 
-    private void calculateDates(JobDataMap jobDataMap) throws JobExecutionException {
-        JobType jobType = JobType.valueOf(jobDataMap.getString(JobProperty.TYPE.key()));
+    private void calculateDates(JobParam jobParam) throws JobExecutionException {
         startDate = LocalDate.now();
         nextUploadDate = LocalDateTime.now();
-        switch (jobType) {
+        switch (jobParam.getJobType()) {
             case EVERY_WEEK:
                 startDate = startDate.minusDays(7);
                 nextUploadDate = nextUploadDate.plusDays(7);
@@ -87,11 +81,10 @@ public class UploadItemJob implements Job {
                 break;
             case CRON:
                 CronExpression cronExpression;
-                String cronString = jobDataMap.getString(JobProperty.CRON.key());
                 try {
-                    cronExpression = new CronExpression(cronString);
+                    cronExpression = new CronExpression(jobParam.getCronExpression());
                 } catch (ParseException e) {
-                    throw new JobExecutionException(String.format("Invalid cron expression [%s]", cronString));
+                    throw new JobExecutionException(String.format("Invalid cron expression [%s]", jobParam.getCronExpression()));
                 }
                 Date now = new Date(System.currentTimeMillis());
                 Date nextValidTimeAfter = cronExpression.getNextValidTimeAfter(now);

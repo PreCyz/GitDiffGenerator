@@ -9,10 +9,14 @@ public enum VersionControlSystem {
     MERCURIAL(".hg"),
     SVN(".svn");
 
-    private String dirName;
+    private final String dirName;
 
     VersionControlSystem(String dirName) {
         this.dirName = dirName;
+    }
+
+    public String command() {
+        return dirName.substring(1);
     }
 
     public static VersionControlSystem valueFrom(File file) {
@@ -43,4 +47,5 @@ public enum VersionControlSystem {
         }
         throw new IllegalArgumentException(errMsg);
     }
+
 }

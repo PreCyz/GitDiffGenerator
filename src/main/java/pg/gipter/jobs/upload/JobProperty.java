@@ -1,5 +1,7 @@
 package pg.gipter.jobs.upload;
 
+@Deprecated(forRemoval = true, since="4.0.0")
+/** Use {@link JobParam} instead  */
 public enum JobProperty {
 
     HOUR_OF_THE_DAY("job.hourOfTheDay"),
@@ -11,7 +13,7 @@ public enum JobProperty {
     NEXT_FIRE_DATE("job.nextUploadDateTime"),
     CONFIGS("job.configurationNames");
 
-    private String value;
+    private final String value;
 
     JobProperty(String value) {
         this.value = value;

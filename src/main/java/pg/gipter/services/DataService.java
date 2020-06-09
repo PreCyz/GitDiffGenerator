@@ -2,9 +2,7 @@ package pg.gipter.services;
 
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
-
-import java.util.Optional;
-import java.util.Properties;
+import pg.gipter.core.dao.data.ProgramData;
 
 public class DataService {
 
@@ -22,7 +20,7 @@ public class DataService {
         this.dataDao = DaoFactory.getDataDao();
     }
 
-    public Optional<Properties> loadDataProperties() {
-        return dataDao.loadDataProperties();
+    public ProgramData loadProgramData() {
+        return dataDao.readProgramData();
     }
 }

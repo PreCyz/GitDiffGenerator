@@ -1,4 +1,4 @@
-package pg.gipter.testfx;
+package pg.gipter.testfx.applicationconfig;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -15,23 +15,23 @@ import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.testfx.UITestUtils;
 import pg.gipter.ui.*;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
-class SharePointProjectAddConfigUI {
+public class ApplicationConfigTraySupportedUI {
 
     @Mock
     private UILauncher uiLauncherMock;
@@ -49,7 +49,7 @@ class SharePointProjectAddConfigUI {
     @Start
     public void start(Stage stage) {
         try {
-            UITestUtils.generateAndSaveConfiguration(0);
+            UITestUtils.generateConfigurationWithSPC(0);
             createWindow(stage);
         } catch (Exception ex) {
             System.err.printf("UPS !!! %s", ex.getMessage());
@@ -59,7 +59,9 @@ class SharePointProjectAddConfigUI {
     }
 
     private void createWindow(Stage stage) throws IOException {
-        AbstractWindow window = WindowFactory.SHARE_POINT_PROJECTS.createWindow(
+        when(uiLauncherMock.isTrayActivated()).thenReturn(true);
+        when(uiLauncherMock.isTraySupported()).thenReturn(true);
+        AbstractWindow window = WindowFactory.APPLICATION_MENU.createWindow(
                 ApplicationPropertiesFactory.getInstance(new String[]{ArgName.configurationName + "=testConfiguration"}),
                 uiLauncherMock
         );
@@ -75,29 +77,31 @@ class SharePointProjectAddConfigUI {
     }
 
     @Test
-    void givenSharePointConfigWindow_whenEnterSharePointConfigAndSave_thenItIsStored(FxRobot robot) {
-        when(uiLauncherMock.hasWizardProperties()).thenReturn(false);
+    void whenLanguageChangeToPL_thenAllLabelsTextsArePL(FxRobot robot) {
+        doNothing().when(uiLauncherMock).changeApplicationSettingsWindowTitle();
 
-        final SharePointConfigWindowObject windowObject = new SharePointConfigWindowObject(robot)
-                .writeName("someName")
-                .writeUsername("someUser")
-                .writePassword("somePassword")
-                .writeDomain("someDomain")
-                .clickAddButton();
+        final ApplicationConfigWindowObject windowObject = new ApplicationConfigWindowObject(robot)
+                .chooseLanguage("pl");
 
-        assertThat(windowObject.getComboBoxSize()).isEqualTo(1);
-        final Optional<RunConfig> runConfig = DaoFactory.getCachedConfiguration().loadRunConfig("testConfiguration");
-        assertThat(runConfig.isPresent()).isTrue();
-        runConfig.ifPresent(rc -> {
-            assertThat(rc.getSharePointConfigs()).hasSize(1);
-            final SharePointConfig spc = new LinkedList<>(rc.getSharePointConfigs()).getFirst();
-            assertThat(spc.getName()).isEqualTo("someName");
-            assertThat(spc.getUsername()).isEqualTo("someUser");
-            assertThat(spc.getPassword()).isNotNull();
-            assertThat(spc.getDomain()).isEqualTo("someDomain");
-            assertThat(windowObject.getComboBoxItems().get(0)).isEqualTo(spc);
-        });
-        assertThat(windowObject.getSharePointLink()).isNotBlank();
+        assertThat(BundleUtils.getBundleName()).isEqualTo("bundle.translation_pl");
+        assertThat(windowObject.getLanguageLabelText()).isEqualTo("Język");
+    }
+
+    @Test
+    void whenDeselectConfirmationWindow_thenConfigurationIsSaved(FxRobot robot) {
+        new ApplicationConfigWindowObject(robot).deselectConfirmationWindow();
+
+        final ApplicationConfig applicationConfig = DaoFactory.getCachedConfiguration().loadApplicationConfig();
+
+        assertThat(applicationConfig.getConfirmationWindow()).isFalse();
+    }
+
+    @Test
+    void whenWindowLoaded_thenPreferredArgSourceComboBoxAndUseUICheckBoxDisabled(FxRobot robot) {
+        final ApplicationConfigWindowObject windowObject = new ApplicationConfigWindowObject(robot);
+
+        assertThat(windowObject.getUseUICheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getPreferredArgSourceCheckbox().isDisabled()).isTrue();
     }
 
 }

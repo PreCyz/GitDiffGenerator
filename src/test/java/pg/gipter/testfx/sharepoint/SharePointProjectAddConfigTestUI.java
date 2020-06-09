@@ -1,4 +1,4 @@
-package pg.gipter.testfx;
+package pg.gipter.testfx.sharepoint;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -13,20 +13,26 @@ import pg.gipter.MockitoExtension;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.testfx.UITestUtils;
 import pg.gipter.ui.*;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
-class SharePointProjectRemoveConfigUI {
+class SharePointProjectAddConfigTestUI {
 
     @Mock
     private UILauncher uiLauncherMock;
@@ -44,7 +50,7 @@ class SharePointProjectRemoveConfigUI {
     @Start
     public void start(Stage stage) {
         try {
-            UITestUtils.generateAndSaveConfiguration(2);
+            UITestUtils.generateConfigurationWithSPC(0);
             createWindow(stage);
         } catch (Exception ex) {
             System.err.printf("UPS !!! %s", ex.getMessage());
@@ -70,25 +76,29 @@ class SharePointProjectRemoveConfigUI {
     }
 
     @Test
-    void given2SharePointConfigs_whenRemoveConfigPressed_thenOnlyOneLeftInComboBoxAndInTheFile(FxRobot robot) {
+    void givenSharePointConfigWindow_whenEnterSharePointConfigAndSave_thenItIsStored(FxRobot robot) {
         when(uiLauncherMock.hasWizardProperties()).thenReturn(false);
+
         final SharePointConfigWindowObject windowObject = new SharePointConfigWindowObject(robot)
-                .chooseComboBoxEntry(1)
-                .clickRemoveButton();
+                .writeName("someName")
+                .writeUsername("someUser")
+                .writePassword("somePassword")
+                .writeDomain("someDomain")
+                .clickAddButton();
 
-        int actualItemsSize = windowObject.getComboBoxSize();
-        assertThat(actualItemsSize).isEqualTo(1);
-
-        actualItemsSize = windowObject.clickRemoveButton().getComboBoxSize();
-        assertThat(actualItemsSize).isEqualTo(0);
-
-        assertThat(windowObject.getName()).isEmpty();
-        assertThat(windowObject.getUsername()).isEmpty();
-        assertThat(windowObject.getPassword()).isEmpty();
-        assertThat(windowObject.getDomain()).isEmpty();
-        assertThat(windowObject.getUrl()).isEmpty();
-        assertThat(windowObject.getProject()).isEmpty();
-        assertThat(windowObject.getListNames()).isEmpty();
-        assertThat(windowObject.getSharePointLink()).isEqualTo("Full link will appear here");
+        assertThat(windowObject.getComboBoxSize()).isEqualTo(1);
+        final Optional<RunConfig> runConfig = DaoFactory.getCachedConfiguration().loadRunConfig("testConfiguration");
+        assertThat(runConfig.isPresent()).isTrue();
+        runConfig.ifPresent(rc -> {
+            assertThat(rc.getSharePointConfigs()).hasSize(1);
+            final SharePointConfig spc = new LinkedList<>(rc.getSharePointConfigs()).getFirst();
+            assertThat(spc.getName()).isEqualTo("someName");
+            assertThat(spc.getUsername()).isEqualTo("someUser");
+            assertThat(spc.getPassword()).isNotNull();
+            assertThat(spc.getDomain()).isEqualTo("someDomain");
+            assertThat(windowObject.getComboBoxItems().get(0)).isEqualTo(spc);
+        });
+        assertThat(windowObject.getSharePointLink()).isNotBlank();
     }
+
 }

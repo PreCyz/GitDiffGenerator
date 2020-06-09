@@ -6,13 +6,9 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
-import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.*;
 import pg.gipter.services.GithubService;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.WindowType;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDateTime;
@@ -21,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 public class UpgradeJob implements Job {
 
     private static final Logger logger = LoggerFactory.getLogger(UpgradeJob.class);
-    private GithubService githubService;
+    private final GithubService githubService;
     static final String NAME = UpgradeJob.class.getName();
     static final String GROUP = NAME + "Group";
 

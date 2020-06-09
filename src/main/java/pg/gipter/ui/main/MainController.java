@@ -25,8 +25,8 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.*;
-import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.CacheManager;
+import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.*;
@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
 import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
@@ -258,7 +259,7 @@ public class MainController extends AbstractController {
     }
 
     private void initConfigurationName() {
-        Set<String> confNames = applicationProperties.configurationNames();
+        Set<String> confNames = new HashSet<>(applicationProperties.configurationNames());
         if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
             confNames.add(configurationNameComboBox.getValue());
         }
@@ -544,7 +545,7 @@ public class MainController extends AbstractController {
         ).toArray(String[]::new));
 
         FXMultiRunner runner = new FXMultiRunner(
-                Stream.of(uiAppProperties).collect(Collectors.toList()),
+                Stream.of(uiAppProperties).collect(toList()),
                 uiLauncher.nonUIExecutor(),
                 RunType.EXECUTE
         );
@@ -560,15 +561,14 @@ public class MainController extends AbstractController {
 
     private void updateLastItemUploadDate() {
         try {
-            Optional<Properties> dataProperties = dataService.loadDataProperties();
-            if (dataProperties.isPresent() && dataProperties.get().containsKey(DaoConstants.UPLOAD_STATUS_KEY)) {
-                UploadStatus status = UploadStatus.valueOf(dataProperties.get().getProperty(DaoConstants.UPLOAD_STATUS_KEY));
-                if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(status)) {
-                    uiLauncher.setLastItemSubmissionDate(null);
-                }
+            ProgramData programData = dataService.loadProgramData();
+            if (programData.getUploadStatus() != null &&
+                    EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(programData.getUploadStatus())) {
+                uiLauncher.setLastItemSubmissionDate(null);
             }
         } catch (Exception ex) {
-            logger.warn("Could not determine the status of the upload. {}. Forcing to refresh last upload date.", ex.getMessage());
+            logger.warn("Could not determine the status of the upload. {}. Forcing to refresh last upload date.",
+                    ex.getMessage());
             uiLauncher.setLastItemSubmissionDate(null);
         } finally {
             setLastItemSubmissionDate();
@@ -666,7 +666,7 @@ public class MainController extends AbstractController {
             }
             toolkitProjectListNamesTextField.setDisable(itemTypeComboBox.getValue() != ItemType.TOOLKIT_DOCS);
             deleteDownloadedFilesCheckBox.setDisable(
-                    !EnumSet.of(ItemType.TOOLKIT_DOCS,  ItemType.SHARE_POINT_DOCS).contains(itemTypeComboBox.getValue())
+                    !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(itemTypeComboBox.getValue())
             );
             setDisable(itemTypeComboBox.getValue());
             setTooltipOnProjectListNames();
@@ -822,12 +822,14 @@ public class MainController extends AbstractController {
 
     private EventHandler<MouseEvent> verifyCredentialsHyperlinkOnMouseClickEventHandler() {
         return event -> {
-            Task<Void> task = new Task<Void>() {
+            Task<Void> task = new Task<>() {
                 @Override
                 public Void call() {
-                    RunConfig runConfigFromUI = createRunConfigFromUI();
-                    ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(runConfigFromUI.toArgumentArray());
-                    boolean hasProperCredentials = new ToolkitService(uiAppProps).hasProperCredentials();
+                    final List<String> arguments = Stream.of(createToolkitConfigFromUI().toArgumentArray()).collect(toList());
+                    arguments.add(ArgName.preferredArgSource.name() + "=" + ArgName.preferredArgSource.defaultValue());
+                    arguments.add(ArgName.useUI.name() + "=N");
+                    final ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(arguments.toArray(String[]::new));
+                    boolean hasProperCredentials = new ToolkitService(instance).hasProperCredentials();
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
                     if (hasProperCredentials) {
                         alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
