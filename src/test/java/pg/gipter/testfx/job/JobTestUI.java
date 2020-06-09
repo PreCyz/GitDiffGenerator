@@ -125,6 +125,6 @@ public class JobTestUI {
         assertThat(jobParam.getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
         assertThat(jobParam.getScheduleStart()).isNotNull();
         assertThat(jobParam.getJobType()).isEqualTo(JobType.EVERY_WEEK);
-        assertThat(jobParam.getCronExpression()).isNull();
+        assertThat(jobParam.getCronExpression()).isEmpty();
     }
 }
