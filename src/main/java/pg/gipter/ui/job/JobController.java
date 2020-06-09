@@ -312,7 +312,7 @@ public class JobController extends AbstractController {
     }
 
     private StringConverter<LocalDate> startDateConverter() {
-        return new StringConverter<>() {
+        return new StringConverter<LocalDate>() {
             @Override
             public String toString(LocalDate object) {
                 return object != null ? object.format(ApplicationProperties.yyyy_MM_dd) : "";

@@ -23,7 +23,6 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
-import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.*;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.ProgramData;
@@ -753,7 +752,6 @@ public class MainController extends AbstractController {
         }
     }
 
-    @NotNull
     private RunConfig getRunConfigWithoutDates() {
         RunConfig runConfigFromUI = createRunConfigFromUI();
         runConfigFromUI.setStartDate(null);
@@ -845,13 +843,13 @@ public class MainController extends AbstractController {
         return event -> {
             verifyProgressIndicator.setVisible(true);
             verifyCredentialsHyperlink.setVisited(false);
-            Task<Void> task = new Task<>() {
+            Task<Void> task = new Task<Void>() {
                 @Override
                 public Void call() {
                     final List<String> arguments = Stream.of(createToolkitConfigFromUI().toArgumentArray()).collect(toList());
                     arguments.add(ArgName.preferredArgSource.name() + "=" + ArgName.preferredArgSource.defaultValue());
                     arguments.add(ArgName.useUI.name() + "=N");
-                    final ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(arguments.toArray(String[]::new));
+                    final ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(arguments.toArray(new String[]{}));
                     boolean hasProperCredentials = new ToolkitService(instance).hasProperCredentials();
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
                     if (hasProperCredentials) {
