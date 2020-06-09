@@ -118,4 +118,17 @@ class CustomCommandTest {
 
         assertThat(customCommand.containsCommand(VersionControlSystem.MERCURIAL)).isFalse();
     }
+
+    @Test
+    void givenCommandDifferentFromCommandList_whenFullCommand_thenReturnCommand() {
+        final ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
+                new String[]{ArgName.author + "=precyz", ArgName.startDate + "=2020-06-05"}
+        );
+
+        CustomCommand customCommand = new CustomCommand();
+        customCommand.setCommand("git log");
+        customCommand.setCommandList(Arrays.asList("git","status"));
+
+        assertThat(customCommand.fullCommand(applicationProperties)).containsExactly("git", "log");
+    }
 }
