@@ -252,9 +252,8 @@ public class MainTestUI {
     @Test
     void givenWrongToolkitCredentials_whenClickVerifyCredentials_thenAlertWithErrorMsg(FxRobot robot) {
         final MainWindowObject windowObject = new MainWindowObject(robot)
-                .clickVerifyCredentialsHyperlink()
-                .pressOkOnPopup();
+                .clickVerifyCredentialsHyperlink();
 
-        assertThat(windowObject.getVerifyCredentialsHyperLink().isVisited()).isTrue();
+        assertThat(windowObject.getVerifyCredentialsHyperLink().isVisited()).isFalse();
     }
 }

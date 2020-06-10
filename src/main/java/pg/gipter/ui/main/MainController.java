@@ -822,6 +822,8 @@ public class MainController extends AbstractController {
 
     private EventHandler<MouseEvent> verifyCredentialsHyperlinkOnMouseClickEventHandler() {
         return event -> {
+            verifyProgressIndicator.setVisible(true);
+            verifyCredentialsHyperlink.setVisited(false);
             Task<Void> task = new Task<>() {
                 @Override
                 public Void call() {
@@ -850,9 +852,7 @@ public class MainController extends AbstractController {
                     return null;
                 }
             };
-            verifyProgressIndicator.setVisible(true);
             uiLauncher.executeOutsideUIThread(task);
-            verifyCredentialsHyperlink.setVisited(false);
         };
     }
 
