@@ -10,3 +10,4 @@ libs
 *.pdf
 *.json
 dependency-reduced-pom.xml
+!command.json
