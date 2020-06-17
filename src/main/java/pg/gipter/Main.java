@@ -8,16 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.converters.Converter;
 import pg.gipter.converters.ConverterFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import pg.gipter.core.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.utils.StringUtils;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -25,31 +21,48 @@ import static java.util.stream.Collectors.toSet;
 /** Created by Pawel Gawedzki on 17-Sep-2018 */
 public class Main extends Application {
 
-    private static ApplicationProperties applicationProperties;
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
-    private static String[] args;
+    private String[] args;
+    private static ApplicationProperties applicationProperties;
 
     public static void main(String[] args) {
         logger.info("Gipter started.");
-        Main.args = args;
-        launch(args);
+        Main mObj = new Main(args);
+        mObj.setLoggerLevel(applicationProperties.loggerLevel());
+        logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
+        logger.info("Gipter can use '{}' threads.", Runtime.getRuntime().availableProcessors());
+        mObj.runConverters();
+        mObj.setDefaultConfig();
+        if (Main.applicationProperties.isUseUI()) {
+            launch(args);
+        } else {
+            Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
+            launcher.execute();
+        }
+    }
+
+    public Main() { }
+
+    Main(String[] args) {
+        this.args = args;
+        applicationProperties = ApplicationPropertiesFactory.getInstance(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
-        applicationProperties = ApplicationPropertiesFactory.getInstance(args);
-        setLoggerLevel(applicationProperties.loggerLevel());
-        logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
-        logger.info("Gipter can use '{}' threads.", Runtime.getRuntime().availableProcessors());
-        runConverters();
-        setDefaultConfig();
         Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
         launcher.execute();
     }
 
     private void setLoggerLevel(String loggerLevel) {
         if (!StringUtils.nullOrEmpty(loggerLevel)) {
-            Set<String> loggers = Stream.of("pg.gipter", "org.springframework", "org.mongodb", "org.quartz").collect(toSet());
+            Set<String> loggers = Stream.of(
+                    "pg.gipter",
+                    "org.springframework",
+                    "org.mongodb",
+                    "org.quartz"
+            ).collect(toSet());
+
             LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
             for (String loggerName : loggers) {
@@ -65,7 +78,7 @@ public class Main extends Application {
     }
 
     private void setDefaultConfig() {
-        LinkedList<String> configs = new LinkedList<>(Main.applicationProperties.getRunConfigMap().keySet());
+        LinkedList<String> configs = new LinkedList<>(applicationProperties.getRunConfigMap().keySet());
         if (!configs.isEmpty()) {
             String defaultConfigName = configs.getFirst();
             String[] arguments = Arrays.copyOf(args, args.length + 1);

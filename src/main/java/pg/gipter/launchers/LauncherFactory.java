@@ -20,4 +20,8 @@ public class LauncherFactory {
         }
         return new CLILauncher(applicationProperties);
     }
+
+    public static Launcher getLauncher(ApplicationProperties applicationProperties) {
+        return new CLILauncher(applicationProperties);
+    }
 }
