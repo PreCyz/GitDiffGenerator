@@ -118,8 +118,6 @@ public class MainController extends AbstractController {
     private DatePicker startDatePicker;
     @FXML
     private DatePicker endDatePicker;
-    @FXML
-    private TextField periodInDaysTextField;
 
     @FXML
     private Button executeButton;
@@ -216,7 +214,6 @@ public class MainController extends AbstractController {
         if (!now.isEqual(applicationProperties.endDate())) {
             endDatePicker.setValue(applicationProperties.endDate());
         }
-        periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
 
         userFolderUrl = applicationProperties.toolkitUserFolder();
         if (applicationProperties.toolkitUserFolder().equals(ArgName.toolkitUserFolder.defaultValue())) {
@@ -631,9 +628,6 @@ public class MainController extends AbstractController {
 
         runConfig.setStartDate(startDatePicker.getValue());
         runConfig.setEndDate(endDatePicker.getValue());
-        if (!ArgName.periodInDays.defaultValue().equals(periodInDaysTextField.getText())) {
-            runConfig.setPeriodInDays(Integer.parseInt(periodInDaysTextField.getText()));
-        }
 
         runConfig.setConfigurationName(configurationNameTextField.getText());
         runConfig.setPreferredArgSource(PreferredArgSource.UI);
@@ -938,13 +932,9 @@ public class MainController extends AbstractController {
     private ChangeListener<Boolean> useListItemCheckBoxListener() {
         return (observable, oldValue, newValue) -> {
             startDatePicker.setDisable(newValue);
-            periodInDaysTextField.setDisable(newValue);
             if (newValue) {
                 startDatePicker.setValue(uiLauncher.getLastItemSubmissionDate().toLocalDate());
-                int newPeriodInDays = endDatePicker.getValue().getDayOfYear() - startDatePicker.getValue().getDayOfYear();
-                periodInDaysTextField.setText(String.valueOf(newPeriodInDays));
             } else {
-                periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
                 startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
             }
         };
