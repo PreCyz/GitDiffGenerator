@@ -15,6 +15,7 @@
           </Menu>
             <Menu mnemonicParsing="false" text="%main.menu.help">
                <items>
+                  <MenuItem fx:id="wikiMenuItem" mnemonicParsing="false" text="%main.menu.help.wiki" />
                   <MenuItem fx:id="readMeMenuItem" mnemonicParsing="false" text="%main.menu.help.readMe" />
                   <MenuItem fx:id="instructionMenuItem" mnemonicParsing="false" text="%main.menu.help.pdf" />
                   <MenuItem fx:id="upgradeMenuItem" mnemonicParsing="false" text="%main.menu.help.upgradeApplication" />
@@ -68,7 +69,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
-                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="71.0" prefHeight="135.0" prefWidth="560.0" text="%paths.panel.title">
+                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="71.0" prefHeight="135.0" prefWidth="560.0" text="%paths.panel.title" textFill="#2102f8">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="558.0">
                            <children>
@@ -104,7 +105,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </TitledPane>
-                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="205.0" prefHeight="245.0" prefWidth="288.0" text="%csv.panel.title">
+                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="205.0" prefHeight="245.0" prefWidth="288.0" text="%csv.panel.title" textFill="#2102f8">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="295.0" prefWidth="286.0">
                            <children>
@@ -129,7 +130,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </TitledPane>
-                  <TitledPane animated="false" collapsible="false" layoutX="289.0" layoutY="205.0" prefHeight="125.0" prefWidth="272.0" text="%timeFrame.panel.title">
+                  <TitledPane animated="false" collapsible="false" layoutX="289.0" layoutY="205.0" prefHeight="125.0" prefWidth="272.0" text="%timeFrame.panel.title" textFill="#2102f8">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="272.0">
                            <children>
@@ -182,7 +183,7 @@
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </Label>
-                  <TitledPane animated="false" collapsible="false" layoutX="289.0" layoutY="329.0" prefHeight="121.0" prefWidth="272.0" text="%additional.panel.title">
+                  <TitledPane animated="false" collapsible="false" layoutX="289.0" layoutY="329.0" prefHeight="121.0" prefWidth="272.0" text="%additional.panel.title" textFill="#2102f8">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>

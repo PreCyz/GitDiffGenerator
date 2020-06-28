@@ -70,6 +70,8 @@ public class MainController extends AbstractController {
     private MenuItem upgradeMenuItem;
     @FXML
     private MenuItem wizardMenuItem;
+    @FXML
+    private MenuItem wikiMenuItem;
 
     @FXML
     private TextField authorsTextField;
@@ -307,7 +309,10 @@ public class MainController extends AbstractController {
         applicationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
         toolkitMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
         upgradeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        readMeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        instructionMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
         wizardMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        wikiMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
                 e.consume();
@@ -410,6 +415,7 @@ public class MainController extends AbstractController {
         instructionMenuItem.setOnAction(instructionActionEventHandler());
         upgradeMenuItem.setOnAction(upgradeActionEventHandler());
         wizardMenuItem.setOnAction(launchWizardActionEventHandler());
+        wikiMenuItem.setOnAction(wikiActionEventHandler());
         projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         itemTypeComboBox.setOnAction(uploadTypeActionEventHandler());
@@ -479,6 +485,13 @@ public class MainController extends AbstractController {
         return event -> {
             uiLauncher.hideMainWindow();
             new WizardLauncher(uiLauncher.currentWindow(), configurationNameComboBox.getValue()).execute();
+        };
+    }
+
+    private EventHandler<ActionEvent> wikiActionEventHandler() {
+        return event -> {
+            AppManager instance = AppManagerFactory.getInstance();
+            instance.launchDefaultBrowser(GithubService.GITHUB_URL + "/wiki");
         };
     }
 
