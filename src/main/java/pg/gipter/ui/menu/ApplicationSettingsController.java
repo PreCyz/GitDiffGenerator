@@ -19,7 +19,6 @@ import java.util.*;
 
 public class ApplicationSettingsController extends AbstractController {
 
-    //Label section
     @FXML
     private Label confirmationWindowLabel;
     @FXML

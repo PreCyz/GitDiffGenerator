@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="mainAnchorPane" prefHeight="130.0" prefWidth="430.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="mainAnchorPane" prefHeight="130.0" prefWidth="430.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TitledPane fx:id="titledPane" animated="false" collapsible="false" prefHeight="130.0" prefWidth="430.0" text="%launch.panel.title">
          <content>
@@ -11,7 +11,7 @@
                <children>
                   <Label fx:id="confirmationWindowLabel" layoutX="10.0" layoutY="8.0" text="%launch.panel.confirmationWindow" />
                   <CheckBox fx:id="confirmationWindowCheckBox" layoutX="133.0" layoutY="8.0" mnemonicParsing="false" />
-                  <Label fx:id="preferredArgSourceLabel" layoutX="265.0" layoutY="12.0" text="%launch.panel.preferredArgSource" />
+                  <Label fx:id="preferredArgSourceLabel" disable="true" layoutX="265.0" layoutY="12.0" text="%launch.panel.preferredArgSource" />
                   <ComboBox fx:id="preferredArgSourceComboBox" layoutX="165.0" layoutY="8.0" prefHeight="25.0" prefWidth="90.0" />
                   <CheckBox fx:id="useUICheckBox" layoutX="165.0" layoutY="43.0" mnemonicParsing="false" text="%launch.panel.useUI" />
                   <Label fx:id="activateTrayLabel" layoutX="10.0" layoutY="29.0" text="%launch.panel.activateTray" />
