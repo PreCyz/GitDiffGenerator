@@ -55,6 +55,9 @@ public class StatisticService {
         }
         statistic.setControlSystemMap(createControlSystemMap(runDetails.getApplicationPropertiesCollection()));
         statistic.setApplicationVersion(appProperties.version().getVersion());
+        if (runDetails.getExceptionDetails() != null && !runDetails.getExceptionDetails().isEmpty()) {
+            statistic.setExceptions(runDetails.getExceptionDetails());
+        }
 
         return statistic;
     }

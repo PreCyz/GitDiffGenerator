@@ -1,18 +1,18 @@
 package pg.gipter.statistics;
 
+import org.bson.types.ObjectId;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Statistic implements Serializable {
 
     public static final String COLLECTION_NAME = "statistics";
 
-    private String id;
+    private ObjectId id;
     private String username;
     private String lastExecutionDate;
     private String firstExecutionDate;
@@ -24,12 +24,13 @@ public class Statistic implements Serializable {
     private Map<VersionControlSystem, Set<String>> controlSystemMap;
     private Set<String> systemUsers;
     private String applicationVersion;
+    private List<ExceptionDetails> exceptions;
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -119,5 +120,13 @@ public class Statistic implements Serializable {
 
     public void setApplicationVersion(String applicationVersion) {
         this.applicationVersion = applicationVersion;
+    }
+
+    public List<ExceptionDetails> getExceptions() {
+        return exceptions;
+    }
+
+    public void setExceptions(List<ExceptionDetails> exceptions) {
+        this.exceptions = exceptions;
     }
 }

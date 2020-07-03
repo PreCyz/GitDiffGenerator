@@ -13,6 +13,7 @@ import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.producers.DiffProducer;
 import pg.gipter.core.producers.DiffProducerFactory;
 import pg.gipter.launchers.Starter;
+import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.dto.RunDetails;
 import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
@@ -21,6 +22,8 @@ import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -123,7 +126,8 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             } finally {
                 status = calculateFinalStatus();
                 saveUploadStatus(status);
-                updateStatistics(status);
+                final List<ExceptionDetails> exceptionDetails = calculateErrorDetails();
+                updateStatistics(status, exceptionDetails);
                 displayAlertWindow(status);
             }
         }
@@ -250,7 +254,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         return isUploaded;
     }
 
-    private void updateStatistics(final UploadStatus status) {
+    private void updateStatistics(final UploadStatus status, final List<ExceptionDetails> exceptionDetails) {
         executor.execute(() -> {
             StatisticService statisticService = new StatisticService();
             LinkedList<ApplicationProperties> appProps = new LinkedList<>(applicationPropertiesCollection);
@@ -259,7 +263,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                     appProps.add(ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configName)));
                 }
             }
-            statisticService.updateStatistics(new RunDetails(appProps, status, runType));
+            statisticService.updateStatistics(new RunDetails(appProps, status, runType, exceptionDetails));
         });
     }
 
@@ -275,6 +279,20 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             status = UploadStatus.FAIL;
         }
         return status;
+    }
+
+    private List<ExceptionDetails> calculateErrorDetails() {
+        return resultMap.values()
+                .stream()
+                .filter(uploadResult -> !uploadResult.success)
+                .map(uploadResult -> new ExceptionDetails(
+                        uploadResult.logMsg(),
+                        Optional.ofNullable(uploadResult.throwable.getCause())
+                                .map(Throwable::getMessage)
+                                .orElseGet(() -> uploadResult.throwable.getMessage()),
+                        LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+                )
+                .collect(Collectors.toList());
     }
 
     private void saveUploadStatus(UploadStatus status) {

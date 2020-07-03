@@ -3,8 +3,13 @@ package pg.gipter.core.dao;
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.bson.codecs.Codec;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.statistics.ExceptionDetails;
+import pg.gipter.statistics.Statistic;
 import pg.gipter.utils.CryptoUtils;
 
 import java.io.*;
@@ -47,13 +52,23 @@ public abstract class MongoDaoConfig {
 
     private void init(Properties dbConfig) {
         try {
+            CodecRegistry codecRegistry = MongoClient.getDefaultCodecRegistry();
+            Codec<Document> documentCodec = codecRegistry.get(Document.class);
+            Codec<Statistic> statisticCodec = new StatisticCodec(codecRegistry);
+            Codec<ExceptionDetails> exceptionDetailsCodec = new ExceptionDetailsCodec(codecRegistry);
+            codecRegistry = CodecRegistries.fromRegistries(
+                    MongoClient.getDefaultCodecRegistry(),
+                    CodecRegistries.fromCodecs(documentCodec, statisticCodec, exceptionDetailsCodec)
+            );
+
             String host = dbConfig.getProperty("db.host");
             String username = dbConfig.getProperty("db.username");
             String password = CryptoUtils.decrypt(dbConfig.getProperty("db.password"));
             String databaseName = dbConfig.getProperty("db.dbName");
 
             MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
-                    .writeConcern(WriteConcern.ACKNOWLEDGED);
+                    .writeConcern(WriteConcern.ACKNOWLEDGED)
+                    .codecRegistry(codecRegistry);
             String uri = String.format("mongodb+srv://%s:%s@%s", username, password, host);
             MongoClientURI mongoClientURI = new MongoClientURI(uri, mongoClientOptionsBuilder);
             MongoClient mongoClient = new MongoClient(mongoClientURI);
