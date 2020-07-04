@@ -1968,14 +1968,14 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenStart_date_month_name_whenValueFromPattern_thenReturnMonthNameLowerCase() {
+    void givenStartDateFromCLI_whenValueFromPattern_thenReturnMonthNameLowerCaseTakenFromCliArg() {
         applicationProperties = new CliApplicationProperties(new String[]{
                 ArgName.startDate.name() + "=2020-06-01"
         });
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.start_date_month_name);
 
-        assertThat(actual).isEqualTo(LocalDate.now().getMonth().name().toLowerCase());
+        assertThat(actual).isEqualTo(Month.JUNE.name().toLowerCase());
     }
 
     @Test

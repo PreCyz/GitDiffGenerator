@@ -9,6 +9,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CacheManager;
+import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.jobs.JobHandler;
@@ -169,6 +170,7 @@ class TrayHandler {
         return windowEvent -> {
             hide();
             CacheManager.clearAllCache();
+            ConfigurationDaoFactory.getCachedConfigurationDao().resetCache();
         };
     }
 
