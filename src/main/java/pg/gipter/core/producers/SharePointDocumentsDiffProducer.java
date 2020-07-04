@@ -6,10 +6,7 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.processor.DocumentFinder;
 import pg.gipter.core.producers.processor.DocumentFinderFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -35,7 +32,7 @@ class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
             throw new IllegalArgumentException("Given projects do not contain any items.");
         }
 
-        logger.info("Upload type set as {}. Documents will be zipped and uploaded.", itemType);
+        logger.info("Item type set as {}. Documents will be zipped and uploaded.", itemType);
         DocumentFinder documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
         List<File> documents = documentFinder.find();
         if (documents.isEmpty()) {

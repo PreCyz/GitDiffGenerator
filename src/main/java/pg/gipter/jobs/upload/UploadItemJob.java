@@ -45,8 +45,9 @@ public class UploadItemJob implements Job {
 
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
 
-        new FXMultiRunner(jobParam.getConfigs(), uiLauncher.nonUIExecutor(), RunType.UPLOAD_ITEM_JOB, startDate)
-                .start();
+        new FXMultiRunner(
+                jobParam.getConfigs(), uiLauncher.nonUIExecutor(), RunType.UPLOAD_ITEM_JOB, startDate
+        ).start();
 
         logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         dataDao.saveNextUploadDateTime(nextUploadDate);

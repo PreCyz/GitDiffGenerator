@@ -157,17 +157,12 @@ class TrayHandler {
     private Image createTrayImage() {
         String path = "img/chicken-tray.gif";
         URL imageURL = getClass().getClassLoader().getResource(path);
-        if (imageURL == null) {
-            logger.error("Resource not found: {}", path);
-            return null;
-        } else {
-            String description = "Tray icon";
-            return new ImageIcon(imageURL, description).getImage();
-        }
+        String description = "Tray icon";
+        return new ImageIcon(imageURL, description).getImage();
     }
 
     private ActionListener createJobActionListener() {
-        return e -> Platform.runLater(() -> uiLauncher.showJobWindow());
+        return e -> Platform.runLater(uiLauncher::showJobWindow);
     }
 
     EventHandler<WindowEvent> trayOnCloseEventHandler() {

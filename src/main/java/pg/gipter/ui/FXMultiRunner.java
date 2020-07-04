@@ -101,6 +101,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         return null;
     }
 
+    @Override
     public void start() {
         UploadStatus status;
         logger.info("{} started.", this.getClass().getName());
