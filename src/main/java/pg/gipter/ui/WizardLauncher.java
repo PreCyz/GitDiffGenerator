@@ -13,42 +13,30 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.*;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.ResourceUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 import static java.util.stream.Collectors.toCollection;
 
 public class WizardLauncher implements Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(WizardLauncher.class);
-    private Stage primaryStage;
+    private final Stage primaryStage;
+    private final Properties wizardProperties;
+    private final String lastChosenConfiguration;
     private UILauncher uiLauncher;
-    private Properties wizardProperties;
-    private String lastChosenConfiguration;
     private ApplicationProperties applicationProperties;
 
     static final String projectLabelPropertyName = "projectLabelProperty";
@@ -204,6 +192,7 @@ public class WizardLauncher implements Launcher {
         properties.put(ArgName.author.name(), getValue(wizard, ArgName.author.name()));
         properties.put(ArgName.committerEmail.name(), getValue(wizard, ArgName.committerEmail.name()));
         properties.put(ArgName.itemPath.name(), getValue(wizard, ArgName.itemPath.name()));
+        @SuppressWarnings("unchecked")
         LinkedHashSet<SharePointConfig> sharePointConfigs =
                 Optional.ofNullable(wizard.getSettings().get(SharePointConfig.SHARE_POINT_CONFIGS))
                 .map(value -> (LinkedHashSet<SharePointConfig>) value)
@@ -236,9 +225,9 @@ public class WizardLauncher implements Launcher {
         comboBox.setId(id);
         comboBox.setValue(ItemType.SIMPLE);
         comboBox.setItems(FXCollections.observableArrayList(ItemType.values()));
-        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            wizardProperties.put(ArgName.itemType.name(), newValue.name());
-        });
+        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                wizardProperties.put(ArgName.itemType.name(), newValue.name())
+        );
         Tooltip tooltip = new Tooltip(BundleUtils.getMsg("wizard.uploadType.description"));
         tooltip.setTextAlignment(TextAlignment.LEFT);
         tooltip.setFont(Font.font("Courier New", 14));
@@ -358,6 +347,7 @@ public class WizardLauncher implements Launcher {
                 .toArray(String[]::new);
         RunConfig runConfig = RunConfig.valueFrom(args);
 
+        @SuppressWarnings("unchecked")
         LinkedHashSet<SharePointConfig> sharePointConfigs = wizardProperties.entrySet()
                     .stream()
                     .filter(entry -> SharePointConfig.SHARE_POINT_CONFIGS.equals(entry.getKey()))
@@ -369,10 +359,7 @@ public class WizardLauncher implements Launcher {
         }
 
         applicationProperties.updateCurrentRunConfig(runConfig);
-        ToolkitConfig toolkitConfig = ToolkitConfig.valueFrom(args);
-        if (toolkitConfig.isToolkitCredentialsSet()) {
-            applicationProperties.updateToolkitConfig(toolkitConfig);
-        }
+        applicationProperties.updateToolkitConfig(ToolkitConfig.valueFrom(args));
         applicationProperties.updateApplicationConfig(ApplicationConfig.valueFrom(args));
         applicationProperties.save();
     }
