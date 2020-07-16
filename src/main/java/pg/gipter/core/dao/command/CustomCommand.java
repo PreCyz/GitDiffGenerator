@@ -73,19 +73,27 @@ public class CustomCommand {
             while (iterator.hasNext()) {
                 final String cmd = iterator.next();
                 if (cmd.contains("'")) {
-                    StringBuilder argument = new StringBuilder(cmd);
-                    String param = "";
-                    do {
-                        param = iterator.next();
-                        argument.append(" ").append(param);
-                    } while (!param.contains("'") && iterator.hasNext());
+                    StringBuilder argument = handleQuotedText(iterator, cmd, "'");
                     result.add(argument.toString().replaceAll("'", ""));
+                } else if (cmd.contains("\"") && cmd.indexOf("\"") == cmd.lastIndexOf("\"")) {
+                    StringBuilder argument = handleQuotedText(iterator, cmd, "\"");
+                    result.add(argument.toString());
                 } else {
                     result.add(cmd);
                 }
             }
         }
         return result;
+    }
+
+    private StringBuilder handleQuotedText(Iterator<String> iterator, String cmd, String quote) {
+        StringBuilder argument = new StringBuilder(cmd);
+        String param;
+        do {
+            param = iterator.next();
+            argument.append(" ").append(param);
+        } while (!param.contains(quote) && iterator.hasNext());
+        return argument;
     }
 
     private String replacePlaceholders(String command, ApplicationProperties applicationProperties) {
@@ -97,12 +105,16 @@ public class CustomCommand {
     }
 
     private Map<String, String> escapedPlaceholderMap(ApplicationProperties applicationProperties) {
-        Map<String, String> result = new HashMap<>();
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("\"\\$\\{" + ArgName.author + "}\"", new LinkedList<>(applicationProperties.authors()).getFirst());
+        result.put("\"\\$\\{" + ArgName.gitAuthor + "}\"", applicationProperties.gitAuthor());
+        result.put("\"\\$\\{" + ArgName.svnAuthor + "}\"", applicationProperties.svnAuthor());
+        result.put("\"\\$\\{" + ArgName.mercurialAuthor + "}\"", applicationProperties.mercurialAuthor());
         result.put("\\$\\{" + ArgName.committerEmail + "}", applicationProperties.committerEmail());
-        result.put("\\$\\{" + ArgName.author + "}", new LinkedList<>(applicationProperties.authors()).getFirst());
-        result.put("\\$\\{" + ArgName.gitAuthor + "}", applicationProperties.gitAuthor());
-        result.put("\\$\\{" + ArgName.svnAuthor + "}", applicationProperties.svnAuthor());
-        result.put("\\$\\{" + ArgName.mercurialAuthor + "}", applicationProperties.mercurialAuthor());
+        result.put("\\$\\{" + ArgName.author + "}", "\"" + new LinkedList<>(applicationProperties.authors()).getFirst() + "\"");
+        result.put("\\$\\{" + ArgName.gitAuthor + "}", "\"" + applicationProperties.gitAuthor() + "\"");
+        result.put("\\$\\{" + ArgName.svnAuthor + "}", "\"" + applicationProperties.svnAuthor() + "\"");
+        result.put("\\$\\{" + ArgName.mercurialAuthor + "}", "\"" + applicationProperties.mercurialAuthor() + "\"");
         result.put("\\$\\{" + ArgName.startDate + "}", applicationProperties.startDate().format(DateTimeFormatter.ISO_DATE));
         result.put("\\$\\{" + ArgName.endDate + "}", applicationProperties.endDate().format(DateTimeFormatter.ISO_DATE));
         return result;
@@ -110,11 +122,15 @@ public class CustomCommand {
 
     private Map<String, String> placeholderMap(ApplicationProperties applicationProperties) {
         Map<String, String> result = new HashMap<>();
+        result.put("\"${" + ArgName.author + "}\"", new LinkedList<>(applicationProperties.authors()).getFirst());
+        result.put("\"${" + ArgName.gitAuthor + "}\"", applicationProperties.gitAuthor());
+        result.put("\"${" + ArgName.svnAuthor + "}\"", applicationProperties.svnAuthor());
+        result.put("\"${" + ArgName.mercurialAuthor + "}\"", applicationProperties.mercurialAuthor());
         result.put("${" + ArgName.committerEmail + "}", applicationProperties.committerEmail());
-        result.put("${" + ArgName.author + "}", new LinkedList<>(applicationProperties.authors()).getFirst());
-        result.put("${" + ArgName.gitAuthor + "}", applicationProperties.gitAuthor());
-        result.put("${" + ArgName.svnAuthor + "}", applicationProperties.svnAuthor());
-        result.put("${" + ArgName.mercurialAuthor + "}", applicationProperties.mercurialAuthor());
+        result.put("${" + ArgName.author + "}", "\"" + new LinkedList<>(applicationProperties.authors()).getFirst() + "\"");
+        result.put("${" + ArgName.gitAuthor + "}", "\"" + applicationProperties.gitAuthor() + "\"");
+        result.put("${" + ArgName.svnAuthor + "}", "\"" + applicationProperties.svnAuthor() + "\"");
+        result.put("${" + ArgName.mercurialAuthor + "}", "\"" + applicationProperties.mercurialAuthor() + "\"");
         result.put("${" + ArgName.startDate + "}", applicationProperties.startDate().format(DateTimeFormatter.ISO_DATE));
         result.put("${" + ArgName.endDate + "}", applicationProperties.endDate().format(DateTimeFormatter.ISO_DATE));
         return result;
