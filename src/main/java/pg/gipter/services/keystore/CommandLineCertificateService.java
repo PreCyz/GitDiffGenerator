@@ -12,13 +12,29 @@ class CommandLineCertificateService extends AbstractCertificateService {
     }
 
     @Override
-    public void addCertificate(String certPath, String alias) throws IOException {
+    public CertImportStatus addCertificate(String certPath, String alias) throws IOException {
         final List<String> command = Arrays.asList(
                 "keytool", "-import", "-alias", alias,
                 "-file", "\"" + certPath + "\"",
                 "-keystore", "\"" + getKeystorePath().toString() + "\"",
                 "-storepass", storepass
         );
+        executeCommand(command);
+        return CertImportStatus.SUCCESS;
+    }
+
+    @Override
+    public CertImportStatus removeCertificate(String alias) throws Exception {
+        final List<String> command = Arrays.asList(
+                "keytool", "-delete", "-alias", alias,
+                "-keystore", "\"" + getKeystorePath().toString() + "\"",
+                "-storepass", storepass
+        );
+        executeCommand(command);
+        return null;
+    }
+
+    private void executeCommand(List<String> command) throws IOException {
         logger.info("Full command to add certificate [{}]", command);
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);

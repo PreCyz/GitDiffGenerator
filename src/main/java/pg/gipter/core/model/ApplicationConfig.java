@@ -20,6 +20,7 @@ public class ApplicationConfig {
     private transient Level loggingLevel;
     private Boolean upgradeFinished;
     private String uiLanguage;
+    private Boolean certImportEnabled;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -31,6 +32,7 @@ public class ApplicationConfig {
         loggingLevel = Level.INFO;
         upgradeFinished = StringUtils.getBoolean(ArgName.upgradeFinished.defaultValue());
         uiLanguage = BundleUtils.getDefaultLanguage();
+        certImportEnabled = StringUtils.getBoolean(ArgName.certImport.defaultValue());
     }
 
     public Boolean getConfirmationWindow() {
@@ -105,6 +107,14 @@ public class ApplicationConfig {
         this.uiLanguage = uiLanguage;
     }
 
+    public Boolean getCertImportEnabled() {
+        return certImportEnabled;
+    }
+
+    public void setCertImportEnabled(Boolean certImportEnabled) {
+        this.certImportEnabled = certImportEnabled;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -134,6 +144,9 @@ public class ApplicationConfig {
         if (getUiLanguage() != null) {
             arguments.add(ArgName.uiLanguage.name() + "=" + getUiLanguage());
         }
+        if (getCertImportEnabled() != null) {
+            arguments.add(ArgName.certImport.name() + "=" + getCertImportEnabled());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -162,6 +175,8 @@ public class ApplicationConfig {
                     applicationConfig.setUpgradeFinished(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.uiLanguage.name().equals(argumentName)) {
                     applicationConfig.setUiLanguage(argumentValue);
+                } else if (ArgName.certImport.name().equals(argumentName)) {
+                    applicationConfig.setCertImportEnabled(StringUtils.getBoolean(argumentValue));
                 }
             }
         }
@@ -180,6 +195,7 @@ public class ApplicationConfig {
                 ", loggingLevel=" + loggingLevel +
                 ", upgradeFinished=" + upgradeFinished +
                 ", uiLanguage=" + uiLanguage +
+                ", certImportEnabled=" + certImportEnabled +
                 '}';
     }
 }

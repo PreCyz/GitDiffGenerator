@@ -18,8 +18,8 @@ import pg.gipter.statistics.dto.RunDetails;
 import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.JarHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -109,7 +109,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             logger.info("There is no configuration to launch.");
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog"))
-                    .withLink(AlertHelper.logsFolder())
+                    .withLink(JarHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
@@ -316,7 +316,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
                 alertWindowBuilder
                         .withMessage(detailedMessage)
-                        .withLink(AlertHelper.logsFolder())
+                        .withLink(JarHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
                         .withImage(ImageFile.randomFailImage());
@@ -325,7 +325,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
                 alertWindowBuilder
                         .withMessage(detailedMessage)
-                        .withLink(AlertHelper.logsFolder())
+                        .withLink(JarHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING)
                         .withImage(ImageFile.randomPartialSuccessImage());

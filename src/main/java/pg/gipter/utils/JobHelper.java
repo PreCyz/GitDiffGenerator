@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.toCollection;
 
 public class JobHelper {
 
-    private DataDao dataDao;
+    private final DataDao dataDao;
 
     public JobHelper() {
         dataDao = DaoFactory.getDataDao();

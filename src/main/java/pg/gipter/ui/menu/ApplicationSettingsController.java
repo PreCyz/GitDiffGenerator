@@ -30,6 +30,8 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private Label preferredArgSourceLabel;
     @FXML
+    private Label importCertLabel;
+    @FXML
     private TitledPane titledPane;
 
     @FXML
@@ -47,6 +49,8 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private CheckBox silentModeCheckBox;
     @FXML
+    private CheckBox importCertCheckBox;
+    @FXML
     private ComboBox<String> languageComboBox;
 
     private final Map<String, Labeled> labelsAffectedByLanguage;
@@ -60,14 +64,14 @@ public class ApplicationSettingsController extends AbstractController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
-        setInitValues(resources);
+        setInitValues();
         setProperties();
         setListeners();
         setAccelerators();
         createLabelsMap();
     }
 
-    private void setInitValues(ResourceBundle resources) {
+    private void setInitValues() {
         confirmationWindowCheckBox.setSelected(applicationProperties.isConfirmationWindow());
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
@@ -80,6 +84,7 @@ public class ApplicationSettingsController extends AbstractController {
             languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
         }
         languageComboBox.setValue(applicationProperties.uiLanguage());
+        importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
     }
 
     private void setProperties() {
@@ -129,6 +134,8 @@ public class ApplicationSettingsController extends AbstractController {
         });
 
         confirmationWindowCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+
+        importCertCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
     }
 
     private void saveNewSettings() {
@@ -147,6 +154,7 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setEnableOnStartup(autostartCheckBox.isSelected());
         applicationConfig.setSilentMode(silentModeCheckBox.isSelected());
         applicationConfig.setUiLanguage(languageComboBox.getValue());
+        applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
         return applicationConfig;
     }
 
@@ -167,5 +175,6 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.useUI", useUICheckBox);
         labelsAffectedByLanguage.put("launch.panel.silentMode", silentModeCheckBox);
         labelsAffectedByLanguage.put("launch.panel.title", titledPane);
+        labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
     }
 }

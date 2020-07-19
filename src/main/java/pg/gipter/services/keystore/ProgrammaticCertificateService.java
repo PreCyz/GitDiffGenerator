@@ -16,19 +16,18 @@ class ProgrammaticCertificateService extends AbstractCertificateService {
     private static final Logger logger = LoggerFactory.getLogger(ProgrammaticCertificateService.class);
 
     @Override
-    public void addCertificate(String certPath, String alias) throws Exception {
+    public CertImportStatus addCertificate(String certPath, String alias) throws Exception {
         InputStream certIn = ClassLoader.class.getResourceAsStream(certPath);
 
         final Path cacertPath = getKeystorePath();
         InputStream localCertIn = new FileInputStream(cacertPath.toFile());
-
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
         keystore.load(localCertIn, storepass.toCharArray());
         if (keystore.containsAlias(alias)) {
             logger.info("Alias [{}] is already in the store.", alias);
             certIn.close();
             localCertIn.close();
-            return;
+            return CertImportStatus.ALREADY_IMPORTED;
         }
         localCertIn.close();
 
@@ -43,6 +42,16 @@ class ProgrammaticCertificateService extends AbstractCertificateService {
         OutputStream out = new FileOutputStream(cacertPath.toFile());
         keystore.store(out, storepass.toCharArray());
         out.close();
+        return CertImportStatus.SUCCESS;
+    }
+
+    @Override
+    public CertImportStatus removeCertificate(String alias) throws Exception {
+        InputStream localCertIn = new FileInputStream(getKeystorePath().toFile());
+        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keystore.load(localCertIn, storepass.toCharArray());
+        keystore.deleteEntry(alias);
+        return CertImportStatus.SUCCESS;
     }
 
     @Override
@@ -59,7 +68,6 @@ class ProgrammaticCertificateService extends AbstractCertificateService {
             Optional<Key> ssoSigningKey = Optional.ofNullable(keystore.getKey(keyAlias, storepass.toCharArray()));
             ssoSigningKey.ifPresent(System.out::println);
             Certificate certificate = keystore.getCertificate(keyAlias);
-            //System.out.printf("Alias: %s%n%s%n", keyAlias, certificate.toString());
             result.put(keyAlias, certificate.toString());
         }
 

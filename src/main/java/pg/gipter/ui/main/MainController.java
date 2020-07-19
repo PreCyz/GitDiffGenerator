@@ -30,6 +30,7 @@ import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.*;
+import pg.gipter.services.keystore.*;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.*;
@@ -49,8 +50,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toCollection;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
@@ -72,6 +72,10 @@ public class MainController extends AbstractController {
     private MenuItem wizardMenuItem;
     @FXML
     private MenuItem wikiMenuItem;
+    @FXML
+    private MenuItem importCertMenuItem;
+    @FXML
+    private MenuItem importCertProgrammaticMenuItem;
 
     @FXML
     private TextField authorsTextField;
@@ -303,6 +307,12 @@ public class MainController extends AbstractController {
 
         TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
         setUpgradeMenuItemDisabled();
+
+        final boolean enableImportCert = StringUtils.notEmpty(System.getProperty("java.home")) &&
+                applicationProperties.isCertImportEnabled() &&
+                CertificateServiceFactory.getInstance(true).hasCertToImport();
+        importCertMenuItem.setDisable(!enableImportCert);
+        importCertProgrammaticMenuItem.setDisable(!enableImportCert);
     }
 
     private void setAccelerators() {
@@ -313,6 +323,8 @@ public class MainController extends AbstractController {
         instructionMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
         wizardMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
         wikiMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
+        importCertMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN));
+        importCertProgrammaticMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN));
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
                 e.consume();
@@ -428,6 +440,8 @@ public class MainController extends AbstractController {
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
         verifyCredentialsHyperlink.setOnMouseClicked(verifyCredentialsHyperlinkOnMouseClickEventHandler());
         itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
+        importCertMenuItem.setOnAction(importCertEventHandler());
+        importCertProgrammaticMenuItem.setOnAction(importCertProgrammaticEventHandler());
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
@@ -818,7 +832,7 @@ public class MainController extends AbstractController {
             } catch (IllegalStateException ex) {
                 alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(ex.getMessage())
-                        .withLink(AlertHelper.logsFolder())
+                        .withLink(JarHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
                         .withImage(ImageFile.ERROR_CHICKEN_PNG);
@@ -847,7 +861,7 @@ public class MainController extends AbstractController {
                                 .withImage(ImageFile.FINGER_UP_PNG);
                     } else {
                         alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
-                                .withLink(AlertHelper.logsFolder())
+                                .withLink(JarHelper.logsFolder())
                                 .withWindowType(WindowType.LOG_WINDOW)
                                 .withAlertType(Alert.AlertType.ERROR)
                                 .withImage(ImageFile.MINION_IOIO_GIF);
@@ -870,6 +884,57 @@ public class MainController extends AbstractController {
                 itemFileNamePrefixTextField.positionCaret(currentItemName.length());
             }
         };
+    }
+
+    private EventHandler<ActionEvent> importCertEventHandler() {
+        return actionEvent -> {
+            final List<CertImportResult> certs = CertificateServiceFactory.getInstance(true).automaticImport();
+            autoImport(certs);
+        };
+    }
+
+    private EventHandler<ActionEvent> importCertProgrammaticEventHandler() {
+        return actionEvent -> {
+            final List<CertImportResult> certs = CertificateServiceFactory.getInstance(false).automaticImport();
+            autoImport(certs);
+        };
+    }
+
+    private void autoImport(List<CertImportResult> certs) {
+        String successMsg = certs.stream()
+                .filter(r -> r.getStatus() == CertImportStatus.SUCCESS)
+                .map(CertImportResult::getCertName)
+                .collect(joining(","));
+        String importedMsg = certs.stream()
+                .filter(r -> r.getStatus() == CertImportStatus.ALREADY_IMPORTED)
+                .map(CertImportResult::getCertName)
+                .collect(joining(","));
+        String failMsg = certs.stream()
+                .filter(r -> r.getStatus() == CertImportStatus.FAILED)
+                .map(CertImportResult::getCertName)
+                .collect(joining(","));
+
+        String finalMsg = "";
+        EnumSet<CertImportStatus> statuses = EnumSet.noneOf(CertImportStatus.class);
+        if (StringUtils.notEmpty(successMsg)) {
+            finalMsg = BundleUtils.getMsg("certificate.add.success", successMsg) + "\n";
+            statuses.add(CertImportStatus.SUCCESS);
+        }
+        if (StringUtils.notEmpty(successMsg)) {
+            finalMsg += BundleUtils.getMsg("certificate.add.failed", failMsg) + "\n";
+            statuses.add(CertImportStatus.FAILED);
+        }
+        if (StringUtils.notEmpty(importedMsg)) {
+            finalMsg += BundleUtils.getMsg("certificate.add.exists", importedMsg);
+            statuses.add(CertImportStatus.ALREADY_IMPORTED);
+        }
+        AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
+        alertWindowBuilder.withHeaderText(finalMsg)
+                .withWindowType(WindowType.LOG_WINDOW)
+                .withAlertType(Alert.AlertType.INFORMATION)
+                .withImage(statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
+                        ImageFile.randomSuccessImage() : ImageFile.randomFailImage())
+                .buildAndDisplayWindow();
     }
 
     private void setToolkitCredentialsIfAvailable() {

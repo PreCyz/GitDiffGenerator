@@ -278,4 +278,12 @@ class FileApplicationProperties extends ApplicationProperties {
         return argExtractor.uiLanguage();
     }
 
+    @Override
+    public boolean isCertImportEnabled() {
+        if (applicationConfig.getCertImportEnabled() != null) {
+            return applicationConfig.getCertImportEnabled();
+        }
+        return argExtractor.isCertImportEnabled();
+    }
+
 }

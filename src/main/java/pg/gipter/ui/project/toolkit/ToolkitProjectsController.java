@@ -20,8 +20,8 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.ui.project.ProjectDetails;
-import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.JarHelper;
 
 import java.net.URL;
 import java.util.*;
@@ -143,7 +143,7 @@ public class ToolkitProjectsController extends AbstractController {
                 } else {
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                             .withHeaderText(BundleUtils.getMsg("toolkit.projects.canNotDownload"))
-                            .withLink(AlertHelper.logsFolder())
+                            .withLink(JarHelper.logsFolder())
                             .withAlertType(Alert.AlertType.WARNING)
                             .withWindowType(WindowType.LOG_WINDOW)
                             .withImage(ImageFile.ERROR_CHICKEN_PNG);

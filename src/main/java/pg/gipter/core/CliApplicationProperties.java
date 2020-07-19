@@ -289,4 +289,13 @@ class CliApplicationProperties extends ApplicationProperties {
         return uiLanguage;
     }
 
+    @Override
+    public boolean isCertImportEnabled() {
+        boolean certImportEnabled = argExtractor.isCertImportEnabled();
+        if (!containsArg(ArgName.certImport.name()) && applicationConfig.getCertImportEnabled() != null) {
+            certImportEnabled = applicationConfig.getCertImportEnabled();
+        }
+        return certImportEnabled;
+    }
+
 }
