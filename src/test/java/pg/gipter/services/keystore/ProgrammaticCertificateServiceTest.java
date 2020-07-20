@@ -50,7 +50,7 @@ class ProgrammaticCertificateServiceTest {
         assertThat(cert.toFile().exists()).isTrue();
 
         final ProgrammaticCertificateService serviceSpy = spy(new ProgrammaticCertificateService());
-        doNothing().when(serviceSpy).addCertificate(anyString(), anyString());
+        doReturn(CertImportStatus.SUCCESS).when(serviceSpy).addCertificate(anyString(), anyString());
 
         final List<CertImportResult> actual = serviceSpy.automaticImport();
 
