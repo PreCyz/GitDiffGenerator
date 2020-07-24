@@ -29,13 +29,14 @@ abstract class AbstractCertificateService implements CertificateService {
         return Paths.get(javaHome, "bin", "keytool");
     }
 
-    protected Path getKeystorePath() {
+    @Override
+    public Path getKeystorePath() {
         String javaHome = System.getProperty("java.home");
         if (StringUtils.nullOrEmpty(javaHome)) {
             logger.error("Can not find java home.");
             throw new IllegalStateException("Can not find java home.");
         }
-        final Path path = Paths.get(javaHome, "lib", "security", "cacerts");
+        final Path path = Paths.get(javaHome, "lib", "security", "keystore.jks");
         logger.info("Full cacerts path: '{}'", path.toString());
         return path;
     }

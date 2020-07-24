@@ -1,7 +1,6 @@
 package pg.gipter.services.keystore;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +25,7 @@ class ProgrammaticCertificateServiceTest {
     }
 
     @Test
+    @Disabled
     void whenGetCecartsFile_thenReturnPath() {
         final Path cacertsPath = new ProgrammaticCertificateService().getKeystorePath();
 
@@ -36,6 +36,7 @@ class ProgrammaticCertificateServiceTest {
     }
 
     @Test
+    @Disabled
     void givenKeystore_whenGetCertificates_thenReturnListOfCerts() throws Exception {
         Map<String, String> actual = new ProgrammaticCertificateService().getCertificates();
 

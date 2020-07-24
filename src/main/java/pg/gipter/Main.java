@@ -11,6 +11,7 @@ import pg.gipter.converters.ConverterFactory;
 import pg.gipter.core.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
+import pg.gipter.services.keystore.CertificateServiceFactory;
 import pg.gipter.utils.StringUtils;
 
 import java.util.*;
@@ -49,6 +50,9 @@ public class Main extends Application {
         String javaHome = args[args.length - 1];
         if (javaHome.startsWith("java.home")) {
             System.setProperty("java.home", javaHome.split("=")[1]);
+            System.setProperty("javax.net.ssl.trustStore",
+                    CertificateServiceFactory.getInstance(true).getKeystorePath().toString());
+            System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
             logger.info("New JAVA_HOME {}.", System.getProperty("java.home"));
         }
     }
