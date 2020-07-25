@@ -1,42 +1,72 @@
 package pg.gipter.services.vcs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 public class GitService implements VcsService {
 
+    private static final Logger logger = LoggerFactory.getLogger(GitService.class);
 
-
-
+    private final List<String> userNameCommand = Stream.of("git", "config", "--get", "user.name").collect(toUnmodifiableList());
+    private final List<String> userEmailCommand = Stream.of("git", "config", "--get", "user.email").collect(toUnmodifiableList());
 
     @Override
-    public String getUserName() {
-        logger.info("Updating the repository [{}] with command [{}].", projectPath, String.join(" ", diffCommand.updateRepositoriesCommand()));
-        ProcessBuilder processBuilder = new ProcessBuilder(diffCommand.updateRepositoriesCommand());
+    public Optional<String> getUserName(String projectPath) {
+        Optional<String> result = Optional.empty();
+
+        ProcessBuilder processBuilder = new ProcessBuilder(userNameCommand);
         processBuilder.directory(Paths.get(projectPath).toFile());
-        Process process = processBuilder.start();
+        try {
+            Process process = processBuilder.start();
 
-        try (InputStream is = process.getInputStream();
-             InputStreamReader isr = new InputStreamReader(is);
-             BufferedReader br = new BufferedReader(isr)) {
+            try (InputStream is = process.getInputStream();
+                 InputStreamReader isr = new InputStreamReader(is);
+                 BufferedReader br = new BufferedReader(isr)) {
 
-            StringBuilder builder = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                builder.append(String.format("%s%n", line));
+                String line;
+                if ((line = br.readLine()) != null) {
+                    result = Optional.of(String.format("%s", line));
+                    logger.debug("Git config contains following user.name [{}].", line);
+                }
             }
-            logger.debug(builder.toString());
-
         } catch (Exception ex) {
             logger.error(ex.getMessage());
-            throw new IOException(ex);
         }
 
-        return null;
+        return result;
     }
 
     @Override
-    public String getUserEmail() {
-        return null;
+    public Optional<String> getUserEmail(String projectPath) {
+        Optional<String> result = Optional.empty();
+
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(userEmailCommand);
+            processBuilder.directory(Paths.get(projectPath).toFile());
+            Process process = processBuilder.start();
+
+            try (InputStream is = process.getInputStream();
+                 InputStreamReader isr = new InputStreamReader(is);
+                 BufferedReader br = new BufferedReader(isr)) {
+
+                String line;
+                if ((line = br.readLine()) != null) {
+                    result = Optional.of(String.format("%s", line));
+                    logger.debug("Git config contains following user.name [{}].", line);
+                }
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage());
+        }
+
+        return result;
     }
 }

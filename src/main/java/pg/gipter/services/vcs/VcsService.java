@@ -1,6 +1,8 @@
 package pg.gipter.services.vcs;
 
+import java.util.Optional;
+
 public interface VcsService {
-    String getUserName();
-    String getUserEmail();
+    Optional<String> getUserName(String projectPath);
+    Optional<String> getUserEmail(String projectPath);
 }
