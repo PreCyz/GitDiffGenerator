@@ -93,6 +93,10 @@ public class MainController extends AbstractController {
     private CheckBox skipRemoteCheckBox;
     @FXML
     private CheckBox fetchAllCheckBox;
+    @FXML
+    private Checkbox useDefaultAuthorCheckBox;
+    @FXML
+    private Checkbox useDefaultEmailCheckBox;
 
     @FXML
     private TextField toolkitUsernameTextField;
