@@ -36,6 +36,9 @@ public class MainWindowObject extends BaseWindowObject {
 
     private final String verifyCredentialsHyperlinkId = "verifyCredentialsHyperlink";
 
+    private final String useDefaultAuthorCheckBoxId = "useDefaultAuthorCheckBox";
+    private final String useDefaultEmailCheckBoxId = "useDefaultEmailCheckBox";
+
     public MainWindowObject(FxRobot robot) {
         super(robot);
     }
@@ -105,6 +108,45 @@ public class MainWindowObject extends BaseWindowObject {
 
     public MainWindowObject clickVerifyCredentialsHyperlink() {
         clickHyperLink(verifyCredentialsHyperlinkId);
+        return this;
+    }
+
+    public MainWindowObject enterGitAuthor(String value) {
+        clickAndWrite(gitAuthorTextFieldId, value);
+        return this;
+    }
+
+    public MainWindowObject checkDefaultAuthor() {
+        selectCheckBox(useDefaultAuthorCheckBoxId);
+        return this;
+    }
+
+    public MainWindowObject uncheckDefaultAuthor() {
+        deselectCheckBox(useDefaultAuthorCheckBoxId);
+        return this;
+    }
+
+    public MainWindowObject checkDefaultEmail() {
+        selectCheckBox(useDefaultEmailCheckBoxId);
+        return this;
+    }
+
+    public MainWindowObject uncheckDefaultEmail() {
+        deselectCheckBox(useDefaultEmailCheckBoxId);
+        return this;
+    }
+
+    public MainWindowObject clickAuthor() {
+        clickAndWrite(authorsTextFieldId, "");
+        return this;
+    }
+
+    public MainWindowObject waitForPopup(int seconds) {
+        try {
+            Thread.sleep(1000 * seconds);
+        } catch (InterruptedException e) {
+            System.err.printf("Could not wait. Something went wrong %s\n", e.getMessage());
+        }
         return this;
     }
 
@@ -188,12 +230,11 @@ public class MainWindowObject extends BaseWindowObject {
         return getHyperLink(verifyCredentialsHyperlinkId);
     }
 
-    public MainWindowObject waitForPopup(int seconds) {
-        try {
-            Thread.sleep(1000 * seconds);
-        } catch (InterruptedException e) {
-            System.err.printf("Could not wait. Something went wrong %s\n", e.getMessage());
-        }
-        return this;
+    public CheckBox getUseDefaultAuthorCheckBox() {
+        return getCheckBox(useDefaultAuthorCheckBoxId);
+    }
+
+    public CheckBox getUseDefaultEmailCheckBox() {
+        return getCheckBox(useDefaultEmailCheckBoxId);
     }
 }

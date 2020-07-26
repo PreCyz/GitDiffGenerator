@@ -11,15 +11,22 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
 
-public class GitService implements VcsService {
+class GitService implements VcsService {
 
     private static final Logger logger = LoggerFactory.getLogger(GitService.class);
 
     private final List<String> userNameCommand = Stream.of("git", "config", "--get", "user.name").collect(toUnmodifiableList());
     private final List<String> userEmailCommand = Stream.of("git", "config", "--get", "user.email").collect(toUnmodifiableList());
 
+    private String projectPath;
+
     @Override
-    public Optional<String> getUserName(String projectPath) {
+    public void setProjectPath(String projectPath) {
+        this.projectPath = projectPath;
+    }
+
+    @Override
+    public Optional<String> getUserName() {
         Optional<String> result = Optional.empty();
 
         ProcessBuilder processBuilder = new ProcessBuilder(userNameCommand);
@@ -45,7 +52,7 @@ public class GitService implements VcsService {
     }
 
     @Override
-    public Optional<String> getUserEmail(String projectPath) {
+    public Optional<String> getUserEmail() {
         Optional<String> result = Optional.empty();
 
         try {

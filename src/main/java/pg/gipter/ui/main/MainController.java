@@ -29,10 +29,13 @@ import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.*;
 import pg.gipter.services.keystore.*;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
+import pg.gipter.services.vcs.VcsService;
+import pg.gipter.services.vcs.VcsServiceFactory;
 import pg.gipter.ui.*;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.*;
@@ -94,9 +97,9 @@ public class MainController extends AbstractController {
     @FXML
     private CheckBox fetchAllCheckBox;
     @FXML
-    private Checkbox useDefaultAuthorCheckBox;
+    private CheckBox useDefaultAuthorCheckBox;
     @FXML
-    private Checkbox useDefaultEmailCheckBox;
+    private CheckBox useDefaultEmailCheckBox;
 
     @FXML
     private TextField toolkitUsernameTextField;
@@ -164,6 +167,7 @@ public class MainController extends AbstractController {
     private String inteliSense = "";
     private boolean useInteliSense = false;
     private static boolean useComboBoxValueChangeListener = true;
+    private VcsService vcsService;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -173,6 +177,11 @@ public class MainController extends AbstractController {
                 .stream()
                 .map(e -> String.format("{%s}", e.name()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+        this.vcsService = VcsServiceFactory.getInstance();
+    }
+
+    public void setVcsService(VcsService vcsService) {
+        this.vcsService = vcsService;
     }
 
     @Override
@@ -317,18 +326,104 @@ public class MainController extends AbstractController {
                 CertificateServiceFactory.getInstance(true).hasCertToImport();
         importCertMenuItem.setDisable(!enableImportCert);
         importCertProgrammaticMenuItem.setDisable(!enableImportCert);
+        useDefaultAuthorCheckBox.setDisable(disableDefaultAuthor());
+        setTooltipOnUseDefaultAuthor();
+        useDefaultEmailCheckBox.setDisable(disableDefaultEmail());
+        setTooltipOnUseDefaultEmail();
+    }
+
+    private boolean disableDefaultAuthor() {
+        boolean disabled = true;
+        if (EnumSet.of(ItemType.STATEMENT, ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS)
+                .contains(applicationProperties.itemType())) {
+
+            Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
+                    .stream()
+                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath).toFile()))
+                    .collect(toSet());
+
+            if (vcsSet.contains(VersionControlSystem.GIT)) {
+                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+                Optional<String> userName = vcsService.getUserName();
+                if (userName.isPresent()) {
+                    disabled = applicationProperties.authors().contains(userName.get());
+                    disabled |= StringUtils.notEmpty(applicationProperties.gitAuthor()) &&
+                            !userName.get().equals(applicationProperties.gitAuthor());
+                }
+            }
+        }
+        return disabled;
+    }
+
+    private void setTooltipOnUseDefaultAuthor() {
+        vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+        String userName = vcsService.getUserName().orElseGet(() -> "");
+        Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultAuthor.tooltip", userName));
+        tooltip.setTextAlignment(TextAlignment.LEFT);
+        tooltip.setFont(Font.font("Courier New", 16));
+        useDefaultAuthorCheckBox.setTooltip(tooltip);
+    }
+
+    private boolean disableDefaultEmail() {
+        boolean disabled = true;
+        if (EnumSet.of(ItemType.STATEMENT, ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS)
+                .contains(applicationProperties.itemType())) {
+
+            Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
+                    .stream()
+                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath).toFile()))
+                    .collect(toSet());
+            if (vcsSet.contains(VersionControlSystem.GIT) &&
+                    StringUtils.notEmpty(applicationProperties.committerEmail())) {
+
+                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+                Optional<String> userEmail = vcsService.getUserEmail();
+
+                if (userEmail.isPresent()) {
+                    disabled = userEmail.get().equals(applicationProperties.committerEmail());
+                }
+            }
+        }
+        return disabled;
+    }
+
+    private void setTooltipOnUseDefaultEmail() {
+        vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+        String userEmail = vcsService.getUserEmail().orElseGet(() -> "");
+        Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultEmail.tooltip", userEmail));
+        tooltip.setTextAlignment(TextAlignment.LEFT);
+        tooltip.setFont(Font.font("Courier New", 16));
+        useDefaultEmailCheckBox.setTooltip(tooltip);
     }
 
     private void setAccelerators() {
-        applicationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        toolkitMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        upgradeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        readMeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        instructionMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        wizardMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        wikiMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        importCertMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN));
-        importCertProgrammaticMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN));
+        applicationMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
+        );
+        toolkitMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
+        );
+        upgradeMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
+        );
+        readMeMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
+        );
+        instructionMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
+        );
+        wizardMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
+        );
+        wikiMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
+        );
+        importCertMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN)
+        );
+        importCertProgrammaticMenuItem.setAccelerator(
+                new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN)
+        );
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
                 e.consume();
@@ -684,7 +779,9 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             boolean disableProjectButton = itemTypeComboBox.getValue() == ItemType.STATEMENT;
-            disableProjectButton |= applicationProperties.getRunConfigMap().isEmpty() && configurationNameTextField.getText().isEmpty();
+            System.out.println("configurationNameTextField.getText() = " + configurationNameTextField.getText());
+            disableProjectButton |= applicationProperties.getRunConfigMap().isEmpty() &&
+                    configurationNameTextField.getText().isEmpty();
             projectPathButton.setDisable(disableProjectButton);
             if (itemTypeComboBox.getValue() == ItemType.TOOLKIT_DOCS) {
                 endDatePicker.setValue(LocalDate.now());
@@ -973,6 +1070,10 @@ public class MainController extends AbstractController {
         configurationNameTextField.textProperty().addListener(configurationNameListener());
         useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
         itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
+        useDefaultAuthorCheckBox.selectedProperty().addListener(useDefaultAuthorChangeListener());
+        useDefaultEmailCheckBox.selectedProperty().addListener(useDefaultEmailChangeListener());
+        gitAuthorTextField.focusedProperty().addListener(gitAuthorFocusChangeListener());
+        committerEmailTextField.focusedProperty().addListener(committerEmailFocusChangeListener());
     }
 
     private ChangeListener<String> toolkitUsernameListener() {
@@ -1051,6 +1152,54 @@ public class MainController extends AbstractController {
                     } else {
                         inteliSense = newValue.substring(newValue.lastIndexOf("{"));
                     }
+                }
+            }
+        };
+    }
+
+    private ChangeListener<? super Boolean> useDefaultAuthorChangeListener() {
+        return (observable, oldValue, newValue) -> {
+            if (newValue) {
+                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+                vcsService.getUserName().ifPresent(userName -> gitAuthorTextField.setText(userName));
+            } else {
+                gitAuthorTextField.setText(applicationProperties.gitAuthor());
+            }
+        };
+    }
+
+    private ChangeListener<? super Boolean> useDefaultEmailChangeListener() {
+        return (observable, oldValue, newValue) -> {
+            if (newValue) {
+                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+                vcsService.getUserEmail().ifPresent(userEmail -> committerEmailTextField.setText(userEmail));
+            } else {
+                committerEmailTextField.setText(applicationProperties.committerEmail());
+            }
+        };
+    }
+
+    private ChangeListener<? super Boolean> gitAuthorFocusChangeListener() {
+        return (ChangeListener<Boolean>) (observableValue, oldValue, newValue) -> {
+            if (!newValue) {
+                if (gitAuthorTextField.getLength() > 0) {
+                    vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+                    vcsService.getUserEmail().ifPresent(userName ->
+                        useDefaultAuthorCheckBox.setDisable(gitAuthorTextField.getText().equals(userName))
+                    );
+                }
+            }
+        };
+    }
+
+    private ChangeListener<? super Boolean> committerEmailFocusChangeListener() {
+        return (ChangeListener<Boolean>) (observableValue, oldValue, newValue) -> {
+            if (!newValue) {
+                if (committerEmailTextField.getLength() > 0) {
+                    vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+                    vcsService.getUserEmail().ifPresent(userEmail ->
+                        useDefaultEmailCheckBox.setDisable(committerEmailTextField.getText().equals(userEmail))
+                    );
                 }
             }
         };

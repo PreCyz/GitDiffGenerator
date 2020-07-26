@@ -10,14 +10,18 @@ class GitServiceTest {
 
     @Test
     void givenGitProjectPath_whenGetUserName_thenReturnUserName() {
-        Optional<String> actual = new GitService().getUserName(".");
+        GitService gitService = new GitService();
+        gitService.setProjectPath(".");
+        Optional<String> actual = gitService.getUserName();
         assertThat(actual.isPresent()).isTrue();
         assertThat(actual.get()).isNotBlank();
     }
 
     @Test
     void givenGitProjectPath_whenGetUserEmail_thenReturnUserEmail() {
-        Optional<String> actual = new GitService().getUserEmail(".");
+        GitService gitService = new GitService();
+        gitService.setProjectPath(".");
+        Optional<String> actual = gitService.getUserEmail();
         assertThat(actual.isPresent()).isTrue();
         assertThat(actual.get()).isNotBlank();
     }

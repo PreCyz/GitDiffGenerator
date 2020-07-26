@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane fx:id="mainAnchorPane" prefHeight="715.0" prefWidth="590.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="mainAnchorPane" prefHeight="715.0" prefWidth="590.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <MenuBar>
         <menus>
@@ -107,25 +107,25 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </TitledPane>
-                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="205.0" prefHeight="245.0" prefWidth="308.0" text="%csv.panel.title" textFill="#2102f8">
+                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="205.0" prefHeight="245.0" prefWidth="308.0" text="%vcs.panel.title" textFill="#2102f8">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="295.0" prefWidth="286.0">
                            <children>
-                              <Label layoutX="9.0" layoutY="10.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
+                              <Label layoutX="9.0" layoutY="10.0" prefHeight="17.0" prefWidth="53.0" text="%vcs.panel.authors" />
                               <TextField fx:id="authorsTextField" layoutX="109.0" layoutY="8.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="41.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
+                              <Label layoutX="9.0" layoutY="41.0" prefHeight="15.0" prefWidth="111.0" text="%vcs.panel.committerEmail" />
                               <TextField fx:id="committerEmailTextField" layoutX="109.0" layoutY="38.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="71.0" text="%csv.panel.gitAuthor" />
+                              <Label layoutX="9.0" layoutY="71.0" text="%vcs.panel.gitAuthor" />
                               <TextField fx:id="gitAuthorTextField" layoutX="109.0" layoutY="68.0" prefWidth="160.0" />
                               <TextField fx:id="mercurialAuthorTextField" layoutX="109.0" layoutY="98.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="101.0" text="%csv.panel.mercurialAuthor" />
+                              <Label layoutX="9.0" layoutY="101.0" text="%vcs.panel.mercurialAuthor" />
                               <TextField fx:id="svnAuthorTextField" layoutX="109.0" layoutY="128.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="131.0" text="%csv.panel.svnAuthor" />
-                              <Label layoutX="10.0" layoutY="161.0" text="%csv.panel.itemType" />
+                              <Label layoutX="9.0" layoutY="131.0" text="%vcs.panel.svnAuthor" />
+                              <Label layoutX="10.0" layoutY="161.0" text="%vcs.panel.itemType" />
                               <ComboBox fx:id="itemTypeComboBox" layoutX="109.0" layoutY="158.0" prefWidth="160.0" />
                               <TextField fx:id="toolkitProjectListNamesTextField" layoutX="109.0" layoutY="188.0" prefHeight="25.0" prefWidth="160.0" />
                               <Label layoutX="9.0" layoutY="192.0" text="%toolkit.panel.projectListNames" />
-                              <CheckBox fx:id="useDefaultAuthorCheckBox" layoutX="279.0" layoutY="12.0" mnemonicParsing="false" />
+                              <CheckBox fx:id="useDefaultAuthorCheckBox" layoutX="279.0" layoutY="71.0" mnemonicParsing="false" />
                               <CheckBox fx:id="useDefaultEmailCheckBox" layoutX="279.0" layoutY="41.0" mnemonicParsing="false" />
                            </children>
                         </AnchorPane>

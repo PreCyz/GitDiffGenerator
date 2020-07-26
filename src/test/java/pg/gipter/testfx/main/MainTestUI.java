@@ -1,10 +1,10 @@
 package pg.gipter.testfx.main;
 
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.testfx.api.FxRobot;
@@ -18,17 +18,22 @@ import pg.gipter.core.dao.configuration.CachedConfiguration;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.services.vcs.VcsService;
 import pg.gipter.testfx.UITestUtils;
 import pg.gipter.ui.*;
+import pg.gipter.ui.main.MainController;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Mockito.when;
 import static org.testfx.api.FxAssert.verifyThat;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
@@ -36,8 +41,11 @@ public class MainTestUI {
 
     @Mock
     private UILauncher uiLauncherMock;
+    @Mock
+    private VcsService vcsService;
 
     private final CachedConfiguration dao = DaoFactory.getCachedConfiguration();
+    private AbstractWindow window;
 
     @AfterEach
     private void teardown() {
@@ -62,7 +70,7 @@ public class MainTestUI {
     }
 
     private void createWindow(Stage stage) throws IOException {
-        AbstractWindow window = WindowFactory.MAIN.createWindow(
+        window = WindowFactory.MAIN.createWindow(
                 ApplicationPropertiesFactory.getInstance(new String[]{}),
                 uiLauncherMock
         );
@@ -220,6 +228,8 @@ public class MainTestUI {
         assertThat(windowObject.getDeleteDownloadedFilesCheckBox().isDisabled()).isFalse();
         assertThat(windowObject.getStartDatePicker().isDisabled()).isFalse();
         assertThat(windowObject.getEndDatePicker().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isTrue();
     }
 
     @Test
@@ -255,5 +265,29 @@ public class MainTestUI {
                 .clickVerifyCredentialsHyperlink();
 
         assertThat(windowObject.getVerifyCredentialsHyperLink().isVisited()).isFalse();
+    }
+
+    @Test
+    @Disabled
+    void givenDifferentConfigUserThanEnteredUser_whenGitAuthorFocusLost_thenUseDefaultAuthorEnabled(FxRobot robot) {
+        when(vcsService.getUserName()).thenReturn(Optional.of("configAuthor"));
+        final MainWindowObject windowObject = new MainWindowObject(robot)
+                .enterConfigurationName("code")
+                .pressAddConfigurationButton()
+                .pressOkOnPopup();
+
+        MainController controller = (MainController) window.getController();
+        controller.setVcsService(vcsService);
+        Optional<RunConfig> code = dao.loadRunConfig("code");
+        code.ifPresent(rc -> {
+            rc.setProjectPath(".");
+            dao.updateCachedConfiguration(rc);
+        });
+
+        Platform.runLater(() -> {
+            controller.initialize(null, BundleUtils.loadBundle());
+            windowObject.enterGitAuthor("testAuthor").clickAuthor();
+            assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isFalse();
+        });
     }
 }

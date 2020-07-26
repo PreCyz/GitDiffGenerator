@@ -1,5 +1,6 @@
 package pg.gipter.services.keystore;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -20,6 +21,7 @@ class CommandLineCertificateServiceTest {
     }
 
     @Test
+    @Disabled
     void givenKeystore_whenGetCertificates_thenReturnListOfCerts() throws IOException {
         final Map<String, String> certificates = new CommandLineCertificateService().getCertificates();
 
