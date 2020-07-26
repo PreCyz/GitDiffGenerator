@@ -161,13 +161,13 @@ public class MainController extends AbstractController {
 
     private final DataService dataService;
 
-    private String userFolderUrl;
     private final Set<String> definedPatterns;
     private String currentItemName = "";
     private String inteliSense = "";
     private boolean useInteliSense = false;
     private static boolean useComboBoxValueChangeListener = true;
     private VcsService vcsService;
+    private ToolkitSectionController toolkitSectionController;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -180,6 +180,16 @@ public class MainController extends AbstractController {
         this.vcsService = VcsServiceFactory.getInstance();
     }
 
+    private Map<String, Object> initToolkitSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("toolkitUsernameTextField", toolkitUsernameTextField);
+        map.put("toolkitPasswordField", toolkitPasswordField);
+        map.put("toolkitDomainTextField", toolkitDomainTextField);
+        map.put("verifyCredentialsHyperlink", verifyCredentialsHyperlink);
+        map.put("verifyProgressIndicator", verifyProgressIndicator);
+        return map;
+    }
+
     public void setVcsService(VcsService vcsService) {
         this.vcsService = vcsService;
     }
@@ -187,6 +197,8 @@ public class MainController extends AbstractController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
+        toolkitSectionController = new ToolkitSectionController(uiLauncher, applicationProperties, initToolkitSectionMap());
+        toolkitSectionController.initialize(location, resources);
         setInitValues();
         initConfigurationName();
         setProperties(resources);
@@ -205,10 +217,6 @@ public class MainController extends AbstractController {
         itemTypeComboBox.setValue(applicationProperties.itemType());
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
         fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
-
-        toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
-        toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
 
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
@@ -234,10 +242,6 @@ public class MainController extends AbstractController {
             endDatePicker.setValue(applicationProperties.endDate());
         }
 
-        userFolderUrl = applicationProperties.toolkitUserFolder();
-        if (applicationProperties.toolkitUserFolder().equals(ArgName.toolkitUserFolder.defaultValue())) {
-            userFolderUrl = "";
-        }
         setLastItemSubmissionDate();
         currentWeekNumberLabel.setText(String.valueOf(applicationProperties.getWeekNumber(LocalDate.now())));
     }
@@ -287,7 +291,6 @@ public class MainController extends AbstractController {
     }
 
     private void setProperties(ResourceBundle resources) {
-        toolkitDomainTextField.setEditable(false);
         toolkitProjectListNamesTextField.setDisable(
                 !EnumSet.of(ItemType.TOOLKIT_DOCS).contains(applicationProperties.itemType())
         );
@@ -314,7 +317,6 @@ public class MainController extends AbstractController {
         setDisable(applicationProperties.itemType());
 
         loadProgressIndicator.setVisible(false);
-        verifyProgressIndicator.setVisible(false);
         instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
         setDisableDependOnConfigurations();
 
@@ -537,7 +539,6 @@ public class MainController extends AbstractController {
         saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler());
         addConfigurationButton.setOnAction(addConfigurationEventHandler());
         removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
-        verifyCredentialsHyperlink.setOnMouseClicked(verifyCredentialsHyperlinkOnMouseClickEventHandler());
         itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
         importCertMenuItem.setOnAction(importCertEventHandler());
         importCertProgrammaticMenuItem.setOnAction(importCertProgrammaticEventHandler());
@@ -661,7 +662,7 @@ public class MainController extends AbstractController {
 
     private void execute() {
         RunConfig runConfig = createRunConfigFromUI();
-        ToolkitConfig toolkitConfig = createToolkitConfigFromUI();
+        ToolkitConfig toolkitConfig = toolkitSectionController.createToolkitConfigFromUI();
         ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(Stream.concat(
                 Arrays.stream(runConfig.toArgumentArray()),
                 Arrays.stream(toolkitConfig.toArgumentArray())
@@ -761,13 +762,6 @@ public class MainController extends AbstractController {
         return runConfig;
     }
 
-    private ToolkitConfig createToolkitConfigFromUI() {
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername(toolkitUsernameTextField.getText());
-        toolkitConfig.setToolkitPassword(toolkitPasswordField.getText());
-        return toolkitConfig;
-    }
-
     private void resetIndicatorProperties(Task<?> task) {
         loadProgressIndicator.setVisible(true);
         loadProgressIndicator.progressProperty().unbind();
@@ -840,7 +834,7 @@ public class MainController extends AbstractController {
     }
 
     private void updateRunConfig(String oldConfigName, String newConfigName) {
-        ToolkitConfig toolkitConfigFromUI = createToolkitConfigFromUI();
+        ToolkitConfig toolkitConfigFromUI = toolkitSectionController.createToolkitConfigFromUI();
         applicationProperties.updateToolkitConfig(toolkitConfigFromUI);
         if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
             RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
@@ -924,7 +918,7 @@ public class MainController extends AbstractController {
                 setInitValues();
                 configurationNameTextField.setText(configurationNameComboBox.getValue());
                 setDisableDependOnConfigurations();
-                setToolkitCredentialsIfAvailable();
+                toolkitSectionController.setToolkitCredentialsIfAvailable();
                 alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
@@ -939,42 +933,6 @@ public class MainController extends AbstractController {
                         .withImage(ImageFile.ERROR_CHICKEN_PNG);
             }
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-        };
-    }
-
-    private EventHandler<MouseEvent> verifyCredentialsHyperlinkOnMouseClickEventHandler() {
-        return event -> {
-            verifyProgressIndicator.setVisible(true);
-            verifyCredentialsHyperlink.setVisited(false);
-            Task<Void> task = new Task<>() {
-                @Override
-                public Void call() {
-                    final List<String> arguments = Stream.of(createToolkitConfigFromUI().toArgumentArray()).collect(toList());
-                    arguments.add(ArgName.preferredArgSource.name() + "=" + ArgName.preferredArgSource.defaultValue());
-                    arguments.add(ArgName.useUI.name() + "=N");
-                    final ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(arguments.toArray(String[]::new));
-                    boolean hasProperCredentials = new ToolkitService(instance).hasProperCredentials();
-                    AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
-                    if (hasProperCredentials) {
-                        alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
-                                .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                                .withAlertType(Alert.AlertType.INFORMATION)
-                                .withImage(ImageFile.FINGER_UP_PNG);
-                    } else {
-                        alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
-                                .withLink(JarHelper.logsFolder())
-                                .withWindowType(WindowType.LOG_WINDOW)
-                                .withAlertType(Alert.AlertType.ERROR)
-                                .withImage(ImageFile.MINION_IOIO_GIF);
-                    }
-                    Platform.runLater(() -> {
-                        verifyProgressIndicator.setVisible(false);
-                        alertWindowBuilder.buildAndDisplayWindow();
-                    });
-                    return null;
-                }
-            };
-            uiLauncher.executeOutsideUIThread(task);
         };
     }
 
@@ -1038,11 +996,6 @@ public class MainController extends AbstractController {
                 .buildAndDisplayWindow();
     }
 
-    private void setToolkitCredentialsIfAvailable() {
-        toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
-    }
-
     private void updateConfigurationNameComboBox(String oldValue, String newValue) {
         List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
         items.remove(oldValue);
@@ -1065,7 +1018,6 @@ public class MainController extends AbstractController {
     }
 
     private void setListeners() {
-        toolkitUsernameTextField.textProperty().addListener(toolkitUsernameListener());
         configurationNameComboBox.getSelectionModel().selectedItemProperty().addListener(configurationNameComboBoxListener());
         configurationNameTextField.textProperty().addListener(configurationNameListener());
         useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
@@ -1074,13 +1026,6 @@ public class MainController extends AbstractController {
         useDefaultEmailCheckBox.selectedProperty().addListener(useDefaultEmailChangeListener());
         gitAuthorTextField.focusedProperty().addListener(gitAuthorFocusChangeListener());
         committerEmailTextField.focusedProperty().addListener(committerEmailFocusChangeListener());
-    }
-
-    private ChangeListener<String> toolkitUsernameListener() {
-        return (observable, oldValue, newValue) -> {
-            userFolderUrl = applicationProperties.toolkitUserFolder();
-            userFolderUrl = userFolderUrl.substring(0, userFolderUrl.lastIndexOf("/") + 1) + newValue;
-        };
     }
 
     private ChangeListener<String> configurationNameComboBoxListener() {
@@ -1185,7 +1130,7 @@ public class MainController extends AbstractController {
                 if (gitAuthorTextField.getLength() > 0) {
                     vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
                     vcsService.getUserEmail().ifPresent(userName ->
-                        useDefaultAuthorCheckBox.setDisable(gitAuthorTextField.getText().equals(userName))
+                            useDefaultAuthorCheckBox.setDisable(gitAuthorTextField.getText().equals(userName))
                     );
                 }
             }
@@ -1198,7 +1143,7 @@ public class MainController extends AbstractController {
                 if (committerEmailTextField.getLength() > 0) {
                     vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
                     vcsService.getUserEmail().ifPresent(userEmail ->
-                        useDefaultEmailCheckBox.setDisable(committerEmailTextField.getText().equals(userEmail))
+                            useDefaultEmailCheckBox.setDisable(committerEmailTextField.getText().equals(userEmail))
                     );
                 }
             }
