@@ -30,14 +30,14 @@ class ToolkitSectionController extends AbstractController {
 
     ToolkitSectionController(UILauncher uiLauncher,
                              ApplicationProperties applicationProperties,
-                             Map<String, Object> controls) {
+                             Map<String, Object> controlsMap) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        this.toolkitUsernameTextField = (TextField)controls.get("toolkitUsernameTextField");
-        this.toolkitPasswordField = (PasswordField)controls.get("toolkitPasswordField");
-        this.toolkitDomainTextField = (TextField)controls.get("toolkitDomainTextField");
-        this.verifyCredentialsHyperlink = (Hyperlink) controls.get("verifyCredentialsHyperlink");
-        this.verifyProgressIndicator = (ProgressIndicator) controls.get("verifyProgressIndicator");
+        this.toolkitUsernameTextField = (TextField)controlsMap.get("toolkitUsernameTextField");
+        this.toolkitPasswordField = (PasswordField)controlsMap.get("toolkitPasswordField");
+        this.toolkitDomainTextField = (TextField)controlsMap.get("toolkitDomainTextField");
+        this.verifyCredentialsHyperlink = (Hyperlink) controlsMap.get("verifyCredentialsHyperlink");
+        this.verifyProgressIndicator = (ProgressIndicator) controlsMap.get("verifyProgressIndicator");
     }
 
     @Override

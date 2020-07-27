@@ -3,7 +3,6 @@ package pg.gipter.ui.main;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -23,7 +22,6 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
-import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.*;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.ProgramData;
@@ -155,9 +153,9 @@ public class MainController extends AbstractController {
     @FXML
     private Button saveConfigurationButton;
     @FXML
-    private CheckBox useLastItemDateCheckbox;
-    @FXML
     private Label currentWeekNumberLabel;
+    @FXML
+    private CheckBox useLastItemDateCheckbox;
 
     private final DataService dataService;
 
@@ -165,9 +163,9 @@ public class MainController extends AbstractController {
     private String currentItemName = "";
     private String inteliSense = "";
     private boolean useInteliSense = false;
-    private static boolean useComboBoxValueChangeListener = true;
     private VcsService vcsService;
     private ToolkitSectionController toolkitSectionController;
+    private ConfigurationSectionController configurationSectionController;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -190,6 +188,17 @@ public class MainController extends AbstractController {
         return map;
     }
 
+    private Map<String, Object> initConfigurationSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("configurationNameComboBox", configurationNameComboBox);
+        map.put("configurationNameTextField", configurationNameTextField);
+        map.put("addConfigurationButton", addConfigurationButton);
+        map.put("removeConfigurationButton", removeConfigurationButton);
+        map.put("saveConfigurationButton", saveConfigurationButton);
+        map.put("currentWeekNumberLabel", currentWeekNumberLabel);
+        return map;
+    }
+
     public void setVcsService(VcsService vcsService) {
         this.vcsService = vcsService;
     }
@@ -199,8 +208,12 @@ public class MainController extends AbstractController {
         super.initialize(location, resources);
         toolkitSectionController = new ToolkitSectionController(uiLauncher, applicationProperties, initToolkitSectionMap());
         toolkitSectionController.initialize(location, resources);
+
+        configurationSectionController = new ConfigurationSectionController(
+                uiLauncher, applicationProperties, initConfigurationSectionMap(), this);
+        configurationSectionController.initialize(location, resources);
+
         setInitValues();
-        initConfigurationName();
         setProperties(resources);
         setActions(resources);
         setListeners();
@@ -243,10 +256,9 @@ public class MainController extends AbstractController {
         }
 
         setLastItemSubmissionDate();
-        currentWeekNumberLabel.setText(String.valueOf(applicationProperties.getWeekNumber(LocalDate.now())));
     }
 
-    private void setLastItemSubmissionDate() {
+    void setLastItemSubmissionDate() {
         uiLauncher.executeOutsideUIThread(() -> {
             if (uiLauncher.getLastItemSubmissionDate() == null) {
                 Optional<String> submissionDate = new ToolkitService(applicationProperties).lastItemUploadDate();
@@ -278,18 +290,6 @@ public class MainController extends AbstractController {
         });
     }
 
-    private void initConfigurationName() {
-        Set<String> confNames = new HashSet<>(applicationProperties.configurationNames());
-        if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
-            confNames.add(configurationNameComboBox.getValue());
-        }
-        configurationNameComboBox.setItems(FXCollections.observableList(new ArrayList<>(confNames)));
-        if (confNames.contains(applicationProperties.configurationName())) {
-            configurationNameComboBox.setValue(applicationProperties.configurationName());
-            configurationNameTextField.setText(applicationProperties.configurationName());
-        }
-    }
-
     private void setProperties(ResourceBundle resources) {
         toolkitProjectListNamesTextField.setDisable(
                 !EnumSet.of(ItemType.TOOLKIT_DOCS).contains(applicationProperties.itemType())
@@ -318,7 +318,7 @@ public class MainController extends AbstractController {
 
         loadProgressIndicator.setVisible(false);
         instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
-        setDisableDependOnConfigurations();
+        configurationSectionController.setDisableDependOnConfigurations();
 
         TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
         setUpgradeMenuItemDisabled();
@@ -481,14 +481,11 @@ public class MainController extends AbstractController {
         };
     }
 
-    private void setDisableDependOnConfigurations() {
+    void setDisableDependOnConfigurations() {
         Map<String, RunConfig> runConfigMap = applicationProperties.getRunConfigMap();
-        addConfigurationButton.setDisable(runConfigMap.isEmpty());
-        removeConfigurationButton.setDisable(runConfigMap.isEmpty());
         executeButton.setDisable(runConfigMap.isEmpty());
         executeAllButton.setDisable(runConfigMap.isEmpty());
         jobButton.setDisable(runConfigMap.isEmpty());
-        configurationNameComboBox.setDisable(runConfigMap.isEmpty());
         projectPathButton.setDisable(runConfigMap.isEmpty() || itemTypeComboBox.getValue() == ItemType.STATEMENT);
     }
 
@@ -536,9 +533,6 @@ public class MainController extends AbstractController {
         executeAllButton.setOnAction(executeAllActionEventHandler());
         jobButton.setOnAction(jobActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
-        saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler());
-        addConfigurationButton.setOnAction(addConfigurationEventHandler());
-        removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
         itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
         importCertMenuItem.setOnAction(importCertEventHandler());
         importCertProgrammaticMenuItem.setOnAction(importCertProgrammaticEventHandler());
@@ -615,7 +609,7 @@ public class MainController extends AbstractController {
             applicationProperties.updateCurrentRunConfig(runConfig);
             uiLauncher.setApplicationProperties(applicationProperties);
             String configurationName = configurationNameTextField.getText();
-            updateConfigurationNameComboBox(configurationName, configurationName);
+            configurationSectionController.updateConfigurationNameComboBox(configurationName, configurationName);
             uiLauncher.showProject(itemTypeComboBox.getValue());
         };
     }
@@ -720,7 +714,7 @@ public class MainController extends AbstractController {
         });
     }
 
-    private RunConfig createRunConfigFromUI() {
+    RunConfig createRunConfigFromUI() {
         RunConfig runConfig = new RunConfig();
 
         if (!StringUtils.nullOrEmpty(authorsTextField.getText())) {
@@ -773,7 +767,6 @@ public class MainController extends AbstractController {
     private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
         return event -> {
             boolean disableProjectButton = itemTypeComboBox.getValue() == ItemType.STATEMENT;
-            System.out.println("configurationNameTextField.getText() = " + configurationNameTextField.getText());
             disableProjectButton |= applicationProperties.getRunConfigMap().isEmpty() &&
                     configurationNameTextField.getText().isEmpty();
             projectPathButton.setDisable(disableProjectButton);
@@ -809,38 +802,18 @@ public class MainController extends AbstractController {
         return event -> UILauncher.platformExit();
     }
 
-    private EventHandler<ActionEvent> saveConfigurationActionEventHandler() {
-        return event -> saveConfiguration();
-    }
-
     private void saveConfiguration() {
-        String configurationName = configurationNameTextField.getText();
-        String comboConfigName = configurationNameComboBox.getValue();
-
-        RunConfig runConfigFromUI = createRunConfigFromUI();
-        applicationProperties.updateCurrentRunConfig(runConfigFromUI);
-        CacheManager.removeFromCache(applicationProperties.configurationName());
-        uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
-        setLastItemSubmissionDate();
-
-        updateConfigurationNameComboBox(comboConfigName, configurationName);
-        uiLauncher.updateTray(applicationProperties);
-        AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                .withHeaderText(BundleUtils.getMsg("main.config.changed"))
-                .withAlertType(Alert.AlertType.INFORMATION)
-                .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                .withImage(ImageFile.FINGER_UP_PNG);
-        Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
+        configurationSectionController.saveConfiguration();
     }
 
-    private void updateRunConfig(String oldConfigName, String newConfigName) {
+    void updateRunConfig(String oldConfigName, String newConfigName) {
         ToolkitConfig toolkitConfigFromUI = toolkitSectionController.createToolkitConfigFromUI();
         applicationProperties.updateToolkitConfig(toolkitConfigFromUI);
         if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
             RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
             applicationProperties.updateCurrentRunConfig(runConfigWithoutDates);
             new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
-            setDisableDependOnConfigurations();
+            configurationSectionController.setDisableDependOnConfigurations();
         }
         applicationProperties.save();
         if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
@@ -848,92 +821,11 @@ public class MainController extends AbstractController {
         }
     }
 
-    @NotNull
-    private RunConfig getRunConfigWithoutDates() {
+    RunConfig getRunConfigWithoutDates() {
         RunConfig runConfigFromUI = createRunConfigFromUI();
         runConfigFromUI.setStartDate(null);
         runConfigFromUI.setEndDate(null);
         return runConfigFromUI;
-    }
-
-    private EventHandler<ActionEvent> addConfigurationEventHandler() {
-        return event -> {
-            String configurationName = configurationNameTextField.getText();
-            Optional<RunConfig> runConfig = applicationProperties.getRunConfig(configurationName);
-            boolean operationDone = false;
-            if (runConfig.isPresent()) {
-                boolean result = new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("popup.overrideProperties.message", configurationName))
-                        .withAlertType(Alert.AlertType.CONFIRMATION)
-                        .withWindowType(WindowType.OVERRIDE_WINDOW)
-                        .withImage(ImageFile.OVERRIDE_PNG)
-                        .withOkButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonOk"))
-                        .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
-                        .buildAndDisplayOverrideWindow();
-                if (result) {
-                    saveNewConfig(configurationName);
-                    updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationName);
-                    operationDone = true;
-                } else {
-                    configurationNameTextField.setText(configurationNameComboBox.getValue());
-                }
-            } else {
-                applicationProperties.updateCurrentRunConfig(getRunConfigWithoutDates());
-                applicationProperties.save();
-                updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), configurationName);
-                operationDone = true;
-            }
-            if (operationDone) {
-                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("main.config.changed"))
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                        .withImage(ImageFile.FINGER_UP_PNG);
-                alertWindowBuilder.buildAndDisplayWindow();
-            }
-
-        };
-    }
-
-    private void saveNewConfig(String configurationName) {
-        RunConfig currentRunConfig = getRunConfigWithoutDates();
-        currentRunConfig.setConfigurationName(configurationName);
-        applicationProperties.updateCurrentRunConfig(currentRunConfig);
-        applicationProperties.save();
-    }
-
-    private EventHandler<ActionEvent> removeConfigurationEventHandler() {
-        return event -> {
-            AlertWindowBuilder alertWindowBuilder;
-            try {
-                CacheManager.removeFromCache(configurationNameComboBox.getValue());
-                applicationProperties.removeConfig(configurationNameComboBox.getValue());
-                String newConfiguration = ArgName.configurationName.defaultValue();
-                if (!applicationProperties.getRunConfigMap().isEmpty()) {
-                    newConfiguration = applicationProperties.configurationName();
-                }
-                removeConfigurationNameFromComboBox(configurationNameComboBox.getValue(), newConfiguration);
-
-                applicationProperties = CacheManager.getApplicationProperties(newConfiguration);
-                setInitValues();
-                configurationNameTextField.setText(configurationNameComboBox.getValue());
-                setDisableDependOnConfigurations();
-                toolkitSectionController.setToolkitCredentialsIfAvailable();
-                alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("main.config.removed"))
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                        .withImage(ImageFile.FINGER_UP_PNG);
-            } catch (IllegalStateException ex) {
-                alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(ex.getMessage())
-                        .withLink(JarHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
-            }
-            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-        };
     }
 
     private EventHandler<KeyEvent> itemNameKeyReleasedEventHandler() {
@@ -996,65 +888,13 @@ public class MainController extends AbstractController {
                 .buildAndDisplayWindow();
     }
 
-    private void updateConfigurationNameComboBox(String oldValue, String newValue) {
-        List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
-        items.remove(oldValue);
-        items.add(newValue);
-        updateItemsForConfigComboBox(newValue, FXCollections.observableArrayList(items));
-    }
-
-    private void updateItemsForConfigComboBox(String newValue, ObservableList<String> items) {
-        useComboBoxValueChangeListener = false;
-        configurationNameComboBox.setItems(items);
-        configurationNameComboBox.setValue(newValue);
-        useComboBoxValueChangeListener = true;
-        setDisableDependOnConfigurations();
-    }
-
-    private void removeConfigurationNameFromComboBox(String oldValue, String newValue) {
-        List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
-        items.remove(oldValue);
-        updateItemsForConfigComboBox(newValue, FXCollections.observableList(items));
-    }
-
     private void setListeners() {
-        configurationNameComboBox.getSelectionModel().selectedItemProperty().addListener(configurationNameComboBoxListener());
-        configurationNameTextField.textProperty().addListener(configurationNameListener());
         useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
         itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
         useDefaultAuthorCheckBox.selectedProperty().addListener(useDefaultAuthorChangeListener());
         useDefaultEmailCheckBox.selectedProperty().addListener(useDefaultEmailChangeListener());
         gitAuthorTextField.focusedProperty().addListener(gitAuthorFocusChangeListener());
         committerEmailTextField.focusedProperty().addListener(committerEmailFocusChangeListener());
-    }
-
-    private ChangeListener<String> configurationNameComboBoxListener() {
-        return (options, oldValue, newValue) -> {
-            if (useComboBoxValueChangeListener) {
-                RunConfig runConfigFromUI = createRunConfigFromUI();
-                ApplicationProperties uiApplicationProperties = ApplicationPropertiesFactory.getInstance(runConfigFromUI.toArgumentArray());
-                CacheManager.addToCache(oldValue, uiApplicationProperties);
-
-                applicationProperties = CacheManager.getApplicationProperties(newValue);
-                setInitValues();
-                configurationNameTextField.setText(newValue);
-                if (useLastItemDateCheckbox.isSelected()) {
-                    useLastItemDateCheckbox.setSelected(false);
-                }
-            }
-        };
-    }
-
-    private ChangeListener<String> configurationNameListener() {
-        return (observable, oldValue, newValue) -> {
-            if (StringUtils.nullOrEmpty(oldValue) && !StringUtils.nullOrEmpty(newValue)) {
-                addConfigurationButton.setDisable(false);
-                projectPathButton.setDisable(false);
-            } else if (StringUtils.nullOrEmpty(newValue)) {
-                addConfigurationButton.setDisable(true);
-                projectPathButton.setDisable(true);
-            }
-        };
     }
 
     private ChangeListener<Boolean> useListItemCheckBoxListener() {
@@ -1148,6 +988,20 @@ public class MainController extends AbstractController {
                 }
             }
         };
+    }
+
+    void deselectUseLastItemDate() {
+        if (useLastItemDateCheckbox.isSelected()) {
+            useLastItemDateCheckbox.setSelected(false);
+        }
+    }
+
+    void setDisableProjectPathButton(boolean value) {
+        projectPathButton.setDisable(value);
+    }
+
+    void setToolkitCredentialsIfAvailable() {
+        toolkitSectionController.setToolkitCredentialsIfAvailable();
     }
 
 }
