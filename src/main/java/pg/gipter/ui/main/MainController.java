@@ -12,7 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -29,24 +30,19 @@ import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.*;
-import pg.gipter.services.keystore.*;
-import pg.gipter.services.platforms.AppManager;
-import pg.gipter.services.platforms.AppManagerFactory;
+import pg.gipter.services.keystore.CertificateServiceFactory;
 import pg.gipter.services.vcs.VcsService;
 import pg.gipter.services.vcs.VcsServiceFactory;
 import pg.gipter.ui.*;
-import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -164,8 +160,9 @@ public class MainController extends AbstractController {
     private String inteliSense = "";
     private boolean useInteliSense = false;
     private VcsService vcsService;
-    private ToolkitSectionController toolkitSectionController;
-    private ConfigurationSectionController configurationSectionController;
+    private final ToolkitSectionController toolkitSectionController;
+    private final ConfigurationSectionController configurationSectionController;
+    private final MenuSectionController menuSectionController;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -176,6 +173,9 @@ public class MainController extends AbstractController {
                 .map(e -> String.format("{%s}", e.name()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         this.vcsService = VcsServiceFactory.getInstance();
+        toolkitSectionController = new ToolkitSectionController(uiLauncher, applicationProperties);
+        configurationSectionController = new ConfigurationSectionController(uiLauncher, applicationProperties, this);
+        menuSectionController = new MenuSectionController(uiLauncher, applicationProperties, this);
     }
 
     private Map<String, Object> initToolkitSectionMap() {
@@ -199,6 +199,20 @@ public class MainController extends AbstractController {
         return map;
     }
 
+    private Map<String, MenuItem> initMenuSectionMap() {
+        Map<String, MenuItem> map = new HashMap<>();
+        map.put("applicationMenuItem", applicationMenuItem);
+        map.put("toolkitMenuItem", toolkitMenuItem);
+        map.put("readMeMenuItem", readMeMenuItem);
+        map.put("instructionMenuItem", instructionMenuItem);
+        map.put("upgradeMenuItem", upgradeMenuItem);
+        map.put("wizardMenuItem", wizardMenuItem);
+        map.put("wikiMenuItem", wikiMenuItem);
+        map.put("importCertMenuItem", importCertMenuItem);
+        map.put("importCertProgrammaticMenuItem", importCertProgrammaticMenuItem);
+        return map;
+    }
+
     public void setVcsService(VcsService vcsService) {
         this.vcsService = vcsService;
     }
@@ -206,12 +220,9 @@ public class MainController extends AbstractController {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
-        toolkitSectionController = new ToolkitSectionController(uiLauncher, applicationProperties, initToolkitSectionMap());
-        toolkitSectionController.initialize(location, resources);
-
-        configurationSectionController = new ConfigurationSectionController(
-                uiLauncher, applicationProperties, initConfigurationSectionMap(), this);
-        configurationSectionController.initialize(location, resources);
+        toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
+        configurationSectionController.initialize(location, resources, initConfigurationSectionMap());
+        menuSectionController.initialize(location, resources, initMenuSectionMap());
 
         setInitValues();
         setProperties(resources);
@@ -399,33 +410,6 @@ public class MainController extends AbstractController {
     }
 
     private void setAccelerators() {
-        applicationMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
-        toolkitMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
-        upgradeMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
-        readMeMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
-        instructionMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
-        wizardMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
-        wikiMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
-        importCertMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
-        importCertProgrammaticMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
                 e.consume();
@@ -519,13 +503,6 @@ public class MainController extends AbstractController {
     }
 
     private void setActions(ResourceBundle resources) {
-        applicationMenuItem.setOnAction(applicationActionEventHandler());
-        toolkitMenuItem.setOnAction(toolkitActionEventHandler());
-        readMeMenuItem.setOnAction(readMeActionEventHandler());
-        instructionMenuItem.setOnAction(instructionActionEventHandler());
-        upgradeMenuItem.setOnAction(upgradeActionEventHandler());
-        wizardMenuItem.setOnAction(launchWizardActionEventHandler());
-        wikiMenuItem.setOnAction(wikiActionEventHandler());
         projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         itemTypeComboBox.setOnAction(uploadTypeActionEventHandler());
@@ -534,73 +511,6 @@ public class MainController extends AbstractController {
         jobButton.setOnAction(jobActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
         itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
-        importCertMenuItem.setOnAction(importCertEventHandler());
-        importCertProgrammaticMenuItem.setOnAction(importCertProgrammaticEventHandler());
-    }
-
-    private EventHandler<ActionEvent> applicationActionEventHandler() {
-        return event -> uiLauncher.showApplicationSettingsWindow();
-    }
-
-    private EventHandler<ActionEvent> toolkitActionEventHandler() {
-        return event -> {
-            uiLauncher.setApplicationProperties(applicationProperties);
-            uiLauncher.showToolkitSettingsWindow();
-        };
-    }
-
-    private EventHandler<ActionEvent> readMeActionEventHandler() {
-        return event -> {
-            AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser(GithubService.GITHUB_URL + "#gitdiffgenerator");
-        };
-    }
-
-    private EventHandler<ActionEvent> instructionActionEventHandler() {
-        return event -> {
-            String pdfFileName = "Gipter-ui-description.pdf";
-            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
-                    .withLink(applicationProperties.toolkitUserFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
-                    .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
-            try {
-                File pdfFile = Paths.get(pdfFileName).toFile();
-                if (pdfFile.exists()) {
-                    if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().open(pdfFile);
-                    } else {
-                        logger.error("AWT Desktop is not supported by the platform.");
-                        Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-                    }
-                }
-            } catch (IOException e) {
-                logger.error("Could not find [{}] file with instructions.", pdfFileName, e);
-                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-            }
-        };
-    }
-
-    private EventHandler<ActionEvent> upgradeActionEventHandler() {
-        return event -> {
-            uiLauncher.hideMainWindow();
-            uiLauncher.showUpgradeWindow();
-        };
-    }
-
-    private EventHandler<ActionEvent> launchWizardActionEventHandler() {
-        return event -> {
-            uiLauncher.hideMainWindow();
-            new WizardLauncher(uiLauncher.currentWindow(), configurationNameComboBox.getValue()).execute();
-        };
-    }
-
-    private EventHandler<ActionEvent> wikiActionEventHandler() {
-        return event -> {
-            AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser(GithubService.GITHUB_URL + "/wiki");
-        };
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
@@ -837,57 +747,6 @@ public class MainController extends AbstractController {
         };
     }
 
-    private EventHandler<ActionEvent> importCertEventHandler() {
-        return actionEvent -> {
-            final List<CertImportResult> certs = CertificateServiceFactory.getInstance(true).automaticImport();
-            autoImport(certs);
-        };
-    }
-
-    private EventHandler<ActionEvent> importCertProgrammaticEventHandler() {
-        return actionEvent -> {
-            final List<CertImportResult> certs = CertificateServiceFactory.getInstance(false).automaticImport();
-            autoImport(certs);
-        };
-    }
-
-    private void autoImport(List<CertImportResult> certs) {
-        String successMsg = certs.stream()
-                .filter(r -> r.getStatus() == CertImportStatus.SUCCESS)
-                .map(CertImportResult::getCertName)
-                .collect(joining(","));
-        String importedMsg = certs.stream()
-                .filter(r -> r.getStatus() == CertImportStatus.ALREADY_IMPORTED)
-                .map(CertImportResult::getCertName)
-                .collect(joining(","));
-        String failMsg = certs.stream()
-                .filter(r -> r.getStatus() == CertImportStatus.FAILED)
-                .map(CertImportResult::getCertName)
-                .collect(joining(","));
-
-        String finalMsg = "";
-        EnumSet<CertImportStatus> statuses = EnumSet.noneOf(CertImportStatus.class);
-        if (StringUtils.notEmpty(successMsg)) {
-            finalMsg = BundleUtils.getMsg("certificate.add.success", successMsg) + "\n";
-            statuses.add(CertImportStatus.SUCCESS);
-        }
-        if (StringUtils.notEmpty(successMsg)) {
-            finalMsg += BundleUtils.getMsg("certificate.add.failed", failMsg) + "\n";
-            statuses.add(CertImportStatus.FAILED);
-        }
-        if (StringUtils.notEmpty(importedMsg)) {
-            finalMsg += BundleUtils.getMsg("certificate.add.exists", importedMsg);
-            statuses.add(CertImportStatus.ALREADY_IMPORTED);
-        }
-        AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
-        alertWindowBuilder.withHeaderText(finalMsg)
-                .withWindowType(WindowType.LOG_WINDOW)
-                .withAlertType(Alert.AlertType.INFORMATION)
-                .withImage(statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
-                        ImageFile.randomSuccessImage() : ImageFile.randomFailImage())
-                .buildAndDisplayWindow();
-    }
-
     private void setListeners() {
         useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
         itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
@@ -1004,4 +863,7 @@ public class MainController extends AbstractController {
         toolkitSectionController.setToolkitCredentialsIfAvailable();
     }
 
+    public String getConfigurationNameComboBoxValue() {
+        return configurationNameComboBox.getValue();
+    }
 }

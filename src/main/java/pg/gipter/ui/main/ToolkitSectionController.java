@@ -22,27 +22,24 @@ import static java.util.stream.Collectors.toList;
 
 class ToolkitSectionController extends AbstractController {
 
-    private final TextField toolkitUsernameTextField;
-    private final PasswordField toolkitPasswordField;
-    private final TextField toolkitDomainTextField;
-    private final Hyperlink verifyCredentialsHyperlink;
-    private final ProgressIndicator verifyProgressIndicator;
+    private TextField toolkitUsernameTextField;
+    private PasswordField toolkitPasswordField;
+    private TextField toolkitDomainTextField;
+    private Hyperlink verifyCredentialsHyperlink;
+    private ProgressIndicator verifyProgressIndicator;
 
-    ToolkitSectionController(UILauncher uiLauncher,
-                             ApplicationProperties applicationProperties,
-                             Map<String, Object> controlsMap) {
+    ToolkitSectionController(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        this.toolkitUsernameTextField = (TextField)controlsMap.get("toolkitUsernameTextField");
-        this.toolkitPasswordField = (PasswordField)controlsMap.get("toolkitPasswordField");
-        this.toolkitDomainTextField = (TextField)controlsMap.get("toolkitDomainTextField");
-        this.verifyCredentialsHyperlink = (Hyperlink) controlsMap.get("verifyCredentialsHyperlink");
-        this.verifyProgressIndicator = (ProgressIndicator) controlsMap.get("verifyProgressIndicator");
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL location, ResourceBundle resources, Map<String, Object> controlsMap) {
         super.initialize(location, resources);
+        toolkitUsernameTextField = (TextField)controlsMap.get("toolkitUsernameTextField");
+        toolkitPasswordField = (PasswordField)controlsMap.get("toolkitPasswordField");
+        toolkitDomainTextField = (TextField)controlsMap.get("toolkitDomainTextField");
+        verifyCredentialsHyperlink = (Hyperlink) controlsMap.get("verifyCredentialsHyperlink");
+        verifyProgressIndicator = (ProgressIndicator) controlsMap.get("verifyProgressIndicator");
         setInitValues();
         setProperties();
         setActions();

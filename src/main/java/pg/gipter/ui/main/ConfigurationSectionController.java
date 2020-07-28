@@ -21,36 +21,36 @@ import java.util.*;
 
 class ConfigurationSectionController extends AbstractController {
 
-    private final ComboBox<String> configurationNameComboBox;
-    private final TextField configurationNameTextField;
-    private final Button addConfigurationButton;
-    private final Button removeConfigurationButton;
-    private final Button saveConfigurationButton;
-    private final Label currentWeekNumberLabel;
+    private ComboBox<String> configurationNameComboBox;
+    private TextField configurationNameTextField;
+    private Button addConfigurationButton;
+    private Button removeConfigurationButton;
+    private Button saveConfigurationButton;
+    private Label currentWeekNumberLabel;
 
     private final MainController mainController;
 
     private static boolean useComboBoxValueChangeListener = true;
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     ConfigurationSectionController(UILauncher uiLauncher,
                                    ApplicationProperties applicationProperties,
-                                   Map<String, Object> controlsMap,
                                    MainController mainController) {
         super(uiLauncher);
-        this.mainController = mainController;
         this.applicationProperties = applicationProperties;
+        this.mainController = mainController;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    void initialize(URL location, ResourceBundle resources, Map<String, Object> controlsMap) {
+        super.initialize(location, resources);
+
         configurationNameComboBox = (ComboBox) controlsMap.get("configurationNameComboBox");
         configurationNameTextField = (TextField) controlsMap.get("configurationNameTextField");
         addConfigurationButton = (Button) controlsMap.get("addConfigurationButton");
         removeConfigurationButton = (Button) controlsMap.get("removeConfigurationButton");
         saveConfigurationButton = (Button) controlsMap.get("saveConfigurationButton");
         currentWeekNumberLabel = (Label) controlsMap.get("currentWeekNumberLabel");
-    }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        super.initialize(location, resources);
         setInitValues();
         initConfigurationName();
         setActions();
