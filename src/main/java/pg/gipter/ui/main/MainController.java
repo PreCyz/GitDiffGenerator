@@ -825,13 +825,11 @@ public class MainController extends AbstractController {
 
     private ChangeListener<? super Boolean> gitAuthorFocusChangeListener() {
         return (ChangeListener<Boolean>) (observableValue, oldValue, newValue) -> {
-            if (!newValue) {
-                if (gitAuthorTextField.getLength() > 0) {
-                    vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-                    vcsService.getUserEmail().ifPresent(userName ->
-                            useDefaultAuthorCheckBox.setDisable(gitAuthorTextField.getText().equals(userName))
-                    );
-                }
+            if (!newValue && !gitAuthorTextField.getText().isEmpty()) {
+                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+                vcsService.getUserName().ifPresent(userName ->
+                        useDefaultAuthorCheckBox.setDisable(gitAuthorTextField.getText().equals(userName))
+                );
             }
         };
     }

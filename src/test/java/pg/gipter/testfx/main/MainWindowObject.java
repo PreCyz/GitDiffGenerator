@@ -136,8 +136,8 @@ public class MainWindowObject extends BaseWindowObject {
         return this;
     }
 
-    public MainWindowObject clickAuthor() {
-        clickAndWrite(authorsTextFieldId, "");
+    public MainWindowObject enterCommitterEmail(String value) {
+        clickAndWrite(committerEmailTextFieldId, value);
         return this;
     }
 

@@ -1,10 +1,10 @@
 package pg.gipter.testfx.main;
 
-import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.testfx.api.FxRobot;
@@ -12,6 +12,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import pg.gipter.MockitoExtension;
 import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CachedConfiguration;
@@ -22,7 +23,6 @@ import pg.gipter.services.vcs.VcsService;
 import pg.gipter.testfx.UITestUtils;
 import pg.gipter.ui.*;
 import pg.gipter.ui.main.MainController;
-import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
@@ -33,6 +33,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.testfx.api.FxAssert.verifyThat;
 
@@ -71,7 +73,10 @@ public class MainTestUI {
 
     private void createWindow(Stage stage) throws IOException {
         window = WindowFactory.MAIN.createWindow(
-                ApplicationPropertiesFactory.getInstance(new String[]{}),
+                ApplicationPropertiesFactory.getInstance(new String[]{
+                        ArgName.projectPath + "=" + Paths.get(".").toFile().getAbsolutePath(),
+                        ArgName.itemPath + "=" + Paths.get(".").toFile().getAbsolutePath()
+                }),
                 uiLauncherMock
         );
 
@@ -268,26 +273,97 @@ public class MainTestUI {
     }
 
     @Test
-    @Disabled
     void givenDifferentConfigUserThanEnteredUser_whenGitAuthorFocusLost_thenUseDefaultAuthorEnabled(FxRobot robot) {
         when(vcsService.getUserName()).thenReturn(Optional.of("configAuthor"));
+        doNothing().when(vcsService).setProjectPath(anyString());
+        MainController controller = (MainController) window.getController();
+        controller.setVcsService(vcsService);
+
         final MainWindowObject windowObject = new MainWindowObject(robot)
                 .enterConfigurationName("code")
                 .pressAddConfigurationButton()
-                .pressOkOnPopup();
+                .pressOkOnPopup()
+                .enterGitAuthor("testAuthor")
+                .enterAuthor("configAuthor");
 
+        assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isFalse();
+    }
+
+    @Test
+    void givenDifferentConfigEmailThanEnteredEmail_whenCommitterEmailFocusLost_thenUseDefaultEmailEnabled(FxRobot robot) {
+        when(vcsService.getUserEmail()).thenReturn(Optional.of("config@email.com"));
+        doNothing().when(vcsService).setProjectPath(anyString());
         MainController controller = (MainController) window.getController();
         controller.setVcsService(vcsService);
-        Optional<RunConfig> code = dao.loadRunConfig("code");
-        code.ifPresent(rc -> {
-            rc.setProjectPath(".");
-            dao.updateCachedConfiguration(rc);
-        });
 
-        Platform.runLater(() -> {
-            controller.initialize(null, BundleUtils.loadBundle());
-            windowObject.enterGitAuthor("testAuthor").clickAuthor();
-            assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isFalse();
-        });
+        final MainWindowObject windowObject = new MainWindowObject(robot)
+                .enterConfigurationName("code")
+                .pressAddConfigurationButton()
+                .pressOkOnPopup()
+                .enterCommitterEmail("test@email.com")
+                .enterAuthor("configAuthor");
+
+        assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isFalse();
+    }
+
+    @Test
+    void givenDifferentConfigEmailThanEnteredEmail_whenPressUseDefaultEmailCheckBox_thenEmailIsEqualDefault(FxRobot robot) {
+        when(vcsService.getUserEmail()).thenReturn(Optional.of("config@email.com"));
+        doNothing().when(vcsService).setProjectPath(anyString());
+        MainController controller = (MainController) window.getController();
+        controller.setVcsService(vcsService);
+
+        final MainWindowObject windowObject = new MainWindowObject(robot)
+                .enterConfigurationName("code")
+                .pressAddConfigurationButton()
+                .pressOkOnPopup()
+                .enterCommitterEmail("test@email.com")
+                .enterAuthor("configAuthor")
+                .checkDefaultEmail();
+
+        assertThat(windowObject.getCommitterEmailTextField().getText()).isEqualTo("config@email.com");
+    }
+
+    @Test
+    void givenDifferentConfigUserThanEnteredGitAuthor_whenPressUseDefaultAuthorCheckBox_thenGitAuthorIsEqualDefault(FxRobot robot) {
+        when(vcsService.getUserName()).thenReturn(Optional.of("configUserName"));
+        doNothing().when(vcsService).setProjectPath(anyString());
+        MainController controller = (MainController) window.getController();
+        controller.setVcsService(vcsService);
+
+        final MainWindowObject windowObject = new MainWindowObject(robot)
+                .enterConfigurationName("code")
+                .pressAddConfigurationButton()
+                .pressOkOnPopup()
+                .enterGitAuthor("enteredUserName")
+                .enterAuthor("configAuthor")
+                .checkDefaultAuthor();
+
+        assertThat(windowObject.getGitAuthorTextField().getText()).isEqualTo("configUserName");
+    }
+
+    @Test
+    void whenPressUseDefaultCheckBoxesTwice_thenGitAuthorAndEmailEqualsEntered(FxRobot robot) {
+        when(vcsService.getUserName()).thenReturn(Optional.of("configUserName"));
+        when(vcsService.getUserEmail()).thenReturn(Optional.of("config@email.com"));
+        doNothing().when(vcsService).setProjectPath(anyString());
+        MainController controller = (MainController) window.getController();
+        controller.setVcsService(vcsService);
+
+        final MainWindowObject windowObject = new MainWindowObject(robot)
+                .enterConfigurationName("code")
+                .pressAddConfigurationButton()
+                .pressOkOnPopup()
+                .enterGitAuthor("enteredUserName")
+                .enterCommitterEmail("entered@email.com")
+                .pressSaveButton()
+                .pressOkOnPopup()
+                .checkDefaultAuthor()
+                .checkDefaultEmail()
+                .uncheckDefaultAuthor()
+                .uncheckDefaultEmail();
+
+        assertThat(windowObject.getGitAuthorTextField().getText()).isEqualTo("enteredUserName");
+        assertThat(windowObject.getCommitterEmailTextField().getText()).isEqualTo("entered@email.com");
     }
 }
