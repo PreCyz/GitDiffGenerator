@@ -107,6 +107,8 @@ public class MainTestUI {
         assertThat(windowObject.getProjectPathButton().isDisabled()).isTrue();
         assertThat(windowObject.getToolkitProjectListNamesTextField().isDisabled()).isTrue();
         assertThat(windowObject.getDeleteDownloadedFilesCheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isTrue();
     }
 
     @Test
@@ -133,6 +135,8 @@ public class MainTestUI {
         assertThat(windowObject.getDeleteDownloadedFilesCheckBox().isDisabled()).isTrue();
         assertThat(windowObject.getStartDatePicker().isDisabled()).isFalse();
         assertThat(windowObject.getEndDatePicker().isDisabled()).isFalse();
+        assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isTrue();
     }
 
     @Test
@@ -160,6 +164,8 @@ public class MainTestUI {
         assertThat(windowObject.getDeleteDownloadedFilesCheckBox().isDisabled()).isTrue();
         assertThat(windowObject.getStartDatePicker().isDisabled()).isFalse();
         assertThat(windowObject.getEndDatePicker().isDisabled()).isFalse();
+        assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isTrue();
     }
 
     @Test
@@ -187,6 +193,8 @@ public class MainTestUI {
         assertThat(windowObject.getDeleteDownloadedFilesCheckBox().isDisabled()).isTrue();
         assertThat(windowObject.getStartDatePicker().isDisabled()).isFalse();
         assertThat(windowObject.getEndDatePicker().isDisabled()).isFalse();
+        assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isTrue();
     }
 
     @Test
@@ -210,6 +218,8 @@ public class MainTestUI {
         assertThat(windowObject.getDeleteDownloadedFilesCheckBox().isDisabled()).isFalse();
         assertThat(windowObject.getStartDatePicker().isDisabled()).isFalse();
         assertThat(windowObject.getEndDatePicker().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isTrue();
     }
 
     @Test
@@ -262,6 +272,8 @@ public class MainTestUI {
         assertThat(windowObject.getConfigurationNameComboBox().getValue()).isEqualTo("docs");
         assertThat(windowObject.getItemTypeComboBox().getValue()).isEqualTo(ItemType.TOOLKIT_DOCS);
         assertThat(windowObject.getToolkitProjectListNamesTextField().getText()).isEqualTo("Deliverables,General");
+        assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isTrue();
     }
 
     @Test
