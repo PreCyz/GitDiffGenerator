@@ -17,16 +17,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
 import pg.gipter.core.*;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.ProgramData;
-import pg.gipter.core.model.*;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.*;
@@ -37,17 +33,16 @@ import pg.gipter.ui.*;
 import pg.gipter.utils.*;
 
 import java.awt.*;
-import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
@@ -155,27 +150,21 @@ public class MainController extends AbstractController {
 
     private final DataService dataService;
 
-    private final Set<String> definedPatterns;
-    private String currentItemName = "";
-    private String inteliSense = "";
-    private boolean useInteliSense = false;
     private VcsService vcsService;
     private final ToolkitSectionController toolkitSectionController;
     private final ConfigurationSectionController configurationSectionController;
     private final MenuSectionController menuSectionController;
+    private final PathsSectionController pathsSectionController;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         this.dataService = DataService.getInstance();
-        this.definedPatterns = EnumSet.allOf(NamePatternValue.class)
-                .stream()
-                .map(e -> String.format("{%s}", e.name()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
         this.vcsService = VcsServiceFactory.getInstance();
         toolkitSectionController = new ToolkitSectionController(uiLauncher, applicationProperties);
         configurationSectionController = new ConfigurationSectionController(uiLauncher, applicationProperties, this);
         menuSectionController = new MenuSectionController(uiLauncher, applicationProperties, this);
+        pathsSectionController = new PathsSectionController(uiLauncher, applicationProperties, this);
     }
 
     private Map<String, Object> initToolkitSectionMap() {
@@ -213,6 +202,16 @@ public class MainController extends AbstractController {
         return map;
     }
 
+    private Map<String, Object> initPathsSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("projectPathLabel", projectPathLabel);
+        map.put("itemPathLabel", itemPathLabel);
+        map.put("itemFileNamePrefixTextField", itemFileNamePrefixTextField);
+        map.put("projectPathButton", projectPathButton);
+        map.put("itemPathButton", itemPathButton);
+        return map;
+    }
+
     public void setVcsService(VcsService vcsService) {
         this.vcsService = vcsService;
     }
@@ -223,6 +222,7 @@ public class MainController extends AbstractController {
         toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
         configurationSectionController.initialize(location, resources, initConfigurationSectionMap());
         menuSectionController.initialize(location, resources, initMenuSectionMap());
+        pathsSectionController.initialize(location, resources, initPathsSectionMap());
 
         setInitValues();
         setProperties(resources);
@@ -242,16 +242,6 @@ public class MainController extends AbstractController {
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
         fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
 
-        projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
-        String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
-        String itemPath = applicationProperties.itemPath().substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
-        itemPathLabel.setText(itemPath);
-        if (applicationProperties.itemType() == ItemType.STATEMENT) {
-            itemPathLabel.setText(applicationProperties.itemPath());
-        }
-        projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
-        itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
-        itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
         deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
 
@@ -310,18 +300,6 @@ public class MainController extends AbstractController {
                 !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(applicationProperties.itemType())
         );
 
-        if (applicationProperties.projectPaths().isEmpty()) {
-            projectPathButton.setText(resources.getString("button.add"));
-        } else {
-            projectPathButton.setText(resources.getString("button.change"));
-        }
-
-        if (StringUtils.nullOrEmpty(applicationProperties.itemPath())) {
-            itemPathButton.setText(resources.getString("button.add"));
-        } else {
-            itemPathButton.setText(resources.getString("button.change"));
-        }
-
         startDatePicker.setConverter(dateConverter());
         endDatePicker.setConverter(dateConverter());
 
@@ -331,7 +309,6 @@ public class MainController extends AbstractController {
         instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
         configurationSectionController.setDisableDependOnConfigurations();
 
-        TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
         setUpgradeMenuItemDisabled();
 
         final boolean enableImportCert = StringUtils.notEmpty(System.getProperty("java.home")) &&
@@ -470,22 +447,9 @@ public class MainController extends AbstractController {
         executeButton.setDisable(runConfigMap.isEmpty());
         executeAllButton.setDisable(runConfigMap.isEmpty());
         jobButton.setDisable(runConfigMap.isEmpty());
-        projectPathButton.setDisable(runConfigMap.isEmpty() || itemTypeComboBox.getValue() == ItemType.STATEMENT);
-    }
-
-    private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
-        return param -> {
-            Collection<String> result = new HashSet<>();
-            if (useInteliSense) {
-                result = definedPatterns;
-                if (!inteliSense.isEmpty()) {
-                    result = definedPatterns.stream()
-                            .filter(pattern -> pattern.startsWith(inteliSense))
-                            .collect(toCollection(LinkedHashSet::new));
-                }
-            }
-            return result;
-        };
+        pathsSectionController.setDisableProjectPathButton(
+                runConfigMap.isEmpty() || itemTypeComboBox.getValue() == ItemType.STATEMENT
+        );
     }
 
     private void setUpgradeMenuItemDisabled() {
@@ -503,61 +467,11 @@ public class MainController extends AbstractController {
     }
 
     private void setActions(ResourceBundle resources) {
-        projectPathButton.setOnAction(projectPathActionEventHandler());
-        itemPathButton.setOnAction(itemPathActionEventHandler(resources));
         itemTypeComboBox.setOnAction(uploadTypeActionEventHandler());
         executeButton.setOnAction(executeActionEventHandler());
         executeAllButton.setOnAction(executeAllActionEventHandler());
         jobButton.setOnAction(jobActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
-        itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
-    }
-
-    private EventHandler<ActionEvent> projectPathActionEventHandler() {
-        return event -> {
-            RunConfig runConfig = createRunConfigFromUI();
-            applicationProperties.updateCurrentRunConfig(runConfig);
-            uiLauncher.setApplicationProperties(applicationProperties);
-            String configurationName = configurationNameTextField.getText();
-            configurationSectionController.updateConfigurationNameComboBox(configurationName, configurationName);
-            uiLauncher.showProject(itemTypeComboBox.getValue());
-        };
-    }
-
-    private Tooltip buildPathTooltip(String result) {
-        String[] paths = result.split(",");
-        StringBuilder builder = new StringBuilder();
-        Arrays.asList(paths).forEach(path -> builder.append(path).append("\n"));
-        Tooltip tooltip = new Tooltip(builder.toString());
-        tooltip.setTextAlignment(TextAlignment.LEFT);
-        tooltip.setFont(Font.font("Courier New", 14));
-        return tooltip;
-    }
-
-    private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
-        return event -> {
-            if (itemTypeComboBox.getValue() == ItemType.STATEMENT) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setInitialDirectory(new File("."));
-                fileChooser.setTitle(resources.getString("directory.item.statement.title"));
-                File statementFile = fileChooser.showOpenDialog(uiLauncher.currentWindow());
-                if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
-                    itemPathLabel.setText(statementFile.getAbsolutePath());
-                    itemPathButton.setText(resources.getString("button.open"));
-                    itemPathLabel.getTooltip().setText(statementFile.getAbsolutePath());
-                }
-            } else {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setInitialDirectory(new File("."));
-                directoryChooser.setTitle(resources.getString("directory.item.store"));
-                File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
-                if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                    itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
-                    itemPathButton.setText(resources.getString("button.change"));
-                    itemPathLabel.getTooltip().setText(itemPathDirectory.getAbsolutePath());
-                }
-            }
-        };
     }
 
     private EventHandler<ActionEvent> executeActionEventHandler() {
@@ -651,10 +565,10 @@ public class MainController extends AbstractController {
         }
         runConfig.setDeleteDownloadedFiles(deleteDownloadedFilesCheckBox.isSelected());
 
-        runConfig.setProjectPath(projectPathLabel.getText());
-        runConfig.setItemPath(itemPathLabel.getText());
-        if (!StringUtils.nullOrEmpty(itemFileNamePrefixTextField.getText())) {
-            runConfig.setItemFileNamePrefix(itemFileNamePrefixTextField.getText());
+        runConfig.setProjectPath(pathsSectionController.getProjectPathLabelValue());
+        runConfig.setItemPath(pathsSectionController.getItemPathLabelValue());
+        if (!StringUtils.nullOrEmpty(pathsSectionController.getItemFileNamePrefix())) {
+            runConfig.setItemFileNamePrefix(pathsSectionController.getItemFileNamePrefix());
         }
 
         runConfig.setStartDate(startDatePicker.getValue());
@@ -679,7 +593,7 @@ public class MainController extends AbstractController {
             boolean disableProjectButton = itemTypeComboBox.getValue() == ItemType.STATEMENT;
             disableProjectButton |= applicationProperties.getRunConfigMap().isEmpty() &&
                     configurationNameTextField.getText().isEmpty();
-            projectPathButton.setDisable(disableProjectButton);
+            pathsSectionController.setDisableProjectPathButton(disableProjectButton);
             if (itemTypeComboBox.getValue() == ItemType.TOOLKIT_DOCS) {
                 endDatePicker.setValue(LocalDate.now());
             }
@@ -738,18 +652,8 @@ public class MainController extends AbstractController {
         return runConfigFromUI;
     }
 
-    private EventHandler<KeyEvent> itemNameKeyReleasedEventHandler() {
-        return event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                itemFileNamePrefixTextField.setText(currentItemName);
-                itemFileNamePrefixTextField.positionCaret(currentItemName.length());
-            }
-        };
-    }
-
     private void setListeners() {
         useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
-        itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
         useDefaultAuthorCheckBox.selectedProperty().addListener(useDefaultAuthorChangeListener());
         useDefaultEmailCheckBox.selectedProperty().addListener(useDefaultEmailChangeListener());
         gitAuthorTextField.focusedProperty().addListener(gitAuthorFocusChangeListener());
@@ -763,40 +667,6 @@ public class MainController extends AbstractController {
                 startDatePicker.setValue(uiLauncher.getLastItemSubmissionDate().toLocalDate());
             } else {
                 startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
-            }
-        };
-    }
-
-    private ChangeListener<String> itemFileNameChangeListener() {
-        return (observable, oldValue, newValue) -> {
-            if (newValue.endsWith("{")) {
-                useInteliSense = true;
-                inteliSense = "";
-            } else if (newValue.endsWith("}") || newValue.isEmpty()) {
-                useInteliSense = false;
-            }
-            if (definedPatterns.contains(newValue)) {
-                useInteliSense = false;
-                inteliSense = "";
-                currentItemName = oldValue.substring(0, oldValue.lastIndexOf("{")) + newValue;
-                itemFileNamePrefixTextField.setText(currentItemName);
-                itemFileNamePrefixTextField.positionCaret(currentItemName.length());
-            } else {
-                currentItemName = newValue;
-            }
-
-            if (useInteliSense) {
-                //letter was added
-                if (newValue.length() > oldValue.length()) {
-                    inteliSense += newValue.replace(oldValue, "");
-                } else { //back space was pressed
-                    if (oldValue.endsWith("{")) {
-                        inteliSense = "";
-                        useInteliSense = false;
-                    } else {
-                        inteliSense = newValue.substring(newValue.lastIndexOf("{"));
-                    }
-                }
             }
         };
     }
@@ -854,14 +724,27 @@ public class MainController extends AbstractController {
     }
 
     void setDisableProjectPathButton(boolean value) {
-        projectPathButton.setDisable(value);
+        pathsSectionController.setDisableProjectPathButton(value);
     }
 
     void setToolkitCredentialsIfAvailable() {
         toolkitSectionController.setToolkitCredentialsIfAvailable();
     }
 
-    public String getConfigurationNameComboBoxValue() {
+    String getConfigurationNameComboBoxValue() {
         return configurationNameComboBox.getValue();
+    }
+
+    ItemType getItemType() {
+        return itemTypeComboBox.getValue();
+    }
+
+    String getConfigurationName() {
+        return configurationNameTextField.getText();
+    }
+
+
+    void updateConfigurationNameComboBox(String oldValue, String newValue) {
+        configurationSectionController.updateConfigurationNameComboBox(oldValue, newValue);
     }
 }
