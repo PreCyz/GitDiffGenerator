@@ -61,8 +61,35 @@ public class MenuSectionController extends AbstractController {
         importCertMenuItem = controlsMap.get("importCertMenuItem");
         importCertProgrammaticMenuItem = controlsMap.get("importCertProgrammaticMenuItem");
 
+        setProperties();
         setAccelerators();
         setActions();
+    }
+
+    private void setProperties() {
+        instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
+
+        setUpgradeMenuItemDisabled();
+
+        final boolean enableImportCert = StringUtils.notEmpty(System.getProperty("java.home")) &&
+                applicationProperties.isCertImportEnabled() &&
+                CertificateServiceFactory.getInstance(true).hasCertToImport();
+        importCertMenuItem.setDisable(!enableImportCert);
+        importCertProgrammaticMenuItem.setDisable(!enableImportCert);
+    }
+
+    private void setUpgradeMenuItemDisabled() {
+        uiLauncher.executeOutsideUIThread(() -> {
+            logger.info("Checking new version.");
+            GithubService service = new GithubService(applicationProperties.version());
+            final boolean newVersion = service.isNewVersion();
+            if (newVersion) {
+                logger.info("New version [{}] available.", service.getServerVersion());
+            } else {
+                logger.info("This version is up to date.");
+            }
+            Platform.runLater(() -> upgradeMenuItem.setDisable(!newVersion));
+        });
     }
 
     private void setAccelerators() {
