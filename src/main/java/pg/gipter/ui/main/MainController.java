@@ -1,23 +1,17 @@
 package pg.gipter.ui.main;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.util.StringConverter;
 import pg.gipter.core.*;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.ProgramData;
@@ -25,25 +19,20 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
-import pg.gipter.services.*;
-import pg.gipter.services.keystore.CertificateServiceFactory;
+import pg.gipter.services.DataService;
 import pg.gipter.services.vcs.VcsService;
 import pg.gipter.services.vcs.VcsServiceFactory;
 import pg.gipter.ui.*;
 import pg.gipter.utils.*;
 
-import java.awt.*;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
 
@@ -120,6 +109,8 @@ public class MainController extends AbstractController {
     private DatePicker startDatePicker;
     @FXML
     private DatePicker endDatePicker;
+    @FXML
+    private CheckBox useLastItemDateCheckbox;
 
     @FXML
     private Button executeButton;
@@ -145,8 +136,6 @@ public class MainController extends AbstractController {
     private Button saveConfigurationButton;
     @FXML
     private Label currentWeekNumberLabel;
-    @FXML
-    private CheckBox useLastItemDateCheckbox;
 
     private final DataService dataService;
 
@@ -155,6 +144,7 @@ public class MainController extends AbstractController {
     private final ConfigurationSectionController configurationSectionController;
     private final MenuSectionController menuSectionController;
     private final PathsSectionController pathsSectionController;
+    private final DatesSectionController datesSectionController;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -165,6 +155,7 @@ public class MainController extends AbstractController {
         configurationSectionController = new ConfigurationSectionController(uiLauncher, applicationProperties, this);
         menuSectionController = new MenuSectionController(uiLauncher, applicationProperties, this);
         pathsSectionController = new PathsSectionController(uiLauncher, applicationProperties, this);
+        datesSectionController = new DatesSectionController(uiLauncher, applicationProperties);
     }
 
     private Map<String, Object> initToolkitSectionMap() {
@@ -212,6 +203,14 @@ public class MainController extends AbstractController {
         return map;
     }
 
+    private Map<String, Object> initDatesSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("startDatePicker", startDatePicker);
+        map.put("endDatePicker", endDatePicker);
+        map.put("useLastItemDateCheckbox", useLastItemDateCheckbox);
+        return map;
+    }
+
     public void setVcsService(VcsService vcsService) {
         this.vcsService = vcsService;
     }
@@ -223,10 +222,11 @@ public class MainController extends AbstractController {
         configurationSectionController.initialize(location, resources, initConfigurationSectionMap());
         menuSectionController.initialize(location, resources, initMenuSectionMap());
         pathsSectionController.initialize(location, resources, initPathsSectionMap());
+        datesSectionController.initialize(location, resources, initDatesSectionMap());
 
         setInitValues();
-        setProperties(resources);
-        setActions(resources);
+        setProperties();
+        setActions();
         setListeners();
         setAccelerators();
     }
@@ -244,54 +244,9 @@ public class MainController extends AbstractController {
 
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
         deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
-
-        LocalDate now = LocalDate.now();
-        LocalDate initStartDate = now.minusDays(applicationProperties.periodInDays());
-        startDatePicker.setValue(initStartDate);
-        if (!initStartDate.isEqual(applicationProperties.startDate())) {
-            startDatePicker.setValue(applicationProperties.startDate());
-        }
-        endDatePicker.setValue(now);
-        if (!now.isEqual(applicationProperties.endDate())) {
-            endDatePicker.setValue(applicationProperties.endDate());
-        }
-
-        setLastItemSubmissionDate();
     }
 
-    void setLastItemSubmissionDate() {
-        uiLauncher.executeOutsideUIThread(() -> {
-            if (uiLauncher.getLastItemSubmissionDate() == null) {
-                Optional<String> submissionDate = new ToolkitService(applicationProperties).lastItemUploadDate();
-                if (submissionDate.isPresent()) {
-                    uiLauncher.setLastItemSubmissionDate(LocalDateTime.parse(submissionDate.get(), DateTimeFormatter.ISO_DATE_TIME));
-                    Platform.runLater(() -> {
-                        useLastItemDateCheckbox.setDisable(uiLauncher.getLastItemSubmissionDate() == null);
-                        useLastItemDateCheckbox.setText(BundleUtils.getMsg(
-                                "main.lastUploadDate",
-                                uiLauncher.getLastItemSubmissionDate().format(DateTimeFormatter.ISO_DATE)
-                        ));
-                    });
-                } else {
-                    uiLauncher.setLastItemSubmissionDate(null);
-                    Platform.runLater(() -> {
-                        useLastItemDateCheckbox.setDisable(uiLauncher.getLastItemSubmissionDate() == null);
-                        useLastItemDateCheckbox.setText(BundleUtils.getMsg("main.lastUploadDate.unavailable"));
-                    });
-                }
-            } else {
-                Platform.runLater(() -> {
-                    useLastItemDateCheckbox.setDisable(uiLauncher.getLastItemSubmissionDate() == null);
-                    useLastItemDateCheckbox.setText(BundleUtils.getMsg(
-                            "main.lastUploadDate",
-                            uiLauncher.getLastItemSubmissionDate().format(DateTimeFormatter.ISO_DATE)
-                    ));
-                });
-            }
-        });
-    }
-
-    private void setProperties(ResourceBundle resources) {
+    private void setProperties() {
         toolkitProjectListNamesTextField.setDisable(
                 !EnumSet.of(ItemType.TOOLKIT_DOCS).contains(applicationProperties.itemType())
         );
@@ -300,22 +255,11 @@ public class MainController extends AbstractController {
                 !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(applicationProperties.itemType())
         );
 
-        startDatePicker.setConverter(dateConverter());
-        endDatePicker.setConverter(dateConverter());
-
         setDisable(applicationProperties.itemType());
 
         loadProgressIndicator.setVisible(false);
-        instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
         configurationSectionController.setDisableDependOnConfigurations();
 
-        setUpgradeMenuItemDisabled();
-
-        final boolean enableImportCert = StringUtils.notEmpty(System.getProperty("java.home")) &&
-                applicationProperties.isCertImportEnabled() &&
-                CertificateServiceFactory.getInstance(true).hasCertToImport();
-        importCertMenuItem.setDisable(!enableImportCert);
-        importCertProgrammaticMenuItem.setDisable(!enableImportCert);
         useDefaultAuthorCheckBox.setDisable(disableDefaultAuthor());
         setTooltipOnUseDefaultAuthor();
         useDefaultEmailCheckBox.setDisable(disableDefaultEmail());
@@ -428,20 +372,6 @@ public class MainController extends AbstractController {
         }
     }
 
-    private StringConverter<LocalDate> dateConverter() {
-        return new StringConverter<>() {
-            @Override
-            public String toString(LocalDate object) {
-                return object.format(yyyy_MM_dd);
-            }
-
-            @Override
-            public LocalDate fromString(String string) {
-                return LocalDate.parse(string, yyyy_MM_dd);
-            }
-        };
-    }
-
     void setDisableDependOnConfigurations() {
         Map<String, RunConfig> runConfigMap = applicationProperties.getRunConfigMap();
         executeButton.setDisable(runConfigMap.isEmpty());
@@ -452,21 +382,7 @@ public class MainController extends AbstractController {
         );
     }
 
-    private void setUpgradeMenuItemDisabled() {
-        uiLauncher.executeOutsideUIThread(() -> {
-            logger.info("Checking new version.");
-            GithubService service = new GithubService(applicationProperties.version());
-            final boolean newVersion = service.isNewVersion();
-            if (newVersion) {
-                logger.info("New version [{}] available.", service.getServerVersion());
-            } else {
-                logger.info("This version is up to date.");
-            }
-            Platform.runLater(() -> upgradeMenuItem.setDisable(!newVersion));
-        });
-    }
-
-    private void setActions(ResourceBundle resources) {
+    private void setActions() {
         itemTypeComboBox.setOnAction(uploadTypeActionEventHandler());
         executeButton.setOnAction(executeActionEventHandler());
         executeAllButton.setOnAction(executeAllActionEventHandler());
@@ -513,7 +429,7 @@ public class MainController extends AbstractController {
                     ex.getMessage());
             uiLauncher.setLastItemSubmissionDate(null);
         } finally {
-            setLastItemSubmissionDate();
+            datesSectionController.setLastItemSubmissionDate();
         }
     }
 
@@ -571,8 +487,8 @@ public class MainController extends AbstractController {
             runConfig.setItemFileNamePrefix(pathsSectionController.getItemFileNamePrefix());
         }
 
-        runConfig.setStartDate(startDatePicker.getValue());
-        runConfig.setEndDate(endDatePicker.getValue());
+        runConfig.setStartDate(datesSectionController.getStartDate());
+        runConfig.setEndDate(datesSectionController.getEndDate());
 
         runConfig.setConfigurationName(configurationNameTextField.getText());
         runConfig.setPreferredArgSource(PreferredArgSource.UI);
@@ -595,7 +511,7 @@ public class MainController extends AbstractController {
                     configurationNameTextField.getText().isEmpty();
             pathsSectionController.setDisableProjectPathButton(disableProjectButton);
             if (itemTypeComboBox.getValue() == ItemType.TOOLKIT_DOCS) {
-                endDatePicker.setValue(LocalDate.now());
+                datesSectionController.setEndDatePicker(LocalDate.now());
             }
             toolkitProjectListNamesTextField.setDisable(itemTypeComboBox.getValue() != ItemType.TOOLKIT_DOCS);
             deleteDownloadedFilesCheckBox.setDisable(
@@ -606,8 +522,8 @@ public class MainController extends AbstractController {
         };
     }
 
-    private void setDisable(ItemType uploadType) {
-        boolean disable = EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(uploadType);
+    private void setDisable(ItemType itemType) {
+        boolean disable = EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(itemType);
         authorsTextField.setDisable(disable);
         committerEmailTextField.setDisable(disable);
         gitAuthorTextField.setDisable(disable);
@@ -615,7 +531,7 @@ public class MainController extends AbstractController {
         mercurialAuthorTextField.setDisable(disable);
         skipRemoteCheckBox.setDisable(disable);
         fetchAllCheckBox.setDisable(disable);
-        endDatePicker.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(uploadType));
+        datesSectionController.disableEndDatePicker(itemType);
     }
 
     private EventHandler<ActionEvent> jobActionEventHandler() {
@@ -653,22 +569,10 @@ public class MainController extends AbstractController {
     }
 
     private void setListeners() {
-        useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
         useDefaultAuthorCheckBox.selectedProperty().addListener(useDefaultAuthorChangeListener());
         useDefaultEmailCheckBox.selectedProperty().addListener(useDefaultEmailChangeListener());
         gitAuthorTextField.focusedProperty().addListener(gitAuthorFocusChangeListener());
         committerEmailTextField.focusedProperty().addListener(committerEmailFocusChangeListener());
-    }
-
-    private ChangeListener<Boolean> useListItemCheckBoxListener() {
-        return (observable, oldValue, newValue) -> {
-            startDatePicker.setDisable(newValue);
-            if (newValue) {
-                startDatePicker.setValue(uiLauncher.getLastItemSubmissionDate().toLocalDate());
-            } else {
-                startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
-            }
-        };
     }
 
     private ChangeListener<? super Boolean> useDefaultAuthorChangeListener() {
@@ -718,9 +622,7 @@ public class MainController extends AbstractController {
     }
 
     void deselectUseLastItemDate() {
-        if (useLastItemDateCheckbox.isSelected()) {
-            useLastItemDateCheckbox.setSelected(false);
-        }
+        datesSectionController.deselectUseLastItemDate();
     }
 
     void setDisableProjectPathButton(boolean value) {
@@ -746,5 +648,9 @@ public class MainController extends AbstractController {
 
     void updateConfigurationNameComboBox(String oldValue, String newValue) {
         configurationSectionController.updateConfigurationNameComboBox(oldValue, newValue);
+    }
+
+    public void setLastItemSubmissionDate() {
+        datesSectionController.setLastItemSubmissionDate();
     }
 }
