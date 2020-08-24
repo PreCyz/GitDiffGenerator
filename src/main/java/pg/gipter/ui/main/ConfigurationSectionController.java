@@ -244,4 +244,8 @@ class ConfigurationSectionController extends AbstractController {
         useComboBoxValueChangeListener = true;
         setDisableDependOnConfigurations();
     }
+
+    String getConfigurationName() {
+        return configurationNameTextField.getText();
+    }
 }

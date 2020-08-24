@@ -404,7 +404,7 @@ public class MainController extends AbstractController {
         runConfig.setStartDate(datesSectionController.getStartDate());
         runConfig.setEndDate(datesSectionController.getEndDate());
 
-        runConfig.setConfigurationName(configurationNameTextField.getText());
+        runConfig.setConfigurationName(configurationSectionController.getConfigurationName());
         runConfig.setPreferredArgSource(PreferredArgSource.UI);
 
         return runConfig;
@@ -440,7 +440,7 @@ public class MainController extends AbstractController {
     void updateRunConfig(String oldConfigName, String newConfigName) {
         ToolkitConfig toolkitConfigFromUI = toolkitSectionController.createToolkitConfigFromUI();
         applicationProperties.updateToolkitConfig(toolkitConfigFromUI);
-        if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
+        if (!StringUtils.nullOrEmpty(configurationSectionController.getConfigurationName())) {
             RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
             applicationProperties.updateCurrentRunConfig(runConfigWithoutDates);
             new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
@@ -480,7 +480,7 @@ public class MainController extends AbstractController {
     }
 
     String getConfigurationName() {
-        return configurationNameTextField.getText();
+        return configurationSectionController.getConfigurationName();
     }
 
 
