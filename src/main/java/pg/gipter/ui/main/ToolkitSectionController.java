@@ -81,6 +81,7 @@ class ToolkitSectionController extends AbstractController {
                     boolean hasProperCredentials = new ToolkitService(instance).hasProperCredentials();
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
                     if (hasProperCredentials) {
+                        saveToolkitCredentials();
                         alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
                                 .withWindowType(WindowType.CONFIRMATION_WINDOW)
                                 .withAlertType(Alert.AlertType.INFORMATION)
@@ -101,6 +102,12 @@ class ToolkitSectionController extends AbstractController {
             };
             uiLauncher.executeOutsideUIThread(task);
         };
+    }
+
+    private void saveToolkitCredentials() {
+        ToolkitConfig toolkitConfigFromUI = createToolkitConfigFromUI();
+        applicationProperties.updateToolkitConfig(toolkitConfigFromUI);
+        applicationProperties.save();
     }
 
     void setToolkitCredentialsIfAvailable() {
