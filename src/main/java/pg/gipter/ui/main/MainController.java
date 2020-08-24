@@ -71,10 +71,6 @@ public class MainController extends AbstractController {
     @FXML
     private ComboBox<ItemType> itemTypeComboBox;
     @FXML
-    private CheckBox skipRemoteCheckBox;
-    @FXML
-    private CheckBox fetchAllCheckBox;
-    @FXML
     private CheckBox useDefaultAuthorCheckBox;
     @FXML
     private CheckBox useDefaultEmailCheckBox;
@@ -90,9 +86,14 @@ public class MainController extends AbstractController {
     @FXML
     private TextField toolkitProjectListNamesTextField;
     @FXML
+    private ProgressIndicator verifyProgressIndicator;
+
+    @FXML
     private CheckBox deleteDownloadedFilesCheckBox;
     @FXML
-    private ProgressIndicator verifyProgressIndicator;
+    private CheckBox skipRemoteCheckBox;
+    @FXML
+    private CheckBox fetchAllCheckBox;
 
     @FXML
     private Label projectPathLabel;
@@ -145,6 +146,7 @@ public class MainController extends AbstractController {
     private final MenuSectionController menuSectionController;
     private final PathsSectionController pathsSectionController;
     private final DatesSectionController datesSectionController;
+    private final AdditionalSettingsSectionController additionalSettingsSectionController;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -156,6 +158,7 @@ public class MainController extends AbstractController {
         menuSectionController = new MenuSectionController(uiLauncher, applicationProperties, this);
         pathsSectionController = new PathsSectionController(uiLauncher, applicationProperties, this);
         datesSectionController = new DatesSectionController(uiLauncher, applicationProperties);
+        additionalSettingsSectionController = new AdditionalSettingsSectionController(uiLauncher, applicationProperties);
     }
 
     private Map<String, Object> initToolkitSectionMap() {
@@ -211,6 +214,14 @@ public class MainController extends AbstractController {
         return map;
     }
 
+    private Map<String, CheckBox> initAdditionalSettingsSectionMap() {
+        Map<String, CheckBox> map = new HashMap<>();
+        map.put("deleteDownloadedFilesCheckBox", deleteDownloadedFilesCheckBox);
+        map.put("skipRemoteCheckBox", skipRemoteCheckBox);
+        map.put("fetchAllCheckBox", fetchAllCheckBox);
+        return map;
+    }
+
     public void setVcsService(VcsService vcsService) {
         this.vcsService = vcsService;
     }
@@ -223,6 +234,7 @@ public class MainController extends AbstractController {
         menuSectionController.initialize(location, resources, initMenuSectionMap());
         pathsSectionController.initialize(location, resources, initPathsSectionMap());
         datesSectionController.initialize(location, resources, initDatesSectionMap());
+        additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
 
         setInitValues();
         setProperties();
@@ -239,11 +251,8 @@ public class MainController extends AbstractController {
         svnAuthorTextField.setText(applicationProperties.svnAuthor());
         itemTypeComboBox.setItems(FXCollections.observableArrayList(ItemType.values()));
         itemTypeComboBox.setValue(applicationProperties.itemType());
-        skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
-        fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
 
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
-        deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
     }
 
     private void setProperties() {
@@ -251,9 +260,6 @@ public class MainController extends AbstractController {
                 !EnumSet.of(ItemType.TOOLKIT_DOCS).contains(applicationProperties.itemType())
         );
         setTooltipOnProjectListNames();
-        deleteDownloadedFilesCheckBox.setDisable(
-                !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(applicationProperties.itemType())
-        );
 
         setDisable(applicationProperties.itemType());
 
@@ -514,7 +520,7 @@ public class MainController extends AbstractController {
                 datesSectionController.setEndDatePicker(LocalDate.now());
             }
             toolkitProjectListNamesTextField.setDisable(itemTypeComboBox.getValue() != ItemType.TOOLKIT_DOCS);
-            deleteDownloadedFilesCheckBox.setDisable(
+            additionalSettingsSectionController.disableDeleteDownloadedFiles(
                     !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(itemTypeComboBox.getValue())
             );
             setDisable(itemTypeComboBox.getValue());
@@ -529,9 +535,9 @@ public class MainController extends AbstractController {
         gitAuthorTextField.setDisable(disable);
         svnAuthorTextField.setDisable(disable);
         mercurialAuthorTextField.setDisable(disable);
-        skipRemoteCheckBox.setDisable(disable);
-        fetchAllCheckBox.setDisable(disable);
         datesSectionController.disableEndDatePicker(itemType);
+        additionalSettingsSectionController.disableSkipRemote(disable);
+        additionalSettingsSectionController.disableFetchAll(disable);
     }
 
     private EventHandler<ActionEvent> jobActionEventHandler() {
