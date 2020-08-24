@@ -54,4 +54,16 @@ class AdditionalSettingsSectionController extends AbstractController {
     void disableFetchAll(boolean disable) {
         fetchAllCheckBox.setDisable(disable);
     }
+
+    public Boolean getDeleteDownloadedFiles() {
+        return deleteDownloadedFilesCheckBox.isSelected();
+    }
+
+    public Boolean getSkipRemote() {
+        return skipRemoteCheckBox.isSelected();
+    }
+
+    public Boolean getFetchAll() {
+        return fetchAllCheckBox.isSelected();
+    }
 }

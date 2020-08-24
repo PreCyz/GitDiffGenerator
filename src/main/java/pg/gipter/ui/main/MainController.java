@@ -1,7 +1,5 @@
 package pg.gipter.ui.main;
 
-import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -10,29 +8,24 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 import pg.gipter.core.*;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.DataService;
 import pg.gipter.services.vcs.VcsService;
-import pg.gipter.services.vcs.VcsServiceFactory;
 import pg.gipter.ui.*;
-import pg.gipter.utils.*;
+import pg.gipter.utils.JobHelper;
+import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 public class MainController extends AbstractController {
 
@@ -74,6 +67,8 @@ public class MainController extends AbstractController {
     private CheckBox useDefaultAuthorCheckBox;
     @FXML
     private CheckBox useDefaultEmailCheckBox;
+    @FXML
+    private TextField toolkitProjectListNamesTextField;
 
     @FXML
     private TextField toolkitUsernameTextField;
@@ -83,8 +78,6 @@ public class MainController extends AbstractController {
     private TextField toolkitDomainTextField;
     @FXML
     private Hyperlink verifyCredentialsHyperlink;
-    @FXML
-    private TextField toolkitProjectListNamesTextField;
     @FXML
     private ProgressIndicator verifyProgressIndicator;
 
@@ -140,25 +133,29 @@ public class MainController extends AbstractController {
 
     private final DataService dataService;
 
-    private VcsService vcsService;
     private final ToolkitSectionController toolkitSectionController;
     private final ConfigurationSectionController configurationSectionController;
     private final MenuSectionController menuSectionController;
     private final PathsSectionController pathsSectionController;
     private final DatesSectionController datesSectionController;
     private final AdditionalSettingsSectionController additionalSettingsSectionController;
+    private final CsvDetailsSectionController csvDetailsSectionController;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         this.dataService = DataService.getInstance();
-        this.vcsService = VcsServiceFactory.getInstance();
         toolkitSectionController = new ToolkitSectionController(uiLauncher, applicationProperties);
         configurationSectionController = new ConfigurationSectionController(uiLauncher, applicationProperties, this);
         menuSectionController = new MenuSectionController(uiLauncher, applicationProperties, this);
         pathsSectionController = new PathsSectionController(uiLauncher, applicationProperties, this);
         datesSectionController = new DatesSectionController(uiLauncher, applicationProperties);
         additionalSettingsSectionController = new AdditionalSettingsSectionController(uiLauncher, applicationProperties);
+        csvDetailsSectionController = new CsvDetailsSectionController(uiLauncher, applicationProperties, this);
+    }
+
+    public void setVcsService(VcsService vcsService) {
+        csvDetailsSectionController.setVcsService(vcsService);
     }
 
     private Map<String, Object> initToolkitSectionMap() {
@@ -222,8 +219,18 @@ public class MainController extends AbstractController {
         return map;
     }
 
-    public void setVcsService(VcsService vcsService) {
-        this.vcsService = vcsService;
+    private Map<String, Object> initCsvDetailsSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("authorsTextField", authorsTextField);
+        map.put("committerEmailTextField", committerEmailTextField);
+        map.put("gitAuthorTextField", gitAuthorTextField);
+        map.put("mercurialAuthorTextField", mercurialAuthorTextField);
+        map.put("svnAuthorTextField", svnAuthorTextField);
+        map.put("itemTypeComboBox", itemTypeComboBox);
+        map.put("toolkitProjectListNamesTextField", toolkitProjectListNamesTextField);
+        map.put("useDefaultAuthorCheckBox", useDefaultAuthorCheckBox);
+        map.put("useDefaultEmailCheckBox", useDefaultEmailCheckBox);
+        return map;
     }
 
     @Override
@@ -235,105 +242,18 @@ public class MainController extends AbstractController {
         pathsSectionController.initialize(location, resources, initPathsSectionMap());
         datesSectionController.initialize(location, resources, initDatesSectionMap());
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
+        csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
 
-        setInitValues();
         setProperties();
         setActions();
-        setListeners();
         setAccelerators();
     }
 
-    private void setInitValues() {
-        authorsTextField.setText(String.join(",", applicationProperties.authors()));
-        committerEmailTextField.setText(applicationProperties.committerEmail());
-        gitAuthorTextField.setText(applicationProperties.gitAuthor());
-        mercurialAuthorTextField.setText(applicationProperties.mercurialAuthor());
-        svnAuthorTextField.setText(applicationProperties.svnAuthor());
-        itemTypeComboBox.setItems(FXCollections.observableArrayList(ItemType.values()));
-        itemTypeComboBox.setValue(applicationProperties.itemType());
-
-        toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
-    }
-
     private void setProperties() {
-        toolkitProjectListNamesTextField.setDisable(
-                !EnumSet.of(ItemType.TOOLKIT_DOCS).contains(applicationProperties.itemType())
-        );
-        setTooltipOnProjectListNames();
-
-        setDisable(applicationProperties.itemType());
-
         loadProgressIndicator.setVisible(false);
         configurationSectionController.setDisableDependOnConfigurations();
 
-        useDefaultAuthorCheckBox.setDisable(disableDefaultAuthor());
-        setTooltipOnUseDefaultAuthor();
-        useDefaultEmailCheckBox.setDisable(disableDefaultEmail());
-        setTooltipOnUseDefaultEmail();
-    }
-
-    private boolean disableDefaultAuthor() {
-        boolean disabled = true;
-        if (EnumSet.of(ItemType.STATEMENT, ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS)
-                .contains(applicationProperties.itemType())) {
-
-            Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
-                    .stream()
-                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath).toFile()))
-                    .collect(toSet());
-
-            if (vcsSet.contains(VersionControlSystem.GIT)) {
-                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-                Optional<String> userName = vcsService.getUserName();
-                if (userName.isPresent()) {
-                    disabled = applicationProperties.authors().contains(userName.get());
-                    disabled |= StringUtils.notEmpty(applicationProperties.gitAuthor()) &&
-                            !userName.get().equals(applicationProperties.gitAuthor());
-                }
-            }
-        }
-        return disabled;
-    }
-
-    private void setTooltipOnUseDefaultAuthor() {
-        vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-        String userName = vcsService.getUserName().orElseGet(() -> "");
-        Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultAuthor.tooltip", userName));
-        tooltip.setTextAlignment(TextAlignment.LEFT);
-        tooltip.setFont(Font.font("Courier New", 16));
-        useDefaultAuthorCheckBox.setTooltip(tooltip);
-    }
-
-    private boolean disableDefaultEmail() {
-        boolean disabled = true;
-        if (EnumSet.of(ItemType.STATEMENT, ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS)
-                .contains(applicationProperties.itemType())) {
-
-            Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
-                    .stream()
-                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath).toFile()))
-                    .collect(toSet());
-            if (vcsSet.contains(VersionControlSystem.GIT) &&
-                    StringUtils.notEmpty(applicationProperties.committerEmail())) {
-
-                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-                Optional<String> userEmail = vcsService.getUserEmail();
-
-                if (userEmail.isPresent()) {
-                    disabled = userEmail.get().equals(applicationProperties.committerEmail());
-                }
-            }
-        }
-        return disabled;
-    }
-
-    private void setTooltipOnUseDefaultEmail() {
-        vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-        String userEmail = vcsService.getUserEmail().orElseGet(() -> "");
-        Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultEmail.tooltip", userEmail));
-        tooltip.setTextAlignment(TextAlignment.LEFT);
-        tooltip.setFont(Font.font("Courier New", 16));
-        useDefaultEmailCheckBox.setTooltip(tooltip);
+        setDisable(applicationProperties.itemType());
     }
 
     private void setAccelerators() {
@@ -367,29 +287,17 @@ public class MainController extends AbstractController {
         });
     }
 
-    private void setTooltipOnProjectListNames() {
-        if (!toolkitProjectListNamesTextField.isDisabled()) {
-            Tooltip tooltip = new Tooltip(BundleUtils.getMsg("toolkit.panel.projectListNames.tooltip"));
-            tooltip.setTextAlignment(TextAlignment.LEFT);
-            tooltip.setFont(Font.font("Courier New", 16));
-            toolkitProjectListNamesTextField.setTooltip(tooltip);
-        } else {
-            toolkitProjectListNamesTextField.setTooltip(null);
-        }
-    }
-
     void setDisableDependOnConfigurations() {
         Map<String, RunConfig> runConfigMap = applicationProperties.getRunConfigMap();
         executeButton.setDisable(runConfigMap.isEmpty());
         executeAllButton.setDisable(runConfigMap.isEmpty());
         jobButton.setDisable(runConfigMap.isEmpty());
         pathsSectionController.setDisableProjectPathButton(
-                runConfigMap.isEmpty() || itemTypeComboBox.getValue() == ItemType.STATEMENT
+                runConfigMap.isEmpty() || csvDetailsSectionController.getItemType() == ItemType.STATEMENT
         );
     }
 
     private void setActions() {
-        itemTypeComboBox.setOnAction(uploadTypeActionEventHandler());
         executeButton.setOnAction(executeActionEventHandler());
         executeAllButton.setOnAction(executeAllActionEventHandler());
         jobButton.setOnAction(jobActionEventHandler());
@@ -463,29 +371,29 @@ public class MainController extends AbstractController {
     RunConfig createRunConfigFromUI() {
         RunConfig runConfig = new RunConfig();
 
-        if (!StringUtils.nullOrEmpty(authorsTextField.getText())) {
-            runConfig.setAuthor(authorsTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getAuthors())) {
+            runConfig.setAuthor(csvDetailsSectionController.getAuthors());
         }
-        if (!StringUtils.nullOrEmpty(committerEmailTextField.getText())) {
-            runConfig.setCommitterEmail(committerEmailTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getCommitterEmail())) {
+            runConfig.setCommitterEmail(csvDetailsSectionController.getCommitterEmail());
         }
-        if (!StringUtils.nullOrEmpty(gitAuthorTextField.getText())) {
-            runConfig.setGitAuthor(gitAuthorTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getGitAuthor())) {
+            runConfig.setGitAuthor(csvDetailsSectionController.getGitAuthor());
         }
-        if (!StringUtils.nullOrEmpty(mercurialAuthorTextField.getText())) {
-            runConfig.setMercurialAuthor(mercurialAuthorTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getMercurialAuthor())) {
+            runConfig.setMercurialAuthor(csvDetailsSectionController.getMercurialAuthor());
         }
-        if (!StringUtils.nullOrEmpty(svnAuthorTextField.getText())) {
-            runConfig.setSvnAuthor(svnAuthorTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getSvnAuthor())) {
+            runConfig.setSvnAuthor(csvDetailsSectionController.getSvnAuthor());
         }
-        runConfig.setItemType(itemTypeComboBox.getValue());
-        runConfig.setSkipRemote(skipRemoteCheckBox.isSelected());
-        runConfig.setFetchAll(fetchAllCheckBox.isSelected());
+        runConfig.setItemType(csvDetailsSectionController.getItemType());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getToolkitProjectListNames())) {
+            runConfig.setToolkitProjectListNames(csvDetailsSectionController.getToolkitProjectListNames());
+        }
 
-        if (!StringUtils.nullOrEmpty(toolkitProjectListNamesTextField.getText())) {
-            runConfig.setToolkitProjectListNames(toolkitProjectListNamesTextField.getText());
-        }
-        runConfig.setDeleteDownloadedFiles(deleteDownloadedFilesCheckBox.isSelected());
+        runConfig.setDeleteDownloadedFiles(additionalSettingsSectionController.getDeleteDownloadedFiles());
+        runConfig.setSkipRemote(additionalSettingsSectionController.getSkipRemote());
+        runConfig.setFetchAll(additionalSettingsSectionController.getFetchAll());
 
         runConfig.setProjectPath(pathsSectionController.getProjectPathLabelValue());
         runConfig.setItemPath(pathsSectionController.getItemPathLabelValue());
@@ -510,31 +418,8 @@ public class MainController extends AbstractController {
         infoLabel.textProperty().bind(task.messageProperty());
     }
 
-    private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
-        return event -> {
-            boolean disableProjectButton = itemTypeComboBox.getValue() == ItemType.STATEMENT;
-            disableProjectButton |= applicationProperties.getRunConfigMap().isEmpty() &&
-                    configurationNameTextField.getText().isEmpty();
-            pathsSectionController.setDisableProjectPathButton(disableProjectButton);
-            if (itemTypeComboBox.getValue() == ItemType.TOOLKIT_DOCS) {
-                datesSectionController.setEndDatePicker(LocalDate.now());
-            }
-            toolkitProjectListNamesTextField.setDisable(itemTypeComboBox.getValue() != ItemType.TOOLKIT_DOCS);
-            additionalSettingsSectionController.disableDeleteDownloadedFiles(
-                    !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(itemTypeComboBox.getValue())
-            );
-            setDisable(itemTypeComboBox.getValue());
-            setTooltipOnProjectListNames();
-        };
-    }
-
-    private void setDisable(ItemType itemType) {
+    void setDisable(ItemType itemType) {
         boolean disable = EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(itemType);
-        authorsTextField.setDisable(disable);
-        committerEmailTextField.setDisable(disable);
-        gitAuthorTextField.setDisable(disable);
-        svnAuthorTextField.setDisable(disable);
-        mercurialAuthorTextField.setDisable(disable);
         datesSectionController.disableEndDatePicker(itemType);
         additionalSettingsSectionController.disableSkipRemote(disable);
         additionalSettingsSectionController.disableFetchAll(disable);
@@ -574,59 +459,6 @@ public class MainController extends AbstractController {
         return runConfigFromUI;
     }
 
-    private void setListeners() {
-        useDefaultAuthorCheckBox.selectedProperty().addListener(useDefaultAuthorChangeListener());
-        useDefaultEmailCheckBox.selectedProperty().addListener(useDefaultEmailChangeListener());
-        gitAuthorTextField.focusedProperty().addListener(gitAuthorFocusChangeListener());
-        committerEmailTextField.focusedProperty().addListener(committerEmailFocusChangeListener());
-    }
-
-    private ChangeListener<? super Boolean> useDefaultAuthorChangeListener() {
-        return (observable, oldValue, newValue) -> {
-            if (newValue) {
-                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-                vcsService.getUserName().ifPresent(userName -> gitAuthorTextField.setText(userName));
-            } else {
-                gitAuthorTextField.setText(applicationProperties.gitAuthor());
-            }
-        };
-    }
-
-    private ChangeListener<? super Boolean> useDefaultEmailChangeListener() {
-        return (observable, oldValue, newValue) -> {
-            if (newValue) {
-                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-                vcsService.getUserEmail().ifPresent(userEmail -> committerEmailTextField.setText(userEmail));
-            } else {
-                committerEmailTextField.setText(applicationProperties.committerEmail());
-            }
-        };
-    }
-
-    private ChangeListener<? super Boolean> gitAuthorFocusChangeListener() {
-        return (ChangeListener<Boolean>) (observableValue, oldValue, newValue) -> {
-            if (!newValue && !gitAuthorTextField.getText().isEmpty()) {
-                vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-                vcsService.getUserName().ifPresent(userName ->
-                        useDefaultAuthorCheckBox.setDisable(gitAuthorTextField.getText().equals(userName))
-                );
-            }
-        };
-    }
-
-    private ChangeListener<? super Boolean> committerEmailFocusChangeListener() {
-        return (ChangeListener<Boolean>) (observableValue, oldValue, newValue) -> {
-            if (!newValue) {
-                if (committerEmailTextField.getLength() > 0) {
-                    vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-                    vcsService.getUserEmail().ifPresent(userEmail ->
-                            useDefaultEmailCheckBox.setDisable(committerEmailTextField.getText().equals(userEmail))
-                    );
-                }
-            }
-        };
-    }
-
     void deselectUseLastItemDate() {
         datesSectionController.deselectUseLastItemDate();
     }
@@ -644,7 +476,7 @@ public class MainController extends AbstractController {
     }
 
     ItemType getItemType() {
-        return itemTypeComboBox.getValue();
+        return csvDetailsSectionController.getItemType();
     }
 
     String getConfigurationName() {
@@ -656,7 +488,15 @@ public class MainController extends AbstractController {
         configurationSectionController.updateConfigurationNameComboBox(oldValue, newValue);
     }
 
-    public void setLastItemSubmissionDate() {
+    void setLastItemSubmissionDate() {
         datesSectionController.setLastItemSubmissionDate();
+    }
+
+    void setEndDatePicker(LocalDate localDate) {
+        datesSectionController.setEndDatePicker(localDate);
+    }
+
+    void disableDeleteDownloadedFiles(boolean disable) {
+        additionalSettingsSectionController.disableDeleteDownloadedFiles(disable);
     }
 }
