@@ -1,14 +1,13 @@
 package pg.gipter.ui.main;
 
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.RunConfig;
@@ -23,9 +22,6 @@ import pg.gipter.utils.StringUtils;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
 
 public class MainController extends AbstractController {
 
@@ -140,6 +136,7 @@ public class MainController extends AbstractController {
     private final DatesSectionController datesSectionController;
     private final AdditionalSettingsSectionController additionalSettingsSectionController;
     private final CsvDetailsSectionController csvDetailsSectionController;
+    private final ButtonController buttonController;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -152,6 +149,7 @@ public class MainController extends AbstractController {
         datesSectionController = new DatesSectionController(uiLauncher, applicationProperties);
         additionalSettingsSectionController = new AdditionalSettingsSectionController(uiLauncher, applicationProperties);
         csvDetailsSectionController = new CsvDetailsSectionController(uiLauncher, applicationProperties, this);
+        buttonController = new ButtonController(uiLauncher, applicationProperties, this);
     }
 
     public void setVcsService(VcsService vcsService) {
@@ -233,6 +231,15 @@ public class MainController extends AbstractController {
         return map;
     }
 
+    private Map<String, Button> initButtonMap() {
+        Map<String, Button> map = new HashMap<>();
+        map.put("executeButton", executeButton);
+        map.put("executeAllButton", executeAllButton);
+        map.put("exitButton", exitButton);
+        map.put("jobButton", jobButton);
+        return map;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
@@ -243,9 +250,9 @@ public class MainController extends AbstractController {
         datesSectionController.initialize(location, resources, initDatesSectionMap());
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
         csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
+        buttonController.initialize(location, resources, initButtonMap());
 
         setProperties();
-        setActions();
         setAccelerators();
     }
 
@@ -264,9 +271,9 @@ public class MainController extends AbstractController {
                 switch (e.getCode()) {
                     case ENTER:
                         if (e.isShiftDown()) {
-                            executeAll();
+                            buttonController.executeAll();
                         } else {
-                            execute();
+                            buttonController.execute();
                         }
                         break;
                     case J:
@@ -297,41 +304,7 @@ public class MainController extends AbstractController {
         );
     }
 
-    private void setActions() {
-        executeButton.setOnAction(executeActionEventHandler());
-        executeAllButton.setOnAction(executeAllActionEventHandler());
-        jobButton.setOnAction(jobActionEventHandler());
-        exitButton.setOnAction(exitActionEventHandler());
-    }
-
-    private EventHandler<ActionEvent> executeActionEventHandler() {
-        return event -> execute();
-    }
-
-    private void execute() {
-        RunConfig runConfig = createRunConfigFromUI();
-        ToolkitConfig toolkitConfig = toolkitSectionController.createToolkitConfigFromUI();
-        ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(Stream.concat(
-                Arrays.stream(runConfig.toArgumentArray()),
-                Arrays.stream(toolkitConfig.toArgumentArray())
-        ).toArray(String[]::new));
-
-        FXMultiRunner runner = new FXMultiRunner(
-                Stream.of(uiAppProperties).collect(toList()),
-                uiLauncher.nonUIExecutor(),
-                RunType.EXECUTE
-        );
-        resetIndicatorProperties(runner);
-        uiLauncher.executeOutsideUIThread(() -> {
-            runner.start();
-            if (uiAppProperties.isActiveTray()) {
-                uiLauncher.updateTray(uiAppProperties);
-            }
-            updateLastItemUploadDate();
-        });
-    }
-
-    private void updateLastItemUploadDate() {
+    void updateLastItemUploadDate() {
         try {
             ProgramData programData = dataService.loadProgramData();
             if (programData.getUploadStatus() != null &&
@@ -345,27 +318,6 @@ public class MainController extends AbstractController {
         } finally {
             datesSectionController.setLastItemSubmissionDate();
         }
-    }
-
-    private EventHandler<ActionEvent> executeAllActionEventHandler() {
-        return event -> executeAll();
-    }
-
-    private void executeAll() {
-        RunConfig runConfig = createRunConfigFromUI();
-        ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(runConfig.toArgumentArray());
-        Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
-        map.put(uiAppProperties.configurationName(), uiAppProperties);
-
-        FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
-        resetIndicatorProperties(runner);
-        uiLauncher.executeOutsideUIThread(() -> {
-            runner.call();
-            ApplicationProperties instance = new LinkedList<>(map.values()).getFirst();
-            if (instance.isActiveTray()) {
-                uiLauncher.updateTray(instance);
-            }
-        });
     }
 
     RunConfig createRunConfigFromUI() {
@@ -410,7 +362,7 @@ public class MainController extends AbstractController {
         return runConfig;
     }
 
-    private void resetIndicatorProperties(Task<?> task) {
+    void resetIndicatorProperties(Task<?> task) {
         loadProgressIndicator.setVisible(true);
         loadProgressIndicator.progressProperty().unbind();
         loadProgressIndicator.progressProperty().bind(task.progressProperty());
@@ -423,14 +375,6 @@ public class MainController extends AbstractController {
         datesSectionController.disableEndDatePicker(itemType);
         additionalSettingsSectionController.disableSkipRemote(disable);
         additionalSettingsSectionController.disableFetchAll(disable);
-    }
-
-    private EventHandler<ActionEvent> jobActionEventHandler() {
-        return event -> uiLauncher.showJobWindow();
-    }
-
-    private EventHandler<ActionEvent> exitActionEventHandler() {
-        return event -> UILauncher.platformExit();
     }
 
     private void saveConfiguration() {
@@ -498,5 +442,9 @@ public class MainController extends AbstractController {
 
     void disableDeleteDownloadedFiles(boolean disable) {
         additionalSettingsSectionController.disableDeleteDownloadedFiles(disable);
+    }
+
+    ToolkitConfig createToolkitConfigFromUI() {
+        return toolkitSectionController.createToolkitConfigFromUI();
     }
 }
