@@ -47,6 +47,10 @@ public abstract class AbstractWindow {
         return result;
     }
 
+    public AbstractController getController() {
+        return controller;
+    }
+
     protected abstract String fxmlFileName();
     protected abstract ImageFile windowImgFileName();
     protected abstract String cssFileName();

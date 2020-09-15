@@ -86,7 +86,7 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </TitledPane>
-      <Button fx:id="cancelJobButton" layoutX="456.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="93.0" text="%job.cancel" textFill="#32a1c9">
+      <Button fx:id="cancelJobButton" layoutX="456.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="93.0" text="%job.cancel" textFill="#f41b63">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>

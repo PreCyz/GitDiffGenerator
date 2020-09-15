@@ -117,7 +117,7 @@ public class WizardLauncher implements Launcher {
         TextField configurationName = createTextField(ArgName.configurationName.name());
         gridPane.add(configurationName, 1, row++);
 
-        gridPane.add(new Label(BundleUtils.getMsg("csv.panel.itemType")), 0, row);
+        gridPane.add(new Label(BundleUtils.getMsg("vcs.panel.itemType")), 0, row);
         ComboBox<ItemType> comboBox = createUploadTypeComboBox(ArgName.itemType.name());
         gridPane.add(comboBox, 1, row);
 
@@ -250,11 +250,11 @@ public class WizardLauncher implements Launcher {
         pageGrid.setVgap(10);
         pageGrid.setHgap(10);
 
-        pageGrid.add(new Label(BundleUtils.getMsg("csv.panel.authors")), 0, row);
+        pageGrid.add(new Label(BundleUtils.getMsg("vcs.panel.authors")), 0, row);
         TextField author = createTextField(ArgName.author.name());
         pageGrid.add(author, 1, row++);
 
-        pageGrid.add(new Label(BundleUtils.getMsg("csv.panel.committerEmail")), 0, row);
+        pageGrid.add(new Label(BundleUtils.getMsg("vcs.panel.committerEmail")), 0, row);
         TextField committerEmail = createTextField(ArgName.committerEmail.name());
         pageGrid.add(committerEmail, 1, row);
 
