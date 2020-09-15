@@ -46,6 +46,11 @@ public class Main extends Application {
     Main(String[] args) {
         this.args = args;
         applicationProperties = ApplicationPropertiesFactory.getInstance(args);
+        String javaHome = args[args.length - 1];
+        if (javaHome.startsWith("java.home")) {
+            System.setProperty("java.home", javaHome.split("=")[1]);
+            logger.info("New JAVA_HOME {}.", System.getProperty("java.home"));
+        }
     }
 
     @Override

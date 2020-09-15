@@ -352,7 +352,7 @@ public class JobController extends AbstractController {
                 String errorMsg = BundleUtils.getMsg("popup.job.errorMsg", se.getMessage());
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(errorMsg)
-                        .withLink(AlertHelper.logsFolder())
+                        .withLink(JarHelper.logsFolder())
                         .withAlertType(Alert.AlertType.ERROR)
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withImage(ImageFile.ERROR_CHICKEN_PNG);

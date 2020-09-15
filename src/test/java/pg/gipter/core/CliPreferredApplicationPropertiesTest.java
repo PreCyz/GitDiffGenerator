@@ -1986,4 +1986,61 @@ class CliPreferredApplicationPropertiesTest {
 
         assertThat(actual).isEqualTo(LocalDate.now().getMonth().name().toLowerCase());
     }
+
+    @Test
+    void givenCertImportEnabled_whenIsCertImportEnabled_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenCertImportEnabledFromCLI_whenIsCertImportEnabled_thenReturnCliCertImportEnabled() {
+        applicationProperties = new CliApplicationProperties(new String[]{"certImport=T"});
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCertImportEnabledFileAndCLI_whenIsCertImportEnabled_thenReturnCliCertImportEnabled() {
+        String[] args = {"certImport=t"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setCertImportEnabled(Boolean.FALSE);
+        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCertImportEnabledFromFile_whenIsCertImportEnabled_thenReturnCertImportEnabledFromFile() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setCertImportEnabled(Boolean.TRUE);
+        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCertImportEnabledFromFileAndOtherArgs_whenIsCertImportEnabled_thenReturnCertImportEnabledFromFile() {
+        String[] args = {"author=test"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setCertImportEnabled(Boolean.TRUE);
+        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
 }

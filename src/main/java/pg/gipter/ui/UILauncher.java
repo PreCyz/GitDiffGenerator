@@ -284,7 +284,7 @@ public class UILauncher implements Launcher {
             logger.error(errorMessage);
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(errorMessage)
-                    .withLink(AlertHelper.logsFolder())
+                    .withLink(JarHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
@@ -322,7 +322,7 @@ public class UILauncher implements Launcher {
                 logger.warn("Can not restart the scheduler.", e);
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
-                        .withLink(AlertHelper.logsFolder())
+                        .withLink(JarHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
                         .withImage(ImageFile.ERROR_CHICKEN_PNG);

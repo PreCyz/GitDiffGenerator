@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.utils.AlertHelper;
+import pg.gipter.utils.JarHelper;
 import pg.gipter.utils.SystemUtils;
 
 import java.io.File;
@@ -28,11 +28,11 @@ public class StartupService {
                     systemUsername
             );
 
-            String target = AlertHelper.getJarFile().map(File::getAbsolutePath).orElse("");
+            String target = JarHelper.getJarFile().map(File::getAbsolutePath).orElse("");
             if (!new File(shortcutLnkPath).exists()) {
                 logger.info("Creating shortcut to [{}] and placing it in Windows startup folder. [{}]", target, shortcutLnkPath);
                 try {
-                    String workingDir = AlertHelper.homeDirectoryPath().orElse("");
+                    String workingDir = JarHelper.homeDirectoryPath().orElse("");
 
                     int iconNumber = 130;
                     ShellLink shellLink = ShellLink.createLink(target)

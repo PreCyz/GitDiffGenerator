@@ -59,14 +59,17 @@ public class StatisticConverter {
     }
 
     private List<ExceptionDetails> getExceptions(Document document) {
-        return document.getList("exceptions", Document.class)
-                    .stream()
+        List<Document> exceptions = Optional.ofNullable(document.getList("exceptions", Document.class))
+                .orElseGet(ArrayList::new);
+        return exceptions.stream()
                     .map(d -> new ExceptionDetails(d.getString("errorMsg"), d.getString("cause"), d.getString("errorDate")))
                     .collect(toList());
     }
 
+    @SuppressWarnings("unchecked")
     private Map<VersionControlSystem, Set<String>> getVersionControlSystemSetMap(Document document) {
-        Map<String, Set<String>> controlSystemMap = document.get("controlSystemMap", Map.class);
+        Map<String, Set<String>> controlSystemMap = Optional.ofNullable(document.get("controlSystemMap", Map.class))
+                .orElseGet(HashMap::new);
         return controlSystemMap.entrySet()
                 .stream()
                 .collect(toMap(

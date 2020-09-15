@@ -12,8 +12,8 @@ import pg.gipter.core.producers.DiffProducerFactory;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.UploadStatus;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.JarHelper;
 
 class Runner implements Starter {
 
@@ -49,7 +49,7 @@ class Runner implements Starter {
             error = true;
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()))
-                    .withLink(AlertHelper.logsFolder())
+                    .withLink(JarHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
                     .withImage(ImageFile.ERROR_CHICKEN_PNG)
