@@ -296,9 +296,9 @@ public class MainController extends AbstractController {
 
     void setDisableDependOnConfigurations() {
         Map<String, RunConfig> runConfigMap = applicationProperties.getRunConfigMap();
-        executeButton.setDisable(runConfigMap.isEmpty());
-        executeAllButton.setDisable(runConfigMap.isEmpty());
-        jobButton.setDisable(runConfigMap.isEmpty());
+        buttonController.setExecuteDisabled(runConfigMap.isEmpty());
+        buttonController.setExecuteAllDisabled(runConfigMap.isEmpty());
+        buttonController.setJobDisabled(runConfigMap.isEmpty());
         pathsSectionController.setDisableProjectPathButton(
                 runConfigMap.isEmpty() || csvDetailsSectionController.getItemType() == ItemType.STATEMENT
         );

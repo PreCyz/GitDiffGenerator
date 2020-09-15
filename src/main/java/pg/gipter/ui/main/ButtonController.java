@@ -102,4 +102,16 @@ public class ButtonController extends AbstractController {
     private EventHandler<ActionEvent> exitActionEventHandler() {
         return event -> UILauncher.platformExit();
     }
+
+    public void setExecuteDisabled(boolean value) {
+        executeButton.setDisable(value);
+    }
+
+    public void setExecuteAllDisabled(boolean value) {
+        executeAllButton.setDisable(value);
+    }
+
+    public void setJobDisabled(boolean value) {
+        jobButton.setDisable(value);
+    }
 }
