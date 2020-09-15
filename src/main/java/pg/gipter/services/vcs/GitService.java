@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toUnmodifiableList;
+import static java.util.stream.Collectors.toList;
 
 class GitService implements VcsService {
 
     private static final Logger logger = LoggerFactory.getLogger(GitService.class);
 
-    private final List<String> userNameCommand = Stream.of("git", "config", "--get", "user.name").collect(toUnmodifiableList());
-    private final List<String> userEmailCommand = Stream.of("git", "config", "--get", "user.email").collect(toUnmodifiableList());
+    private final List<String> userNameCommand = Stream.of("git", "config", "--get", "user.name").collect(toList());
+    private final List<String> userEmailCommand = Stream.of("git", "config", "--get", "user.email").collect(toList());
 
     private String projectPath;
 

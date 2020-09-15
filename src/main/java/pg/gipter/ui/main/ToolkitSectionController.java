@@ -71,13 +71,13 @@ class ToolkitSectionController extends AbstractController {
         return event -> {
             verifyProgressIndicator.setVisible(true);
             verifyCredentialsHyperlink.setVisited(false);
-            Task<Void> task = new Task<>() {
+            Task<Void> task = new Task<Void>() {
                 @Override
                 public Void call() {
                     final List<String> arguments = Stream.of(createToolkitConfigFromUI().toArgumentArray()).collect(toList());
                     arguments.add(ArgName.preferredArgSource.name() + "=" + ArgName.preferredArgSource.defaultValue());
                     arguments.add(ArgName.useUI.name() + "=N");
-                    final ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(arguments.toArray(String[]::new));
+                    final ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(arguments.toArray(new String[0]));
                     boolean hasProperCredentials = new ToolkitService(instance).hasProperCredentials();
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
                     if (hasProperCredentials) {
