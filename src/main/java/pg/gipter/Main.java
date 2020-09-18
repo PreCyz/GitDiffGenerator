@@ -47,13 +47,15 @@ public class Main extends Application {
     Main(String[] args) {
         this.args = args;
         applicationProperties = ApplicationPropertiesFactory.getInstance(args);
-        String javaHome = args[args.length - 1];
-        if (javaHome.startsWith("java.home")) {
-            System.setProperty("java.home", javaHome.split("=")[1]);
-            System.setProperty("javax.net.ssl.trustStore",
-                    CertificateServiceFactory.getInstance(true).getKeystorePath().toString());
-            System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
-            logger.info("New JAVA_HOME {}.", System.getProperty("java.home"));
+        if (args != null) {
+            Optional<String> javaHome = Stream.of(args).filter(arg -> arg.startsWith("java.home")).findFirst();
+            if (javaHome.isPresent()) {
+                System.setProperty("java.home", javaHome.get().split("=")[1]);
+                System.setProperty("javax.net.ssl.trustStore",
+                        CertificateServiceFactory.getInstance(true).getKeystorePath().toString());
+                System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+                logger.info("New JAVA_HOME {}.", System.getProperty("java.home"));
+            }
         }
     }
 
