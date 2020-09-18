@@ -15,6 +15,8 @@ import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.jobs.JobHandler;
 import pg.gipter.jobs.upload.JobParam;
 import pg.gipter.jobs.upload.UploadItemJob;
+import pg.gipter.services.platforms.AppManager;
+import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.job.JobController;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -132,7 +134,14 @@ class TrayHandler {
             createJobItem.addActionListener(createJobActionListener());
             popupMenu.add(createJobItem);
 
-            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(jobHandler.isUpgradeJobExists() ? "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
+            if (applicationProperties.isToolkitCredentialsSet()) {
+                MenuItem goToToolkitItem = new MenuItem(BundleUtils.getMsg("tray.item.goToToolkit"));
+                goToToolkitItem.addActionListener(createGoToToolkitActionListener());
+                popupMenu.add(goToToolkitItem);
+            }
+
+            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(jobHandler.isUpgradeJobExists() ?
+                    "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
             upgradeItem.addActionListener(upgradeJobActionListener());
             popupMenu.add(upgradeItem);
             popupMenu.addSeparator();
@@ -141,6 +150,13 @@ class TrayHandler {
             closeItem.addActionListener(closeActionListener());
             popupMenu.add(closeItem);
         });
+    }
+
+    private ActionListener createGoToToolkitActionListener() {
+        return e -> {
+            AppManager instance = AppManagerFactory.getInstance();
+            instance.launchDefaultBrowser(applicationProperties.toolkitUserFolder());
+        };
     }
 
     private ActionListener upgradeJobActionListener() {
