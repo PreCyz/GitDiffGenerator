@@ -1,16 +1,15 @@
 package pg.gipter.core.producers.processor;
 
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
-import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.*;
 import pg.gipter.core.producers.command.ItemType;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DocumentFinderFactoryTest {
 
@@ -22,9 +21,10 @@ class DocumentFinderFactoryTest {
                 }
         );
 
-        DocumentFinder documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
+        Optional<DocumentFinder> documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
 
-        AssertionsForClassTypes.assertThat(documentFinder).isInstanceOf(ToolkitDocumentFinder.class);
+        assertThat(documentFinder.isPresent()).isTrue();
+        assertThat(documentFinder.get()).isInstanceOf(ToolkitDocumentFinder.class);
     }
 
     @Test
@@ -35,9 +35,10 @@ class DocumentFinderFactoryTest {
                 }
         );
 
-        DocumentFinder documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
+        Optional<DocumentFinder> documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
 
-        AssertionsForClassTypes.assertThat(documentFinder).isInstanceOf(SharePointDocumentFinder.class);
+        assertThat(documentFinder.isPresent()).isTrue();
+        assertThat(documentFinder.get()).isInstanceOf(SharePointDocumentFinder.class);
     }
 
     @Test
@@ -50,9 +51,10 @@ class DocumentFinderFactoryTest {
                 }
         );
 
-        DocumentFinder documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
+        Optional<DocumentFinder> documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
 
-        AssertionsForClassTypes.assertThat(documentFinder).isInstanceOf(ComplexDocumentFinder.class);
+        assertThat(documentFinder.isPresent()).isTrue();
+        assertThat(documentFinder.get()).isInstanceOf(ComplexDocumentFinder.class);
     }
 
 }

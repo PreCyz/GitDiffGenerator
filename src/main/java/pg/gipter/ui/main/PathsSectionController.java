@@ -21,9 +21,8 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
 import java.net.URL;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -143,23 +142,29 @@ class PathsSectionController extends AbstractController {
         return event -> {
             if (mainController.getItemType() == ItemType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
-                fileChooser.setInitialDirectory(new File("."));
+                fileChooser.setInitialDirectory(Paths.get(".").toFile());
                 fileChooser.setTitle(resources.getString("directory.item.statement.title"));
-                File statementFile = fileChooser.showOpenDialog(uiLauncher.currentWindow());
-                if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
-                    itemPathLabel.setText(statementFile.getAbsolutePath());
+                final Optional<Path> statementFile = Optional.ofNullable(fileChooser.showOpenDialog(uiLauncher.currentWindow()))
+                        .map(file -> file.toPath());
+                boolean isStatementFileSet = statementFile.map(path -> Files.exists(path) && Files.isRegularFile(path))
+                        .orElseGet(() -> false);
+                if (isStatementFileSet) {
+                    itemPathLabel.setText(statementFile.get().toAbsolutePath().toString());
                     itemPathButton.setText(resources.getString("button.open"));
-                    itemPathLabel.getTooltip().setText(statementFile.getAbsolutePath());
+                    itemPathLabel.getTooltip().setText(statementFile.get().toAbsolutePath().toString());
                 }
             } else {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setInitialDirectory(new File("."));
+                directoryChooser.setInitialDirectory(Paths.get(".").toFile());
                 directoryChooser.setTitle(resources.getString("directory.item.store"));
-                File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
-                if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                    itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
+                final Optional<Path> itemPathDirectory = Optional.ofNullable(directoryChooser.showDialog(uiLauncher.currentWindow()))
+                        .map(file -> file.toPath());
+                boolean isDirectorySet = itemPathDirectory.map(path -> Files.exists(path) && Files.isDirectory(path))
+                        .orElseGet(() -> false);
+                if (isDirectorySet) {
+                    itemPathLabel.setText(itemPathDirectory.get().toAbsolutePath().toString());
                     itemPathButton.setText(resources.getString("button.change"));
-                    itemPathLabel.getTooltip().setText(itemPathDirectory.getAbsolutePath());
+                    itemPathLabel.getTooltip().setText(itemPathDirectory.get().toAbsolutePath().toString());
                 }
             }
         };

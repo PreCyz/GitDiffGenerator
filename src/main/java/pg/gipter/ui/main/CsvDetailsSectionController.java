@@ -129,7 +129,7 @@ class CsvDetailsSectionController extends AbstractController {
 
             Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
                     .stream()
-                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath).toFile()))
+                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath)))
                     .collect(toSet());
 
             if (vcsSet.contains(VersionControlSystem.GIT)) {
@@ -152,7 +152,7 @@ class CsvDetailsSectionController extends AbstractController {
 
             Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
                     .stream()
-                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath).toFile()))
+                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath)))
                     .collect(toSet());
             if (vcsSet.contains(VersionControlSystem.GIT) &&
                     StringUtils.notEmpty(applicationProperties.committerEmail())) {

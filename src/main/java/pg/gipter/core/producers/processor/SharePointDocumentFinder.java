@@ -8,7 +8,7 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -23,7 +23,7 @@ class SharePointDocumentFinder extends AbstractDocumentFinder {
     }
 
     @Override
-    public List<File> find() {
+    public List<Path> find() {
         List<SharePointConfig> sharePointConfigs = buildSharePointConfigs();
         List<JsonObject> items = getItems(sharePointConfigs);
         List<DocumentDetails> documentDetails = items.stream()

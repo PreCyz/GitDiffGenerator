@@ -67,7 +67,7 @@ public class StatisticService {
         for (ApplicationProperties ap : appPropertiesCollection) {
             for (String projectPath : ap.projectPaths()) {
                 try {
-                    VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath).toFile());
+                    VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath));
                     VCSVersionProducer vcsVersionProducer = VCSVersionProducerFactory.getInstance(vcs, projectPath);
                     if (controlSystemMap.containsKey(vcs)) {
                         controlSystemMap.get(vcs).add(vcsVersionProducer.getVersion());

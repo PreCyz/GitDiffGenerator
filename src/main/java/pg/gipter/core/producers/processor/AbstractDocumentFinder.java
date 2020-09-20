@@ -8,7 +8,7 @@ import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.toolkit.dto.*;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -248,7 +248,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
         return String.format("%s%s", applicationProperties.toolkitUrl(), fileReference);
     }
 
-    List<File> downloadDocuments(List<DownloadDetails> downloadDetails) {
+    List<Path> downloadDocuments(List<DownloadDetails> downloadDetails) {
         if (downloadDetails.isEmpty()) {
             throw new IllegalArgumentException("No files to download.");
         }
@@ -267,5 +267,5 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
         return result;
     }
 
-    public abstract List<File> find();
+    public abstract List<Path> find();
 }

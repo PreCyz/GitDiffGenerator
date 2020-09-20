@@ -3,18 +3,16 @@ package pg.gipter.toolkit.helpers;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public final class XmlHelper {
@@ -58,7 +56,7 @@ public final class XmlHelper {
         }
         fileName = getFullXmlPath(fileName);
         try {
-            StreamResult streamResult = new StreamResult(new File(fileName));
+            StreamResult streamResult = new StreamResult(Paths.get(fileName).toFile());
             getTransformer().transform(source, streamResult);
         } catch (Exception ex) {
             logger.error("Error converting to String.", ex);
@@ -101,8 +99,9 @@ public final class XmlHelper {
     }
 
     public static String getFullXmlPath(String xmlFileName) {
-        return String.format(".%ssrc%stest%sjava%sresources%sxml%s%s",
-                File.separator, File.separator, File.separator, File.separator, File.separator, File.separator, xmlFileName);
+        return Paths.get(".","src", "test", "java", "resources", "xml", xmlFileName)
+                .toAbsolutePath()
+                .toString();
     }
 
     private static Document xmlToDocument(final Source source) {
@@ -128,7 +127,7 @@ public final class XmlHelper {
             stringBuilder.append(",").append(errorStr.item(i).getTextContent());
         }
         if (stringBuilder.length() > 0) {
-            return stringBuilder.toString().substring(1);
+            return stringBuilder.substring(1);
         }
         return stringBuilder.toString();
     }
@@ -139,10 +138,9 @@ public final class XmlHelper {
     }
 
     public static Document getDocument(String fullXmlPath) throws Exception {
-        File file = new File(fullXmlPath);
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        Document document = documentBuilder.parse(file);
+        Document document = documentBuilder.parse(Files.newInputStream(Paths.get(fullXmlPath)));
         document.normalizeDocument();
         return document;
     }

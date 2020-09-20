@@ -5,10 +5,11 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.utils.JarHelper;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 abstract class AbstractCertificateService implements CertificateService {
 
@@ -45,17 +46,22 @@ abstract class AbstractCertificateService implements CertificateService {
     public List<CertImportResult> automaticImport() {
         List<CertImportResult> importResults = new LinkedList<>();
         final String certFolder = JarHelper.certFolder();
-        final File certs = Paths.get(certFolder).toFile();
-        if (certs.isDirectory() && certs.exists()) {
-            for (File cert : certs.listFiles()) {
-                try {
-                    final CertImportStatus certImportStatus = addCertificate(cert.getAbsolutePath(), cert.getName());
-                    importResults.add(new CertImportResult(cert.getName(), certImportStatus));
-                    logger.info("Certificate [{}] added to the [{}] keystore.", cert.getName(), getKeystorePath().toString());
-                } catch (Exception ex) {
-                    logger.error("Certificate {} not imported.", cert.getName(), ex);
-                    importResults.add(new CertImportResult(cert.getName(), CertImportStatus.FAILED, ex.getMessage()));
+        final Path certs = Paths.get(certFolder);
+        if (Files.exists(certs) && Files.isDirectory(certs)) {
+            try {
+                for (Path cert : Files.list(certs).collect(toList())) {
+                    final String fileName = cert.getFileName().toString();
+                    try {
+                        final CertImportStatus certImportStatus = addCertificate(cert.toAbsolutePath().toString(), fileName);
+                        importResults.add(new CertImportResult(fileName, certImportStatus));
+                        logger.info("Certificate [{}] added to the [{}] keystore.", fileName, getKeystorePath().toString());
+                    } catch (Exception ex) {
+                        logger.error("Certificate {} not imported.", fileName, ex);
+                        importResults.add(new CertImportResult(fileName, CertImportStatus.FAILED, ex.getMessage()));
+                    }
                 }
+            } catch (IOException ex) {
+                importResults = Collections.emptyList();
             }
         } else {
             logger.info("There is no certs to import.");
@@ -66,8 +72,14 @@ abstract class AbstractCertificateService implements CertificateService {
     @Override
     public boolean hasCertToImport() {
         final String certFolder = JarHelper.certFolder();
-        final File certDir = Paths.get(certFolder).toFile();
-        return certDir.exists() && certDir.listFiles() != null && certDir.listFiles().length > 0;
+        final Path certDir = Paths.get(certFolder);
+        List<Path> fileList = Collections.emptyList();
+        try {
+            fileList = Files.list(certDir).collect(toList());
+        } catch (IOException ex) {
+            logger.info("Directory does not contain any files.");
+        }
+        return Files.exists(certDir) && !fileList.isEmpty();
     }
 
     @Override
