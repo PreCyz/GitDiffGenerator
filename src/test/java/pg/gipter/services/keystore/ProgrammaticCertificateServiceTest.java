@@ -3,7 +3,6 @@ package pg.gipter.services.keystore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
@@ -18,8 +17,13 @@ class ProgrammaticCertificateServiceTest {
         try {
             Files.walk(Paths.get("target", "cert"))
                     .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            System.err.println(e);
+                        }
+                    });
         } catch (IOException e) {
             System.err.printf("There is something weird going on. %s%n", e.getMessage());
         }
@@ -32,7 +36,7 @@ class ProgrammaticCertificateServiceTest {
         assertThat(cacertsPath).isNotNull();
         assertThat(cacertsPath.toFile().exists()).isTrue();
         assertThat(cacertsPath.toString())
-                .endsWith("lib" + File.separatorChar + "security" + File.separatorChar + "cacerts");
+                .endsWith(Paths.get("lib", "security", "cacerts").toString());
     }
 
     @Test

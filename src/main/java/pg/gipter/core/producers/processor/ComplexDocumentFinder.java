@@ -7,14 +7,11 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -27,7 +24,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
     }
 
     @Override
-    public List<File> find() {
+    public List<Path> find() {
         List<ItemCountResponse> itemCounts = getItemCount();
         List<SharePointConfig> sharePointConfigs = buildSharePointConfigs(itemCounts);
 

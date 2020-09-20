@@ -1,19 +1,12 @@
 package pg.gipter.toolkit.sharepoint;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.apache.commons.io.FileUtils;
+import com.google.gson.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +16,7 @@ import pg.gipter.core.producers.processor.DownloadDetails;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 
 public class HttpRequester {
 
@@ -71,7 +65,7 @@ public class HttpRequester {
         return credentialsProvider;
     }
 
-    public File downloadFile(DownloadDetails downloadDetails) throws Exception {
+    public Path downloadFile(DownloadDetails downloadDetails) throws Exception {
         HttpGet httpget = new HttpGet(replaceSpaces(downloadDetails.getDownloadLink()));
         String callId = this.toString().substring(this.toString().lastIndexOf("@") + 1);
         logger.info("Executing request {} {}", callId, httpget.getRequestLine());
@@ -84,10 +78,10 @@ public class HttpRequester {
             logger.info("Response {} {}", callId, response.getStatusLine());
             String downloadFilePath = applicationProperties.itemPath()
                     .substring(0, applicationProperties.itemPath().lastIndexOf(File.separator));
-            File downloadedFile = new File(downloadFilePath + File.separator + downloadDetails.getFileName());
-            FileUtils.copyInputStreamToFile(response.getEntity().getContent(), downloadedFile);
+            Path downloadedPath = Paths.get(downloadFilePath, downloadDetails.getFileName());
+            Files.copy(response.getEntity().getContent(), downloadedPath);
             EntityUtils.consume(response.getEntity());
-            return downloadedFile;
+            return downloadedPath;
         }
     }
 
@@ -187,7 +181,9 @@ public class HttpRequester {
              CloseableHttpResponse response = httpclient.execute(httpget)
         ) {
             logger.info("Response {}", response.getStatusLine());
-            InputStreamReader inputStreamReader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
+            InputStreamReader inputStreamReader = new InputStreamReader(
+                    response.getEntity().getContent(), StandardCharsets.UTF_8
+            );
             BufferedReader reader = new BufferedReader(inputStreamReader);
 
             String line;

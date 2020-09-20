@@ -33,7 +33,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
             for (String projectPath : applicationProperties.projectPaths()) {
                 logger.info("Project path: {}", projectPath);
-                VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath).toFile());
+                VersionControlSystem vcs = VersionControlSystem.valueFrom(Paths.get(projectPath));
                 VCSVersionProducer VCSVersionProducer = VCSVersionProducerFactory.getInstance(vcs, projectPath);
                 logger.info("Discovered '{}' version control system.", VCSVersionProducer.getVersion());
 

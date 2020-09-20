@@ -4,7 +4,7 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -68,7 +68,7 @@ class CliApplicationProperties extends ApplicationProperties {
         if (!containsArg(argName) && StringUtils.notEmpty(currentRunConfig.getItemPath())) {
             itemPath = currentRunConfig.getItemPath();
         }
-        return itemType() == ItemType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
+        return itemType() == ItemType.STATEMENT ? itemPath : Paths.get(itemPath, fileName()).toString();
     }
 
     @Override

@@ -10,7 +10,6 @@ import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SemanticVersioning;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -371,7 +370,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.itemPath();
 
-        assertThat(actual).startsWith("testItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("testItemPath").toString());
     }
 
     @Test
@@ -385,7 +384,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.itemPath();
 
-        assertThat(actual).startsWith("cliItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("cliItemPath").toString());
     }
 
     @Test
@@ -399,7 +398,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.itemPath();
 
-        assertThat(actual).startsWith("propertiesItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("propertiesItemPath").toString());
     }
 
     @Test
