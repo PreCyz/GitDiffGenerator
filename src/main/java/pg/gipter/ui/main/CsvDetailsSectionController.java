@@ -21,6 +21,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -129,7 +130,7 @@ class CsvDetailsSectionController extends AbstractController {
 
             Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
                     .stream()
-                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath)))
+                    .map(versionControlSystemFunction())
                     .collect(toSet());
 
             if (vcsSet.contains(VersionControlSystem.GIT)) {
@@ -145,6 +146,16 @@ class CsvDetailsSectionController extends AbstractController {
         return disabled;
     }
 
+    private Function<String, VersionControlSystem> versionControlSystemFunction() {
+        return projectPath -> {
+            try {
+                return VersionControlSystem.valueFrom(Paths.get(projectPath));
+            } catch (IllegalArgumentException ex) {
+                return VersionControlSystem.NA;
+            }
+        };
+    }
+
     private boolean disableDefaultEmail() {
         boolean disabled = true;
         if (EnumSet.of(ItemType.STATEMENT, ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS)
@@ -152,7 +163,7 @@ class CsvDetailsSectionController extends AbstractController {
 
             Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
                     .stream()
-                    .map(projectPath -> VersionControlSystem.valueFrom(Paths.get(projectPath)))
+                    .map(versionControlSystemFunction())
                     .collect(toSet());
             if (vcsSet.contains(VersionControlSystem.GIT) &&
                     StringUtils.notEmpty(applicationProperties.committerEmail())) {
