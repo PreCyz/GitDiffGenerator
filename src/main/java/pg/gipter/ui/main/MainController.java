@@ -445,4 +445,28 @@ public class MainController extends AbstractController {
     ToolkitConfig createToolkitConfigFromUI() {
         return toolkitSectionController.createToolkitConfigFromUI();
     }
+
+    void setInitValues(ApplicationProperties applicationProperties) {
+        setApplicationProperties(applicationProperties);
+
+        toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
+        pathsSectionController.initialize(location, resources, initPathsSectionMap());
+        datesSectionController.initialize(location, resources, initDatesSectionMap());
+        additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
+        csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
+        buttonController.initialize(location, resources, initButtonMap());
+    }
+
+    @Override
+    public void setApplicationProperties(ApplicationProperties applicationProperties) {
+        super.setApplicationProperties(applicationProperties);
+        toolkitSectionController.setApplicationProperties(applicationProperties);
+        configurationSectionController.setApplicationProperties(applicationProperties);
+        menuSectionController.setApplicationProperties(applicationProperties);
+        pathsSectionController.setApplicationProperties(applicationProperties);
+        datesSectionController.setApplicationProperties(applicationProperties);
+        additionalSettingsSectionController.setApplicationProperties(applicationProperties);
+        csvDetailsSectionController.setApplicationProperties(applicationProperties);
+        buttonController.setApplicationProperties(applicationProperties);
+    }
 }

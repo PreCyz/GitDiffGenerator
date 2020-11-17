@@ -49,6 +49,9 @@ public class CacheManager {
 
     public static void removeFromCache(String configName) {
         cacheMap.remove(configName);
+        for (Map.Entry<String, ApplicationProperties> entry : cacheMap.entrySet()) {
+            entry.getValue().getRunConfigMap().remove(configName);
+        }
         logger.info("Configuration [{}] removed from cache.", configName);
     }
 
