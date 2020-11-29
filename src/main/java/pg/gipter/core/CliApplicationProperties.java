@@ -307,4 +307,13 @@ class CliApplicationProperties extends ApplicationProperties {
         return checkLastItemEnabled;
     }
 
+    @Override
+    public String getCheckLastItemJobCronExpression() {
+        String cronExpression = argExtractor.checkLastItemJobCronExpression();
+        if (!containsArg(ArgName.checkLastItemJobCronExpression.name())
+                && applicationConfig.getCheckLastItemJobCronExpression() != null) {
+            cronExpression = applicationConfig.getCheckLastItemJobCronExpression();
+        }
+        return cronExpression;
+    }
 }

@@ -180,7 +180,7 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setSilentMode(silentModeCheckBox.isSelected());
         applicationConfig.setUiLanguage(languageComboBox.getValue());
         applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
-        applicationConfig.setCheckLastUpdateEnabled(checkLastItemCheckBox.isSelected());
+        applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
         return applicationConfig;
     }
 

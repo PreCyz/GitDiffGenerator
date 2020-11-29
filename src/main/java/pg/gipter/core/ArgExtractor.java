@@ -291,4 +291,11 @@ final class ArgExtractor {
         }
         return StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
     }
+
+    public String checkLastItemJobCronExpression() {
+        if (containsArg(ArgName.checkLastItemJobCronExpression.name())) {
+            return getValue(ArgName.checkLastItemJobCronExpression, ArgName.checkLastItemJobCronExpression.defaultValue());
+        }
+        return ArgName.checkLastItemJobCronExpression.defaultValue();
+    }
 }

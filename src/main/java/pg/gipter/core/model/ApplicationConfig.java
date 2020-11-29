@@ -21,7 +21,8 @@ public class ApplicationConfig {
     private Boolean upgradeFinished;
     private String uiLanguage;
     private Boolean certImportEnabled;
-    private Boolean checkLastUpdateEnabled;
+    private Boolean checkLastItemEnabled;
+    private String checkLastItemJobCronExpression;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -34,7 +35,8 @@ public class ApplicationConfig {
         upgradeFinished = StringUtils.getBoolean(ArgName.upgradeFinished.defaultValue());
         uiLanguage = BundleUtils.getDefaultLanguage();
         certImportEnabled = StringUtils.getBoolean(ArgName.certImport.defaultValue());
-        checkLastUpdateEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
+        checkLastItemEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
+        checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
     }
 
     public Boolean getConfirmationWindow() {
@@ -118,11 +120,19 @@ public class ApplicationConfig {
     }
 
     public Boolean getCheckLastItemEnabled() {
-        return checkLastUpdateEnabled;
+        return checkLastItemEnabled;
     }
 
-    public void setCheckLastUpdateEnabled(Boolean checkLastUpdateEnabled) {
-        this.checkLastUpdateEnabled = checkLastUpdateEnabled;
+    public void setCheckLastItemEnabled(Boolean checkLastItemEnabled) {
+        this.checkLastItemEnabled = checkLastItemEnabled;
+    }
+
+    public String getCheckLastItemJobCronExpression() {
+        return checkLastItemJobCronExpression;
+    }
+
+    public void setCheckLastItemJobCronExpression(String checkLastItemJobCronExpression) {
+        this.checkLastItemJobCronExpression = checkLastItemJobCronExpression;
     }
 
     public String[] toArgumentArray() {
@@ -160,6 +170,9 @@ public class ApplicationConfig {
         if (getCheckLastItemEnabled() != null) {
             arguments.add(ArgName.checkLastItem.name() + "=" + getCheckLastItemEnabled());
         }
+        if (getCheckLastItemJobCronExpression() != null) {
+            arguments.add(ArgName.checkLastItemJobCronExpression.name() + "=" + getCheckLastItemEnabled());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -190,6 +203,10 @@ public class ApplicationConfig {
                     applicationConfig.setUiLanguage(argumentValue);
                 } else if (ArgName.certImport.name().equals(argumentName)) {
                     applicationConfig.setCertImportEnabled(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.checkLastItem.name().equals(argumentName)) {
+                    applicationConfig.setCheckLastItemEnabled(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.checkLastItemJobCronExpression.name().equals(argumentName)) {
+                    applicationConfig.setCheckLastItemJobCronExpression(argumentValue);
                 }
             }
         }
@@ -209,7 +226,8 @@ public class ApplicationConfig {
                 ", upgradeFinished=" + upgradeFinished +
                 ", uiLanguage=" + uiLanguage +
                 ", certImportEnabled=" + certImportEnabled +
-                ", checkLastUpdateEnabled=" + checkLastUpdateEnabled +
+                ", checkLastItemEnabled=" + checkLastItemEnabled +
+                ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
                 '}';
     }
 }

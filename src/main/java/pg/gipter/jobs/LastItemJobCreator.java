@@ -14,7 +14,6 @@ class LastItemJobCreator implements JobCreator {
     private static final Logger logger = LoggerFactory.getLogger(LastItemJobCreator.class);
 
     final static TriggerKey TRIGGER_KEY = new TriggerKey("checkLastItemTrigger", "checkLastItemTriggerGroup");
-    public static final String CRON_EXPRESSION = "0 5 12 20 * ?"; //At 12:05:00pm, on the 20th day, every month
     private Trigger trigger;
     private final ApplicationProperties applicationProperties;
 
@@ -34,7 +33,7 @@ class LastItemJobCreator implements JobCreator {
 
     @Override
     public void createTrigger() throws ParseException {
-        CronExpression expression = new CronExpression(CRON_EXPRESSION);
+        CronExpression expression = new CronExpression(applicationProperties.getCheckLastItemJobCronExpression());
         trigger = newTrigger()
                 .withIdentity(TRIGGER_KEY.getName(), TRIGGER_KEY.getGroup())
                 .startNow()
@@ -63,7 +62,8 @@ class LastItemJobCreator implements JobCreator {
             createTrigger();
 
             scheduler.scheduleJob(create(), getTrigger());
-            logger.info("New upgrade job scheduled with following frequency [{}].", LastItemJobCreator.CRON_EXPRESSION);
+            logger.info("New check last item job scheduled with the following frequency [{}].",
+                    applicationProperties.getCheckLastItemJobCronExpression());
         } catch (ParseException | SchedulerException ex) {
             logger.error("Can not schedule upgrade job.", ex);
         }

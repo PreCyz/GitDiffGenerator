@@ -294,4 +294,11 @@ class FileApplicationProperties extends ApplicationProperties {
         return argExtractor.isCheckLastItemEnabled();
     }
 
+    @Override
+    public String getCheckLastItemJobCronExpression() {
+        if (StringUtils.notEmpty(applicationConfig.getCheckLastItemJobCronExpression())) {
+            return applicationConfig.getCheckLastItemJobCronExpression();
+        }
+        return argExtractor.checkLastItemJobCronExpression();
+    }
 }

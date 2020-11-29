@@ -174,6 +174,12 @@ public enum ArgName {
             return "Y";
         }
     },
+    checkLastItemJobCronExpression {
+        @Override
+        public String defaultValue() {
+            return "0 5 12 20 * ?";
+        }
+    },
     uiLanguage {
         @Override
         public String defaultValue() {
@@ -230,7 +236,6 @@ public enum ArgName {
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
     };
-
 
     public abstract String defaultValue();
 }
