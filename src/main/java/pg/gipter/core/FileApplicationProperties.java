@@ -286,4 +286,12 @@ class FileApplicationProperties extends ApplicationProperties {
         return argExtractor.isCertImportEnabled();
     }
 
+    @Override
+    public boolean isCheckLastItemEnabled() {
+        if (applicationConfig.getCheckLastItemEnabled() != null) {
+            return applicationConfig.getCheckLastItemEnabled();
+        }
+        return argExtractor.isCheckLastItemEnabled();
+    }
+
 }

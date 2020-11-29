@@ -21,7 +21,7 @@ public class LastItemJob implements Job {
     public static final String GROUP = NAME + "Group";
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(JobExecutionContext context) {
         logger.info("Executing check upgrade job {}.", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         checkLastUploadedItem(context.getMergedJobDataMap());
     }
@@ -31,19 +31,26 @@ public class LastItemJob implements Job {
                 (ApplicationProperties) jobDataMap.get(ApplicationProperties.class.getSimpleName());
         final ToolkitService toolkitService = new ToolkitService(applicationProperties);
         final Optional<String> lastItemUploadDate = toolkitService.lastItemUploadDate();
+        boolean shouldDisplayWindow;
+        String msg;
         if (lastItemUploadDate.isPresent()) {
-            logger.info("New version available: {}.", lastItemUploadDate.get());
+            msg = BundleUtils.getMsg("popup.job.missingItem", lastItemUploadDate.get());
+            logger.info("Last item upload date is: {}.", lastItemUploadDate.get());
             LocalDateTime dateTime = LocalDateTime.parse(lastItemUploadDate.get(), DateTimeFormatter.ISO_DATE_TIME);
+            shouldDisplayWindow = dateTime.getMonthValue() < LocalDateTime.now().getMonthValue();
+        } else {
+            msg = BundleUtils.getMsg("popup.job.noItem");
+            shouldDisplayWindow = true;
+        }
 
-            if (dateTime.getMonthValue() < LocalDateTime.now().getMonthValue()) {
-                Platform.runLater(() -> new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", lastItemUploadDate.get()))
-                        .withWindowType(WindowType.BROWSER_WINDOW)
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage(ImageFile.randomFailImage())
-                        .buildAndDisplayWindow()
-                );
-            }
+        if (shouldDisplayWindow) {
+            final AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                    .withHeaderText(msg)
+                    .withWindowType(WindowType.BROWSER_WINDOW)
+                    .withAlertType(Alert.AlertType.INFORMATION)
+                    .withImage(ImageFile.randomFailImage());
+
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         }
     }
 }

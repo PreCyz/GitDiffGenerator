@@ -351,6 +351,7 @@ public abstract class ApplicationProperties {
     public abstract String loggerLevel();
     public abstract String uiLanguage();
     public abstract boolean isCertImportEnabled();
+    public abstract boolean isCheckLastItemEnabled();
 
     public abstract boolean isUpgradeFinished();
 }

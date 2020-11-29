@@ -168,6 +168,12 @@ public enum ArgName {
             return "N";
         }
     },
+    checkLastItem {
+        @Override
+        public String defaultValue() {
+            return "Y";
+        }
+    },
     uiLanguage {
         @Override
         public String defaultValue() {
@@ -224,6 +230,7 @@ public enum ArgName {
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
     };
+
 
     public abstract String defaultValue();
 }

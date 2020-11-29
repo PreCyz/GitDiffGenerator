@@ -181,6 +181,9 @@ public class UILauncher implements Launcher {
         scheduleUploadJob();
         scheduleUpgradeJob();
         jobService.executeUploadJobIfMissed(executor);
+        if (applicationProperties.isCheckLastItemEnabled()) {
+            scheduleCheckLastItemJob();
+        }
     }
 
     private void scheduleUpgradeJob() {
@@ -188,6 +191,14 @@ public class UILauncher implements Launcher {
             jobService.scheduleJob(JobCreatorFactory.upgradeJobCreator());
         } catch (SchedulerException e) {
             logger.error("Can not schedule the upgrade job.");
+        }
+    }
+
+    private void scheduleCheckLastItemJob() {
+        try {
+            jobService.scheduleJob(JobCreatorFactory.lastItemJobCreator(applicationProperties));
+        } catch (SchedulerException e) {
+            logger.error("Can not schedule the last item job.");
         }
     }
 
