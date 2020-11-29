@@ -1,6 +1,7 @@
-package pg.gipter.jobs.upload;
+package pg.gipter.jobs;
 
 import java.time.*;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -17,11 +18,13 @@ public class JobParam {
     private LocalDate scheduleStart;
     private LocalDateTime nextFireDate;
     private Set<String> configs;
+    private Map<String, Object> additionalJobParams;
 
     public JobParam() { }
 
     JobParam(Integer minuteOfHour, Integer hourOfDay, Integer dayOfMonth, DayOfWeek dayOfWeek, String cronExpression,
-             JobType jobType, LocalDate scheduleStart, LocalDateTime nextFireDate, Set<String> configs) {
+             JobType jobType, LocalDate scheduleStart, LocalDateTime nextFireDate, Set<String> configs,
+             Map<String, Object> additionalJobParams) {
         this.minuteOfHour = minuteOfHour;
         this.hourOfDay = hourOfDay;
         this.dayOfMonth = dayOfMonth;
@@ -31,6 +34,7 @@ public class JobParam {
         this.scheduleStart = scheduleStart;
         this.nextFireDate = nextFireDate;
         this.configs = configs;
+        this.additionalJobParams = additionalJobParams;
     }
 
     public Integer getMinuteOfHour() {
@@ -118,5 +122,13 @@ public class JobParam {
 
     public void setConfigsStr(String configs) {
         setConfigs(Stream.of(configs.split(",")).collect(toSet()));
+    }
+
+    public Map<String, Object> getAdditionalJobParams() {
+        return additionalJobParams;
+    }
+
+    public void setAdditionalJobParams(Map<String, Object> additionalJobParams) {
+        this.additionalJobParams = additionalJobParams;
     }
 }

@@ -11,101 +11,47 @@ import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
-import pg.gipter.jobs.upgrade.UpgradeJobCreator;
-import pg.gipter.jobs.upload.*;
 import pg.gipter.ui.FXMultiRunner;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
 
-import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Executor;
 
-public class JobHandler {
+public class JobService {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(JobService.class);
+    public static final String CONFIG_DELIMITER = ",";
 
     private Scheduler scheduler;
-    private final UpgradeJobCreator upgradeJob;
-    private UploadJobCreator uploadJobCreator;
 
-    public JobHandler() {
-        upgradeJob = new UpgradeJobCreator();
+    public void scheduleJob(JobCreator jobCreator) throws SchedulerException {
+        if (!isSchedulerInitiated()) {
+            scheduler = StdSchedulerFactory.getDefaultScheduler();
+            logger.info("Default scheduler created.");
+        }
+        jobCreator.schedule(scheduler);
+        scheduler.start();
     }
 
-    public void scheduleUpgradeJob() {
-        try {
-            upgradeJob.createTrigger();
-
-            if (!isSchedulerInitiated()) {
-                scheduler = StdSchedulerFactory.getDefaultScheduler();
-                scheduler.scheduleJob(upgradeJob.create(), upgradeJob.getTrigger());
-                scheduler.start();
-                logger.info("New upgrade job scheduled and started.");
-            } else if (!isUpgradeJobExists()) {
-                scheduler.scheduleJob(upgradeJob.create(), upgradeJob.getTrigger());
-                logger.info("New upgrade job scheduled with following frequency [{}].", UpgradeJobCreator.UPGRADE_CRON_EXPRESSION);
-            }
-        } catch (ParseException | SchedulerException ex) {
-            logger.error("Can not schedule upgrade job.", ex);
-        }
-    }
-
-    public void cancelUpgradeJob() {
-        try {
-            scheduler.deleteJob(upgradeJob.getJobKey());
-            logger.info("Upgrade job deleted.");
-        } catch (SchedulerException e) {
-            logger.error("Weird :( can not stop the upgrade job.", e);
-        }
-    }
-
-    public boolean isUpgradeJobExists() {
-        try {
-            return isSchedulerInitiated() && scheduler.checkExists(upgradeJob.getTriggerKey());
-        } catch (SchedulerException e) {
-            return false;
-        }
+    public void deleteJob(JobCreator jobCreator) throws SchedulerException {
+        scheduler.deleteJob(jobCreator.getJobKey());
+        logger.info("Upgrade job deleted.");
     }
 
     public boolean isSchedulerInitiated() {
         return scheduler != null;
     }
 
-    public void scheduleUploadJob(UploadItemJobBuilder jobCreatorBuilder, Map<String, Object> additionalJobParameters)
-            throws ParseException, SchedulerException {
-        uploadJobCreator = jobCreatorBuilder.createJobCreator();
-        uploadJobCreator.createTrigger();
-        uploadJobCreator.setNextFireDate();
-        uploadJobCreator.addAdditionalParameters(additionalJobParameters);
-        if (!isSchedulerInitiated()) {
-            scheduler = StdSchedulerFactory.getDefaultScheduler();
-            scheduler.start();
-        } else if (scheduler.checkExists(uploadJobCreator.getJobKey())) {
-            cancelUploadJob();
-        }
-        if (scheduler.getJobDetail(uploadJobCreator.getJobDetail().getKey()) == null) {
-            scheduler.scheduleJob(uploadJobCreator.getJobDetail(), uploadJobCreator.getTrigger());
-            logger.info("New upload items job scheduled and started.");
-        } else {
-            logger.info("Job with key [{}] already exists. No need to schedule it again.", uploadJobCreator.getJobDetail().getKey());
-        }
-    }
-
-    public void cancelUploadJob() throws SchedulerException {
-        scheduler.deleteJob(uploadJobCreator.getJobKey());
-        logger.info("Upload job canceled.");
-    }
-
     public String schedulerClassName() {
         return scheduler.getClass().getName();
     }
 
-    public JobParam getJobParam() {
-        return uploadJobCreator.getJobParam();
+    public JobParam getJobParam(JobCreator jobCreator) {
+        return jobCreator.getJobParam();
     }
 
     public void executeUploadJobIfMissed(Executor executor) {
@@ -181,5 +127,13 @@ public class JobHandler {
             result = jobParam.getNextFireDate().isBefore(LocalDateTime.now());
         }
         return result;
+    }
+
+    public boolean isJobExist(JobCreator jobCreator) {
+        try {
+            return scheduler.checkExists(jobCreator.getTriggerKey());
+        } catch (SchedulerException e) {
+            return false;
+        }
     }
 }

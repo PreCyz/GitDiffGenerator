@@ -104,7 +104,11 @@ abstract class AbstractDiffProducer implements DiffProducer {
     }
 
     private void writeItemToFile(FileWriter fw, String projectPath, List<String> gitCommand) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder(gitCommand);
+        LinkedList<String> fullCommand = new LinkedList<>();
+        //fullCommand.add(Paths.get("C:\\Install\\Git\\git-bash.exe").toString());
+        fullCommand.add("powershell.exe");
+        fullCommand.addAll(gitCommand);
+        ProcessBuilder processBuilder = new ProcessBuilder(fullCommand);
         processBuilder.directory(Paths.get(projectPath).toFile());
         processBuilder.environment().put("LANG", "pl_PL.UTF-8");
         Process process = processBuilder.start();

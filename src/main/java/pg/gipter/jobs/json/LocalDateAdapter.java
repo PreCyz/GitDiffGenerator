@@ -1,4 +1,4 @@
-package pg.gipter.jobs.upload.json;
+package pg.gipter.jobs.json;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

@@ -1,7 +1,9 @@
-package pg.gipter.jobs.upload;
+package pg.gipter.jobs;
 
 import org.quartz.*;
 import org.quartz.impl.triggers.CronTriggerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.time.*;
@@ -10,13 +12,16 @@ import java.util.*;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 /** Created by Pawel Gawedzki on 12-Mar-2019. */
-public class UploadJobCreator {
+class UploadJobCreator implements JobCreator {
 
-    public static final String CONFIG_DELIMITER = ",";
+    private static final Logger logger = LoggerFactory.getLogger(UploadJobCreator.class);
+
     public static final TriggerKey CRON_TRIGGER_KEY = new TriggerKey("cronTrigger", "cronTriggerGroup");
     public static final TriggerKey EVERY_WEEK_TRIGGER_KEY = new TriggerKey("everyWeekTrigger", "everyWeekTriggerGroup");
     public static final TriggerKey EVERY_2_WEEKS_CRON_TRIGGER_KEY = new TriggerKey("every2WeeksTrigger", "every2WeeksTriggerGroup");
     public static final TriggerKey EVERY_MONTH_TRIGGER_KEY = new TriggerKey("everyMonthTrigger", "everyMonthTriggerGroup");
+
+    private final Map<String, Object> additionalJobParameters;
 
     private final JobParam jobParam;
 
@@ -25,6 +30,12 @@ public class UploadJobCreator {
 
     UploadJobCreator(JobParam jobParam) {
         this.jobParam = jobParam;
+        additionalJobParameters = new HashMap<>();
+    }
+
+    public UploadJobCreator(JobParam jobParam, Map<String, Object> additionalJobParameters) {
+        this.jobParam = jobParam;
+        this.additionalJobParameters = additionalJobParameters;
     }
 
     private Trigger createTriggerEveryMonth() {
@@ -111,6 +122,12 @@ public class UploadJobCreator {
                 .build();
     }
 
+    @Override
+    public JobDetail create() {
+        return null;
+    }
+
+    @Override
     public void createTrigger() throws ParseException {
         if (trigger != null) {
             return;
@@ -160,11 +177,47 @@ public class UploadJobCreator {
         return jobDetail;
     }
 
+    @Override
     public Trigger getTrigger() {
         return trigger;
     }
 
+    @Override
     public JobKey getJobKey() {
         return new JobKey(UploadItemJob.NAME, UploadItemJob.GROUP);
+    }
+
+    @Override
+    public TriggerKey getTriggerKey() {
+        switch (jobParam.getJobType()) {
+            case CRON:
+                return CRON_TRIGGER_KEY;
+            case EVERY_MONTH:
+                return EVERY_MONTH_TRIGGER_KEY;
+            case EVERY_2_WEEKS:
+                return EVERY_2_WEEKS_CRON_TRIGGER_KEY;
+            default: return EVERY_WEEK_TRIGGER_KEY;
+        }
+    }
+
+    @Override
+    public void schedule(Scheduler scheduler) {
+        try {
+            createTrigger();
+            setNextFireDate();
+            addAdditionalParameters(additionalJobParameters);
+            if (scheduler.checkExists(getJobKey())) {
+                scheduler.deleteJob(getJobKey());
+                logger.info("Upload job canceled.");
+            }
+            if (scheduler.getJobDetail(getJobDetail().getKey()) == null) {
+                scheduler.scheduleJob(getJobDetail(), getTrigger());
+                logger.info("New upload items job scheduled and started.");
+            } else {
+                logger.info("Job with key [{}] already exists. No need to schedule it again.", getJobDetail().getKey());
+            }
+        } catch (SchedulerException | ParseException e) {
+            e.printStackTrace();
+        }
     }
 }

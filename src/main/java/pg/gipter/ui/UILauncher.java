@@ -17,8 +17,7 @@ import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.jobs.JobHandler;
-import pg.gipter.jobs.upload.*;
+import pg.gipter.jobs.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.StartupService;
@@ -28,7 +27,6 @@ import pg.gipter.utils.*;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -55,7 +53,7 @@ public class UILauncher implements Launcher {
     private boolean upgradeChecked = false;
     private LocalDateTime lastItemSubmissionDate;
     private final Executor executor;
-    private final JobHandler jobHandler;
+    private final JobService jobService;
     private Properties wizardProperties;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
@@ -65,7 +63,7 @@ public class UILauncher implements Launcher {
         dataDao = DaoFactory.getDataDao();
         silentMode = applicationProperties.isSilentMode();
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        jobHandler = new JobHandler();
+        jobService = new JobService();
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -181,8 +179,16 @@ public class UILauncher implements Launcher {
 
     private void scheduleJobs() {
         scheduleUploadJob();
-        jobHandler.scheduleUpgradeJob();
-        jobHandler.executeUploadJobIfMissed(executor);
+        scheduleUpgradeJob();
+        jobService.executeUploadJobIfMissed(executor);
+    }
+
+    private void scheduleUpgradeJob() {
+        try {
+            jobService.scheduleJob(JobCreatorFactory.upgradeJobCreator());
+        } catch (SchedulerException e) {
+            logger.error("Can not schedule the upgrade job.");
+        }
     }
 
     public void buildAndShowMainWindow() {
@@ -276,11 +282,26 @@ public class UILauncher implements Launcher {
 
     public void cancelJob() {
         try {
-            if (jobHandler.isSchedulerInitiated()) {
-                jobHandler.cancelUploadJob();
+            if (jobService.isSchedulerInitiated()) {
+                final Optional<JobParam> jobParamOpt = dataDao.loadJobParam();
+                JobParam jobParam = jobParamOpt.get();
+                Map<String, Object> additionalJobParams = new HashMap<>();
+                additionalJobParams.put(UILauncher.class.getName(), this);
+
+                UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                        .withJobType(jobParam.getJobType())
+                        .withStartDate(jobParam.getScheduleStart())
+                        .withDayOfMonth(jobParam.getDayOfMonth())
+                        .withHourOfDay(jobParam.getHourOfDay())
+                        .withMinuteOfHour(jobParam.getMinuteOfHour())
+                        .withDayOfWeek(jobParam.getDayOfWeek())
+                        .withCronExpression(jobParam.getCronExpression())
+                        .withConfigs(String.join(",", jobParam.getConfigs()))
+                        .withAdditionalParams(additionalJobParams);
+                jobService.deleteJob(builder.createJobCreator());
             }
         } catch (SchedulerException e) {
-            String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", jobHandler.schedulerClassName(), e.getMessage());
+            String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", jobService.schedulerClassName(), e.getMessage());
             logger.error(errorMessage);
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(errorMessage)
@@ -299,7 +320,7 @@ public class UILauncher implements Launcher {
 
     private void scheduleUploadJob() {
         final Optional<JobParam> jobParamOpt = dataDao.loadJobParam();
-        if (!jobHandler.isSchedulerInitiated() && jobParamOpt.isPresent() && jobParamOpt.get().getJobType() != null) {
+        if (!jobService.isSchedulerInitiated() && jobParamOpt.isPresent() && jobParamOpt.get().getJobType() != null) {
             JobParam jobParam = jobParamOpt.get();
             logger.info("Setting up the job.");
             try {
@@ -314,11 +335,12 @@ public class UILauncher implements Launcher {
                         .withMinuteOfHour(jobParam.getMinuteOfHour())
                         .withDayOfWeek(jobParam.getDayOfWeek())
                         .withCronExpression(jobParam.getCronExpression())
-                        .withConfigs(String.join(",", jobParam.getConfigs()));
-                jobHandler.scheduleUploadJob(builder, additionalJobParams);
+                        .withConfigs(String.join(",", jobParam.getConfigs()))
+                        .withAdditionalParams(additionalJobParams);
+                jobService.scheduleJob(builder.createJobCreator());
                 logger.info("Job set up successfully.");
 
-            } catch (ParseException | SchedulerException e) {
+            } catch (SchedulerException e) {
                 logger.warn("Can not restart the scheduler.", e);
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
@@ -439,8 +461,8 @@ public class UILauncher implements Launcher {
         toolkitProjectsWindow.hide();
     }
 
-    public JobHandler getJobHandler() {
-        return jobHandler;
+    public JobService getJobService() {
+        return jobService;
     }
 
     public void showUpgradeWindow() {

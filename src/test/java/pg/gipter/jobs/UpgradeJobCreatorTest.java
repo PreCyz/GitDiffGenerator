@@ -1,11 +1,8 @@
-package pg.gipter.jobs.upgrade;
+package pg.gipter.jobs;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Trigger;
+import org.quartz.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
