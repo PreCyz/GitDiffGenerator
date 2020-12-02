@@ -39,7 +39,7 @@ public class JobService {
 
     public void deleteJob(JobCreator jobCreator) throws SchedulerException {
         scheduler.deleteJob(jobCreator.getJobKey());
-        logger.info("Upgrade job deleted.");
+        logger.info("{} job deleted.", jobCreator.getJobKey().getName());
     }
 
     public boolean isSchedulerInitiated() {

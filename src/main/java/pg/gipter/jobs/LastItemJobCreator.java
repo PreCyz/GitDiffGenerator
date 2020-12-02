@@ -59,13 +59,18 @@ class LastItemJobCreator implements JobCreator {
     @Override
     public void schedule(Scheduler scheduler) {
         try {
-            createTrigger();
 
-            scheduler.scheduleJob(create(), getTrigger());
-            logger.info("New check last item job scheduled with the following frequency [{}].",
-                    applicationProperties.getCheckLastItemJobCronExpression());
+            if (scheduler.checkExists(getJobKey())) {
+                logger.info("Job with key [{}] already exists. No need to schedule it again.", getJobKey());
+            } else {
+                createTrigger();
+                scheduler.scheduleJob(create(), getTrigger());
+                logger.info("New check last item job scheduled with the following frequency [{}].",
+                        applicationProperties.getCheckLastItemJobCronExpression());
+            }
+
         } catch (ParseException | SchedulerException ex) {
-            logger.error("Can not schedule upgrade job.", ex);
+            logger.error("Can not schedule check last item job.", ex);
         }
     }
 

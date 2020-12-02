@@ -340,8 +340,9 @@ public class JobController extends AbstractController {
                         .withAdditionalParams(additionalJobParams);
 
                 JobService jobService = uiLauncher.getJobService();
-                jobService.scheduleJob(builder.createJobCreator());
-                dataDao.saveJobParam(jobService.getJobParam(builder.createJobCreator()));
+                final JobCreator uploadJobCreator = builder.createJobCreator();
+                jobService.scheduleJob(uploadJobCreator);
+                dataDao.saveJobParam(jobService.getJobParam(uploadJobCreator));
 
                 uiLauncher.hideJobWindow();
                 uiLauncher.updateTray();

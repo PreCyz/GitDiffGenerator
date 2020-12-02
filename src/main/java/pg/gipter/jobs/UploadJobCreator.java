@@ -30,12 +30,7 @@ class UploadJobCreator implements JobCreator {
 
     UploadJobCreator(JobParam jobParam) {
         this.jobParam = jobParam;
-        additionalJobParameters = new HashMap<>();
-    }
-
-    public UploadJobCreator(JobParam jobParam, Map<String, Object> additionalJobParameters) {
-        this.jobParam = jobParam;
-        this.additionalJobParameters = additionalJobParameters;
+        additionalJobParameters = jobParam.getAdditionalJobParams();
     }
 
     private Trigger createTriggerEveryMonth() {
@@ -217,7 +212,7 @@ class UploadJobCreator implements JobCreator {
                 logger.info("Job with key [{}] already exists. No need to schedule it again.", getJobDetail().getKey());
             }
         } catch (SchedulerException | ParseException e) {
-            e.printStackTrace();
+            logger.error("Could not schedule the upload job.", e);
         }
     }
 }

@@ -18,7 +18,7 @@ public class JobParam {
     private LocalDate scheduleStart;
     private LocalDateTime nextFireDate;
     private Set<String> configs;
-    private Map<String, Object> additionalJobParams;
+    private transient Map<String, Object> additionalJobParams;
 
     public JobParam() { }
 
