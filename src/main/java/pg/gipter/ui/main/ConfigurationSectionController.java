@@ -59,6 +59,7 @@ class ConfigurationSectionController extends AbstractController {
 
     private void setInitValues() {
         currentWeekNumberLabel.setText(String.valueOf(applicationProperties.getWeekNumber(LocalDate.now())));
+        mainController.setInitValues(applicationProperties);
     }
 
     private void initConfigurationName() {

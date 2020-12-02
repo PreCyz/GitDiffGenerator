@@ -2,7 +2,7 @@ package pg.gipter.utils;
 
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.jobs.upload.JobParam;
+import pg.gipter.jobs.JobParam;
 
 import java.util.*;
 

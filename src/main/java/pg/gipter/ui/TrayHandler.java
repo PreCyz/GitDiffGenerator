@@ -3,6 +3,7 @@ package pg.gipter.ui;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
@@ -12,9 +13,7 @@ import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.ProgramData;
-import pg.gipter.jobs.JobHandler;
-import pg.gipter.jobs.upload.JobParam;
-import pg.gipter.jobs.upload.UploadItemJob;
+import pg.gipter.jobs.*;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.job.JobController;
@@ -80,7 +79,7 @@ class TrayHandler {
 
     private void addMenuItemsToMenu(PopupMenu popupMenu) {
         executor.execute(() -> {
-            JobHandler jobHandler = uiLauncher.getJobHandler();
+            JobService jobService = uiLauncher.getJobService();
             ProgramData programData = dataDao.readProgramData();
             if (programData.getJobParam() != null) {
                 JobParam jobParam = programData.getJobParam();
@@ -140,7 +139,8 @@ class TrayHandler {
                 popupMenu.add(goToToolkitItem);
             }
 
-            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(jobHandler.isUpgradeJobExists() ?
+            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(
+                    jobService.isJobExist(JobCreatorFactory.upgradeJobCreator()) ?
                     "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
             upgradeItem.addActionListener(upgradeJobActionListener());
             popupMenu.add(upgradeItem);
@@ -161,11 +161,16 @@ class TrayHandler {
 
     private ActionListener upgradeJobActionListener() {
         return e -> {
-            JobHandler jobHandler = uiLauncher.getJobHandler();
-            if (jobHandler.isUpgradeJobExists()) {
-                jobHandler.cancelUpgradeJob();
-            } else {
-                jobHandler.scheduleUpgradeJob();
+            JobService jobService = uiLauncher.getJobService();
+            final JobCreator jobCreator = JobCreatorFactory.upgradeJobCreator();
+            try {
+                if (jobService.isJobExist(jobCreator)) {
+                    jobService.deleteJob(jobCreator);
+                } else {
+                    jobService.scheduleJob(jobCreator);
+                }
+            } catch (SchedulerException ex) {
+                logger.error("Can not schedule upgrade job.");
             }
             updateTrayLabels();
         };

@@ -303,7 +303,9 @@ public abstract class ApplicationProperties {
                     ", silentMode='" + isSilentMode() + '\'' +
                     ", enableOnStartup='" + isEnableOnStartup() + '\'' +
                     ", upgradeFinished='" + isUpgradeFinished() + '\'' +
-                    ", loggerLevel='" + loggerLevel() + '\'';
+                    ", loggerLevel='" + loggerLevel() + '\'' +
+                    ", checkLastItemEnabled='" + isCheckLastItemEnabled() + '\'' +
+                    ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
         }
         if (toolkitConfig != null) {
             log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
@@ -351,6 +353,8 @@ public abstract class ApplicationProperties {
     public abstract String loggerLevel();
     public abstract String uiLanguage();
     public abstract boolean isCertImportEnabled();
+    public abstract boolean isCheckLastItemEnabled();
+    public abstract String getCheckLastItemJobCronExpression();
 
     public abstract boolean isUpgradeFinished();
 }

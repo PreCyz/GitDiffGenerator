@@ -15,9 +15,7 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.dao.data.DataDaoFactory;
-import pg.gipter.jobs.JobHandler;
-import pg.gipter.jobs.upload.JobParam;
-import pg.gipter.jobs.upload.JobType;
+import pg.gipter.jobs.*;
 import pg.gipter.testfx.UITestUtils;
 import pg.gipter.ui.*;
 import pg.gipter.utils.StringUtils;
@@ -38,7 +36,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 public class JobTestUI {
 
-    final JobHandler jobHandler = new JobHandler();
+    final JobService jobHandler = new JobService();
 
     @Mock
     private UILauncher uiLauncherMock;
@@ -97,7 +95,7 @@ public class JobTestUI {
 
     @Test
     void givenConfigs_whenSetEVERY_WEEKJob_thenJobIsCreated(FxRobot robot) {
-        when(uiLauncherMock.getJobHandler()).thenReturn(jobHandler);
+        when(uiLauncherMock.getJobService()).thenReturn(jobHandler);
         final JobWindowObject windowObject = new JobWindowObject(robot)
                 .chooseDayOfWeek(DayOfWeek.MONDAY)
                 .pressEveryWeekRadioButton()

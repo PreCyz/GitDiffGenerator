@@ -267,5 +267,25 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
         return result;
     }
 
+    protected String select() {
+        return "$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
+                "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
+                "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +
+                "File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email," +
+                "File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel," +
+                "File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email";
+    }
+
+    protected String filter() {
+        return String.format("$filter=Modified+ge+datetime'%s'+and+Modified+le+datetime'%s'+and+FSObjType+eq+0",
+                LocalDateTime.of(applicationProperties.startDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME),
+                LocalDateTime.of(applicationProperties.endDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME)
+        );
+    }
+
+    protected String expand() {
+        return "$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy";
+    }
+
     public abstract List<Path> find();
 }

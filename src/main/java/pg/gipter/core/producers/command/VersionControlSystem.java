@@ -11,7 +11,8 @@ import static java.util.stream.Collectors.toMap;
 public enum VersionControlSystem {
     GIT(".git"),
     MERCURIAL(".hg"),
-    SVN(".svn");
+    SVN(".svn"),
+    NA("");
 
     private final String dirName;
 

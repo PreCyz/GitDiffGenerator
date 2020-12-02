@@ -1,4 +1,4 @@
-package pg.gipter.jobs.upload;
+package pg.gipter.jobs;
 
 import java.time.*;
 import java.util.*;
@@ -16,6 +16,7 @@ public class UploadItemJobBuilder {
     private DayOfWeek dayOfWeek;
     private String cronExpression;
     private String configs;
+    private Map<String, Object> additionalParams;
 
     public UploadItemJobBuilder withJobType(JobType jobType) {
         this.jobType = jobType;
@@ -62,6 +63,11 @@ public class UploadItemJobBuilder {
         return this;
     }
 
+    public UploadItemJobBuilder withAdditionalParams(Map<String, Object> additionalParams) {
+        this.additionalParams = new HashMap<>(additionalParams);
+        return this;
+    }
+
     public UploadJobCreator createJobCreator() {
         return new UploadJobCreator(createJobParam());
     }
@@ -72,6 +78,6 @@ public class UploadItemJobBuilder {
                 .orElseGet(Collections::emptySet);
         LocalDate scheduleDate = Optional.ofNullable(startDateTime).orElseGet(() -> null);
         return new JobParam(minuteOfHour, hourOfDay, dayOfMonth, dayOfWeek, cronExpression, jobType, scheduleDate,
-                nextFireDateTime, configSet);
+                nextFireDateTime, configSet, additionalParams);
     }
 }

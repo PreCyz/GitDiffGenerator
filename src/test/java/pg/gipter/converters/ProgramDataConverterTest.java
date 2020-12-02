@@ -8,8 +8,8 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.dao.data.DataDaoFactory;
 import pg.gipter.core.dao.data.ProgramData;
-import pg.gipter.jobs.upload.JobProperty;
-import pg.gipter.jobs.upload.JobType;
+import pg.gipter.jobs.JobProperty;
+import pg.gipter.jobs.JobType;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.IOException;

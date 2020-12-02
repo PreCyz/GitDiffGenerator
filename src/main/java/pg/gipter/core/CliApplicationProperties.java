@@ -298,4 +298,22 @@ class CliApplicationProperties extends ApplicationProperties {
         return certImportEnabled;
     }
 
+    @Override
+    public boolean isCheckLastItemEnabled() {
+        boolean checkLastItemEnabled = argExtractor.isCheckLastItemEnabled();
+        if (!containsArg(ArgName.checkLastItem.name()) && applicationConfig.getCheckLastItemEnabled() != null) {
+            checkLastItemEnabled = applicationConfig.getCheckLastItemEnabled();
+        }
+        return checkLastItemEnabled;
+    }
+
+    @Override
+    public String getCheckLastItemJobCronExpression() {
+        String cronExpression = argExtractor.checkLastItemJobCronExpression();
+        if (!containsArg(ArgName.checkLastItemJobCronExpression.name())
+                && applicationConfig.getCheckLastItemJobCronExpression() != null) {
+            cronExpression = applicationConfig.getCheckLastItemJobCronExpression();
+        }
+        return cronExpression;
+    }
 }

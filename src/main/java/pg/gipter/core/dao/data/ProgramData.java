@@ -1,6 +1,6 @@
 package pg.gipter.core.dao.data;
 
-import pg.gipter.jobs.upload.JobParam;
+import pg.gipter.jobs.JobParam;
 import pg.gipter.ui.UploadStatus;
 
 import java.time.LocalDateTime;

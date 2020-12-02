@@ -1,4 +1,4 @@
-package pg.gipter.jobs.upgrade;
+package pg.gipter.jobs;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -18,8 +18,8 @@ public class UpgradeJob implements Job {
 
     private static final Logger logger = LoggerFactory.getLogger(UpgradeJob.class);
     private final GithubService githubService;
-    static final String NAME = UpgradeJob.class.getName();
-    static final String GROUP = NAME + "Group";
+    public static final String NAME = UpgradeJob.class.getName();
+    public static final String GROUP = NAME + "Group";
 
     UpgradeJob() {
         String[] args = {ArgName.preferredArgSource + "=" + PreferredArgSource.UI};
