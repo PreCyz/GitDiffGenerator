@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.quartz.SchedulerException;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
@@ -16,6 +18,7 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.jobs.*;
 import pg.gipter.testfx.UITestUtils;
 import pg.gipter.ui.*;
 import pg.gipter.utils.BundleUtils;
@@ -27,8 +30,7 @@ import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 public class ApplicationConfigTraySupportedUI {
@@ -102,6 +104,50 @@ public class ApplicationConfigTraySupportedUI {
 
         assertThat(windowObject.getUseUICheckBox().isDisabled()).isTrue();
         assertThat(windowObject.getPreferredArgSourceCheckbox().isDisabled()).isTrue();
+    }
+
+    @Test
+    void whenWindowLoaded_thenCheckLastItemCheckBoxSelected(FxRobot robot) {
+        final ApplicationConfigWindowObject windowObject = new ApplicationConfigWindowObject(robot);
+
+        assertThat(windowObject.getCheckLastItemCheckBox().isSelected()).isTrue();
+    }
+
+    @Test
+    void whenDeselectCheckLastItem_thenJobCanceled(FxRobot robot) throws SchedulerException {
+        final JobService jobService = spy(JobService.class);
+        final JobCreator jobCreator = JobCreatorFactory.lastItemJobCreator(
+                ApplicationPropertiesFactory.getInstance(new String[]{ArgName.configurationName + "=testConfiguration"})
+        );
+        jobService.scheduleJob(jobCreator);
+        when(uiLauncherMock.getJobService()).thenReturn(jobService);
+        Mockito.reset(jobService);
+
+        new ApplicationConfigWindowObject(robot).deselectCheckLastItem();
+
+        final ApplicationConfig applicationConfig = DaoFactory.getCachedConfiguration().loadApplicationConfig();
+        assertThat(applicationConfig.getCheckLastItemEnabled()).isFalse();
+        verify(jobService, times(0)).scheduleJob(eq(jobCreator));
+        verify(jobService, times(1)).deleteJob(any());
+        assertThat(jobService.isJobExist(jobCreator)).isFalse();
+    }
+
+    @Test
+    void whenSelectCheckLastItem_thenJobScheduled(FxRobot robot) throws SchedulerException {
+        final JobService jobService = spy(JobService.class);
+        final JobCreator jobCreator = JobCreatorFactory.lastItemJobCreator(
+                ApplicationPropertiesFactory.getInstance(new String[]{ArgName.configurationName + "=testConfiguration"})
+        );
+        jobService.scheduleJob(jobCreator);
+        when(uiLauncherMock.getJobService()).thenReturn(jobService);
+
+        new ApplicationConfigWindowObject(robot).deselectCheckLastItem()
+                .selectCheckLastItem();
+
+        final ApplicationConfig applicationConfig = DaoFactory.getCachedConfiguration().loadApplicationConfig();
+        assertThat(applicationConfig.getCheckLastItemEnabled()).isTrue();
+        verify(jobService, times(1)).deleteJob(any());
+        assertThat(jobService.isJobExist(jobCreator)).isTrue();
     }
 
 }
