@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.vcs.VcsService;
@@ -125,8 +126,7 @@ class CsvDetailsSectionController extends AbstractController {
 
     private boolean disableDefaultAuthor() {
         boolean disabled = true;
-        if (EnumSet.of(ItemType.STATEMENT, ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS)
-                .contains(applicationProperties.itemType())) {
+        if (EnumSet.of(ItemType.SIMPLE, ItemType.PROTECTED).contains(applicationProperties.itemType())) {
 
             Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
                     .stream()
@@ -136,10 +136,10 @@ class CsvDetailsSectionController extends AbstractController {
             if (vcsSet.contains(VersionControlSystem.GIT)) {
                 vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
                 Optional<String> userName = vcsService.getUserName();
-                if (userName.isPresent()) {
+                if (userName.isPresent() && !applicationProperties.authors().contains(ArgName.author.defaultValue())) {
                     disabled = applicationProperties.authors().contains(userName.get());
                     disabled |= StringUtils.notEmpty(applicationProperties.gitAuthor()) &&
-                            !userName.get().equals(applicationProperties.gitAuthor());
+                            userName.get().equals(applicationProperties.gitAuthor());
                 }
             }
         }
