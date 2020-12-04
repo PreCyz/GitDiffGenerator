@@ -45,7 +45,7 @@ class GitService implements VcsService {
                 }
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.error("Unable to retrieve user name from git config. {}", ex.getMessage());
         }
 
         return result;
@@ -71,7 +71,7 @@ class GitService implements VcsService {
                 }
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.error("Unable to retrieve user email from git config. {}", ex.getMessage());
         }
 
         return result;
