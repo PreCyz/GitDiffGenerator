@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane fx:id="mainAnchorPane" prefHeight="714.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="mainAnchorPane" prefHeight="715.0" prefWidth="590.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <children>
       <MenuBar>
         <menus>
@@ -20,11 +20,13 @@
                   <MenuItem fx:id="instructionMenuItem" mnemonicParsing="false" text="%main.menu.help.pdf" />
                   <MenuItem fx:id="upgradeMenuItem" mnemonicParsing="false" text="%main.menu.help.upgradeApplication" />
                   <MenuItem fx:id="wizardMenuItem" mnemonicParsing="false" text="%main.menu.help.launchWizard" />
+                  <MenuItem fx:id="importCertMenuItem" mnemonicParsing="false" text="Importuj cert" />
+                  <MenuItem fx:id="importCertProgrammaticMenuItem" mnemonicParsing="false" text="Importuj cert" />
                </items>
             </Menu>
         </menus>
       </MenuBar>
-      <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="25.0" prefHeight="130.0" prefWidth="566.0" text="%toolkit.panel.title" textFill="#2302f8">
+      <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="25.0" prefHeight="130.0" prefWidth="587.0" text="%toolkit.panel.title" textFill="#2302f8">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
@@ -48,34 +50,34 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </TitledPane>
-      <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="154.0" prefHeight="558.0" prefWidth="566.0" text="%main.configuration" textFill="#2102f8">
+      <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="154.0" prefHeight="558.0" prefWidth="587.0" text="%main.configuration" textFill="#2102f8">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="185.0" prefWidth="200.0">
                <children>
                   <TextField fx:id="configurationNameTextField" layoutX="57.0" layoutY="9.0" prefHeight="25.0" prefWidth="160.0" />
-                  <Button fx:id="addConfigurationButton" layoutX="219.0" layoutY="9.0" mnemonicParsing="false" prefWidth="110.0" text="%main.addConfiguration" textFill="#32a1c9">
+                  <Button fx:id="addConfigurationButton" layoutX="227.0" layoutY="9.0" mnemonicParsing="false" prefWidth="110.0" text="%main.addConfiguration" textFill="#32a1c9">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="saveConfigurationButton" layoutX="339.0" layoutY="9.0" mnemonicParsing="false" prefWidth="222.0" text="%button.save" textFill="#32a1c9">
+                  <Button fx:id="saveConfigurationButton" layoutX="347.0" layoutY="9.0" mnemonicParsing="false" prefWidth="222.0" text="%button.save" textFill="#32a1c9">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
                   <ComboBox fx:id="configurationNameComboBox" layoutX="57.0" layoutY="39.0" prefHeight="25.0" prefWidth="160.0" />
-                  <Button fx:id="removeConfigurationButton" layoutX="219.0" layoutY="39.0" mnemonicParsing="false" prefWidth="110.0" text="%main.deleteConfiguration" textFill="#f41b63">
+                  <Button fx:id="removeConfigurationButton" layoutX="227.0" layoutY="39.0" mnemonicParsing="false" prefWidth="110.0" text="%main.deleteConfiguration" textFill="#f41b63">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
-                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="71.0" prefHeight="135.0" prefWidth="560.0" text="%paths.panel.title" textFill="#2102f8">
+                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="71.0" prefHeight="135.0" prefWidth="580.0" text="%paths.panel.title" textFill="#2102f8">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="558.0">
                            <children>
                               <Label layoutX="10.0" layoutY="12.0" text="%paths.panel.fileNamePrefix" />
-                              <TextField fx:id="itemFileNamePrefixTextField" layoutX="105.0" layoutY="9.0" prefHeight="25.0" prefWidth="446.0" />
-                              <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="45.0" prefHeight="17.0" prefWidth="127.0" text="need set up">
+                              <TextField fx:id="itemFileNamePrefixTextField" layoutX="106.0" layoutY="9.0" prefHeight="25.0" prefWidth="466.0" />
+                              <Label fx:id="projectPathLabel" layoutX="164.0" layoutY="45.0" prefHeight="17.0" prefWidth="141.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
@@ -92,12 +94,12 @@
                                  </font>
                               </Button>
                               <Label layoutX="10.0" layoutY="78.0" text="%paths.panel.itemPath" />
-                              <Label fx:id="itemPathLabel" layoutX="164.0" layoutY="80.0" prefHeight="17.0" prefWidth="127.0" text="need set up">
+                              <Label fx:id="itemPathLabel" layoutX="164.0" layoutY="80.0" prefHeight="17.0" prefWidth="141.0" text="need set up">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
                               </Label>
-                              <Pane id="minions-group" layoutX="291.0" layoutY="44.0" prefHeight="65.0" prefWidth="267.0" stylesheets="@../css/main.css" />
+                              <Pane id="minions-group" layoutX="311.0" layoutY="44.0" prefHeight="65.0" prefWidth="267.0" stylesheets="@../css/main.css" />
                            </children>
                         </AnchorPane>
                      </content>
@@ -105,24 +107,26 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </TitledPane>
-                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="205.0" prefHeight="245.0" prefWidth="288.0" text="%csv.panel.title" textFill="#2102f8">
+                  <TitledPane animated="false" collapsible="false" layoutX="2.0" layoutY="205.0" prefHeight="245.0" prefWidth="308.0" text="%vcs.panel.title" textFill="#2102f8">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="295.0" prefWidth="286.0">
                            <children>
-                              <Label layoutX="9.0" layoutY="10.0" prefHeight="17.0" prefWidth="53.0" text="%csv.panel.authors" />
+                              <Label layoutX="9.0" layoutY="10.0" prefHeight="17.0" prefWidth="53.0" text="%vcs.panel.authors" />
                               <TextField fx:id="authorsTextField" layoutX="109.0" layoutY="8.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="41.0" prefHeight="15.0" prefWidth="111.0" text="%csv.panel.committerEmail" />
+                              <Label layoutX="9.0" layoutY="41.0" prefHeight="15.0" prefWidth="111.0" text="%vcs.panel.committerEmail" />
                               <TextField fx:id="committerEmailTextField" layoutX="109.0" layoutY="38.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="71.0" text="%csv.panel.gitAuthor" />
+                              <Label layoutX="9.0" layoutY="71.0" text="%vcs.panel.gitAuthor" />
                               <TextField fx:id="gitAuthorTextField" layoutX="109.0" layoutY="68.0" prefWidth="160.0" />
                               <TextField fx:id="mercurialAuthorTextField" layoutX="109.0" layoutY="98.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="101.0" text="%csv.panel.mercurialAuthor" />
+                              <Label layoutX="9.0" layoutY="101.0" text="%vcs.panel.mercurialAuthor" />
                               <TextField fx:id="svnAuthorTextField" layoutX="109.0" layoutY="128.0" prefWidth="160.0" />
-                              <Label layoutX="9.0" layoutY="131.0" text="%csv.panel.svnAuthor" />
-                              <Label layoutX="10.0" layoutY="161.0" text="%csv.panel.itemType" />
+                              <Label layoutX="9.0" layoutY="131.0" text="%vcs.panel.svnAuthor" />
+                              <Label layoutX="10.0" layoutY="161.0" text="%vcs.panel.itemType" />
                               <ComboBox fx:id="itemTypeComboBox" layoutX="109.0" layoutY="158.0" prefWidth="160.0" />
                               <TextField fx:id="toolkitProjectListNamesTextField" layoutX="109.0" layoutY="188.0" prefHeight="25.0" prefWidth="160.0" />
                               <Label layoutX="9.0" layoutY="192.0" text="%toolkit.panel.projectListNames" />
+                              <CheckBox fx:id="useDefaultAuthorCheckBox" layoutX="279.0" layoutY="71.0" mnemonicParsing="false" />
+                              <CheckBox fx:id="useDefaultEmailCheckBox" layoutX="279.0" layoutY="41.0" mnemonicParsing="false" />
                            </children>
                         </AnchorPane>
                      </content>
@@ -130,7 +134,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </TitledPane>
-                  <TitledPane animated="false" collapsible="false" layoutX="289.0" layoutY="205.0" prefHeight="125.0" prefWidth="272.0" text="%timeFrame.panel.title" textFill="#2102f8">
+                  <TitledPane animated="false" collapsible="false" layoutX="309.0" layoutY="205.0" prefHeight="125.0" prefWidth="272.0" text="%timeFrame.panel.title" textFill="#2102f8">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="272.0">
                            <children>
@@ -167,13 +171,13 @@
                         <Font name="System Bold" size="13.0" />
                      </font>
                   </Button>
-                  <ProgressIndicator fx:id="loadProgressIndicator" layoutX="531.0" layoutY="488.0" progress="0.0" />
+                  <ProgressIndicator fx:id="loadProgressIndicator" layoutX="541.0" layoutY="488.0" progress="0.0" />
                   <Label layoutX="8.0" layoutY="13.0" text="%main.configurationName">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label layoutX="340.0" layoutY="45.0" text="%main.currentWeekNumber">
+                  <Label layoutX="348.0" layoutY="45.0" text="%main.currentWeekNumber">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
@@ -183,7 +187,7 @@
                         <Font name="System Bold" size="16.0" />
                      </font>
                   </Label>
-                  <TitledPane animated="false" collapsible="false" layoutX="289.0" layoutY="329.0" prefHeight="121.0" prefWidth="272.0" text="%additional.panel.title" textFill="#2102f8">
+                  <TitledPane animated="false" collapsible="false" layoutX="309.0" layoutY="329.0" prefHeight="121.0" prefWidth="272.0" text="%additional.panel.title" textFill="#2102f8">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>

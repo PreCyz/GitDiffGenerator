@@ -277,4 +277,25 @@ final class ArgExtractor {
         }
         return ArgName.uiLanguage.defaultValue();
     }
+
+    boolean isCertImportEnabled() {
+        if (containsArg(ArgName.certImport.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.certImport, ArgName.certImport.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.certImport.defaultValue());
+    }
+
+    boolean isCheckLastItemEnabled() {
+        if (containsArg(ArgName.checkLastItem.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.checkLastItem, ArgName.checkLastItem.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
+    }
+
+    public String checkLastItemJobCronExpression() {
+        if (containsArg(ArgName.checkLastItemJobCronExpression.name())) {
+            return getValue(ArgName.checkLastItemJobCronExpression, ArgName.checkLastItemJobCronExpression.defaultValue());
+        }
+        return ArgName.checkLastItemJobCronExpression.defaultValue();
+    }
 }

@@ -22,10 +22,12 @@ class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
 
     @Override
     public void updateStatistics(Statistic statistic) {
-        FindIterable<Statistic> users = collection.find(Filters.eq("username", statistic.getUsername()), Statistic.class);
+        FindIterable<Statistic> users = collection.find(
+                Filters.eq("username", statistic.getUsername()),
+                Statistic.class
+        );
 
         try (MongoCursor<Statistic> cursor = users.cursor()) {
-            //Document userToUpsert = Document.parse(new Gson().toJson(statistic, Statistic.class));
             Statistic statisticToUpsert;
             if (cursor.hasNext()) {
                 statisticToUpsert = cursor.next();
@@ -33,13 +35,16 @@ class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
                 statisticToUpsert.setJavaVersion(statistic.getJavaVersion());
                 statisticToUpsert.setLastUpdateStatus(statistic.getLastUpdateStatus());
                 statisticToUpsert.setLastRunType(statistic.getLastRunType());
+                statisticToUpsert.setApplicationVersion(statistic.getApplicationVersion());
 
-                LinkedHashSet<String> systemUsers = new LinkedHashSet<>(Optional.ofNullable(statisticToUpsert.getSystemUsers()).orElseGet(LinkedHashSet::new));
+                LinkedHashSet<String> systemUsers = new LinkedHashSet<>(
+                        Optional.ofNullable(statisticToUpsert.getSystemUsers()).orElseGet(LinkedHashSet::new)
+                );
                 systemUsers.addAll(statistic.getSystemUsers());
                 statisticToUpsert.setSystemUsers(systemUsers);
 
-                Map<VersionControlSystem, Set<String>> controlSystemMap = Optional.ofNullable(statisticToUpsert.getControlSystemMap())
-                        .orElseGet(LinkedHashMap::new);
+                Map<VersionControlSystem, Set<String>> controlSystemMap =
+                        Optional.ofNullable(statisticToUpsert.getControlSystemMap()).orElseGet(LinkedHashMap::new);
                 for (Map.Entry<VersionControlSystem, Set<String>> entry : statistic.getControlSystemMap().entrySet()) {
                     if (controlSystemMap.containsKey(entry.getKey())) {
                         Set<String> scvs = new LinkedHashSet<>(controlSystemMap.get(entry.getKey()));

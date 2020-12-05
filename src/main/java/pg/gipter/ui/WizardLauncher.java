@@ -25,7 +25,7 @@ import pg.gipter.launchers.Launcher;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.*;
 
-import java.io.File;
+import java.nio.file.*;
 import java.util.*;
 
 import static java.util.stream.Collectors.toCollection;
@@ -117,7 +117,7 @@ public class WizardLauncher implements Launcher {
         TextField configurationName = createTextField(ArgName.configurationName.name());
         gridPane.add(configurationName, 1, row++);
 
-        gridPane.add(new Label(BundleUtils.getMsg("csv.panel.itemType")), 0, row);
+        gridPane.add(new Label(BundleUtils.getMsg("vcs.panel.itemType")), 0, row);
         ComboBox<ItemType> comboBox = createUploadTypeComboBox(ArgName.itemType.name());
         gridPane.add(comboBox, 1, row);
 
@@ -250,11 +250,11 @@ public class WizardLauncher implements Launcher {
         pageGrid.setVgap(10);
         pageGrid.setHgap(10);
 
-        pageGrid.add(new Label(BundleUtils.getMsg("csv.panel.authors")), 0, row);
+        pageGrid.add(new Label(BundleUtils.getMsg("vcs.panel.authors")), 0, row);
         TextField author = createTextField(ArgName.author.name());
         pageGrid.add(author, 1, row++);
 
-        pageGrid.add(new Label(BundleUtils.getMsg("csv.panel.committerEmail")), 0, row);
+        pageGrid.add(new Label(BundleUtils.getMsg("vcs.panel.committerEmail")), 0, row);
         TextField committerEmail = createTextField(ArgName.committerEmail.name());
         pageGrid.add(committerEmail, 1, row);
 
@@ -367,24 +367,30 @@ public class WizardLauncher implements Launcher {
     private EventHandler<ActionEvent> addItemEventHandler(StringProperty itemPathStringProperty) {
         return event -> {
             ItemType uploadType = ItemType.valueFor(wizardProperties.getProperty(ArgName.itemType.name()));
-            File currentDirectory = new File(".");
+            Path currentDirectory = Paths.get(".");
             if (uploadType == ItemType.STATEMENT) {
                 FileChooser fileChooser = new FileChooser();
-                fileChooser.setInitialDirectory(currentDirectory);
+                fileChooser.setInitialDirectory(currentDirectory.toFile());
                 fileChooser.setTitle(BundleUtils.getMsg("directory.item.statement.title"));
-                File statementFile = fileChooser.showOpenDialog(primaryStage);
-                if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
-                    itemPathStringProperty.setValue(statementFile.getAbsolutePath());
-                    wizardProperties.put(ArgName.itemPath.name(), statementFile.getAbsolutePath());
+                final Optional<Path> statementPath = Optional.ofNullable(fileChooser.showOpenDialog(primaryStage))
+                        .map(file -> file.toPath());
+                boolean isStatementFileSet = statementPath.map(path -> Files.exists(path) && Files.isRegularFile(path))
+                        .orElseGet(() -> false);
+                if (isStatementFileSet) {
+                    itemPathStringProperty.setValue(statementPath.get().toAbsolutePath().toString());
+                    wizardProperties.put(ArgName.itemPath.name(), statementPath.get().toAbsolutePath().toString());
                 }
             } else {
                 DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setInitialDirectory(currentDirectory);
+                directoryChooser.setInitialDirectory(currentDirectory.toFile());
                 directoryChooser.setTitle(BundleUtils.getMsg("directory.item.store"));
-                File itemPathDirectory = directoryChooser.showDialog(primaryStage);
-                if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                    itemPathStringProperty.setValue(itemPathDirectory.getAbsolutePath());
-                    wizardProperties.put(ArgName.itemPath.name(), itemPathDirectory.getAbsolutePath());
+                final Optional<Path> directoryPath = Optional.ofNullable(directoryChooser.showDialog(primaryStage))
+                        .map(file -> file.toPath());
+                boolean isItemPathDirectorySet = directoryPath.map(path -> Files.exists(path) && Files.isDirectory(path))
+                        .orElseGet(() -> false);
+                if (isItemPathDirectorySet) {
+                    itemPathStringProperty.setValue(directoryPath.get().toAbsolutePath().toString());
+                    wizardProperties.put(ArgName.itemPath.name(), directoryPath.get().toAbsolutePath().toString());
                 }
             }
         };

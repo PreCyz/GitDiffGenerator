@@ -4,7 +4,7 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -68,7 +68,7 @@ class CliApplicationProperties extends ApplicationProperties {
         if (!containsArg(argName) && StringUtils.notEmpty(currentRunConfig.getItemPath())) {
             itemPath = currentRunConfig.getItemPath();
         }
-        return itemType() == ItemType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
+        return itemType() == ItemType.STATEMENT ? itemPath : Paths.get(itemPath, fileName()).toString();
     }
 
     @Override
@@ -289,4 +289,31 @@ class CliApplicationProperties extends ApplicationProperties {
         return uiLanguage;
     }
 
+    @Override
+    public boolean isCertImportEnabled() {
+        boolean certImportEnabled = argExtractor.isCertImportEnabled();
+        if (!containsArg(ArgName.certImport.name()) && applicationConfig.getCertImportEnabled() != null) {
+            certImportEnabled = applicationConfig.getCertImportEnabled();
+        }
+        return certImportEnabled;
+    }
+
+    @Override
+    public boolean isCheckLastItemEnabled() {
+        boolean checkLastItemEnabled = argExtractor.isCheckLastItemEnabled();
+        if (!containsArg(ArgName.checkLastItem.name()) && applicationConfig.getCheckLastItemEnabled() != null) {
+            checkLastItemEnabled = applicationConfig.getCheckLastItemEnabled();
+        }
+        return checkLastItemEnabled;
+    }
+
+    @Override
+    public String getCheckLastItemJobCronExpression() {
+        String cronExpression = argExtractor.checkLastItemJobCronExpression();
+        if (!containsArg(ArgName.checkLastItemJobCronExpression.name())
+                && applicationConfig.getCheckLastItemJobCronExpression() != null) {
+            cronExpression = applicationConfig.getCheckLastItemJobCronExpression();
+        }
+        return cronExpression;
+    }
 }

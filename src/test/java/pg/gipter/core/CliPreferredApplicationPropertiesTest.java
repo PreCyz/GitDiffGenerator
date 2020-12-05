@@ -10,7 +10,6 @@ import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SemanticVersioning;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -371,7 +370,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.itemPath();
 
-        assertThat(actual).startsWith("testItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("testItemPath").toString());
     }
 
     @Test
@@ -385,7 +384,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.itemPath();
 
-        assertThat(actual).startsWith("cliItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("cliItemPath").toString());
     }
 
     @Test
@@ -399,7 +398,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.itemPath();
 
-        assertThat(actual).startsWith("propertiesItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("propertiesItemPath").toString());
     }
 
     @Test
@@ -1985,5 +1984,62 @@ class CliPreferredApplicationPropertiesTest {
         String actual = applicationProperties.valueFromPattern(NamePatternValue.end_date_month_name);
 
         assertThat(actual).isEqualTo(LocalDate.now().getMonth().name().toLowerCase());
+    }
+
+    @Test
+    void givenCertImportEnabled_whenIsCertImportEnabled_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenCertImportEnabledFromCLI_whenIsCertImportEnabled_thenReturnCliCertImportEnabled() {
+        applicationProperties = new CliApplicationProperties(new String[]{"certImport=T"});
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCertImportEnabledFileAndCLI_whenIsCertImportEnabled_thenReturnCliCertImportEnabled() {
+        String[] args = {"certImport=t"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setCertImportEnabled(Boolean.FALSE);
+        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCertImportEnabledFromFile_whenIsCertImportEnabled_thenReturnCertImportEnabledFromFile() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setCertImportEnabled(Boolean.TRUE);
+        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCertImportEnabledFromFileAndOtherArgs_whenIsCertImportEnabled_thenReturnCertImportEnabledFromFile() {
+        String[] args = {"author=test"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setCertImportEnabled(Boolean.TRUE);
+        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
     }
 }

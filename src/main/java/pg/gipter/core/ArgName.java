@@ -162,6 +162,24 @@ public enum ArgName {
             return "";
         }
     },
+    certImport {
+        @Override
+        public String defaultValue() {
+            return "N";
+        }
+    },
+    checkLastItem {
+        @Override
+        public String defaultValue() {
+            return "Y";
+        }
+    },
+    checkLastItemJobCronExpression {
+        @Override
+        public String defaultValue() {
+            return "0 5 12 20 * ?";
+        }
+    },
     uiLanguage {
         @Override
         public String defaultValue() {

@@ -18,6 +18,7 @@ public class ApplicationConfigWindowObject extends BaseWindowObject {
     private final String autostartCheckBoxId = "autostartCheckBox";
     private final String preferredArgSourceComboBoxId = "preferredArgSourceComboBox";
     private final String useUICheckBoxId = "useUICheckBox";
+    private final String checkLastItemCheckBoxId = "checkLastItemCheckBox";
 
     public ApplicationConfigWindowObject(FxRobot robot) {
         super(robot);
@@ -67,6 +68,16 @@ public class ApplicationConfigWindowObject extends BaseWindowObject {
         return this;
     }
 
+    public ApplicationConfigWindowObject selectCheckLastItem() {
+        selectCheckBox(checkLastItemCheckBoxId);
+        return this;
+    }
+
+    public ApplicationConfigWindowObject deselectCheckLastItem() {
+        deselectCheckBox(checkLastItemCheckBoxId);
+        return this;
+    }
+
     public CheckBox getActiveTrayCheckBox() {
         return getCheckBox(activateTrayCheckBoxId);
     }
@@ -81,5 +92,9 @@ public class ApplicationConfigWindowObject extends BaseWindowObject {
 
     public ComboBox<PreferredArgSource> getPreferredArgSourceCheckbox() {
         return getComboBox(preferredArgSourceComboBoxId);
+    }
+
+    public CheckBox getCheckLastItemCheckBox() {
+        return getCheckBox(checkLastItemCheckBoxId);
     }
 }

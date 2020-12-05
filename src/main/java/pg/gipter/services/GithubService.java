@@ -1,9 +1,6 @@
 package pg.gipter.services;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -21,15 +18,13 @@ import java.util.stream.Stream;
 public class GithubService {
 
     public static final String GITHUB_URL = "https://github.com/PreCyz/GitDiffGenerator";
-
-    private final SemanticVersioning currentVersion;
-
     private static final Logger logger = LoggerFactory.getLogger(GithubService.class);
+
     private static JsonObject latestReleaseDetails;
     private SemanticVersioning serverVersion;
     String distributionName;
+    private final SemanticVersioning currentVersion;
     private final String JSON_TAG_NAME = "tag_name";
-    private final String ELEVEN_PLUS = "11+";
 
     public GithubService(SemanticVersioning semanticVersioning) {
         this.currentVersion = semanticVersioning;
@@ -177,8 +172,9 @@ public class GithubService {
     private boolean isProperAsset(String name, JsonElement assetName) {
         boolean result = assetName != null;
         if (result) {
+            String elevenPlus = "11+";
             result = !assetName.isJsonNull();
-            result &= assetName.getAsString().startsWith(ELEVEN_PLUS);
+            result &= assetName.getAsString().startsWith(elevenPlus);
             result &= assetName.getAsString().contains(name);
         }
         return result;

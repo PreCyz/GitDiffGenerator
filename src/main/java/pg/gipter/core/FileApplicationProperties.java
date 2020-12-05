@@ -4,7 +4,7 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -69,7 +69,7 @@ class FileApplicationProperties extends ApplicationProperties {
                 return itemPath;
             }
         }
-        return itemType() == ItemType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
+        return itemType() == ItemType.STATEMENT ? itemPath : Paths.get(itemPath, fileName()).toString();
     }
 
     @Override
@@ -278,4 +278,27 @@ class FileApplicationProperties extends ApplicationProperties {
         return argExtractor.uiLanguage();
     }
 
+    @Override
+    public boolean isCertImportEnabled() {
+        if (applicationConfig.getCertImportEnabled() != null) {
+            return applicationConfig.getCertImportEnabled();
+        }
+        return argExtractor.isCertImportEnabled();
+    }
+
+    @Override
+    public boolean isCheckLastItemEnabled() {
+        if (applicationConfig.getCheckLastItemEnabled() != null) {
+            return applicationConfig.getCheckLastItemEnabled();
+        }
+        return argExtractor.isCheckLastItemEnabled();
+    }
+
+    @Override
+    public String getCheckLastItemJobCronExpression() {
+        if (StringUtils.notEmpty(applicationConfig.getCheckLastItemJobCronExpression())) {
+            return applicationConfig.getCheckLastItemJobCronExpression();
+        }
+        return argExtractor.checkLastItemJobCronExpression();
+    }
 }

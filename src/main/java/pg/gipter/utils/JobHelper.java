@@ -2,7 +2,7 @@ package pg.gipter.utils;
 
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.jobs.upload.JobParam;
+import pg.gipter.jobs.JobParam;
 
 import java.util.*;
 
@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.toCollection;
 
 public class JobHelper {
 
-    private DataDao dataDao;
+    private final DataDao dataDao;
 
     public JobHelper() {
         dataDao = DaoFactory.getDataDao();

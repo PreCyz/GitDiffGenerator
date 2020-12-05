@@ -4,22 +4,21 @@ import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
+import javax.xml.parsers.*;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class XmlHelperTest {
 
     private Document readXml(String xmlFilePath) throws ParserConfigurationException, IOException, SAXException {
-        File fXmlFile = new File(xmlFilePath);
-        System.out.println(fXmlFile.getAbsolutePath());
+        Path fXmlFile = Paths.get(xmlFilePath);
+        System.out.println(fXmlFile.toAbsolutePath().toString());
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(fXmlFile);
+        Document doc = dBuilder.parse(fXmlFile.toFile());
 
         doc.getDocumentElement().normalize();
         return doc;

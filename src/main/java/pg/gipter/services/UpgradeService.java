@@ -9,14 +9,11 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.WindowType;
-import pg.gipter.utils.AlertHelper;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.JarHelper;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,7 +23,7 @@ public class UpgradeService extends TaskService<Void> {
 
     private static final Logger logger = LoggerFactory.getLogger(UpgradeService.class);
 
-    private GithubService githubService;
+    private final GithubService githubService;
 
     public UpgradeService(SemanticVersioning currentVersion) {
         super();
@@ -39,7 +36,7 @@ public class UpgradeService extends TaskService<Void> {
         increaseProgress();
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
         try {
-            Optional<String> homeDirectoryPath = AlertHelper.homeDirectoryPath();
+            Optional<String> homeDirectoryPath = JarHelper.homeDirectoryPath();
             if (homeDirectoryPath.isPresent()) {
                 Optional<String> fileName = githubService.downloadLatestDistribution(homeDirectoryPath.get(), this);
                 if (fileName.isPresent()) {
@@ -49,14 +46,14 @@ public class UpgradeService extends TaskService<Void> {
                 } else {
                     logger.error("Did not download the newest version.");
                     alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
-                            .withLink(AlertHelper.logsFolder())
+                            .withLink(JarHelper.logsFolder())
                             .withWindowType(WindowType.LOG_WINDOW)
                             .withAlertType(Alert.AlertType.WARNING);
                 }
             } else {
                 logger.error("Can not find home directory.");
                 alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
-                        .withLink(AlertHelper.logsFolder())
+                        .withLink(JarHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING);
             }
@@ -64,7 +61,7 @@ public class UpgradeService extends TaskService<Void> {
             logger.error(ex.getMessage(), ex);
             alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
                     .withMessage(ex.getMessage())
-                    .withLink(AlertHelper.logsFolder())
+                    .withLink(JarHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.WARNING);
         } finally {
@@ -122,26 +119,31 @@ public class UpgradeService extends TaskService<Void> {
     private void restartApplication() throws IOException {
         updateMsg(BundleUtils.getMsg("upgrade.progress.restarting"));
         final String javaBin = Paths.get(System.getProperty("java.home"), "bin", "java").toString();
-        Optional<File> jarFile = AlertHelper.getJarFile();
+        Optional<Path> jarPath = JarHelper.getJarPath();
 
-        if (!jarFile.isPresent()) {
+        if (!jarPath.isPresent()) {
             workCompleted();
             logger.error("Error when restarting application. Could not file jar file.");
             return;
         }
         if ("DEV".equals(System.getenv().get("PROGRAM-PROFILE"))) {
-            jarFile = Optional.of(Paths.get(jarFile.get().getAbsolutePath().replaceFirst("classes", "Gipter.jar")).toFile());
+            final String jarFilePath = jarPath.get().toAbsolutePath().toString();
+            jarPath = Optional.of(jarFilePath.replaceFirst("classes", "Gipter.jar"))
+                    .map(Paths::get);
         }
 
-        if (!jarFile.get().exists() || !jarFile.get().isFile()) {
-            logger.error("Error when restarting application. [{}] is not a file.", jarFile.get().getAbsolutePath());
+        if (!Files.exists(jarPath.get()) || !Files.isRegularFile(jarPath.get())) {
+            logger.error("Error when restarting application. [{}] is not a file.",
+                    jarPath.get().toAbsolutePath().toString());
             workCompleted();
             return;
         }
 
         workCompleted();
         final LinkedList<String> command = Stream.of(
-                javaBin, "-jar", jarFile.get().getPath(), ArgName.upgradeFinished.name() + "=" + Boolean.TRUE
+                javaBin, "-jar",
+                jarPath.get().toAbsolutePath().toString(),
+                ArgName.upgradeFinished.name() + "=" + Boolean.TRUE
         ).collect(Collectors.toCollection(LinkedList::new));
 
         new ProcessBuilder(command).start();

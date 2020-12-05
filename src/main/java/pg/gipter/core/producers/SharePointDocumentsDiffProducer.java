@@ -7,13 +7,16 @@ import pg.gipter.core.producers.processor.DocumentFinder;
 import pg.gipter.core.producers.processor.DocumentFinderFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
 
-    private ItemType itemType;
+    private final ItemType itemType;
 
     SharePointDocumentsDiffProducer(ItemType itemType, ApplicationProperties applicationProperties) {
         super(applicationProperties);
@@ -33,8 +36,9 @@ class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
         }
 
         logger.info("Item type set as {}. Documents will be zipped and uploaded.", itemType);
-        DocumentFinder documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
-        List<File> documents = documentFinder.find();
+        List<Path> documents = DocumentFinderFactory.getInstance(applicationProperties)
+                .map(DocumentFinder::find)
+                .orElseGet(ArrayList::new);
         if (documents.isEmpty()) {
             logger.warn("No documents to zip is no item to upload. [{}].", itemType);
             throw new IllegalArgumentException("Given projects do not contain any items.");
@@ -46,13 +50,13 @@ class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
         }
     }
 
-    private void zipDocumentsAndWriteToFile(List<File> documents) {
+    private void zipDocumentsAndWriteToFile(List<Path> documents) {
         try (FileOutputStream fos = new FileOutputStream(applicationProperties.itemPath());
              ZipOutputStream zipOut = new ZipOutputStream(fos)) {
 
-            for (File document : documents) {
-                FileInputStream fis = new FileInputStream(document);
-                ZipEntry zipEntry = new ZipEntry(document.getName());
+            for (Path document : documents) {
+                FileInputStream fis = new FileInputStream(document.toFile());
+                ZipEntry zipEntry = new ZipEntry(document.getFileName().toString());
                 zipOut.putNextEntry(zipEntry);
 
                 byte[] bytes = new byte[1024];
@@ -69,13 +73,17 @@ class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
         }
     }
 
-    private void deleteFiles(List<File> documents) {
-        for (File doc : documents) {
+    private void deleteFiles(List<Path> documents) {
+        for (Path doc : documents) {
             try {
-                FileUtils.forceDelete(doc);
-                logger.info("File [{}] deleted.", doc.getName());
+                Files.deleteIfExists(doc);
+                logger.info("File [{}] deleted.", doc.getFileName().toString());
             } catch (IOException e) {
-                logger.warn("Can not delete file [{}].", doc.getName());
+                try {
+                    FileUtils.forceDelete(doc.toFile());
+                } catch (IOException ioException) {
+                    logger.warn("Can not delete file [{}].", doc.getFileName().toString());
+                }
             }
         }
     }
