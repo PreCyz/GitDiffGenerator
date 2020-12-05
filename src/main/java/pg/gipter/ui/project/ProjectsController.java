@@ -12,7 +12,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
-import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.producers.command.ItemType;
@@ -22,11 +21,14 @@ import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.JarHelper;
 
-import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 public class ProjectsController extends AbstractController {
 
@@ -92,18 +94,18 @@ public class ProjectsController extends AbstractController {
         } else {
             ObservableList<ProjectDetails> projectsPaths = FXCollections.observableArrayList();
             for (String path : projects) {
-                File project = new File(path);
-                Optional<String> supportedVcs = getSupportedVcs(project);
+                Path project = Paths.get(path);
+                Optional<String> supportedVcs = getSupportedVcs(Paths.get(path));
                 if (!supportedVcs.isPresent() && applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
                     ProjectDetails pd = new ProjectDetails(
-                            project.getName(),
+                            project.getFileName().toString(),
                             applicationProperties.itemType().name(),
                             path
                     );
                     projectsPaths.add(pd);
                 } else if (supportedVcs.isPresent() && applicationProperties.itemType() != ItemType.TOOLKIT_DOCS) {
                     ProjectDetails pd = new ProjectDetails(
-                            project.getName(),
+                            project.getFileName().toString(),
                             supportedVcs.get(),
                             path
                     );
@@ -117,10 +119,9 @@ public class ProjectsController extends AbstractController {
         }
     }
 
-    @NotNull
-    private Optional<String> getSupportedVcs(File project) {
+    private Optional<String> getSupportedVcs(Path project) {
         try {
-            return Optional.of(VersionControlSystem.valueFrom(project).name());
+            return Optional.of(VersionControlSystem.valueFrom(project)).map(Enum::name);
         } catch (IllegalArgumentException ex) {
             return Optional.empty();
         }
@@ -144,48 +145,52 @@ public class ProjectsController extends AbstractController {
         saveButton.setDisable(projectsTableView.getItems().contains(ProjectDetails.DEFAULT));
     }
 
-    @NotNull
     private EventHandler<ActionEvent> searchButtonActionEventHandler(ResourceBundle resources) {
         return event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(new File("."));
+            directoryChooser.setInitialDirectory(Paths.get(".").toFile());
             directoryChooser.setTitle(resources.getString("directory.search.title"));
-            File directory = directoryChooser.showDialog(uiLauncher.currentWindow());
-            if (directory != null && directory.exists() && directory.isDirectory()) {
-                CompletableFuture.supplyAsync(() -> FXCollections.observableList(searchForProjects(directory)), uiLauncher.nonUIExecutor())
-                        .thenAcceptAsync(this::refreshProjectTableView, Platform::runLater);
+            final Path directory = directoryChooser.showDialog(uiLauncher.currentWindow()).toPath();
+            if (Files.exists(directory) && Files.isDirectory(directory)) {
+                CompletableFuture.supplyAsync(() ->
+                        FXCollections.observableList(searchForProjects(directory)), uiLauncher.nonUIExecutor()
+                ).thenAcceptAsync(this::refreshProjectTableView, Platform::runLater);
             }
         };
     }
 
-    private void refreshProjectTableView(@NotNull ObservableList<ProjectDetails> observableList) {
-        if (!observableList.isEmpty()) {
-            if (projectsTableView.getItems().size() == 1 && projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
-                projectsTableView.setItems(observableList);
-            } else {
-                projectsTableView.getItems().addAll(observableList);
-            }
-            projectsTableView.refresh();
-            saveButton.setDisable(false);
+    private void refreshProjectTableView(ObservableList<ProjectDetails> observableList) {
+        if (observableList.isEmpty()) {
+            projectsTableView.setItems(FXCollections.observableArrayList(ProjectDetails.DEFAULT));
+        } else {
+            projectsTableView.setItems(observableList);
         }
+        projectsTableView.refresh();
+        saveButton.setDisable(false);
     }
 
-    List<ProjectDetails> searchForProjects(File directory) {
+    List<ProjectDetails> searchForProjects(Path directory) {
         List<ProjectDetails> result = new ArrayList<>();
         try {
             VersionControlSystem vcs = VersionControlSystem.valueFrom(directory);
-            result.add(new ProjectDetails(directory.getName(), vcs.name(), directory.getAbsolutePath()));
+            result.add(new ProjectDetails(
+                    directory.getFileName().toString(), vcs.name(), directory.toAbsolutePath().toString()
+            ));
         } catch (IllegalArgumentException ex) {
-            for (File file : directory.listFiles()) {
-                if (file != null && file.isDirectory()) {
-                    result.addAll(searchForProjects(file));
+            try {
+                List<Path> files = Files.list(directory).collect(toList());
+                for (Path file : files) {
+                    if (file != null && Files.isDirectory(file)) {
+                        result.addAll(searchForProjects(file));
+                    }
                 }
+            } catch (IOException e) {
+                logger.warn("Problem with searching repos.", e);
             }
         }
         return result;
     }
 
-    @NotNull
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
         return event -> {
             final String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
@@ -205,16 +210,16 @@ public class ProjectsController extends AbstractController {
     private EventHandler<ActionEvent> addButtonActionEventHandler(ResourceBundle resources) {
         return event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(new File("."));
+            directoryChooser.setInitialDirectory(Paths.get(".").toFile());
             directoryChooser.setTitle(resources.getString("directory.item.title"));
-            File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
-            if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
+            Path itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow()).toPath();
+            if (Files.exists(itemPathDirectory) && Files.isDirectory(itemPathDirectory)) {
                 try {
                     String vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
                     ProjectDetails project = new ProjectDetails(
-                            itemPathDirectory.getName(),
+                            itemPathDirectory.getFileName().toString(),
                             vcsType,
-                            itemPathDirectory.getAbsolutePath()
+                            itemPathDirectory.toAbsolutePath().toString()
                     );
                     if (projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
                         projectsTableView.setItems(FXCollections.observableArrayList(project));

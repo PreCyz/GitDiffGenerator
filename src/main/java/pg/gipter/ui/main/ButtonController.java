@@ -32,7 +32,9 @@ public class ButtonController extends AbstractController {
     }
 
     public void initialize(URL location, ResourceBundle resources, Map<String, Button> initButtonMap) {
-        executeButton = initButtonMap.get("exitButton");
+        super.initialize(location, resources);
+
+        executeButton = initButtonMap.get("executeButton");
         executeAllButton = initButtonMap.get("executeAllButton");
         jobButton = initButtonMap.get("jobButton");
         exitButton = initButtonMap.get("exitButton");
@@ -103,15 +105,9 @@ public class ButtonController extends AbstractController {
         return event -> UILauncher.platformExit();
     }
 
-    public void setExecuteDisabled(boolean value) {
+    void setDisableDependOnConfigurations(boolean value) {
         executeButton.setDisable(value);
-    }
-
-    public void setExecuteAllDisabled(boolean value) {
         executeAllButton.setDisable(value);
-    }
-
-    public void setJobDisabled(boolean value) {
         jobButton.setDisable(value);
     }
 }

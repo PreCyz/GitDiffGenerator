@@ -20,15 +20,13 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.RunConfig;
-import pg.gipter.jobs.JobHandler;
-import pg.gipter.jobs.upload.*;
+import pg.gipter.jobs.*;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.*;
 
 import java.net.URL;
-import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -104,7 +102,7 @@ public class JobController extends AbstractController {
             items.add(0, ALL_CONFIGS);
             configurationNameComboBox.setItems(items);
             configurationNameComboBox.setValue(configurationNameComboBox.getItems().get(0));
-            configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, runConfigMap.keySet()));
+            configsLabel.setText(String.join(JobService.CONFIG_DELIMITER, runConfigMap.keySet()));
         }
         setDefaultsForJobDetailsControls();
         final ProgramData programData = dataDao.readProgramData();
@@ -240,7 +238,7 @@ public class JobController extends AbstractController {
         if (runConfigMap.isEmpty()) {
             configsLabel.setText(NOT_AVAILABLE);
         } else {
-            configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, runConfigMap.keySet()));
+            configsLabel.setText(String.join(JobService.CONFIG_DELIMITER, runConfigMap.keySet()));
         }
     }
 
@@ -338,16 +336,18 @@ public class JobController extends AbstractController {
                         .withMinuteOfHour(minuteComboBox.getValue())
                         .withDayOfWeek(dayNameComboBox.getValue())
                         .withCronExpression(cronExpressionTextField.getText())
-                        .withConfigs(configsLabel.getText());
+                        .withConfigs(configsLabel.getText())
+                        .withAdditionalParams(additionalJobParams);
 
-                JobHandler jobHandler = uiLauncher.getJobHandler();
-                jobHandler.scheduleUploadJob(builder, additionalJobParams);
-                dataDao.saveJobParam(jobHandler.getJobParam());
+                JobService jobService = uiLauncher.getJobService();
+                final JobCreator uploadJobCreator = builder.createJobCreator();
+                jobService.scheduleJob(uploadJobCreator);
+                dataDao.saveJobParam(jobService.getJobParam(uploadJobCreator));
 
                 uiLauncher.hideJobWindow();
                 uiLauncher.updateTray();
 
-            } catch (SchedulerException | ParseException se) {
+            } catch (SchedulerException se) {
                 logger.error("Error when creating a job.", se);
                 String errorMsg = BundleUtils.getMsg("popup.job.errorMsg", se.getMessage());
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
@@ -378,15 +378,15 @@ public class JobController extends AbstractController {
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
                     if (ALL_CONFIGS.equals(newValue)) {
-                        configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, runConfigMap.keySet()));
+                        configsLabel.setText(String.join(JobService.CONFIG_DELIMITER, runConfigMap.keySet()));
                     } else if (oldValue.equals(ALL_CONFIGS)) {
                         configsLabel.setText(newValue);
                     } else {
-                        Set<String> currentSelection = Stream.of(configsLabel.getText().split(UploadJobCreator.CONFIG_DELIMITER))
+                        Set<String> currentSelection = Stream.of(configsLabel.getText().split(JobService.CONFIG_DELIMITER))
                                 .filter(v -> !v.isEmpty())
                                 .collect(toCollection(LinkedHashSet::new));
                         currentSelection.add(newValue);
-                        configsLabel.setText(String.join(UploadJobCreator.CONFIG_DELIMITER, currentSelection));
+                        configsLabel.setText(String.join(JobService.CONFIG_DELIMITER, currentSelection));
                     }
                 });
         dayNameComboBox.getSelectionModel()

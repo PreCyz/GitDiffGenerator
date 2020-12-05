@@ -16,6 +16,7 @@ public abstract class AbstractController implements Initializable {
     protected final UILauncher uiLauncher;
     protected final Logger logger;
     protected URL location;
+    protected ResourceBundle resources;
     protected ApplicationProperties applicationProperties;
 
     protected AbstractController(UILauncher uiLauncher) {
@@ -26,13 +27,14 @@ public abstract class AbstractController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.location = location;
+        this.resources = resources;
     }
 
     protected static EventHandler<WindowEvent> regularOnCloseEventHandler() {
         return t -> UILauncher.platformExit();
     }
 
-    public final void setApplicationProperties(ApplicationProperties applicationProperties) {
+    public void setApplicationProperties(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
     }
 

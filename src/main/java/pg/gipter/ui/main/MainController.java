@@ -249,7 +249,8 @@ public class MainController extends AbstractController {
         pathsSectionController.initialize(location, resources, initPathsSectionMap());
         datesSectionController.initialize(location, resources, initDatesSectionMap());
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
-        csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
+        //this is executed later in the flow
+        //csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
         buttonController.initialize(location, resources, initButtonMap());
 
         setProperties();
@@ -296,9 +297,7 @@ public class MainController extends AbstractController {
 
     void setDisableDependOnConfigurations() {
         Map<String, RunConfig> runConfigMap = applicationProperties.getRunConfigMap();
-        buttonController.setExecuteDisabled(runConfigMap.isEmpty());
-        buttonController.setExecuteAllDisabled(runConfigMap.isEmpty());
-        buttonController.setJobDisabled(runConfigMap.isEmpty());
+        buttonController.setDisableDependOnConfigurations(runConfigMap.isEmpty());
         pathsSectionController.setDisableProjectPathButton(
                 runConfigMap.isEmpty() || csvDetailsSectionController.getItemType() == ItemType.STATEMENT
         );
@@ -446,5 +445,29 @@ public class MainController extends AbstractController {
 
     ToolkitConfig createToolkitConfigFromUI() {
         return toolkitSectionController.createToolkitConfigFromUI();
+    }
+
+    void setInitValues(ApplicationProperties applicationProperties) {
+        setApplicationProperties(applicationProperties);
+
+        toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
+        pathsSectionController.initialize(location, resources, initPathsSectionMap());
+        datesSectionController.initialize(location, resources, initDatesSectionMap());
+        additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
+        csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
+        buttonController.initialize(location, resources, initButtonMap());
+    }
+
+    @Override
+    public void setApplicationProperties(ApplicationProperties applicationProperties) {
+        super.setApplicationProperties(applicationProperties);
+        toolkitSectionController.setApplicationProperties(applicationProperties);
+        configurationSectionController.setApplicationProperties(applicationProperties);
+        menuSectionController.setApplicationProperties(applicationProperties);
+        pathsSectionController.setApplicationProperties(applicationProperties);
+        datesSectionController.setApplicationProperties(applicationProperties);
+        additionalSettingsSectionController.setApplicationProperties(applicationProperties);
+        csvDetailsSectionController.setApplicationProperties(applicationProperties);
+        buttonController.setApplicationProperties(applicationProperties);
     }
 }

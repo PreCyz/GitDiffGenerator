@@ -1,4 +1,4 @@
-package pg.gipter.jobs.upload;
+package pg.gipter.jobs;
 
 @Deprecated(forRemoval = true, since="4.0.0")
 /** Use {@link JobParam} instead  */

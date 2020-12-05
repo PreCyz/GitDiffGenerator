@@ -3,7 +3,8 @@ package pg.gipter.ui.project;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +14,7 @@ class ProjectsControllerTest {
 
     @Test
     void givenGitFolder_whenSearchForProjects_thenReturnListWithOneElement() {
-        File file = new File("/home/gawa/IdeaProjects/GitDiffGenerator");
+        Path file = Paths.get("/home/gawa/IdeaProjects/GitDiffGenerator");
         ProjectsController controller = new ProjectsController(null, null);
         List<ProjectDetails> actual = controller.searchForProjects(file);
 
@@ -22,7 +23,7 @@ class ProjectsControllerTest {
 
     @Test
     void givenGeneralFolder_whenSearchForProjects_thenReturnList() {
-        File file = new File("/home/gawa/IdeaProjects");
+        Path file = Paths.get("/home/gawa/IdeaProjects");
         ProjectsController controller = new ProjectsController(null, null);
         List<ProjectDetails> actual = controller.searchForProjects(file);
 

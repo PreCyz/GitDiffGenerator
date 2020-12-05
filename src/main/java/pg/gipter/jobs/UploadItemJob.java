@@ -1,4 +1,4 @@
-package pg.gipter.jobs.upload;
+package pg.gipter.jobs;
 
 import org.quartz.*;
 import org.slf4j.Logger;

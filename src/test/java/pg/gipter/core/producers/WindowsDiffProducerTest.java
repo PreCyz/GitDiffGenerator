@@ -10,7 +10,7 @@ import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.producers.command.DiffCommand;
 import pg.gipter.core.producers.command.VersionControlSystem;
-import pg.gipter.jobs.upload.json.LocalDateTimeAdapter;
+import pg.gipter.jobs.json.LocalDateTimeAdapter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

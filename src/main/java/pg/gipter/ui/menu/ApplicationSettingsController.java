@@ -6,9 +6,12 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import org.quartz.SchedulerException;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.jobs.JobCreator;
+import pg.gipter.jobs.JobCreatorFactory;
 import pg.gipter.services.StartupService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
@@ -32,6 +35,8 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private Label importCertLabel;
     @FXML
+    private Label checkLastItemLabel;
+    @FXML
     private TitledPane titledPane;
 
     @FXML
@@ -50,6 +55,8 @@ public class ApplicationSettingsController extends AbstractController {
     private CheckBox silentModeCheckBox;
     @FXML
     private CheckBox importCertCheckBox;
+    @FXML
+    private CheckBox checkLastItemCheckBox;
     @FXML
     private ComboBox<String> languageComboBox;
 
@@ -85,6 +92,7 @@ public class ApplicationSettingsController extends AbstractController {
         }
         languageComboBox.setValue(applicationProperties.uiLanguage());
         importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
+        checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
     }
 
     private void setProperties() {
@@ -136,6 +144,23 @@ public class ApplicationSettingsController extends AbstractController {
         confirmationWindowCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
 
         importCertCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+        checkLastItemCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            processLastItemJob(newValue);
+            saveNewSettings();
+        });
+    }
+
+    private void processLastItemJob(Boolean shouldSchedule) {
+        try {
+            final JobCreator jobCreator = JobCreatorFactory.lastItemJobCreator(applicationProperties);
+            if (shouldSchedule) {
+                uiLauncher.getJobService().scheduleJob(jobCreator);
+            } else {
+                uiLauncher.getJobService().deleteJob(jobCreator);
+            }
+        } catch (SchedulerException ex) {
+            logger.error("Can not schedule the last item job.");
+        }
     }
 
     private void saveNewSettings() {
@@ -155,6 +180,7 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setSilentMode(silentModeCheckBox.isSelected());
         applicationConfig.setUiLanguage(languageComboBox.getValue());
         applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
+        applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
         return applicationConfig;
     }
 
@@ -176,5 +202,6 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.silentMode", silentModeCheckBox);
         labelsAffectedByLanguage.put("launch.panel.title", titledPane);
         labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
+        labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
     }
 }

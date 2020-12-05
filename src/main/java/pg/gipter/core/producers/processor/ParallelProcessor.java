@@ -6,11 +6,8 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.concurrent.*;
 
 class ParallelProcessor {
@@ -25,12 +22,12 @@ class ParallelProcessor {
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
-    List<File> downloadFiles(List<DownloadDetails> downloadDetails) {
-        CompletionService<File> ecs = new ExecutorCompletionService<>(executor);
+    List<Path> downloadFiles(List<DownloadDetails> downloadDetails) {
+        CompletionService<Path> ecs = new ExecutorCompletionService<>(executor);
         downloadDetails.forEach(downloadDetail -> ecs.submit(new DownloadFileCall(downloadDetail, applicationProperties)));
 
         int numberOfCalls = downloadDetails.size();
-        List<File> result = new ArrayList<>(numberOfCalls);
+        List<Path> result = new ArrayList<>(numberOfCalls);
         for (int i = 0; i < numberOfCalls; i++) {
             try {
                 result.add(ecs.take().get());

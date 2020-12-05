@@ -1,7 +1,8 @@
 package pg.gipter.utils;
 
-import java.io.File;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 /** Created by Pawel Gawedzki on 10-Mar-2019.*/
@@ -14,13 +15,13 @@ public final class JarHelper {
     }
 
     public static Optional<String> homeDirectoryPath() {
-        Optional<File> jarFile = getJarFile();
-        return jarFile.map(file -> file.getPath().replace(file.getName(), ""));
+        Optional<Path> jarFile = getJarPath();
+        return jarFile.map(path -> path.toString().replace(path.getFileName().toString(), ""));
     }
 
-    public static Optional<File> getJarFile() {
+    public static Optional<Path> getJarPath() {
         try {
-            return Optional.of(new File(JarHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
+            return Optional.of(Paths.get(JarHelper.class.getProtectionDomain().getCodeSource().getLocation().toURI()));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }

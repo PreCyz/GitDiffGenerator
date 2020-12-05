@@ -1,13 +1,18 @@
 package pg.gipter.core.producers.command;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 public enum VersionControlSystem {
     GIT(".git"),
     MERCURIAL(".hg"),
-    SVN(".svn");
+    SVN(".svn"),
+    NA("");
 
     private final String dirName;
 
@@ -19,18 +24,31 @@ public enum VersionControlSystem {
         return dirName.substring(1);
     }
 
-    public static VersionControlSystem valueFrom(File file) {
-        if (file == null || file.listFiles() == null) {
-            throw new IllegalArgumentException("Can not determine version control system.");
+    String dirName() {
+        return dirName;
+    }
+
+    public static VersionControlSystem valueFrom(Path path) {
+        final IllegalArgumentException iae = new IllegalArgumentException("Can not determine version control system.");
+        if (path == null) {
+            throw iae;
         }
-        for (VersionControlSystem vcs : VersionControlSystem.values()) {
-            for (File dir : file.listFiles()) {
-                if (dir.isDirectory() && vcs.dirName.equals(dir.getName())) {
-                    return vcs;
-                }
+        try {
+            if (Files.list(path) != null) {
+                final Map<String, VersionControlSystem> vcsStringMap = EnumSet.allOf(VersionControlSystem.class)
+                        .stream()
+                        .collect(toMap(k -> k.dirName, v -> v, (v1, v2) -> v1));
+                return Files.list(path)
+                        .filter(p -> vcsStringMap.containsKey(p.getFileName().toString()))
+                        .findFirst()
+                        .map(vcs -> vcsStringMap.get(vcs.toFile().getName()))
+                        .orElseThrow(() -> iae);
             }
+        } catch (Exception ex) {
+            iae.setStackTrace(ex.getStackTrace());
+            throw iae;
         }
-        throw new IllegalArgumentException("Can not determine version control system.");
+        throw iae;
     }
 
     public static VersionControlSystem valueFor(String value) {

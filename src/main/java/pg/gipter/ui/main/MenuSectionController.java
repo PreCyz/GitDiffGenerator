@@ -17,10 +17,9 @@ import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.List;
 import java.util.*;
 
@@ -162,10 +161,10 @@ public class MenuSectionController extends AbstractController {
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
             try {
-                File pdfFile = Paths.get(pdfFileName).toFile();
-                if (pdfFile.exists()) {
+                Path pdfFile = Paths.get(pdfFileName);
+                if (Files.exists(pdfFile)) {
                     if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().open(pdfFile);
+                        Desktop.getDesktop().open(pdfFile.toFile());
                     } else {
                         logger.error("AWT Desktop is not supported by the platform.");
                         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);

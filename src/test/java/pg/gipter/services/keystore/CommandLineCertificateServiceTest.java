@@ -3,8 +3,8 @@ package pg.gipter.services.keystore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,7 +17,7 @@ class CommandLineCertificateServiceTest {
 
         assertThat(keytoolPath).isNotNull();
         assertThat(keytoolPath).startsWith(System.getProperty("java.home"));
-        assertThat(keytoolPath).endsWith("bin" + File.separatorChar + "keytool");
+        assertThat(keytoolPath).endsWith(Paths.get("bin", "keytool").toString());
     }
 
     @Test

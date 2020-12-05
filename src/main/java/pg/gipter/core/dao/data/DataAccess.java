@@ -5,9 +5,9 @@ import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.jobs.upload.JobParam;
-import pg.gipter.jobs.upload.json.LocalDateAdapter;
-import pg.gipter.jobs.upload.json.LocalDateTimeAdapter;
+import pg.gipter.jobs.JobParam;
+import pg.gipter.jobs.json.LocalDateAdapter;
+import pg.gipter.jobs.json.LocalDateTimeAdapter;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.*;
