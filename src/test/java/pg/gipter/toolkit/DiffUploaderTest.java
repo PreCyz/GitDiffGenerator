@@ -8,8 +8,8 @@ import org.springframework.ws.soap.client.SoapFaultClientException;
 import pg.gipter.MockitoExtension;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.producer.command.VersionControlSystem;
-import pg.gipter.toolkit.helper.XmlHelper;
+import pg.gipter.core.producers.command.VersionControlSystem;
+import pg.gipter.toolkit.helpers.XmlHelper;
 import pg.gipter.toolkit.sharepoint.soap.SharePointSoapClient;
 
 import javax.xml.transform.Source;
@@ -60,9 +60,9 @@ class DiffUploaderTest {
     }
 
     @Test
-    void given_codeProtectionStatement_when_buildAttributesMap_then_return_properMap() {
+    void givenCodeProtectionStatement_whenBuildAttributesMap_thenReturnProperMap() {
         ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(new String[]{
-                "uploadType=STATEMENT",
+                "itemType=STATEMENT",
                 "startDate=2017-10-19",
                 "endDate=2017-12-20",
                 "itemFileNamePrefix=custom",

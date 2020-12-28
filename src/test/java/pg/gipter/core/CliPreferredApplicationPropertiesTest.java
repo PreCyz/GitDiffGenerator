@@ -1,24 +1,22 @@
 package pg.gipter.core;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.dto.*;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.model.*;
+import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.services.SemanticVersioning;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.WeekFields;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,11 +24,11 @@ class CliPreferredApplicationPropertiesTest {
 
     private CliApplicationProperties applicationProperties;
 
-    @AfterEach
-    void tearDown() {
+    @BeforeEach
+    void setup() {
         try {
-            DaoFactory.reset();
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
+            DaoFactory.getCachedConfiguration().resetCache();
         } catch (IOException e) {
             System.out.println("There is something weird going on.");
         }
@@ -372,7 +370,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.itemPath();
 
-        assertThat(actual).startsWith("testItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("testItemPath").toString());
     }
 
     @Test
@@ -386,7 +384,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.itemPath();
 
-        assertThat(actual).startsWith("cliItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("cliItemPath").toString());
     }
 
     @Test
@@ -400,7 +398,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.itemPath();
 
-        assertThat(actual).startsWith("propertiesItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("propertiesItemPath").toString());
     }
 
     @Test
@@ -767,34 +765,34 @@ class CliPreferredApplicationPropertiesTest {
     void given_noCodeProtection_when_uploadType_then_returnCodeProtection() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.SIMPLE);
+        assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
 
     @Test
-    void given_uploadTypeFromCLI_when_uploadType_then_returnCliCodeProtection() {
+    void givenItemTypeFromCLI_whenItemType_thenReturnCliCodeProtection() {
         applicationProperties = new CliApplicationProperties(
-                new String[]{"uploadType=protected"}
+                new String[]{"itemType=protected"}
         );
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.PROTECTED);
+        assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
-    void given_uploadTypeFileAndCLI_when_uploadType_then_returnCliCodeProtection() {
-        String[] args = {"uploadType=PROTECTED"};
+    void givenItemTypeFileAndCLI_whenItemType_thenReturnCliCodeProtection() {
+        String[] args = {"itemType=PROTECTED"};
         applicationProperties = new CliApplicationProperties(args);
         RunConfig runConfig = new RunConfigBuilder()
-                .withUploadType(UploadType.STATEMENT)
+                .withItemType(ItemType.STATEMENT)
                 .create();
         applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.PROTECTED);
+        assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
@@ -802,13 +800,13 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {};
         applicationProperties = new CliApplicationProperties(args);
         RunConfig runConfig = new RunConfigBuilder()
-                .withUploadType(UploadType.STATEMENT)
+                .withItemType(ItemType.STATEMENT)
                 .create();
         applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.STATEMENT);
+        assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }
 
     @Test
@@ -816,13 +814,13 @@ class CliPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         applicationProperties = new CliApplicationProperties(args);
         RunConfig runConfig = new RunConfigBuilder()
-                .withUploadType(UploadType.STATEMENT)
+                .withItemType(ItemType.STATEMENT)
                 .create();
         applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
 
-        UploadType actual = applicationProperties.uploadType();
+        ItemType actual = applicationProperties.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.STATEMENT);
+        assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }
 
     @Test
@@ -1422,10 +1420,11 @@ class CliPreferredApplicationPropertiesTest {
     void given_versionTxt_when_version_then_returnVersion() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        String actual = applicationProperties.version();
+        SemanticVersioning actual = applicationProperties.version();
 
-        assertThat(actual).isNotEmpty();
-        assertThat(actual).isNotBlank();
+        assertThat(actual).isNotNull();
+        assertThat(actual.getVersion()).isNotEmpty();
+        assertThat(actual.getVersion()).isNotBlank();
     }
 
     @Test
@@ -1769,7 +1768,8 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.CURRENT_MONTH_NUMBER);
 
-        assertThat(actual).isEqualTo(String.valueOf(LocalDate.now().getMonthValue()));
+        assertThat(actual.length()).isEqualTo(2);
+        assertThat(actual).contains(String.valueOf(LocalDate.now().getMonthValue()));
     }
 
     @Test
@@ -1819,7 +1819,8 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.START_DATE_MONTH_NUMBER);
 
-        assertThat(actual).isEqualTo(String.valueOf(Month.JUNE.getValue()));
+        assertThat(actual.length()).isEqualTo(2);
+        assertThat(actual).contains(String.valueOf(Month.JUNE.getValue()));
     }
 
     @Test
@@ -1870,7 +1871,8 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.valueFromPattern(NamePatternValue.END_DATE_MONTH_NUMBER);
 
-        assertThat(actual).isEqualTo(String.valueOf(Month.JUNE.getValue()));
+        assertThat(actual.length()).isEqualTo(2);
+        assertThat(actual).contains(String.valueOf(Month.JUNE.getValue()));
     }
 
     @Test
@@ -1951,6 +1953,92 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
 
         boolean actual = applicationProperties.isUpgradeFinished();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCurrent_month_name_whenValueFromPattern_thenReturnMonthNameLowerCase() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.current_month_name);
+
+        assertThat(actual).isEqualTo(LocalDate.now().getMonth().name().toLowerCase());
+    }
+
+    @Test
+    void givenStartDateFromCLI_whenValueFromPattern_thenReturnMonthNameLowerCaseTakenFromCliArg() {
+        applicationProperties = new CliApplicationProperties(new String[]{
+                ArgName.startDate.name() + "=2020-06-01"
+        });
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.start_date_month_name);
+
+        assertThat(actual).isEqualTo(Month.JUNE.name().toLowerCase());
+    }
+
+    @Test
+    void givenEnd_date_month_name_whenValueFromPattern_thenReturnMonthNameLowerCase() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.valueFromPattern(NamePatternValue.end_date_month_name);
+
+        assertThat(actual).isEqualTo(LocalDate.now().getMonth().name().toLowerCase());
+    }
+
+    @Test
+    void givenCertImportEnabled_whenIsCertImportEnabled_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenCertImportEnabledFromCLI_whenIsCertImportEnabled_thenReturnCliCertImportEnabled() {
+        applicationProperties = new CliApplicationProperties(new String[]{"certImport=T"});
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCertImportEnabledFileAndCLI_whenIsCertImportEnabled_thenReturnCliCertImportEnabled() {
+        String[] args = {"certImport=t"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setCertImportEnabled(Boolean.FALSE);
+        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCertImportEnabledFromFile_whenIsCertImportEnabled_thenReturnCertImportEnabledFromFile() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setCertImportEnabled(Boolean.TRUE);
+        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+
+        boolean actual = applicationProperties.isCertImportEnabled();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenCertImportEnabledFromFileAndOtherArgs_whenIsCertImportEnabled_thenReturnCertImportEnabledFromFile() {
+        String[] args = {"author=test"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setCertImportEnabled(Boolean.TRUE);
+        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+
+        boolean actual = applicationProperties.isCertImportEnabled();
 
         assertThat(actual).isTrue();
     }

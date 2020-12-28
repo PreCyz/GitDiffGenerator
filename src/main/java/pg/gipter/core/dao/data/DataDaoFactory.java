@@ -4,6 +4,6 @@ public final class DataDaoFactory {
     private DataDaoFactory() { }
 
     public static DataDao getDataDao() {
-        return new DataDaoImpl();
+        return DataAccess.getInstance();
     }
 }

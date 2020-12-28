@@ -2,7 +2,7 @@ package pg.gipter.core;
 
 import org.junit.jupiter.api.Test;
 import pg.gipter.TestUtils;
-import pg.gipter.core.dto.ApplicationConfig;
+import pg.gipter.core.model.ApplicationConfig;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

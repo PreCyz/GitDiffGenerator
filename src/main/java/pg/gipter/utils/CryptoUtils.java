@@ -1,5 +1,7 @@
 package pg.gipter.utils;
 
+import org.slf4j.LoggerFactory;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -9,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 
-final class CryptoUtils {
+public final class CryptoUtils {
 
     private static final String CIPHER = "PBEWithMD5AndDES";
     private static final int ITERATION_COUNT = 20;
@@ -21,7 +23,7 @@ final class CryptoUtils {
 
     private CryptoUtils() { }
 
-    static String encrypt(String property) throws GeneralSecurityException {
+    public static String encrypt(String property) throws GeneralSecurityException {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(CIPHER);
         SecretKey key = keyFactory.generateSecret(new PBEKeySpec(KEY_SPEC));
         Cipher pbeCipher = Cipher.getInstance(CIPHER);
@@ -29,11 +31,11 @@ final class CryptoUtils {
         return base64Encode(pbeCipher.doFinal(property.getBytes(StandardCharsets.UTF_8)));
     }
 
-    private static String base64Encode(byte[] bytes) {
+    public static String base64Encode(byte[] bytes) {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
-    static String decrypt(String property) throws GeneralSecurityException {
+    public static String decrypt(String property) throws GeneralSecurityException {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(CIPHER);
         SecretKey key = keyFactory.generateSecret(new PBEKeySpec(KEY_SPEC));
         Cipher pbeCipher = Cipher.getInstance(CIPHER);
@@ -41,8 +43,26 @@ final class CryptoUtils {
         return new String(pbeCipher.doFinal(base64Decode(property)), StandardCharsets.UTF_8);
     }
 
-    private static byte[] base64Decode(String property) {
+    public static byte[] base64Decode(String property) {
         return Base64.getDecoder().decode(property);
+    }
+
+    public static String encryptSafe(String value) {
+        try {
+            return encrypt(value);
+        } catch (GeneralSecurityException e) {
+            LoggerFactory.getLogger(CryptoUtils.class).warn("Can not encrypt string.", e);
+            throw new IllegalArgumentException("Can not encrypt value.");
+        }
+    }
+
+    public static String decryptSafe(String value) {
+        try {
+            return decrypt(value);
+        } catch (GeneralSecurityException e) {
+            LoggerFactory.getLogger(CryptoUtils.class).warn("Can not decrypt value.", e);
+            throw new IllegalArgumentException("Can not decrypt value.");
+        }
     }
 
 }

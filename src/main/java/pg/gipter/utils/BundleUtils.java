@@ -2,8 +2,7 @@ package pg.gipter.utils;
 
 import org.slf4j.LoggerFactory;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**Created by Pawel Gawedzki on 05-Mar-2019.*/
 public final class BundleUtils {
@@ -49,5 +48,17 @@ public final class BundleUtils {
             return bundle = ResourceBundle.getBundle(BundleUtils.BUNDLE_BASE_NAME);
         }
         return bundle;
+    }
+
+    public static String getDefaultLanguage() {
+        return SUPPORTED_LANGUAGES[0];
+    }
+
+    public static boolean isLanguageSupported(String language) {
+        return Arrays.asList(SUPPORTED_LANGUAGES).contains(language);
+    }
+
+    public static String getBundleName() {
+        return bundle.getBaseBundleName();
     }
 }

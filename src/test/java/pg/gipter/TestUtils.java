@@ -2,13 +2,9 @@ package pg.gipter;
 
 import org.mockito.stubbing.Answer;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.dto.ApplicationConfig;
-import pg.gipter.core.dto.RunConfig;
-import pg.gipter.core.dto.ToolkitConfig;
+import pg.gipter.core.model.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;

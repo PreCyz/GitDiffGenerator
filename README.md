@@ -70,7 +70,7 @@ Below parameters are mandatory for toolkit:<br/>
 **toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
 **toolkitPassword** - user password used to log in into SharePoint.<br /><br />
 **toolkitProjectListNames** - comma separated names of the folders to scan on toolkit, when looking for changes in documents made by user. Default value is `Deliverables`.<br/>
-**deleteDownloadedFiles** - if `Y` then all downloaded files from toolkit will be downloaded afterwards. This parameter works together with upload type `TOOLKIT_DOCS`<br/>
+**deleteDownloadedFiles** - if `Y` then all downloaded files from toolkit will be downloaded afterwards. This parameter works together with item type `TOOLKIT_DOCS`<br/>
 
 _Note:_ When `periodInDays` is used together with `startDate` then **startDate** has higher priority.
 ### Explanation of *uploadType* parameter
@@ -82,12 +82,12 @@ _Note:_ When `periodInDays` is used together with `startDate` then **startDate**
 * `CLI` - commandLine arguments will be used as first then missing parameters will be read from _application.properties_,
 * `FILE` - arguments from _application.properties_ will be used as first then missing parameters will be read from commandLine arguments.
 * `UI` - it is used by the UI. Arguments from _ui-application.properties_ will be used as first then missing parameters will be read from commandLine arguments.
-### Explanation of *toolkitProjectListNames* upload type
+### Explanation of *toolkitProjectListNames* item type
 Each toolkit project has its own list, that store the documentation of the project. The most known list is `Deliverables`.<br/>
 But there are more lists, depends on the project. If produced by you documents are kept under different lists<br/>
 then you should enter comma separated display names of the lists (the names what you see on the web page of your project).<br/>
 If display names don't work then use the names taken from the links of these lists.
-### Explanation of *TOOLKIT_DOCS* upload type
+### Explanation of *TOOLKIT_DOCS* item type
 This option should be used by the users that do not create code, but work with project documentation. If this is the case then copyright items are created from documentations produced by the user.<br/> 
 How the application handles such a case? Documentation of the project is kept on SharePoint in different folders. In order to extract the changes from these documents made by the user,<br/>
 application will scan the documents from given folders within given date range (_startDate and endDate_). Because of the nature of SharePoint, the produced item will consist pair of documents before and after the change made by the user.<br/>

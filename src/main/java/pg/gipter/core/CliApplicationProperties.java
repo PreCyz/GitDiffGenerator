@@ -1,9 +1,10 @@
 package pg.gipter.core;
 
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -67,7 +68,7 @@ class CliApplicationProperties extends ApplicationProperties {
         if (!containsArg(argName) && StringUtils.notEmpty(currentRunConfig.getItemPath())) {
             itemPath = currentRunConfig.getItemPath();
         }
-        return uploadType() == UploadType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
+        return itemType() == ItemType.STATEMENT ? itemPath : Paths.get(itemPath, fileName()).toString();
     }
 
     @Override
@@ -128,10 +129,10 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public UploadType uploadType() {
-        UploadType uploadType = argExtractor.uploadType();
-        if (!containsArg(ArgName.uploadType.name()) && currentRunConfig.getUploadType() != null) {
-            uploadType = currentRunConfig.getUploadType();
+    public ItemType itemType() {
+        ItemType uploadType = argExtractor.itemType();
+        if (!containsArg(ArgName.itemType.name()) && currentRunConfig.getItemType() != null) {
+            uploadType = currentRunConfig.getItemType();
         }
         return uploadType;
     }
@@ -278,4 +279,41 @@ class CliApplicationProperties extends ApplicationProperties {
         return loggerLevel;
     }
 
+    @Override
+    public String uiLanguage() {
+        String uiLanguage = argExtractor.uiLanguage();
+        if (!containsArg(ArgName.uiLanguage.name()) && StringUtils.notEmpty(applicationConfig.getUiLanguage())
+                && BundleUtils.isLanguageSupported(applicationConfig.getUiLanguage())) {
+            uiLanguage = applicationConfig.getUiLanguage();
+        }
+        return uiLanguage;
+    }
+
+    @Override
+    public boolean isCertImportEnabled() {
+        boolean certImportEnabled = argExtractor.isCertImportEnabled();
+        if (!containsArg(ArgName.certImport.name()) && applicationConfig.getCertImportEnabled() != null) {
+            certImportEnabled = applicationConfig.getCertImportEnabled();
+        }
+        return certImportEnabled;
+    }
+
+    @Override
+    public boolean isCheckLastItemEnabled() {
+        boolean checkLastItemEnabled = argExtractor.isCheckLastItemEnabled();
+        if (!containsArg(ArgName.checkLastItem.name()) && applicationConfig.getCheckLastItemEnabled() != null) {
+            checkLastItemEnabled = applicationConfig.getCheckLastItemEnabled();
+        }
+        return checkLastItemEnabled;
+    }
+
+    @Override
+    public String getCheckLastItemJobCronExpression() {
+        String cronExpression = argExtractor.checkLastItemJobCronExpression();
+        if (!containsArg(ArgName.checkLastItemJobCronExpression.name())
+                && applicationConfig.getCheckLastItemJobCronExpression() != null) {
+            cronExpression = applicationConfig.getCheckLastItemJobCronExpression();
+        }
+        return cronExpression;
+    }
 }

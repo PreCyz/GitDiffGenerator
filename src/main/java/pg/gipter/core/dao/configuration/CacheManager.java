@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dto.RunConfig;
+import pg.gipter.core.model.RunConfig;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ public class CacheManager {
     private static final Logger logger = LoggerFactory.getLogger(CacheManager.class);
 
     static final Map<String, ApplicationProperties> cacheMap = new LinkedHashMap<>();
-    private static final ConfigurationDao configurationDao = DaoFactory.getConfigurationDao();
+    private static final ConfigurationDao configurationDao = DaoFactory.getCachedConfiguration();
 
     private CacheManager() { }
 
@@ -49,6 +49,9 @@ public class CacheManager {
 
     public static void removeFromCache(String configName) {
         cacheMap.remove(configName);
+        for (Map.Entry<String, ApplicationProperties> entry : cacheMap.entrySet()) {
+            entry.getValue().getRunConfigMap().remove(configName);
+        }
         logger.info("Configuration [{}] removed from cache.", configName);
     }
 

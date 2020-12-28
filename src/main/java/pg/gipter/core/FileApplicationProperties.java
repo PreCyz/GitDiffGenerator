@@ -1,9 +1,10 @@
 package pg.gipter.core;
 
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -64,11 +65,11 @@ class FileApplicationProperties extends ApplicationProperties {
         String itemPath = argExtractor.itemPath();
         if (StringUtils.notEmpty(currentRunConfig.getItemPath())) {
             itemPath = currentRunConfig.getItemPath();
-            if (uploadType() == UploadType.STATEMENT) {
+            if (itemType() == ItemType.STATEMENT) {
                 return itemPath;
             }
         }
-        return uploadType() == UploadType.STATEMENT ? itemPath : itemPath + File.separator + fileName();
+        return itemType() == ItemType.STATEMENT ? itemPath : Paths.get(itemPath, fileName()).toString();
     }
 
     @Override
@@ -126,11 +127,11 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public UploadType uploadType() {
-        if (currentRunConfig.getUploadType() != null) {
-            return currentRunConfig.getUploadType();
+    public ItemType itemType() {
+        if (currentRunConfig.getItemType() != null) {
+            return currentRunConfig.getItemType();
         }
-        return argExtractor.uploadType();
+        return argExtractor.itemType();
     }
 
     @Override
@@ -268,4 +269,36 @@ class FileApplicationProperties extends ApplicationProperties {
         return argExtractor.loggerLevel();
     }
 
+    @Override
+    public String uiLanguage() {
+        if (StringUtils.notEmpty(applicationConfig.getUiLanguage())
+                && BundleUtils.isLanguageSupported(applicationConfig.getUiLanguage())) {
+            return applicationConfig.getUiLanguage();
+        }
+        return argExtractor.uiLanguage();
+    }
+
+    @Override
+    public boolean isCertImportEnabled() {
+        if (applicationConfig.getCertImportEnabled() != null) {
+            return applicationConfig.getCertImportEnabled();
+        }
+        return argExtractor.isCertImportEnabled();
+    }
+
+    @Override
+    public boolean isCheckLastItemEnabled() {
+        if (applicationConfig.getCheckLastItemEnabled() != null) {
+            return applicationConfig.getCheckLastItemEnabled();
+        }
+        return argExtractor.isCheckLastItemEnabled();
+    }
+
+    @Override
+    public String getCheckLastItemJobCronExpression() {
+        if (StringUtils.notEmpty(applicationConfig.getCheckLastItemJobCronExpression())) {
+            return applicationConfig.getCheckLastItemJobCronExpression();
+        }
+        return argExtractor.checkLastItemJobCronExpression();
+    }
 }

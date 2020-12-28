@@ -2,7 +2,7 @@ package pg.gipter.ui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.ResourceUtils;
 
@@ -19,7 +19,8 @@ public abstract class AbstractWindow {
         this.controller = controller;
     }
 
-    Parent root() throws IOException {
+    public Parent root() throws IOException {
+        BundleUtils.changeBundle(controller.getUiLanguage());
         FXMLLoader loader = new FXMLLoader(url(), BundleUtils.loadBundle());
         loader.setController(controller);
         return loader.load();
@@ -37,13 +38,17 @@ public abstract class AbstractWindow {
         return false;
     }
 
-    String css() {
+    public String css() {
         Optional<URL> css = ResourceUtils.getCssResource(cssFileName());
         String result = "";
         if (css.isPresent()) {
             result = css.get().toExternalForm();
         }
         return result;
+    }
+
+    public AbstractController getController() {
+        return controller;
     }
 
     protected abstract String fxmlFileName();

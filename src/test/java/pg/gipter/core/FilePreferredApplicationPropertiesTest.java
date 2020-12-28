@@ -1,21 +1,19 @@
 package pg.gipter.core;
 
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dto.ApplicationConfig;
-import pg.gipter.core.dto.RunConfig;
-import pg.gipter.core.dto.RunConfigBuilder;
-import pg.gipter.core.dto.ToolkitConfig;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.model.*;
+import pg.gipter.core.producers.command.ItemType;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -26,9 +24,14 @@ class FilePreferredApplicationPropertiesTest {
 
     private FileApplicationProperties appProps;
 
-    @AfterEach
-    void tearDown() {
-        DaoFactory.reset();
+    @BeforeEach
+    void setUp() {
+        try {
+            Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
+            DaoFactory.getCachedConfiguration().resetCache();
+        } catch (IOException e) {
+            System.out.println("There is something weird going on.");
+        }
     }
 
     @Test
@@ -183,7 +186,7 @@ class FilePreferredApplicationPropertiesTest {
 
         String actual = appProps.itemPath();
 
-        assertThat(actual).startsWith("testItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("testItemPath").toString());
     }
 
     @Test
@@ -195,7 +198,7 @@ class FilePreferredApplicationPropertiesTest {
 
         String actual = appProps.itemPath();
 
-        assertThat(actual).startsWith("propertiesItemPath" + File.separator);
+        assertThat(actual).startsWith(Paths.get("propertiesItemPath").toString());
     }
 
     @Test
@@ -247,7 +250,7 @@ class FilePreferredApplicationPropertiesTest {
         props.put("itemFileNamePrefix", "custom");
 
         RunConfig runConfig = new RunConfigBuilder()
-                .withUploadType(UploadType.STATEMENT)
+                .withItemType(ItemType.STATEMENT)
                 .withStartDate(LocalDate.of(2017, 10, 19))
                 .withEndDate(LocalDate.of(2017, 12, 20))
                 .withItemFileNamePrefix("custom")
@@ -296,7 +299,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void given_uploadTypeToolkitDocs_whenFileName_thenReturnFileNameWithZip() {
-        appProps = new FileApplicationProperties(new String[]{"uploadType=toolkit_docs"});
+        appProps = new FileApplicationProperties(new String[]{"itemType=toolkit_docs"});
 
         String actual = appProps.fileName();
 
@@ -306,7 +309,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenUseAsFileNameYAndFileNamePrefixAndToolkitDocs_whenFileName_thenReturnFileNamePrefixAsNameWithZip() {
         appProps = new FileApplicationProperties(new String[]{
-                ArgName.uploadType.name() + "=" + UploadType.TOOLKIT_DOCS.name(),
+                ArgName.itemType.name() + "=" + ItemType.TOOLKIT_DOCS.name(),
                 ArgName.itemFileNamePrefix + "=my_custom_name",
         });
 
@@ -551,30 +554,30 @@ class FilePreferredApplicationPropertiesTest {
     void given_noCodeProtection_when_uploadType_then_returnDefaultValueNONE() {
         appProps = new FileApplicationProperties(new String[]{});
 
-        UploadType actual = appProps.uploadType();
+        ItemType actual = appProps.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.SIMPLE);
+        assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
 
     @Test
-    void given_uploadType_when_uploadType_then_returnThatCodeProtection() {
-        appProps = new FileApplicationProperties(new String[]{"uploadType=protected"});
+    void givenItemType_whenItemType_thenReturnThatCodeProtection() {
+        appProps = new FileApplicationProperties(new String[]{"itemType=protected"});
 
-        UploadType actual = appProps.uploadType();
+        ItemType actual = appProps.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.PROTECTED);
+        assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
-    void given_uploadTypeFromPropertiesAndCommandLine_when_uploadType_then_returnCodeProtectionFromProperties() {
+    void givenItemTypeFromPropertiesAndCommandLine_whenItemType_thenReturnCodeProtectionFromProperties() {
         String[] args = {"uploadType=Simple"};
         appProps = new FileApplicationProperties(args);
-        RunConfig runConfig = new RunConfigBuilder().withUploadType(UploadType.STATEMENT).create();
+        RunConfig runConfig = new RunConfigBuilder().withItemType(ItemType.STATEMENT).create();
         appProps.init(mockConfigurtionDao(runConfig));
 
-        UploadType actual = appProps.uploadType();
+        ItemType actual = appProps.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.STATEMENT);
+        assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }
 
     @Test
@@ -998,6 +1001,7 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void givenFewDates_whenGetCurrentWeekNumber_thenReturnProperNumber() {
+        Locale.setDefault(Locale.UK);
         String[] args = {""};
         appProps = new FileApplicationProperties(args);
 

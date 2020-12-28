@@ -2,26 +2,42 @@ package pg.gipter.ui.menu;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import org.quartz.SchedulerException;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.PreferredArgSource;
-import pg.gipter.core.dto.ApplicationConfig;
-import pg.gipter.service.StartupService;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.jobs.JobCreator;
+import pg.gipter.jobs.JobCreatorFactory;
+import pg.gipter.services.StartupService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.ResourceBundle;
+import java.util.*;
 
-/** Created by Pawel Gawedzki on 23-Jul-2019. */
 public class ApplicationSettingsController extends AbstractController {
+
+    @FXML
+    private Label confirmationWindowLabel;
+    @FXML
+    private Label activateTrayLabel;
+    @FXML
+    private Label autoStartLabel;
+    @FXML
+    private Label languageLabel;
+    @FXML
+    private Label preferredArgSourceLabel;
+    @FXML
+    private Label importCertLabel;
+    @FXML
+    private Label checkLastItemLabel;
+    @FXML
+    private TitledPane titledPane;
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -38,27 +54,31 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private CheckBox silentModeCheckBox;
     @FXML
+    private CheckBox importCertCheckBox;
+    @FXML
+    private CheckBox checkLastItemCheckBox;
+    @FXML
     private ComboBox<String> languageComboBox;
 
-    private ApplicationProperties applicationProperties;
-
-    private static String currentLanguage;
+    private final Map<String, Labeled> labelsAffectedByLanguage;
 
     public ApplicationSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
+        labelsAffectedByLanguage = new HashMap<>();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
-        setInitValues(resources);
+        setInitValues();
         setProperties();
         setListeners();
         setAccelerators();
+        createLabelsMap();
     }
 
-    private void setInitValues(ResourceBundle resources) {
+    private void setInitValues() {
         confirmationWindowCheckBox.setSelected(applicationProperties.isConfirmationWindow());
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
@@ -70,16 +90,9 @@ public class ApplicationSettingsController extends AbstractController {
         if (languageComboBox.getItems().isEmpty()) {
             languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
         }
-        if (StringUtils.nullOrEmpty(currentLanguage)) {
-            if (StringUtils.nullOrEmpty(resources.getLocale().getLanguage())
-                    || BundleUtils.SUPPORTED_LANGUAGES[0].equals(resources.getLocale().getLanguage())) {
-                currentLanguage = BundleUtils.SUPPORTED_LANGUAGES[0];
-
-            } else if (BundleUtils.SUPPORTED_LANGUAGES[1].equals(resources.getLocale().getLanguage())) {
-                currentLanguage = BundleUtils.SUPPORTED_LANGUAGES[1];
-            }
-        }
-        languageComboBox.setValue(currentLanguage);
+        languageComboBox.setValue(applicationProperties.uiLanguage());
+        importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
+        checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
     }
 
     private void setProperties() {
@@ -94,9 +107,12 @@ public class ApplicationSettingsController extends AbstractController {
         languageComboBox.getSelectionModel()
                 .selectedItemProperty()
                 .addListener((options, oldValue, newValue) -> {
-                    currentLanguage = languageComboBox.getValue();
+                    BundleUtils.changeBundle(languageComboBox.getValue());
+                    labelsAffectedByLanguage.forEach((key, labeled) -> labeled.setText(BundleUtils.getMsg(key)));
+                    uiLauncher.changeApplicationSettingsWindowTitle();
+                    applicationProperties.updateApplicationConfig(createApplicationConfigFromUI());
+                    applicationProperties.save();
                     uiLauncher.setApplicationProperties(applicationProperties);
-                    uiLauncher.changeLanguage(languageComboBox.getValue());
                 });
 
         final StartupService startupService = new StartupService();
@@ -126,6 +142,25 @@ public class ApplicationSettingsController extends AbstractController {
         });
 
         confirmationWindowCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+
+        importCertCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+        checkLastItemCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            processLastItemJob(newValue);
+            saveNewSettings();
+        });
+    }
+
+    private void processLastItemJob(Boolean shouldSchedule) {
+        try {
+            final JobCreator jobCreator = JobCreatorFactory.lastItemJobCreator(applicationProperties);
+            if (shouldSchedule) {
+                uiLauncher.getJobService().scheduleJob(jobCreator);
+            } else {
+                uiLauncher.getJobService().deleteJob(jobCreator);
+            }
+        } catch (SchedulerException ex) {
+            logger.error("Can not schedule the last item job.");
+        }
     }
 
     private void saveNewSettings() {
@@ -143,6 +178,9 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setActiveTray(activateTrayCheckBox.isSelected());
         applicationConfig.setEnableOnStartup(autostartCheckBox.isSelected());
         applicationConfig.setSilentMode(silentModeCheckBox.isSelected());
+        applicationConfig.setUiLanguage(languageComboBox.getValue());
+        applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
+        applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
         return applicationConfig;
     }
 
@@ -152,5 +190,18 @@ public class ApplicationSettingsController extends AbstractController {
                 uiLauncher.closeApplicationWindow();
             }
         });
+    }
+
+    private void createLabelsMap() {
+        labelsAffectedByLanguage.put("launch.panel.confirmationWindow", confirmationWindowLabel);
+        labelsAffectedByLanguage.put("launch.panel.activateTray", activateTrayLabel);
+        labelsAffectedByLanguage.put("launch.panel.autoStart", autoStartLabel);
+        labelsAffectedByLanguage.put("launch.panel.language", languageLabel);
+        labelsAffectedByLanguage.put("launch.panel.preferredArgSource", preferredArgSourceLabel);
+        labelsAffectedByLanguage.put("launch.panel.useUI", useUICheckBox);
+        labelsAffectedByLanguage.put("launch.panel.silentMode", silentModeCheckBox);
+        labelsAffectedByLanguage.put("launch.panel.title", titledPane);
+        labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
+        labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
     }
 }

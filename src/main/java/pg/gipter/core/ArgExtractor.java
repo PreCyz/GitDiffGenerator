@@ -1,13 +1,10 @@
 package pg.gipter.core;
 
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -135,12 +132,12 @@ final class ArgExtractor {
         return ArgName.itemFileNamePrefix.defaultValue();
     }
 
-    UploadType uploadType() {
-        if (containsArg(ArgName.uploadType.name())) {
-            String codeProtection = getValue(ArgName.uploadType, ArgName.uploadType.defaultValue());
-            return UploadType.valueFor(codeProtection);
+    ItemType itemType() {
+        if (containsArg(ArgName.itemType.name())) {
+            String codeProtection = getValue(ArgName.itemType, ArgName.itemType.defaultValue());
+            return ItemType.valueFor(codeProtection);
         }
-        return UploadType.valueFor(ArgName.uploadType.defaultValue());
+        return ItemType.valueFor(ArgName.itemType.defaultValue());
     }
 
     boolean isConfirmationWindow() {
@@ -246,21 +243,21 @@ final class ArgExtractor {
         return StringUtils.getBoolean(ArgName.enableOnStartup.defaultValue());
     }
 
-    public String configurationName() {
+    String configurationName() {
         if (containsArg(ArgName.configurationName.name())) {
             return getValue(ArgName.configurationName, ArgName.configurationName.defaultValue());
         }
         return ArgName.configurationName.defaultValue();
     }
 
-    public boolean isUpgradeFinished() {
+    boolean isUpgradeFinished() {
         if (containsArg(ArgName.upgradeFinished.name())) {
             return StringUtils.getBoolean(getValue(ArgName.upgradeFinished, ArgName.upgradeFinished.defaultValue()));
         }
         return StringUtils.getBoolean(ArgName.upgradeFinished.defaultValue());
     }
 
-    public String loggerLevel() {
+    String loggerLevel() {
         if (containsArg(ArgName.loggerLevel.name())) {
             return getValue(ArgName.loggerLevel, ArgName.loggerLevel.defaultValue());
         }
@@ -272,5 +269,33 @@ final class ArgExtractor {
             return StringUtils.getBoolean(getValue(ArgName.fetchAll, ArgName.fetchAll.defaultValue()));
         }
         return StringUtils.getBoolean(ArgName.fetchAll.defaultValue());
+    }
+
+    String uiLanguage() {
+        if (containsArg(ArgName.uiLanguage.name())) {
+            return getValue(ArgName.uiLanguage, ArgName.uiLanguage.defaultValue());
+        }
+        return ArgName.uiLanguage.defaultValue();
+    }
+
+    boolean isCertImportEnabled() {
+        if (containsArg(ArgName.certImport.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.certImport, ArgName.certImport.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.certImport.defaultValue());
+    }
+
+    boolean isCheckLastItemEnabled() {
+        if (containsArg(ArgName.checkLastItem.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.checkLastItem, ArgName.checkLastItem.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
+    }
+
+    public String checkLastItemJobCronExpression() {
+        if (containsArg(ArgName.checkLastItemJobCronExpression.name())) {
+            return getValue(ArgName.checkLastItemJobCronExpression, ArgName.checkLastItemJobCronExpression.defaultValue());
+        }
+        return ArgName.checkLastItemJobCronExpression.defaultValue();
     }
 }

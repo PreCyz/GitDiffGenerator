@@ -1,39 +1,32 @@
 package pg.gipter.core.dao;
 
-import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dao.configuration.CachedConfiguration;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
+import pg.gipter.core.dao.configuration.SecurityProvider;
+import pg.gipter.core.dao.configuration.SecurityProviderFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.DataDaoFactory;
-import pg.gipter.statistic.dao.StatisticDao;
-import pg.gipter.statistic.dao.StatisticDaoFactory;
+import pg.gipter.statistics.dao.StatisticDao;
+import pg.gipter.statistics.dao.StatisticDaoFactory;
 
 public final class DaoFactory {
-    private static ConfigurationDao configurationDao;
-    private static DataDao dataDao;
 
-    private DaoFactory() {}
+    private DaoFactory() {
+    }
 
-    public static ConfigurationDao getConfigurationDao() {
-        if (configurationDao == null) {
-            configurationDao = ConfigurationDaoFactory.getConfigurationDao();
-        }
-        return configurationDao;
+    public static CachedConfiguration getCachedConfiguration() {
+        return ConfigurationDaoFactory.getCachedConfigurationDao();
     }
 
     public static DataDao getDataDao() {
-        if (dataDao == null) {
-            dataDao = DataDaoFactory.getDataDao();
-        }
-        return dataDao;
+        return DataDaoFactory.getDataDao();
     }
 
     public static StatisticDao getStatisticDao() {
         return StatisticDaoFactory.getStatisticDao();
     }
 
-    //Used in tests
-    public static void reset() {
-        configurationDao = null;
-        dataDao = null;
+    public static SecurityProvider getSecurityProvider() {
+        return SecurityProviderFactory.getSecurityProvider();
     }
 }

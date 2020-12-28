@@ -1,7 +1,7 @@
 package pg.gipter.core;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.producer.command.UploadType;
+import pg.gipter.core.producers.command.ItemType;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -321,36 +321,36 @@ class ArgExtractorTest {
     void given_noCodeProtection_when_codeProtection_then_returnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{});
 
-        UploadType actual = argExtractor.uploadType();
+        ItemType actual = argExtractor.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.SIMPLE);
+        assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
 
     @Test
     void given_uploadTypeSetAsNone_when_codeProtection_then_returnEnum() {
         argExtractor = new ArgExtractor(new String[]{"uploadType=simple"});
 
-        UploadType actual = argExtractor.uploadType();
+        ItemType actual = argExtractor.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.SIMPLE);
+        assertThat(actual).isEqualTo(ItemType.SIMPLE);
     }
 
     @Test
-    void given_uploadTypeSetAsSimple_when_codeProtection_then_returnEnum() {
-        argExtractor = new ArgExtractor(new String[]{"uploadType=protected"});
+    void givenItemTypeSetAsSimple_whenCodeProtection_thenReturnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"itemType=protected"});
 
-        UploadType actual = argExtractor.uploadType();
+        ItemType actual = argExtractor.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.PROTECTED);
+        assertThat(actual).isEqualTo(ItemType.PROTECTED);
     }
 
     @Test
-    void given_uploadTypeSetAsStatement_when_codeProtection_then_returnEnum() {
-        argExtractor = new ArgExtractor(new String[]{"uploadType=STaTeMeNt"});
+    void givenItemTypeSetAsStatement_whenCodeProtection_thenReturnEnum() {
+        argExtractor = new ArgExtractor(new String[]{"itemType=STaTeMeNt"});
 
-        UploadType actual = argExtractor.uploadType();
+        ItemType actual = argExtractor.itemType();
 
-        assertThat(actual).isEqualTo(UploadType.STATEMENT);
+        assertThat(actual).isEqualTo(ItemType.STATEMENT);
     }
 
     @Test

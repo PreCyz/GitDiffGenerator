@@ -2,7 +2,7 @@ package pg.gipter.ui.upgrade;
 
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
-import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alerts.ImageFile;
 
 public class UpgradeWindow extends AbstractWindow {
 

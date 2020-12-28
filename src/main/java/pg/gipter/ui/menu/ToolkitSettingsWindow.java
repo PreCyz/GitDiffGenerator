@@ -2,7 +2,7 @@ package pg.gipter.ui.menu;
 
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
-import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alerts.ImageFile;
 
 /** Created by Pawel Gawedzki on 23-Jul-2019. */
 public class ToolkitSettingsWindow extends AbstractWindow {

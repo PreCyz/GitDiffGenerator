@@ -1,69 +1,27 @@
 package pg.gipter.ui.main;
 
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
-import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
-import pg.gipter.core.dao.DaoConstants;
-import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CacheManager;
-import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.core.dto.NamePatternValue;
-import pg.gipter.core.dto.RunConfig;
-import pg.gipter.core.dto.ToolkitConfig;
-import pg.gipter.core.producer.command.UploadType;
-import pg.gipter.service.GithubService;
-import pg.gipter.service.ToolkitService;
-import pg.gipter.service.platform.AppManager;
-import pg.gipter.service.platform.AppManagerFactory;
+import pg.gipter.core.dao.data.ProgramData;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.services.DataService;
+import pg.gipter.services.vcs.VcsService;
 import pg.gipter.ui.*;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.JobHelper;
 import pg.gipter.utils.StringUtils;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toCollection;
-import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 
 public class MainController extends AbstractController {
 
@@ -82,6 +40,12 @@ public class MainController extends AbstractController {
     private MenuItem upgradeMenuItem;
     @FXML
     private MenuItem wizardMenuItem;
+    @FXML
+    private MenuItem wikiMenuItem;
+    @FXML
+    private MenuItem importCertMenuItem;
+    @FXML
+    private MenuItem importCertProgrammaticMenuItem;
 
     @FXML
     private TextField authorsTextField;
@@ -94,11 +58,13 @@ public class MainController extends AbstractController {
     @FXML
     private TextField svnAuthorTextField;
     @FXML
-    private ComboBox<UploadType> uploadTypeComboBox;
+    private ComboBox<ItemType> itemTypeComboBox;
     @FXML
-    private CheckBox skipRemoteCheckBox;
+    private CheckBox useDefaultAuthorCheckBox;
     @FXML
-    private CheckBox fetchAllCheckBox;
+    private CheckBox useDefaultEmailCheckBox;
+    @FXML
+    private TextField toolkitProjectListNamesTextField;
 
     @FXML
     private TextField toolkitUsernameTextField;
@@ -109,11 +75,14 @@ public class MainController extends AbstractController {
     @FXML
     private Hyperlink verifyCredentialsHyperlink;
     @FXML
-    private TextField toolkitProjectListNamesTextField;
+    private ProgressIndicator verifyProgressIndicator;
+
     @FXML
     private CheckBox deleteDownloadedFilesCheckBox;
     @FXML
-    private ProgressIndicator verifyProgressIndicator;
+    private CheckBox skipRemoteCheckBox;
+    @FXML
+    private CheckBox fetchAllCheckBox;
 
     @FXML
     private Label projectPathLabel;
@@ -131,7 +100,7 @@ public class MainController extends AbstractController {
     @FXML
     private DatePicker endDatePicker;
     @FXML
-    private TextField periodInDaysTextField;
+    private CheckBox useLastItemDateCheckbox;
 
     @FXML
     private Button executeButton;
@@ -156,174 +125,146 @@ public class MainController extends AbstractController {
     @FXML
     private Button saveConfigurationButton;
     @FXML
-    private CheckBox useLastItemDateCheckbox;
-    @FXML
     private Label currentWeekNumberLabel;
 
-    private ApplicationProperties applicationProperties;
-    private DataDao dataDao;
+    private final DataService dataService;
 
-    private String userFolderUrl;
-    private Set<String> definedPatterns;
-    private String currentItemName = "";
-    private String inteliSense = "";
-    private boolean useInteliSense = false;
-    private static boolean useComboBoxValueChangeListener = true;
+    private final ToolkitSectionController toolkitSectionController;
+    private final ConfigurationSectionController configurationSectionController;
+    private final MenuSectionController menuSectionController;
+    private final PathsSectionController pathsSectionController;
+    private final DatesSectionController datesSectionController;
+    private final AdditionalSettingsSectionController additionalSettingsSectionController;
+    private final CsvDetailsSectionController csvDetailsSectionController;
+    private final ButtonController buttonController;
 
     public MainController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        this.dataDao = DaoFactory.getDataDao();
-        this.definedPatterns = EnumSet.allOf(NamePatternValue.class)
-                .stream()
-                .map(e -> String.format("{%s}", e.name()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        this.dataService = DataService.getInstance();
+        toolkitSectionController = new ToolkitSectionController(uiLauncher, applicationProperties);
+        configurationSectionController = new ConfigurationSectionController(uiLauncher, applicationProperties, this);
+        menuSectionController = new MenuSectionController(uiLauncher, applicationProperties, this);
+        pathsSectionController = new PathsSectionController(uiLauncher, applicationProperties, this);
+        datesSectionController = new DatesSectionController(uiLauncher, applicationProperties);
+        additionalSettingsSectionController = new AdditionalSettingsSectionController(uiLauncher, applicationProperties);
+        csvDetailsSectionController = new CsvDetailsSectionController(uiLauncher, applicationProperties, this);
+        buttonController = new ButtonController(uiLauncher, applicationProperties, this);
+    }
+
+    public void setVcsService(VcsService vcsService) {
+        csvDetailsSectionController.setVcsService(vcsService);
+    }
+
+    private Map<String, Object> initToolkitSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("toolkitUsernameTextField", toolkitUsernameTextField);
+        map.put("toolkitPasswordField", toolkitPasswordField);
+        map.put("toolkitDomainTextField", toolkitDomainTextField);
+        map.put("verifyCredentialsHyperlink", verifyCredentialsHyperlink);
+        map.put("verifyProgressIndicator", verifyProgressIndicator);
+        return map;
+    }
+
+    private Map<String, Object> initConfigurationSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("configurationNameComboBox", configurationNameComboBox);
+        map.put("configurationNameTextField", configurationNameTextField);
+        map.put("addConfigurationButton", addConfigurationButton);
+        map.put("removeConfigurationButton", removeConfigurationButton);
+        map.put("saveConfigurationButton", saveConfigurationButton);
+        map.put("currentWeekNumberLabel", currentWeekNumberLabel);
+        return map;
+    }
+
+    private Map<String, MenuItem> initMenuSectionMap() {
+        Map<String, MenuItem> map = new HashMap<>();
+        map.put("applicationMenuItem", applicationMenuItem);
+        map.put("toolkitMenuItem", toolkitMenuItem);
+        map.put("readMeMenuItem", readMeMenuItem);
+        map.put("instructionMenuItem", instructionMenuItem);
+        map.put("upgradeMenuItem", upgradeMenuItem);
+        map.put("wizardMenuItem", wizardMenuItem);
+        map.put("wikiMenuItem", wikiMenuItem);
+        map.put("importCertMenuItem", importCertMenuItem);
+        map.put("importCertProgrammaticMenuItem", importCertProgrammaticMenuItem);
+        return map;
+    }
+
+    private Map<String, Object> initPathsSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("projectPathLabel", projectPathLabel);
+        map.put("itemPathLabel", itemPathLabel);
+        map.put("itemFileNamePrefixTextField", itemFileNamePrefixTextField);
+        map.put("projectPathButton", projectPathButton);
+        map.put("itemPathButton", itemPathButton);
+        return map;
+    }
+
+    private Map<String, Object> initDatesSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("startDatePicker", startDatePicker);
+        map.put("endDatePicker", endDatePicker);
+        map.put("useLastItemDateCheckbox", useLastItemDateCheckbox);
+        return map;
+    }
+
+    private Map<String, CheckBox> initAdditionalSettingsSectionMap() {
+        Map<String, CheckBox> map = new HashMap<>();
+        map.put("deleteDownloadedFilesCheckBox", deleteDownloadedFilesCheckBox);
+        map.put("skipRemoteCheckBox", skipRemoteCheckBox);
+        map.put("fetchAllCheckBox", fetchAllCheckBox);
+        return map;
+    }
+
+    private Map<String, Object> initCsvDetailsSectionMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("authorsTextField", authorsTextField);
+        map.put("committerEmailTextField", committerEmailTextField);
+        map.put("gitAuthorTextField", gitAuthorTextField);
+        map.put("mercurialAuthorTextField", mercurialAuthorTextField);
+        map.put("svnAuthorTextField", svnAuthorTextField);
+        map.put("itemTypeComboBox", itemTypeComboBox);
+        map.put("toolkitProjectListNamesTextField", toolkitProjectListNamesTextField);
+        map.put("useDefaultAuthorCheckBox", useDefaultAuthorCheckBox);
+        map.put("useDefaultEmailCheckBox", useDefaultEmailCheckBox);
+        return map;
+    }
+
+    private Map<String, Button> initButtonMap() {
+        Map<String, Button> map = new HashMap<>();
+        map.put("executeButton", executeButton);
+        map.put("executeAllButton", executeAllButton);
+        map.put("exitButton", exitButton);
+        map.put("jobButton", jobButton);
+        return map;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         super.initialize(location, resources);
-        setInitValues();
-        initConfigurationName();
-        setProperties(resources);
-        setActions(resources);
-        setListeners();
+        toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
+        configurationSectionController.initialize(location, resources, initConfigurationSectionMap());
+        menuSectionController.initialize(location, resources, initMenuSectionMap());
+        pathsSectionController.initialize(location, resources, initPathsSectionMap());
+        datesSectionController.initialize(location, resources, initDatesSectionMap());
+        additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
+        //this is executed later in the flow
+        //csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
+        buttonController.initialize(location, resources, initButtonMap());
+
+        setProperties();
         setAccelerators();
     }
 
-    private void setInitValues() {
-        authorsTextField.setText(String.join(",", applicationProperties.authors()));
-        committerEmailTextField.setText(applicationProperties.committerEmail());
-        gitAuthorTextField.setText(applicationProperties.gitAuthor());
-        mercurialAuthorTextField.setText(applicationProperties.mercurialAuthor());
-        svnAuthorTextField.setText(applicationProperties.svnAuthor());
-        uploadTypeComboBox.setItems(FXCollections.observableArrayList(UploadType.values()));
-        uploadTypeComboBox.setValue(applicationProperties.uploadType());
-        skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
-        fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
-
-        toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
-        toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
-
-        projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
-        String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
-        String itemPath = applicationProperties.itemPath().substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
-        itemPathLabel.setText(itemPath);
-        projectPathLabel.setTooltip(buildPathTooltip(projectPathLabel.getText()));
-        itemPathLabel.setTooltip(buildPathTooltip(itemPathLabel.getText()));
-        itemFileNamePrefixTextField.setText(applicationProperties.itemFileNamePrefix());
-        toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
-        deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
-
-        LocalDate now = LocalDate.now();
-        LocalDate initStartDate = now.minusDays(applicationProperties.periodInDays());
-        startDatePicker.setValue(initStartDate);
-        if (!initStartDate.isEqual(applicationProperties.startDate())) {
-            startDatePicker.setValue(applicationProperties.startDate());
-        }
-        endDatePicker.setValue(now);
-        if (!now.isEqual(applicationProperties.endDate())) {
-            endDatePicker.setValue(applicationProperties.endDate());
-        }
-        periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
-
-        userFolderUrl = applicationProperties.toolkitUserFolder();
-        if (applicationProperties.toolkitUserFolder().equals(ArgName.toolkitUserFolder.defaultValue())) {
-            userFolderUrl = "";
-        }
-        setLastItemSubmissionDate();
-        currentWeekNumberLabel.setText(String.valueOf(applicationProperties.getWeekNumber(LocalDate.now())));
-    }
-
-    private void setLastItemSubmissionDate() {
-        uiLauncher.executeOutsideUIThread(() -> {
-            if (uiLauncher.getLastItemSubmissionDate() == null) {
-                Optional<String> submissionDate = new ToolkitService(applicationProperties).lastItemUploadDate();
-                if (submissionDate.isPresent()) {
-                    uiLauncher.setLastItemSubmissionDate(LocalDateTime.parse(submissionDate.get(), DateTimeFormatter.ISO_DATE_TIME));
-                    Platform.runLater(() -> {
-                        useLastItemDateCheckbox.setDisable(uiLauncher.getLastItemSubmissionDate() == null);
-                        useLastItemDateCheckbox.setText(BundleUtils.getMsg(
-                                "main.lastUploadDate",
-                                uiLauncher.getLastItemSubmissionDate().format(DateTimeFormatter.ISO_DATE)
-                        ));
-                    });
-                } else {
-                    uiLauncher.setLastItemSubmissionDate(null);
-                    Platform.runLater(() -> {
-                        useLastItemDateCheckbox.setDisable(uiLauncher.getLastItemSubmissionDate() == null);
-                        useLastItemDateCheckbox.setText(BundleUtils.getMsg("main.lastUploadDate.unavailable"));
-                    });
-                }
-            } else {
-                Platform.runLater(() -> {
-                    useLastItemDateCheckbox.setDisable(uiLauncher.getLastItemSubmissionDate() == null);
-                    useLastItemDateCheckbox.setText(BundleUtils.getMsg(
-                            "main.lastUploadDate",
-                            uiLauncher.getLastItemSubmissionDate().format(DateTimeFormatter.ISO_DATE)
-                    ));
-                });
-            }
-        });
-    }
-
-    private void initConfigurationName() {
-        Set<String> confNames = applicationProperties.configurationNames();
-        if (!StringUtils.nullOrEmpty(configurationNameComboBox.getValue())) {
-            confNames.add(configurationNameComboBox.getValue());
-        }
-        configurationNameComboBox.setItems(FXCollections.observableList(new ArrayList<>(confNames)));
-        if (confNames.contains(applicationProperties.configurationName())) {
-            configurationNameComboBox.setValue(applicationProperties.configurationName());
-            configurationNameTextField.setText(applicationProperties.configurationName());
-        }
-    }
-
-    private void setProperties(ResourceBundle resources) {
-        toolkitDomainTextField.setEditable(false);
-        toolkitProjectListNamesTextField.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
-        setTooltipOnProjectListNames();
-        deleteDownloadedFilesCheckBox.setDisable(applicationProperties.uploadType() != UploadType.TOOLKIT_DOCS);
-
-        if (applicationProperties.projectPaths().isEmpty()) {
-            projectPathButton.setText(resources.getString("button.add"));
-        } else {
-            projectPathButton.setText(resources.getString("button.change"));
-        }
-
-        if (StringUtils.nullOrEmpty(applicationProperties.itemPath())) {
-            itemPathButton.setText(resources.getString("button.add"));
-        } else {
-            itemPathButton.setText(resources.getString("button.change"));
-        }
-
-        startDatePicker.setConverter(dateConverter());
-        endDatePicker.setConverter(dateConverter());
-
-        endDatePicker.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        authorsTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        committerEmailTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        gitAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        svnAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        mercurialAuthorTextField.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        skipRemoteCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-        fetchAllCheckBox.setDisable(applicationProperties.uploadType() == UploadType.TOOLKIT_DOCS);
-
+    private void setProperties() {
         loadProgressIndicator.setVisible(false);
-        verifyProgressIndicator.setVisible(false);
-        instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
-        setDisableDependOnConfigurations();
+        configurationSectionController.setDisableDependOnConfigurations();
 
-        TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
-        setUpgradeMenuItemDisabled();
+        setDisable(applicationProperties.itemType());
     }
 
     private void setAccelerators() {
-        applicationMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        toolkitMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        upgradeMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
-        wizardMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.W, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN));
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (e.isAltDown() || KeyCode.ALT_GRAPH == e.getCode()) {
                 e.consume();
@@ -331,9 +272,9 @@ public class MainController extends AbstractController {
                 switch (e.getCode()) {
                     case ENTER:
                         if (e.isShiftDown()) {
-                            executeAll();
+                            buttonController.executeAll();
                         } else {
-                            execute();
+                            buttonController.execute();
                         }
                         break;
                     case J:
@@ -354,317 +295,73 @@ public class MainController extends AbstractController {
         });
     }
 
-    private void setTooltipOnProjectListNames() {
-        if (!toolkitProjectListNamesTextField.isDisabled()) {
-            Tooltip tooltip = new Tooltip(BundleUtils.getMsg("toolkit.panel.projectListNames.tooltip"));
-            tooltip.setTextAlignment(TextAlignment.LEFT);
-            tooltip.setFont(Font.font("Courier New", 16));
-            toolkitProjectListNamesTextField.setTooltip(tooltip);
-        } else {
-            toolkitProjectListNamesTextField.setTooltip(null);
-        }
-    }
-
-    private StringConverter<LocalDate> dateConverter() {
-        return new StringConverter<LocalDate>() {
-            @Override
-            public String toString(LocalDate object) {
-                return object.format(yyyy_MM_dd);
-            }
-
-            @Override
-            public LocalDate fromString(String string) {
-                return LocalDate.parse(string, yyyy_MM_dd);
-            }
-        };
-    }
-
-    private void setDisableDependOnConfigurations() {
+    void setDisableDependOnConfigurations() {
         Map<String, RunConfig> runConfigMap = applicationProperties.getRunConfigMap();
-        addConfigurationButton.setDisable(runConfigMap.isEmpty());
-        removeConfigurationButton.setDisable(runConfigMap.isEmpty());
-        executeButton.setDisable(runConfigMap.isEmpty());
-        executeAllButton.setDisable(runConfigMap.isEmpty());
-        jobButton.setDisable(runConfigMap.isEmpty());
-        configurationNameComboBox.setDisable(runConfigMap.isEmpty());
-        projectPathButton.setDisable(runConfigMap.isEmpty() || uploadTypeComboBox.getValue() == UploadType.STATEMENT);
-    }
-
-    private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
-        return param -> {
-            Collection<String> result = new HashSet<>();
-            if (useInteliSense) {
-                result = definedPatterns;
-                if (!inteliSense.isEmpty()) {
-                    result = definedPatterns.stream()
-                            .filter(pattern -> pattern.startsWith(inteliSense))
-                            .collect(toCollection(LinkedHashSet::new));
-                }
-            }
-            return result;
-        };
-    }
-
-    private void setUpgradeMenuItemDisabled() {
-        uiLauncher.executeOutsideUIThread(() -> {
-            logger.info("Checking new version.");
-            GithubService service = new GithubService(applicationProperties.version());
-            final boolean newVersion = service.isNewVersion();
-            if (newVersion) {
-                logger.info("New version [{}] available.", service.getStrippedVersion());
-            } else {
-                logger.info("This version is up to date.");
-            }
-            Platform.runLater(() -> upgradeMenuItem.setDisable(!newVersion));
-        });
-    }
-
-    private void setActions(ResourceBundle resources) {
-        applicationMenuItem.setOnAction(applicationActionEventHandler());
-        toolkitMenuItem.setOnAction(toolkitActionEventHandler());
-        readMeMenuItem.setOnAction(readMeActionEventHandler());
-        instructionMenuItem.setOnAction(instructionActionEventHandler());
-        upgradeMenuItem.setOnAction(upgradeActionEventHandler());
-        wizardMenuItem.setOnAction(launchWizardActionEventHandler());
-        projectPathButton.setOnAction(projectPathActionEventHandler());
-        itemPathButton.setOnAction(itemPathActionEventHandler(resources));
-        uploadTypeComboBox.setOnAction(uploadTypeActionEventHandler());
-        executeButton.setOnAction(executeActionEventHandler());
-        executeAllButton.setOnAction(executeAllActionEventHandler());
-        jobButton.setOnAction(jobActionEventHandler());
-        exitButton.setOnAction(exitActionEventHandler());
-        saveConfigurationButton.setOnAction(saveConfigurationActionEventHandler());
-        addConfigurationButton.setOnAction(addConfigurationEventHandler());
-        removeConfigurationButton.setOnAction(removeConfigurationEventHandler());
-        verifyCredentialsHyperlink.setOnMouseClicked(verifyCredentialsHyperlinkOnMouseClickEventHandler());
-        itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
-    }
-
-    private EventHandler<ActionEvent> applicationActionEventHandler() {
-        return event -> uiLauncher.showApplicationSettingsWindow();
-    }
-
-    private EventHandler<ActionEvent> toolkitActionEventHandler() {
-        return event -> {
-            uiLauncher.setApplicationProperties(applicationProperties);
-            uiLauncher.showToolkitSettingsWindow();
-        };
-    }
-
-    private EventHandler<ActionEvent> readMeActionEventHandler() {
-        return event -> {
-            AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser(GithubService.GITHUB_URL + "#gitdiffgenerator");
-        };
-    }
-
-    private EventHandler<ActionEvent> instructionActionEventHandler() {
-        return event -> {
-            String pdfFileName = "Gipter-ui-description.pdf";
-            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
-                    .withLink(applicationProperties.toolkitUserFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
-                    .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
-            try {
-                File pdfFile = Paths.get(pdfFileName).toFile();
-                if (pdfFile.exists()) {
-                    if (Desktop.isDesktopSupported()) {
-                        Desktop.getDesktop().open(pdfFile);
-                    } else {
-                        logger.error("AWT Desktop is not supported by the platform.");
-                        Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-                    }
-                }
-            } catch (IOException e) {
-                logger.error("Could not find [{}] file with instructions.", pdfFileName, e);
-                Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-            }
-        };
-    }
-
-    private EventHandler<ActionEvent> upgradeActionEventHandler() {
-        return event -> {
-            uiLauncher.hideMainWindow();
-            uiLauncher.showUpgradeWindow();
-        };
-    }
-
-    private EventHandler<ActionEvent> launchWizardActionEventHandler() {
-        return event -> {
-            uiLauncher.hideMainWindow();
-            new WizardLauncher(uiLauncher.currentWindow(), configurationNameComboBox.getValue()).execute();
-        };
-    }
-
-    private EventHandler<ActionEvent> projectPathActionEventHandler() {
-        return event -> {
-            RunConfig runConfig = createRunConfigFromUI();
-            applicationProperties.updateCurrentRunConfig(runConfig);
-            uiLauncher.setApplicationProperties(applicationProperties);
-            String configurationName = configurationNameTextField.getText();
-            updateConfigurationNameComboBox(configurationName, configurationName);
-            if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
-                uiLauncher.showToolkitProjectsWindow(new Properties());
-            } else {
-                uiLauncher.showProjectsWindow(new Properties());
-            }
-        };
-    }
-
-    private Tooltip buildPathTooltip(String result) {
-        String[] paths = result.split(",");
-        StringBuilder builder = new StringBuilder();
-        Arrays.asList(paths).forEach(path -> builder.append(path).append("\n"));
-        Tooltip tooltip = new Tooltip(builder.toString());
-        tooltip.setTextAlignment(TextAlignment.LEFT);
-        tooltip.setFont(Font.font("Courier New", 14));
-        return tooltip;
-    }
-
-    private EventHandler<ActionEvent> itemPathActionEventHandler(final ResourceBundle resources) {
-        return event -> {
-            if (uploadTypeComboBox.getValue() == UploadType.STATEMENT) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setInitialDirectory(new File("."));
-                fileChooser.setTitle(resources.getString("directory.item.statement.title"));
-                File statementFile = fileChooser.showOpenDialog(uiLauncher.currentWindow());
-                if (statementFile != null && statementFile.exists() && statementFile.isFile()) {
-                    itemPathLabel.setText(statementFile.getAbsolutePath());
-                    itemPathButton.setText(resources.getString("button.open"));
-                }
-            } else {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setInitialDirectory(new File("."));
-                directoryChooser.setTitle(resources.getString("directory.item.store"));
-                File itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow());
-                if (itemPathDirectory != null && itemPathDirectory.exists() && itemPathDirectory.isDirectory()) {
-                    itemPathLabel.setText(itemPathDirectory.getAbsolutePath());
-                    itemPathButton.setText(resources.getString("button.change"));
-                }
-            }
-        };
-    }
-
-    private EventHandler<ActionEvent> executeActionEventHandler() {
-        return event -> execute();
-    }
-
-    private void execute() {
-        RunConfig runConfig = createRunConfigFromUI();
-        ToolkitConfig toolkitConfig = createToolkitConfigFromUI();
-        ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(Stream.concat(
-                Arrays.stream(runConfig.toArgumentArray()),
-                Arrays.stream(toolkitConfig.toArgumentArray())
-        ).toArray(String[]::new));
-
-        FXMultiRunner runner = new FXMultiRunner(
-                Stream.of(uiAppProperties).collect(Collectors.toList()),
-                uiLauncher.nonUIExecutor(),
-                RunType.EXECUTE
+        buttonController.setDisableDependOnConfigurations(runConfigMap.isEmpty());
+        pathsSectionController.setDisableProjectPathButton(
+                runConfigMap.isEmpty() || csvDetailsSectionController.getItemType() == ItemType.STATEMENT
         );
-        resetIndicatorProperties(runner);
-        uiLauncher.executeOutsideUIThread(() -> {
-            runner.start();
-            if (uiAppProperties.isActiveTray()) {
-                uiLauncher.updateTray(uiAppProperties);
-            }
-            updateLastItemUploadDate();
-        });
     }
 
-    private void updateLastItemUploadDate() {
+    void updateLastItemUploadDate() {
         try {
-            Optional<Properties> dataProperties = dataDao.loadDataProperties();
-            if (dataProperties.isPresent() && dataProperties.get().containsKey(DaoConstants.UPLOAD_STATUS_KEY)) {
-                UploadStatus status = UploadStatus.valueOf(dataProperties.get().getProperty(DaoConstants.UPLOAD_STATUS_KEY));
-                if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(status)) {
-                    uiLauncher.setLastItemSubmissionDate(null);
-                }
+            ProgramData programData = dataService.loadProgramData();
+            if (programData.getUploadStatus() != null &&
+                    EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(programData.getUploadStatus())) {
+                uiLauncher.setLastItemSubmissionDate(null);
             }
         } catch (Exception ex) {
-            logger.warn("Could not determine the status of the upload. {}. Forcing to refresh last upload date.", ex.getMessage());
+            logger.warn("Could not determine the status of the upload. {}. Forcing to refresh last upload date.",
+                    ex.getMessage());
             uiLauncher.setLastItemSubmissionDate(null);
         } finally {
-            setLastItemSubmissionDate();
+            datesSectionController.setLastItemSubmissionDate();
         }
     }
 
-    private EventHandler<ActionEvent> executeAllActionEventHandler() {
-        return event -> executeAll();
-    }
-
-    private void executeAll() {
-        RunConfig runConfig = createRunConfigFromUI();
-        ApplicationProperties uiAppProperties = ApplicationPropertiesFactory.getInstance(runConfig.toArgumentArray());
-        Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
-        map.put(uiAppProperties.configurationName(), uiAppProperties);
-
-        FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
-        resetIndicatorProperties(runner);
-        uiLauncher.executeOutsideUIThread(() -> {
-            runner.call();
-            ApplicationProperties instance = new LinkedList<>(map.values()).getFirst();
-            if (instance.isActiveTray()) {
-                uiLauncher.updateTray(instance);
-            }
-        });
-    }
-
-    private RunConfig createRunConfigFromUI() {
+    RunConfig createRunConfigFromUI() {
         RunConfig runConfig = new RunConfig();
 
-        if (!StringUtils.nullOrEmpty(authorsTextField.getText())) {
-            runConfig.setAuthor(authorsTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getAuthors())) {
+            runConfig.setAuthor(csvDetailsSectionController.getAuthors());
         }
-        if (!StringUtils.nullOrEmpty(committerEmailTextField.getText())) {
-            runConfig.setCommitterEmail(committerEmailTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getCommitterEmail())) {
+            runConfig.setCommitterEmail(csvDetailsSectionController.getCommitterEmail());
         }
-        if (!StringUtils.nullOrEmpty(gitAuthorTextField.getText())) {
-            runConfig.setGitAuthor(gitAuthorTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getGitAuthor())) {
+            runConfig.setGitAuthor(csvDetailsSectionController.getGitAuthor());
         }
-        if (!StringUtils.nullOrEmpty(mercurialAuthorTextField.getText())) {
-            runConfig.setMercurialAuthor(mercurialAuthorTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getMercurialAuthor())) {
+            runConfig.setMercurialAuthor(csvDetailsSectionController.getMercurialAuthor());
         }
-        if (!StringUtils.nullOrEmpty(svnAuthorTextField.getText())) {
-            runConfig.setSvnAuthor(svnAuthorTextField.getText());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getSvnAuthor())) {
+            runConfig.setSvnAuthor(csvDetailsSectionController.getSvnAuthor());
         }
-        runConfig.setUploadType(uploadTypeComboBox.getValue());
-        runConfig.setSkipRemote(skipRemoteCheckBox.isSelected());
-        runConfig.setFetchAll(fetchAllCheckBox.isSelected());
-
-        if (!StringUtils.nullOrEmpty(toolkitProjectListNamesTextField.getText())) {
-            runConfig.setToolkitProjectListNames(toolkitProjectListNamesTextField.getText());
-        }
-        runConfig.setDeleteDownloadedFiles(deleteDownloadedFilesCheckBox.isSelected());
-
-        runConfig.setProjectPath(projectPathLabel.getText());
-        runConfig.setItemPath(itemPathLabel.getText());
-        if (!StringUtils.nullOrEmpty(itemFileNamePrefixTextField.getText())) {
-            runConfig.setItemFileNamePrefix(itemFileNamePrefixTextField.getText());
+        runConfig.setItemType(csvDetailsSectionController.getItemType());
+        if (!StringUtils.nullOrEmpty(csvDetailsSectionController.getToolkitProjectListNames())) {
+            runConfig.setToolkitProjectListNames(csvDetailsSectionController.getToolkitProjectListNames());
         }
 
-        runConfig.setStartDate(startDatePicker.getValue());
-        runConfig.setEndDate(endDatePicker.getValue());
-        if (!ArgName.periodInDays.defaultValue().equals(periodInDaysTextField.getText())) {
-            runConfig.setPeriodInDays(Integer.parseInt(periodInDaysTextField.getText()));
+        runConfig.setDeleteDownloadedFiles(additionalSettingsSectionController.getDeleteDownloadedFiles());
+        runConfig.setSkipRemote(additionalSettingsSectionController.getSkipRemote());
+        runConfig.setFetchAll(additionalSettingsSectionController.getFetchAll());
+
+        runConfig.setProjectPath(pathsSectionController.getProjectPathLabelValue());
+        runConfig.setItemPath(pathsSectionController.getItemPathLabelValue());
+        if (!StringUtils.nullOrEmpty(pathsSectionController.getItemFileNamePrefix())) {
+            runConfig.setItemFileNamePrefix(pathsSectionController.getItemFileNamePrefix());
         }
 
-        runConfig.setConfigurationName(configurationNameTextField.getText());
+        runConfig.setStartDate(datesSectionController.getStartDate());
+        runConfig.setEndDate(datesSectionController.getEndDate());
+
+        runConfig.setConfigurationName(configurationSectionController.getConfigurationName());
         runConfig.setPreferredArgSource(PreferredArgSource.UI);
 
         return runConfig;
     }
 
-    private ToolkitConfig createToolkitConfigFromUI() {
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername(toolkitUsernameTextField.getText());
-        toolkitConfig.setToolkitPassword(toolkitPasswordField.getText());
-        return toolkitConfig;
-    }
-
-    private void resetIndicatorProperties(Task<?> task) {
+    void resetIndicatorProperties(Task<?> task) {
         loadProgressIndicator.setVisible(true);
         loadProgressIndicator.progressProperty().unbind();
         loadProgressIndicator.progressProperty().bind(task.progressProperty());
@@ -672,68 +369,25 @@ public class MainController extends AbstractController {
         infoLabel.textProperty().bind(task.messageProperty());
     }
 
-    private EventHandler<ActionEvent> uploadTypeActionEventHandler() {
-        return event -> {
-            boolean disableProjectButton = uploadTypeComboBox.getValue() == UploadType.STATEMENT;
-            disableProjectButton |= applicationProperties.getRunConfigMap().isEmpty() && configurationNameTextField.getText().isEmpty();
-            projectPathButton.setDisable(disableProjectButton);
-            if (uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS) {
-                endDatePicker.setValue(LocalDate.now());
-            }
-            toolkitProjectListNamesTextField.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
-            setTooltipOnProjectListNames();
-            endDatePicker.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            authorsTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            committerEmailTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            gitAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            svnAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            mercurialAuthorTextField.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            skipRemoteCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            fetchAllCheckBox.setDisable(uploadTypeComboBox.getValue() == UploadType.TOOLKIT_DOCS);
-            deleteDownloadedFilesCheckBox.setDisable(uploadTypeComboBox.getValue() != UploadType.TOOLKIT_DOCS);
-        };
-    }
-
-    private EventHandler<ActionEvent> jobActionEventHandler() {
-        return event -> uiLauncher.showJobWindow();
-    }
-
-    private EventHandler<ActionEvent> exitActionEventHandler() {
-        return event -> UILauncher.platformExit();
-    }
-
-    private EventHandler<ActionEvent> saveConfigurationActionEventHandler() {
-        return event -> saveConfiguration();
+    void setDisable(ItemType itemType) {
+        boolean disable = EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(itemType);
+        datesSectionController.disableEndDatePicker(itemType);
+        additionalSettingsSectionController.disableSkipRemote(disable);
+        additionalSettingsSectionController.disableFetchAll(disable);
     }
 
     private void saveConfiguration() {
-        String configurationName = configurationNameTextField.getText();
-        String comboConfigName = configurationNameComboBox.getValue();
-
-        RunConfig runConfigFromUI = createRunConfigFromUI();
-        applicationProperties.updateCurrentRunConfig(runConfigFromUI);
-        CacheManager.removeFromCache(applicationProperties.configurationName());
-        uiLauncher.executeOutsideUIThread(() -> updateRunConfig(comboConfigName, configurationName));
-        setLastItemSubmissionDate();
-
-        updateConfigurationNameComboBox(comboConfigName, configurationName);
-        uiLauncher.updateTray(applicationProperties);
-        AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                .withHeaderText(BundleUtils.getMsg("main.config.changed"))
-                .withAlertType(Alert.AlertType.INFORMATION)
-                .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                .withImage(ImageFile.FINGER_UP_PNG);
-        Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
+        configurationSectionController.saveConfiguration();
     }
 
-    private void updateRunConfig(String oldConfigName, String newConfigName) {
-        ToolkitConfig toolkitConfigFromUI = createToolkitConfigFromUI();
+    void updateRunConfig(String oldConfigName, String newConfigName) {
+        ToolkitConfig toolkitConfigFromUI = toolkitSectionController.createToolkitConfigFromUI();
         applicationProperties.updateToolkitConfig(toolkitConfigFromUI);
-        if (!StringUtils.nullOrEmpty(configurationNameTextField.getText())) {
+        if (!StringUtils.nullOrEmpty(configurationSectionController.getConfigurationName())) {
             RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
             applicationProperties.updateCurrentRunConfig(runConfigWithoutDates);
             new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
-            setDisableDependOnConfigurations();
+            configurationSectionController.setDisableDependOnConfigurations();
         }
         applicationProperties.save();
         if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
@@ -741,254 +395,79 @@ public class MainController extends AbstractController {
         }
     }
 
-    @NotNull
-    private RunConfig getRunConfigWithoutDates() {
+    RunConfig getRunConfigWithoutDates() {
         RunConfig runConfigFromUI = createRunConfigFromUI();
         runConfigFromUI.setStartDate(null);
         runConfigFromUI.setEndDate(null);
         return runConfigFromUI;
     }
 
-    private EventHandler<ActionEvent> addConfigurationEventHandler() {
-        return event -> {
-            String configurationName = configurationNameTextField.getText();
-            Optional<RunConfig> runConfig = applicationProperties.getRunConfig(configurationName);
-            boolean operationDone = false;
-            if (runConfig.isPresent()) {
-                boolean result = new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("popup.overrideProperties.message", configurationName))
-                        .withAlertType(Alert.AlertType.CONFIRMATION)
-                        .withWindowType(WindowType.OVERRIDE_WINDOW)
-                        .withImage(ImageFile.OVERRIDE_PNG)
-                        .withOkButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonOk"))
-                        .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
-                        .buildAndDisplayOverrideWindow();
-                if (result) {
-                    saveNewConfig(configurationName);
-                    updateConfigurationNameComboBox(configurationNameComboBox.getValue(), configurationName);
-                    operationDone = true;
-                } else {
-                    configurationNameTextField.setText(configurationNameComboBox.getValue());
-                }
-            } else {
-                applicationProperties.updateCurrentRunConfig(getRunConfigWithoutDates());
-                applicationProperties.save();
-                updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), configurationName);
-                operationDone = true;
-            }
-            if (operationDone) {
-                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("main.config.changed"))
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                        .withImage(ImageFile.FINGER_UP_PNG);
-                alertWindowBuilder.buildAndDisplayWindow();
-            }
-
-        };
+    void deselectUseLastItemDate() {
+        datesSectionController.deselectUseLastItemDate();
     }
 
-    private void saveNewConfig(String configurationName) {
-        RunConfig currentRunConfig = getRunConfigWithoutDates();
-        currentRunConfig.setConfigurationName(configurationName);
-        applicationProperties.updateCurrentRunConfig(currentRunConfig);
-        applicationProperties.save();
+    void setDisableProjectPathButton(boolean value) {
+        pathsSectionController.setDisableProjectPathButton(value);
     }
 
-    private EventHandler<ActionEvent> removeConfigurationEventHandler() {
-        return event -> {
-            AlertWindowBuilder alertWindowBuilder;
-            try {
-                CacheManager.removeFromCache(configurationNameComboBox.getValue());
-                applicationProperties.removeConfig(configurationNameComboBox.getValue());
-                String newConfiguration = ArgName.configurationName.defaultValue();
-                if (!applicationProperties.getRunConfigMap().isEmpty()) {
-                    newConfiguration = applicationProperties.configurationName();
-                }
-                removeConfigurationNameFromComboBox(configurationNameComboBox.getValue(), newConfiguration);
-
-                applicationProperties = CacheManager.getApplicationProperties(newConfiguration);
-                setInitValues();
-                configurationNameTextField.setText(configurationNameComboBox.getValue());
-                setDisableDependOnConfigurations();
-                setToolkitCredentialsIfAvailable();
-                alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("main.config.removed"))
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                        .withImage(ImageFile.FINGER_UP_PNG);
-            } catch (IllegalStateException ex) {
-                alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(ex.getMessage())
-                        .withLink(AlertHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
-            }
-            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-        };
+    void setToolkitCredentialsIfAvailable() {
+        toolkitSectionController.setToolkitCredentialsIfAvailable();
     }
 
-    private EventHandler<MouseEvent> verifyCredentialsHyperlinkOnMouseClickEventHandler() {
-        return event -> {
-            Task<Void> task = new Task<Void>() {
-                @Override
-                public Void call() {
-                    RunConfig runConfigFromUI = createRunConfigFromUI();
-                    ApplicationProperties uiAppProps = ApplicationPropertiesFactory.getInstance(runConfigFromUI.toArgumentArray());
-                    boolean hasProperCredentials = new ToolkitService(uiAppProps).hasProperCredentials();
-                    AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
-                    if (hasProperCredentials) {
-                        alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
-                                .withWindowType(WindowType.CONFIRMATION_WINDOW)
-                                .withAlertType(Alert.AlertType.INFORMATION)
-                                .withImage(ImageFile.FINGER_UP_PNG);
-                    } else {
-                        alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
-                                .withLink(AlertHelper.logsFolder())
-                                .withWindowType(WindowType.LOG_WINDOW)
-                                .withAlertType(Alert.AlertType.ERROR)
-                                .withImage(ImageFile.MINION_IOIO_GIF);
-                    }
-                    Platform.runLater(() -> {
-                        verifyProgressIndicator.setVisible(false);
-                        alertWindowBuilder.buildAndDisplayWindow();
-                    });
-                    return null;
-                }
-            };
-            verifyProgressIndicator.setVisible(true);
-            uiLauncher.executeOutsideUIThread(task);
-            verifyCredentialsHyperlink.setVisited(false);
-        };
+    String getConfigurationNameComboBoxValue() {
+        return configurationNameComboBox.getValue();
     }
 
-    private EventHandler<KeyEvent> itemNameKeyReleasedEventHandler() {
-        return event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                itemFileNamePrefixTextField.setText(currentItemName);
-                itemFileNamePrefixTextField.positionCaret(currentItemName.length());
-            }
-        };
+    ItemType getItemType() {
+        return csvDetailsSectionController.getItemType();
     }
 
-    private void setToolkitCredentialsIfAvailable() {
-        toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
+    String getConfigurationName() {
+        return configurationSectionController.getConfigurationName();
     }
 
-    private void updateConfigurationNameComboBox(String oldValue, String newValue) {
-        List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
-        items.remove(oldValue);
-        items.add(newValue);
-        updateItemsForConfigComboBox(newValue, FXCollections.observableArrayList(items));
+
+    void updateConfigurationNameComboBox(String oldValue, String newValue) {
+        configurationSectionController.updateConfigurationNameComboBox(oldValue, newValue);
     }
 
-    private void updateItemsForConfigComboBox(String newValue, ObservableList<String> items) {
-        useComboBoxValueChangeListener = false;
-        configurationNameComboBox.setItems(items);
-        configurationNameComboBox.setValue(newValue);
-        useComboBoxValueChangeListener = true;
-        setDisableDependOnConfigurations();
+    void setLastItemSubmissionDate() {
+        datesSectionController.setLastItemSubmissionDate();
     }
 
-    private void removeConfigurationNameFromComboBox(String oldValue, String newValue) {
-        List<String> items = new ArrayList<>(configurationNameComboBox.getItems());
-        items.remove(oldValue);
-        updateItemsForConfigComboBox(newValue, FXCollections.observableList(items));
+    void setEndDatePicker(LocalDate localDate) {
+        datesSectionController.setEndDatePicker(localDate);
     }
 
-    private void setListeners() {
-        toolkitUsernameTextField.textProperty().addListener(toolkitUsernameListener());
-        configurationNameComboBox.getSelectionModel().selectedItemProperty().addListener(configurationNameComboBoxListener());
-        configurationNameTextField.textProperty().addListener(configurationNameListener());
-        useLastItemDateCheckbox.selectedProperty().addListener(useListItemCheckBoxListener());
-        itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
+    void disableDeleteDownloadedFiles(boolean disable) {
+        additionalSettingsSectionController.disableDeleteDownloadedFiles(disable);
     }
 
-    private ChangeListener<String> toolkitUsernameListener() {
-        return (observable, oldValue, newValue) -> {
-            userFolderUrl = applicationProperties.toolkitUserFolder();
-            userFolderUrl = userFolderUrl.substring(0, userFolderUrl.lastIndexOf("/") + 1) + newValue;
-        };
+    ToolkitConfig createToolkitConfigFromUI() {
+        return toolkitSectionController.createToolkitConfigFromUI();
     }
 
-    private ChangeListener<String> configurationNameComboBoxListener() {
-        return (options, oldValue, newValue) -> {
-            if (useComboBoxValueChangeListener) {
-                RunConfig runConfigFromUI = createRunConfigFromUI();
-                ApplicationProperties uiApplicationProperties = ApplicationPropertiesFactory.getInstance(runConfigFromUI.toArgumentArray());
-                CacheManager.addToCache(oldValue, uiApplicationProperties);
+    void setInitValues(ApplicationProperties applicationProperties) {
+        setApplicationProperties(applicationProperties);
 
-                applicationProperties = CacheManager.getApplicationProperties(newValue);
-                setInitValues();
-                configurationNameTextField.setText(newValue);
-                if (useLastItemDateCheckbox.isSelected()) {
-                    useLastItemDateCheckbox.setSelected(false);
-                }
-            }
-        };
+        toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
+        pathsSectionController.initialize(location, resources, initPathsSectionMap());
+        datesSectionController.initialize(location, resources, initDatesSectionMap());
+        additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
+        csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
+        buttonController.initialize(location, resources, initButtonMap());
     }
 
-    private ChangeListener<String> configurationNameListener() {
-        return (observable, oldValue, newValue) -> {
-            if (StringUtils.nullOrEmpty(oldValue) && !StringUtils.nullOrEmpty(newValue)) {
-                addConfigurationButton.setDisable(false);
-                projectPathButton.setDisable(false);
-            } else if (StringUtils.nullOrEmpty(newValue)) {
-                addConfigurationButton.setDisable(true);
-                projectPathButton.setDisable(true);
-            }
-        };
+    @Override
+    public void setApplicationProperties(ApplicationProperties applicationProperties) {
+        super.setApplicationProperties(applicationProperties);
+        toolkitSectionController.setApplicationProperties(applicationProperties);
+        configurationSectionController.setApplicationProperties(applicationProperties);
+        menuSectionController.setApplicationProperties(applicationProperties);
+        pathsSectionController.setApplicationProperties(applicationProperties);
+        datesSectionController.setApplicationProperties(applicationProperties);
+        additionalSettingsSectionController.setApplicationProperties(applicationProperties);
+        csvDetailsSectionController.setApplicationProperties(applicationProperties);
+        buttonController.setApplicationProperties(applicationProperties);
     }
-
-    private ChangeListener<Boolean> useListItemCheckBoxListener() {
-        return (observable, oldValue, newValue) -> {
-            startDatePicker.setDisable(newValue);
-            periodInDaysTextField.setDisable(newValue);
-            if (newValue) {
-                startDatePicker.setValue(uiLauncher.getLastItemSubmissionDate().toLocalDate());
-                int newPeriodInDays = endDatePicker.getValue().getDayOfYear() - startDatePicker.getValue().getDayOfYear();
-                periodInDaysTextField.setText(String.valueOf(newPeriodInDays));
-            } else {
-                periodInDaysTextField.setText(String.valueOf(applicationProperties.periodInDays()));
-                startDatePicker.setValue(LocalDate.now().minusDays(applicationProperties.periodInDays()));
-            }
-        };
-    }
-
-    private ChangeListener<String> itemFileNameChangeListener() {
-        return (observable, oldValue, newValue) -> {
-            if (newValue.endsWith("{")) {
-                useInteliSense = true;
-                inteliSense = "";
-            } else if (newValue.endsWith("}") || newValue.isEmpty()) {
-                useInteliSense = false;
-            }
-            if (definedPatterns.contains(newValue)) {
-                useInteliSense = false;
-                inteliSense = "";
-                currentItemName = oldValue.substring(0, oldValue.lastIndexOf("{")) + newValue;
-                itemFileNamePrefixTextField.setText(currentItemName);
-                itemFileNamePrefixTextField.positionCaret(currentItemName.length());
-            } else {
-                currentItemName = newValue;
-            }
-
-            if (useInteliSense) {
-                //letter was added
-                if (newValue.length() > oldValue.length()) {
-                    inteliSense += newValue.replace(oldValue, "");
-                } else { //back space was pressed
-                    if (oldValue.endsWith("{")) {
-                        inteliSense = "";
-                        useInteliSense = false;
-                    } else {
-                        inteliSense = newValue.substring(newValue.lastIndexOf("{"));
-                    }
-                }
-            }
-        };
-    }
-
 }

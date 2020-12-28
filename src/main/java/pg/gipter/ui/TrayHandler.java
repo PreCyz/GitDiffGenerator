@@ -3,16 +3,19 @@ package pg.gipter.ui;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.CacheManager;
+import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.job.JobHandler;
-import pg.gipter.job.upload.JobProperty;
-import pg.gipter.job.upload.UploadItemJob;
+import pg.gipter.core.dao.data.ProgramData;
+import pg.gipter.jobs.*;
+import pg.gipter.services.platforms.AppManager;
+import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.job.JobController;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -21,8 +24,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.net.URL;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.LinkedList;
 import java.util.concurrent.Executor;
 
 class TrayHandler {
@@ -30,11 +32,11 @@ class TrayHandler {
     private static final Logger logger = LoggerFactory.getLogger(TrayHandler.class);
 
     private ApplicationProperties applicationProperties;
-    private UILauncher uiLauncher;
+    private final UILauncher uiLauncher;
     private static TrayIcon trayIcon;
     private static PopupMenu trayPopupMenu;
-    private DataDao dataDao;
-    private Executor executor;
+    private final DataDao dataDao;
+    private final Executor executor;
 
     TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties, Executor executor) {
         this.uiLauncher = uiLauncher;
@@ -57,7 +59,9 @@ class TrayHandler {
         addMenuItemsToMenu(trayPopupMenu);
 
         trayIcon = new TrayIcon(
-                createTrayImage(), BundleUtils.getMsg("main.title", applicationProperties.version()), trayPopupMenu
+                createTrayImage(),
+                BundleUtils.getMsg("main.title", applicationProperties.version().getVersion()),
+                trayPopupMenu
         );
         trayIcon.addActionListener(showActionListener());
         trayIcon.setImageAutoSize(true);
@@ -75,39 +79,34 @@ class TrayHandler {
 
     private void addMenuItemsToMenu(PopupMenu popupMenu) {
         executor.execute(() -> {
-            JobHandler jobHandler = uiLauncher.getJobHandler();
-            Optional<Properties> data = dataDao.loadDataProperties();
-            if (data.isPresent()) {
+            JobService jobService = uiLauncher.getJobService();
+            ProgramData programData = dataDao.readProgramData();
+            if (programData.getJobParam() != null) {
+                JobParam jobParam = programData.getJobParam();
 
                 boolean addSeparator = false;
 
-                if (data.get().containsKey(DaoConstants.UPLOAD_DATE_TIME_KEY) && data.get().containsKey(DaoConstants.UPLOAD_STATUS_KEY)) {
+                if (programData.getLastUploadDateTime() != null && programData.getUploadStatus() != null) {
                     String uploadInfo = String.format("%s [%s]",
-                            data.get().getProperty(DaoConstants.UPLOAD_DATE_TIME_KEY),
-                            data.get().getProperty(DaoConstants.UPLOAD_STATUS_KEY)
+                            programData.getLastUploadDateTime().format(DaoConstants.DATE_TIME_FORMATTER),
+                            programData.getUploadStatus()
                     );
                     popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
                     addSeparator = true;
                 }
-                if (data.get().containsKey(JobProperty.NEXT_FIRE_DATE.key()) &&
-                        !StringUtils.nullOrEmpty(data.get().getProperty(JobProperty.NEXT_FIRE_DATE.key(), ""))) {
+                if (jobParam.getNextFireDate() != null) {
                     popupMenu.add(BundleUtils.getMsg(
                             "tray.item.nextUpdate",
-                            data.get().getProperty(JobProperty.NEXT_FIRE_DATE.key())
+                            jobParam.getNextFireDate().format(DaoConstants.DATE_TIME_FORMATTER)
                     ));
                     addSeparator = true;
                 }
 
-                if (data.get().containsKey(JobProperty.TYPE.key())) {
-                    Menu jobMenu = new Menu(
-                            String.format("%s %s", UploadItemJob.NAME, data.get().getProperty(JobProperty.TYPE.key()))
-                    );
-                    JobController.buildLabel(data.get(), JobProperty.DAY_OF_WEEK).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.HOUR_OF_THE_DAY).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.DAY_OF_MONTH).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.SCHEDULE_START).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.CRON).ifPresent(jobMenu::add);
-                    JobController.buildLabel(data.get(), JobProperty.CONFIGS).ifPresent(jobMenu::add);
+                if (jobParam.getJobType() != null) {
+                    Menu jobMenu = new Menu(String.format("%s %s", UploadItemJob.NAME, jobParam.getJobType()));
+
+                    LinkedList<String> labels = JobController.jobTrayLabels(jobParam);
+                    labels.forEach(jobMenu::add);
                     jobMenu.addSeparator();
 
                     MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));
@@ -134,7 +133,15 @@ class TrayHandler {
             createJobItem.addActionListener(createJobActionListener());
             popupMenu.add(createJobItem);
 
-            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(jobHandler.isUpgradeJobExists() ? "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
+            if (applicationProperties.isToolkitCredentialsSet()) {
+                MenuItem goToToolkitItem = new MenuItem(BundleUtils.getMsg("tray.item.goToToolkit"));
+                goToToolkitItem.addActionListener(createGoToToolkitActionListener());
+                popupMenu.add(goToToolkitItem);
+            }
+
+            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(
+                    jobService.isJobExist(JobCreatorFactory.upgradeJobCreator()) ?
+                    "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
             upgradeItem.addActionListener(upgradeJobActionListener());
             popupMenu.add(upgradeItem);
             popupMenu.addSeparator();
@@ -145,13 +152,25 @@ class TrayHandler {
         });
     }
 
+    private ActionListener createGoToToolkitActionListener() {
+        return e -> {
+            AppManager instance = AppManagerFactory.getInstance();
+            instance.launchDefaultBrowser(applicationProperties.toolkitUserFolder());
+        };
+    }
+
     private ActionListener upgradeJobActionListener() {
         return e -> {
-            JobHandler jobHandler = uiLauncher.getJobHandler();
-            if (jobHandler.isUpgradeJobExists()) {
-                jobHandler.cancelUpgradeJob();
-            } else {
-                jobHandler.scheduleUpgradeJob();
+            JobService jobService = uiLauncher.getJobService();
+            final JobCreator jobCreator = JobCreatorFactory.upgradeJobCreator();
+            try {
+                if (jobService.isJobExist(jobCreator)) {
+                    jobService.deleteJob(jobCreator);
+                } else {
+                    jobService.scheduleJob(jobCreator);
+                }
+            } catch (SchedulerException ex) {
+                logger.error("Can not schedule upgrade job.");
             }
             updateTrayLabels();
         };
@@ -160,23 +179,19 @@ class TrayHandler {
     private Image createTrayImage() {
         String path = "img/chicken-tray.gif";
         URL imageURL = getClass().getClassLoader().getResource(path);
-        if (imageURL == null) {
-            logger.error("Resource not found: {}", path);
-            return null;
-        } else {
-            String description = "Tray icon";
-            return new ImageIcon(imageURL, description).getImage();
-        }
+        String description = "Tray icon";
+        return new ImageIcon(imageURL, description).getImage();
     }
 
     private ActionListener createJobActionListener() {
-        return e -> Platform.runLater(() -> uiLauncher.showJobWindow());
+        return e -> Platform.runLater(uiLauncher::showJobWindow);
     }
 
     EventHandler<WindowEvent> trayOnCloseEventHandler() {
         return windowEvent -> {
             hide();
             CacheManager.clearAllCache();
+            ConfigurationDaoFactory.getCachedConfigurationDao().resetCache();
         };
     }
 

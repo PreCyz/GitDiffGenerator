@@ -1,0 +1,8 @@
+{
+  "vcs": "GIT",
+  "command": "git log --patch --all --author=\"PreCyz\" '--since 2020-06-01' '--until 2020-06-08'",
+  "commandList": [
+    "git",
+    "log"
+  ]
+}

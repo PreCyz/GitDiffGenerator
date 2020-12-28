@@ -3,12 +3,17 @@ package pg.gipter.toolkit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.env.*;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.dao.DaoConstants;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.model.Configuration;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -18,11 +23,18 @@ class SpringInitializerTest {
 
     @BeforeEach
     void setup() {
-        SpringInitializer.destroyContext();
+        try {
+            SpringInitializer.destroyContext();
+            final ConfigurationDao configurationDao = DaoFactory.getCachedConfiguration();
+            configurationDao.saveConfiguration(new Configuration());
+            Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
+        } catch (IOException e) {
+            System.out.println("There is something weird going on.");
+        }
     }
 
     @Test
-    void when_initSpringApplicationContext_then_returnApplicationContext() {
+    void whenInitSpringApplicationContext_thenReturnApplicationContext() {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                 new String[]{"toolkitUsername=userName", "toolkitPassword=password"}
         );
@@ -47,7 +59,7 @@ class SpringInitializerTest {
     }
 
     @Test
-    void given_springEnvironment_when_setToolkitProperties_then_addPropertiesToEnvironment() {
+    void givenSpringEnvironment_whenSetToolkitProperties_thenAddPropertiesToEnvironment() {
         ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(new String[]{
                 "toolkitUsername=xxx",
                 "toolkitPassword=pass",

@@ -6,48 +6,31 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import pg.gipter.core.*;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.core.dto.RunConfig;
-import pg.gipter.job.JobHandler;
-import pg.gipter.job.upload.JobProperty;
-import pg.gipter.job.upload.JobType;
-import pg.gipter.job.upload.UploadItemJob;
-import pg.gipter.job.upload.UploadItemJobBuilder;
-import pg.gipter.launcher.Launcher;
-import pg.gipter.service.GithubService;
-import pg.gipter.service.StartupService;
-import pg.gipter.ui.alert.AlertWindowBuilder;
-import pg.gipter.ui.alert.ImageFile;
-import pg.gipter.ui.alert.WindowType;
-import pg.gipter.utils.AlertHelper;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.jobs.*;
+import pg.gipter.launchers.Launcher;
+import pg.gipter.services.GithubService;
+import pg.gipter.services.StartupService;
+import pg.gipter.ui.alerts.*;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.stream.Stream;
 
 /** Created by Gawa 2017-10-04 */
 public class UILauncher implements Launcher {
@@ -62,24 +45,25 @@ public class UILauncher implements Launcher {
     private Stage applicationSettingsWindow;
     private Stage upgradeWindow;
     private Stage toolkitSettingsWindow;
+    private Stage sharePointConfigWindow;
     private TrayHandler trayHandler;
-    private ConfigurationDao configurationDao;
-    private DataDao dataDao;
+    private final ConfigurationDao configurationDao;
+    private final DataDao dataDao;
     private boolean silentMode;
     private boolean upgradeChecked = false;
     private LocalDateTime lastItemSubmissionDate;
-    private Executor executor;
-    private JobHandler jobHandler;
+    private final Executor executor;
+    private final JobService jobService;
     private Properties wizardProperties;
 
     public UILauncher(Stage mainWindow, ApplicationProperties applicationProperties) {
         this.mainWindow = mainWindow;
         this.applicationProperties = applicationProperties;
-        configurationDao = DaoFactory.getConfigurationDao();
+        configurationDao = DaoFactory.getCachedConfiguration();
         dataDao = DaoFactory.getDataDao();
         silentMode = applicationProperties.isSilentMode();
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        jobHandler = new JobHandler();
+        jobService = new JobService();
     }
 
     public void setApplicationProperties(ApplicationProperties applicationProperties) {
@@ -107,6 +91,10 @@ public class UILauncher implements Launcher {
         StringProperty projectLabelProperty = (StringProperty) wizardProperties.get(WizardLauncher.projectLabelPropertyName);
         projectLabelProperty.setValue(StringUtils.trimTo50(value));
         wizardProperties.put(WizardLauncher.projectLabelPropertyName, projectLabelProperty);
+    }
+
+    public void addPropertyToWizard(String key, Collection<SharePointConfig> value) {
+        wizardProperties.put(key, new LinkedHashSet<>(value));
     }
 
     public void executeOutsideUIThread(Runnable runnable) {
@@ -149,7 +137,7 @@ public class UILauncher implements Launcher {
     }
 
     private void displayUpgradeInfo() {
-        logger.info("Upgrade to version {} finished [{}].", applicationProperties.version(), applicationProperties.isUpgradeFinished());
+        logger.info("Upgrade to version {} finished [{}].", applicationProperties.version().getVersion(), applicationProperties.isUpgradeFinished());
         new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
                 .withWindowType(WindowType.CONFIRMATION_WINDOW)
@@ -163,9 +151,9 @@ public class UILauncher implements Launcher {
             executor.execute(() -> {
                 GithubService service = new GithubService(applicationProperties.version());
                 if (service.isNewVersion()) {
-                    logger.info("New version available: {}.", service.getStrippedVersion());
+                    logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
-                            .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getStrippedVersion()))
+                            .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
                             .withLink(GithubService.GITHUB_URL + "/releases/latest")
                             .withWindowType(WindowType.BROWSER_WINDOW)
                             .withAlertType(Alert.AlertType.INFORMATION)
@@ -191,8 +179,27 @@ public class UILauncher implements Launcher {
 
     private void scheduleJobs() {
         scheduleUploadJob();
-        jobHandler.scheduleUpgradeJob();
-        jobHandler.executeUploadJobIfMissed(executor);
+        scheduleUpgradeJob();
+        jobService.executeUploadJobIfMissed(executor);
+        if (applicationProperties.isCheckLastItemEnabled()) {
+            scheduleCheckLastItemJob();
+        }
+    }
+
+    private void scheduleUpgradeJob() {
+        try {
+            jobService.scheduleJob(JobCreatorFactory.upgradeJobCreator());
+        } catch (SchedulerException e) {
+            logger.error("Can not schedule the upgrade job.");
+        }
+    }
+
+    private void scheduleCheckLastItemJob() {
+        try {
+            jobService.scheduleJob(JobCreatorFactory.lastItemJobCreator(applicationProperties));
+        } catch (SchedulerException e) {
+            logger.error("Can not schedule the last item job.");
+        }
     }
 
     public void buildAndShowMainWindow() {
@@ -212,7 +219,7 @@ public class UILauncher implements Launcher {
         }
         try {
             stage.setTitle(BundleUtils.getMsg(
-                    window.windowTitleBundle(), applicationProperties.version()
+                    window.windowTitleBundle(), applicationProperties.version().getVersion()
             ));
             stage.setResizable(window.resizable());
             Scene scene = new Scene(window.root());
@@ -234,13 +241,6 @@ public class UILauncher implements Launcher {
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(imgPath)) {
             return new Image(is);
         }
-    }
-
-    public void changeLanguage(String language) {
-        applicationSettingsWindow.close();
-        mainWindow.close();
-        BundleUtils.changeBundle(language);
-        execute();
     }
 
     public static void platformExit() {
@@ -293,25 +293,36 @@ public class UILauncher implements Launcher {
 
     public void cancelJob() {
         try {
-            if (jobHandler.isSchedulerInitiated()) {
-                jobHandler.cancelUploadJob();
+            if (jobService.isSchedulerInitiated()) {
+                final Optional<JobParam> jobParamOpt = dataDao.loadJobParam();
+                JobParam jobParam = jobParamOpt.get();
+                Map<String, Object> additionalJobParams = new HashMap<>();
+                additionalJobParams.put(UILauncher.class.getName(), this);
+
+                UploadItemJobBuilder builder = new UploadItemJobBuilder()
+                        .withJobType(jobParam.getJobType())
+                        .withStartDate(jobParam.getScheduleStart())
+                        .withDayOfMonth(jobParam.getDayOfMonth())
+                        .withHourOfDay(jobParam.getHourOfDay())
+                        .withMinuteOfHour(jobParam.getMinuteOfHour())
+                        .withDayOfWeek(jobParam.getDayOfWeek())
+                        .withCronExpression(jobParam.getCronExpression())
+                        .withConfigs(String.join(",", jobParam.getConfigs()))
+                        .withAdditionalParams(additionalJobParams);
+                jobService.deleteJob(builder.createJobCreator());
             }
         } catch (SchedulerException e) {
-            String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", jobHandler.schedulerClassName(), e.getMessage());
+            String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", jobService.schedulerClassName(), e.getMessage());
             logger.error(errorMessage);
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(errorMessage)
-                    .withLink(AlertHelper.logsFolder())
+                    .withLink(JarHelper.logsFolder())
                     .withWindowType(WindowType.LOG_WINDOW)
                     .withAlertType(Alert.AlertType.ERROR)
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } finally {
-            Optional<Properties> data = dataDao.loadDataProperties();
-            if (data.isPresent()) {
-                data.ifPresent(properties -> Stream.of(JobProperty.values()).forEach(jobKey -> properties.remove(jobKey.key())));
-                dataDao.saveDataProperties(data.get());
-            }
+            dataDao.removeJobParam();
 
             logger.info("{} canceled.", UploadItemJob.NAME);
             updateTray();
@@ -319,58 +330,32 @@ public class UILauncher implements Launcher {
     }
 
     private void scheduleUploadJob() {
-        Optional<Properties> data = dataDao.loadDataProperties();
-        if (data.isPresent() && !jobHandler.isSchedulerInitiated() && data.get().containsKey(JobProperty.TYPE.key())) {
+        final Optional<JobParam> jobParamOpt = dataDao.loadJobParam();
+        if (!jobService.isSchedulerInitiated() && jobParamOpt.isPresent() && jobParamOpt.get().getJobType() != null) {
+            JobParam jobParam = jobParamOpt.get();
             logger.info("Setting up the job.");
             try {
-                JobType jobType = JobType.valueOf(data.get().getProperty(JobProperty.TYPE.key()));
-
-                LocalDate scheduleStart = null;
-                if (data.get().containsKey(JobProperty.SCHEDULE_START.key())) {
-                    scheduleStart = LocalDate.parse(
-                            data.get().getProperty(JobProperty.SCHEDULE_START.key()),
-                            ApplicationProperties.yyyy_MM_dd
-                    );
-                }
-                int dayOfMonth = 0;
-                if (data.get().containsKey(JobProperty.DAY_OF_MONTH.key())) {
-                    dayOfMonth = Integer.parseInt(data.get().getProperty(JobProperty.DAY_OF_MONTH.key()));
-                }
-                int hourOfDay = 0;
-                int minuteOfHour = 0;
-                if (data.get().containsKey(JobProperty.HOUR_OF_THE_DAY.key())) {
-                    String hourOfDayString = data.get().getProperty(JobProperty.HOUR_OF_THE_DAY.key());
-                    hourOfDay = Integer.parseInt(hourOfDayString.substring(0, hourOfDayString.lastIndexOf(":")));
-                    minuteOfHour = Integer.parseInt(hourOfDayString.substring(hourOfDayString.lastIndexOf(":") + 1));
-                }
-                DayOfWeek dayOfWeek = null;
-                if (data.get().containsKey(JobProperty.DAY_OF_WEEK.key())) {
-                    dayOfWeek = DayOfWeek.valueOf(data.get().getProperty(JobProperty.DAY_OF_WEEK.key()));
-                }
-                String cronExpression = data.get().getProperty(JobProperty.CRON.key());
-                String configs = data.get().getProperty(JobProperty.CONFIGS.key());
-
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), this);
 
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
-                        .withData(data.get())
-                        .withJobType(jobType)
-                        .withStartDateTime(scheduleStart)
-                        .withDayOfMonth(dayOfMonth)
-                        .withHourOfDay(hourOfDay)
-                        .withMinuteOfHour(minuteOfHour)
-                        .withDayOfWeek(dayOfWeek)
-                        .withCronExpression(cronExpression)
-                        .withConfigs(configs);
-                jobHandler.scheduleUploadJob(builder, additionalJobParams);
+                        .withJobType(jobParam.getJobType())
+                        .withStartDate(jobParam.getScheduleStart())
+                        .withDayOfMonth(jobParam.getDayOfMonth())
+                        .withHourOfDay(jobParam.getHourOfDay())
+                        .withMinuteOfHour(jobParam.getMinuteOfHour())
+                        .withDayOfWeek(jobParam.getDayOfWeek())
+                        .withCronExpression(jobParam.getCronExpression())
+                        .withConfigs(String.join(",", jobParam.getConfigs()))
+                        .withAdditionalParams(additionalJobParams);
+                jobService.scheduleJob(builder.createJobCreator());
                 logger.info("Job set up successfully.");
 
-            } catch (ParseException | SchedulerException e) {
+            } catch (SchedulerException e) {
                 logger.warn("Can not restart the scheduler.", e);
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
-                        .withLink(AlertHelper.logsFolder())
+                        .withLink(JarHelper.logsFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.ERROR)
                         .withImage(ImageFile.ERROR_CHICKEN_PNG);
@@ -403,7 +388,7 @@ public class UILauncher implements Launcher {
         mainWindow.hide();
     }
 
-    public void showProjectsWindow(Properties wizardProperties) {
+    private void showProjectsWindow(Properties wizardProperties) {
         this.wizardProperties = wizardProperties;
         Platform.runLater(() -> {
             projectsWindow = new Stage();
@@ -411,7 +396,7 @@ public class UILauncher implements Launcher {
             buildScene(projectsWindow, WindowFactory.PROJECTS.createWindow(applicationProperties, this));
             projectsWindow.setOnCloseRequest(event -> {
                 hideProjectsWindow();
-                if (isInvokeExecute()) {
+                if (hasNoWizardProperties()) {
                     execute();
                 }
             });
@@ -428,9 +413,10 @@ public class UILauncher implements Launcher {
     }
 
     public void showApplicationSettingsWindow() {
+        mainWindow.close();
+
         applicationSettingsWindow = new Stage();
         applicationSettingsWindow.initModality(Modality.APPLICATION_MODAL);
-
         buildScene(applicationSettingsWindow, WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this));
         applicationSettingsWindow.setOnCloseRequest(event -> closeWindow(applicationSettingsWindow));
         applicationSettingsWindow.showAndWait();
@@ -466,7 +452,7 @@ public class UILauncher implements Launcher {
         toolkitSettingsWindow.showAndWait();
     }
 
-    public void showToolkitProjectsWindow(Properties wizardProperties) {
+    private void showToolkitProjectsWindow(Properties wizardProperties) {
         this.wizardProperties = wizardProperties;
         Platform.runLater(() -> {
             toolkitProjectsWindow = new Stage();
@@ -474,7 +460,7 @@ public class UILauncher implements Launcher {
             buildScene(toolkitProjectsWindow, WindowFactory.TOOLKIT_PROJECTS.createWindow(applicationProperties, this));
             toolkitProjectsWindow.setOnCloseRequest(event -> {
                 hideToolkitProjectsWindow();
-                if (isInvokeExecute()) {
+                if (hasNoWizardProperties()) {
                     execute();
                 }
             });
@@ -486,8 +472,8 @@ public class UILauncher implements Launcher {
         toolkitProjectsWindow.hide();
     }
 
-    public JobHandler getJobHandler() {
-        return jobHandler;
+    public JobService getJobService() {
+        return jobService;
     }
 
     public void showUpgradeWindow() {
@@ -505,7 +491,56 @@ public class UILauncher implements Launcher {
         upgradeWindow.close();
     }
 
-    public boolean isInvokeExecute() {
-        return wizardProperties == null || wizardProperties.isEmpty();
+    private boolean hasNoWizardProperties() {
+        return !hasWizardProperties();
+    }
+
+    public boolean hasWizardProperties() {
+        return wizardProperties != null && !wizardProperties.isEmpty();
+    }
+
+    private void showSharePointProjectWindow(Properties wizardProperties) {
+        this.wizardProperties = wizardProperties;
+        Platform.runLater(() -> {
+            sharePointConfigWindow = new Stage();
+            sharePointConfigWindow.initModality(Modality.APPLICATION_MODAL);
+            buildScene(sharePointConfigWindow, WindowFactory.SHARE_POINT_PROJECTS.createWindow(applicationProperties, this));
+            sharePointConfigWindow.setOnCloseRequest(event -> {
+                hideSharePointConfigWindow();
+                if (hasNoWizardProperties()) {
+                    execute();
+                }
+            });
+            sharePointConfigWindow.showAndWait();
+        });
+    }
+
+    private void hideSharePointConfigWindow() {
+        sharePointConfigWindow.close();
+        sharePointConfigWindow = null;
+    }
+
+    public void showProject(ItemType itemType) {
+        showProject(itemType, new Properties());
+    }
+
+    public void showProject(ItemType itemType, Properties properties) {
+        switch (itemType) {
+            case TOOLKIT_DOCS:
+                showToolkitProjectsWindow(properties);
+                break;
+            case SHARE_POINT_DOCS:
+                showSharePointProjectWindow(properties);
+                break;
+            default:
+                showProjectsWindow(properties);
+        }
+    }
+
+    public void changeApplicationSettingsWindowTitle() {
+        final AbstractWindow window = WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this);
+        applicationSettingsWindow.setTitle(BundleUtils.getMsg(
+                window.windowTitleBundle(), applicationProperties.version().getVersion()
+        ));
     }
 }

@@ -2,7 +2,7 @@ package pg.gipter.ui.main;
 
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.AbstractWindow;
-import pg.gipter.ui.alert.ImageFile;
+import pg.gipter.ui.alerts.ImageFile;
 
 /**Created by Gawa 2019-03-02*/
 public class MainWindow extends AbstractWindow {

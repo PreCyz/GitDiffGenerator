@@ -3,17 +3,13 @@ package pg.gipter.ui.menu;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.service.platform.AppManager;
-import pg.gipter.service.platform.AppManagerFactory;
+import pg.gipter.services.platforms.AppManager;
+import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 
@@ -41,8 +37,6 @@ public class ToolkitSettingsController extends AbstractController {
     private TextField toolkitUserFolderTextField;
     @FXML
     private Hyperlink toolkitUserFolderHyperlink;
-
-    private ApplicationProperties applicationProperties;
 
     public ToolkitSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);

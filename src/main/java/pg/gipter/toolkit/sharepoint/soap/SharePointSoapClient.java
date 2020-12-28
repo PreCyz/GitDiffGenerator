@@ -9,8 +9,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
-import pg.gipter.toolkit.helper.ListViewId;
-import pg.gipter.toolkit.helper.XmlHelper;
+import pg.gipter.toolkit.helpers.ListViewId;
+import pg.gipter.toolkit.helpers.XmlHelper;
 import pg.gipter.toolkit.ws.*;
 
 import javax.xml.parsers.DocumentBuilder;

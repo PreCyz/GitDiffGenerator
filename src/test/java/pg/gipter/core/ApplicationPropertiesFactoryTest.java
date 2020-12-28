@@ -1,10 +1,25 @@
 package pg.gipter.core;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pg.gipter.core.dao.DaoConstants;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ApplicationPropertiesFactoryTest {
+
+    @BeforeEach
+    void tearDown() {
+        try {
+            Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
+        } catch (IOException e) {
+            System.out.println("There is something weird going on.");
+        }
+    }
 
     @Test
     void givenNoArg_whenGetInstance_thenReturnUIApplicationProperties() {

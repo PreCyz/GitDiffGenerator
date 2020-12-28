@@ -3,13 +3,11 @@ package pg.gipter.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.dto.ApplicationConfig;
-import pg.gipter.core.dto.NamePatternValue;
-import pg.gipter.core.dto.RunConfig;
-import pg.gipter.core.dto.ToolkitConfig;
-import pg.gipter.core.producer.command.UploadType;
-import pg.gipter.core.producer.command.VersionControlSystem;
+import pg.gipter.core.dao.configuration.*;
+import pg.gipter.core.model.*;
+import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.core.producers.command.VersionControlSystem;
+import pg.gipter.services.SemanticVersioning;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
@@ -32,16 +30,16 @@ public abstract class ApplicationProperties {
     protected RunConfig currentRunConfig;
     protected final ArgExtractor argExtractor;
     private Set<VersionControlSystem> vcs;
-    private String[] cliArgs;
-    private ConfigurationDao configurationDao;
+    private final String[] cliArgs;
+    private final CachedConfiguration cachedConfiguration;
 
     public ApplicationProperties(String[] cliArgs) {
         this.cliArgs = cliArgs;
         argExtractor = new ArgExtractor(cliArgs);
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
-        configurationDao = DaoFactory.getConfigurationDao();
-        init(configurationDao);
+        cachedConfiguration = DaoFactory.getCachedConfiguration();
+        init(cachedConfiguration);
     }
 
     protected final void init(ConfigurationDao configurationDao) {
@@ -56,7 +54,7 @@ public abstract class ApplicationProperties {
             currentRunConfig = new ArrayList<>(runConfigMap.entrySet()).get(0).getValue();
         }
         if (currentRunConfig != null) {
-            logger.info("Configuration [{}] loaded.", argExtractor.configurationName());
+            logger.info("Configuration [{}] loaded.", currentRunConfig.getConfigurationName());
         } else {
             logger.warn("Can not load configuration [{}].", argExtractor.configurationName());
             logger.info("Command line argument loaded: {}.",
@@ -92,7 +90,7 @@ public abstract class ApplicationProperties {
     }
 
     public final Set<String> configurationNames() {
-        return configurationDao.loadRunConfigMap().keySet();
+        return cachedConfiguration.loadRunConfigMap().keySet();
     }
 
     public final Map<String, RunConfig> getRunConfigMap() {
@@ -112,7 +110,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitConfigExists() {
-        return toolkitConfig != null;
+        return toolkitConfig != null && toolkitConfig.isToolkitCredentialsSet();
     }
 
     protected final boolean isOtherAuthorsExists() {
@@ -186,8 +184,10 @@ public abstract class ApplicationProperties {
                 return String.valueOf(LocalDate.now().getYear());
             case CURRENT_MONTH_NAME:
                 return LocalDate.now().getMonth().name();
+            case current_month_name:
+                return LocalDate.now().getMonth().name().toLowerCase();
             case CURRENT_MONTH_NUMBER:
-                return String.valueOf(LocalDate.now().getMonthValue());
+                return String.format("%2d", LocalDate.now().getMonthValue()).replace(" ", "0");
             case CURRENT_WEEK_NUMBER:
                 return String.valueOf(LocalDate.now().get(weekFields.weekOfWeekBasedYear()));
             case START_DATE:
@@ -196,8 +196,10 @@ public abstract class ApplicationProperties {
                 return String.valueOf(startDate().getYear());
             case START_DATE_MONTH_NAME:
                 return startDate().getMonth().name();
+            case start_date_month_name:
+                return startDate().getMonth().name().toLowerCase();
             case START_DATE_MONTH_NUMBER:
-                return String.valueOf(startDate().getMonthValue());
+                return String.format("%2d", startDate().getMonthValue()).replace(" ", "0");
             case START_DATE_WEEK_NUMBER:
                 return String.valueOf(startDate().get(weekFields.weekOfWeekBasedYear()));
             case END_DATE:
@@ -206,8 +208,10 @@ public abstract class ApplicationProperties {
                 return String.valueOf(endDate().getYear());
             case END_DATE_MONTH_NAME:
                 return endDate().getMonth().name();
+            case end_date_month_name:
+                return endDate().getMonth().name().toLowerCase();
             case END_DATE_MONTH_NUMBER:
-                return String.valueOf(endDate().getMonthValue());
+                return String.format("%2d", endDate().getMonthValue()).replace(" ", "0");
             case END_DATE_WEEK_NUMBER:
                 return String.valueOf(endDate().get(weekFields.weekOfWeekBasedYear()));
             default:
@@ -217,7 +221,7 @@ public abstract class ApplicationProperties {
 
     final String getFileExtension() {
         String extension = "txt";
-        if (uploadType() == UploadType.TOOLKIT_DOCS) {
+        if (itemType() == ItemType.TOOLKIT_DOCS) {
             extension = "zip";
         }
         return extension;
@@ -227,7 +231,7 @@ public abstract class ApplicationProperties {
         return argExtractor.preferredArgSource();
     }
 
-    public String version() {
+    public SemanticVersioning version() {
         String version = "";
 
         InputStream is = getClass().getClassLoader().getResourceAsStream("version.txt");
@@ -239,7 +243,7 @@ public abstract class ApplicationProperties {
                 version = scan.nextLine();
             }
         }
-        return version;
+        return SemanticVersioning.getSemanticVersioning(version);
     }
 
     public final boolean isSilentMode() {
@@ -247,14 +251,25 @@ public abstract class ApplicationProperties {
     }
 
     public final void save() {
-        configurationDao.saveApplicationConfig(applicationConfig);
-        configurationDao.saveRunConfig(currentRunConfig);
-        configurationDao.saveToolkitConfig(toolkitConfig);
+        Map<String, RunConfig> tmpRunConfigs = new HashMap<>(runConfigMap);
+        tmpRunConfigs.put(currentRunConfig.getConfigurationName(), currentRunConfig);
+        tmpRunConfigs.remove(ArgName.configurationName.defaultValue());
+
+        Configuration configuration = new Configuration(
+                applicationConfig,
+                toolkitConfig, new LinkedList<>(tmpRunConfigs.values()),
+                SecurityProviderFactory.getSecurityProvider()
+                        .readCipherDetails()
+                        .orElseThrow(() -> new IllegalStateException("There is no CipherDetails"))
+        );
+
+        cachedConfiguration.saveConfiguration(configuration);
         runConfigMap.put(currentRunConfig.getConfigurationName(), currentRunConfig);
+        runConfigMap.remove(ArgName.configurationName.defaultValue());
     }
 
     public final void removeConfig(String configurationName) {
-        configurationDao.removeConfig(configurationName);
+        cachedConfiguration.removeConfig(configurationName);
         runConfigMap.remove(configurationName);
         currentRunConfig = new RunConfig();
         if (!runConfigMap.isEmpty()) {
@@ -263,7 +278,7 @@ public abstract class ApplicationProperties {
     }
 
     protected final String log() {
-        String log = "version='" + version() + '\'';
+        String log = "version='" + version().getVersion() + '\'';
         if (currentRunConfig != null) {
             log += ", configurationName='" + configurationName() + '\'' +
                     ", authors='" + String.join(",", authors()) + '\'' +
@@ -277,7 +292,7 @@ public abstract class ApplicationProperties {
                     ", periodInDays='" + periodInDays() + '\'' +
                     ", startDate='" + startDate() + '\'' +
                     ", endDate='" + endDate() + '\'' +
-                    ", uploadType='" + uploadType() + '\'' +
+                    ", uploadType='" + itemType() + '\'' +
                     ", skipRemote='" + isSkipRemote() + '\'' +
                     ", fetchAll='" + isFetchAll() + '\'' +
                     ", deleteDownloadedFiles='" + isDeleteDownloadedFiles() + '\'';
@@ -288,7 +303,9 @@ public abstract class ApplicationProperties {
                     ", silentMode='" + isSilentMode() + '\'' +
                     ", enableOnStartup='" + isEnableOnStartup() + '\'' +
                     ", upgradeFinished='" + isUpgradeFinished() + '\'' +
-                    ", loggerLevel='" + loggerLevel() + '\'';
+                    ", loggerLevel='" + loggerLevel() + '\'' +
+                    ", checkLastItemEnabled='" + isCheckLastItemEnabled() + '\'' +
+                    ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
         }
         if (toolkitConfig != null) {
             log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
@@ -298,7 +315,7 @@ public abstract class ApplicationProperties {
                     ", toolkitDomain='" + toolkitDomain() + '\'' +
                     ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
                     ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
-                    ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames());
+                    ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + "'";
 
         }
         return  log;
@@ -316,11 +333,11 @@ public abstract class ApplicationProperties {
     public abstract LocalDate startDate();
     public abstract LocalDate endDate();
     public abstract int periodInDays();
-    public abstract UploadType uploadType();
+    public abstract ItemType itemType();
     public abstract boolean isDeleteDownloadedFiles();
+    public abstract boolean isFetchAll();
     public abstract boolean isSkipRemote();
 
-    public abstract boolean isFetchAll();
     public abstract String toolkitUsername();
     public abstract String toolkitPassword();
     public abstract String toolkitDomain();
@@ -334,6 +351,10 @@ public abstract class ApplicationProperties {
     public abstract boolean isEnableOnStartup();
     public abstract boolean isUseUI();
     public abstract String loggerLevel();
+    public abstract String uiLanguage();
+    public abstract boolean isCertImportEnabled();
+    public abstract boolean isCheckLastItemEnabled();
+    public abstract String getCheckLastItemJobCronExpression();
 
     public abstract boolean isUpgradeFinished();
 }
