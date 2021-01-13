@@ -170,12 +170,19 @@ public class GithubService {
     }
 
     private boolean isProperAsset(String name, JsonElement assetName) {
-        boolean result = assetName != null;
-        if (result) {
-            String elevenPlus = "11+";
-            result = !assetName.isJsonNull();
+        if (assetName == null) {
+            return false;
+        }
+
+        final String version_1_8 = "1.8";
+        final String elevenPlus = "11+";
+
+        boolean result = !assetName.isJsonNull();
+        result &= assetName.getAsString().contains(name);
+        if (System.getProperty("java.version").startsWith(version_1_8)) {
+            result &= !assetName.getAsString().startsWith(elevenPlus);
+        } else {
             result &= assetName.getAsString().startsWith(elevenPlus);
-            result &= assetName.getAsString().contains(name);
         }
         return result;
     }
