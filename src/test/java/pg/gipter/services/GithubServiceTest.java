@@ -129,7 +129,7 @@ class GithubServiceTest {
         Optional<String> fileName = spyGithubService.getDownloadLink(new Gson().fromJson(reader, JsonObject.class));
 
         assertThat(fileName.isPresent()).isTrue();
-        assertThat(spyGithubService.distributionName).isEqualTo("11+Gipter_v3.6.6.7z");
+        assertThat(spyGithubService.distributionName).isEqualTo("Gipter_v3.6.6.7z");
     }
 
 }
