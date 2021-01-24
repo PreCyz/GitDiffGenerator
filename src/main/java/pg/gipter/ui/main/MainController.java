@@ -247,7 +247,8 @@ public class MainController extends AbstractController {
         configurationSectionController.initialize(location, resources, initConfigurationSectionMap());
         menuSectionController.initialize(location, resources, initMenuSectionMap());
         pathsSectionController.initialize(location, resources, initPathsSectionMap());
-        datesSectionController.initialize(location, resources, initDatesSectionMap());
+        //this is executed trough configurationSectionController
+        //datesSectionController.initialize(location, resources, initDatesSectionMap());
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
         //this is executed later in the flow
         //csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());

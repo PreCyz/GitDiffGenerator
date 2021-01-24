@@ -1,8 +1,6 @@
 package pg.gipter.services;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import javafx.concurrent.Task;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,13 +16,9 @@ import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-/**
- * Created by Pawel Gawedzki on 26-Jul-2019.
- */
+/** Created by Pawel Gawedzki on 26-Jul-2019. */
 public class ToolkitService extends Task<Set<String>> {
 
     protected static Logger logger = LoggerFactory.getLogger(ToolkitService.class);
