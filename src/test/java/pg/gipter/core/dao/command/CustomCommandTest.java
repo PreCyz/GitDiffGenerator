@@ -26,29 +26,39 @@ class CustomCommandTest {
     @Test
     void givenCustomCommandWithPlaceholders_whenFullCommand_returnCommand() {
         final ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{ArgName.author + "=precyz", ArgName.startDate + "=2020-06-05"}
+                new String[]{
+                        ArgName.author + "=precyz",
+                        ArgName.startDate + "=2020-06-05",
+                        ArgName.preferredArgSource + "=" + ArgName.preferredArgSource.defaultValue(),
+                        ArgName.useUI + "=N"
+                }
         );
         CustomCommand customCommand = new CustomCommand();
-        customCommand.setCommand("git log --author ${author} --oneline 'startDate ${startDate}'");
+        customCommand.setCommand("git log --author=${author} --oneline 'startDate ${startDate}'");
 
         final LinkedList<String> actual = customCommand.fullCommand(applicationProperties);
 
-        assertThat(actual).containsExactly("git", "log", "--author", "\"precyz\"", "--oneline", "startDate 2020-06-05");
+        assertThat(actual).containsExactly("git", "log", "--author='precyz'", "--oneline", "startDate 2020-06-05");
     }
 
     @Test
     void givenCustomCommandAsListWithPlaceholders_whenFullCommand_returnCommand() {
         final ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{ArgName.author + "=precyz", ArgName.startDate + "=2020-06-05"}
+                new String[]{
+                        ArgName.author + "=precyz",
+                        ArgName.startDate + "=2020-06-05",
+                        ArgName.preferredArgSource + "=" + ArgName.preferredArgSource.defaultValue(),
+                        ArgName.useUI + "=N"
+                }
         );
         CustomCommand customCommand = new CustomCommand();
         customCommand.setCommandList(Arrays.asList(
-                "git", "log", "--author", "${author}", "--oneline", "startDate ${startDate}"
+                "git", "log", "--author=${author}", "--oneline", "startDate ${startDate}"
         ));
 
         final LinkedList<String> actual = customCommand.fullCommand(applicationProperties);
 
-        assertThat(actual).containsExactly("git", "log", "--author", "\"precyz\"", "--oneline", "startDate 2020-06-05");
+        assertThat(actual).containsExactly("git", "log", "--author='precyz'", "--oneline", "startDate 2020-06-05");
     }
 
     @Test
@@ -139,52 +149,66 @@ class CustomCommandTest {
         );
         CustomCommand customCommand = new CustomCommand();
         customCommand.setCommandList(Arrays.asList(
-                "git", "log", "--author", "${author}", "--oneline", "startDate ${startDate}"
+                "git", "log", "--author=${author}", "--oneline", "startDate ${startDate}"
         ));
 
         final LinkedList<String> actual = customCommand.fullCommand(applicationProperties);
 
-        assertThat(actual).containsExactly("git", "log", "--author", "\"" + ArgName.author.defaultValue() + "\"", "--oneline", "startDate 2020-06-05");
+        assertThat(actual).containsExactly("git", "log", "--author='" + ArgName.author.defaultValue() + "'", "--oneline", "startDate 2020-06-05");
     }
 
     @Test
     void givenCustomCommandWithPlaceholdersAndNoAuthor_whenFullCommand_returnCommand() {
         final ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{ArgName.startDate + "=2020-06-05"}
+                new String[]{
+                        ArgName.startDate + "=2020-06-05",
+                        ArgName.preferredArgSource + "=" + ArgName.preferredArgSource.defaultValue(),
+                        ArgName.useUI + "=N"
+                }
         );
         CustomCommand customCommand = new CustomCommand();
-        customCommand.setCommand("git log --author ${author} --oneline 'startDate ${startDate}'");
+        customCommand.setCommand("git log --author=${author} --oneline 'startDate ${startDate}'");
 
         final LinkedList<String> actual = customCommand.fullCommand(applicationProperties);
 
-        assertThat(actual).containsExactly("git", "log", "--author", "\"" + ArgName.author.defaultValue() + "\"", "--oneline", "startDate 2020-06-05");
+        assertThat(actual).containsExactly("git", "log", "--author='" + ArgName.author.defaultValue() + "'", "--oneline", "startDate 2020-06-05");
     }
 
     @Test
     void givenCustomCommandAsListWithPlaceholdersAndEscapedAuthor_whenFullCommand_returnCommand() {
         final ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{ArgName.author + "=Obiwan Kenobi", ArgName.startDate + "=2020-06-05"}
+                new String[]{
+                        ArgName.author + "=Obiwan Kenobi",
+                        ArgName.startDate + "=2020-06-05",
+                        ArgName.preferredArgSource + "=" + ArgName.preferredArgSource.defaultValue(),
+                        ArgName.useUI + "=N"
+                }
         );
         CustomCommand customCommand = new CustomCommand();
         customCommand.setCommandList(Arrays.asList(
-                "git", "log", "--author", "${author}", "--oneline", "startDate ${startDate}"
+                "git", "log", "--author=${author}", "--oneline", "startDate ${startDate}"
         ));
 
         final LinkedList<String> actual = customCommand.fullCommand(applicationProperties);
 
-        assertThat(actual).containsExactly("git", "log", "--author", "\"Obiwan Kenobi\"", "--oneline", "startDate 2020-06-05");
+        assertThat(actual).containsExactly("git", "log", "--author='Obiwan Kenobi'", "--oneline", "startDate 2020-06-05");
     }
 
     @Test
     void givenCustomCommandWithPlaceholdersAndEscapedAuthor_whenFullCommand_returnCommand() {
         final ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{ArgName.author + "=Obiwan Kenobi", ArgName.startDate + "=2020-06-05"}
+                new String[]{
+                        ArgName.author + "=Obiwan Kenobi",
+                        ArgName.startDate + "=2020-06-05",
+                        ArgName.preferredArgSource + "=" + ArgName.preferredArgSource.defaultValue(),
+                        ArgName.useUI + "=N"
+                }
         );
         CustomCommand customCommand = new CustomCommand();
-        customCommand.setCommand("git log --author ${author} --oneline 'startDate ${startDate}'");
+        customCommand.setCommand("git log --author=${author} --oneline 'startDate ${startDate}'");
 
         final LinkedList<String> actual = customCommand.fullCommand(applicationProperties);
 
-        assertThat(actual).containsExactly("git", "log", "--author", "\"Obiwan Kenobi\"", "--oneline", "startDate 2020-06-05");
+        assertThat(actual).containsExactly("git", "log", "--author='Obiwan Kenobi'", "--oneline", "startDate 2020-06-05");
     }
 }

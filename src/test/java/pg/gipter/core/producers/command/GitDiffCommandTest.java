@@ -8,9 +8,7 @@ import pg.gipter.core.ApplicationProperties;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -73,7 +71,7 @@ class GitDiffCommandTest {
         List<String> actual = command.commandAsList();
 
         assertThat(actual).containsExactly("git", "log", "--remotes=origin*", "--patch", "--all",
-                "--author=\"" + author + "\"",
+                "--author='" + author + "'",
                 "--author=" + committerEmail,
                 "--since", startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 "--until", endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
@@ -98,15 +96,15 @@ class GitDiffCommandTest {
         List<String> actual = command.commandAsList();
 
         assertThat(actual).containsExactly("git", "log", "--patch", "--all",
-                "--author=\"" + author + "\"",
+                "--author='" + author + "'",
                 "--since", startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                 "--until", endDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         );
     }
 
     @Test
-    void given_authors_when_authors_thenReturnAuthors() {
-        Set<String> authors = Stream.of("author1", "author2").collect(toCollection(LinkedHashSet::new));
+    void givenAuthors_whenAuthors_thenReturnAuthors() {
+        Set<String> authors = Stream.of("author1 lastname", "author2").collect(toCollection(LinkedHashSet::new));
 
         when(applicationProperties.authors()).thenReturn(authors);
         when(applicationProperties.gitAuthor()).thenReturn("");
@@ -114,7 +112,7 @@ class GitDiffCommandTest {
 
         List<String> actual = command.authors();
 
-        assertThat(actual).containsExactly("--author=\"author1\"", "--author=\"author2\"");
+        assertThat(actual).containsExactly("--author='author1 lastname'", "--author='author2'");
     }
 
     @Test
@@ -127,18 +125,18 @@ class GitDiffCommandTest {
 
         List<String> actual = command.authors();
 
-        assertThat(actual).containsExactly("--author=\"gitAuthor\"");
+        assertThat(actual).containsExactly("--author='gitAuthor'");
     }
 
     @Test
     void given_gitAuthorAndCommitterEmail_when_authors_thenReturnGitAuthorAndCommitterEmail() {
-        when(applicationProperties.gitAuthor()).thenReturn("gitAuthor");
+        when(applicationProperties.gitAuthor()).thenReturn("gitAuthor GitLastname");
         when(applicationProperties.committerEmail()).thenReturn("committerEmail");
         command = new GitDiffCommand(applicationProperties);
 
         List<String> actual = command.authors();
 
-        assertThat(actual).containsExactly("--author=\"gitAuthor\"", "--author=committerEmail");
+        assertThat(actual).containsExactly("--author='gitAuthor GitLastname'", "--author=committerEmail");
     }
 
     @Test

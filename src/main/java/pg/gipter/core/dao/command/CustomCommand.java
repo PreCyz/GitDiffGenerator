@@ -57,7 +57,13 @@ public class CustomCommand {
                         argument.append(param).append(" ");
                     } while (iterator.hasNext());
                     commandReplaced.add(argument.toString().trim());
-                } else {
+                } else if (cmd.contains("$")) {
+                    String placeHolder = cmd.substring(cmd.indexOf("$"), cmd.indexOf("}") + 1);
+                    cmd = cmd.replace(placeHolder, placeholderMap.getOrDefault(placeHolder, cmd));
+                    cmd = placeholderMap.getOrDefault(cmd, cmd);
+                    commandReplaced.add(cmd.replaceAll("\"", "'"));
+                }
+                else {
                     commandReplaced.add(placeholderMap.getOrDefault(cmd, cmd));
                 }
             }
@@ -77,9 +83,9 @@ public class CustomCommand {
                     result.add(argument.toString().replaceAll("'", ""));
                 } else if (cmd.contains("\"") && cmd.indexOf("\"") == cmd.lastIndexOf("\"")) {
                     StringBuilder argument = handleQuotedText(iterator, cmd, "\"");
-                    result.add(argument.toString());
+                    result.add(argument.toString().replaceAll("\"", "'"));
                 } else {
-                    result.add(cmd);
+                    result.add(cmd.replaceAll("\"", "'"));
                 }
             }
         }
