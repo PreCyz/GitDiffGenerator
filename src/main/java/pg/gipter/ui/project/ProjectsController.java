@@ -21,6 +21,7 @@ import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.JarHelper;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.*;
@@ -150,10 +151,11 @@ public class ProjectsController extends AbstractController {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(Paths.get(".").toFile());
             directoryChooser.setTitle(resources.getString("directory.search.title"));
-            final Path directory = directoryChooser.showDialog(uiLauncher.currentWindow()).toPath();
-            if (Files.exists(directory) && Files.isDirectory(directory)) {
+            final Optional<File> directory = Optional.ofNullable(directoryChooser.showDialog(uiLauncher.currentWindow()));
+            if (directory .isPresent() && Files.exists(directory.get().toPath()) &&
+                    Files.isDirectory(directory.get().toPath())) {
                 CompletableFuture.supplyAsync(() ->
-                        FXCollections.observableList(searchForProjects(directory)), uiLauncher.nonUIExecutor()
+                        FXCollections.observableList(searchForProjects(directory.get().toPath())), uiLauncher.nonUIExecutor()
                 ).thenAcceptAsync(this::refreshProjectTableView, Platform::runLater);
             }
         };
