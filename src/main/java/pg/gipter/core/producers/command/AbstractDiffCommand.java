@@ -12,8 +12,12 @@ abstract class AbstractDiffCommand implements DiffCommand {
         this.appProps = appProps;
     }
 
-    protected String wrapWithQuotationMarks(String value) {
+    protected String wrapWithQuotationMark(String value) {
         return "\"" + value + "\"";
+    }
+
+    protected String wrapWithSingleQuotationMark(String value) {
+        return "'" + value + "'";
     }
 
     abstract List<String> getInitialCommand();

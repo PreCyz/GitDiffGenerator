@@ -14,9 +14,9 @@ import pg.gipter.utils.StringUtils;
 
 import java.util.*;
 
-class StatisticDaoImpl extends MongoDaoConfig implements StatisticDao {
+class StatisticRepository extends MongoDaoConfig implements StatisticDao {
 
-    StatisticDaoImpl() {
+    StatisticRepository() {
         super(Statistic.COLLECTION_NAME);
     }
 
