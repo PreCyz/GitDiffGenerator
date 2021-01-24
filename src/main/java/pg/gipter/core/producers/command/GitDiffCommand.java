@@ -3,9 +3,7 @@ package pg.gipter.core.producers.command;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.utils.StringUtils;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -53,13 +51,16 @@ final class GitDiffCommand extends AbstractDiffCommand {
     }
 
     List<String> authors() {
-        List<String> authors = new LinkedList<>();
+        List<String> authors;
         if (!appProps.gitAuthor().isEmpty()) {
-            authors.add("--author=" + wrapWithQuotationMarks(appProps.gitAuthor()));
+            authors = Arrays.stream(appProps.gitAuthor().split(" "))
+                    .map(split -> "--author=" + split)
+                    .collect(toCollection(LinkedList::new));
         } else {
             authors = appProps.authors()
                     .stream()
-                    .map(author -> "--author=" + wrapWithQuotationMarks(author))
+                    .flatMap(author -> Arrays.stream(author.split(" ")))
+                    .map(author -> "--author=" + author)
                     .collect(toCollection(LinkedList::new));
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {
