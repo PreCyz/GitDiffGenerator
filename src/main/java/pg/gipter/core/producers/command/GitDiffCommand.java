@@ -51,16 +51,13 @@ final class GitDiffCommand extends AbstractDiffCommand {
     }
 
     List<String> authors() {
-        List<String> authors;
+        List<String> authors = new LinkedList<>();
         if (!appProps.gitAuthor().isEmpty()) {
-            authors = Arrays.stream(appProps.gitAuthor().split(" "))
-                    .map(split -> "--author=" + split)
-                    .collect(toCollection(LinkedList::new));
+            authors.add("--author=" + wrapWithSingleQuotationMark(appProps.gitAuthor()));
         } else {
             authors = appProps.authors()
                     .stream()
-                    .flatMap(author -> Arrays.stream(author.split(" ")))
-                    .map(author -> "--author=" + author)
+                    .map(author -> "--author=" + wrapWithSingleQuotationMark(author))
                     .collect(toCollection(LinkedList::new));
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {
