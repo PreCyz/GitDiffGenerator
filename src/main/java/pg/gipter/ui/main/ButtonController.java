@@ -22,12 +22,14 @@ public class ButtonController extends AbstractController {
     private Button executeAllButton;
     private Button jobButton;
     private Button exitButton;
+    private Button trayButton;
 
     private final MainController mainController;
 
     protected ButtonController(UILauncher uiLauncher, ApplicationProperties applicationProperties,
                                MainController mainController) {
         super(uiLauncher);
+        this.applicationProperties = applicationProperties;
         this.mainController = mainController;
     }
 
@@ -38,8 +40,14 @@ public class ButtonController extends AbstractController {
         executeAllButton = initButtonMap.get("executeAllButton");
         jobButton = initButtonMap.get("jobButton");
         exitButton = initButtonMap.get("exitButton");
+        trayButton = initButtonMap.get("trayButton");
 
+        setProperties();
         setActions();
+    }
+
+    private void setProperties() {
+        trayButton.setDisable(!uiLauncher.isTrayActivated());
     }
 
     private void setActions() {
@@ -47,6 +55,7 @@ public class ButtonController extends AbstractController {
         executeAllButton.setOnAction(executeAllActionEventHandler());
         jobButton.setOnAction(jobActionEventHandler());
         exitButton.setOnAction(exitActionEventHandler());
+        trayButton.setOnAction(trayActionEventHandler());
     }
 
     private EventHandler<ActionEvent> executeActionEventHandler() {
@@ -109,5 +118,9 @@ public class ButtonController extends AbstractController {
         executeButton.setDisable(value);
         executeAllButton.setDisable(value);
         jobButton.setDisable(value);
+    }
+
+    private EventHandler<ActionEvent> trayActionEventHandler() {
+        return actionEvent -> uiLauncher.currentWindow().close();
     }
 }

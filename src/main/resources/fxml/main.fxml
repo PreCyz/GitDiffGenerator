@@ -60,9 +60,9 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="saveConfigurationButton" layoutX="347.0" layoutY="9.0" mnemonicParsing="false" prefWidth="222.0" text="%button.save" textFill="#32a1c9">
+                  <Button fx:id="saveConfigurationButton" layoutX="347.0" layoutY="9.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="164.0" text="%button.save" textFill="#1eb235">
                      <font>
-                        <Font name="System Bold" size="12.0" />
+                        <Font name="System Bold" size="14.0" />
                      </font>
                   </Button>
                   <ComboBox fx:id="configurationNameComboBox" layoutX="57.0" layoutY="39.0" prefHeight="25.0" prefWidth="160.0" />
@@ -151,22 +151,22 @@
                      </font>
                   </TitledPane>
                   <Label fx:id="infoLabel" alignment="CENTER_RIGHT" layoutX="264.0" layoutY="504.0" prefHeight="17.0" prefWidth="255.0" />
-                  <Button fx:id="executeButton" layoutX="3.0" layoutY="460.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="126.0" text="%button.execute" textFill="#1eb235">
+                  <Button fx:id="executeButton" layoutX="3.0" layoutY="460.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="90.0" text="%button.execute" textFill="#1eb235">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="executeAllButton" layoutX="133.0" layoutY="460.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="126.0" text="%button.executeAll" textFill="#1eb235">
+                  <Button fx:id="executeAllButton" layoutX="95.0" layoutY="460.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="90.0" text="%button.executeAll" textFill="#1eb235">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="jobButton" layoutX="264.0" layoutY="460.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="126.0" text="%button.job" textFill="#32a1c9">
+                  <Button fx:id="jobButton" layoutX="187.0" layoutY="460.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="90.0" text="%button.job" textFill="#32a1c9">
                      <font>
                         <Font name="System Bold" size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="exitButton" layoutX="394.0" layoutY="460.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="126.0" text="%button.exit" textFill="#0d0d0d">
+                  <Button fx:id="exitButton" layoutX="279.0" layoutY="460.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="90.0" text="%button.exit" textFill="#0d0d0d">
                      <font>
                         <Font name="System Bold" size="13.0" />
                      </font>
@@ -201,6 +201,11 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </TitledPane>
+                  <Button fx:id="trayButton" layoutX="371.0" layoutY="460.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="90.0" text="%button.tray" textFill="#0d0d0d">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Button>
                </children>
             </AnchorPane>
         </content>
