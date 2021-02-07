@@ -186,6 +186,12 @@ public enum ArgName {
             return BundleUtils.getDefaultLanguage();
         }
     },
+    useMetroSkin {
+        @Override
+        public String defaultValue() {
+            return "N";
+        }
+    },
 
     toolkitUsername {
         @Override
