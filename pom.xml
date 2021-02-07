@@ -258,6 +258,11 @@
             <version>${javaFX.version}</version>
             <classifier>mac</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.jfxtras</groupId>
+            <artifactId>jmetro</artifactId>
+            <version>11.6.12</version>
+        </dependency>
 
         <dependency>
             <groupId>javax.xml.bind</groupId>

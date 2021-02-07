@@ -1,26 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <AnchorPane prefHeight="385.0" prefWidth="440.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label layoutX="14.0" layoutY="14.0" text="%sharepoint.name" />
-      <TextField fx:id="nameTextField" layoutX="101.0" layoutY="10.0" prefWidth="220.0" />
-      <TextField fx:id="usernameTextField" layoutX="101.0" layoutY="40.0" prefWidth="220.0" />
-      <Label layoutX="14.0" layoutY="44.0" text="%sharepoint.username" />
-      <Label layoutX="14.0" layoutY="74.0" text="%sharepoint.password" />
-      <PasswordField fx:id="passwordField" layoutX="101.0" layoutY="70.0" prefWidth="220.0" />
-      <Label layoutX="14.0" layoutY="104.0" text="%sharepoint.domain" />
-      <TextField fx:id="domainTextField" layoutX="101.0" layoutY="100.0" prefWidth="220.0" />
-      <TextField fx:id="urlTextField" layoutX="101.0" layoutY="130.0" prefHeight="25.0" prefWidth="220.0" />
-      <Label layoutX="14.0" layoutY="134.0" text="%sharepoint.url" />
-      <TextField fx:id="projectTextField" layoutX="101.0" layoutY="160.0" prefHeight="25.0" prefWidth="220.0" />
-      <Label layoutX="14.0" layoutY="164.0" text="%sharepoint.project" />
-      <Label layoutX="14.0" layoutY="194.0" text="%sharepoint.listName" />
-      <TextField fx:id="listNameTextField" layoutX="101.0" layoutY="190.0" prefHeight="25.0" prefWidth="220.0" />
       <Button id="add-button" fx:id="addConfigButton" layoutX="402.0" layoutY="271.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/sharepointProject.css" />
-      <ComboBox fx:id="sharePointProjectsComboBox" layoutX="142.0" layoutY="271.0" prefHeight="25.0" prefWidth="250.0" />
+      <ComboBox id="combo-box" fx:id="sharePointProjectsComboBox" layoutX="142.0" layoutY="271.0" prefHeight="25.0" prefWidth="250.0" stylesheets="@../css/combobox.css" />
       <Button id="remove-button" fx:id="removeConfigButton" layoutX="402.0" layoutY="307.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/sharepointProject.css" />
       <Label fx:id="numberOfConfigsLabel" layoutX="14.0" layoutY="275.0" text="%sharepoint.numberOfConfigs" />
       <Hyperlink fx:id="sharePointLink" alignment="TOP_CENTER" layoutX="14.0" layoutY="220.0" prefHeight="42.0" prefWidth="389.0" text="%sharepoint.fullLink.default" textAlignment="CENTER" textOverrun="CENTER_ELLIPSIS" wrapText="true">
@@ -28,5 +14,36 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </Hyperlink>
+      <GridPane layoutY="10.0">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="220.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="%sharepoint.name" />
+            <TextField id="text-field" fx:id="nameTextField" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" />
+            <Label text="%sharepoint.username" GridPane.rowIndex="1" />
+            <TextField id="text-field" fx:id="usernameTextField" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="%sharepoint.password" GridPane.rowIndex="2" />
+            <PasswordField id="text-field" fx:id="passwordField" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="%sharepoint.domain" GridPane.rowIndex="3" />
+            <TextField id="text-field" fx:id="domainTextField" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="%sharepoint.url" GridPane.rowIndex="4" />
+            <TextField id="text-field" fx:id="urlTextField" prefHeight="25.0" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField id="text-field" fx:id="projectTextField" prefHeight="25.0" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Label text="%sharepoint.project" GridPane.rowIndex="5" />
+            <Label text="%sharepoint.listName" GridPane.rowIndex="6" />
+            <TextField id="text-field" fx:id="listNameTextField" prefHeight="25.0" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+         </children>
+      </GridPane>
    </children>
 </AnchorPane>

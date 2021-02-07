@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="575.0" prefWidth="544.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="575.0" prefWidth="544.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label layoutX="10.0" layoutY="10.0" text="%toolkit.projects.instructions">
          <font>
@@ -20,14 +20,14 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </Hyperlink>
-      <TextField fx:id="projectIdTextField" alignment="CENTER" layoutX="224.0" layoutY="157.0" prefHeight="25.0" prefWidth="70.0" />
+      <TextField fx:id="projectIdTextField" alignment="CENTER" layoutX="224.0" layoutY="157.0" prefHeight="25.0" prefWidth="70.0" stylesheets="@../css/text-field.css" />
       <Label layoutX="10.0" layoutY="99.0" text="%toolkit.projects.example" />
       <Label layoutX="296.0" layoutY="161.0" text="/">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <TextField fx:id="projectNameTextField" alignment="CENTER" layoutX="304.0" layoutY="157.0" prefHeight="25.0" prefWidth="80.0" />
+      <TextField fx:id="projectNameTextField" alignment="CENTER" layoutX="304.0" layoutY="157.0" prefHeight="25.0" prefWidth="80.0" stylesheets="@../css/text-field.css" />
       <Label layoutX="386.0" layoutY="161.0" text="/default.aspx">
          <font>
             <Font name="System Bold" size="12.0" />
@@ -45,7 +45,7 @@
             <TableColumn editable="false" prefWidth="231.0" sortable="false" text="%projects.column.path" />
          </columns>
       </TableView>
-      <Button fx:id="saveButton" layoutX="286.0" layoutY="533.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="142.0" text="%projects.button.save" textFill="#1eb235">
+      <Button id="green" fx:id="saveButton" layoutX="286.0" layoutY="533.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="142.0" stylesheets="@../css/buttons.css" text="%projects.button.save" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
