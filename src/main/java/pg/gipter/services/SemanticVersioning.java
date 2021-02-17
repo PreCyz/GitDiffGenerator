@@ -61,6 +61,7 @@ public class SemanticVersioning {
     }
 
     public static SemanticVersioning getSemanticVersioning(String version) {
+        version = removeSnapshot(version);
         int major = 0;
         int minor = 0;
         int patch = 0;
@@ -87,6 +88,17 @@ public class SemanticVersioning {
         SemanticVersioning semanticVersioning = new SemanticVersioning(major, minor, patch);
         semanticVersioning.setAdditionalLabel(label);
         return semanticVersioning;
+    }
+
+    private static String removeSnapshot(String value) {
+        String result = "1.0.0";
+        if (value != null) {
+            final String SNAPSHOT = "-SNAPSHOT";
+            if (!value.contains(SNAPSHOT)) {
+                result = value;
+            }
+        }
+        return result;
     }
 
     @Override
