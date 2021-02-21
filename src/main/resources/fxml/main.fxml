@@ -163,7 +163,7 @@
                                           <Label text="%vcs.panel.svnAuthor" GridPane.rowIndex="4" />
                                           <TextField fx:id="svnAuthorTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                           <Label text="%vcs.panel.itemType" GridPane.rowIndex="5" />
-                                          <ComboBox fx:id="itemTypeComboBox" prefWidth="160.0" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                          <ComboBox fx:id="itemTypeComboBox" prefWidth="160.0" stylesheets="@../css/combobox.css" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                           <Label text="%toolkit.panel.projectListNames" GridPane.rowIndex="6" />
                                           <TextField fx:id="toolkitProjectListNamesTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                                           <CheckBox fx:id="useDefaultAuthorCheckBox" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
@@ -274,7 +274,7 @@
                                     <Font name="System Bold" size="14.0" />
                                  </font>
                               </Button>
-                              <ComboBox fx:id="configurationNameComboBox" prefHeight="25.0" prefWidth="207.0" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <ComboBox fx:id="configurationNameComboBox" prefHeight="25.0" prefWidth="207.0" stylesheets="@../css/combobox.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                               <Button id="red" fx:id="removeConfigurationButton" mnemonicParsing="false" prefWidth="110.0" stylesheets="@../css/buttons.css" text="%main.deleteConfiguration" textFill="#f41b63" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
