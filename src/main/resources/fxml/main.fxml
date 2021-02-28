@@ -138,9 +138,9 @@
                                  <children>
                                     <GridPane layoutX="8.0" layoutY="9.0" prefHeight="193.0" prefWidth="296.0">
                                        <columnConstraints>
-                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
-                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="10.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="36.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" percentWidth="54.0" />
+                                          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" percentWidth="10.0" />
                                        </columnConstraints>
                                        <rowConstraints>
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -158,16 +158,16 @@
                                           <TextField fx:id="committerEmailTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                           <Label text="%vcs.panel.gitAuthor" GridPane.rowIndex="2" />
                                           <TextField fx:id="gitAuthorTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                          <TextField fx:id="mercurialAuthorTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                           <Label text="%vcs.panel.mercurialAuthor" GridPane.rowIndex="3" />
+                                          <TextField fx:id="mercurialAuthorTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                           <Label text="%vcs.panel.svnAuthor" GridPane.rowIndex="4" />
                                           <TextField fx:id="svnAuthorTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                           <Label text="%vcs.panel.itemType" GridPane.rowIndex="5" />
                                           <ComboBox fx:id="itemTypeComboBox" prefWidth="160.0" stylesheets="@../css/combobox.css" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                           <Label text="%toolkit.panel.projectListNames" GridPane.rowIndex="6" />
                                           <TextField fx:id="toolkitProjectListNamesTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                          <CheckBox fx:id="useDefaultAuthorCheckBox" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                           <CheckBox fx:id="useDefaultEmailCheckBox" layoutX="274.0" layoutY="69.0" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                          <CheckBox fx:id="useDefaultAuthorCheckBox" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                        </children>
                                     </GridPane>
                                  </children>

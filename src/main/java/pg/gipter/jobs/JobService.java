@@ -87,7 +87,7 @@ public class JobService {
                             .withAlertType(Alert.AlertType.WARNING)
                             .withWindowType(WindowType.CONFIRMATION_WINDOW)
                             .withImage(ImageFile.OVERRIDE_PNG)
-                            .withTitle(BundleUtils.getMsg("job.missingExecution",
+                            .withHeaderText(BundleUtils.getMsg("job.missingExecution",
                                     LocalDateTime.parse(savedNextFireDate, DateTimeFormatter.ISO_DATE_TIME).format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")),
                                     startDate.format(DateTimeFormatter.ISO_DATE)
                             ))

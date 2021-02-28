@@ -325,7 +325,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
                 detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
                 alertWindowBuilder
                         .withMessage(detailedMessage)
-                        .withLink(JarHelper.logsFolder())
+                        .withLink(JarHelper.logsFolder(), toolkitUserFolder())
                         .withWindowType(WindowType.LOG_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING)
                         .withImage(ImageFile.randomPartialSuccessImage());
