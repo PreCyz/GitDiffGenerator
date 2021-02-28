@@ -70,7 +70,7 @@ public class ButtonController extends AbstractController {
                 Arrays.stream(toolkitConfig.toArgumentArray())
         ).toArray(String[]::new));
 
-        FXMultiRunner runner = new FXMultiRunner(
+        MultiConfigRunner runner = new MultiConfigRunner(
                 Stream.of(uiAppProperties).collect(toList()),
                 uiLauncher.nonUIExecutor(),
                 RunType.EXECUTE
@@ -95,7 +95,7 @@ public class ButtonController extends AbstractController {
         Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
         map.put(uiAppProperties.configurationName(), uiAppProperties);
 
-        FXMultiRunner runner = new FXMultiRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
+        MultiConfigRunner runner = new MultiConfigRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
         mainController.resetIndicatorProperties(runner);
         uiLauncher.executeOutsideUIThread(() -> {
             runner.call();

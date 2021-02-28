@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toCollection;
 
 /** Created by Pawel Gawedzki on 15-Jul-2019. */
-public class FXMultiRunner extends Task<Void> implements Starter {
+public class MultiConfigRunner extends Task<Void> implements Starter {
 
     private static class UploadResult {
         String configName;
@@ -55,7 +55,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(FXMultiRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(MultiConfigRunner.class);
     private final LinkedList<String> configurationNames;
     private final Executor executor;
     private static Boolean toolkitCredentialsSet = null;
@@ -68,11 +68,11 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private final RunType runType;
     private final LocalDate startDate;
 
-    public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType) {
+    public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType) {
         this(configurationNames, executor, runType, null);
     }
 
-    public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType, LocalDate startDate) {
+    public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType, LocalDate startDate) {
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
         this.totalProgress = configurationNames.size() * 5;
@@ -84,7 +84,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.startDate = startDate;
     }
 
-    public FXMultiRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor, RunType runType) {
+    public MultiConfigRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor, RunType runType) {
         this(
                 applicationPropertiesCollection.stream()
                         .map(ApplicationProperties::configurationName)

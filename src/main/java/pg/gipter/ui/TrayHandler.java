@@ -214,7 +214,7 @@ class TrayHandler {
 
     private ActionListener uploadActionListener() {
         return e -> executor.execute(() ->
-                new FXMultiRunner(applicationProperties.getRunConfigMap().keySet(), executor, RunType.TRAY).start()
+                new MultiConfigRunner(applicationProperties.getRunConfigMap().keySet(), executor, RunType.TRAY).start()
         );
     }
 
