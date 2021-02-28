@@ -316,4 +316,9 @@ class CliApplicationProperties extends ApplicationProperties {
         }
         return cronExpression;
     }
+
+    @Override
+    public boolean useMetroSkin() {
+        return argExtractor.isUseMetroSkin();
+    }
 }

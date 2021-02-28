@@ -10,31 +10,29 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import pg.gipter.services.platforms.AppManagerFactory;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.ResourceUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
-/** Created by Pawel Gawedzki on 01-Apr-2019. */
+import static java.util.stream.Collectors.toCollection;
+
+/**
+ * Created by Pawel Gawedzki on 01-Apr-2019.
+ */
 public class AlertWindowBuilder {
     private String title;
     private String headerText;
     private String message;
-    private String link;
+    private Set<String> links;
     private WindowType windowType;
     private Alert.AlertType alertType;
     private ImageFile imageFile;
     private String cancelButtonText;
     private String okButtonText;
 
-    public AlertWindowBuilder() { }
-
-    public AlertWindowBuilder withTitle(String title) {
-        this.headerText = title;
-        return this;
+    public AlertWindowBuilder() {
     }
 
     public AlertWindowBuilder withHeaderText(String headerText) {
@@ -47,8 +45,8 @@ public class AlertWindowBuilder {
         return this;
     }
 
-    public AlertWindowBuilder withLink(String link) {
-        this.link = link;
+    public AlertWindowBuilder withLink(String... links) {
+        this.links = Stream.of(links).collect(toCollection(LinkedHashSet::new));
         return this;
     }
 
@@ -79,8 +77,8 @@ public class AlertWindowBuilder {
 
     public void buildAndDisplayWindow() {
         Alert alert = buildDefaultAlert();
-        Hyperlink hyperLink = buildHyperlink(alert);
-        GridPane gridPane = buildGridPane(hyperLink);
+        List<Hyperlink> hyperLinks = buildHyperlinks(alert);
+        GridPane gridPane = buildGridPane(hyperLinks);
 
         alert.getDialogPane().contentProperty().set(gridPane);
         alert.showAndWait();
@@ -98,24 +96,29 @@ public class AlertWindowBuilder {
         return alert;
     }
 
-    private Hyperlink buildHyperlink(Alert alert) {
-        Hyperlink hyperLink = new Hyperlink(link);
-        if (windowType == WindowType.LOG_WINDOW) {
-            hyperLink.setOnAction((evt) -> {
-                alert.close();
-                AppManagerFactory.getInstance().launchFileManagerForLogs();
-            });
-        } else if (windowType == WindowType.BROWSER_WINDOW) {
-            hyperLink.setOnAction((evt) -> {
-                alert.close();
-                AppManagerFactory.getInstance().launchDefaultBrowser(link);
-            });
+    private List<Hyperlink> buildHyperlinks(Alert alert) {
+        List<Hyperlink> hyperlinks = new LinkedList<>();
+        for (String link : links) {
+            Hyperlink hyperLink = new Hyperlink(link);
+            if (windowType == WindowType.LOG_WINDOW) {
+                hyperLink.setOnAction((evt) -> {
+                    alert.close();
+                    AppManagerFactory.getInstance().launchFileManagerForLogs();
+                });
+            } else if (windowType == WindowType.BROWSER_WINDOW) {
+                hyperLink.setOnAction((evt) -> {
+                    alert.close();
+                    AppManagerFactory.getInstance().launchDefaultBrowser(link);
+                });
+            }
+            hyperLink.setFont(Font.font("Verdana", 14));
+            hyperlinks.add(hyperLink);
+
         }
-        hyperLink.setFont(Font.font("Verdana", 14));
-        return hyperLink;
+        return hyperlinks;
     }
 
-    private GridPane buildGridPane(Hyperlink hyperLink) {
+    private GridPane buildGridPane(List<Hyperlink> hyperLinks) {
         GridPane gridPane = new GridPane();
         gridPane.setVgap(10);
         gridPane.setHgap(10);
@@ -134,7 +137,7 @@ public class AlertWindowBuilder {
             gridPane.add(messageLabel, 0, row++);
         }
 
-        if (hyperLink != null && !StringUtils.nullOrEmpty(hyperLink.getText())) {
+        for (Hyperlink hyperLink : hyperLinks) {
             int pixelsPerLetter = 8; //depends on font size
             preferredWidth = Math.max(preferredWidth, pixelsPerLetter * hyperLink.getText().length());
             gridPane.add(hyperLink, 0, row++);
@@ -164,7 +167,7 @@ public class AlertWindowBuilder {
         ButtonType cancelButton = new ButtonType(cancelButtonText, ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().addAll(okButton, cancelButton);
 
-        GridPane fp = buildGridPane(new Hyperlink(""));
+        GridPane fp = buildGridPane(Collections.singletonList(new Hyperlink("")));
         alert.getDialogPane().contentProperty().set(fp);
 
         return alert.showAndWait().orElse(cancelButton) == okButton;

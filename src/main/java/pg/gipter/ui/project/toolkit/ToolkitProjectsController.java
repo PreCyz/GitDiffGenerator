@@ -11,7 +11,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.ToolkitService;
 import pg.gipter.services.platforms.AppManager;
@@ -64,7 +65,7 @@ public class ToolkitProjectsController extends AbstractController {
         super.initialize(location, resources);
         setUpColumns();
         initValues();
-        setupActions();
+        setActions();
         setProperties();
     }
 
@@ -166,7 +167,7 @@ public class ToolkitProjectsController extends AbstractController {
         }
     }
 
-    private void setupActions() {
+    private void setActions() {
         showMyProjectsHyperlink.setOnMouseClicked(showMyProjectsMouseClickEventHandler());
         checkProjectHyperlink.setOnMouseClicked(checkProjectsMouseClickEventHandler());
         addProjectButton.setOnAction(addActionEventHandler());
@@ -217,7 +218,9 @@ public class ToolkitProjectsController extends AbstractController {
 
     private EventHandler<ActionEvent> removeButtonActionEventHandler() {
         return event -> {
-            LinkedHashSet<ProjectDetails> projectsToDelete = new LinkedHashSet<>(projectsTableView.getSelectionModel().getSelectedItems());
+            LinkedHashSet<ProjectDetails> projectsToDelete = new LinkedHashSet<>(
+                    projectsTableView.getSelectionModel().getSelectedItems()
+            );
             projectsTableView.getItems().removeAll(projectsToDelete);
             if (projectsTableView.getItems().isEmpty()) {
                 projectsTableView.getItems().add(ProjectDetails.DEFAULT);
@@ -237,7 +240,6 @@ public class ToolkitProjectsController extends AbstractController {
             if (uiLauncher.hasWizardProperties()) {
                 uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
             } else {
-                applicationProperties = ApplicationPropertiesFactory.getInstance(applicationProperties.getCliArgs());
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
             }
