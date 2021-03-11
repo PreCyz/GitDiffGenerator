@@ -1,4 +1,4 @@
-#green {
+.green {
     -fx-background-color:
         linear-gradient(#f0ff35, #a9ff00),
         radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
@@ -7,14 +7,14 @@
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
     -fx-text-fill: #395306;
 }
-#green:hover {
+.green:hover {
     -fx-background-color: #ceff59;
 }
-#green:pressed {
+.green:pressed {
     -fx-background-color: transparent;
 }
 
-#red {
+.red {
     -fx-background-color:
         linear-gradient(#f0ff35, #a9ff00),
         radial-gradient(center 50% -40%, radius 200%, #ff5c92 45%, #f41b63 50%);
@@ -23,14 +23,14 @@
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
     -fx-text-fill: #395306;
 }
-#red:hover {
+.red:hover {
     -fx-background-color: #f294b3;
 }
-#red:pressed {
+.red:pressed {
     -fx-background-color: transparent;
 }
 
-#blue {
+.blue {
     -fx-background-color:
         linear-gradient(#f0ff35, #a9ff00),
         radial-gradient(center 50% -40%, radius 200%, #4dd0ff 45%, #32a1c9 50%);
@@ -39,14 +39,14 @@
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.4) , 5, 0.0 , 0 , 1 );
     -fx-text-fill: #395306;
 }
-#blue:hover {
+.blue:hover {
     -fx-background-color: #75dbff;
 }
-#blue:pressed {
+.blue:pressed {
     -fx-background-color: transparent;
 }
 
-#grey {
+.grey {
     -fx-background-color:
         linear-gradient(#f2f2f2, #d6d6d6),
         linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%),
@@ -56,9 +56,9 @@
     -fx-text-fill: black;
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
 }
-#grey:hover {
+.grey:hover {
     -fx-background-color: #dbdbdb;
 }
-#grey:pressed {
+.grey:pressed {
     -fx-background-color: transparent;
 }

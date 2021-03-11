@@ -12,7 +12,7 @@
                 <TableColumn editable="false" prefWidth="361.0" sortable="false" text="%projects.column.path" />
             </columns>
         </TableView>
-        <Button id="blue" fx:id="searchProjectsButton" layoutX="14.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" stylesheets="@../css/buttons.css" text="%projects.button.search" textFill="#32a1c9">
+        <Button fx:id="searchProjectsButton" layoutX="14.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" styleClass="blue" stylesheets="@../css/buttons.css" text="%projects.button.search" textFill="#32a1c9">
             <font>
                 <Font name="System Bold" size="15.0" />
             </font>
@@ -27,7 +27,7 @@
                 <Font size="9.0" />
             </font>
         </Button>
-      <Button id="green" fx:id="saveButton" layoutX="198.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" stylesheets="@../css/buttons.css" text="%projects.button.save" textFill="#1eb235">
+      <Button fx:id="saveButton" layoutX="198.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" styleClass="green" stylesheets="@../css/buttons.css" text="%projects.button.save" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>

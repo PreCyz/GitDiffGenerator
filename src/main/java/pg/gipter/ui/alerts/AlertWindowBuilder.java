@@ -33,6 +33,7 @@ public class AlertWindowBuilder {
     private String okButtonText;
 
     public AlertWindowBuilder() {
+        links = Collections.emptySet();
     }
 
     public AlertWindowBuilder withHeaderText(String headerText) {

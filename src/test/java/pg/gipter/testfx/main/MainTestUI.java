@@ -100,6 +100,7 @@ public class MainTestUI {
 
         assertThat(map).hasSize(0);
         assertThat(windowObject.getJobButton().isDisabled()).isTrue();
+        assertThat(windowObject.getTrayButton().isDisabled()).isTrue();
         assertThat(windowObject.getAddConfigurationButton().isDisabled()).isTrue();
         assertThat(windowObject.getExecuteButton().isDisabled()).isTrue();
         assertThat(windowObject.getExecuteAllButton().isDisabled()).isTrue();
@@ -125,6 +126,7 @@ public class MainTestUI {
         final Map<String, RunConfig> map = dao.loadRunConfigMap();
 
         assertThat(map.keySet()).containsExactly("config");
+        assertThat(windowObject.getJobButton().isDisabled()).isFalse();
         assertThat(windowObject.getJobButton().isDisabled()).isFalse();
         assertThat(windowObject.getAddConfigurationButton().isDisabled()).isFalse();
         assertThat(windowObject.getExecuteButton().isDisabled()).isFalse();

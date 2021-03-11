@@ -52,7 +52,7 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </TitledPane>
-      <Button id="green" fx:id="scheduleButton" layoutX="343.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="102.0" stylesheets="@../css/buttons.css" text="%job.schedule" textFill="#24bf31">
+      <Button fx:id="scheduleButton" layoutX="343.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="102.0" styleClass="green" stylesheets="@../css/buttons.css" text="%job.schedule" textFill="#24bf31">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -86,7 +86,7 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </TitledPane>
-      <Button id="red" fx:id="cancelJobButton" layoutX="456.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="93.0" stylesheets="@../css/buttons.css" text="%job.cancel" textFill="#f41b63">
+      <Button fx:id="cancelJobButton" layoutX="456.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="93.0" styleClass="red" stylesheets="@../css/buttons.css" text="%job.cancel" textFill="#f41b63">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>

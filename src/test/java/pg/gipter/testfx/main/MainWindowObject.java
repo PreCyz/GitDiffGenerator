@@ -15,6 +15,7 @@ public class MainWindowObject extends BaseWindowObject {
     private final String saveConfigurationButtonId = "saveConfigurationButton";
     private final String projectPathButtonId = "projectPathButton";
     private final String removeConfigurationButtonId = "removeConfigurationButton";
+    private final String trayButtonButtonId = "trayButton";
 
     private final String configurationNameTextFieldId = "configurationNameTextField";
     private final String authorsTextFieldId = "authorsTextField";
@@ -65,6 +66,11 @@ public class MainWindowObject extends BaseWindowObject {
 
     public MainWindowObject pressRemoveConfigurationButton() {
         clickOnButton(removeConfigurationButtonId);
+        return this;
+    }
+
+    public MainWindowObject pressTrayButton() {
+        clickOnButton(trayButtonButtonId);
         return this;
     }
 
@@ -168,6 +174,10 @@ public class MainWindowObject extends BaseWindowObject {
 
     public Button getAddConfigurationButton() {
         return getButton(addConfigurationButtonId);
+    }
+
+    public Button getTrayButton() {
+        return getButton(trayButtonButtonId);
     }
 
     public TextField getAuthorsTextField() {
