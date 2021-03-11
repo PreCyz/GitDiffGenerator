@@ -301,4 +301,12 @@ class FileApplicationProperties extends ApplicationProperties {
         }
         return argExtractor.checkLastItemJobCronExpression();
     }
+
+    @Override
+    public boolean useMetroSkin() {
+        if (applicationConfig.getUseMetroSkin() != null) {
+            return applicationConfig.getUseMetroSkin();
+        }
+        return argExtractor.isUseMetroSkin();
+    }
 }

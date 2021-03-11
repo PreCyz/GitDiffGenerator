@@ -111,6 +111,8 @@ public class MainController extends AbstractController {
     @FXML
     private Button exitButton;
     @FXML
+    private Button trayButton;
+    @FXML
     private ProgressIndicator loadProgressIndicator;
     @FXML
     private Label infoLabel;
@@ -235,8 +237,9 @@ public class MainController extends AbstractController {
         Map<String, Button> map = new HashMap<>();
         map.put("executeButton", executeButton);
         map.put("executeAllButton", executeAllButton);
-        map.put("exitButton", exitButton);
         map.put("jobButton", jobButton);
+        map.put("exitButton", exitButton);
+        map.put("trayButton", trayButton);
         return map;
     }
 

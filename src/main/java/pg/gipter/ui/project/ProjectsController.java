@@ -54,7 +54,7 @@ public class ProjectsController extends AbstractController {
         super.initialize(location, resources);
         setUpColumns();
         initValues();
-        setupActions(resources);
+        setActions(resources);
         setProperties(resources);
     }
 
@@ -128,7 +128,7 @@ public class ProjectsController extends AbstractController {
         }
     }
 
-    private void setupActions(ResourceBundle resources) {
+    private void setActions(ResourceBundle resources) {
         searchProjectsButton.setOnAction(searchButtonActionEventHandler(resources));
         saveButton.setOnAction(saveButtonActionEventHandler());
         addProjectButton.setOnAction(addButtonActionEventHandler(resources));

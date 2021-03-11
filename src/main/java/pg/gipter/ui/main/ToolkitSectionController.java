@@ -93,6 +93,7 @@ class ToolkitSectionController extends AbstractController {
                                 .withAlertType(Alert.AlertType.ERROR)
                                 .withImage(ImageFile.MINION_IOIO_GIF);
                     }
+                    uiLauncher.updateTray(applicationProperties);
                     Platform.runLater(() -> {
                         verifyProgressIndicator.setVisible(false);
                         alertWindowBuilder.buildAndDisplayWindow();

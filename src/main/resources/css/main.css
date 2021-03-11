@@ -11,3 +11,11 @@
     -fx-background-repeat: no-repeat;
     -fx-background-position: 100%;
 }
+
+.text-field {
+  -fx-border-color: #d6d6d6;
+  -fx-border-width: 1 1 1 1;/*top, right, bottom, left*/
+  -fx-border-radius: 5 5 5 5;
+  -fx-background-color: white;
+  -fx-background-radius: 5px;
+}
