@@ -6,7 +6,7 @@
 <AnchorPane prefHeight="385.0" prefWidth="440.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Button id="add-button" fx:id="addConfigButton" layoutX="402.0" layoutY="271.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/sharepointProject.css" />
-      <ComboBox id="combo-box" fx:id="sharePointProjectsComboBox" layoutX="142.0" layoutY="271.0" prefHeight="25.0" prefWidth="250.0" stylesheets="@../css/combobox.css" />
+      <ComboBox fx:id="sharePointProjectsComboBox" layoutX="142.0" layoutY="271.0" prefHeight="25.0" prefWidth="250.0" stylesheets="@../css/combobox.css" />
       <Button id="remove-button" fx:id="removeConfigButton" layoutX="402.0" layoutY="307.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/sharepointProject.css" />
       <Label fx:id="numberOfConfigsLabel" layoutX="14.0" layoutY="275.0" text="%sharepoint.numberOfConfigs" />
       <Hyperlink fx:id="sharePointLink" alignment="TOP_CENTER" layoutX="14.0" layoutY="220.0" prefHeight="42.0" prefWidth="389.0" text="%sharepoint.fullLink.default" textAlignment="CENTER" textOverrun="CENTER_ELLIPSIS" wrapText="true">
@@ -30,19 +30,19 @@
         </rowConstraints>
          <children>
             <Label text="%sharepoint.name" />
-            <TextField id="text-field" fx:id="nameTextField" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" />
+            <TextField fx:id="nameTextField" prefWidth="220.0" styleClass="text-field" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" />
             <Label text="%sharepoint.username" GridPane.rowIndex="1" />
-            <TextField id="text-field" fx:id="usernameTextField" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="usernameTextField" prefWidth="220.0" styleClass="text-field" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label text="%sharepoint.password" GridPane.rowIndex="2" />
-            <PasswordField id="text-field" fx:id="passwordField" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <PasswordField fx:id="passwordField" prefWidth="220.0" styleClass="text-field" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="%sharepoint.domain" GridPane.rowIndex="3" />
-            <TextField id="text-field" fx:id="domainTextField" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="domainTextField" prefWidth="220.0" styleClass="text-field" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <Label text="%sharepoint.url" GridPane.rowIndex="4" />
-            <TextField id="text-field" fx:id="urlTextField" prefHeight="25.0" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <TextField id="text-field" fx:id="projectTextField" prefHeight="25.0" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="urlTextField" prefHeight="25.0" prefWidth="220.0" styleClass="text-field" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="projectTextField" prefHeight="25.0" prefWidth="220.0" styleClass="text-field" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <Label text="%sharepoint.project" GridPane.rowIndex="5" />
             <Label text="%sharepoint.listName" GridPane.rowIndex="6" />
-            <TextField id="text-field" fx:id="listNameTextField" prefHeight="25.0" prefWidth="220.0" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <TextField fx:id="listNameTextField" prefHeight="25.0" prefWidth="220.0" styleClass="text-field" stylesheets="@../css/text-field.css" GridPane.columnIndex="1" GridPane.rowIndex="6" />
          </children>
       </GridPane>
    </children>

@@ -9,9 +9,9 @@
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="238.0" prefWidth="378.0">
                <children>
-                  <ComboBox fx:id="dayNameComboBox" layoutX="116.0" layoutY="117.0" prefWidth="130.0" />
-                  <ComboBox fx:id="dayOfMonthComboBox" layoutX="116.0" layoutY="80.0" prefWidth="60.0" />
-                  <ComboBox fx:id="hourOfDayComboBox" layoutX="116.0" layoutY="43.0" prefWidth="65.0" />
+                  <ComboBox fx:id="dayNameComboBox" layoutX="116.0" layoutY="117.0" prefWidth="130.0" stylesheets="@../css/combobox.css" />
+                  <ComboBox fx:id="dayOfMonthComboBox" layoutX="116.0" layoutY="80.0" prefWidth="60.0" stylesheets="@../css/combobox.css" />
+                  <ComboBox fx:id="hourOfDayComboBox" layoutX="116.0" layoutY="43.0" prefWidth="65.0" stylesheets="@../css/combobox.css" />
                   <Label layoutX="14.0" layoutY="86.0" text="%job.clickWay.dayOfMonth" />
                   <Label layoutX="14.0" layoutY="48.0" text="%job.clickWay.hourOfTheDay" />
                   <Label layoutX="14.0" layoutY="121.0" text="%job.clickWay.dayOfWeek" />
@@ -24,14 +24,14 @@
                   <RadioButton fx:id="everyWeekRadioButton" layoutX="221.0" layoutY="14.0" mnemonicParsing="false" selected="true" text="%job.clickWay.everyWeek" toggleGroup="$triggerOptionsToggleGroup" />
                   <Label layoutX="14.0" layoutY="158.0" text="%job.clickWay.startDate" />
                   <DatePicker fx:id="startDatePicker" layoutX="116.0" layoutY="153.0" prefWidth="130.0" />
-                  <ComboBox fx:id="minuteComboBox" layoutX="200.0" layoutY="42.0" prefWidth="65.0" />
+                  <ComboBox fx:id="minuteComboBox" layoutX="200.0" layoutY="42.0" prefWidth="65.0" stylesheets="@../css/combobox.css" />
                   <Label layoutX="187.0" layoutY="43.0" text=":">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Label>
                   <Label layoutX="14.0" layoutY="195.0" text="%job.clickWay.configs" />
-                  <ComboBox fx:id="configurationNameComboBox" layoutX="116.0" layoutY="190.0" prefWidth="130.0" />
+                  <ComboBox fx:id="configurationNameComboBox" layoutX="116.0" layoutY="190.0" prefWidth="130.0" stylesheets="@../css/combobox.css" />
                </children>
             </AnchorPane>
         </content>
@@ -52,7 +52,7 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </TitledPane>
-      <Button id="green" fx:id="scheduleButton" layoutX="343.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="102.0" stylesheets="@../css/buttons.css" text="%job.schedule" textFill="#24bf31">
+      <Button fx:id="scheduleButton" layoutX="343.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="102.0" styleClass="green" stylesheets="@../css/buttons.css" text="%job.schedule" textFill="#24bf31">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -86,7 +86,7 @@
             <Font name="System Bold" size="13.0" />
          </font>
       </TitledPane>
-      <Button id="red" fx:id="cancelJobButton" layoutX="456.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="93.0" stylesheets="@../css/buttons.css" text="%job.cancel" textFill="#f41b63">
+      <Button fx:id="cancelJobButton" layoutX="456.0" layoutY="485.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="93.0" styleClass="red" stylesheets="@../css/buttons.css" text="%job.cancel" textFill="#f41b63">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>

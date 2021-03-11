@@ -45,7 +45,7 @@
             <TableColumn editable="false" prefWidth="231.0" sortable="false" text="%projects.column.path" />
          </columns>
       </TableView>
-      <Button id="green" fx:id="saveButton" layoutX="286.0" layoutY="533.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="142.0" stylesheets="@../css/buttons.css" text="%projects.button.save" textFill="#1eb235">
+      <Button fx:id="saveButton" layoutX="286.0" layoutY="533.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="142.0" styleClass="blue" stylesheets="@../css/buttons.css" text="%projects.button.save" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
