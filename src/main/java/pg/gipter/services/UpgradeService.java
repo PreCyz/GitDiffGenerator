@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.WindowType;
+import pg.gipter.ui.alerts.LogLinkAction;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.JarHelper;
 
@@ -46,23 +46,20 @@ public class UpgradeService extends TaskService<Void> {
                 } else {
                     logger.error("Did not download the newest version.");
                     alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
-                            .withLink(JarHelper.logsFolder())
-                            .withWindowType(WindowType.LOG_WINDOW)
+                            .withLinkAction(new LogLinkAction())
                             .withAlertType(Alert.AlertType.WARNING);
                 }
             } else {
                 logger.error("Can not find home directory.");
                 alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
-                        .withLink(JarHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.WARNING);
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
                     .withMessage(ex.getMessage())
-                    .withLink(JarHelper.logsFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.WARNING);
         } finally {
             updateMsg(BundleUtils.getMsg("upgrade.fail"));

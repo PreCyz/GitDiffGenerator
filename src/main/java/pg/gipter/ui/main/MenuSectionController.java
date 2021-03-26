@@ -156,8 +156,7 @@ public class MenuSectionController extends AbstractController {
             String pdfFileName = "Gipter-ui-description.pdf";
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
-                    .withLink(applicationProperties.toolkitUserFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolder()))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
             try {
@@ -242,7 +241,6 @@ public class MenuSectionController extends AbstractController {
         }
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
         alertWindowBuilder.withHeaderText(finalMsg)
-                .withWindowType(WindowType.LOG_WINDOW)
                 .withAlertType(Alert.AlertType.INFORMATION)
                 .withImage(statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
                         ImageFile.randomSuccessImage() : ImageFile.randomFailImage())

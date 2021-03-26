@@ -13,7 +13,8 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.*;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -99,7 +100,6 @@ class ConfigurationSectionController extends AbstractController {
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withWindowType(WindowType.CONFIRMATION_WINDOW)
                 .withImage(ImageFile.FINGER_UP_PNG);
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
     }
@@ -120,7 +120,6 @@ class ConfigurationSectionController extends AbstractController {
                 boolean result = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.overrideProperties.message", configurationName))
                         .withAlertType(Alert.AlertType.CONFIRMATION)
-                        .withWindowType(WindowType.OVERRIDE_WINDOW)
                         .withImage(ImageFile.OVERRIDE_PNG)
                         .withOkButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonOk"))
                         .withCancelButtonText(BundleUtils.getMsg("popup.overrideProperties.buttonNo"))
@@ -142,7 +141,6 @@ class ConfigurationSectionController extends AbstractController {
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
-                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
                         .withImage(ImageFile.FINGER_UP_PNG);
                 alertWindowBuilder.buildAndDisplayWindow();
             }
@@ -177,13 +175,11 @@ class ConfigurationSectionController extends AbstractController {
                 alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
-                        .withWindowType(WindowType.CONFIRMATION_WINDOW)
                         .withImage(ImageFile.FINGER_UP_PNG);
             } catch (IllegalStateException ex) {
                 alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(ex.getMessage())
-                        .withLink(JarHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
                         .withImage(ImageFile.ERROR_CHICKEN_PNG);
             }

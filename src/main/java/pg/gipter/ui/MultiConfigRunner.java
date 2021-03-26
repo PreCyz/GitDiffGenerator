@@ -19,7 +19,6 @@ import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JarHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -75,7 +74,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType, LocalDate startDate) {
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
-        this.totalProgress = configurationNames.size() * 5;
+        this.totalProgress = configurationNames.size() * 5L;
         this.workDone = new AtomicLong(0);
         this.applicationPropertiesCollection = Collections.emptyList();
         this.configurationDao = DaoFactory.getCachedConfiguration();
@@ -109,8 +108,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
             logger.info("There is no configuration to launch.");
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog"))
-                    .withLink(JarHelper.logsFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
@@ -316,8 +314,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
                 detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
                 alertWindowBuilder
                         .withMessage(detailedMessage)
-                        .withLink(JarHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
                         .withImage(ImageFile.randomFailImage());
                 break;
@@ -325,15 +322,13 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
                 detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
                 alertWindowBuilder
                         .withMessage(detailedMessage)
-                        .withLink(JarHelper.logsFolder(), toolkitUserFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withLinkAction(new LogLinkAction(), new BrowserLinkAction(toolkitUserFolder()))
                         .withAlertType(Alert.AlertType.WARNING)
                         .withImage(ImageFile.randomPartialSuccessImage());
                 break;
             default:
                 alertWindowBuilder
-                        .withLink(toolkitUserFolder())
-                        .withWindowType(WindowType.BROWSER_WINDOW)
+                        .withLinkAction(new BrowserLinkAction(toolkitUserFolder()))
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .withImage(ImageFile.randomSuccessImage());
 

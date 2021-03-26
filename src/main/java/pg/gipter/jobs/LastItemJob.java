@@ -7,7 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.services.ToolkitService;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDateTime;
@@ -46,7 +47,6 @@ public class LastItemJob implements Job {
         if (shouldDisplayWindow) {
             final AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(msg)
-                    .withWindowType(WindowType.BROWSER_WINDOW)
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withImage(ImageFile.randomFailImage());
 

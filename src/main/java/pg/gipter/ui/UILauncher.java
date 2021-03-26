@@ -24,7 +24,8 @@ import pg.gipter.launchers.Launcher;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.StartupService;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.*;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
 import java.io.IOException;
@@ -142,7 +143,6 @@ public class UILauncher implements Launcher {
         logger.info("Upgrade to version {} finished [{}].", applicationProperties.version().getVersion(), applicationProperties.isUpgradeFinished());
         new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
-                .withWindowType(WindowType.CONFIRMATION_WINDOW)
                 .withAlertType(Alert.AlertType.INFORMATION)
                 .withImage(ImageFile.MINION_AAAA_GIF)
                 .buildAndDisplayWindow();
@@ -156,8 +156,7 @@ public class UILauncher implements Launcher {
                     logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
                             .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
-                            .withLink(GithubService.GITHUB_URL + "/releases/latest")
-                            .withWindowType(WindowType.BROWSER_WINDOW)
+                            .withLinkAction(new BrowserLinkAction(GithubService.GITHUB_URL + "/releases/latest"))
                             .withAlertType(Alert.AlertType.INFORMATION)
                             .withImage(ImageFile.MINION_AAAA_2_GIF)
                             .buildAndDisplayWindow()
@@ -259,7 +258,6 @@ public class UILauncher implements Launcher {
             if (runConfigMap.containsKey(ArgName.configurationName.defaultValue())) {
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.window.canNotOpen"))
-                        .withWindowType(WindowType.OVERRIDE_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING)
                         .withImage(ImageFile.OVERRIDE_PNG);
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
@@ -321,8 +319,7 @@ public class UILauncher implements Launcher {
             logger.error(errorMessage);
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(errorMessage)
-                    .withLink(JarHelper.logsFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
@@ -360,8 +357,7 @@ public class UILauncher implements Launcher {
                 logger.warn("Can not restart the scheduler.", e);
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
-                        .withLink(JarHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
                         .withImage(ImageFile.ERROR_CHICKEN_PNG);
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
