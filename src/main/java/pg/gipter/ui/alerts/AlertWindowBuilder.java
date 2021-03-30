@@ -96,7 +96,7 @@ public class AlertWindowBuilder {
                 alert.close();
                 linkAction.run();
             });
-            hyperLink.setFont(Font.font("Verdana", 14));
+            hyperLink.setFont(Font.font("Verdana", 13));
             hyperlinks.add(hyperLink);
         }
         return hyperlinks;
