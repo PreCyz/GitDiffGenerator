@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toCollection;
 
 abstract class AbstractDocumentFinder implements DocumentFinder {
 
-    protected static Logger logger;
+    protected Logger logger;
     protected ApplicationProperties applicationProperties;
     protected final ParallelProcessor parallelProcessor;
 

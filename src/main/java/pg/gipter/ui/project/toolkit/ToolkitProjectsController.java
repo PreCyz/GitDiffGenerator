@@ -52,7 +52,7 @@ public class ToolkitProjectsController extends AbstractController {
     @FXML
     private Label downloadLabel;
 
-    private final String CASES = "/cases/";
+    private final static String CASES = "/cases/";
 
     public ToolkitProjectsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);

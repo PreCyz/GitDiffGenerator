@@ -18,7 +18,9 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 
-/** Created by Pawel Gawedzki on 17-Sep-2018 */
+/**
+ * Created by Pawel Gawedzki on 17-Sep-2018
+ */
 public class Main extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -41,17 +43,16 @@ public class Main extends Application {
         }
     }
 
-    public Main() { }
+    public Main() {
+    }
 
     Main(String[] args) {
         this.args = args;
         applicationProperties = ApplicationPropertiesFactory.getInstance(args);
-        if (args != null) {
-            Optional<String> javaHome = Stream.of(args).filter(arg -> arg.startsWith("java.home")).findFirst();
-            if (javaHome.isPresent()) {
-                System.setProperty("java.home", javaHome.get().split("=")[1]);
-                logger.info("New JAVA_HOME {}.", System.getProperty("java.home"));
-            }
+        Optional<String> javaHome = Stream.of(args).filter(arg -> arg.startsWith("java.home")).findFirst();
+        if (javaHome.isPresent()) {
+            System.setProperty("java.home", javaHome.get().split("=")[1]);
+            logger.info("New JAVA_HOME {}.", System.getProperty("java.home"));
         }
     }
 

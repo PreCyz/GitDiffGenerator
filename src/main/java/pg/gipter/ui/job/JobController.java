@@ -189,6 +189,8 @@ public class JobController extends AbstractController {
 
                     everyWeekSwitch();
                     break;
+                default:
+                    break;
             }
         }
     }

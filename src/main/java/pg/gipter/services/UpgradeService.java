@@ -79,7 +79,8 @@ public class UpgradeService extends TaskService<Void> {
                 File currentFile = new File(destination, entry.getName());
                 File parent = currentFile.getParentFile();
                 if (!parent.exists()) {
-                    parent.mkdirs();
+                    final boolean mkdirs = parent.mkdirs();
+                    logger.info("Directory created [{}]", parent.getAbsolutePath());
                 }
                 FileOutputStream out = new FileOutputStream(currentFile);
                 byte[] content = new byte[(int) entry.getSize()];

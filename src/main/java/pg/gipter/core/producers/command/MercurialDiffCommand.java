@@ -40,6 +40,8 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
                 initialCommand.add("--style");
                 initialCommand.add("changelog");
                 break;
+            default:
+                break;
         }
         return initialCommand;
     }

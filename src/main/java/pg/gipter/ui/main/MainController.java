@@ -294,6 +294,8 @@ public class MainController extends AbstractController {
                     case S:
                         saveConfiguration();
                         break;
+                    default:
+                        break;
                 }
             }
         });

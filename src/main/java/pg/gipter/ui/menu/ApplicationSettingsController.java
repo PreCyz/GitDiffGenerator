@@ -91,7 +91,7 @@ public class ApplicationSettingsController extends AbstractController {
         silentModeCheckBox.setSelected(applicationProperties.isSilentMode());
 
         if (languageComboBox.getItems().isEmpty()) {
-            languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
+            languageComboBox.setItems(FXCollections.observableList(BundleUtils.getSupportedLanguages()));
         }
         languageComboBox.setValue(applicationProperties.uiLanguage());
         importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());

@@ -44,6 +44,8 @@ final class SvnDiffCommand extends AbstractDiffCommand {
             case PROTECTED:
                 initialCommand.add("--verbose");
                 break;
+            default:
+                break;
         }
         return initialCommand;
     }
