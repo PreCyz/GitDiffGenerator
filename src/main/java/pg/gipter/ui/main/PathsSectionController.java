@@ -14,17 +14,19 @@ import javafx.util.Callback;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.model.NamePatternValue;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.services.InteliSenseService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.StringUtils;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
 
@@ -39,9 +41,9 @@ class PathsSectionController extends AbstractController {
     private final MainController mainController;
 
     private final Set<String> definedPatterns;
-    private String currentItemName = "";
-    private String inteliSense = "";
-    private boolean useInteliSense = false;
+    private String currentItemFileNamePrefixValue = "";
+    private final InteliSenseService inteliSenseService;
+    boolean ignoreItemPrefixNameListener = false;
 
     PathsSectionController(UILauncher uiLauncher, ApplicationProperties applicationProperties, MainController mainController) {
         super(uiLauncher);
@@ -50,7 +52,8 @@ class PathsSectionController extends AbstractController {
         this.definedPatterns = EnumSet.allOf(NamePatternValue.class)
                 .stream()
                 .map(e -> String.format("{%s}", e.name()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+                .collect(toCollection(LinkedHashSet::new));
+        inteliSenseService = new InteliSenseService();
     }
 
     public void initialize(URL location, ResourceBundle resources, Map<String, Object> controlsMap) {
@@ -69,9 +72,13 @@ class PathsSectionController extends AbstractController {
     private void setInitValues() {
         projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
-        String itemPath = applicationProperties.itemPath()
-                .substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
-        itemPathLabel.setText(itemPath);
+        if (applicationProperties.itemPath().contains(ArgName.itemPath.defaultValue())) {
+            itemPathLabel.setText(ArgName.itemPath.defaultValue());
+        } else {
+            String itemPath = applicationProperties.itemPath()
+                    .substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
+            itemPathLabel.setText(itemPath);
+        }
         if (applicationProperties.itemType() == ItemType.STATEMENT) {
             itemPathLabel.setText(applicationProperties.itemPath());
         }
@@ -108,16 +115,12 @@ class PathsSectionController extends AbstractController {
 
     private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
         return param -> {
-            Collection<String> result = new HashSet<>();
-            if (useInteliSense) {
-                result = definedPatterns;
-                if (!inteliSense.isEmpty()) {
-                    result = definedPatterns.stream()
-                            .filter(pattern -> pattern.startsWith(inteliSense))
-                            .collect(toCollection(LinkedHashSet::new));
-                }
+            System.out.printf("Callback new text %s%n", param.getUserText());
+            if (itemFileNamePrefixTextField.getCaretPosition() < param.getUserText().length()) {
+                itemFileNamePrefixTextField.positionCaret(param.getUserText().length());
+                System.out.printf("Callback caret set %s%n", param.getUserText().length());
             }
-            return result;
+            return inteliSenseService.getFilteredValues(param.getUserText());
         };
     }
 
@@ -145,7 +148,7 @@ class PathsSectionController extends AbstractController {
                 fileChooser.setInitialDirectory(Paths.get(".").toFile());
                 fileChooser.setTitle(resources.getString("directory.item.statement.title"));
                 final Optional<Path> statementFile = Optional.ofNullable(fileChooser.showOpenDialog(uiLauncher.currentWindow()))
-                        .map(file -> file.toPath());
+                        .map(File::toPath);
                 boolean isStatementFileSet = statementFile.map(path -> Files.exists(path) && Files.isRegularFile(path))
                         .orElseGet(() -> false);
                 if (isStatementFileSet) {
@@ -158,7 +161,7 @@ class PathsSectionController extends AbstractController {
                 directoryChooser.setInitialDirectory(Paths.get(".").toFile());
                 directoryChooser.setTitle(resources.getString("directory.item.store"));
                 final Optional<Path> itemPathDirectory = Optional.ofNullable(directoryChooser.showDialog(uiLauncher.currentWindow()))
-                        .map(file -> file.toPath());
+                        .map(File::toPath);
                 boolean isDirectorySet = itemPathDirectory.map(path -> Files.exists(path) && Files.isDirectory(path))
                         .orElseGet(() -> false);
                 if (isDirectorySet) {
@@ -172,9 +175,18 @@ class PathsSectionController extends AbstractController {
 
     private EventHandler<KeyEvent> itemNameKeyReleasedEventHandler() {
         return event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                itemFileNamePrefixTextField.setText(currentItemName);
-                itemFileNamePrefixTextField.positionCaret(currentItemName.length());
+            if (EnumSet.of(KeyCode.ENTER, KeyCode.TAB).contains(event.getCode())) {
+                ignoreItemPrefixNameListener = true;
+                itemFileNamePrefixTextField.setText(currentItemFileNamePrefixValue);
+                itemFileNamePrefixTextField.positionCaret(currentItemFileNamePrefixValue.length());
+                ignoreItemPrefixNameListener = false;
+            } else if (KeyCode.BACK_SPACE == event.getCode()) {
+                boolean isPatternStarted = currentItemFileNamePrefixValue.lastIndexOf("{") > currentItemFileNamePrefixValue.lastIndexOf("}");
+                if (isPatternStarted) {
+                    final int startSelectionPosition = currentItemFileNamePrefixValue.lastIndexOf("{") + 1;
+                    final int endSelectionPosition = itemFileNamePrefixTextField.getCaretPosition();
+                    itemFileNamePrefixTextField.selectRange(startSelectionPosition, endSelectionPosition);
+                }
             }
         };
     }
@@ -185,35 +197,19 @@ class PathsSectionController extends AbstractController {
 
     private ChangeListener<String> itemFileNameChangeListener() {
         return (observable, oldValue, newValue) -> {
-            if (newValue.endsWith("{")) {
-                useInteliSense = true;
-                inteliSense = "";
-            } else if (newValue.endsWith("}") || newValue.isEmpty()) {
-                useInteliSense = false;
-            }
-            if (definedPatterns.contains(newValue)) {
-                useInteliSense = false;
-                inteliSense = "";
-                currentItemName = oldValue.substring(0, oldValue.lastIndexOf("{")) + newValue;
-                itemFileNamePrefixTextField.setText(currentItemName);
-                itemFileNamePrefixTextField.positionCaret(currentItemName.length());
-            } else {
-                currentItemName = newValue;
-            }
 
-            if (useInteliSense) {
-                //letter was added
-                if (newValue.length() > oldValue.length()) {
-                    inteliSense += newValue.replace(oldValue, "");
-                } else { //back space was pressed
-                    if (oldValue.endsWith("{")) {
-                        inteliSense = "";
-                        useInteliSense = false;
-                    } else {
-                        inteliSense = newValue.substring(newValue.lastIndexOf("{"));
-                    }
-                }
+            System.out.printf("Change listener %b%n", ignoreItemPrefixNameListener);
+
+            if (ignoreItemPrefixNameListener) return;
+
+            currentItemFileNamePrefixValue = newValue;
+            if (definedPatterns.contains(newValue)) {
+                currentItemFileNamePrefixValue = oldValue.substring(0, oldValue.lastIndexOf("{")) + newValue;
+                ignoreItemPrefixNameListener = true;
+                itemFileNamePrefixTextField.setText(currentItemFileNamePrefixValue);
+                ignoreItemPrefixNameListener = false;
             }
+            itemFileNamePrefixTextField.positionCaret(currentItemFileNamePrefixValue.length());
         };
     }
 

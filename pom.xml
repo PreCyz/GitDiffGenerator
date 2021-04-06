@@ -181,7 +181,7 @@
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>11.0.0</version>
+            <version>11.1.0</version>
         </dependency>
 
         <dependency>
@@ -257,11 +257,6 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javaFX.version}</version>
             <classifier>mac</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jfxtras</groupId>
-            <artifactId>jmetro</artifactId>
-            <version>11.6.12</version>
         </dependency>
 
         <dependency>

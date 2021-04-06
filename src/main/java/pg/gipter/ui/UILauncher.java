@@ -7,8 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.*;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,9 +227,6 @@ public class UILauncher implements Launcher {
             }
             stage.setScene(scene);
             stage.sizeToScene();
-            if (applicationProperties.useMetroSkin()) {
-                new JMetro(scene, Style.LIGHT);
-            }
         } catch (IOException ex) {
             logger.error("Building scene error.", ex);
         }

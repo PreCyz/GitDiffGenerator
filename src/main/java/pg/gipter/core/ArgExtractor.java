@@ -299,10 +299,4 @@ final class ArgExtractor {
         return ArgName.checkLastItemJobCronExpression.defaultValue();
     }
 
-    public boolean isUseMetroSkin() {
-        if (containsArg(ArgName.useMetroSkin.name())) {
-            return StringUtils.getBoolean(getValue(ArgName.useMetroSkin, ArgName.useMetroSkin.defaultValue()));
-        }
-        return StringUtils.getBoolean(ArgName.useMetroSkin.defaultValue());
-    }
 }

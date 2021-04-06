@@ -16,7 +16,6 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.DataService;
 import pg.gipter.services.vcs.VcsService;
 import pg.gipter.ui.*;
-import pg.gipter.utils.JobHelper;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
@@ -119,8 +118,6 @@ public class MainController extends AbstractController {
     @FXML
     private ComboBox<String> configurationNameComboBox;
     @FXML
-    private TextField configurationNameTextField;
-    @FXML
     private Button addConfigurationButton;
     @FXML
     private Button removeConfigurationButton;
@@ -171,7 +168,7 @@ public class MainController extends AbstractController {
     private Map<String, Object> initConfigurationSectionMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("configurationNameComboBox", configurationNameComboBox);
-        map.put("configurationNameTextField", configurationNameTextField);
+        //map.put("configurationNameTextField", configurationNameTextField);
         map.put("addConfigurationButton", addConfigurationButton);
         map.put("removeConfigurationButton", removeConfigurationButton);
         map.put("saveConfigurationButton", saveConfigurationButton);
@@ -250,7 +247,7 @@ public class MainController extends AbstractController {
         configurationSectionController.initialize(location, resources, initConfigurationSectionMap());
         menuSectionController.initialize(location, resources, initMenuSectionMap());
         pathsSectionController.initialize(location, resources, initPathsSectionMap());
-        //this is executed trough configurationSectionController
+        //this is executed through configurationSectionController
         //datesSectionController.initialize(location, resources, initDatesSectionMap());
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
         //this is executed later in the flow
@@ -386,19 +383,18 @@ public class MainController extends AbstractController {
         configurationSectionController.saveConfiguration();
     }
 
-    void updateRunConfig(String oldConfigName, String newConfigName) {
+    void updateRunConfig() {
         ToolkitConfig toolkitConfigFromUI = toolkitSectionController.createToolkitConfigFromUI();
         applicationProperties.updateToolkitConfig(toolkitConfigFromUI);
-        if (!StringUtils.nullOrEmpty(configurationSectionController.getConfigurationName())) {
-            RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
-            applicationProperties.updateCurrentRunConfig(runConfigWithoutDates);
-            new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
-            configurationSectionController.setDisableDependOnConfigurations();
-        }
+        configurationSectionController.getConfigurationName();
+        RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
+        applicationProperties.updateCurrentRunConfig(runConfigWithoutDates);
+        //new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
+        configurationSectionController.setDisableDependOnConfigurations();
         applicationProperties.save();
-        if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
+        /*if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
             applicationProperties.removeConfig(oldConfigName);
-        }
+        }*/
     }
 
     RunConfig getRunConfigWithoutDates() {
@@ -431,7 +427,6 @@ public class MainController extends AbstractController {
     String getConfigurationName() {
         return configurationSectionController.getConfigurationName();
     }
-
 
     void updateConfigurationNameComboBox(String oldValue, String newValue) {
         configurationSectionController.updateConfigurationNameComboBox(oldValue, newValue);
