@@ -166,4 +166,62 @@ class InteliSenseServiceTest {
                 .collect(toCollection(LinkedHashSet::new))
         );
     }
+
+    @Test
+    void givenFatText_whenGetSelectedStartPosition_thenReturn6() {
+        final Optional<Integer> actual = service.getSelectedStartPosition("some-{some");
+        assertThat(actual.isPresent()).isTrue();
+        assertThat(actual.get()).isEqualTo(6);
+    }
+
+    @Test
+    void givenOnlyOpenBracket_whenGetSelectedStartPosition_thenReturn1() {
+        final Optional<Integer> actual = service.getSelectedStartPosition("{");
+        assertThat(actual.isPresent()).isTrue();
+        assertThat(actual.get()).isEqualTo(1);
+    }
+
+    @Test
+    void givenOpenBracketAndSomeText_whenGetSelectedStartPosition_thenReturn1() {
+        final Optional<Integer> actual = service.getSelectedStartPosition("{some");
+        assertThat(actual.isPresent()).isTrue();
+        assertThat(actual.get()).isEqualTo(1);
+    }
+
+    @Test
+    void givenEmptyText_whenGetSelectedStartPosition_thenReturnEmpty() {
+        final Optional<Integer> actual = service.getSelectedStartPosition("");
+        assertThat(actual.isPresent()).isFalse();
+    }
+
+    @Test
+    void givenPlainText_whenGetSelectedStartPosition_thenReturnEmpty() {
+        final Optional<Integer> actual = service.getSelectedStartPosition("plain text");
+        assertThat(actual.isPresent()).isFalse();
+    }
+
+    @Test
+    void givenTextFullOfBrackets_whenGetSelectedStartPosition_thenReturnStartPositionForTheLastBracket() {
+        final Optional<Integer> actual = service.getSelectedStartPosition("s-{a}-{some}-{some");
+        assertThat(actual.isPresent()).isTrue();
+        assertThat(actual.get()).isEqualTo(14);
+    }
+
+    @Test
+    void givenOldNullAndNewText_whenGetValue_thenReturnNewValue() {
+        final String actual = service.getValue(null, "newValue");
+        assertThat(actual).isEqualTo("newValue");
+    }
+
+    @Test
+    void givenOldAndNewText_whenGetValue_thenReturnNewValue() {
+        final String actual = service.getValue("some={new", "newValue");
+        assertThat(actual).isEqualTo("some=newValue");
+    }
+
+    @Test
+    void givenRealLiveExample_whenGetValue_thenReturnProperValue() {
+        final String actual = service.getValue("{CURRENT_YEAR", "CURRENT_YEAR");
+        assertThat(actual).isEqualTo("CURRENT_YEAR");
+    }
 }

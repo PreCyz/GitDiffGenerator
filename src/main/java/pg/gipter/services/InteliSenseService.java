@@ -49,4 +49,20 @@ public class InteliSenseService {
         return result;
     }
 
+    public Optional<Integer> getSelectedStartPosition(String text) {
+        Optional<Integer> result = Optional.empty();
+        boolean isPatternStarted = text.lastIndexOf("{") > text.lastIndexOf("}");
+        if (isPatternStarted) {
+            result = Optional.of(text.lastIndexOf("{") + 1);
+        }
+        return result;
+    }
+
+    public String getValue(String oldValue, String newValue) {
+        if (oldValue != null) {
+            return oldValue.substring(0, oldValue.lastIndexOf("{")) + newValue;
+        }
+        return newValue;
+    }
+
 }

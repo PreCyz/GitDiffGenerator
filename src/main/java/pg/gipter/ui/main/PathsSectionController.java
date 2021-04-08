@@ -118,7 +118,6 @@ class PathsSectionController extends AbstractController {
             System.out.printf("Callback new text %s%n", param.getUserText());
             if (itemFileNamePrefixTextField.getCaretPosition() < param.getUserText().length()) {
                 itemFileNamePrefixTextField.positionCaret(param.getUserText().length());
-                System.out.printf("Callback caret set %s%n", param.getUserText().length());
             }
             return inteliSenseService.getFilteredValues(param.getUserText());
         };
@@ -181,11 +180,10 @@ class PathsSectionController extends AbstractController {
                 itemFileNamePrefixTextField.positionCaret(currentItemFileNamePrefixValue.length());
                 ignoreItemPrefixNameListener = false;
             } else if (KeyCode.BACK_SPACE == event.getCode()) {
-                boolean isPatternStarted = currentItemFileNamePrefixValue.lastIndexOf("{") > currentItemFileNamePrefixValue.lastIndexOf("}");
-                if (isPatternStarted) {
-                    final int startSelectionPosition = currentItemFileNamePrefixValue.lastIndexOf("{") + 1;
+                final Optional<Integer> startPosition = inteliSenseService.getSelectedStartPosition(currentItemFileNamePrefixValue);
+                if (startPosition.isPresent()) {
                     final int endSelectionPosition = itemFileNamePrefixTextField.getCaretPosition();
-                    itemFileNamePrefixTextField.selectRange(startSelectionPosition, endSelectionPosition);
+                    itemFileNamePrefixTextField.selectRange(startPosition.get(), endSelectionPosition);
                 }
             }
         };
@@ -204,7 +202,7 @@ class PathsSectionController extends AbstractController {
 
             currentItemFileNamePrefixValue = newValue;
             if (definedPatterns.contains(newValue)) {
-                currentItemFileNamePrefixValue = oldValue.substring(0, oldValue.lastIndexOf("{")) + newValue;
+                currentItemFileNamePrefixValue = inteliSenseService.getValue(oldValue, newValue);
                 ignoreItemPrefixNameListener = true;
                 itemFileNamePrefixTextField.setText(currentItemFileNamePrefixValue);
                 ignoreItemPrefixNameListener = false;
