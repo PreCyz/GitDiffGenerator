@@ -115,7 +115,6 @@ class PathsSectionController extends AbstractController {
 
     private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
         return param -> {
-            System.out.printf("Callback new text %s%n", param.getUserText());
             if (itemFileNamePrefixTextField.getCaretPosition() < param.getUserText().length()) {
                 itemFileNamePrefixTextField.positionCaret(param.getUserText().length());
             }
@@ -195,9 +194,6 @@ class PathsSectionController extends AbstractController {
 
     private ChangeListener<String> itemFileNameChangeListener() {
         return (observable, oldValue, newValue) -> {
-
-            System.out.printf("Change listener %b%n", ignoreItemPrefixNameListener);
-
             if (ignoreItemPrefixNameListener) return;
 
             currentItemFileNamePrefixValue = newValue;

@@ -19,7 +19,6 @@ import static java.util.stream.Collectors.toCollection;
 
 /** Created by Pawel Gawedzki on 01-Apr-2019. */
 public class AlertWindowBuilder {
-    private String title;
     private String headerText;
     private String message;
     private Set<AbstractLinkAction> linkActions;
@@ -78,7 +77,7 @@ public class AlertWindowBuilder {
 
     private Alert buildDefaultAlert() {
         Alert alert = new Alert(alertType);
-        alert.setTitle(StringUtils.nullOrEmpty(title) ? BundleUtils.getMsg("popup.title") : title);
+        alert.setTitle(BundleUtils.getMsg("popup.title"));
         alert.setHeaderText(StringUtils.nullOrEmpty(headerText) ? BundleUtils.getMsg("popup.header.error") : headerText);
         Optional<URL> imgUrl = ResourceUtils.getImgResource("chicken-face.png");
         if (imgUrl.isPresent()) {
