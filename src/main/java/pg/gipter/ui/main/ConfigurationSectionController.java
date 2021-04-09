@@ -115,7 +115,7 @@ class ConfigurationSectionController extends AbstractController {
             if (newConfigName.isPresent() && !StringUtils.nullOrEmpty(newConfigName.get())) {
                 updateConfigurationNameComboBox(ArgName.configurationName.defaultValue(), newConfigName.get());
                 Optional<RunConfig> runConfig = applicationProperties.getRunConfig(newConfigName.get());
-                if (runConfig.isEmpty()) {
+                if (!runConfig.isPresent()) {
                     applicationProperties.updateCurrentRunConfig(mainController.getRunConfigWithoutDates());
                     applicationProperties.save();
                     setDisableDependOnConfigurations();

@@ -62,9 +62,9 @@ class ProgrammaticCertificateService extends AbstractCertificateService {
             KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
             keystore.load(is, storepass.toCharArray());
 
-            final Iterator<String> aliasIterator = keystore.aliases().asIterator();
-            while (aliasIterator.hasNext()) {
-                String keyAlias = aliasIterator.next();
+            final Enumeration<String> aliasIterator = keystore.aliases();
+            while (aliasIterator.hasMoreElements()) {
+                String keyAlias = aliasIterator.nextElement();
                 Optional<Key> ssoSigningKey = Optional.ofNullable(keystore.getKey(keyAlias, storepass.toCharArray()));
                 ssoSigningKey.ifPresent(System.out::println);
                 Certificate certificate = keystore.getCertificate(keyAlias);
