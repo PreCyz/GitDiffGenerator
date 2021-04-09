@@ -19,7 +19,6 @@ import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.JarHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -233,8 +232,7 @@ public class ProjectsController extends AbstractController {
                 } catch (IllegalArgumentException ex) {
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                             .withHeaderText(ex.getMessage())
-                            .withLink(JarHelper.logsFolder())
-                            .withWindowType(WindowType.LOG_WINDOW)
+                            .withLinkAction(new LogLinkAction())
                             .withAlertType(Alert.AlertType.ERROR)
                             .withImage(ImageFile.ERROR_CHICKEN_PNG);
                     Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);

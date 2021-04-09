@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toList;
 
 class ComplexDocumentFinder extends AbstractDocumentFinder {
 
-    private final int TOP_LIMIT = 100;
+    private static final int TOP_LIMIT = 100;
 
     ComplexDocumentFinder(ApplicationProperties applicationProperties) {
         super(applicationProperties);

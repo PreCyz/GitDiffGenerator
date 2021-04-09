@@ -22,7 +22,6 @@ import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.ui.project.ProjectDetails;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JarHelper;
 
 import java.net.URL;
 import java.util.*;
@@ -53,7 +52,7 @@ public class ToolkitProjectsController extends AbstractController {
     @FXML
     private Label downloadLabel;
 
-    private final String CASES = "/cases/";
+    private final static String CASES = "/cases/";
 
     public ToolkitProjectsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -144,9 +143,8 @@ public class ToolkitProjectsController extends AbstractController {
                 } else {
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                             .withHeaderText(BundleUtils.getMsg("toolkit.projects.canNotDownload"))
-                            .withLink(JarHelper.logsFolder())
+                            .withLinkAction(new LogLinkAction())
                             .withAlertType(Alert.AlertType.WARNING)
-                            .withWindowType(WindowType.LOG_WINDOW)
                             .withImage(ImageFile.ERROR_CHICKEN_PNG);
                     Platform.runLater(() -> {
                         alertWindowBuilder.buildAndDisplayWindow();
@@ -161,7 +159,6 @@ public class ToolkitProjectsController extends AbstractController {
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("toolkit.projects.credentialsNotSet"))
                     .withAlertType(Alert.AlertType.WARNING)
-                    .withWindowType(WindowType.OVERRIDE_WINDOW)
                     .withImage(ImageFile.OVERRIDE_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         }

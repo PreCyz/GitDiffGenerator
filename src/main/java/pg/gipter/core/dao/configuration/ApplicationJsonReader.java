@@ -13,8 +13,8 @@ import java.util.Optional;
 abstract class ApplicationJsonReader {
 
     protected final Logger logger;
-    private JsonSerializer<Configuration> passwordSerializer;
-    private JsonDeserializer<Configuration> passwordDeserializer;
+    private final JsonSerializer<Configuration> passwordSerializer;
+    private final JsonDeserializer<Configuration> passwordDeserializer;
 
     protected ApplicationJsonReader() {
         logger = LoggerFactory.getLogger(getClass());

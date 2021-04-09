@@ -9,7 +9,6 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.utils.*;
 
 import java.net.URL;
@@ -18,22 +17,18 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 
-/**
- * Created by Pawel Gawedzki on 01-Apr-2019.
- */
+/** Created by Pawel Gawedzki on 01-Apr-2019. */
 public class AlertWindowBuilder {
-    private String title;
     private String headerText;
     private String message;
-    private Set<String> links;
-    private WindowType windowType;
+    private Set<AbstractLinkAction> linkActions;
     private Alert.AlertType alertType;
     private ImageFile imageFile;
     private String cancelButtonText;
     private String okButtonText;
 
     public AlertWindowBuilder() {
-        links = Collections.emptySet();
+        linkActions = Collections.emptySet();
     }
 
     public AlertWindowBuilder withHeaderText(String headerText) {
@@ -46,13 +41,8 @@ public class AlertWindowBuilder {
         return this;
     }
 
-    public AlertWindowBuilder withLink(String... links) {
-        this.links = Stream.of(links).collect(toCollection(LinkedHashSet::new));
-        return this;
-    }
-
-    public AlertWindowBuilder withWindowType(WindowType windowType) {
-        this.windowType = windowType;
+    public AlertWindowBuilder withLinkAction(AbstractLinkAction... linkActions) {
+        this.linkActions = Stream.of(linkActions).collect(toCollection(LinkedHashSet::new));
         return this;
     }
 
@@ -87,7 +77,7 @@ public class AlertWindowBuilder {
 
     private Alert buildDefaultAlert() {
         Alert alert = new Alert(alertType);
-        alert.setTitle(StringUtils.nullOrEmpty(title) ? BundleUtils.getMsg("popup.title") : title);
+        alert.setTitle(BundleUtils.getMsg("popup.title"));
         alert.setHeaderText(StringUtils.nullOrEmpty(headerText) ? BundleUtils.getMsg("popup.header.error") : headerText);
         Optional<URL> imgUrl = ResourceUtils.getImgResource("chicken-face.png");
         if (imgUrl.isPresent()) {
@@ -99,25 +89,17 @@ public class AlertWindowBuilder {
 
     private List<Hyperlink> buildHyperlinks(Alert alert) {
         List<Hyperlink> hyperlinks = new LinkedList<>();
-        for (String link : links) {
-            Hyperlink hyperLink = new Hyperlink(link);
-            if (windowType == WindowType.LOG_WINDOW) {
-                hyperLink.setOnAction((evt) -> {
-                    alert.close();
-                    AppManagerFactory.getInstance().launchFileManagerForLogs();
-                });
-            } else if (windowType == WindowType.BROWSER_WINDOW) {
-                hyperLink.setOnAction((evt) -> {
-                    alert.close();
-                    AppManagerFactory.getInstance().launchDefaultBrowser(link);
-                });
-            }
-            hyperLink.setFont(Font.font("Verdana", 14));
+        for (AbstractLinkAction linkAction : linkActions) {
+            Hyperlink hyperLink = new Hyperlink(linkAction.getLink());
+            hyperLink.setOnAction((evt) -> {
+                alert.close();
+                linkAction.run();
+            });
+            hyperLink.setFont(Font.font("Verdana", 13));
             hyperlinks.add(hyperLink);
-
         }
         return hyperlinks;
-    }
+}
 
     private GridPane buildGridPane(List<Hyperlink> hyperLinks) {
         GridPane gridPane = new GridPane();
