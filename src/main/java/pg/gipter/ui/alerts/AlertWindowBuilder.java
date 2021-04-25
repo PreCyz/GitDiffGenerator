@@ -9,7 +9,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import pg.gipter.services.platforms.AppManagerFactory;
+import pg.gipter.ui.UploadResult;
 import pg.gipter.utils.*;
 
 import java.net.URL;
@@ -18,22 +18,20 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 
-/**
- * Created by Pawel Gawedzki on 01-Apr-2019.
- */
+/** Created by Pawel Gawedzki on 01-Apr-2019. */
 public class AlertWindowBuilder {
-    private String title;
     private String headerText;
     private String message;
-    private Set<String> links;
-    private WindowType windowType;
+    private Set<AbstractLinkAction> linkActions;
     private Alert.AlertType alertType;
     private ImageFile imageFile;
     private String cancelButtonText;
     private String okButtonText;
+    private Map<String, UploadResult> msgResultMap;
+    private int gridPaneRow;
 
     public AlertWindowBuilder() {
-        links = Collections.emptySet();
+        linkActions = Collections.emptySet();
     }
 
     public AlertWindowBuilder withHeaderText(String headerText) {
@@ -46,13 +44,13 @@ public class AlertWindowBuilder {
         return this;
     }
 
-    public AlertWindowBuilder withLink(String... links) {
-        this.links = Stream.of(links).collect(toCollection(LinkedHashSet::new));
+    public AlertWindowBuilder withUploadResultMap(Map<String, UploadResult> msgResultMap) {
+        this.msgResultMap = new LinkedHashMap<>(msgResultMap);
         return this;
     }
 
-    public AlertWindowBuilder withWindowType(WindowType windowType) {
-        this.windowType = windowType;
+    public AlertWindowBuilder withLinkAction(AbstractLinkAction... linkActions) {
+        this.linkActions = Stream.of(linkActions).collect(toCollection(LinkedHashSet::new));
         return this;
     }
 
@@ -87,7 +85,7 @@ public class AlertWindowBuilder {
 
     private Alert buildDefaultAlert() {
         Alert alert = new Alert(alertType);
-        alert.setTitle(StringUtils.nullOrEmpty(title) ? BundleUtils.getMsg("popup.title") : title);
+        alert.setTitle(BundleUtils.getMsg("popup.title"));
         alert.setHeaderText(StringUtils.nullOrEmpty(headerText) ? BundleUtils.getMsg("popup.header.error") : headerText);
         Optional<URL> imgUrl = ResourceUtils.getImgResource("chicken-face.png");
         if (imgUrl.isPresent()) {
@@ -99,58 +97,33 @@ public class AlertWindowBuilder {
 
     private List<Hyperlink> buildHyperlinks(Alert alert) {
         List<Hyperlink> hyperlinks = new LinkedList<>();
-        for (String link : links) {
-            Hyperlink hyperLink = new Hyperlink(link);
-            if (windowType == WindowType.LOG_WINDOW) {
-                hyperLink.setOnAction((evt) -> {
-                    alert.close();
-                    AppManagerFactory.getInstance().launchFileManagerForLogs();
-                });
-            } else if (windowType == WindowType.BROWSER_WINDOW) {
-                hyperLink.setOnAction((evt) -> {
-                    alert.close();
-                    AppManagerFactory.getInstance().launchDefaultBrowser(link);
-                });
-            }
-            hyperLink.setFont(Font.font("Verdana", 14));
+        for (AbstractLinkAction linkAction : linkActions) {
+            Hyperlink hyperLink = new Hyperlink(linkAction.getLink());
+            hyperLink.setOnAction((evt) -> {
+                alert.close();
+                linkAction.run();
+            });
+            hyperLink.setFont(Font.font("Verdana", 13));
             hyperlinks.add(hyperLink);
-
         }
         return hyperlinks;
-    }
+}
 
     private GridPane buildGridPane(List<Hyperlink> hyperLinks) {
+        gridPaneRow = 0;
+
         GridPane gridPane = new GridPane();
         gridPane.setVgap(10);
         gridPane.setHgap(10);
         gridPane.setAlignment(Pos.CENTER);
 
-        double preferredWidth = 0;
-        int row = 0;
+        double preferredWidth = addHyperLinks(hyperLinks, gridPane);
 
-        if (!StringUtils.nullOrEmpty(message)) {
-            Label messageLabel = new Label(message);
-            double pixelsPerLetter = 5.3; //depends on font size
-            preferredWidth = pixelsPerLetter * Arrays.stream(message.split("\n"))
-                    .map(String::length)
-                    .max((o1, o2) -> o1 > o2 ? o1 : o2)
-                    .orElseGet(() -> 0);
-            gridPane.add(messageLabel, 0, row++);
-        }
+        final double labelWidth = addLabels(gridPane);
+        preferredWidth = Math.max(preferredWidth, labelWidth);
 
-        for (Hyperlink hyperLink : hyperLinks) {
-            int pixelsPerLetter = 8; //depends on font size
-            preferredWidth = Math.max(preferredWidth, pixelsPerLetter * hyperLink.getText().length());
-            gridPane.add(hyperLink, 0, row++);
-        }
-
-        if (imageFile != null) {
-            ImageView imageView = ResourceUtils.getImgResource(imageFile.fileUrl())
-                    .map(url -> new ImageView(new Image(url.toString())))
-                    .orElseGet(ImageView::new);
-            preferredWidth = Math.max(preferredWidth, imageView.getImage().getWidth());
-            gridPane.add(imageView, 0, row);
-        }
+        final double imageWidth = addImageFile(gridPane);
+        preferredWidth = Math.max(preferredWidth, imageWidth);
 
         ColumnConstraints columnConstraint = new ColumnConstraints();
         columnConstraint.setHalignment(HPos.CENTER);
@@ -158,6 +131,77 @@ public class AlertWindowBuilder {
         gridPane.getColumnConstraints().add(columnConstraint);
 
         return gridPane;
+    }
+
+    private double addLabels(GridPane gridPane) {
+        double preferredWidth = 0;
+        final double pixelsPerLetterFactor = 16; //depends on font size
+        final double fontSize = 16;
+
+        if (msgResultMap != null && !msgResultMap.isEmpty()) {
+            for (Map.Entry<String, UploadResult> entry : msgResultMap.entrySet()) {
+                Label messageLabel = new Label(entry.getValue().logMsg());
+                String style = "-fx-font-family:monospace; " +
+                        String.format("-fx-font-size:%spx; ", fontSize) +
+                        "-fx-text-alignment:left; " +
+                        "-fx-font-style:normal; " +
+                        "-fx-font-weight:bolder; ";
+                if (entry.getValue().getSuccess()) {
+                    style += "-fx-text-fill:forestgreen;";
+                } else {
+                    style += "-fx-text-fill:crimson;";
+                }
+                messageLabel.setStyle(style);
+
+                preferredWidth = pixelsPerLetterFactor * Arrays.stream(entry.getValue().logMsg().split(System.getProperty("line.separator")))
+                        .map(String::length)
+                        .max((o1, o2) -> o1 > o2 ? o1 : o2)
+                        .orElseGet(() -> 0);
+                gridPane.add(messageLabel, 0, gridPaneRow++);
+            }
+        }
+
+        if (!StringUtils.nullOrEmpty(message)) {
+            Label messageLabel = new Label(message);
+            messageLabel.setStyle(
+                    "-fx-font-family:monospace; " +
+                            String.format("-fx-font-size:%spx; ", fontSize) +
+                            "-fx-text-alignment:left; " +
+                            "-fx-font-style:normal; " +
+                            "-fx-text-fill:mediumblue;"
+            );
+            gridPane.add(messageLabel, 0, gridPaneRow++);
+
+            double messageWidth = pixelsPerLetterFactor * Arrays.stream(message.split(System.getProperty("line.separator")))
+                    .map(String::length)
+                    .max((o1, o2) -> o1 > o2 ? o1 : o2)
+                    .orElseGet(() -> 0);
+            preferredWidth = Math.max(preferredWidth, messageWidth);
+        }
+
+        return preferredWidth;
+    }
+
+    private double addHyperLinks(List<Hyperlink> hyperLinks, GridPane gridPane) {
+        double preferredWidth = 0;
+        for (Hyperlink hyperLink : hyperLinks) {
+            gridPane.add(hyperLink, 0, gridPaneRow++);
+            final int pixelsPerLetterFactor = 8; //depends on font size
+            preferredWidth = Math.max(preferredWidth, pixelsPerLetterFactor * hyperLink.getText().length());
+        }
+        return preferredWidth;
+    }
+
+    private double addImageFile(GridPane gridPane) {
+        double preferredWidth = 0;
+        if (imageFile != null) {
+            ImageView imageView = ResourceUtils.getImgResource(imageFile.fileUrl())
+                    .map(url -> new ImageView(new Image(url.toString())))
+                    .orElseGet(ImageView::new);
+            gridPane.add(imageView, 0, gridPaneRow++);
+            preferredWidth = imageView.getImage().getWidth();
+        }
+        return preferredWidth;
     }
 
     public boolean buildAndDisplayOverrideWindow() {

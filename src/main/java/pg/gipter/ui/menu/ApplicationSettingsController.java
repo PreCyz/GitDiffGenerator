@@ -59,8 +59,6 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private CheckBox checkLastItemCheckBox;
     @FXML
-    private CheckBox useMetroSkinCheckBox;
-    @FXML
     private ComboBox<String> languageComboBox;
 
     private final Map<String, Labeled> labelsAffectedByLanguage;
@@ -91,12 +89,11 @@ public class ApplicationSettingsController extends AbstractController {
         silentModeCheckBox.setSelected(applicationProperties.isSilentMode());
 
         if (languageComboBox.getItems().isEmpty()) {
-            languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
+            languageComboBox.setItems(FXCollections.observableList(BundleUtils.getSupportedLanguages()));
         }
         languageComboBox.setValue(applicationProperties.uiLanguage());
         importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
         checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
-        useMetroSkinCheckBox.setSelected(applicationProperties.useMetroSkin());
     }
 
     private void setProperties() {
@@ -153,10 +150,6 @@ public class ApplicationSettingsController extends AbstractController {
             processLastItemJob(newValue);
             saveNewSettings();
         });
-        useMetroSkinCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            saveNewSettings();
-            uiLauncher.refreshApplicationSettingsWindow();
-        });
     }
 
     private void processLastItemJob(Boolean shouldSchedule) {
@@ -190,7 +183,6 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setUiLanguage(languageComboBox.getValue());
         applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
         applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
-        applicationConfig.setUseMetroSkin(useMetroSkinCheckBox.isSelected());
         return applicationConfig;
     }
 
@@ -213,6 +205,5 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.title", titledPane);
         labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
         labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
-        labelsAffectedByLanguage.put("launch.panel.useMetroSkin", useMetroSkinCheckBox);
     }
 }

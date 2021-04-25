@@ -13,7 +13,8 @@ import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.ui.MultiConfigRunner;
 import pg.gipter.ui.RunType;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.*;
@@ -85,7 +86,6 @@ public class JobService {
                 if (startDate != null) {
                     boolean shouldExecute = new AlertWindowBuilder()
                             .withAlertType(Alert.AlertType.WARNING)
-                            .withWindowType(WindowType.CONFIRMATION_WINDOW)
                             .withImage(ImageFile.OVERRIDE_PNG)
                             .withHeaderText(BundleUtils.getMsg("job.missingExecution",
                                     LocalDateTime.parse(savedNextFireDate, DateTimeFormatter.ISO_DATE_TIME).format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")),
