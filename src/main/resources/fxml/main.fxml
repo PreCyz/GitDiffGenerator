@@ -67,8 +67,8 @@
                               <Label text="%toolkit.panel.username" />
                               <TextField fx:id="toolkitUsernameTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" />
                               <Label text="%toolkit.panel.password" GridPane.rowIndex="1" />
-                              <Label text="%toolkit.panel.domain" GridPane.rowIndex="2" />
                               <TextField fx:id="toolkitDomainTextField" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="%toolkit.panel.domain" GridPane.rowIndex="2" />
                               <PasswordField fx:id="toolkitPasswordField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                            </children>
                         </GridPane>

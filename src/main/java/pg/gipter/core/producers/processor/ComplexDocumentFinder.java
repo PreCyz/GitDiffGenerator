@@ -35,8 +35,8 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
                 .filter(dd -> !StringUtils.nullOrEmpty(dd.getDocType()))
                 .collect(toList());
         if (documentDetails.isEmpty()) {
-            logger.error("Can not find [{}] to upload as your copyright items.", ItemType.TOOLKIT_DOCS);
-            throw new IllegalArgumentException("Can not find items to upload.");
+            logger.error("Could not find [{}] to upload as your copyright items.", ItemType.TOOLKIT_DOCS);
+            throw new IllegalArgumentException("Could not find items to upload.");
         }
         Map<String, String> filesToDownload = new HashMap<>(getFilesToDownload(documentDetails));
         List<DownloadDetails> downloadDetails = createDownloadDetails(sharePointConfigs, filesToDownload);
