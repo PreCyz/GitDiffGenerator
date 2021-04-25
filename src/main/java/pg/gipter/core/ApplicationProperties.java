@@ -34,7 +34,7 @@ public abstract class ApplicationProperties {
     private final CachedConfiguration cachedConfiguration;
 
     public ApplicationProperties(String[] cliArgs) {
-        this.cliArgs = cliArgs;
+        this.cliArgs = Arrays.copyOf(cliArgs, cliArgs.length);
         argExtractor = new ArgExtractor(cliArgs);
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
@@ -66,7 +66,7 @@ public abstract class ApplicationProperties {
     }
 
     public final String[] getCliArgs() {
-        return cliArgs;
+        return Arrays.copyOf(cliArgs, cliArgs.length);
     }
 
     public final void updateApplicationConfig(ApplicationConfig applicationConfig) {

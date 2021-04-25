@@ -13,8 +13,8 @@ import static java.util.stream.Collectors.toList;
 
 abstract class AbstractCertificateService implements CertificateService {
 
-    protected final String storepass = "changeit";
-    protected final String X_509 = "X.509";
+    protected final static String storepass = "changeit";
+    protected final static String X_509 = "X.509";
     protected final Logger logger;
 
     public AbstractCertificateService() {

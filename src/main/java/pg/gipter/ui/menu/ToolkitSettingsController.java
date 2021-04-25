@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
-import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
@@ -65,7 +64,6 @@ public class ToolkitSettingsController extends AbstractController {
         toolkitUserFolderHyperlink.setOnMouseClicked(mouseClickEventHandler());
     }
 
-    @NotNull
     private EventHandler<MouseEvent> mouseClickEventHandler() {
         return event -> Platform.runLater(() -> {
             AppManager instance = AppManagerFactory.getInstance();

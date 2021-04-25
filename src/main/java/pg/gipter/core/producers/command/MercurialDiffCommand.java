@@ -3,9 +3,7 @@ package pg.gipter.core.producers.command;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.utils.StringUtils;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -42,6 +40,8 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
                 initialCommand.add("--style");
                 initialCommand.add("changelog");
                 break;
+            default:
+                break;
         }
         return initialCommand;
     }
@@ -50,11 +50,11 @@ final class MercurialDiffCommand extends AbstractDiffCommand {
         List<String> authors = new LinkedList<>();
         if (!appProps.mercurialAuthor().isEmpty()) {
             authors.add("--user");
-            authors.add(wrapWithQuotationMarks(appProps.mercurialAuthor()));
+            authors.add(wrapWithQuotationMark(appProps.mercurialAuthor()));
         } else {
             for (String author : appProps.authors()) {
                 authors.add("--user");
-                authors.add(wrapWithQuotationMarks(author));
+                authors.add(wrapWithQuotationMark(author));
             }
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {

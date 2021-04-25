@@ -19,8 +19,8 @@ import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.JarHelper;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.*;
@@ -53,7 +53,7 @@ public class ProjectsController extends AbstractController {
         super.initialize(location, resources);
         setUpColumns();
         initValues();
-        setupActions(resources);
+        setActions(resources);
         setProperties(resources);
     }
 
@@ -127,7 +127,7 @@ public class ProjectsController extends AbstractController {
         }
     }
 
-    private void setupActions(ResourceBundle resources) {
+    private void setActions(ResourceBundle resources) {
         searchProjectsButton.setOnAction(searchButtonActionEventHandler(resources));
         saveButton.setOnAction(saveButtonActionEventHandler());
         addProjectButton.setOnAction(addButtonActionEventHandler(resources));
@@ -150,10 +150,11 @@ public class ProjectsController extends AbstractController {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(Paths.get(".").toFile());
             directoryChooser.setTitle(resources.getString("directory.search.title"));
-            final Path directory = directoryChooser.showDialog(uiLauncher.currentWindow()).toPath();
-            if (Files.exists(directory) && Files.isDirectory(directory)) {
+            final Optional<File> directory = Optional.ofNullable(directoryChooser.showDialog(uiLauncher.currentWindow()));
+            if (directory .isPresent() && Files.exists(directory.get().toPath()) &&
+                    Files.isDirectory(directory.get().toPath())) {
                 CompletableFuture.supplyAsync(() ->
-                        FXCollections.observableList(searchForProjects(directory)), uiLauncher.nonUIExecutor()
+                        FXCollections.observableList(searchForProjects(directory.get().toPath())), uiLauncher.nonUIExecutor()
                 ).thenAcceptAsync(this::refreshProjectTableView, Platform::runLater);
             }
         };
@@ -231,8 +232,7 @@ public class ProjectsController extends AbstractController {
                 } catch (IllegalArgumentException ex) {
                     AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                             .withHeaderText(ex.getMessage())
-                            .withLink(JarHelper.logsFolder())
-                            .withWindowType(WindowType.LOG_WINDOW)
+                            .withLinkAction(new LogLinkAction())
                             .withAlertType(Alert.AlertType.ERROR)
                             .withImage(ImageFile.ERROR_CHICKEN_PNG);
                     Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);

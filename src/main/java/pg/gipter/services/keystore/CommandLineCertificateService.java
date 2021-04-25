@@ -98,7 +98,7 @@ class CommandLineCertificateService extends AbstractCertificateService {
             }
             logger.info("Found {} certificates.", result.size());
 
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             logger.error(ex.getMessage());
             throw new IOException(ex);
         }

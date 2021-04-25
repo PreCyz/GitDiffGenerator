@@ -11,9 +11,10 @@ import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
-import pg.gipter.ui.FXMultiRunner;
+import pg.gipter.ui.MultiConfigRunner;
 import pg.gipter.ui.RunType;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.*;
@@ -85,9 +86,8 @@ public class JobService {
                 if (startDate != null) {
                     boolean shouldExecute = new AlertWindowBuilder()
                             .withAlertType(Alert.AlertType.WARNING)
-                            .withWindowType(WindowType.CONFIRMATION_WINDOW)
                             .withImage(ImageFile.OVERRIDE_PNG)
-                            .withTitle(BundleUtils.getMsg("job.missingExecution",
+                            .withHeaderText(BundleUtils.getMsg("job.missingExecution",
                                     LocalDateTime.parse(savedNextFireDate, DateTimeFormatter.ISO_DATE_TIME).format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")),
                                     startDate.format(DateTimeFormatter.ISO_DATE)
                             ))
@@ -108,7 +108,7 @@ public class JobService {
                                     );
                                 }
                             }
-                            new FXMultiRunner(applicationPropertiesCollection, executor, RunType.FIXING_JOB_EXECUTION).start();
+                            new MultiConfigRunner(applicationPropertiesCollection, executor, RunType.FIXING_JOB_EXECUTION).start();
                         } else {
                             logger.warn("From some reason the job is defined but without any specific configurations. I do not know how this happened and can do nothing with it.");
                         }

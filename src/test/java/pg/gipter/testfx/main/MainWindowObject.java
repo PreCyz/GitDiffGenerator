@@ -6,6 +6,11 @@ import org.testfx.api.FxRobot;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.testfx.BaseWindowObject;
 
+import java.util.Arrays;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toMap;
+
 public class MainWindowObject extends BaseWindowObject {
 
     private final String jobButtonId = "jobButton";
@@ -15,8 +20,8 @@ public class MainWindowObject extends BaseWindowObject {
     private final String saveConfigurationButtonId = "saveConfigurationButton";
     private final String projectPathButtonId = "projectPathButton";
     private final String removeConfigurationButtonId = "removeConfigurationButton";
+    private final String trayButtonButtonId = "trayButton";
 
-    private final String configurationNameTextFieldId = "configurationNameTextField";
     private final String authorsTextFieldId = "authorsTextField";
     private final String committerEmailTextFieldId = "committerEmailTextField";
     private final String gitAuthorTextFieldId = "gitAuthorTextField";
@@ -50,6 +55,7 @@ public class MainWindowObject extends BaseWindowObject {
 
     public MainWindowObject pressAddConfigurationButton() {
         clickOnButton(addConfigurationButtonId);
+        waitInSeconds(0.5d);
         return this;
     }
 
@@ -59,7 +65,24 @@ public class MainWindowObject extends BaseWindowObject {
     }
 
     public MainWindowObject pressOkOnPopup() {
+        return pressEnter();
+    }
+
+    public MainWindowObject pressEnter() {
         robot.press(KeyCode.ENTER).release(KeyCode.ENTER);
+        return this;
+    }
+
+    public MainWindowObject enterTextInDialog(String text) {
+        final Map<String, KeyCode> keyBoardMap = Arrays.stream(KeyCode.values())
+                .collect(toMap(KeyCode::getName, keyCode -> keyCode, (v1, v2) -> v1));
+        for (char c : text.toCharArray()) {
+            final String letter = String.valueOf(c).toUpperCase();
+            if (keyBoardMap.containsKey(letter)) {
+                final KeyCode keyCode = keyBoardMap.get(letter);
+                robot.press(keyCode).release(keyCode);
+            }
+        }
         return this;
     }
 
@@ -68,9 +91,8 @@ public class MainWindowObject extends BaseWindowObject {
         return this;
     }
 
-    public MainWindowObject enterConfigurationName(String value) {
-        getConfigurationNameTextField().clear();
-        clickAndWrite(configurationNameTextFieldId, value);
+    public MainWindowObject pressTrayButton() {
+        clickOnButton(trayButtonButtonId);
         return this;
     }
 
@@ -141,9 +163,10 @@ public class MainWindowObject extends BaseWindowObject {
         return this;
     }
 
-    public MainWindowObject waitForPopup(int seconds) {
+    public MainWindowObject waitInSeconds(double seconds) {
         try {
-            Thread.sleep(1000 * seconds);
+            final double milliSeconds = 1000 * seconds;
+            Thread.sleep((long) milliSeconds);
         } catch (InterruptedException e) {
             System.err.printf("Could not wait. Something went wrong %s\n", e.getMessage());
         }
@@ -168,6 +191,10 @@ public class MainWindowObject extends BaseWindowObject {
 
     public Button getAddConfigurationButton() {
         return getButton(addConfigurationButtonId);
+    }
+
+    public Button getTrayButton() {
+        return getButton(trayButtonButtonId);
     }
 
     public TextField getAuthorsTextField() {
@@ -216,10 +243,6 @@ public class MainWindowObject extends BaseWindowObject {
 
     public DatePicker getStartDatePicker() {
         return getDatePicker(startDatePickerId);
-    }
-
-    public TextField getConfigurationNameTextField() {
-        return getTextField(configurationNameTextFieldId);
     }
 
     public ComboBox<ItemType> getItemTypeComboBox() {

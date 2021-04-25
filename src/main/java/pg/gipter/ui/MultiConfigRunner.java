@@ -19,7 +19,6 @@ import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JarHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,30 +31,9 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toCollection;
 
 /** Created by Pawel Gawedzki on 15-Jul-2019. */
-public class FXMultiRunner extends Task<Void> implements Starter {
+public class MultiConfigRunner extends Task<Void> implements Starter {
 
-    private static class UploadResult {
-        String configName;
-        Boolean success;
-        Throwable throwable;
-
-        UploadResult(String configName, Boolean success, Throwable throwable) {
-            this.configName = configName;
-            this.success = success;
-            this.throwable = throwable;
-        }
-
-        String logMsg() {
-            String cause = "N/A";
-            if (throwable != null) {
-                cause = throwable.getMessage();
-                cause = cause.substring(cause.lastIndexOf(":") + 1);
-            }
-            return String.format("configName: %s, success: %b, cause: %s", configName, success, cause);
-        }
-    }
-
-    private static final Logger logger = LoggerFactory.getLogger(FXMultiRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(MultiConfigRunner.class);
     private final LinkedList<String> configurationNames;
     private final Executor executor;
     private static Boolean toolkitCredentialsSet = null;
@@ -68,14 +46,14 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private final RunType runType;
     private final LocalDate startDate;
 
-    public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType) {
+    public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType) {
         this(configurationNames, executor, runType, null);
     }
 
-    public FXMultiRunner(Set<String> configurationNames, Executor executor, RunType runType, LocalDate startDate) {
+    public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType, LocalDate startDate) {
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
-        this.totalProgress = configurationNames.size() * 5;
+        this.totalProgress = configurationNames.size() * 5L;
         this.workDone = new AtomicLong(0);
         this.applicationPropertiesCollection = Collections.emptyList();
         this.configurationDao = DaoFactory.getCachedConfiguration();
@@ -84,7 +62,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         this.startDate = startDate;
     }
 
-    public FXMultiRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor, RunType runType) {
+    public MultiConfigRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor, RunType runType) {
         this(
                 applicationPropertiesCollection.stream()
                         .map(ApplicationProperties::configurationName)
@@ -109,8 +87,7 @@ public class FXMultiRunner extends Task<Void> implements Starter {
             logger.info("There is no configuration to launch.");
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog"))
-                    .withLink(JarHelper.logsFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
                     .withImage(ImageFile.ERROR_CHICKEN_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
@@ -270,13 +247,13 @@ public class FXMultiRunner extends Task<Void> implements Starter {
 
     private UploadStatus calculateFinalStatus() {
         UploadStatus status = UploadStatus.N_A;
-        if (resultMap.entrySet().stream().allMatch(entry -> entry.getValue().success)) {
+        if (resultMap.entrySet().stream().allMatch(entry -> entry.getValue().getSuccess())) {
             status = UploadStatus.SUCCESS;
         }
-        if (resultMap.entrySet().stream().anyMatch(entry -> !entry.getValue().success)) {
+        if (resultMap.entrySet().stream().anyMatch(entry -> !entry.getValue().getSuccess())) {
             status = UploadStatus.PARTIAL_SUCCESS;
         }
-        if (resultMap.entrySet().stream().noneMatch(entry -> entry.getValue().success)) {
+        if (resultMap.entrySet().stream().noneMatch(entry -> entry.getValue().getSuccess())) {
             status = UploadStatus.FAIL;
         }
         return status;
@@ -285,12 +262,12 @@ public class FXMultiRunner extends Task<Void> implements Starter {
     private List<ExceptionDetails> calculateErrorDetails() {
         return resultMap.values()
                 .stream()
-                .filter(uploadResult -> !uploadResult.success)
+                .filter(uploadResult -> !uploadResult.getSuccess())
                 .map(uploadResult -> new ExceptionDetails(
                         uploadResult.logMsg(),
-                        Optional.ofNullable(uploadResult.throwable.getCause())
+                        Optional.ofNullable(uploadResult.getCause())
                                 .map(Throwable::getMessage)
-                                .orElseGet(() -> uploadResult.throwable.getMessage()),
+                                .orElseGet(uploadResult::getThrowableMsg),
                         LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
                 )
                 .collect(Collectors.toList());
@@ -309,31 +286,25 @@ public class FXMultiRunner extends Task<Void> implements Starter {
         }
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()));
-        String detailedMessage;
         switch (status) {
             case N_A:
             case FAIL:
-                detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
                 alertWindowBuilder
-                        .withMessage(detailedMessage)
-                        .withLink(JarHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withUploadResultMap(resultMap)
+                        .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
                         .withImage(ImageFile.randomFailImage());
                 break;
             case PARTIAL_SUCCESS:
-                detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
                 alertWindowBuilder
-                        .withMessage(detailedMessage)
-                        .withLink(JarHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withUploadResultMap(resultMap)
+                        .withLinkAction(new LogLinkAction(), new BrowserLinkAction(toolkitUserFolder()))
                         .withAlertType(Alert.AlertType.WARNING)
                         .withImage(ImageFile.randomPartialSuccessImage());
                 break;
             default:
                 alertWindowBuilder
-                        .withLink(toolkitUserFolder())
-                        .withWindowType(WindowType.BROWSER_WINDOW)
+                        .withLinkAction(new BrowserLinkAction(toolkitUserFolder()))
                         .withAlertType(Alert.AlertType.INFORMATION)
                         .withImage(ImageFile.randomSuccessImage());
 

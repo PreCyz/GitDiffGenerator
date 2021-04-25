@@ -45,7 +45,7 @@ public class UploadItemJob implements Job {
 
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
 
-        new FXMultiRunner(
+        new MultiConfigRunner(
                 jobParam.getConfigs(), uiLauncher.nonUIExecutor(), RunType.UPLOAD_ITEM_JOB, startDate
         ).start();
 

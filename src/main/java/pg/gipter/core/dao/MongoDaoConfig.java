@@ -21,7 +21,7 @@ public abstract class MongoDaoConfig {
 
     protected final Logger logger;
 
-    private final String DB_CONFIG = "db.properties";
+    private static final String DB_CONFIG = "db.properties";
 
     private String collectionName;
     protected MongoCollection<Document> collection;

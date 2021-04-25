@@ -1,5 +1,6 @@
 package pg.gipter.ui.menu;
 
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -88,7 +89,7 @@ public class ApplicationSettingsController extends AbstractController {
         silentModeCheckBox.setSelected(applicationProperties.isSilentMode());
 
         if (languageComboBox.getItems().isEmpty()) {
-            languageComboBox.setItems(FXCollections.observableList(Arrays.asList(BundleUtils.SUPPORTED_LANGUAGES)));
+            languageComboBox.setItems(FXCollections.observableList(BundleUtils.getSupportedLanguages()));
         }
         languageComboBox.setValue(applicationProperties.uiLanguage());
         importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
@@ -141,9 +142,10 @@ public class ApplicationSettingsController extends AbstractController {
             saveNewSettings();
         });
 
-        confirmationWindowCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+        final ChangeListener<Boolean> saveNewSettingsChangeListener = (observable, oldValue, newValue) -> saveNewSettings();
+        confirmationWindowCheckBox.selectedProperty().addListener(saveNewSettingsChangeListener);
 
-        importCertCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+        importCertCheckBox.selectedProperty().addListener(saveNewSettingsChangeListener);
         checkLastItemCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             processLastItemJob(newValue);
             saveNewSettings();

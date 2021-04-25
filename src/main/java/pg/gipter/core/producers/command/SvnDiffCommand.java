@@ -3,9 +3,7 @@ package pg.gipter.core.producers.command;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.utils.StringUtils;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -46,6 +44,8 @@ final class SvnDiffCommand extends AbstractDiffCommand {
             case PROTECTED:
                 initialCommand.add("--verbose");
                 break;
+            default:
+                break;
         }
         return initialCommand;
     }
@@ -54,11 +54,11 @@ final class SvnDiffCommand extends AbstractDiffCommand {
         List<String> authors = new LinkedList<>();
         if (StringUtils.notEmpty(appProps.svnAuthor())) {
             authors.add("--search");
-            authors.add(wrapWithQuotationMarks(appProps.svnAuthor()));
+            authors.add(wrapWithQuotationMark(appProps.svnAuthor()));
         } else {
             for (String author : appProps.authors()) {
                 authors.add("--search");
-                authors.add(wrapWithQuotationMarks(author));
+                authors.add(wrapWithQuotationMark(author));
             }
         }
         if (StringUtils.notEmpty(appProps.committerEmail())) {

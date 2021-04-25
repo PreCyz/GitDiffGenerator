@@ -1,6 +1,5 @@
 package pg.gipter.testfx.main;
 
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.AfterEach;
@@ -36,7 +35,6 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.testfx.api.FxAssert.verifyThat;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 public class MainTestUI {
@@ -100,7 +98,8 @@ public class MainTestUI {
 
         assertThat(map).hasSize(0);
         assertThat(windowObject.getJobButton().isDisabled()).isTrue();
-        assertThat(windowObject.getAddConfigurationButton().isDisabled()).isTrue();
+        assertThat(windowObject.getTrayButton().isDisabled()).isTrue();
+        assertThat(windowObject.getAddConfigurationButton().isDisabled()).isFalse();
         assertThat(windowObject.getExecuteButton().isDisabled()).isTrue();
         assertThat(windowObject.getExecuteAllButton().isDisabled()).isTrue();
         assertThat(windowObject.getConfigurationNameComboBox().isDisabled()).isTrue();
@@ -114,12 +113,10 @@ public class MainTestUI {
     @Test
     void givenSIMPLEConfiguration_whenSaveButtonPressed_thenConfigurationSaved(FxRobot robot) {
         final MainWindowObject windowObject = new MainWindowObject(robot);
-        verifyThat(windowObject.getAddConfigurationButton(), Node::isDisabled);
 
-        windowObject.enterConfigurationName("config")
-                .pressAddConfigurationButton()
-                .pressOkOnPopup()
-                .pressSaveButton()
+        windowObject.pressAddConfigurationButton()
+                .enterTextInDialog("config")
+                .pressEnter()
                 .pressOkOnPopup();
 
         final Map<String, RunConfig> map = dao.loadRunConfigMap();
@@ -141,13 +138,12 @@ public class MainTestUI {
 
     @Test
     void givenPROTECTEDConfiguration_whenSaveButtonPressed_thenConfigurationSaved(FxRobot robot) {
-        final MainWindowObject windowObject = new MainWindowObject(robot);
-        verifyThat(windowObject.getAddConfigurationButton(), Node::isDisabled);
-
-        windowObject.enterConfigurationName("config")
-                .chooseItemType(ItemType.PROTECTED)
+        final MainWindowObject windowObject = new MainWindowObject(robot)
                 .pressAddConfigurationButton()
+                .enterTextInDialog("config")
+                .pressEnter()
                 .pressOkOnPopup()
+                .chooseItemType(ItemType.PROTECTED)
                 .pressSaveButton()
                 .pressOkOnPopup();
 
@@ -170,13 +166,12 @@ public class MainTestUI {
 
     @Test
     void givenSTATEMENTConfiguration_whenSaveButtonPressed_thenConfigurationSavedAndProjectButtonIsDisabled(FxRobot robot) {
-        final MainWindowObject windowObject = new MainWindowObject(robot);
-        verifyThat(windowObject.getAddConfigurationButton(), Node::isDisabled);
-
-        windowObject.enterConfigurationName("config")
-                .chooseItemType(ItemType.STATEMENT)
+        final MainWindowObject windowObject = new MainWindowObject(robot)
                 .pressAddConfigurationButton()
+                .enterTextInDialog("config")
+                .pressEnter()
                 .pressOkOnPopup()
+                .chooseItemType(ItemType.STATEMENT)
                 .pressSaveButton()
                 .pressOkOnPopup();
 
@@ -200,9 +195,12 @@ public class MainTestUI {
     @Test
     void givenTOOLKIT_DOCSItemType_whenAddConfiguration_thenDisabledFields(FxRobot robot) {
         final MainWindowObject windowObject = new MainWindowObject(robot)
-                .enterConfigurationName("config")
-                .chooseItemType(ItemType.TOOLKIT_DOCS)
                 .pressAddConfigurationButton()
+                .enterTextInDialog("config")
+                .pressEnter()
+                .pressOkOnPopup()
+                .chooseItemType(ItemType.TOOLKIT_DOCS)
+                .pressSaveButton()
                 .pressOkOnPopup();
 
         final Map<String, RunConfig> map = dao.loadRunConfigMap();
@@ -225,9 +223,12 @@ public class MainTestUI {
     @Test
     void givenSHARE_POINT_DOCSItemType_whenAddConfiguration_thenDisabledFields(FxRobot robot) {
         final MainWindowObject windowObject = new MainWindowObject(robot)
-                .enterConfigurationName("config")
-                .chooseItemType(ItemType.SHARE_POINT_DOCS)
                 .pressAddConfigurationButton()
+                .enterTextInDialog("config")
+                .pressEnter()
+                .pressOkOnPopup()
+                .chooseItemType(ItemType.SHARE_POINT_DOCS)
+                .pressSaveButton()
                 .pressOkOnPopup();
 
         final Map<String, RunConfig> map = dao.loadRunConfigMap();
@@ -250,30 +251,35 @@ public class MainTestUI {
     @Test
     void given2DifferentConfigs_whenRemoveFirstConfig_thenOneIsRemovedAndLoaded(FxRobot robot) {
         final MainWindowObject windowObject = new MainWindowObject(robot)
-                .enterConfigurationName("code")
+                .pressAddConfigurationButton()
+                .enterTextInDialog("code")
+                .pressEnter()
+                .pressOkOnPopup()
                 .enterAuthor("testAuthor")
                 .checkFetchAll()
                 .uncheckSkipRemote()
-                .chooseItemType(ItemType.SIMPLE)
-                .pressAddConfigurationButton()
+                .pressSaveButton()
                 .pressOkOnPopup()
 
-                .enterConfigurationName("docs")
+                .pressAddConfigurationButton()
+                .enterTextInDialog("docs")
+                .pressEnter()
+                .pressOkOnPopup()
                 .chooseItemType(ItemType.TOOLKIT_DOCS)
                 .enterListNames("Deliverables,General")
-                .pressAddConfigurationButton()
+                .pressSaveButton()
                 .pressOkOnPopup()
 
                 .chooseConfiguration("code")
                 .pressRemoveConfigurationButton()
-                .pressOkOnPopup();
+                .pressOkOnPopup()
+                .waitInSeconds(5d);
 
-        assertThat(windowObject.getConfigurationNameTextField().getText()).isEqualTo("docs");
         assertThat(windowObject.getConfigurationNameComboBox().getValue()).isEqualTo("docs");
-        assertThat(windowObject.getItemTypeComboBox().getValue()).isEqualTo(ItemType.TOOLKIT_DOCS);
         assertThat(windowObject.getToolkitProjectListNamesTextField().getText()).isEqualTo("Deliverables,General");
         assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isTrue();
         assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isTrue();
+        assertThat(windowObject.getItemTypeComboBox().getValue()).isEqualTo(ItemType.TOOLKIT_DOCS);
     }
 
     @Test
@@ -292,8 +298,9 @@ public class MainTestUI {
         controller.setVcsService(vcsService);
 
         final MainWindowObject windowObject = new MainWindowObject(robot)
-                .enterConfigurationName("code")
                 .pressAddConfigurationButton()
+                .enterTextInDialog("code")
+                .pressEnter()
                 .pressOkOnPopup()
                 .enterGitAuthor("testAuthor")
                 .enterAuthor("configAuthor");
@@ -309,8 +316,9 @@ public class MainTestUI {
         controller.setVcsService(vcsService);
 
         final MainWindowObject windowObject = new MainWindowObject(robot)
-                .enterConfigurationName("code")
                 .pressAddConfigurationButton()
+                .enterTextInDialog("code")
+                .pressEnter()
                 .pressOkOnPopup()
                 .enterCommitterEmail("test@email.com")
                 .enterAuthor("configAuthor");
@@ -326,8 +334,9 @@ public class MainTestUI {
         controller.setVcsService(vcsService);
 
         final MainWindowObject windowObject = new MainWindowObject(robot)
-                .enterConfigurationName("code")
                 .pressAddConfigurationButton()
+                .enterTextInDialog("code")
+                .pressEnter()
                 .pressOkOnPopup()
                 .enterCommitterEmail("test@email.com")
                 .enterAuthor("configAuthor")
@@ -344,8 +353,9 @@ public class MainTestUI {
         controller.setVcsService(vcsService);
 
         final MainWindowObject windowObject = new MainWindowObject(robot)
-                .enterConfigurationName("code")
                 .pressAddConfigurationButton()
+                .enterTextInDialog("code")
+                .pressEnter()
                 .pressOkOnPopup()
                 .enterGitAuthor("enteredUserName")
                 .enterAuthor("configAuthor")
@@ -363,8 +373,9 @@ public class MainTestUI {
         controller.setVcsService(vcsService);
 
         final MainWindowObject windowObject = new MainWindowObject(robot)
-                .enterConfigurationName("code")
                 .pressAddConfigurationButton()
+                .enterTextInDialog("code")
+                .pressEnter()
                 .pressOkOnPopup()
                 .enterGitAuthor("enteredUserName")
                 .enterCommitterEmail("entered@email.com")

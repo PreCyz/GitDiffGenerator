@@ -316,4 +316,5 @@ class CliApplicationProperties extends ApplicationProperties {
         }
         return cronExpression;
     }
+
 }

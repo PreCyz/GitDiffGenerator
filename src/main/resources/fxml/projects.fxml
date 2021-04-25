@@ -2,8 +2,8 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="400.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.text.*?>
+<AnchorPane prefHeight="400.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <TableView fx:id="projectsTableView" layoutX="14.0" layoutY="14.0" prefHeight="330.0" prefWidth="649.0">
             <columns>
@@ -12,7 +12,7 @@
                 <TableColumn editable="false" prefWidth="361.0" sortable="false" text="%projects.column.path" />
             </columns>
         </TableView>
-        <Button fx:id="searchProjectsButton" layoutX="14.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" text="%projects.button.search" textFill="#32a1c9">
+        <Button fx:id="searchProjectsButton" layoutX="14.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" styleClass="blue" stylesheets="@../css/buttons.css" text="%projects.button.search" textFill="#32a1c9">
             <font>
                 <Font name="System Bold" size="15.0" />
             </font>
@@ -27,7 +27,7 @@
                 <Font size="9.0" />
             </font>
         </Button>
-      <Button fx:id="saveButton" layoutX="198.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" text="%projects.button.save" textFill="#1eb235">
+      <Button fx:id="saveButton" layoutX="198.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" styleClass="green" stylesheets="@../css/buttons.css" text="%projects.button.save" textFill="#1eb235">
          <font>
             <Font name="System Bold" size="15.0" />
          </font>
