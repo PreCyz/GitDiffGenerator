@@ -40,7 +40,7 @@ class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
                 .map(DocumentFinder::find)
                 .orElseGet(ArrayList::new);
         if (documents.isEmpty()) {
-            logger.warn("No documents to zip is no item to upload. [{}].", itemType);
+            logger.warn("No documents to zip == no item to upload. [{}].", itemType);
             throw new IllegalArgumentException("Given projects do not contain any items.");
         }
 
@@ -67,7 +67,7 @@ class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
                 fis.close();
             }
         } catch (IOException ex) {
-            String errMsg = "Statement does not exists or it is not a file. Can not produce diff.";
+            String errMsg = "Could not produce diff.";
             logger.error(errMsg);
             throw new IllegalArgumentException(errMsg, ex);
         }
