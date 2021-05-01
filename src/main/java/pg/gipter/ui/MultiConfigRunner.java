@@ -224,9 +224,9 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     private Boolean handleUploadResult(String configName, Boolean isUploaded, Throwable throwable) {
         if (isUploaded == null || !isUploaded) {
-            logger.error("Diff upload for configuration name {} failed.", configName, throwable);
+            logger.error("Diff upload for configuration name [{}] failed.", configName, throwable);
         } else {
-            logger.info("Diff upload for configuration name {} uploaded.", configName);
+            logger.info("Diff upload for configuration name [{}] uploaded.", configName);
         }
         resultMap.put(configName, new UploadResult(configName, isUploaded, throwable));
         return isUploaded;
