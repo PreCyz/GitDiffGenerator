@@ -17,6 +17,7 @@ class GitService implements VcsService {
 
     private final List<String> userNameCommand = Stream.of("git", "config", "--get", "user.name").collect(toUnmodifiableList());
     private final List<String> userEmailCommand = Stream.of("git", "config", "--get", "user.email").collect(toUnmodifiableList());
+    private final List<String> versionCommand = Stream.of("git", "--version").collect(toUnmodifiableList());
 
     private String projectPath;
 
@@ -74,6 +75,30 @@ class GitService implements VcsService {
             logger.error("Unable to retrieve user email from git config. {}", ex.getMessage());
         }
 
+        return result;
+    }
+
+    @Override
+    public boolean isGitAvailableInCommandLine() {
+        boolean result = true;
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(versionCommand);
+            processBuilder.directory(Paths.get(projectPath).toFile());
+            Process process = processBuilder.start();
+
+            try (InputStream is = process.getInputStream();
+                 InputStreamReader isr = new InputStreamReader(is);
+                 BufferedReader br = new BufferedReader(isr)) {
+
+                String line;
+                if ((line = br.readLine()) != null) {
+                    logger.debug("Git available from command line - {}.", line);
+                }
+            }
+        } catch (Exception ex) {
+            result = false;
+            logger.error("Unable to retrieve user email from git config. {}", ex.getMessage());
+        }
         return result;
     }
 }
