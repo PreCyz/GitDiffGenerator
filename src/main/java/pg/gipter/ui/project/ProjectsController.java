@@ -99,7 +99,7 @@ public class ProjectsController extends AbstractController {
             for (String path : projects) {
                 Path project = Paths.get(path);
                 Optional<String> supportedVcs = getSupportedVcs(Paths.get(path));
-                if (supportedVcs.isEmpty() && applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
+                if (!supportedVcs.isPresent() && applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
                     ProjectDetails pd = new ProjectDetails(
                             project.getFileName().toString(),
                             applicationProperties.itemType().name(),
