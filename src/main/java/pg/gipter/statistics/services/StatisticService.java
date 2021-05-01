@@ -57,6 +57,8 @@ public class StatisticService {
         statistic.setApplicationVersion(appProperties.version().getVersion());
         if (runDetails.getExceptionDetails() != null && !runDetails.getExceptionDetails().isEmpty()) {
             statistic.setExceptions(runDetails.getExceptionDetails());
+        } else {
+            statistic.setExceptions(Collections.emptyList());
         }
 
         return statistic;
