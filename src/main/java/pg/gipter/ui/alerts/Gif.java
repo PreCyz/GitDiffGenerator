@@ -29,7 +29,15 @@ public enum Gif {
     BARNEY_STINSON_AAHH("https://media.giphy.com/media/TK3vwIvfBULfO/giphy.gif", 200, 260),
     BARNEY_STINSON_DANCE("https://media.giphy.com/media/kJGLD1ctyrlqU/giphy.gif", 360, 220),
     TED_MARSHAL("https://media.giphy.com/media/Zh0ukrpK77Tos/giphy.gif", 305, 510),
-    KYLO_REN("https://media.giphy.com/media/sgWHkkjwcnKes/giphy.gif", 230, 510)
+    KYLO_REN("https://media.giphy.com/media/sgWHkkjwcnKes/giphy.gif", 230, 510),
+    BAYERN_MUNICH_CELEBRATING("https://media.giphy.com/media/BkwEoWNhSQL9bJc4TH/giphy.gif", 290, 510),
+    LEWY_NEUER("https://media.giphy.com/media/qOlfLk1yTKWDti7jdI/giphy.gif", 500, 510),
+    VOLDEMORT("https://media.giphy.com/media/wLBS2GlPDALS0/giphy.gif", 200, 260),
+    ACE_VENTURA_SUCKS("https://media.giphy.com/media/VQxdDzvRoEwrm/giphy.gif", 370, 480),
+    ACE_VENTURA_AJAJAJ("https://media.giphy.com/media/Qs1aHvvivlnm8/giphy.gif", 370, 480),
+    ACE_VENTURA_AAAA("https://media.giphy.com/media/EOWVPMCalaDpm/giphy.gif", 290, 230),
+    CHICKENS("https://media.giphy.com/media/24FMDDRwtF4uaMTmEQ/giphy.gif", 420, 430),
+    YODA_DANCING("https://media.giphy.com/media/6fScAIQR0P0xW/giphy.gif", 210, 170)
     ;
 
     private final String url;
@@ -62,20 +70,22 @@ public enum Gif {
 
     public static Gif randomPartialSuccessGif() {
         return randomGif(EnumSet.of(
-                PICARD_DAMN, TUK_TUK, MINION_FART, SVEN, MOANA_BABY, MAUI_OH, CHUCK_NORRIS_OK, SPIDER_MAN, TED_MARSHAL
+                PICARD_DAMN, TUK_TUK, MINION_FART, SVEN, MOANA_BABY, MAUI_OH, CHUCK_NORRIS_OK, SPIDER_MAN, TED_MARSHAL,
+                VOLDEMORT, ACE_VENTURA_AJAJAJ, CHICKENS
         ));
     }
 
     public static Gif randomSuccessGif() {
         return randomGif(EnumSet.of(
-                NEVIL_FINIGAN_JOY, BACKPACK_DANCE, MINION_NAKED_GRU, FROZEN_ANNA_JOY, MAUI_TATOO, PALPATINE,  BARNEY_STINSON_DANCE
+                NEVIL_FINIGAN_JOY, BACKPACK_DANCE, MINION_NAKED_GRU, FROZEN_ANNA_JOY, MAUI_TATOO, PALPATINE,
+                BARNEY_STINSON_DANCE, BAYERN_MUNICH_CELEBRATING, LEWY_NEUER, YODA_DANCING
         ));
     }
 
     public static Gif randomFailGif() {
         return randomGif(EnumSet.of(
                 SNAPE_SNAP, MINION_IOIO, OLAF, MOANA_MAUI, MAUI_ANGRY, CHUCK_NORRIS_FIST, ASOKA_TANO, MISSED_KICK,
-                BARNEY_STINSON_GUN, BARNEY_STINSON_AAHH, KYLO_REN
+                BARNEY_STINSON_GUN, BARNEY_STINSON_AAHH, KYLO_REN, ACE_VENTURA_SUCKS, ACE_VENTURA_AAAA
         ));
     }
 }
