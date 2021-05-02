@@ -34,6 +34,7 @@ import static java.util.stream.Collectors.toCollection;
 public class MultiConfigRunner extends Task<Void> implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiConfigRunner.class);
+
     private final LinkedList<String> configurationNames;
     private final Executor executor;
     private static Boolean toolkitCredentialsSet = null;
@@ -45,6 +46,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     private final DataDao dataDao;
     private final RunType runType;
     private final LocalDate startDate;
+    private List<WebViewDetails> webViewDetails;
 
     public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType) {
         this(configurationNames, executor, runType, null);
@@ -81,6 +83,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     @Override
     public void start() {
+        webViewDetails = new WebViewService().loadGifs();
         UploadStatus status;
         logger.info("{} started.", this.getClass().getName());
         if (configurationNames.isEmpty()) {
@@ -89,7 +92,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
                     .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog"))
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                    .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView((ImageFile.ERROR_CHICKEN_PNG))));
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {
@@ -280,10 +283,15 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
         logger.info("{} ended.", this.getClass().getName());
     }
 
-    private void displayAlertWindow(UploadStatus status) {
+    private void displayAlertWindow(final UploadStatus status) {
         if (!isConfirmationWindow()) {
             return;
         }
+        final WebViewDetails webViewDetails = this.webViewDetails.stream()
+                .filter(wvd -> wvd.getUploadStatus() == status)
+                .collect(toCollection(LinkedList::new))
+                .getFirst();
+
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()));
         switch (status) {
@@ -293,20 +301,20 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
                         .withUploadResultMap(resultMap)
                         .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.randomFailImage());
+                        .withWebViewDetails(webViewDetails);
                 break;
             case PARTIAL_SUCCESS:
                 alertWindowBuilder
                         .withUploadResultMap(resultMap)
                         .withLinkAction(new LogLinkAction(), new BrowserLinkAction(toolkitUserFolder()))
                         .withAlertType(Alert.AlertType.WARNING)
-                        .withImage(ImageFile.randomPartialSuccessImage());
+                        .withWebViewDetails(webViewDetails);
                 break;
             default:
                 alertWindowBuilder
                         .withLinkAction(new BrowserLinkAction(toolkitUserFolder()))
                         .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage(ImageFile.randomSuccessImage());
+                        .withWebViewDetails(webViewDetails);
 
         }
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);

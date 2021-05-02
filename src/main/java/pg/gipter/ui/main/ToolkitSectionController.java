@@ -83,12 +83,12 @@ class ToolkitSectionController extends AbstractController {
                         saveToolkitCredentials();
                         alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
                                 .withAlertType(Alert.AlertType.INFORMATION)
-                                .withImage(ImageFile.FINGER_UP_PNG);
+                                .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.FINGER_UP_PNG)));
                     } else {
                         alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
                                 .withLinkAction(new LogLinkAction())
                                 .withAlertType(Alert.AlertType.ERROR)
-                                .withImage(ImageFile.MINION_IOIO_GIF);
+                                .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.MINION_IOIO_GIF)));
                     }
                     uiLauncher.updateTray(applicationProperties);
                     Platform.runLater(() -> {

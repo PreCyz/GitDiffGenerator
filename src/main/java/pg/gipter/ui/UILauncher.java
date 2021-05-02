@@ -142,7 +142,7 @@ public class UILauncher implements Launcher {
         new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withImage(ImageFile.MINION_AAAA_GIF)
+                .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.MINION_AAAA_GIF)))
                 .buildAndDisplayWindow();
     }
 
@@ -156,7 +156,7 @@ public class UILauncher implements Launcher {
                             .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
                             .withLinkAction(new BrowserLinkAction(GithubService.GITHUB_URL + "/releases/latest"))
                             .withAlertType(Alert.AlertType.INFORMATION)
-                            .withImage(ImageFile.MINION_AAAA_2_GIF)
+                            .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.MINION_AAAA_2_GIF)))
                             .buildAndDisplayWindow()
                     );
                 }
@@ -254,7 +254,7 @@ public class UILauncher implements Launcher {
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.window.canNotOpen"))
                         .withAlertType(Alert.AlertType.WARNING)
-                        .withImage(ImageFile.OVERRIDE_PNG);
+                        .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.OVERRIDE_PNG)));
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             } else {
                 jobWindow = new Stage();
@@ -316,7 +316,7 @@ public class UILauncher implements Launcher {
                     .withHeaderText(errorMessage)
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                    .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.ERROR_CHICKEN_PNG)));
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } finally {
             dataDao.removeJobParam();
@@ -354,7 +354,7 @@ public class UILauncher implements Launcher {
                         .withHeaderText(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
                         .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                        .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.ERROR_CHICKEN_PNG)));
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         }

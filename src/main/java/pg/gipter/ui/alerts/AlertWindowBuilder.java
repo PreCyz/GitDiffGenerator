@@ -4,9 +4,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import pg.gipter.ui.UploadResult;
@@ -24,7 +22,7 @@ public class AlertWindowBuilder {
     private String message;
     private Set<AbstractLinkAction> linkActions;
     private Alert.AlertType alertType;
-    private ImageFile imageFile;
+    private WebViewDetails webViewDetails;
     private String cancelButtonText;
     private String okButtonText;
     private Map<String, UploadResult> msgResultMap;
@@ -59,8 +57,8 @@ public class AlertWindowBuilder {
         return this;
     }
 
-    public AlertWindowBuilder withImage(ImageFile imageFile) {
-        this.imageFile = imageFile;
+    public AlertWindowBuilder withWebViewDetails(WebViewDetails webViewDetails) {
+        this.webViewDetails = webViewDetails;
         return this;
     }
 
@@ -122,8 +120,11 @@ public class AlertWindowBuilder {
         final double labelWidth = addLabels(gridPane);
         preferredWidth = Math.max(preferredWidth, labelWidth);
 
-        final double imageWidth = addImageFile(gridPane);
+        final double imageWidth = addImageView(gridPane);
         preferredWidth = Math.max(preferredWidth, imageWidth);
+
+        final double gifWidth = addWebView(gridPane);
+        preferredWidth = Math.max(preferredWidth, gifWidth);
 
         ColumnConstraints columnConstraint = new ColumnConstraints();
         columnConstraint.setHalignment(HPos.CENTER);
@@ -135,7 +136,7 @@ public class AlertWindowBuilder {
 
     private double addLabels(GridPane gridPane) {
         double preferredWidth = 0;
-        final double pixelsPerLetterFactor = 16; //depends on font size
+        final double pixelsPerLetterFactor = 10; //depends on font size
         final double fontSize = 16;
 
         if (msgResultMap != null && !msgResultMap.isEmpty()) {
@@ -153,7 +154,9 @@ public class AlertWindowBuilder {
                 }
                 messageLabel.setStyle(style);
 
-                preferredWidth = pixelsPerLetterFactor * Arrays.stream(entry.getValue().logMsg().split(System.getProperty("line.separator")))
+                final String[] lines = entry.getValue().logMsg().split(System.getProperty("line.separator"));
+
+                preferredWidth = pixelsPerLetterFactor * Arrays.stream(lines)
                         .map(String::length)
                         .max((o1, o2) -> o1 > o2 ? o1 : o2)
                         .orElseGet(() -> 0);
@@ -196,14 +199,24 @@ public class AlertWindowBuilder {
         return preferredWidth;
     }
 
-    private double addImageFile(GridPane gridPane) {
+    private double addImageView(GridPane gridPane) {
         double preferredWidth = 0;
-        if (imageFile != null) {
-            ImageView imageView = ResourceUtils.getImgResource(imageFile.fileUrl())
-                    .map(url -> new ImageView(new Image(url.toString())))
-                    .orElseGet(ImageView::new);
-            gridPane.add(imageView, 0, gridPaneRow++);
-            preferredWidth = imageView.getImage().getWidth();
+        if (webViewDetails != null && webViewDetails.getImageView() != null) {
+            gridPane.add(webViewDetails.getImageView(), 0, gridPaneRow++);
+            preferredWidth = webViewDetails.getWidth();
+        }
+        return preferredWidth;
+    }
+
+    private double addWebView(GridPane gridPane) {
+        double preferredWidth = 0;
+        if (webViewDetails != null && webViewDetails.getWebView() != null) {
+            VBox vBox = new VBox(webViewDetails.getWebView());
+            vBox.setPrefHeight(webViewDetails.getHeight());
+            vBox.setPrefWidth(webViewDetails.getWidth());
+
+            gridPane.add(vBox, 0, gridPaneRow++);
+            preferredWidth = webViewDetails.getWidth();
         }
         return preferredWidth;
     }

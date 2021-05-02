@@ -50,7 +50,7 @@ class Runner implements Starter {
                     .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()))
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG)
+                    .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.ERROR_CHICKEN_PNG)))
                     .buildAndDisplayWindow()
             );
         } finally {
@@ -62,7 +62,7 @@ class Runner implements Starter {
                     .withHeaderText(BundleUtils.getMsg("popup.confirmation.message"))
                     .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolder()))
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImage(ImageFile.GOOD_JOB_PNG)
+                    .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView((ImageFile.GOOD_JOB_PNG))))
                     .buildAndDisplayWindow()
             );
         }
