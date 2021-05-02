@@ -1,9 +1,6 @@
 package pg.gipter.ui.alerts;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public enum ImageFile {
 
@@ -22,15 +19,6 @@ public enum ImageFile {
     MINION_IOIO_GIF("gif/minion-ioio.gif"),
     MINION_APPLAUSE_GIF("gif/minion-applause.gif"),
     MINION_CROWD_GIF("gif/minion-crowd.gif"),
-    BABY_YODA_GIF("gif/baby-yoda.gif"),
-    FIRE_BACK_GIF("gif/fire-back.gif"),
-    MCGONAGAL_GIF("gif/mcgonagal.gif"),
-    SNAPE_GIF("gif/snape.gif"),
-    KYLO_REN_PUSH_GIF("gif/kylo-ren-push.gif"),
-    PICARD_DANCE_GIF("gif/picard-dance.gif"),
-    PICARD_NIGHT_GIF("gif/picard-night.gif"),
-    PICARD_GOOD_GIF("gif/picard-good.gif"),
-    VENTURA_DANCE_GIF("gif/ventura-dance.gif"),
     ;
 
     private final String fileName;
@@ -51,20 +39,20 @@ public enum ImageFile {
 
     public static ImageFile randomPartialSuccessImage() {
         return randomImage(EnumSet.of(
-                ALMOST_ALL_PNG, MINION_BOMB_GIF, MINION_FART_GIF, MINION_CROWD_GIF, BABY_YODA_GIF, PICARD_GOOD_GIF
+                ALMOST_ALL_PNG
         ));
     }
 
     public static ImageFile randomSuccessImage() {
         return randomImage(EnumSet.of(
-                GOOD_JOB_PNG, MINION_AAAA_GIF, MINION_DISCO_GIF, MINION_AAAA_2_GIF, MINION_APPLAUSE_GIF, MCGONAGAL_GIF,
-                PICARD_DANCE_GIF, PICARD_NIGHT_GIF, VENTURA_DANCE_GIF
+                GOOD_JOB_PNG, MINION_AAAA_GIF, MINION_DISCO_GIF, MINION_AAAA_2_GIF, MINION_APPLAUSE_GIF
+
         ));
     }
 
     public static ImageFile randomFailImage() {
         return randomImage(EnumSet.of(
-                ERROR_CHICKEN_PNG, MINION_IOIO_GIF, FIRE_BACK_GIF, SNAPE_GIF, KYLO_REN_PUSH_GIF
+                ERROR_CHICKEN_PNG
         ));
     }
 }
