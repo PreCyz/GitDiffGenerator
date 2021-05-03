@@ -124,6 +124,7 @@ public class ToolkitProjectsController extends AbstractController {
     }
 
     private void downloadAvailableProjectNames() {
+        WebViewService webViewService = WebViewService.getInstance();
         if (applicationProperties.isToolkitCredentialsSet()) {
             final ToolkitService toolkitService = new ToolkitService(applicationProperties);
             resetIndicatorProperties(toolkitService);
@@ -145,7 +146,7 @@ public class ToolkitProjectsController extends AbstractController {
                             .withHeaderText(BundleUtils.getMsg("toolkit.projects.canNotDownload"))
                             .withLinkAction(new LogLinkAction())
                             .withAlertType(Alert.AlertType.WARNING)
-                            .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                            .withWebViewDetails(new WebViewDetails(webViewService.createImageView(ImageFile.ERROR_CHICKEN_PNG)));
                     Platform.runLater(() -> {
                         alertWindowBuilder.buildAndDisplayWindow();
                         downloadProgressIndicator.setVisible(false);
@@ -159,7 +160,7 @@ public class ToolkitProjectsController extends AbstractController {
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("toolkit.projects.credentialsNotSet"))
                     .withAlertType(Alert.AlertType.WARNING)
-                    .withImage(ImageFile.OVERRIDE_PNG);
+                    .withWebViewDetails(new WebViewDetails(webViewService.createImageView(ImageFile.OVERRIDE_PNG)));
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         }
     }

@@ -34,6 +34,7 @@ import static java.util.stream.Collectors.toCollection;
 public class MultiConfigRunner extends Task<Void> implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiConfigRunner.class);
+
     private final LinkedList<String> configurationNames;
     private final Executor executor;
     private static Boolean toolkitCredentialsSet = null;
@@ -45,6 +46,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     private final DataDao dataDao;
     private final RunType runType;
     private final LocalDate startDate;
+    private WebViewService webViewService;
 
     public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType) {
         this(configurationNames, executor, runType, null);
@@ -81,15 +83,16 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     @Override
     public void start() {
+        webViewService = WebViewService.getInstance();
         UploadStatus status;
         logger.info("{} started.", this.getClass().getName());
         if (configurationNames.isEmpty()) {
             logger.info("There is no configuration to launch.");
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog"))
+                    .withMessage(BundleUtils.getMsg("popup.error.messageWithLog"))
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {
@@ -224,9 +227,9 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     private Boolean handleUploadResult(String configName, Boolean isUploaded, Throwable throwable) {
         if (isUploaded == null || !isUploaded) {
-            logger.error("Diff upload for configuration name {} failed.", configName, throwable);
+            logger.error("Diff upload for configuration name [{}] failed.", configName, throwable);
         } else {
-            logger.info("Diff upload for configuration name {} uploaded.", configName);
+            logger.info("Diff upload for configuration name [{}] uploaded.", configName);
         }
         resultMap.put(configName, new UploadResult(configName, isUploaded, throwable));
         return isUploaded;
@@ -280,33 +283,32 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
         logger.info("{} ended.", this.getClass().getName());
     }
 
-    private void displayAlertWindow(UploadStatus status) {
+    private void displayAlertWindow(final UploadStatus status) {
         if (!isConfirmationWindow()) {
             return;
         }
+
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()));
+                .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()))
+                .withWebViewDetails(webViewService.pullWebView(status));
         switch (status) {
             case N_A:
             case FAIL:
                 alertWindowBuilder
                         .withUploadResultMap(resultMap)
                         .withLinkAction(new LogLinkAction())
-                        .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.randomFailImage());
+                        .withAlertType(Alert.AlertType.ERROR);
                 break;
             case PARTIAL_SUCCESS:
                 alertWindowBuilder
                         .withUploadResultMap(resultMap)
                         .withLinkAction(new LogLinkAction(), new BrowserLinkAction(toolkitUserFolder()))
-                        .withAlertType(Alert.AlertType.WARNING)
-                        .withImage(ImageFile.randomPartialSuccessImage());
+                        .withAlertType(Alert.AlertType.WARNING);
                 break;
             default:
                 alertWindowBuilder
                         .withLinkAction(new BrowserLinkAction(toolkitUserFolder()))
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage(ImageFile.randomSuccessImage());
+                        .withAlertType(Alert.AlertType.INFORMATION);
 
         }
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);

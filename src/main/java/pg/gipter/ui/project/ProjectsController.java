@@ -16,9 +16,12 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
+import pg.gipter.services.vcs.VcsService;
+import pg.gipter.services.vcs.VcsServiceFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
+import pg.gipter.utils.BundleUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +72,7 @@ public class ProjectsController extends AbstractController {
         TableColumn<ProjectDetails, String> cvsTypeColumn = new TableColumn<>();
         cvsTypeColumn.setText(column.getText());
         cvsTypeColumn.setPrefWidth(column.getPrefWidth());
-        cvsTypeColumn.setCellValueFactory(new PropertyValueFactory<>("cvsType"));
+        cvsTypeColumn.setCellValueFactory(new PropertyValueFactory<>("vcsType"));
         cvsTypeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         cvsTypeColumn.setEditable(false);
 
@@ -96,7 +99,7 @@ public class ProjectsController extends AbstractController {
             for (String path : projects) {
                 Path project = Paths.get(path);
                 Optional<String> supportedVcs = getSupportedVcs(Paths.get(path));
-                if (!supportedVcs.isPresent() && applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
+                if (supportedVcs.isEmpty() && applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
                     ProjectDetails pd = new ProjectDetails(
                             project.getFileName().toString(),
                             applicationProperties.itemType().name(),
@@ -151,7 +154,7 @@ public class ProjectsController extends AbstractController {
             directoryChooser.setInitialDirectory(Paths.get(".").toFile());
             directoryChooser.setTitle(resources.getString("directory.search.title"));
             final Optional<File> directory = Optional.ofNullable(directoryChooser.showDialog(uiLauncher.currentWindow()));
-            if (directory .isPresent() && Files.exists(directory.get().toPath()) &&
+            if (directory.isPresent() && Files.exists(directory.get().toPath()) &&
                     Files.isDirectory(directory.get().toPath())) {
                 CompletableFuture.supplyAsync(() ->
                         FXCollections.observableList(searchForProjects(directory.get().toPath())), uiLauncher.nonUIExecutor()
@@ -198,6 +201,8 @@ public class ProjectsController extends AbstractController {
             applicationProperties.addProjectPath(projects);
             applicationProperties.save();
 
+            validateVcsAvailability();
+
             uiLauncher.hideProjectsWindow();
             if (uiLauncher.hasWizardProperties()) {
                 uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
@@ -206,6 +211,28 @@ public class ProjectsController extends AbstractController {
                 uiLauncher.buildAndShowMainWindow();
             }
         };
+    }
+
+    private void validateVcsAvailability() {
+        final VcsService vcsService = VcsServiceFactory.getInstance();
+        final Optional<ProjectDetails> gitRepo = projectsTableView.getItems()
+                .stream()
+                .filter(pd -> VersionControlSystem.GIT.name().equals(pd.getVcsType()))
+                .findAny();
+        gitRepo.ifPresent(pd -> vcsService.setProjectPath(pd.getPath()));
+        if (gitRepo.isPresent() && !vcsService.isGitAvailableInCommandLine()) {
+            new AlertWindowBuilder().withAlertType(Alert.AlertType.ERROR)
+                    .withHeaderText(BundleUtils.getMsg("projects.alert.git.unavailable.header"))
+                    .withMessage(BundleUtils.getMsg(
+                            "projects.alert.git.unavailable.msg",
+                            System.getProperty("line.separator"),
+                            System.getProperty("line.separator"),
+                            System.getProperty("line.separator")
+                    ))
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                    .buildAndDisplayWindow();
+        }
+
     }
 
     private EventHandler<ActionEvent> addButtonActionEventHandler(ResourceBundle resources) {
@@ -234,7 +261,7 @@ public class ProjectsController extends AbstractController {
                             .withHeaderText(ex.getMessage())
                             .withLinkAction(new LogLinkAction())
                             .withAlertType(Alert.AlertType.ERROR)
-                            .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                            .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
                     Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
                 }
             }

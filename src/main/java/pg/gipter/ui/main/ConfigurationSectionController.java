@@ -94,7 +94,7 @@ class ConfigurationSectionController extends AbstractController {
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withImage(ImageFile.FINGER_UP_PNG);
+                .withImageFile(ImageFile.FINGER_UP_PNG);
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
     }
 
@@ -121,7 +121,7 @@ class ConfigurationSectionController extends AbstractController {
                     setDisableDependOnConfigurations();
                     new AlertWindowBuilder().withHeaderText(BundleUtils.getMsg("main.config.changed"))
                             .withAlertType(Alert.AlertType.INFORMATION)
-                            .withImage(ImageFile.FINGER_UP_PNG)
+                            .withImageFile(ImageFile.FINGER_UP_PNG)
                             .buildAndDisplayWindow();
                 }
             }
@@ -147,13 +147,13 @@ class ConfigurationSectionController extends AbstractController {
                 alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage(ImageFile.FINGER_UP_PNG);
+                        .withImageFile(ImageFile.FINGER_UP_PNG);
             } catch (IllegalStateException ex) {
                 alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(ex.getMessage())
+                        .withMessage(ex.getMessage())
                         .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                        .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             }
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         };

@@ -86,11 +86,11 @@ public class JobService {
                 if (startDate != null) {
                     boolean shouldExecute = new AlertWindowBuilder()
                             .withAlertType(Alert.AlertType.WARNING)
-                            .withImage(ImageFile.OVERRIDE_PNG)
                             .withHeaderText(BundleUtils.getMsg("job.missingExecution",
                                     LocalDateTime.parse(savedNextFireDate, DateTimeFormatter.ISO_DATE_TIME).format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")),
                                     startDate.format(DateTimeFormatter.ISO_DATE)
                             ))
+                            .withImageFile(ImageFile.OVERRIDE_PNG)
                             .withOkButtonText(BundleUtils.getMsg("job.missingExecution.triggerNow"))
                             .withCancelButtonText(BundleUtils.getMsg("job.missingExecution.dontTrigger"))
                             .buildAndDisplayOverrideWindow();
