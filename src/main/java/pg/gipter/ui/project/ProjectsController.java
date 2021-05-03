@@ -223,7 +223,12 @@ public class ProjectsController extends AbstractController {
         if (gitRepo.isPresent() && !vcsService.isGitAvailableInCommandLine()) {
             new AlertWindowBuilder().withAlertType(Alert.AlertType.ERROR)
                     .withHeaderText(BundleUtils.getMsg("projects.alert.git.unavailable.header"))
-                    .withMessage(BundleUtils.getMsg("projects.alert.git.unavailable.msg", System.getProperty("line.separator")))
+                    .withMessage(BundleUtils.getMsg(
+                            "projects.alert.git.unavailable.msg",
+                            System.getProperty("line.separator"),
+                            System.getProperty("line.separator"),
+                            System.getProperty("line.separator")
+                    ))
                     .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
                     .buildAndDisplayWindow();
         }
