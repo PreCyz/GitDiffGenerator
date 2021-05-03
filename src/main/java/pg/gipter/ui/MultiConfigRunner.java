@@ -17,19 +17,14 @@ import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.dto.RunDetails;
 import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.BrowserLinkAction;
-import pg.gipter.ui.alerts.LogLinkAction;
-import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 

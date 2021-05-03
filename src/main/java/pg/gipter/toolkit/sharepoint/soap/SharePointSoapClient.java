@@ -5,23 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
+import org.w3c.dom.*;
 import pg.gipter.toolkit.helpers.ListViewId;
 import pg.gipter.toolkit.helpers.XmlHelper;
 import pg.gipter.toolkit.ws.*;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import javax.xml.parsers.*;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
