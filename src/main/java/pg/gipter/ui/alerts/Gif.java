@@ -1,6 +1,9 @@
 package pg.gipter.ui.alerts;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Random;
+import java.util.Set;
 
 public enum Gif {
     BACKPACK_DANCE("https://media.giphy.com/media/LPkfppCDJOE5rvSCId/giphy.gif", 500, 300),
@@ -11,6 +14,13 @@ public enum Gif {
     MINION_IOIO("https://media.giphy.com/media/YAlhwn67KT76E/giphy.gif", 220, 220),
     MINION_FART("https://media.giphy.com/media/fnkyJXcCXZngY/giphy.gif", 220, 260),
     MINION_NAKED_GRU("https://media.giphy.com/media/Q7omesiu4NYzeM9LPT/giphy.gif", 290, 500),
+    MINION_CROWD("https://media.giphy.com/media/mPOGx4hJtOWSA/giphy.gif", 290, 525),
+    MINION_DANCE("https://media.giphy.com/media/3EfgWHj0YIDrW/giphy.gif", 200, 420),
+    MINION_SPLASH("https://media.giphy.com/media/qugzlUdW5CkeI/giphy.gif", 220, 380),
+    MINION_AAAA("https://media.giphy.com/media/WxxsVAJLSBsFa/giphy.gif", 240, 420),
+    MINION_BOX("https://media.giphy.com/media/UttZVMEzceMOQ/giphy.gif", 245, 420),
+    MINION_PARTY("https://media.giphy.com/media/W6Lwg2xvTr6tJpuSTd/giphy.gif", 500, 500),
+    MINION_KISS("https://media.giphy.com/media/kP3VObToocJos/giphy.gif", 245, 415),
     FROZEN_ANNA_JOY("https://media.giphy.com/media/lwXbNSQr4QEtq/giphy.gif", 180, 260),
     SVEN("https://media.giphy.com/media/VECTSz9Kc7aCs/giphy.gif", 220, 180),
     OLAF("https://media.giphy.com/media/nIWSZ6Pukcnbq/giphy.gif", 200, 420),
@@ -71,21 +81,21 @@ public enum Gif {
     public static Gif randomPartialSuccessGif() {
         return randomGif(EnumSet.of(
                 PICARD_DAMN, TUK_TUK, MINION_FART, SVEN, MOANA_BABY, MAUI_OH, CHUCK_NORRIS_OK, SPIDER_MAN, TED_MARSHAL,
-                VOLDEMORT, ACE_VENTURA_AJAJAJ, CHICKENS
+                VOLDEMORT, ACE_VENTURA_AJAJAJ, CHICKENS, MINION_CROWD, MINION_BOX, MINION_PARTY, MINION_KISS
         ));
     }
 
     public static Gif randomSuccessGif() {
         return randomGif(EnumSet.of(
-                NEVIL_FINIGAN_JOY, BACKPACK_DANCE, MINION_NAKED_GRU, FROZEN_ANNA_JOY, MAUI_TATOO, PALPATINE,
-                BARNEY_STINSON_DANCE, BAYERN_MUNICH_CELEBRATING, LEWY_NEUER, YODA_DANCING
+                NEVIL_FINIGAN_JOY, BACKPACK_DANCE, MINION_NAKED_GRU, FROZEN_ANNA_JOY, MAUI_TATOO, PALPATINE, LEWY_NEUER,
+                BARNEY_STINSON_DANCE, BAYERN_MUNICH_CELEBRATING, YODA_DANCING, MINION_DANCE
         ));
     }
 
     public static Gif randomFailGif() {
         return randomGif(EnumSet.of(
                 SNAPE_SNAP, MINION_IOIO, OLAF, MOANA_MAUI, MAUI_ANGRY, CHUCK_NORRIS_FIST, ASOKA_TANO, MISSED_KICK,
-                BARNEY_STINSON_GUN, BARNEY_STINSON_AAHH, KYLO_REN, ACE_VENTURA_SUCKS, ACE_VENTURA_AAAA
+                BARNEY_STINSON_GUN, BARNEY_STINSON_AAHH, KYLO_REN, ACE_VENTURA_SUCKS, ACE_VENTURA_AAAA, MINION_SPLASH
         ));
     }
 }

@@ -12,6 +12,7 @@ import pg.gipter.core.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.keystore.CertificateServiceFactory;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
 
 import java.util.*;
@@ -35,6 +36,7 @@ public class Main extends Application {
         mObj.runConverters();
         mObj.setDefaultConfig();
         if (Main.applicationProperties.isUseUI()) {
+            WebViewService.getInstance();
             launch(args);
         } else {
             Launcher launcher = LauncherFactory.getLauncher(applicationProperties);

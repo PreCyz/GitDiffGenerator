@@ -5,16 +5,23 @@ import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.services.ToolkitService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
+import pg.gipter.ui.alerts.LogLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -83,12 +90,12 @@ class ToolkitSectionController extends AbstractController {
                         saveToolkitCredentials();
                         alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
                                 .withAlertType(Alert.AlertType.INFORMATION)
-                                .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.FINGER_UP_PNG)));
+                                .withImageFile(ImageFile.FINGER_UP_PNG);
                     } else {
-                        alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
+                        alertWindowBuilder.withMessage(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
                                 .withLinkAction(new LogLinkAction())
                                 .withAlertType(Alert.AlertType.ERROR)
-                                .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.MINION_IOIO_GIF)));
+                                .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
                     }
                     uiLauncher.updateTray(applicationProperties);
                     Platform.runLater(() -> {

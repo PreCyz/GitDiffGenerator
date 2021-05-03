@@ -23,12 +23,16 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.jobs.*;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.LogLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -357,7 +361,7 @@ public class JobController extends AbstractController {
                         .withHeaderText(errorMsg)
                         .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.ERROR_CHICKEN_PNG)));
+                        .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         };

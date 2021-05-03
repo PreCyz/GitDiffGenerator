@@ -7,12 +7,17 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
+import pg.gipter.ui.alerts.LogLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
@@ -94,7 +99,7 @@ class ConfigurationSectionController extends AbstractController {
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.FINGER_UP_PNG)));
+                .withImageFile(ImageFile.FINGER_UP_PNG);
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
     }
 
@@ -121,7 +126,7 @@ class ConfigurationSectionController extends AbstractController {
                     setDisableDependOnConfigurations();
                     new AlertWindowBuilder().withHeaderText(BundleUtils.getMsg("main.config.changed"))
                             .withAlertType(Alert.AlertType.INFORMATION)
-                            .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.FINGER_UP_PNG)))
+                            .withImageFile(ImageFile.FINGER_UP_PNG)
                             .buildAndDisplayWindow();
                 }
             }
@@ -147,13 +152,13 @@ class ConfigurationSectionController extends AbstractController {
                 alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.removed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
-                        .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.FINGER_UP_PNG)));
+                        .withImageFile(ImageFile.FINGER_UP_PNG);
             } catch (IllegalStateException ex) {
                 alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(ex.getMessage())
+                        .withMessage(ex.getMessage())
                         .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.ERROR_CHICKEN_PNG)));
+                        .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             }
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         };

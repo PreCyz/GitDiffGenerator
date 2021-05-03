@@ -17,14 +17,19 @@ import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.dto.RunDetails;
 import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.BrowserLinkAction;
+import pg.gipter.ui.alerts.LogLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -46,7 +51,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     private final DataDao dataDao;
     private final RunType runType;
     private final LocalDate startDate;
-    private List<WebViewDetails> webViewDetails;
+    private WebViewService webViewService;
 
     public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType) {
         this(configurationNames, executor, runType, null);
@@ -83,16 +88,16 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     @Override
     public void start() {
-        webViewDetails = new WebViewService().loadGifs();
+        webViewService = WebViewService.getInstance();
         UploadStatus status;
         logger.info("{} started.", this.getClass().getName());
         if (configurationNames.isEmpty()) {
             logger.info("There is no configuration to launch.");
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog"))
+                    .withMessage(BundleUtils.getMsg("popup.error.messageWithLog"))
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView((ImageFile.ERROR_CHICKEN_PNG))));
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {
@@ -287,34 +292,28 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
         if (!isConfirmationWindow()) {
             return;
         }
-        final WebViewDetails webViewDetails = this.webViewDetails.stream()
-                .filter(wvd -> wvd.getUploadStatus() == status)
-                .collect(toCollection(LinkedList::new))
-                .getFirst();
 
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()));
+                .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()))
+                .withWebViewDetails(webViewService.pullWebView(status));
         switch (status) {
             case N_A:
             case FAIL:
                 alertWindowBuilder
                         .withUploadResultMap(resultMap)
                         .withLinkAction(new LogLinkAction())
-                        .withAlertType(Alert.AlertType.ERROR)
-                        .withWebViewDetails(webViewDetails);
+                        .withAlertType(Alert.AlertType.ERROR);
                 break;
             case PARTIAL_SUCCESS:
                 alertWindowBuilder
                         .withUploadResultMap(resultMap)
                         .withLinkAction(new LogLinkAction(), new BrowserLinkAction(toolkitUserFolder()))
-                        .withAlertType(Alert.AlertType.WARNING)
-                        .withWebViewDetails(webViewDetails);
+                        .withAlertType(Alert.AlertType.WARNING);
                 break;
             default:
                 alertWindowBuilder
                         .withLinkAction(new BrowserLinkAction(toolkitUserFolder()))
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withWebViewDetails(webViewDetails);
+                        .withAlertType(Alert.AlertType.INFORMATION);
 
         }
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);

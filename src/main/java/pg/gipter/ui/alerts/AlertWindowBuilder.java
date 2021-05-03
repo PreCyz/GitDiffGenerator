@@ -62,6 +62,11 @@ public class AlertWindowBuilder {
         return this;
     }
 
+    public AlertWindowBuilder withImageFile(ImageFile imageFile) {
+        this.webViewDetails = new WebViewDetails(WebViewService.getInstance().createImageView(imageFile));
+        return this;
+    }
+
     public AlertWindowBuilder withCancelButtonText(String cancelButtonText) {
         this.cancelButtonText = cancelButtonText;
         return this;
@@ -203,7 +208,7 @@ public class AlertWindowBuilder {
         double preferredWidth = 0;
         if (webViewDetails != null && webViewDetails.getImageView() != null) {
             gridPane.add(webViewDetails.getImageView(), 0, gridPaneRow++);
-            preferredWidth = webViewDetails.getWidth();
+            preferredWidth = webViewDetails.calculateWidth();
         }
         return preferredWidth;
     }
@@ -212,11 +217,11 @@ public class AlertWindowBuilder {
         double preferredWidth = 0;
         if (webViewDetails != null && webViewDetails.getWebView() != null) {
             VBox vBox = new VBox(webViewDetails.getWebView());
-            vBox.setPrefHeight(webViewDetails.getHeight());
-            vBox.setPrefWidth(webViewDetails.getWidth());
+            vBox.setPrefHeight(webViewDetails.calculateHeight());
+            vBox.setPrefWidth(webViewDetails.calculateWidth());
 
             gridPane.add(vBox, 0, gridPaneRow++);
-            preferredWidth = webViewDetails.getWidth();
+            preferredWidth = webViewDetails.calculateWidth();
         }
         return preferredWidth;
     }
