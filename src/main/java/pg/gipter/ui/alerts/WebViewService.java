@@ -134,7 +134,7 @@ public class WebViewService {
 
         logger.info("Web view [{}] pulled from cache.", Optional.ofNullable(result.getGif())
                 .map(Gif::name)
-                .orElseGet(() -> result.getImageView().getImage().impl_getUrl())
+                .orElseGet(result::getResourceUrl)
         );
 
         WebViewDetails webViewDetails = createWebViewDetails(nextGif);

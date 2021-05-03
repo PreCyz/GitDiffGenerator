@@ -73,4 +73,13 @@ public class WebViewDetails {
     public void setUploadStatus(UploadStatus uploadStatus) {
         this.uploadStatus = uploadStatus;
     }
+
+    public String getResourceUrl() {
+        if (gif != null) {
+            return gif.url();
+        } else if (imageView != null && imageView.getImage() != null) {
+            return imageView.getImage().getUrl();
+        }
+        return "N/A";
+    }
 }
