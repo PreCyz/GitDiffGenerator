@@ -78,7 +78,7 @@ public class WebViewDetails {
         if (gif != null) {
             return gif.url();
         } else if (imageView != null && imageView.getImage() != null) {
-            return imageView.getImage().getUrl();
+            return imageView.getImage().impl_getUrl();
         }
         return "N/A";
     }
