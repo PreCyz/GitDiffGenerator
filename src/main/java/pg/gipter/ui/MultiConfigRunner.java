@@ -83,7 +83,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     @Override
     public void start() {
-        webViewDetails = new WebViewService().loadGifs();
+        webViewDetails = WebViewService.getInstance().loadGifs();
         UploadStatus status;
         logger.info("{} started.", this.getClass().getName());
         if (configurationNames.isEmpty()) {
@@ -92,7 +92,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
                     .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog"))
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView((ImageFile.ERROR_CHICKEN_PNG))));
+                    .withImageFile(ImageFile.ERROR_CHICKEN_PNG);
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {

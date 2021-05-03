@@ -39,7 +39,7 @@ public class UpgradeJob implements Job {
                     .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", githubService.getServerVersion()))
                     .withLinkAction(new BrowserLinkAction(GithubService.GITHUB_URL + "/releases/latest"))
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.MINION_AAAA_GIF)))
+                    .withImageFile(ImageFile.MINION_AAAA_GIF)
                     .buildAndDisplayWindow()
             );
         }

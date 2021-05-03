@@ -357,7 +357,7 @@ public class JobController extends AbstractController {
                         .withHeaderText(errorMsg)
                         .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.ERROR_CHICKEN_PNG)));
+                        .withImageFile(ImageFile.ERROR_CHICKEN_PNG);
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         };

@@ -124,7 +124,7 @@ public class ToolkitProjectsController extends AbstractController {
     }
 
     private void downloadAvailableProjectNames() {
-        WebViewService webViewService = new WebViewService();
+        WebViewService webViewService = WebViewService.getInstance();
         if (applicationProperties.isToolkitCredentialsSet()) {
             final ToolkitService toolkitService = new ToolkitService(applicationProperties);
             resetIndicatorProperties(toolkitService);

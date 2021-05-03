@@ -224,7 +224,7 @@ public class ProjectsController extends AbstractController {
             new AlertWindowBuilder().withAlertType(Alert.AlertType.ERROR)
                     .withHeaderText(BundleUtils.getMsg("projects.alert.git.unavailable.header"))
                     .withMessage(BundleUtils.getMsg("projects.alert.git.unavailable.msg", System.getProperty("line.separator")))
-                    .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.randomFailImage())))
+                    .withImageFile(ImageFile.randomFailImage())
                     .buildAndDisplayWindow();
         }
 
@@ -256,7 +256,7 @@ public class ProjectsController extends AbstractController {
                             .withHeaderText(ex.getMessage())
                             .withLinkAction(new LogLinkAction())
                             .withAlertType(Alert.AlertType.ERROR)
-                            .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.ERROR_CHICKEN_PNG)));
+                            .withImageFile(ImageFile.ERROR_CHICKEN_PNG);
                     Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
                 }
             }

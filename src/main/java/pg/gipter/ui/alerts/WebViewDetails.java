@@ -20,7 +20,7 @@ public class WebViewDetails {
     }
 
     public WebViewDetails(ImageView imageView) {
-        this(null, imageView);
+        this(UploadStatus.N_A, imageView);
     }
 
     public WebViewDetails(UploadStatus uploadStatus, ImageView imageView) {
@@ -48,19 +48,19 @@ public class WebViewDetails {
         return imageView;
     }
 
-    public double getHeight() {
+    public double calculateHeight() {
         if (gif != null) {
             return gif.height();
-        } else if (imageView != null) {
+        } else if (imageView != null && imageView.getImage() != null) {
             return imageView.getImage().getHeight();
         }
         return 0;
     }
 
-    public double getWidth() {
+    public double calculateWidth() {
         if (gif != null) {
             return gif.width();
-        } else if (imageView != null) {
+        } else if (imageView != null && imageView.getImage() != null) {
             return imageView.getImage().getWidth();
         }
         return 0;

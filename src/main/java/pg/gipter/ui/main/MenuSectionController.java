@@ -158,7 +158,7 @@ public class MenuSectionController extends AbstractController {
                     .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
                     .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolder()))
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(ImageFile.ERROR_CHICKEN_PNG)));
+                    .withImageFile(ImageFile.ERROR_CHICKEN_PNG);
             try {
                 Path pdfFile = Paths.get(pdfFileName);
                 if (Files.exists(pdfFile)) {
@@ -242,9 +242,8 @@ public class MenuSectionController extends AbstractController {
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
         alertWindowBuilder.withHeaderText(finalMsg)
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withWebViewDetails(new WebViewDetails(new WebViewService().createImageView(
-                        statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
-                        ImageFile.randomSuccessImage() : ImageFile.randomFailImage())))
+                .withImageFile(statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
+                        ImageFile.randomSuccessImage() : ImageFile.randomFailImage())
                 .buildAndDisplayWindow();
     }
 }

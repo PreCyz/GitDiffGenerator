@@ -25,6 +25,16 @@ public class WebViewService {
     public static final String CUSTOM_ALERT_HTML = "custom-alert.html";
     private String htmlContent;
 
+    private static class WebViewServiceHolder {
+        private static final WebViewService INSTANCE = new WebViewService();
+    }
+
+    private WebViewService() {}
+
+    public static WebViewService getInstance() {
+        return WebViewServiceHolder.INSTANCE;
+    }
+
     public List<WebViewDetails> loadGifs() {
         LinkedList<WebViewDetails> webViewDetails = new LinkedList<>();
 
@@ -63,11 +73,10 @@ public class WebViewService {
              final BufferedReader bufferedReader = new BufferedReader(isr)) {
 
             if (htmlContent == null) {
-                htmlContent = bufferedReader.lines()
-                        .collect(joining(System.getProperty("line.separator")))
-                        .replaceAll(URL_PLACEHOLDER, gif.url());
+                htmlContent = bufferedReader.lines().collect(joining(System.getProperty("line.separator")));
             }
-            return htmlContent;
+
+            return htmlContent.replaceAll(URL_PLACEHOLDER, gif.url());
         } catch (IOException e) {
             logger.error("Could not load the [{}].", CUSTOM_ALERT_HTML, e);
             return "";

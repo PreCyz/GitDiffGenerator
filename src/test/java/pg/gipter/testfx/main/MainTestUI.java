@@ -273,7 +273,7 @@ public class MainTestUI {
                 .chooseConfiguration("code")
                 .pressRemoveConfigurationButton()
                 .pressOkOnPopup()
-                .waitInSeconds(5d);
+                .waitInSeconds(1d);
 
         assertThat(windowObject.getConfigurationNameComboBox().getValue()).isEqualTo("docs");
         assertThat(windowObject.getToolkitProjectListNamesTextField().getText()).isEqualTo("Deliverables,General");
