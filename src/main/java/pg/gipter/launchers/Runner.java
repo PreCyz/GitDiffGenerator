@@ -13,7 +13,6 @@ import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.UploadStatus;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JarHelper;
 
 class Runner implements Starter {
 
@@ -48,11 +47,10 @@ class Runner implements Starter {
             logger.error("Diff upload failure. Program will be terminated.", ex);
             error = true;
             Platform.runLater(() -> new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()))
-                    .withLink(JarHelper.logsFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withMessage(BundleUtils.getMsg("popup.error.messageWithLog", ex.getMessage()))
+                    .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG)
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
                     .buildAndDisplayWindow()
             );
         } finally {
@@ -62,10 +60,9 @@ class Runner implements Starter {
         if (!error && applicationProperties.isConfirmationWindow()) {
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.confirmation.message"))
-                    .withLink(applicationProperties.toolkitUserFolder())
-                    .withWindowType(WindowType.BROWSER_WINDOW)
+                    .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolder()))
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImage(ImageFile.GOOD_JOB_PNG)
+                    .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
                     .buildAndDisplayWindow()
             );
         }

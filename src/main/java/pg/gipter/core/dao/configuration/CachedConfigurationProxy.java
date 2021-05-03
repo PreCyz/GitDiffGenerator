@@ -9,7 +9,7 @@ import static java.util.stream.Collectors.toMap;
 class CachedConfigurationProxy extends ApplicationJsonReader implements CachedConfiguration {
 
     private final ConfigurationDao configurationDao;
-    private static Configuration cachedConfiguration;
+    private Configuration cachedConfiguration;
 
     private static class CachedConfigurationProxyHolder {
         private static final CachedConfigurationProxy INSTANCE = new CachedConfigurationProxy();

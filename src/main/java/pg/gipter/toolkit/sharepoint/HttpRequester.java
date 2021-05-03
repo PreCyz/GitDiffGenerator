@@ -20,7 +20,7 @@ import java.nio.file.*;
 
 public class HttpRequester {
 
-    protected static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
+    protected final static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
 
     private final ApplicationProperties applicationProperties;
 

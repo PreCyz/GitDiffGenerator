@@ -49,7 +49,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
             }
             applicationProperties.setVcs(vcsSet);
             if (noDiff) {
-                String errMsg = String.format("For given repositories within time period [from %s to %s] I couldn't produce any diff.",
+                String errMsg = String.format("Diff could not be produced [from %s to %s].",
                         applicationProperties.startDate().format(ApplicationProperties.yyyy_MM_dd),
                         applicationProperties.endDate().format(ApplicationProperties.yyyy_MM_dd)
                 );

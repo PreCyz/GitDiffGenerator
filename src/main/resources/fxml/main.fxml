@@ -67,8 +67,8 @@
                               <Label text="%toolkit.panel.username" />
                               <TextField fx:id="toolkitUsernameTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" />
                               <Label text="%toolkit.panel.password" GridPane.rowIndex="1" />
-                              <Label text="%toolkit.panel.domain" GridPane.rowIndex="2" />
                               <TextField fx:id="toolkitDomainTextField" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <Label text="%toolkit.panel.domain" GridPane.rowIndex="2" />
                               <PasswordField fx:id="toolkitPasswordField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                            </children>
                         </GridPane>
@@ -88,7 +88,7 @@
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="558.0">
                                  <children>
                                     <Label layoutX="10.0" layoutY="12.0" text="%paths.panel.fileNamePrefix" />
-                                    <TextField fx:id="itemFileNamePrefixTextField" layoutX="106.0" layoutY="9.0" prefHeight="25.0" prefWidth="466.0" stylesheets="@../css/main.css" />
+                                    <TextField fx:id="itemFileNamePrefixTextField" layoutX="106.0" layoutY="9.0" prefHeight="25.0" prefWidth="466.0" stylesheets="@../css/text-field.css" />
                                     <Pane id="minions-group" layoutX="311.0" layoutY="44.0" prefHeight="65.0" prefWidth="267.0" stylesheets="@../css/main.css" />
                                     <GridPane layoutX="9.0" layoutY="44.0" prefHeight="60.0" prefWidth="291.0">
                                        <columnConstraints>
@@ -263,7 +263,6 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="configurationNameTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" />
                               <Button fx:id="addConfigurationButton" mnemonicParsing="false" prefWidth="110.0" styleClass="blue" stylesheets="@../css/buttons.css" text="%main.addConfiguration" textFill="#32a1c9" GridPane.columnIndex="2">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
@@ -274,7 +273,7 @@
                                     <Font name="System Bold" size="14.0" />
                                  </font>
                               </Button>
-                              <ComboBox fx:id="configurationNameComboBox" prefHeight="25.0" prefWidth="207.0" stylesheets="@../css/combobox.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <ComboBox fx:id="configurationNameComboBox" prefHeight="25.0" prefWidth="207.0" stylesheets="@../css/combobox.css" GridPane.columnIndex="1" />
                               <Button fx:id="removeConfigurationButton" mnemonicParsing="false" prefWidth="110.0" styleClass="red" stylesheets="@../css/buttons.css" text="%main.deleteConfiguration" textFill="#f41b63" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                  <font>
                                     <Font name="System Bold" size="12.0" />

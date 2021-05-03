@@ -44,6 +44,8 @@ final class GitDiffCommand extends AbstractDiffCommand {
             case PROTECTED:
                 initialCommand.add("--oneline");
                 break;
+            default:
+                break;
 
         }
         initialCommand.add("--all");

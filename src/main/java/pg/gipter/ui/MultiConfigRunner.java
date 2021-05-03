@@ -19,7 +19,6 @@ import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JarHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,28 +33,8 @@ import static java.util.stream.Collectors.toCollection;
 /** Created by Pawel Gawedzki on 15-Jul-2019. */
 public class MultiConfigRunner extends Task<Void> implements Starter {
 
-    private static class UploadResult {
-        String configName;
-        Boolean success;
-        Throwable throwable;
-
-        UploadResult(String configName, Boolean success, Throwable throwable) {
-            this.configName = configName;
-            this.success = success;
-            this.throwable = throwable;
-        }
-
-        String logMsg() {
-            String cause = "N/A";
-            if (throwable != null) {
-                cause = throwable.getMessage();
-                cause = cause.substring(cause.lastIndexOf(":") + 1);
-            }
-            return String.format("configName: %s, success: %b, cause: %s", configName, success, cause);
-        }
-    }
-
     private static final Logger logger = LoggerFactory.getLogger(MultiConfigRunner.class);
+
     private final LinkedList<String> configurationNames;
     private final Executor executor;
     private static Boolean toolkitCredentialsSet = null;
@@ -67,6 +46,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     private final DataDao dataDao;
     private final RunType runType;
     private final LocalDate startDate;
+    private WebViewService webViewService;
 
     public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType) {
         this(configurationNames, executor, runType, null);
@@ -75,7 +55,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType, LocalDate startDate) {
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
-        this.totalProgress = configurationNames.size() * 5;
+        this.totalProgress = configurationNames.size() * 5L;
         this.workDone = new AtomicLong(0);
         this.applicationPropertiesCollection = Collections.emptyList();
         this.configurationDao = DaoFactory.getCachedConfiguration();
@@ -103,16 +83,16 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     @Override
     public void start() {
+        webViewService = WebViewService.getInstance();
         UploadStatus status;
         logger.info("{} started.", this.getClass().getName());
         if (configurationNames.isEmpty()) {
             logger.info("There is no configuration to launch.");
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("popup.error.messageWithLog"))
-                    .withLink(JarHelper.logsFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withMessage(BundleUtils.getMsg("popup.error.messageWithLog"))
+                    .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {
@@ -247,9 +227,9 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     private Boolean handleUploadResult(String configName, Boolean isUploaded, Throwable throwable) {
         if (isUploaded == null || !isUploaded) {
-            logger.error("Diff upload for configuration name {} failed.", configName, throwable);
+            logger.error("Diff upload for configuration name [{}] failed.", configName, throwable);
         } else {
-            logger.info("Diff upload for configuration name {} uploaded.", configName);
+            logger.info("Diff upload for configuration name [{}] uploaded.", configName);
         }
         resultMap.put(configName, new UploadResult(configName, isUploaded, throwable));
         return isUploaded;
@@ -270,13 +250,13 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     private UploadStatus calculateFinalStatus() {
         UploadStatus status = UploadStatus.N_A;
-        if (resultMap.entrySet().stream().allMatch(entry -> entry.getValue().success)) {
+        if (resultMap.entrySet().stream().allMatch(entry -> entry.getValue().getSuccess())) {
             status = UploadStatus.SUCCESS;
         }
-        if (resultMap.entrySet().stream().anyMatch(entry -> !entry.getValue().success)) {
+        if (resultMap.entrySet().stream().anyMatch(entry -> !entry.getValue().getSuccess())) {
             status = UploadStatus.PARTIAL_SUCCESS;
         }
-        if (resultMap.entrySet().stream().noneMatch(entry -> entry.getValue().success)) {
+        if (resultMap.entrySet().stream().noneMatch(entry -> entry.getValue().getSuccess())) {
             status = UploadStatus.FAIL;
         }
         return status;
@@ -285,12 +265,12 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     private List<ExceptionDetails> calculateErrorDetails() {
         return resultMap.values()
                 .stream()
-                .filter(uploadResult -> !uploadResult.success)
+                .filter(uploadResult -> !uploadResult.getSuccess())
                 .map(uploadResult -> new ExceptionDetails(
                         uploadResult.logMsg(),
-                        Optional.ofNullable(uploadResult.throwable.getCause())
+                        Optional.ofNullable(uploadResult.getCause())
                                 .map(Throwable::getMessage)
-                                .orElseGet(() -> uploadResult.throwable.getMessage()),
+                                .orElseGet(uploadResult::getThrowableMsg),
                         LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
                 )
                 .collect(Collectors.toList());
@@ -303,39 +283,32 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
         logger.info("{} ended.", this.getClass().getName());
     }
 
-    private void displayAlertWindow(UploadStatus status) {
+    private void displayAlertWindow(final UploadStatus status) {
         if (!isConfirmationWindow()) {
             return;
         }
+
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()));
-        String detailedMessage;
+                .withHeaderText(BundleUtils.getMsg("popup.multiRunner." + status.name()))
+                .withWebViewDetails(webViewService.pullWebView(status));
         switch (status) {
             case N_A:
             case FAIL:
-                detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
                 alertWindowBuilder
-                        .withMessage(detailedMessage)
-                        .withLink(JarHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.randomFailImage());
+                        .withUploadResultMap(resultMap)
+                        .withLinkAction(new LogLinkAction())
+                        .withAlertType(Alert.AlertType.ERROR);
                 break;
             case PARTIAL_SUCCESS:
-                detailedMessage = resultMap.values().stream().map(UploadResult::logMsg).collect(Collectors.joining("\n"));
                 alertWindowBuilder
-                        .withMessage(detailedMessage)
-                        .withLink(JarHelper.logsFolder(), toolkitUserFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
-                        .withAlertType(Alert.AlertType.WARNING)
-                        .withImage(ImageFile.randomPartialSuccessImage());
+                        .withUploadResultMap(resultMap)
+                        .withLinkAction(new LogLinkAction(), new BrowserLinkAction(toolkitUserFolder()))
+                        .withAlertType(Alert.AlertType.WARNING);
                 break;
             default:
                 alertWindowBuilder
-                        .withLink(toolkitUserFolder())
-                        .withWindowType(WindowType.BROWSER_WINDOW)
-                        .withAlertType(Alert.AlertType.INFORMATION)
-                        .withImage(ImageFile.randomSuccessImage());
+                        .withLinkAction(new BrowserLinkAction(toolkitUserFolder()))
+                        .withAlertType(Alert.AlertType.INFORMATION);
 
         }
         Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);

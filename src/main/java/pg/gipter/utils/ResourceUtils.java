@@ -1,5 +1,6 @@
 package pg.gipter.utils;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Optional;
 
@@ -29,5 +30,9 @@ public final class ResourceUtils {
 
     public static Optional<URL> getCssResource(String resourceName) {
         return Optional.ofNullable(getResource("css", resourceName));
+    }
+
+    public static InputStream getHtmlResource(String resourceName) {
+        return ResourceUtils.class.getClassLoader().getResourceAsStream(getResourcePath("html", resourceName));
     }
 }

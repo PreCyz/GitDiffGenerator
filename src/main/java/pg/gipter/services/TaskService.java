@@ -9,7 +9,7 @@ abstract class TaskService<T> extends Task<T> {
     protected Logger logger;
     private long maxWork;
     private long workDone;
-    private final int numberOfSteps = 3;
+    private static final int NUMBER_OF_STEPS = 3;
     private final long defaultValue = Double.valueOf(Math.pow(10, 6)).longValue();
 
     protected TaskService() {
@@ -22,7 +22,7 @@ abstract class TaskService<T> extends Task<T> {
         if (maxWork == 0) {
             maxWork = 20 * defaultValue;
         }
-        this.maxWork = maxWork + (numberOfSteps - 1) * defaultValue;
+        this.maxWork = maxWork + (NUMBER_OF_STEPS - 1) * defaultValue;
     }
 
     void increaseProgress() {

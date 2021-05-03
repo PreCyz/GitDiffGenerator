@@ -21,7 +21,7 @@ import java.util.*;
 /** Created by Pawel Gawedzki on 26-Jul-2019. */
 public class ToolkitService extends Task<Set<String>> {
 
-    protected static Logger logger = LoggerFactory.getLogger(ToolkitService.class);
+    protected final static Logger logger = LoggerFactory.getLogger(ToolkitService.class);
     private final ApplicationProperties applicationProperties;
     private final HttpRequester httpRequester;
 

@@ -7,8 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.stage.*;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,8 @@ import pg.gipter.launchers.Launcher;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.StartupService;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.*;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
 import java.io.IOException;
@@ -142,9 +141,8 @@ public class UILauncher implements Launcher {
         logger.info("Upgrade to version {} finished [{}].", applicationProperties.version().getVersion(), applicationProperties.isUpgradeFinished());
         new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("popup.no.upgrade.message"))
-                .withWindowType(WindowType.CONFIRMATION_WINDOW)
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withImage(ImageFile.MINION_AAAA_GIF)
+                .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
                 .buildAndDisplayWindow();
     }
 
@@ -156,10 +154,9 @@ public class UILauncher implements Launcher {
                     logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
                             .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
-                            .withLink(GithubService.GITHUB_URL + "/releases/latest")
-                            .withWindowType(WindowType.BROWSER_WINDOW)
+                            .withLinkAction(new BrowserLinkAction(GithubService.GITHUB_URL + "/releases/latest"))
                             .withAlertType(Alert.AlertType.INFORMATION)
-                            .withImage(ImageFile.MINION_AAAA_2_GIF)
+                            .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
                             .buildAndDisplayWindow()
                     );
                 }
@@ -230,9 +227,6 @@ public class UILauncher implements Launcher {
             }
             stage.setScene(scene);
             stage.sizeToScene();
-            if (applicationProperties.useMetroSkin()) {
-                new JMetro(scene, Style.LIGHT);
-            }
         } catch (IOException ex) {
             logger.error("Building scene error.", ex);
         }
@@ -259,9 +253,8 @@ public class UILauncher implements Launcher {
             if (runConfigMap.containsKey(ArgName.configurationName.defaultValue())) {
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("popup.job.window.canNotOpen"))
-                        .withWindowType(WindowType.OVERRIDE_WINDOW)
                         .withAlertType(Alert.AlertType.WARNING)
-                        .withImage(ImageFile.OVERRIDE_PNG);
+                        .withImageFile(ImageFile.OVERRIDE_PNG);
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             } else {
                 jobWindow = new Stage();
@@ -320,11 +313,10 @@ public class UILauncher implements Launcher {
             String errorMessage = BundleUtils.getMsg("job.cancel.errMsg", jobService.schedulerClassName(), e.getMessage());
             logger.error(errorMessage);
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(errorMessage)
-                    .withLink(JarHelper.logsFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withMessage(errorMessage)
+                    .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } finally {
             dataDao.removeJobParam();
@@ -359,11 +351,10 @@ public class UILauncher implements Launcher {
             } catch (SchedulerException e) {
                 logger.warn("Can not restart the scheduler.", e);
                 AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
-                        .withLink(JarHelper.logsFolder())
-                        .withWindowType(WindowType.LOG_WINDOW)
+                        .withMessage(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
+                        .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                        .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         }

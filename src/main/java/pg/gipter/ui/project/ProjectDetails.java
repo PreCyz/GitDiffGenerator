@@ -9,16 +9,16 @@ import java.util.Objects;
 /** Pawel Gawedzki 2019-03-24 */
 public class ProjectDetails {
     private StringProperty name;
-    private StringProperty cvsType;
+    private StringProperty vcsType;
     private StringProperty path;
 
-    public static ProjectDetails DEFAULT = new ProjectDetails(
+    public static final ProjectDetails DEFAULT = new ProjectDetails(
             ArgName.projectPath.defaultValue(), "N/A", ArgName.projectPath.defaultValue()
     );
 
-    public ProjectDetails(String name, String cvsType, String path) {
+    public ProjectDetails(String name, String vcsType, String path) {
         this.name = new SimpleStringProperty(name);
-        this.cvsType = new SimpleStringProperty(cvsType);
+        this.vcsType = new SimpleStringProperty(vcsType);
         this.path = new SimpleStringProperty(path);
     }
 
@@ -26,8 +26,8 @@ public class ProjectDetails {
         this.name.set(name);
     }
 
-    public void setCvsType(String cvsType) {
-        this.cvsType.set(cvsType);
+    public void setVcsType(String vcsType) {
+        this.vcsType.set(vcsType);
     }
 
     public void setPath(String path) {
@@ -38,8 +38,8 @@ public class ProjectDetails {
         return name.get();
     }
 
-    public String getCvsType() {
-        return cvsType.get();
+    public String getVcsType() {
+        return vcsType.get();
     }
 
     public String getPath() {
@@ -52,20 +52,20 @@ public class ProjectDetails {
         if (o == null || getClass() != o.getClass()) return false;
         ProjectDetails that = (ProjectDetails) o;
         return getName().equals(that.getName()) &&
-                getCvsType().equals(that.getCvsType()) &&
+                getVcsType().equals(that.getVcsType()) &&
                 getPath().equals(that.getPath());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getCvsType(), getPath());
+        return Objects.hash(getName(), getVcsType(), getPath());
     }
 
     @Override
     public String toString() {
         return "ProjectDetails{" +
                 "name=" + name +
-                ", cvsType=" + cvsType +
+                ", cvsType=" + vcsType +
                 ", path=" + path +
                 '}';
     }

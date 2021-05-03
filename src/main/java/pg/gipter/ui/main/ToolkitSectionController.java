@@ -12,7 +12,6 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JarHelper;
 
 import java.net.URL;
 import java.util.*;
@@ -83,15 +82,13 @@ class ToolkitSectionController extends AbstractController {
                     if (hasProperCredentials) {
                         saveToolkitCredentials();
                         alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsVerified"))
-                                .withWindowType(WindowType.CONFIRMATION_WINDOW)
                                 .withAlertType(Alert.AlertType.INFORMATION)
-                                .withImage(ImageFile.FINGER_UP_PNG);
+                                .withImageFile(ImageFile.FINGER_UP_PNG);
                     } else {
-                        alertWindowBuilder.withHeaderText(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
-                                .withLink(JarHelper.logsFolder())
-                                .withWindowType(WindowType.LOG_WINDOW)
+                        alertWindowBuilder.withMessage(BundleUtils.getMsg("toolkit.panel.credentialsWrong"))
+                                .withLinkAction(new LogLinkAction())
                                 .withAlertType(Alert.AlertType.ERROR)
-                                .withImage(ImageFile.MINION_IOIO_GIF);
+                                .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
                     }
                     uiLauncher.updateTray(applicationProperties);
                     Platform.runLater(() -> {

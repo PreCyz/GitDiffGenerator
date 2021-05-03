@@ -12,6 +12,7 @@ import pg.gipter.core.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.keystore.CertificateServiceFactory;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
 
 import java.util.*;
@@ -35,6 +36,7 @@ public class Main extends Application {
         mObj.runConverters();
         mObj.setDefaultConfig();
         if (Main.applicationProperties.isUseUI()) {
+            WebViewService.getInstance();
             launch(args);
         } else {
             Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
@@ -47,15 +49,14 @@ public class Main extends Application {
     Main(String[] args) {
         this.args = args;
         applicationProperties = ApplicationPropertiesFactory.getInstance(args);
-        if (args != null) {
-            Optional<String> javaHome = Stream.of(args).filter(arg -> arg.startsWith("java.home")).findFirst();
-            if (javaHome.isPresent()) {
-                System.setProperty("java.home", javaHome.get().split("=")[1]);
-                System.setProperty("javax.net.ssl.trustStore",
+        Optional<String> javaHome = Stream.of(args).filter(arg -> arg.startsWith("java.home")).findFirst();
+        if (javaHome.isPresent()) {
+            System.setProperty("java.home", javaHome.get().split("=")[1]);
+            System.setProperty("javax.net.ssl.trustStore",
                         CertificateServiceFactory.getInstance(true).getKeystorePath().toString());
                 System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
                 logger.info("New JAVA_HOME {}.", System.getProperty("java.home"));
-            }
+
         }
     }
 

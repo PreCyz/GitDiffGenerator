@@ -23,7 +23,6 @@ public class ApplicationConfig {
     private Boolean certImportEnabled;
     private Boolean checkLastItemEnabled;
     private String checkLastItemJobCronExpression;
-    private Boolean useMetroSkin;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -38,7 +37,6 @@ public class ApplicationConfig {
         certImportEnabled = StringUtils.getBoolean(ArgName.certImport.defaultValue());
         checkLastItemEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
         checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
-        useMetroSkin = StringUtils.getBoolean(ArgName.useMetroSkin.defaultValue());
     }
 
     public Boolean getConfirmationWindow() {
@@ -137,14 +135,6 @@ public class ApplicationConfig {
         this.checkLastItemJobCronExpression = checkLastItemJobCronExpression;
     }
 
-    public Boolean getUseMetroSkin() {
-        return useMetroSkin;
-    }
-
-    public void setUseMetroSkin(Boolean useMetroSkin) {
-        this.useMetroSkin = useMetroSkin;
-    }
-
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -183,9 +173,6 @@ public class ApplicationConfig {
         if (getCheckLastItemJobCronExpression() != null) {
             arguments.add(ArgName.checkLastItemJobCronExpression.name() + "=" + getCheckLastItemEnabled());
         }
-        if (getUseMetroSkin() != null) {
-            arguments.add(ArgName.useMetroSkin.name() + "=" + getUseMetroSkin());
-        }
         return arguments.toArray(new String[0]);
     }
 
@@ -220,8 +207,6 @@ public class ApplicationConfig {
                     applicationConfig.setCheckLastItemEnabled(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.checkLastItemJobCronExpression.name().equals(argumentName)) {
                     applicationConfig.setCheckLastItemJobCronExpression(argumentValue);
-                } else if (ArgName.useMetroSkin.name().equals(argumentName)) {
-                    applicationConfig.setUseMetroSkin(StringUtils.getBoolean(argumentValue));
                 }
             }
         }
@@ -243,7 +228,6 @@ public class ApplicationConfig {
                 ", certImportEnabled=" + certImportEnabled +
                 ", checkLastItemEnabled=" + checkLastItemEnabled +
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
-                ", useMetroSkin=" + useMetroSkin +
                 '}';
     }
 }

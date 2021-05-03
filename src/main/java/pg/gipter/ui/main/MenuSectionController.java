@@ -155,11 +155,10 @@ public class MenuSectionController extends AbstractController {
         return event -> {
             String pdfFileName = "Gipter-ui-description.pdf";
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
-                    .withLink(applicationProperties.toolkitUserFolder())
-                    .withWindowType(WindowType.LOG_WINDOW)
+                    .withMessage(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
+                    .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolder()))
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImage(ImageFile.ERROR_CHICKEN_PNG);
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             try {
                 Path pdfFile = Paths.get(pdfFileName);
                 if (Files.exists(pdfFile)) {
@@ -241,11 +240,10 @@ public class MenuSectionController extends AbstractController {
             statuses.add(CertImportStatus.ALREADY_IMPORTED);
         }
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
-        alertWindowBuilder.withHeaderText(finalMsg)
-                .withWindowType(WindowType.LOG_WINDOW)
+        alertWindowBuilder.withMessage(finalMsg)
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withImage(statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
-                        ImageFile.randomSuccessImage() : ImageFile.randomFailImage())
+                .withWebViewDetails(statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
+                        WebViewService.getInstance().pullSuccessWebView() : WebViewService.getInstance().pullFailWebView())
                 .buildAndDisplayWindow();
     }
 }
