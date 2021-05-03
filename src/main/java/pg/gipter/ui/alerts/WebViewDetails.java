@@ -5,7 +5,7 @@ import javafx.scene.web.WebView;
 import pg.gipter.ui.UploadStatus;
 
 public class WebViewDetails {
-    private final UploadStatus uploadStatus;
+    private UploadStatus uploadStatus;
     private Gif gif;
     private WebView webView;
     private ImageView imageView;
@@ -21,6 +21,10 @@ public class WebViewDetails {
 
     public WebViewDetails(ImageView imageView) {
         this(UploadStatus.N_A, imageView);
+    }
+
+    public WebViewDetails(Gif gif) {
+        this(UploadStatus.N_A, gif);
     }
 
     public WebViewDetails(UploadStatus uploadStatus, ImageView imageView) {
@@ -64,5 +68,9 @@ public class WebViewDetails {
             return imageView.getImage().getWidth();
         }
         return 0;
+    }
+
+    public void setUploadStatus(UploadStatus uploadStatus) {
+        this.uploadStatus = uploadStatus;
     }
 }

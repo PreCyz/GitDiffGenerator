@@ -5,23 +5,35 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.services.GithubService;
-import pg.gipter.services.keystore.*;
+import pg.gipter.services.keystore.CertImportResult;
+import pg.gipter.services.keystore.CertImportStatus;
+import pg.gipter.services.keystore.CertificateServiceFactory;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
-import pg.gipter.ui.*;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.AbstractController;
+import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.WizardLauncher;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.BrowserLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 import static java.util.stream.Collectors.joining;
 
@@ -155,10 +167,10 @@ public class MenuSectionController extends AbstractController {
         return event -> {
             String pdfFileName = "Gipter-ui-description.pdf";
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
+                    .withMessage(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
                     .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolder()))
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withImageFile(ImageFile.ERROR_CHICKEN_PNG);
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             try {
                 Path pdfFile = Paths.get(pdfFileName);
                 if (Files.exists(pdfFile)) {
@@ -240,10 +252,10 @@ public class MenuSectionController extends AbstractController {
             statuses.add(CertImportStatus.ALREADY_IMPORTED);
         }
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
-        alertWindowBuilder.withHeaderText(finalMsg)
+        alertWindowBuilder.withMessage(finalMsg)
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withImageFile(statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
-                        ImageFile.randomSuccessImage() : ImageFile.randomFailImage())
+                .withWebViewDetails(statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
+                        WebViewService.getInstance().pullSuccessWebView() : WebViewService.getInstance().pullFailWebView())
                 .buildAndDisplayWindow();
     }
 }

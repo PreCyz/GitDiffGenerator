@@ -10,11 +10,16 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.ui.UploadStatus;
 import pg.gipter.utils.ResourceUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
@@ -22,20 +27,17 @@ public class WebViewService {
 
     private static final Logger logger = LoggerFactory.getLogger(WebViewService.class);
     private static final String URL_PLACEHOLDER = "%URL_PLACEHOLDER%";
-    public static final String CUSTOM_ALERT_HTML = "custom-alert.html";
+    private static final String CUSTOM_ALERT_HTML = "custom-alert.html";
+    private final EnumMap<UploadStatus, WebViewDetails> cachedWebViewMap = new EnumMap<>(UploadStatus.class);
     private String htmlContent;
 
     private static class WebViewServiceHolder {
-        private static final WebViewService INSTANCE = new WebViewService();
+        private static final WebViewService INSTANCE = new WebViewService().init();
     }
 
     private WebViewService() {}
 
-    public static WebViewService getInstance() {
-        return WebViewServiceHolder.INSTANCE;
-    }
-
-    public List<WebViewDetails> loadGifs() {
+    private WebViewService init() {
         LinkedList<WebViewDetails> webViewDetails = new LinkedList<>();
 
         if (hasInternetConnection()) {
@@ -49,7 +51,7 @@ public class WebViewService {
                     final WebEngine engine = webView.getEngine();
                     engine.loadContent(getHtmlContent(wvd.getGif()), "text/html");
                     wvd.setWebView(webView);
-                    logger.info("Web view loaded the gif from [{}].", wvd.getGif().url());
+                    logger.info("Web view loaded gif [{}] from [{}].", wvd.getGif().name(), wvd.getGif().url());
                 });
             }
         } else {
@@ -58,13 +60,47 @@ public class WebViewService {
             webViewDetails.add(new WebViewDetails(UploadStatus.SUCCESS, createImageView(ImageFile.randomSuccessImage())));
         }
 
-        return webViewDetails;
+        for (WebViewDetails wvd : webViewDetails) {
+            cachedWebViewMap.put(wvd.getUploadStatus(), wvd);
+        }
+
+        return this;
+    }
+
+    public static WebViewService getInstance() {
+        return WebViewServiceHolder.INSTANCE;
     }
 
     public ImageView createImageView(ImageFile imageFile) {
+        logger.info("New web view was created with gif [{}] from [{}].", imageFile.name(), imageFile.fileUrl());
         return ResourceUtils.getImgResource(imageFile.fileUrl())
                 .map(url -> new ImageView(new Image(url.toString())))
                 .orElseGet(ImageView::new);
+    }
+
+    private WebViewDetails createWebViewDetails(final Gif gif) {
+        final WebViewDetails wvd;
+        if (hasInternetConnection()) {
+            wvd = new WebViewDetails(gif);
+            Platform.runLater(() -> {
+                WebView webView = new WebView();
+                final WebEngine engine = webView.getEngine();
+                engine.loadContent(getHtmlContent(gif), "text/html");
+                wvd.setWebView(webView);
+                logger.info("New web view was created with gif [{}] from [{}].", gif.name(), gif.url());
+            });
+        } else {
+            ImageFile imageFile = ImageFile.randomImage(EnumSet.allOf(ImageFile.class));
+            final ImageView imageView = ResourceUtils.getImgResource(imageFile.fileUrl())
+                    .map(url -> new ImageView(new Image(url.toString())))
+                    .orElseGet(ImageView::new);
+            wvd = new WebViewDetails(UploadStatus.N_A, imageView);
+            logger.info("New web view was created with image [{}] from [{}].",
+                    imageFile.name(),
+                    imageFile.fileUrl()
+            );
+        }
+        return wvd;
     }
 
     private String getHtmlContent(Gif gif) {
@@ -91,6 +127,44 @@ public class WebViewService {
             logger.error("No Internet connection", e);
             return false;
         }
+    }
+
+    public WebViewDetails pullWebView(UploadStatus uploadStatus, Gif nextGif) {
+        WebViewDetails result = cachedWebViewMap.get(uploadStatus);
+
+        logger.info("Web view [{}] pulled from cache.", Optional.ofNullable(result.getGif())
+                .map(Gif::name)
+                .orElseGet(() -> result.getImageView().getImage().getUrl())
+        );
+
+        WebViewDetails webViewDetails = createWebViewDetails(nextGif);
+        webViewDetails.setUploadStatus(uploadStatus);
+        cachedWebViewMap.put(uploadStatus, webViewDetails);
+
+        return result;
+    }
+
+    public WebViewDetails pullWebView(UploadStatus uploadStatus) {
+        switch (uploadStatus) {
+            case PARTIAL_SUCCESS:
+                return pullWebView(uploadStatus, Gif.randomPartialSuccessGif());
+            case SUCCESS:
+                return pullWebView(uploadStatus, Gif.randomSuccessGif());
+            default:
+                return pullWebView(uploadStatus, Gif.randomFailGif());
+        }
+    }
+
+    public WebViewDetails pullFailWebView() {
+        return pullWebView(UploadStatus.FAIL, Gif.randomFailGif());
+    }
+
+    public WebViewDetails pullPartialSuccessWebView() {
+        return pullWebView(UploadStatus.PARTIAL_SUCCESS, Gif.randomPartialSuccessGif());
+    }
+
+    public WebViewDetails pullSuccessWebView() {
+        return pullWebView(UploadStatus.SUCCESS, Gif.randomSuccessGif());
     }
 
 }

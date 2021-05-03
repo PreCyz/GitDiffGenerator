@@ -20,13 +20,17 @@ import pg.gipter.services.vcs.VcsService;
 import pg.gipter.services.vcs.VcsServiceFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.LogLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -224,7 +228,7 @@ public class ProjectsController extends AbstractController {
             new AlertWindowBuilder().withAlertType(Alert.AlertType.ERROR)
                     .withHeaderText(BundleUtils.getMsg("projects.alert.git.unavailable.header"))
                     .withMessage(BundleUtils.getMsg("projects.alert.git.unavailable.msg", System.getProperty("line.separator")))
-                    .withImageFile(ImageFile.randomFailImage())
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
                     .buildAndDisplayWindow();
         }
 
@@ -256,7 +260,7 @@ public class ProjectsController extends AbstractController {
                             .withHeaderText(ex.getMessage())
                             .withLinkAction(new LogLinkAction())
                             .withAlertType(Alert.AlertType.ERROR)
-                            .withImageFile(ImageFile.ERROR_CHICKEN_PNG);
+                            .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
                     Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
                 }
             }

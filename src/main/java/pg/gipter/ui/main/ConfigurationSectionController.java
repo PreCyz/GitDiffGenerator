@@ -7,12 +7,17 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
+import pg.gipter.ui.alerts.LogLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
@@ -150,10 +155,10 @@ class ConfigurationSectionController extends AbstractController {
                         .withImageFile(ImageFile.FINGER_UP_PNG);
             } catch (IllegalStateException ex) {
                 alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(ex.getMessage())
+                        .withMessage(ex.getMessage())
                         .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withImageFile(ImageFile.ERROR_CHICKEN_PNG);
+                        .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             }
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         };
