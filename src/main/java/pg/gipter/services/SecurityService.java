@@ -8,17 +8,13 @@ import pg.gipter.core.dao.configuration.SecurityProvider;
 import pg.gipter.core.model.CipherDetails;
 import pg.gipter.utils.CryptoUtils;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.*;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class SecurityService {
 
