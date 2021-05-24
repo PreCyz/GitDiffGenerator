@@ -31,12 +31,12 @@ public class Main extends Application {
         logger.info("Gipter started.");
         Main mObj = new Main(args);
         mObj.setLoggerLevel(applicationProperties.loggerLevel());
+        logger.info("Java version '{}'.", System.getProperty("java.version"));
         logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
         logger.info("Gipter can use '{}' threads.", Runtime.getRuntime().availableProcessors());
         mObj.runConverters();
         mObj.setDefaultConfig();
         if (Main.applicationProperties.isUseUI()) {
-            WebViewService.getInstance();
             launch(args);
         } else {
             Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
@@ -62,6 +62,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        WebViewService.getInstance();
         Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
         launcher.execute();
     }
