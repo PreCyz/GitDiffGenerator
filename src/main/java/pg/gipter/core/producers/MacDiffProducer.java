@@ -4,13 +4,14 @@ import pg.gipter.core.ApplicationProperties;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 /** Created by Pawel Gawedzki on 16-Sep-2019. */
 class MacDiffProducer extends AbstractDiffProducer {
 
-    MacDiffProducer(ApplicationProperties applicationProperties) {
-        super(applicationProperties);
+    MacDiffProducer(ApplicationProperties applicationProperties, Executor executor) {
+        super(applicationProperties, executor);
     }
 
     @Override

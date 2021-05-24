@@ -14,14 +14,18 @@ import pg.gipter.ui.UploadStatus;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
 
+import java.util.concurrent.Executor;
+
 class Runner implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(Runner.class);
     private final ApplicationProperties applicationProperties;
     private final DataDao dataDao;
+    private final Executor executor;
 
-    Runner(ApplicationProperties applicationProperties) {
+    Runner(ApplicationProperties applicationProperties, Executor executor) {
         this.applicationProperties = applicationProperties;
+        this.executor = executor;
         this.dataDao = DaoFactory.getDataDao();
     }
 
@@ -30,7 +34,7 @@ class Runner implements Starter {
         logger.info("{} started.", this.getClass().getName());
         boolean error = false;
         try {
-            DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
+            DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties, executor);
             diffProducer.produceDiff();
 
             if (!applicationProperties.isToolkitCredentialsSet()) {

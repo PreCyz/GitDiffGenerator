@@ -8,7 +8,7 @@ import java.util.List;
 class StatementDiffProducer extends AbstractDiffProducer {
 
     StatementDiffProducer(ApplicationProperties applicationProperties) {
-        super(applicationProperties);
+        super(applicationProperties, null);
     }
 
     @Override

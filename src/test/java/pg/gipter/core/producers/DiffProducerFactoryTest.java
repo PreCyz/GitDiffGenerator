@@ -3,6 +3,8 @@ package pg.gipter.core.producers;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.ApplicationPropertiesFactory;
 
+import java.util.concurrent.Executors;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DiffProducerFactoryTest {
@@ -12,7 +14,7 @@ class DiffProducerFactoryTest {
         DiffProducer instance = DiffProducerFactory.getInstance(ApplicationPropertiesFactory.getInstance(new String[]{
                 "preferredArgSource=FILE",
                 "itemType=statement"
-        }));
+        }), Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()));
 
         assertThat(instance).isInstanceOf(StatementDiffProducer.class);
     }
@@ -20,7 +22,8 @@ class DiffProducerFactoryTest {
     @Test
     void given_codeProtectionDefault_when_getInstance_then_returnProducerDependOnEnvironment() {
         DiffProducer instance = DiffProducerFactory.getInstance(
-                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"}),
+                Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
         );
         String platform = System.getProperty("os.name");
         if ("Linux".equalsIgnoreCase(platform)) {

@@ -32,7 +32,7 @@ class ParallelProcessor {
             try {
                 result.add(ecs.take().get());
             } catch (InterruptedException | ExecutionException e) {
-                logger.error("Error when getting torrents.", e);
+                logger.error("Error when downloading files.", e);
             }
         }
         return result;
