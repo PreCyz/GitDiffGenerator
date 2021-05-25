@@ -45,8 +45,6 @@ abstract class AbstractDiffProducer implements DiffProducer {
             }
             applicationProperties.setVcs(vcsSet);
 
-            CompletionService<DiffDetails> completionService = new ExecutorCompletionService<>(executor);
-            diffs.forEach(completionService::submit);
             List<DiffDetails> diffDetails = processCallable(diffs);
             writeDiffToFile(fw, diffDetails);
 
@@ -176,9 +174,8 @@ abstract class AbstractDiffProducer implements DiffProducer {
         CompletionService<DiffDetails> completionService = new ExecutorCompletionService<>(executor);
         diffs.forEach(completionService::submit);
 
-        int numberOfCalls = diffs.size();
-        List<DiffDetails> result = new ArrayList<>(numberOfCalls);
-        for (int i = 0; i < numberOfCalls; i++) {
+        List<DiffDetails> result = new ArrayList<>(diffs.size());
+        for (int i = 0; i < diffs.size(); i++) {
             try {
                 result.add(completionService.take().get());
             } catch (InterruptedException | ExecutionException e) {

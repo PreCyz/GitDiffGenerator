@@ -98,7 +98,7 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
                     int totalNumberOfProjects = applicationPropertiesCollection.stream()
                             .mapToInt(ap -> ap.projectPaths().size())
                             .sum();
-                    setMax(INCREMENT_FACTOR * totalNumberOfProjects + NUMBER_OF_STEPS);
+                    setMaxProgress(INCREMENT_FACTOR * totalNumberOfProjects + NUMBER_OF_STEPS);
                     executeForApplicationProperties();
                 }
             } catch (Exception ex) {
