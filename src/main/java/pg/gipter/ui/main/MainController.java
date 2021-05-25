@@ -389,12 +389,8 @@ public class MainController extends AbstractController {
         configurationSectionController.getConfigurationName();
         RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
         applicationProperties.updateCurrentRunConfig(runConfigWithoutDates);
-        //new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
         configurationSectionController.setDisableDependOnConfigurations();
         applicationProperties.save();
-        /*if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
-            applicationProperties.removeConfig(oldConfigName);
-        }*/
     }
 
     RunConfig getRunConfigWithoutDates() {
