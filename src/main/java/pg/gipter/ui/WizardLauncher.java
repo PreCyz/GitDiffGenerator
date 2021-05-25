@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -25,6 +26,7 @@ import pg.gipter.launchers.Launcher;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.*;
 
+import java.io.File;
 import java.nio.file.*;
 import java.util.*;
 
@@ -272,6 +274,7 @@ public class WizardLauncher implements Launcher {
         StringProperty itemPathStringProperty = new SimpleStringProperty();
         itemPathStringProperty.setValue(BundleUtils.getMsg("wizard.item.location"));
         Label itemPathLabel = new Label();
+        itemPathLabel.setOnMouseClicked(labelAddItemEventHandler(itemPathStringProperty));
         itemPathLabel.textProperty().unbind();
         itemPathLabel.textProperty().bind(itemPathStringProperty);
 
@@ -281,6 +284,7 @@ public class WizardLauncher implements Launcher {
         pageGrid.add(itemPathLabel, 1, row++);
 
         Label projectLabel = new Label();
+        projectLabel.setOnMouseClicked(labelAddProjectEventHandler());
         projectLabel.textProperty().unbind();
         StringProperty projectLabelStringProperty = new SimpleStringProperty();
         projectLabelStringProperty.setValue(BundleUtils.getMsg("wizard.project.choose"));
@@ -332,12 +336,18 @@ public class WizardLauncher implements Launcher {
         return wizardPane;
     }
 
+    private EventHandler<MouseEvent> labelAddProjectEventHandler() {
+        return event -> addProjects();
+    }
+
     private EventHandler<ActionEvent> addProjectEventHandler() {
-        return event -> {
-            saveConfiguration();
-            uiLauncher = new UILauncher(primaryStage, applicationProperties);
-            uiLauncher.showProject(applicationProperties.itemType(), wizardProperties);
-        };
+        return event -> addProjects();
+    }
+
+    private void addProjects() {
+        saveConfiguration();
+        uiLauncher = new UILauncher(primaryStage, applicationProperties);
+        uiLauncher.showProject(applicationProperties.itemType(), wizardProperties);
     }
 
     public void saveConfiguration() {
@@ -364,36 +374,42 @@ public class WizardLauncher implements Launcher {
         applicationProperties.save();
     }
 
+    private EventHandler<MouseEvent> labelAddItemEventHandler(StringProperty itemPathStringProperty) {
+        return event -> addItemPath(itemPathStringProperty);
+    }
+
     private EventHandler<ActionEvent> addItemEventHandler(StringProperty itemPathStringProperty) {
-        return event -> {
-            ItemType uploadType = ItemType.valueFor(wizardProperties.getProperty(ArgName.itemType.name()));
-            Path currentDirectory = Paths.get(".");
-            if (uploadType == ItemType.STATEMENT) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setInitialDirectory(currentDirectory.toFile());
-                fileChooser.setTitle(BundleUtils.getMsg("directory.item.statement.title"));
-                final Optional<Path> statementPath = Optional.ofNullable(fileChooser.showOpenDialog(primaryStage))
-                        .map(file -> file.toPath());
-                boolean isStatementFileSet = statementPath.map(path -> Files.exists(path) && Files.isRegularFile(path))
-                        .orElseGet(() -> false);
-                if (isStatementFileSet) {
-                    itemPathStringProperty.setValue(statementPath.get().toAbsolutePath().toString());
-                    wizardProperties.put(ArgName.itemPath.name(), statementPath.get().toAbsolutePath().toString());
-                }
-            } else {
-                DirectoryChooser directoryChooser = new DirectoryChooser();
-                directoryChooser.setInitialDirectory(currentDirectory.toFile());
-                directoryChooser.setTitle(BundleUtils.getMsg("directory.item.store"));
-                final Optional<Path> directoryPath = Optional.ofNullable(directoryChooser.showDialog(primaryStage))
-                        .map(file -> file.toPath());
-                boolean isItemPathDirectorySet = directoryPath.map(path -> Files.exists(path) && Files.isDirectory(path))
-                        .orElseGet(() -> false);
-                if (isItemPathDirectorySet) {
-                    itemPathStringProperty.setValue(directoryPath.get().toAbsolutePath().toString());
-                    wizardProperties.put(ArgName.itemPath.name(), directoryPath.get().toAbsolutePath().toString());
-                }
+        return event -> addItemPath(itemPathStringProperty);
+    }
+
+    private void addItemPath(StringProperty itemPathStringProperty) {
+        ItemType uploadType = ItemType.valueFor(wizardProperties.getProperty(ArgName.itemType.name()));
+        Path currentDirectory = Paths.get(".");
+        if (uploadType == ItemType.STATEMENT) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(currentDirectory.toFile());
+            fileChooser.setTitle(BundleUtils.getMsg("directory.item.statement.title"));
+            final Optional<Path> statementPath = Optional.ofNullable(fileChooser.showOpenDialog(primaryStage))
+                    .map(File::toPath);
+            boolean isStatementFileSet = statementPath.map(path -> Files.exists(path) && Files.isRegularFile(path))
+                    .orElseGet(() -> false);
+            if (isStatementFileSet) {
+                itemPathStringProperty.setValue(statementPath.get().toAbsolutePath().toString());
+                wizardProperties.put(ArgName.itemPath.name(), statementPath.get().toAbsolutePath().toString());
             }
-        };
+        } else {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setInitialDirectory(currentDirectory.toFile());
+            directoryChooser.setTitle(BundleUtils.getMsg("directory.item.store"));
+            final Optional<Path> directoryPath = Optional.ofNullable(directoryChooser.showDialog(primaryStage))
+                    .map(File::toPath);
+            boolean isItemPathDirectorySet = directoryPath.map(path -> Files.exists(path) && Files.isDirectory(path))
+                    .orElseGet(() -> false);
+            if (isItemPathDirectorySet) {
+                itemPathStringProperty.setValue(directoryPath.get().toAbsolutePath().toString());
+                wizardProperties.put(ArgName.itemPath.name(), directoryPath.get().toAbsolutePath().toString());
+            }
+        }
     }
 
     private WizardPane buildFinishPage(short step) {

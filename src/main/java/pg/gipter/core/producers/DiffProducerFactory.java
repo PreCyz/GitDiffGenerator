@@ -6,6 +6,8 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.SystemUtils;
 
+import java.util.concurrent.Executor;
+
 /**Created by Pawel Gawedzki on 20-Sep-2018.*/
 public final class DiffProducerFactory {
 
@@ -13,7 +15,7 @@ public final class DiffProducerFactory {
 
     private DiffProducerFactory() { }
 
-    public static DiffProducer getInstance(ApplicationProperties applicationProperties) {
+    public static DiffProducer getInstance(ApplicationProperties applicationProperties, Executor executor) {
         logger.info("Running on platform [{}].", SystemUtils.OS);
         if (applicationProperties.itemType() == ItemType.STATEMENT) {
             return new StatementDiffProducer(applicationProperties);
@@ -22,11 +24,11 @@ public final class DiffProducerFactory {
         } else if (applicationProperties.itemType() == ItemType.SHARE_POINT_DOCS) {
             return new SharePointDocumentsDiffProducer(ItemType.SHARE_POINT_DOCS, applicationProperties);
         } else if (SystemUtils.isUnix()) {
-            return new LinuxDiffProducer(applicationProperties);
+            return new LinuxDiffProducer(applicationProperties, executor);
         } else if (SystemUtils.isWindows()) {
-            return new WindowsDiffProducer(applicationProperties);
+            return new WindowsDiffProducer(applicationProperties, executor);
         } else if (SystemUtils.isMac()){
-            return new MacDiffProducer(applicationProperties);
+            return new MacDiffProducer(applicationProperties, executor);
         } else {
             logger.warn("Platform {} not supported yet.", SystemUtils.OS);
             throw new RuntimeException("Not implemented yet!!!");

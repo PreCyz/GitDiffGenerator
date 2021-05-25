@@ -6,6 +6,5 @@ public interface VcsService {
     Optional<String> getUserName();
     Optional<String> getUserEmail();
     void setProjectPath(String projectPath);
-
-    boolean isGitAvailableInCommandLine();
+    boolean isVcsAvailableInCommandLine();
 }
