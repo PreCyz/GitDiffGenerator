@@ -235,6 +235,12 @@ public enum ArgName {
             return toolkitUrl.defaultValue() + toolkitCopyCase.defaultValue() +
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
+    },
+    fetchWaitTime {
+        @Override
+        public String defaultValue() {
+            return "60";
+        }
     };
 
     public abstract String defaultValue();

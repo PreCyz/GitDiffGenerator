@@ -23,6 +23,7 @@ public class ApplicationConfig {
     private Boolean certImportEnabled;
     private Boolean checkLastItemEnabled;
     private String checkLastItemJobCronExpression;
+    private Integer fetchWaitTime;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -37,6 +38,7 @@ public class ApplicationConfig {
         certImportEnabled = StringUtils.getBoolean(ArgName.certImport.defaultValue());
         checkLastItemEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
         checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
+        fetchWaitTime = Integer.parseInt(ArgName.fetchWaitTime.defaultValue());
     }
 
     public Boolean getConfirmationWindow() {
@@ -135,6 +137,14 @@ public class ApplicationConfig {
         this.checkLastItemJobCronExpression = checkLastItemJobCronExpression;
     }
 
+    public Integer getFetchWaitTime() {
+        return fetchWaitTime;
+    }
+
+    public void setFetchWaitTime(Integer fetchWaitTime) {
+        this.fetchWaitTime = fetchWaitTime;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -173,6 +183,9 @@ public class ApplicationConfig {
         if (getCheckLastItemJobCronExpression() != null) {
             arguments.add(ArgName.checkLastItemJobCronExpression.name() + "=" + getCheckLastItemEnabled());
         }
+        if (getFetchWaitTime() != null) {
+            arguments.add(ArgName.fetchWaitTime.name() + "=" + getFetchWaitTime());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -207,6 +220,8 @@ public class ApplicationConfig {
                     applicationConfig.setCheckLastItemEnabled(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.checkLastItemJobCronExpression.name().equals(argumentName)) {
                     applicationConfig.setCheckLastItemJobCronExpression(argumentValue);
+                } else if (ArgName.fetchWaitTime.name().equals(argumentName)) {
+                    applicationConfig.setFetchWaitTime(Integer.parseInt(argumentValue));
                 }
             }
         }
@@ -228,6 +243,7 @@ public class ApplicationConfig {
                 ", certImportEnabled=" + certImportEnabled +
                 ", checkLastItemEnabled=" + checkLastItemEnabled +
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
+                ", fetchWaitTime=" + fetchWaitTime +
                 '}';
     }
 }

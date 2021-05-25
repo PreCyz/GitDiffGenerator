@@ -301,4 +301,12 @@ class FileApplicationProperties extends ApplicationProperties {
         }
         return argExtractor.checkLastItemJobCronExpression();
     }
+
+    @Override
+    public int fetchWaitTime() {
+        if (applicationConfig.getFetchWaitTime() != null) {
+            return Math.abs(applicationConfig.getFetchWaitTime());
+        }
+        return argExtractor.fetchWaitTime();
+    }
 }

@@ -355,6 +355,7 @@ public abstract class ApplicationProperties {
     public abstract boolean isCertImportEnabled();
     public abstract boolean isCheckLastItemEnabled();
     public abstract String getCheckLastItemJobCronExpression();
+    public abstract int fetchWaitTime();
 
     public abstract boolean isUpgradeFinished();
 }

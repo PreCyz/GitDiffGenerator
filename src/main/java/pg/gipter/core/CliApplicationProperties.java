@@ -317,4 +317,14 @@ class CliApplicationProperties extends ApplicationProperties {
         return cronExpression;
     }
 
+    @Override
+    public int fetchWaitTime() {
+        int fetchWaitTime = argExtractor.fetchWaitTime();
+        if (!containsArg(ArgName.fetchWaitTime.name()) && applicationConfig.getFetchWaitTime() != null) {
+            fetchWaitTime = applicationConfig.getFetchWaitTime();
+        }
+
+        return fetchWaitTime;
+    }
+
 }

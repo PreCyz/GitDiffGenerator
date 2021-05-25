@@ -15,6 +15,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static java.util.stream.Collectors.joining;
+
 abstract class AbstractDiffProducer implements DiffProducer {
 
     protected final ApplicationProperties applicationProperties;
@@ -92,13 +94,28 @@ abstract class AbstractDiffProducer implements DiffProducer {
              InputStreamReader isr = new InputStreamReader(is);
              BufferedReader br = new BufferedReader(isr)) {
 
-            StringBuilder builder = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                builder.append(String.format("%s%n", line));
-            }
-            logger.debug(builder.toString());
+            Future<String> future = new ExecutorCompletionService<String>(executor).submit(() -> br.lines()
+                    .filter(Objects::nonNull)
+                    .collect(joining(System.getProperty("line.separator")))
+            );
 
+            final int interval = 500;
+            int timeout = 0;
+            while(timeout < 1000 * applicationProperties.fetchWaitTime() && !future.isDone()) {
+                Thread.sleep(interval);
+                timeout += interval;
+            }
+            if (future.isDone()) {
+                logger.debug(future.get());
+            } else {
+                logger.warn("Fetching repository cancelled after {}[s].", applicationProperties.fetchWaitTime());
+                future.cancel(true);
+            }
+
+        } catch (InterruptedException | ExecutionException ex) {
+            logger.error("Fetching was interrupted. Task was taking more then [{}] seconds.",
+                    applicationProperties.fetchWaitTime(), ex
+            );
         } catch (Exception ex) {
             logger.error(ex.getMessage());
             throw new IOException(ex);
