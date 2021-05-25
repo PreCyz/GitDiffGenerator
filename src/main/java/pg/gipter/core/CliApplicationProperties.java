@@ -318,13 +318,13 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public int fetchWaitTime() {
-        int fetchWaitTime = argExtractor.fetchWaitTime();
-        if (!containsArg(ArgName.fetchWaitTime.name()) && applicationConfig.getFetchWaitTime() != null) {
-            fetchWaitTime = applicationConfig.getFetchWaitTime();
+    public int fetchTimeout() {
+        int fetchWaitTime = argExtractor.fetchTimeout();
+        if (!containsArg(ArgName.fetchTimeout.name()) && applicationConfig.getFetchTimeout() != null) {
+            fetchWaitTime = applicationConfig.getFetchTimeout();
         }
 
-        return fetchWaitTime;
+        return Math.abs(fetchWaitTime);
     }
 
 }

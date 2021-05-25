@@ -60,9 +60,9 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private ComboBox<String> languageComboBox;
     @FXML
-    private TextField fetchWaitTimeTextField;
+    private TextField fetchTimeoutTextField;
     @FXML
-    private Label fetchWaitTimeLabel;
+    private Label fetchTimeoutLabel;
 
     private final Map<String, Labeled> labelsAffectedByLanguage;
 
@@ -97,7 +97,7 @@ public class ApplicationSettingsController extends AbstractController {
         languageComboBox.setValue(applicationProperties.uiLanguage());
         importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
         checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
-        fetchWaitTimeTextField.setText(String.valueOf(applicationProperties.fetchWaitTime()));
+        fetchTimeoutTextField.setText(String.valueOf(applicationProperties.fetchTimeout()));
     }
 
     private void setProperties() {
@@ -155,7 +155,7 @@ public class ApplicationSettingsController extends AbstractController {
             saveNewSettings();
         });
 
-        fetchWaitTimeTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+        fetchTimeoutTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.equals(oldValue)) {
                 try {
                     Integer.parseInt(newValue);
@@ -198,8 +198,8 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setUiLanguage(languageComboBox.getValue());
         applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
         applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
-        applicationConfig.setFetchWaitTime(Integer.parseInt(
-                Optional.ofNullable(fetchWaitTimeTextField.getText()).orElseGet(ArgName.fetchWaitTime::defaultValue)
+        applicationConfig.setFetchTimeout(Integer.parseInt(
+                Optional.ofNullable(fetchTimeoutTextField.getText()).orElseGet(ArgName.fetchTimeout::defaultValue)
         ));
         return applicationConfig;
     }
@@ -225,6 +225,6 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.title", titledPane);
         labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
         labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
-        labelsAffectedByLanguage.put("launch.panel.fetchWaitTime", fetchWaitTimeLabel);
+        labelsAffectedByLanguage.put("launch.panel.fetchTimeout", fetchTimeoutLabel);
     }
 }

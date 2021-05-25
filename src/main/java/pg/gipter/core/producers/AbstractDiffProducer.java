@@ -101,20 +101,20 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
             final int interval = 500;
             int timeout = 0;
-            while(timeout < 1000 * applicationProperties.fetchWaitTime() && !future.isDone()) {
+            while(timeout < 1000 * applicationProperties.fetchTimeout() && !future.isDone()) {
                 Thread.sleep(interval);
                 timeout += interval;
             }
             if (future.isDone()) {
                 logger.debug(future.get());
             } else {
-                logger.warn("Fetching repository cancelled after {}[s].", applicationProperties.fetchWaitTime());
+                logger.warn("Fetching repository cancelled after {}[s].", applicationProperties.fetchTimeout());
                 future.cancel(true);
             }
 
         } catch (InterruptedException | ExecutionException ex) {
             logger.error("Fetching was interrupted. Task was taking more then [{}] seconds.",
-                    applicationProperties.fetchWaitTime(), ex
+                    applicationProperties.fetchTimeout(), ex
             );
         } catch (Exception ex) {
             logger.error(ex.getMessage());

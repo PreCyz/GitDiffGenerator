@@ -303,10 +303,10 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public int fetchWaitTime() {
-        if (applicationConfig.getFetchWaitTime() != null) {
-            return Math.abs(applicationConfig.getFetchWaitTime());
+    public int fetchTimeout() {
+        if (applicationConfig.getFetchTimeout() != null) {
+            return Math.abs(applicationConfig.getFetchTimeout());
         }
-        return argExtractor.fetchWaitTime();
+        return argExtractor.fetchTimeout();
     }
 }

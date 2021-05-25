@@ -236,7 +236,7 @@ public enum ArgName {
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
     },
-    fetchWaitTime {
+    fetchTimeout {
         @Override
         public String defaultValue() {
             return "60";

@@ -15,19 +15,19 @@ public final class TestUtils {
     private TestUtils() {
     }
 
-    public static ConfigurationDao mockConfigurtionDao(RunConfig runConfig) {
-        return mockConfigurtionDao(runConfig, null, null);
+    public static ConfigurationDao mockConfigurationDao(RunConfig runConfig) {
+        return mockConfigurationDao(runConfig, null, null);
     }
 
-    public static ConfigurationDao mockConfigurtionDao(ApplicationConfig applicationConfig) {
-        return mockConfigurtionDao(null, applicationConfig, null);
+    public static ConfigurationDao mockConfigurationDao(ApplicationConfig applicationConfig) {
+        return mockConfigurationDao(null, applicationConfig, null);
     }
 
-    public static ConfigurationDao mockConfigurtionDao(ToolkitConfig toolkitConfig) {
-        return mockConfigurtionDao(null, null, toolkitConfig);
+    public static ConfigurationDao mockConfigurationDao(ToolkitConfig toolkitConfig) {
+        return mockConfigurationDao(null, null, toolkitConfig);
     }
 
-    public static ConfigurationDao mockConfigurtionDao(RunConfig runConfig, ApplicationConfig applicationConfig, ToolkitConfig toolkitConfig) {
+    public static ConfigurationDao mockConfigurationDao(RunConfig runConfig, ApplicationConfig applicationConfig, ToolkitConfig toolkitConfig) {
         ConfigurationDao loader = mock(ConfigurationDao.class);
         if (runConfig != null) {
             when(loader.loadRunConfig(eq(runConfig.getConfigurationName()))).thenReturn(Optional.of(runConfig));
