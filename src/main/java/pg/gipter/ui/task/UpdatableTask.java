@@ -17,7 +17,7 @@ public abstract class UpdatableTask<T> extends Task<T> {
         workDone = new AtomicLong(0);
     }
 
-    public void setMax(long max) {
+    protected void setMaxProgress(long max) {
         this.max = max;
     }
 
@@ -25,7 +25,7 @@ public abstract class UpdatableTask<T> extends Task<T> {
         this.doubleIncrement = doubleIncrement;
     }
 
-    public long getMax() {
+    protected long getMax() {
         return max;
     }
 

@@ -15,6 +15,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static java.util.stream.Collectors.joining;
+
 abstract class AbstractDiffProducer implements DiffProducer {
 
     protected final ApplicationProperties applicationProperties;
@@ -45,8 +47,6 @@ abstract class AbstractDiffProducer implements DiffProducer {
             }
             applicationProperties.setVcs(vcsSet);
 
-            CompletionService<DiffDetails> completionService = new ExecutorCompletionService<>(executor);
-            diffs.forEach(completionService::submit);
             List<DiffDetails> diffDetails = processCallable(diffs);
             writeDiffToFile(fw, diffDetails);
 
@@ -94,13 +94,30 @@ abstract class AbstractDiffProducer implements DiffProducer {
              InputStreamReader isr = new InputStreamReader(is);
              BufferedReader br = new BufferedReader(isr)) {
 
-            StringBuilder builder = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                builder.append(String.format("%s%n", line));
-            }
-            logger.debug(builder.toString());
+            Future<String> future = new ExecutorCompletionService<String>(executor).submit(() -> br.lines()
+                    .filter(Objects::nonNull)
+                    .collect(joining(System.getProperty("line.separator")))
+            );
 
+            final int interval = 500;
+            int timeout = 0;
+            while(timeout < 1000 * applicationProperties.fetchTimeout() && !future.isDone()) {
+                Thread.sleep(interval);
+                timeout += interval;
+            }
+            if (future.isDone()) {
+                logger.debug(future.get());
+            } else {
+                logger.warn("Fetching the [{}] repository was cancelled after [{}] seconds.",
+                        projectPath, applicationProperties.fetchTimeout()
+                );
+                future.cancel(true);
+            }
+
+        } catch (InterruptedException | ExecutionException ex) {
+            logger.error("Fetching the [{}] repository  was interrupted. Task was taking more than [{}] seconds.",
+                    projectPath, applicationProperties.fetchTimeout(), ex
+            );
         } catch (Exception ex) {
             logger.error(ex.getMessage());
             throw new IOException(ex);
@@ -176,9 +193,8 @@ abstract class AbstractDiffProducer implements DiffProducer {
         CompletionService<DiffDetails> completionService = new ExecutorCompletionService<>(executor);
         diffs.forEach(completionService::submit);
 
-        int numberOfCalls = diffs.size();
-        List<DiffDetails> result = new ArrayList<>(numberOfCalls);
-        for (int i = 0; i < numberOfCalls; i++) {
+        List<DiffDetails> result = new ArrayList<>(diffs.size());
+        for (int i = 0; i < diffs.size(); i++) {
             try {
                 result.add(completionService.take().get());
             } catch (InterruptedException | ExecutionException e) {

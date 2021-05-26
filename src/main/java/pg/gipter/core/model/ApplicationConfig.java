@@ -23,6 +23,7 @@ public class ApplicationConfig {
     private Boolean certImportEnabled;
     private Boolean checkLastItemEnabled;
     private String checkLastItemJobCronExpression;
+    private Integer fetchTimeout;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -135,6 +136,14 @@ public class ApplicationConfig {
         this.checkLastItemJobCronExpression = checkLastItemJobCronExpression;
     }
 
+    public Integer getFetchTimeout() {
+        return fetchTimeout;
+    }
+
+    public void setFetchTimeout(Integer fetchTimeout) {
+        this.fetchTimeout = fetchTimeout;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -173,6 +182,9 @@ public class ApplicationConfig {
         if (getCheckLastItemJobCronExpression() != null) {
             arguments.add(ArgName.checkLastItemJobCronExpression.name() + "=" + getCheckLastItemEnabled());
         }
+        if (getFetchTimeout() != null) {
+            arguments.add(ArgName.fetchTimeout.name() + "=" + getFetchTimeout());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -207,6 +219,8 @@ public class ApplicationConfig {
                     applicationConfig.setCheckLastItemEnabled(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.checkLastItemJobCronExpression.name().equals(argumentName)) {
                     applicationConfig.setCheckLastItemJobCronExpression(argumentValue);
+                } else if (ArgName.fetchTimeout.name().equals(argumentName)) {
+                    applicationConfig.setFetchTimeout(Integer.parseInt(argumentValue));
                 }
             }
         }
@@ -228,6 +242,7 @@ public class ApplicationConfig {
                 ", certImportEnabled=" + certImportEnabled +
                 ", checkLastItemEnabled=" + checkLastItemEnabled +
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
+                ", fetchTimeout=" + fetchTimeout +
                 '}';
     }
 }
