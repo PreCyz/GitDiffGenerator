@@ -428,6 +428,5 @@ public class MainTestUI {
         assertThat(map.keySet()).containsExactly("config");
         assertThat(windowObject.getFetchAllCheckBox().isSelected()).isTrue();
         assertThat(windowObject.getFetchTimeoutTextField().isDisabled()).isFalse();
-        assertThat(map.get("config").getFetchTimeout()).isEqualTo(3);
     }
 }
