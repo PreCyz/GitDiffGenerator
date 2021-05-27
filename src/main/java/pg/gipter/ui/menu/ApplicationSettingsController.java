@@ -8,7 +8,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import org.quartz.SchedulerException;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.model.ApplicationConfig;
 import pg.gipter.jobs.JobCreator;
 import pg.gipter.jobs.JobCreatorFactory;
@@ -59,10 +60,6 @@ public class ApplicationSettingsController extends AbstractController {
     private CheckBox checkLastItemCheckBox;
     @FXML
     private ComboBox<String> languageComboBox;
-    @FXML
-    private TextField fetchTimeoutTextField;
-    @FXML
-    private Label fetchTimeoutLabel;
 
     private final Map<String, Labeled> labelsAffectedByLanguage;
 
@@ -97,7 +94,6 @@ public class ApplicationSettingsController extends AbstractController {
         languageComboBox.setValue(applicationProperties.uiLanguage());
         importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
         checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
-        fetchTimeoutTextField.setText(String.valueOf(applicationProperties.fetchTimeout()));
     }
 
     private void setProperties() {
@@ -154,17 +150,6 @@ public class ApplicationSettingsController extends AbstractController {
             processLastItemJob(newValue);
             saveNewSettings();
         });
-
-        fetchTimeoutTextField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.equals(oldValue)) {
-                try {
-                    Integer.parseInt(newValue);
-                    saveNewSettings();
-                } catch (NumberFormatException ex) {
-                    logger.warn("Fetch wait time is not a number. {}", ex.getMessage());
-                }
-            }
-        });
     }
 
     private void processLastItemJob(Boolean shouldSchedule) {
@@ -198,9 +183,6 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setUiLanguage(languageComboBox.getValue());
         applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
         applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
-        applicationConfig.setFetchTimeout(Integer.parseInt(
-                Optional.ofNullable(fetchTimeoutTextField.getText()).orElseGet(ArgName.fetchTimeout::defaultValue)
-        ));
         return applicationConfig;
     }
 
@@ -225,6 +207,5 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.title", titledPane);
         labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
         labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
-        labelsAffectedByLanguage.put("launch.panel.fetchTimeout", fetchTimeoutLabel);
     }
 }

@@ -31,6 +31,7 @@ public class MainWindowObject extends BaseWindowObject {
 
     private final String skipRemoteCheckBoxId = "skipRemoteCheckBox";
     private final String fetchAllCheckBoxId = "fetchAllCheckBox";
+    private final String fetchTimeoutTextFieldId = "fetchTimeoutTextField";
     private final String deleteDownloadedFilesCheckBoxId = "deleteDownloadedFilesCheckBox";
 
     private final String itemTypeComboBoxId = "itemTypeComboBox";
@@ -110,6 +111,17 @@ public class MainWindowObject extends BaseWindowObject {
 
     public MainWindowObject checkFetchAll() {
         selectCheckBox(fetchAllCheckBoxId);
+        return this;
+    }
+
+    public MainWindowObject uncheckFetchAll() {
+        deselectCheckBox(fetchAllCheckBoxId);
+        return this;
+    }
+
+    public MainWindowObject enterFetchTimeout(Integer value) {
+        getFetchTimeoutTextField().clear();
+        clickAndWrite(fetchTimeoutTextFieldId, value.toString());
         return this;
     }
 
@@ -227,6 +239,10 @@ public class MainWindowObject extends BaseWindowObject {
 
     public CheckBox getFetchAllCheckBox() {
         return getCheckBox(fetchAllCheckBoxId);
+    }
+
+    public TextField getFetchTimeoutTextField() {
+        return getTextField(fetchTimeoutTextFieldId);
     }
 
     public CheckBox getDeleteDownloadedFilesCheckBox() {

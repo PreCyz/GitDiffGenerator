@@ -56,7 +56,7 @@ class PathsSectionController extends AbstractController {
         inteliSenseService = new InteliSenseService();
     }
 
-    public void initialize(URL location, ResourceBundle resources, Map<String, Object> controlsMap) {
+    public void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
         super.initialize(location, resources);
         projectPathLabel = (Label)controlsMap.get("projectPathLabel");
         itemPathLabel = (Label)controlsMap.get("itemPathLabel");
