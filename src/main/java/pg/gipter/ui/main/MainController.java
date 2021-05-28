@@ -353,7 +353,7 @@ public class MainController extends AbstractController {
         runConfig.setFetchAll(additionalSettingsSectionController.getFetchAll());
         runConfig.setFetchTimeout(additionalSettingsSectionController.getFetchTimeout());
 
-        runConfig.setProjectPath(pathsSectionController.getProjectPathLabelValue());
+        runConfig.setProjectPath(pathsSectionController.getProjectPaths());
         runConfig.setItemPath(pathsSectionController.getItemPathLabelValue());
         if (!StringUtils.nullOrEmpty(pathsSectionController.getItemFileNamePrefix())) {
             runConfig.setItemFileNamePrefix(pathsSectionController.getItemFileNamePrefix());

@@ -28,6 +28,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toCollection;
 
 class PathsSectionController extends AbstractController {
@@ -70,7 +71,11 @@ class PathsSectionController extends AbstractController {
     }
 
     private void setInitValues() {
-        projectPathLabel.setText(String.join(",", applicationProperties.projectPaths()));
+        projectPathLabel.setText(applicationProperties.projectPaths()
+                .stream()
+                .map(path -> path.substring(path.lastIndexOf(File.separator) + 1))
+                .collect(joining(","))
+        );
         String itemFileName = Paths.get(applicationProperties.itemPath()).getFileName().toString();
         if (applicationProperties.itemPath().contains(ArgName.itemPath.defaultValue())) {
             itemPathLabel.setText(ArgName.itemPath.defaultValue());
@@ -211,8 +216,8 @@ class PathsSectionController extends AbstractController {
         projectPathButton.setDisable(value);
     }
 
-    String getProjectPathLabelValue() {
-        return projectPathLabel.getText();
+    String getProjectPaths() {
+        return String.join(",", applicationProperties.projectPaths());
     }
 
     String getItemPathLabelValue() {
