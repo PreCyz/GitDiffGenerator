@@ -197,7 +197,7 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
 
     private ApplicationProperties produce(ApplicationProperties applicationProperties) {
         try {
-            DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties, executor);
+            DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
             incrementProgress();
             updateMessage(BundleUtils.getMsg("progress.generatingDiff"));
             diffProducer.produceDiff(this);

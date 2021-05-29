@@ -19,7 +19,7 @@ class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
     private final ItemType itemType;
 
     SharePointDocumentsDiffProducer(ItemType itemType, ApplicationProperties applicationProperties) {
-        super(applicationProperties, null);
+        super(applicationProperties);
         this.itemType = itemType;
     }
 
