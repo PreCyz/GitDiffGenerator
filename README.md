@@ -60,6 +60,7 @@ When application is executed with `uploadType = TOOLKIT_DOCS', then item file is
 **preferredArgSource** - if parameter set as `FILE` then arguments from _application.properties_ will be resolved as first. Default value is `CLI`. This parameter can be changed only from command line.<br />
 **skipRemote** - if parameter set as `N` then git diff will be generated only from origin (`--remotes=origin`). If set as `Y` then git diff will be generated only from local git repository. Default value is `Y`.<br />
 **fetchAll** - if parameter set as `N` then there will your repositories will not be fetched / updated before the diff generation. Default value is `Y`.<br />
+**fetchTimeout** - Default value is 60 seconds. When `fetch --all` command is executed then the application will wait 60 seconds for command to complete. If it's not completed then the command will be terminated, and the whole process will continue. The value can be changed when `fetchAll` is active.<br />
 **useUI** - if parameter set as `N` application will be launched in command line mode. If set as `Y` then UI mode is launched. Default value is `Y`.<br />
 **activeTray** - used in UI, tells if tray icon should be active or not. Default value is `Y`.<br/>
 **silentMode** - used in UI, tells if application should be executed and located directly in tray icon. It is used by startup functionality. Default value is `N`.<br/>
