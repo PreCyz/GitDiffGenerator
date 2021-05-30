@@ -216,12 +216,33 @@ public class AlertWindowBuilder {
     private double addWebView(GridPane gridPane) {
         double preferredWidth = 0;
         if (webViewDetails != null && webViewDetails.getWebView() != null) {
+            final int maxSize = 600;
+            final int cropSize = 580;
+            final int margin = 10;
+
             VBox vBox = new VBox(webViewDetails.getWebView());
-            vBox.setPrefHeight(webViewDetails.calculateHeight());
-            vBox.setPrefWidth(webViewDetails.calculateWidth());
+            vBox.setPrefHeight(maxSize);
+            vBox.setPrefWidth(maxSize);
+            if (webViewDetails.calculateWidth() > webViewDetails.calculateHeight() && webViewDetails.calculateWidth() > maxSize) {
+                double ratio = (webViewDetails.calculateWidth() - cropSize) / webViewDetails.calculateWidth();
+                double height = margin + webViewDetails.calculateHeight() - webViewDetails.calculateHeight() * ratio;
+                vBox.setPrefHeight(height);
+            } else if (webViewDetails.calculateHeight() > webViewDetails.calculateWidth() && webViewDetails.calculateHeight() > maxSize) {
+                double ratio = (webViewDetails.calculateHeight() - cropSize) / webViewDetails.calculateHeight();
+                double width = margin + webViewDetails.calculateWidth() - webViewDetails.calculateWidth() * ratio;
+                vBox.setPrefWidth(width);
+            } else if (webViewDetails.calculateHeight() < webViewDetails.calculateWidth() && webViewDetails.calculateWidth() < cropSize) {
+                double ratio = (cropSize - webViewDetails.calculateWidth()) / webViewDetails.calculateWidth();
+                double height = margin + webViewDetails.calculateHeight() + ratio * webViewDetails.calculateHeight();
+                vBox.setPrefHeight(height);
+            } else if (webViewDetails.calculateWidth() < webViewDetails.calculateHeight() && webViewDetails.calculateHeight() < cropSize) {
+                double ratio = (cropSize - webViewDetails.calculateHeight()) / webViewDetails.calculateHeight();
+                double width = margin + webViewDetails.calculateWidth() + ratio * webViewDetails.calculateWidth();
+                vBox.setPrefWidth(width);
+            }
 
             gridPane.add(vBox, 0, gridPaneRow++);
-            preferredWidth = webViewDetails.calculateWidth();
+            preferredWidth = maxSize;
         }
         return preferredWidth;
     }

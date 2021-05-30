@@ -1,7 +1,8 @@
 package pg.gipter.ui.main;
 
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.*;
 import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
@@ -14,33 +15,42 @@ class AdditionalSettingsSectionController extends AbstractController {
     private CheckBox deleteDownloadedFilesCheckBox;
     private CheckBox skipRemoteCheckBox;
     private CheckBox fetchAllCheckBox;
+    private TextField fetchTimeoutTextField;
 
     AdditionalSettingsSectionController(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
     }
 
-    void initialize(URL location, ResourceBundle resources, Map<String, CheckBox> controlsMap) {
+    void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
         super.initialize(location, resources);
 
-        deleteDownloadedFilesCheckBox = controlsMap.get("deleteDownloadedFilesCheckBox");
-        skipRemoteCheckBox = controlsMap.get("skipRemoteCheckBox");
-        fetchAllCheckBox = controlsMap.get("fetchAllCheckBox");
+        deleteDownloadedFilesCheckBox = (CheckBox) controlsMap.get("deleteDownloadedFilesCheckBox");
+        skipRemoteCheckBox = (CheckBox) controlsMap.get("skipRemoteCheckBox");
+        fetchAllCheckBox = (CheckBox) controlsMap.get("fetchAllCheckBox");
+        fetchTimeoutTextField = (TextField) controlsMap.get("fetchTimeoutTextField");
 
         setInitValues();
         setProperties();
+        setListeners();
     }
 
     private void setInitValues() {
         skipRemoteCheckBox.setSelected(applicationProperties.isSkipRemote());
         fetchAllCheckBox.setSelected(applicationProperties.isFetchAll());
         deleteDownloadedFilesCheckBox.setSelected(applicationProperties.isDeleteDownloadedFiles());
+        fetchTimeoutTextField.setText(String.valueOf(applicationProperties.fetchTimeout()));
     }
 
     private void setProperties() {
         deleteDownloadedFilesCheckBox.setDisable(
                 !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(applicationProperties.itemType())
         );
+        fetchTimeoutTextField.setDisable(fetchAllCheckBox.isSelected() && !fetchAllCheckBox.isDisabled());
+    }
+
+    private void setListeners() {
+        fetchAllCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> fetchTimeoutTextField.setDisable(oldValue));
     }
 
     void disableDeleteDownloadedFiles(boolean disable) {
@@ -53,6 +63,7 @@ class AdditionalSettingsSectionController extends AbstractController {
 
     void disableFetchAll(boolean disable) {
         fetchAllCheckBox.setDisable(disable);
+        fetchTimeoutTextField.setDisable(disable);
     }
 
     public Boolean getDeleteDownloadedFiles() {
@@ -65,5 +76,13 @@ class AdditionalSettingsSectionController extends AbstractController {
 
     public Boolean getFetchAll() {
         return fetchAllCheckBox.isSelected();
+    }
+
+    public Integer getFetchTimeout() {
+        try {
+            return Integer.parseInt(fetchTimeoutTextField.getText());
+        } catch (NumberFormatException ex) {
+            return Integer.parseInt(ArgName.fetchTimeout.defaultValue());
+        }
     }
 }

@@ -67,9 +67,9 @@
                               <Label text="%toolkit.panel.username" />
                               <TextField fx:id="toolkitUsernameTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" />
                               <Label text="%toolkit.panel.password" GridPane.rowIndex="1" />
-                              <TextField fx:id="toolkitDomainTextField" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                              <Label text="%toolkit.panel.domain" GridPane.rowIndex="2" />
                               <PasswordField fx:id="toolkitPasswordField" stylesheets="@../css/main.css" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Label text="%toolkit.panel.domain" GridPane.rowIndex="2" />
+                              <TextField fx:id="toolkitDomainTextField" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
                      </children>
@@ -234,6 +234,8 @@
                                     <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="11.0" layoutY="11.0" mnemonicParsing="false" text="%additional.panel.deleteFiles" />
                                     <CheckBox fx:id="skipRemoteCheckBox" layoutX="11.0" layoutY="38.0" mnemonicParsing="false" text="%additional.panel.skipRemote" />
                                     <CheckBox fx:id="fetchAllCheckBox" layoutX="11.0" layoutY="65.0" mnemonicParsing="false" text="%additional.panel.fetchAll" />
+                                    <TextField fx:id="fetchTimeoutTextField" alignment="CENTER_RIGHT" layoutX="99.0" layoutY="61.0" prefWidth="40.0" stylesheets="@../css/text-field.css" />
+                                    <Label layoutX="144.0" layoutY="65.0" prefHeight="17.0" prefWidth="126.0" text="%launch.panel.fetchTimeout" />
                                  </children>
                               </AnchorPane>
                            </content>
