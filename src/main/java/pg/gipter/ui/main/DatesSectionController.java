@@ -2,8 +2,7 @@ package pg.gipter.ui.main;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.*;
 import javafx.util.StringConverter;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.producers.command.ItemType;
@@ -32,7 +31,7 @@ public class DatesSectionController extends AbstractController {
         this.applicationProperties = applicationProperties;
     }
 
-    public void initialize(URL location, ResourceBundle resources, Map<String, Object> controlsMap) {
+    public void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
         super.initialize(location, resources);
         startDatePicker = (DatePicker) controlsMap.get("startDatePicker");
         endDatePicker = (DatePicker) controlsMap.get("endDatePicker");

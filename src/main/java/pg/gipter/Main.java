@@ -11,6 +11,7 @@ import pg.gipter.converters.ConverterFactory;
 import pg.gipter.core.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
+import pg.gipter.services.ConcurrentService;
 import pg.gipter.services.keystore.CertificateServiceFactory;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
@@ -33,7 +34,7 @@ public class Main extends Application {
         mObj.setLoggerLevel(applicationProperties.loggerLevel());
         logger.info("Java version '{}'.", System.getProperty("java.version"));
         logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
-        logger.info("Gipter can use '{}' threads.", Runtime.getRuntime().availableProcessors());
+        logger.info("Gipter can use '{}' threads.", ConcurrentService.getInstance().availableThreads());
         mObj.runConverters();
         mObj.setDefaultConfig();
         if (Main.applicationProperties.isUseUI()) {

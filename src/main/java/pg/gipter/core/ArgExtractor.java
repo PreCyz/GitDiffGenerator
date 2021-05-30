@@ -299,4 +299,10 @@ final class ArgExtractor {
         return ArgName.checkLastItemJobCronExpression.defaultValue();
     }
 
+    public int fetchTimeout() {
+        if (containsArg(ArgName.fetchTimeout.name())) {
+            return Integer.parseInt(getValue(ArgName.fetchTimeout, ArgName.fetchTimeout.defaultValue()));
+        }
+        return Integer.parseInt(ArgName.fetchTimeout.defaultValue());
+    }
 }

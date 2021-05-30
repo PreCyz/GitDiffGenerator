@@ -28,6 +28,7 @@ public class RunConfigBuilder {
     private Boolean deleteDownloadedFiles;
     private PreferredArgSource preferredArgSource;
     private Set<SharePointConfig> sharePointConfigs;
+    private Integer fetchTimeout;
 
     public RunConfigBuilder withAuthor(String author) {
         this.author = author;
@@ -124,9 +125,14 @@ public class RunConfigBuilder {
         return this;
     }
 
+    public RunConfigBuilder withFetchTimeout(Integer fetchTimeout) {
+        this.fetchTimeout = fetchTimeout;
+        return this;
+    }
+
     public RunConfig create() {
         return new RunConfig(author, gitAuthor, mercurialAuthor, svnAuthor, committerEmail, itemType, skipRemote, fetchAll,
                 itemPath, projectPath, itemFileNamePrefix, periodInDays, startDate, endDate, configurationName, toolkitProjectListNames,
-                deleteDownloadedFiles, preferredArgSource, sharePointConfigs);
+                deleteDownloadedFiles, preferredArgSource, sharePointConfigs, fetchTimeout);
     }
 }

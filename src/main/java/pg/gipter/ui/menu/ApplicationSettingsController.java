@@ -190,6 +190,8 @@ public class ApplicationSettingsController extends AbstractController {
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (KeyCode.ESCAPE == e.getCode()) {
                 uiLauncher.closeApplicationWindow();
+            } else if (e.isControlDown() && KeyCode.S == e.getCode()) {
+                saveNewSettings();
             }
         });
     }

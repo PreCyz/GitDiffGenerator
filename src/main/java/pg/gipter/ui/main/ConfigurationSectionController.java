@@ -41,7 +41,7 @@ class ConfigurationSectionController extends AbstractController {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    void initialize(URL location, ResourceBundle resources, Map<String, Object> controlsMap) {
+    void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
         super.initialize(location, resources);
 
         configurationNameComboBox = (ComboBox) controlsMap.get("configurationNameComboBox");

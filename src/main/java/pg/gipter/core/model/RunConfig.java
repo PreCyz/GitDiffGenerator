@@ -21,6 +21,7 @@ public class RunConfig {
     private ItemType itemType;
     private Boolean skipRemote;
     private Boolean fetchAll;
+    private Integer fetchTimeout;
     private String itemPath;
     private String projectPath;
     private String itemFileNamePrefix;
@@ -41,7 +42,8 @@ public class RunConfig {
                      ItemType itemType, Boolean skipRemote, Boolean fetchAll, String itemPath, String projectPath,
                      String itemFileNamePrefix, Integer periodInDays, LocalDate startDate, LocalDate endDate,
                      String configurationName, String toolkitProjectListNames, Boolean deleteDownloadedFiles,
-                     PreferredArgSource preferredArgSource, Set<SharePointConfig> sharePointConfigs) {
+                     PreferredArgSource preferredArgSource, Set<SharePointConfig> sharePointConfigs,
+                     Integer fetchTimeout) {
         this.author = author;
         this.gitAuthor = gitAuthor;
         this.mercurialAuthor = mercurialAuthor;
@@ -61,6 +63,7 @@ public class RunConfig {
         this.deleteDownloadedFiles = deleteDownloadedFiles;
         this.preferredArgSource = preferredArgSource;
         this.sharePointConfigs = sharePointConfigs;
+        this.fetchTimeout = fetchTimeout;
     }
 
     public RunConfig(RunConfig runConfig) {
@@ -85,6 +88,7 @@ public class RunConfig {
         sharePointConfigs = Optional.ofNullable(runConfig.getSharePointConfigs())
                 .map(LinkedHashSet::new)
                 .orElseGet(LinkedHashSet::new);
+        fetchTimeout = runConfig.getFetchTimeout();
     }
 
     public String getAuthor() {
@@ -239,6 +243,14 @@ public class RunConfig {
         this.sharePointConfigs = sharePointConfigs;
     }
 
+    public Integer getFetchTimeout() {
+        return fetchTimeout;
+    }
+
+    public void setFetchTimeout(Integer fetchTimeout) {
+        this.fetchTimeout = fetchTimeout;
+    }
+
     public void addSharePointConfig(SharePointConfig sharePointConfig) {
         if (sharePointConfigs == null) {
             sharePointConfigs = new LinkedHashSet<>();
@@ -308,6 +320,9 @@ public class RunConfig {
         if (getPreferredArgSource() != null) {
             arguments.add(ArgName.preferredArgSource.name() + "=" + getPreferredArgSource());
         }
+        if (getFetchTimeout() != null) {
+            arguments.add(ArgName.fetchTimeout.name() + "=" + getFetchTimeout());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -354,6 +369,8 @@ public class RunConfig {
                     runConfig.setDeleteDownloadedFiles(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.preferredArgSource.name().equals(argumentName)) {
                     runConfig.setPreferredArgSource(PreferredArgSource.valueFor(argumentValue));
+                } else if (ArgName.fetchTimeout.name().equals(argumentName)) {
+                    runConfig.setFetchTimeout(Integer.parseInt(argumentValue));
                 }
             }
         }
@@ -371,6 +388,7 @@ public class RunConfig {
                 ", itemType=" + itemType +
                 ", skipRemote=" + skipRemote +
                 ", fetchAll=" + fetchAll +
+                ", fetchTimeout=" + fetchTimeout +
                 ", itemPath='" + itemPath + '\'' +
                 ", projectPath='" + projectPath + '\'' +
                 ", itemFileNamePrefix='" + itemFileNamePrefix + '\'' +

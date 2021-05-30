@@ -2,30 +2,28 @@ package pg.gipter.services.vcs;
 
 import pg.gipter.core.producers.command.VersionControlSystem;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
-
-class GitService extends AbstractVcsService {
+class SvnService extends AbstractVcsService {
 
     @Override
     protected List<String> getAvailabilityCommand() {
-        return Stream.of("git", "--version").collect(toList());
+        return Collections.emptyList();
     }
 
     @Override
     protected List<String> getUserNameCommand() {
-        return Stream.of("git", "config", "--get", "user.name").collect(toList());
+        return Collections.emptyList();
     }
 
     @Override
     protected List<String> getUserEmailCommand() {
-        return Stream.of("git", "config", "--get", "user.email").collect(toList());
+        return Collections.emptyList();
     }
 
     @Override
     protected VersionControlSystem getVcs() {
-        return VersionControlSystem.GIT;
+        return VersionControlSystem.SVN;
     }
 }
