@@ -1034,9 +1034,9 @@ class FilePreferredApplicationPropertiesTest {
     void givenFetchTimeoutFromPropertiesAndCommandLine_whenFetchTimeout_then_returnFetchTimeoutFromProperties() {
         String[] args = {"fetchTimeout=1"};
         appProps = new FileApplicationProperties(args);
-        ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setFetchTimeout(2);
-        appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
+        RunConfig runConfig = new RunConfig();
+        runConfig.setFetchTimeout(2);
+        appProps.init(TestUtils.mockConfigurationDao(runConfig));
 
         int actual = appProps.fetchTimeout();
 

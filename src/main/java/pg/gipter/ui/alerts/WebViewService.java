@@ -21,15 +21,16 @@ public class WebViewService {
 
     private static final Logger logger = LoggerFactory.getLogger(WebViewService.class);
     private static final String URL_PLACEHOLDER = "%URL_PLACEHOLDER%";
-    private static final String CUSTOM_ALERT_HTML = "custom-alert.html";
-    private final EnumMap<UploadStatus, WebViewDetails> cachedWebViewMap = new EnumMap<>(UploadStatus.class);
-    private String htmlContent;
+    private static final String FIXED_HEIGHT_ALERT = "fixed-height-alert.html";
+    private static final String FIXED_WIDTH_ALERT = "fixed-width-alert.html";
+    private static final EnumMap<UploadStatus, WebViewDetails> cachedWebViewMap = new EnumMap<>(UploadStatus.class);
 
     private static class WebViewServiceHolder {
         private static final WebViewService INSTANCE = new WebViewService().init();
     }
 
-    private WebViewService() {}
+    private WebViewService() {
+    }
 
     private WebViewService init() {
         LinkedList<WebViewDetails> webViewDetails = new LinkedList<>();
@@ -98,17 +99,19 @@ public class WebViewService {
     }
 
     private String getHtmlContent(Gif gif) {
-        try (final InputStream is = ResourceUtils.getHtmlResource(CUSTOM_ALERT_HTML);
+        String htmlTemplatePath = FIXED_HEIGHT_ALERT;
+        if (gif.width() > gif.height()) {
+            htmlTemplatePath = FIXED_WIDTH_ALERT;
+        }
+        try (final InputStream is = ResourceUtils.getHtmlResource(htmlTemplatePath);
              final InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
              final BufferedReader bufferedReader = new BufferedReader(isr)) {
 
-            if (htmlContent == null) {
-                htmlContent = bufferedReader.lines().collect(joining(System.getProperty("line.separator")));
-            }
+            String htmlContent = bufferedReader.lines().collect(joining(System.getProperty("line.separator")));
 
             return htmlContent.replaceAll(URL_PLACEHOLDER, gif.url());
         } catch (IOException e) {
-            logger.error("Could not load the [{}].", CUSTOM_ALERT_HTML, e);
+            logger.error("Could not load the [{}].", htmlTemplatePath, e);
             return "";
         }
     }

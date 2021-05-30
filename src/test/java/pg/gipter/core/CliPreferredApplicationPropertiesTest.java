@@ -2065,9 +2065,9 @@ class CliPreferredApplicationPropertiesTest {
     void givenFetchTimeoutFileAndCLI_whenFetchTimeout_thenReturnCliFetchTimeout() {
         String[] args = {"fetchTimeout=2"};
         applicationProperties = new CliApplicationProperties(args);
-        ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setFetchTimeout(45);
-        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+        RunConfig runConfig = new RunConfig();
+        runConfig.setFetchTimeout(45);
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         int actual = applicationProperties.fetchTimeout();
 
@@ -2078,9 +2078,9 @@ class CliPreferredApplicationPropertiesTest {
     void givenFetchTimeoutFromFile_whenFetchTimeout_thenReturnFetchTimeoutFromFile() {
         String[] args = {};
         applicationProperties = new CliApplicationProperties(args);
-        ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setFetchTimeout(13);
-        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+        RunConfig runConfig = new RunConfig();
+        runConfig.setFetchTimeout(13);
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         int actual = applicationProperties.fetchTimeout();
 
@@ -2091,9 +2091,9 @@ class CliPreferredApplicationPropertiesTest {
     void givenFetchTimeoutFromFileAndOtherArgs_whenFetchTimeout_thenReturnFetchTimeoutFromFile() {
         String[] args = {"author=test"};
         applicationProperties = new CliApplicationProperties(args);
-        ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setFetchTimeout(13);
-        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+        RunConfig runConfig = new RunConfig();
+        runConfig.setFetchTimeout(13);
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         int actual = applicationProperties.fetchTimeout();
 

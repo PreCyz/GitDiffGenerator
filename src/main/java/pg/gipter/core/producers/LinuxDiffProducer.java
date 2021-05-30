@@ -4,13 +4,12 @@ import pg.gipter.core.ApplicationProperties;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 class LinuxDiffProducer extends AbstractDiffProducer {
 
-    LinuxDiffProducer(ApplicationProperties applicationProperties, Executor executor) {
-        super(applicationProperties, executor);
+    LinuxDiffProducer(ApplicationProperties applicationProperties) {
+        super(applicationProperties);
     }
 
     @Override

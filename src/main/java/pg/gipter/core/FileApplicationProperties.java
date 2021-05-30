@@ -304,8 +304,8 @@ class FileApplicationProperties extends ApplicationProperties {
 
     @Override
     public int fetchTimeout() {
-        if (applicationConfig.getFetchTimeout() != null) {
-            return Math.abs(applicationConfig.getFetchTimeout());
+        if (currentRunConfig.getFetchTimeout() != null) {
+            return Math.abs(currentRunConfig.getFetchTimeout());
         }
         return argExtractor.fetchTimeout();
     }

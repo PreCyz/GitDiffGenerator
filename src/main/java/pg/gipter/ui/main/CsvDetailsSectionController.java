@@ -93,6 +93,17 @@ class CsvDetailsSectionController extends AbstractController {
         setTooltipOnUseDefaultAuthor();
         useDefaultEmailCheckBox.setDisable(disableDefaultEmail());
         setTooltipOnUseDefaultEmail();
+        gitAuthorTextField.setDisable(applicationProperties.projectPaths()
+                .stream()
+                .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.GIT));
+        mercurialAuthorTextField.setDisable(applicationProperties.projectPaths()
+                .stream()
+                .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.MERCURIAL)
+        );
+        svnAuthorTextField.setDisable(applicationProperties.projectPaths()
+                .stream()
+                .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.SVN)
+        );
     }
 
     private void setTooltipOnProjectListNames() {

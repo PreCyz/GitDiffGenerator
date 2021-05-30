@@ -19,8 +19,7 @@ import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.jobs.*;
 import pg.gipter.launchers.Launcher;
-import pg.gipter.services.GithubService;
-import pg.gipter.services.StartupService;
+import pg.gipter.services.*;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -31,7 +30,6 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /** Created by Gawa 2017-10-04 */
 public class UILauncher implements Launcher {
@@ -63,7 +61,7 @@ public class UILauncher implements Launcher {
         configurationDao = DaoFactory.getCachedConfiguration();
         dataDao = DaoFactory.getDataDao();
         silentMode = applicationProperties.isSilentMode();
-        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        this.executor = ConcurrentService.getInstance().executor();
         jobService = new JobService();
     }
 

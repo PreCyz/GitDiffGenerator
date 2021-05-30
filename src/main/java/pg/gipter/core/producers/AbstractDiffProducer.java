@@ -8,6 +8,7 @@ import pg.gipter.core.dao.command.CustomCommandDao;
 import pg.gipter.core.producers.command.*;
 import pg.gipter.core.producers.vcs.VCSVersionProducer;
 import pg.gipter.core.producers.vcs.VCSVersionProducerFactory;
+import pg.gipter.services.ConcurrentService;
 import pg.gipter.ui.task.UpdatableTask;
 
 import java.io.*;
@@ -24,9 +25,9 @@ abstract class AbstractDiffProducer implements DiffProducer {
     private final Executor executor;
     private UpdatableTask<Void> task;
 
-    AbstractDiffProducer(ApplicationProperties applicationProperties, Executor executor) {
+    AbstractDiffProducer(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.executor = executor;
+        this.executor = ConcurrentService.getInstance().executor();
         logger = LoggerFactory.getLogger(this.getClass());
     }
 

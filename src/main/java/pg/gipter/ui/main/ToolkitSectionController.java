@@ -32,7 +32,7 @@ class ToolkitSectionController extends AbstractController {
         this.applicationProperties = applicationProperties;
     }
 
-    public void initialize(URL location, ResourceBundle resources, Map<String, Object> controlsMap) {
+    public void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
         super.initialize(location, resources);
         toolkitUsernameTextField = (TextField)controlsMap.get("toolkitUsernameTextField");
         toolkitPasswordField = (PasswordField)controlsMap.get("toolkitPasswordField");

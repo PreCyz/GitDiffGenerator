@@ -25,8 +25,6 @@
                   <CheckBox fx:id="importCertCheckBox" layoutX="133.0" layoutY="71.0" mnemonicParsing="false" />
                   <Label fx:id="checkLastItemLabel" layoutX="10.0" layoutY="92.0" text="%launch.panel.lastItemJob" />
                   <CheckBox fx:id="checkLastItemCheckBox" layoutX="133.0" layoutY="92.0" mnemonicParsing="false" />
-                  <TextField fx:id="fetchTimeoutTextField" layoutX="165.0" layoutY="96.0" prefHeight="23.0" prefWidth="50.0" />
-                  <Label fx:id="fetchTimeoutLabel" layoutX="226.0" layoutY="101.0" prefHeight="17.0" prefWidth="178.0" text="%launch.panel.fetchTimeout" />
                </children>
             </AnchorPane>
          </content>

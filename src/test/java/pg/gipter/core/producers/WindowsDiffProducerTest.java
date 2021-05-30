@@ -19,7 +19,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -39,8 +38,7 @@ class WindowsDiffProducerTest {
     @Test
     void given_listOfCommands_when_getFullCommand_then_returnFullCommand() {
         WindowsDiffProducer producer = new WindowsDiffProducer(
-                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"}),
-                Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
         );
 
         List<String> actual = producer.getFullCommand(Arrays.asList("c", "\"c2\"", "c3"));
@@ -65,8 +63,7 @@ class WindowsDiffProducerTest {
     @Test
     void givenCustomCommand_whenCalculateCommand_thenUseCustomCommand() {
         WindowsDiffProducer producer = new WindowsDiffProducer(
-                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"}),
-                Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
         );
         CustomCommand customCommand = new CustomCommand();
         customCommand.setVcs(VersionControlSystem.GIT);
@@ -83,8 +80,7 @@ class WindowsDiffProducerTest {
     @Test
     void givenNoCustomCommand_whenCalculateCommand_thenUseDiffCommand() {
         WindowsDiffProducer producer = new WindowsDiffProducer(
-                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"}),
-                Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
+                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
         );
         final DiffCommand diffCommandMock = mock(DiffCommand.class);
         when(diffCommandMock.commandAsList()).thenReturn(Arrays.asList("svn", "up"));
