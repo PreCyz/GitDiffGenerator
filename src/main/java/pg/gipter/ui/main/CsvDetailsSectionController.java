@@ -42,8 +42,8 @@ class CsvDetailsSectionController extends AbstractController {
     private VcsService vcsService;
 
     CsvDetailsSectionController(UILauncher uiLauncher,
-                                          ApplicationProperties applicationProperties,
-                                          MainController mainController) {
+                                ApplicationProperties applicationProperties,
+                                MainController mainController) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         this.mainController = mainController;
@@ -93,17 +93,20 @@ class CsvDetailsSectionController extends AbstractController {
         setTooltipOnUseDefaultAuthor();
         useDefaultEmailCheckBox.setDisable(disableDefaultEmail());
         setTooltipOnUseDefaultEmail();
-        gitAuthorTextField.setDisable(applicationProperties.projectPaths()
-                .stream()
-                .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.GIT));
-        mercurialAuthorTextField.setDisable(applicationProperties.projectPaths()
-                .stream()
-                .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.MERCURIAL)
-        );
-        svnAuthorTextField.setDisable(applicationProperties.projectPaths()
-                .stream()
-                .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.SVN)
-        );
+        if (applicationProperties.projectPaths().stream().noneMatch(projectPath -> ArgName.projectPath.defaultValue().equals(projectPath))) {
+            gitAuthorTextField.setDisable(applicationProperties.projectPaths()
+                    .stream()
+                    .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.GIT)
+            );
+            mercurialAuthorTextField.setDisable(applicationProperties.projectPaths()
+                    .stream()
+                    .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.MERCURIAL)
+            );
+            svnAuthorTextField.setDisable(applicationProperties.projectPaths()
+                    .stream()
+                    .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.SVN)
+            );
+        }
     }
 
     private void setTooltipOnProjectListNames() {
@@ -138,7 +141,6 @@ class CsvDetailsSectionController extends AbstractController {
     private boolean disableDefaultAuthor() {
         boolean disabled = true;
         if (EnumSet.of(ItemType.SIMPLE, ItemType.PROTECTED).contains(applicationProperties.itemType())) {
-
             Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
                     .stream()
                     .map(versionControlSystemFunction())
