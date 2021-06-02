@@ -10,7 +10,10 @@ import javafx.scene.layout.AnchorPane;
 import org.quartz.SchedulerException;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.producers.command.DiffCommandFactory;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.jobs.JobCreator;
 import pg.gipter.jobs.JobCreatorFactory;
 import pg.gipter.services.StartupService;
@@ -23,6 +26,11 @@ import java.util.*;
 
 public class ApplicationSettingsController extends AbstractController {
 
+    @FXML
+    private TabPane applicationSettingsTabPane;
+
+    @FXML
+    private Tab applicationSettingsTab;
     @FXML
     private Label confirmationWindowLabel;
     @FXML
@@ -37,8 +45,6 @@ public class ApplicationSettingsController extends AbstractController {
     private Label importCertLabel;
     @FXML
     private Label checkLastItemLabel;
-    @FXML
-    private TitledPane titledPane;
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -60,6 +66,23 @@ public class ApplicationSettingsController extends AbstractController {
     private CheckBox checkLastItemCheckBox;
     @FXML
     private ComboBox<String> languageComboBox;
+
+    @FXML
+    private Tab customCommandTab;
+    @FXML
+    private TextField gitCommandTextField;
+    @FXML
+    private TextField svnCommandTextField;
+    @FXML
+    private TextField mercurialCommandTextField;
+    @FXML
+    private CheckBox overrideGitCheckBox;
+    @FXML
+    private CheckBox overrideSvnCheckBox;
+    @FXML
+    private CheckBox overrideMercurialCheckBox;
+    @FXML
+    private Label overrideLabel;
 
     private final Map<String, Labeled> labelsAffectedByLanguage;
 
@@ -94,6 +117,29 @@ public class ApplicationSettingsController extends AbstractController {
         languageComboBox.setValue(applicationProperties.uiLanguage());
         importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
         checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
+
+        final CustomCommand gitCustomCommand = applicationProperties.getCustomCommand(VersionControlSystem.GIT);
+        overrideGitCheckBox.setSelected(gitCustomCommand.isOverride());
+        gitCommandTextField.setText(gitCustomCommand.isOverride() ? gitCustomCommand.getCommand() : String.join(
+                " ",
+                DiffCommandFactory.getInstance(VersionControlSystem.GIT, applicationProperties).commandAsList())
+        );
+
+        final CustomCommand svnCustomCommand = applicationProperties.getCustomCommand(VersionControlSystem.SVN);
+        overrideSvnCheckBox.setSelected(svnCustomCommand.isOverride());
+        svnCommandTextField.setText(svnCustomCommand.isOverride() ? svnCustomCommand.getCommand() : String.join(
+                " ",
+                DiffCommandFactory.getInstance(VersionControlSystem.SVN, applicationProperties).commandAsList())
+        );
+
+        final CustomCommand mercurialCustomCommand = applicationProperties.getCustomCommand(VersionControlSystem.MERCURIAL);
+        overrideMercurialCheckBox.setSelected(mercurialCustomCommand.isOverride());
+        mercurialCommandTextField.setText(mercurialCustomCommand.isOverride() ? mercurialCustomCommand.getCommand() :
+                String.join(
+                        " ",
+                        DiffCommandFactory.getInstance(VersionControlSystem.MERCURIAL, applicationProperties).commandAsList()
+                )
+        );
     }
 
     private void setProperties() {
@@ -110,6 +156,8 @@ public class ApplicationSettingsController extends AbstractController {
                 .addListener((options, oldValue, newValue) -> {
                     BundleUtils.changeBundle(languageComboBox.getValue());
                     labelsAffectedByLanguage.forEach((key, labeled) -> labeled.setText(BundleUtils.getMsg(key)));
+                    applicationSettingsTab.setText(BundleUtils.getMsg("launch.panel.title"));
+                    customCommandTab.setText(BundleUtils.getMsg("launch.customCommand.tab"));
                     uiLauncher.changeApplicationSettingsWindowTitle();
                     applicationProperties.updateApplicationConfig(createApplicationConfigFromUI());
                     applicationProperties.save();
@@ -204,8 +252,8 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.preferredArgSource", preferredArgSourceLabel);
         labelsAffectedByLanguage.put("launch.panel.useUI", useUICheckBox);
         labelsAffectedByLanguage.put("launch.panel.silentMode", silentModeCheckBox);
-        labelsAffectedByLanguage.put("launch.panel.title", titledPane);
         labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
         labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
+        labelsAffectedByLanguage.put("launch.customCommand.override", overrideLabel);
     }
 }

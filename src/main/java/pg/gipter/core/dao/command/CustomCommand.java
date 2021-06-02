@@ -14,6 +14,14 @@ public class CustomCommand {
     private VersionControlSystem vcs;
     private String command;
     private List<String> commandList;
+    private boolean override;
+
+    public CustomCommand() {
+    }
+
+    public CustomCommand(VersionControlSystem vcs) {
+        this.vcs = vcs;
+    }
 
     public VersionControlSystem getVcs() {
         return vcs;
@@ -37,6 +45,14 @@ public class CustomCommand {
 
     public void setCommandList(List<String> commandList) {
         this.commandList = commandList;
+    }
+
+    public boolean isOverride() {
+        return override;
+    }
+
+    public void setOverride(boolean override) {
+        this.override = override;
     }
 
     public LinkedList<String> fullCommand(ApplicationProperties applicationProperties) {

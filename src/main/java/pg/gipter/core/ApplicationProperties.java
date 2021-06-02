@@ -3,6 +3,7 @@ package pg.gipter.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.core.dao.configuration.*;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
@@ -275,6 +276,17 @@ public abstract class ApplicationProperties {
         if (!runConfigMap.isEmpty()) {
             currentRunConfig = new LinkedList<>(runConfigMap.entrySet()).getFirst().getValue();
         }
+    }
+
+    public final CustomCommand getCustomCommand(VersionControlSystem vcs) {
+        if (applicationConfig.getCustomCommands() == null) {
+            return new CustomCommand(vcs);
+        }
+        return applicationConfig.getCustomCommands()
+                .stream()
+                .filter(cc -> cc.getVcs() == vcs)
+                .findFirst()
+                .orElseGet(() -> new CustomCommand(vcs));
     }
 
     protected final String log() {
