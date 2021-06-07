@@ -23,6 +23,8 @@ import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ApplicationSettingsController extends AbstractController {
 
@@ -148,6 +150,9 @@ public class ApplicationSettingsController extends AbstractController {
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
         silentModeCheckBox.setDisable(true);
+        gitCommandTextField.setDisable(!overrideGitCheckBox.isSelected());
+        svnCommandTextField.setDisable(!overrideSvnCheckBox.isSelected());
+        mercurialCommandTextField.setDisable(!overrideMercurialCheckBox.isSelected());
     }
 
     private void setListeners() {
@@ -198,6 +203,28 @@ public class ApplicationSettingsController extends AbstractController {
             processLastItemJob(newValue);
             saveNewSettings();
         });
+
+        overrideGitCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            gitCommandTextField.setDisable(oldValue);
+            saveNewSettings();
+        });
+
+        overrideSvnCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            svnCommandTextField.setDisable(oldValue);
+            saveNewSettings();
+        });
+
+        overrideMercurialCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            mercurialCommandTextField.setDisable(oldValue);
+            saveNewSettings();
+        });
+
+        applicationSettingsTab.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+        customCommandTab.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+
+        gitCommandTextField.textProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+        svnCommandTextField.textProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
+        mercurialCommandTextField.textProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
     }
 
     private void processLastItemJob(Boolean shouldSchedule) {
@@ -217,7 +244,7 @@ public class ApplicationSettingsController extends AbstractController {
         ApplicationConfig applicationConfig = createApplicationConfigFromUI();
         applicationProperties.updateApplicationConfig(applicationConfig);
         applicationProperties.save();
-        logger.info("New application settings saved. [{}]", applicationConfig.toString());
+        logger.info("New application settings saved. [{}]", applicationConfig);
     }
 
     private ApplicationConfig createApplicationConfigFromUI() {
@@ -231,6 +258,25 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setUiLanguage(languageComboBox.getValue());
         applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
         applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
+        applicationConfig.setCustomCommands(
+                Stream.of(
+                        new CustomCommand(
+                                VersionControlSystem.GIT,
+                                gitCommandTextField.getText(),
+                                overrideGitCheckBox.isSelected()
+                        ),
+                        new CustomCommand(
+                                VersionControlSystem.SVN,
+                                svnCommandTextField.getText(),
+                                overrideSvnCheckBox.isSelected()
+                        ),
+                        new CustomCommand(
+                                VersionControlSystem.MERCURIAL,
+                                mercurialCommandTextField.getText(),
+                                overrideMercurialCheckBox.isSelected()
+                        )
+                ).collect(Collectors.toSet())
+        );
         return applicationConfig;
     }
 

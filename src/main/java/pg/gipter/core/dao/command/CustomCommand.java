@@ -23,6 +23,12 @@ public class CustomCommand {
         this.vcs = vcs;
     }
 
+    public CustomCommand(VersionControlSystem vcs, String command, boolean override) {
+        this(vcs);
+        this.command = command;
+        this.override = override;
+    }
+
     public VersionControlSystem getVcs() {
         return vcs;
     }
