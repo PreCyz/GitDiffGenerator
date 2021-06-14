@@ -1,5 +1,6 @@
 package pg.gipter.ui.main;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,6 +22,9 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.InteliSenseService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.File;
@@ -59,11 +63,11 @@ class PathsSectionController extends AbstractController {
 
     public void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
         super.initialize(location, resources);
-        projectPathLabel = (Label)controlsMap.get("projectPathLabel");
-        itemPathLabel = (Label)controlsMap.get("itemPathLabel");
-        itemFileNamePrefixTextField = (TextField)controlsMap.get("itemFileNamePrefixTextField");
-        projectPathButton = (Button)controlsMap.get("projectPathButton");
-        itemPathButton = (Button)controlsMap.get("itemPathButton");
+        projectPathLabel = (Label) controlsMap.get("projectPathLabel");
+        itemPathLabel = (Label) controlsMap.get("itemPathLabel");
+        itemFileNamePrefixTextField = (TextField) controlsMap.get("itemFileNamePrefixTextField");
+        projectPathButton = (Button) controlsMap.get("projectPathButton");
+        itemPathButton = (Button) controlsMap.get("itemPathButton");
         setInitValues();
         setProperties(resources);
         setActions(resources);
@@ -83,6 +87,19 @@ class PathsSectionController extends AbstractController {
             String itemPath = applicationProperties.itemPath()
                     .substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
             itemPathLabel.setText(itemPath);
+            Platform.runLater(() -> {
+                if (Files.notExists(Paths.get(itemPath))) {
+                    new AlertWindowBuilder()
+                            .withAlertType(Alert.AlertType.ERROR)
+                            .withMessage(BundleUtils.getMsg(
+                                    "paths.panel.itemPath.nonExists",
+                                    itemPath,
+                                    System.getProperty("line.separator")
+                            ))
+                            .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                            .buildAndDisplayWindow();
+                }
+            });
         }
         if (applicationProperties.itemType() == ItemType.STATEMENT) {
             itemPathLabel.setText(applicationProperties.itemPath());
