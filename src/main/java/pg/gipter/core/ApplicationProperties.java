@@ -289,6 +289,15 @@ public abstract class ApplicationProperties {
                 .orElseGet(() -> new CustomCommand(vcs));
     }
 
+    public final void addCustomCommand(CustomCommand customCommand) {
+        Set<CustomCommand> customCommandSet = applicationConfig.getCustomCommands();
+        if (customCommandSet == null) {
+            customCommandSet = new LinkedHashSet<>();
+        }
+        customCommandSet.add(customCommand);
+        applicationConfig.setCustomCommands(customCommandSet);
+    }
+
     protected final String log() {
         String log = "version='" + version().getVersion() + '\'';
         if (currentRunConfig != null) {

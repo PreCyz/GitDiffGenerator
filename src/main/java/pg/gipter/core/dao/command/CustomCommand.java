@@ -172,4 +172,17 @@ public class CustomCommand {
         }
         return false;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomCommand that = (CustomCommand) o;
+        return vcs == that.vcs;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vcs);
+    }
 }
