@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.dao.command.CustomCommand;
-import pg.gipter.core.dao.command.CustomCommandDao;
 import pg.gipter.core.producers.command.*;
 import pg.gipter.core.producers.vcs.VCSVersionProducer;
 import pg.gipter.core.producers.vcs.VCSVersionProducerFactory;
@@ -131,10 +130,10 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
     protected List<String> calculateCommand(DiffCommand diffCommand, VersionControlSystem vcs) {
         List<String> cmd;
-        final Optional<CustomCommand> customCommand = CustomCommandDao.readCustomCommand();
-        if (customCommand.isPresent() && customCommand.get().containsCommand(vcs)) {
+        CustomCommand customCommand = applicationProperties.getCustomCommand(vcs);
+        if (customCommand.isOverride() && customCommand.containsCommand(vcs)) {
             logger.info("Custom command is used.");
-            cmd = customCommand.get().fullCommand(applicationProperties);
+            cmd = customCommand.fullCommand(applicationProperties);
             logger.info("{} command: {}", vcs.name(), String.join(" ", cmd));
         } else {
             cmd = diffCommand.commandAsList();
