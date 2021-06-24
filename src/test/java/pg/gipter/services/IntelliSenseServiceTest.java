@@ -9,13 +9,13 @@ import java.util.*;
 import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class InteliSenseServiceTest {
+class IntelliSenseServiceTest {
 
-    private InteliSenseService service;
+    private IntelliSenseService service;
 
     @BeforeEach
     void setUp() {
-        service = new InteliSenseService();
+        service = new IntelliSenseService(NamePatternValue.class);
     }
 
     @Test

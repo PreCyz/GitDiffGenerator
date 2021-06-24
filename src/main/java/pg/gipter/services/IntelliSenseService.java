@@ -1,20 +1,22 @@
 package pg.gipter.services;
 
-import pg.gipter.core.model.NamePatternValue;
-
 import java.util.*;
 
 import static java.util.stream.Collectors.toCollection;
 
-public class InteliSenseService {
+public class IntelliSenseService<E extends Enum<E>> {
 
     private final Set<String> definedPatterns;
 
-    public InteliSenseService() {
-        definedPatterns = EnumSet.allOf(NamePatternValue.class)
+    public IntelliSenseService(Class<E> enumClass) {
+        definedPatterns = EnumSet.allOf(enumClass)
                 .stream()
                 .map(e -> String.format("{%s}", e.name()))
                 .collect(toCollection(LinkedHashSet::new));
+    }
+
+    public Set<String> getDefinedPatterns() {
+        return new LinkedHashSet<>(definedPatterns);
     }
 
     Set<String> getCompleted(String text) {

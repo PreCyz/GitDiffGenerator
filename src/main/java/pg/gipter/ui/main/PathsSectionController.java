@@ -19,7 +19,7 @@ import pg.gipter.core.ArgName;
 import pg.gipter.core.model.NamePatternValue;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.InteliSenseService;
+import pg.gipter.services.IntelliSenseService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
@@ -33,7 +33,6 @@ import java.nio.file.*;
 import java.util.*;
 
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toCollection;
 
 class PathsSectionController extends AbstractController {
 
@@ -47,18 +46,15 @@ class PathsSectionController extends AbstractController {
 
     private final Set<String> definedPatterns;
     private String currentItemFileNamePrefixValue = "";
-    private final InteliSenseService inteliSenseService;
+    private final IntelliSenseService<NamePatternValue> intelliSenseService;
     boolean ignoreItemPrefixNameListener = false;
 
     PathsSectionController(UILauncher uiLauncher, ApplicationProperties applicationProperties, MainController mainController) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         this.mainController = mainController;
-        this.definedPatterns = EnumSet.allOf(NamePatternValue.class)
-                .stream()
-                .map(e -> String.format("{%s}", e.name()))
-                .collect(toCollection(LinkedHashSet::new));
-        inteliSenseService = new InteliSenseService();
+        intelliSenseService = new IntelliSenseService<>(NamePatternValue.class);
+        this.definedPatterns = intelliSenseService.getDefinedPatterns();
     }
 
     public void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
@@ -140,7 +136,7 @@ class PathsSectionController extends AbstractController {
             if (itemFileNamePrefixTextField.getCaretPosition() < param.getUserText().length()) {
                 itemFileNamePrefixTextField.positionCaret(param.getUserText().length());
             }
-            return inteliSenseService.getFilteredValues(param.getUserText());
+            return intelliSenseService.getFilteredValues(param.getUserText());
         };
     }
 
@@ -201,7 +197,7 @@ class PathsSectionController extends AbstractController {
                 itemFileNamePrefixTextField.positionCaret(currentItemFileNamePrefixValue.length());
                 ignoreItemPrefixNameListener = false;
             } else if (KeyCode.BACK_SPACE == event.getCode()) {
-                final Optional<Integer> startPosition = inteliSenseService.getSelectedStartPosition(currentItemFileNamePrefixValue);
+                final Optional<Integer> startPosition = intelliSenseService.getSelectedStartPosition(currentItemFileNamePrefixValue);
                 if (startPosition.isPresent()) {
                     final int endSelectionPosition = itemFileNamePrefixTextField.getCaretPosition();
                     itemFileNamePrefixTextField.selectRange(startPosition.get(), endSelectionPosition);
@@ -220,7 +216,7 @@ class PathsSectionController extends AbstractController {
 
             currentItemFileNamePrefixValue = newValue;
             if (definedPatterns.contains(newValue)) {
-                currentItemFileNamePrefixValue = inteliSenseService.getValue(oldValue, newValue);
+                currentItemFileNamePrefixValue = intelliSenseService.getValue(oldValue, newValue);
                 ignoreItemPrefixNameListener = true;
                 itemFileNamePrefixTextField.setText(currentItemFileNamePrefixValue);
                 ignoreItemPrefixNameListener = false;
