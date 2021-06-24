@@ -204,6 +204,13 @@ public class GithubService {
         return size;
     }
 
+    public Optional<String> getReleaseNotes() {
+        if (latestReleaseDetails != null) {
+            return Optional.ofNullable(latestReleaseDetails.get("body").getAsString());
+        }
+        return Optional.empty();
+    }
+
     Optional<Long> getFileSize() {
         return getFileSize(latestReleaseDetails);
     }
