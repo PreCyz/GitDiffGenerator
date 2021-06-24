@@ -9,13 +9,13 @@ import java.util.*;
 import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class IntelliSenseServiceTest {
+class TextFieldIntelliSenseTest {
 
-    private IntelliSenseService service;
+    private TextFieldIntelliSense<NamePatternValue> service;
 
     @BeforeEach
     void setUp() {
-        service = new IntelliSenseService(NamePatternValue.class);
+        service = new TextFieldIntelliSense<>(null, NamePatternValue.class);
     }
 
     @Test

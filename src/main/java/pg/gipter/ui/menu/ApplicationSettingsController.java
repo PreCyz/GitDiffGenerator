@@ -2,15 +2,11 @@ package pg.gipter.ui.menu;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Callback;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
 import org.quartz.SchedulerException;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.PreferredArgSource;
@@ -21,8 +17,8 @@ import pg.gipter.core.producers.command.DiffCommandFactory;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.jobs.JobCreator;
 import pg.gipter.jobs.JobCreatorFactory;
-import pg.gipter.services.IntelliSenseService;
 import pg.gipter.services.StartupService;
+import pg.gipter.services.TextFieldIntelliSense;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.BundleUtils;
@@ -93,17 +89,11 @@ public class ApplicationSettingsController extends AbstractController {
     private Label overrideLabel;
 
     private final Map<String, Labeled> labelsAffectedByLanguage;
-    private final IntelliSenseService<CommandPatternValue> intelliSenseService;
-    boolean ignoreGitCommandListener = false;
-    private String currentGitCommandValue = "";
-    private final Set<String> definedPatterns;
 
     public ApplicationSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         labelsAffectedByLanguage = new HashMap<>();
-        intelliSenseService = new IntelliSenseService<>(CommandPatternValue.class);
-        definedPatterns = intelliSenseService.getDefinedPatterns();
     }
 
     @Override
@@ -111,10 +101,10 @@ public class ApplicationSettingsController extends AbstractController {
         super.initialize(location, resources);
         setInitValues();
         setProperties();
-        setActions();
         setListeners();
         setAccelerators();
         createLabelsMap();
+        TextFieldIntelliSense.init(gitCommandTextField, CommandPatternValue.class);
     }
 
     private void setInitValues() {
@@ -164,14 +154,8 @@ public class ApplicationSettingsController extends AbstractController {
         preferredArgSourceComboBox.setDisable(true);
         silentModeCheckBox.setDisable(true);
         gitCommandTextField.setDisable(!overrideGitCheckBox.isSelected());
-        gitCommandTextField.textProperty().addListener(gitCommandTextFieldChangeListener());
         svnCommandTextField.setDisable(!overrideSvnCheckBox.isSelected());
         mercurialCommandTextField.setDisable(!overrideMercurialCheckBox.isSelected());
-        TextFields.bindAutoCompletion(gitCommandTextField, gitCommandSuggestionsCallback());
-    }
-
-    private void setActions() {
-        gitCommandTextField.setOnKeyReleased(gitCommandTextFieldKeyReleasedEventHandler());
     }
 
     private void setListeners() {
@@ -320,46 +304,5 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
         labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
         labelsAffectedByLanguage.put("launch.customCommand.override", overrideLabel);
-    }
-
-    private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> gitCommandSuggestionsCallback() {
-        return param -> {
-            if (gitCommandTextField.getCaretPosition() < param.getUserText().length()) {
-                gitCommandTextField.positionCaret(param.getUserText().length());
-            }
-            return intelliSenseService.getFilteredValues(param.getUserText());
-        };
-    }
-
-    private EventHandler<KeyEvent> gitCommandTextFieldKeyReleasedEventHandler() {
-        return event -> {
-            if (EnumSet.of(KeyCode.ENTER, KeyCode.TAB).contains(event.getCode())) {
-                ignoreGitCommandListener = true;
-                gitCommandTextField.setText(currentGitCommandValue);
-                gitCommandTextField.positionCaret(currentGitCommandValue.length());
-                ignoreGitCommandListener = false;
-            } else if (KeyCode.BACK_SPACE == event.getCode()) {
-                final Optional<Integer> startPosition = intelliSenseService.getSelectedStartPosition(currentGitCommandValue);
-                if (startPosition.isPresent()) {
-                    final int endSelectionPosition = gitCommandTextField.getCaretPosition();
-                    gitCommandTextField.selectRange(startPosition.get(), endSelectionPosition);
-                }
-            }
-        };
-    }
-
-    private ChangeListener<String> gitCommandTextFieldChangeListener() {
-        return (observable, oldValue, newValue) -> {
-            if (ignoreGitCommandListener) return;
-
-            currentGitCommandValue = newValue;
-            if (definedPatterns.contains(newValue)) {
-                currentGitCommandValue = intelliSenseService.getValue(oldValue, newValue);
-                ignoreGitCommandListener = true;
-                gitCommandTextField.setText(currentGitCommandValue);
-                ignoreGitCommandListener = false;
-            }
-            gitCommandTextField.positionCaret(currentGitCommandValue.length());
-        };
     }
 }
