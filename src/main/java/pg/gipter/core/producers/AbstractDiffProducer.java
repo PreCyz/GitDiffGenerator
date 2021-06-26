@@ -9,6 +9,7 @@ import pg.gipter.core.producers.vcs.VCSVersionProducer;
 import pg.gipter.core.producers.vcs.VCSVersionProducerFactory;
 import pg.gipter.services.ConcurrentService;
 import pg.gipter.ui.task.UpdatableTask;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.*;
 import java.nio.file.Paths;
@@ -96,7 +97,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
             Future<String> future = new ExecutorCompletionService<String>(executor).submit(() -> br.lines()
                     .filter(Objects::nonNull)
-                    .collect(joining(System.getProperty("line.separator")))
+                    .collect(joining(SystemUtils.lineSeparator()))
             );
 
             final int interval = 500;

@@ -1,6 +1,7 @@
 package pg.gipter.ui;
 
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.SystemUtils;
 
 public class UploadResult {
     private final String configName;
@@ -32,7 +33,7 @@ public class UploadResult {
             String cause = throwable.getMessage();
             cause = cause.substring(cause.lastIndexOf(":") + 1);
             message.append(BundleUtils.getMsg("upload.result.status", BundleUtils.getMsg("upload.result.status.fail")))
-                    .append(System.getProperty("line.separator"))
+                    .append(SystemUtils.lineSeparator())
                     .append(BundleUtils.getMsg("upload.result.cause", cause));
 
         } else {

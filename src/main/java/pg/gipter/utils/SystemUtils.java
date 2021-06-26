@@ -24,4 +24,8 @@ public final class SystemUtils {
         return (OS_LOWER_CASE.contains("sunos"));
     }
 
+    public static String lineSeparator() {
+        return System.getProperty("line.separator");
+    }
+
 }

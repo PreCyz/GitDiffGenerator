@@ -14,8 +14,7 @@ import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -113,14 +112,14 @@ class ConfigurationSectionController extends AbstractController {
                 !runConfig.getAuthor().equals(String.join(",", applicationProperties.authors()))) {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.author.changed",
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (isOverride && Objects.nonNull(runConfig.getCommitterEmail()) &&
                 !runConfig.getCommitterEmail().equals(applicationProperties.committerEmail())) {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.committerEmail.changed",
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (Objects.nonNull(runConfig.getGitAuthor()) && Objects.nonNull(applicationProperties.gitAuthor()) &&
@@ -129,7 +128,7 @@ class ConfigurationSectionController extends AbstractController {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.cvsAuthor.changed",
                     VersionControlSystem.GIT.name(),
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (Objects.nonNull(runConfig.getSvnAuthor()) && Objects.nonNull(applicationProperties.svnAuthor()) &&
@@ -138,7 +137,7 @@ class ConfigurationSectionController extends AbstractController {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.cvsAuthor.changed",
                     VersionControlSystem.SVN.name(),
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (Objects.nonNull(runConfig.getMercurialAuthor()) && Objects.nonNull(applicationProperties.mercurialAuthor()) &&
@@ -147,20 +146,20 @@ class ConfigurationSectionController extends AbstractController {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.cvsAuthor.changed",
                     VersionControlSystem.MERCURIAL.name(),
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (isOverride && Objects.isNull(runConfig.getAuthor()) && !applicationProperties.authors().isEmpty()) {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.author.removed",
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (isOverride && Objects.isNull(runConfig.getCommitterEmail()) &&
                 Objects.nonNull(applicationProperties.committerEmail())) {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.committerEmail.removed",
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (Objects.isNull(runConfig.getGitAuthor()) && Objects.nonNull(applicationProperties.gitAuthor()) &&
@@ -168,7 +167,7 @@ class ConfigurationSectionController extends AbstractController {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.cvsAuthor.removed",
                     VersionControlSystem.GIT.name(),
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (Objects.isNull(runConfig.getSvnAuthor()) && Objects.nonNull(applicationProperties.svnAuthor()) &&
@@ -176,7 +175,7 @@ class ConfigurationSectionController extends AbstractController {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.cvsAuthor.removed",
                     VersionControlSystem.SVN.name(),
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (Objects.isNull(runConfig.getMercurialAuthor()) && Objects.nonNull(applicationProperties.mercurialAuthor()) &&
@@ -184,7 +183,7 @@ class ConfigurationSectionController extends AbstractController {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.cvsAuthor.removed",
                     VersionControlSystem.MERCURIAL.name(),
-                    System.getProperty("line.separator")
+                    SystemUtils.lineSeparator()
             ));
             result = Optional.of(alertWindowBuilder);
         }

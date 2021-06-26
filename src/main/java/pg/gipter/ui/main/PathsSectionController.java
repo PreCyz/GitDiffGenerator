@@ -18,8 +18,7 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.WebViewService;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.io.File;
 import java.net.URL;
@@ -77,7 +76,7 @@ class PathsSectionController extends AbstractController {
                             .withMessage(BundleUtils.getMsg(
                                     "paths.panel.itemPath.nonExists",
                                     itemPath,
-                                    System.getProperty("line.separator")
+                                    SystemUtils.lineSeparator()
                             ))
                             .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
                             .buildAndDisplayWindow();
