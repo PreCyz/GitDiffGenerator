@@ -107,6 +107,11 @@ public class ApplicationSettingsController extends AbstractController {
         TextFieldIntelliSense.init(gitCommandTextField, CommandPatternValue.class);
     }
 
+    @Override
+    public void executeBeforeClose() {
+        saveNewSettings();
+    }
+
     private void setInitValues() {
         confirmationWindowCheckBox.setSelected(applicationProperties.isConfirmationWindow());
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
@@ -221,13 +226,6 @@ public class ApplicationSettingsController extends AbstractController {
             mercurialCommandTextField.setDisable(oldValue);
             saveNewSettings();
         });
-
-        applicationSettingsTab.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
-        customCommandTab.selectedProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
-
-        gitCommandTextField.textProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
-        svnCommandTextField.textProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
-        mercurialCommandTextField.textProperty().addListener((observable, oldValue, newValue) -> saveNewSettings());
     }
 
     private void processLastItemJob(Boolean shouldSchedule) {

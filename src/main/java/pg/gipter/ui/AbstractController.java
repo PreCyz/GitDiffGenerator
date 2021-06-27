@@ -41,4 +41,8 @@ public abstract class AbstractController implements Initializable {
     public final String getUiLanguage() {
         return applicationProperties.uiLanguage();
     }
+
+    public void executeBeforeClose() {
+
+    }
 }
