@@ -21,7 +21,7 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
     private boolean ignoreListener = false;
     private String currentValue = "";
 
-    private int caretPosition;
+    private int caretPosition = -1;
     private Integer caretAfterChange;
     private String previousValue = "";
 
@@ -63,7 +63,7 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
     Set<String> getFilteredValues(String text) {
         Set<String> result = Collections.emptySet();
         final String uncompleted = getUncompleted(text).toLowerCase();
-        if (text.endsWith("{") || text.charAt(caretPosition) == '{') {
+        if (text.endsWith("{") || (caretPosition >= 0 && text.charAt(caretPosition) == '{')) {
             result = new LinkedHashSet<>(definedPatterns);
         } else if (!uncompleted.isEmpty()) {
             result = definedPatterns.stream()
@@ -105,10 +105,11 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
             if (EnumSet.of(KeyCode.ENTER, KeyCode.TAB).contains(event.getCode())) {
                 ignoreListener = true;
                 textField.setText(currentValue);
-                Optional.ofNullable(caretAfterChange).ifPresentOrElse(
-                        textField::positionCaret,
-                        () -> textField.positionCaret(currentValue.length())
-                );
+                if (Optional.ofNullable(caretAfterChange).isPresent()) {
+                    textField.positionCaret(caretAfterChange);
+                } else {
+                    textField.positionCaret(currentValue.length());
+                }
                 ignoreListener = false;
             } else if (KeyCode.BACK_SPACE == event.getCode()) {
                 final Optional<Integer> startPosition = getSelectedStartPosition(currentValue);

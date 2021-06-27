@@ -29,7 +29,8 @@ abstract class AbstractCertificateService implements CertificateService {
         return Paths.get(javaHome, "bin", "keytool");
     }
 
-    protected Path getKeystorePath() {
+    @Override
+    public Path getKeystorePath() {
         String javaHome = SystemUtils.javaHome();
         if (StringUtils.nullOrEmpty(javaHome)) {
             logger.error("Can not find java home.");
