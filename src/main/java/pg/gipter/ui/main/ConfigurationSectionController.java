@@ -156,7 +156,7 @@ class ConfigurationSectionController extends AbstractController {
             ));
             result = Optional.of(alertWindowBuilder);
         } else if (isOverride && Objects.isNull(runConfig.getCommitterEmail()) &&
-                Objects.nonNull(applicationProperties.committerEmail())) {
+                !StringUtils.nullOrEmpty(applicationProperties.committerEmail())) {
             alertWindowBuilder.withMessage(BundleUtils.getMsg(
                     "main.committerEmail.removed",
                     SystemUtils.lineSeparator()
