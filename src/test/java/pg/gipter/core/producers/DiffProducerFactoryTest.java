@@ -2,6 +2,7 @@ package pg.gipter.core.producers;
 
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.utils.SystemUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +23,7 @@ class DiffProducerFactoryTest {
         DiffProducer instance = DiffProducerFactory.getInstance(
                 ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
         );
-        String platform = System.getProperty("os.name");
+        String platform = SystemUtils.osName();
         if ("Linux".equalsIgnoreCase(platform)) {
             assertThat(instance).isInstanceOf(LinuxDiffProducer.class);
         } else if (platform.startsWith("Windows")) {

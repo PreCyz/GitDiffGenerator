@@ -411,8 +411,12 @@ public class UILauncher implements Launcher {
 
         applicationSettingsWindow = new Stage();
         applicationSettingsWindow.initModality(Modality.APPLICATION_MODAL);
-        buildScene(applicationSettingsWindow, WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this));
-        applicationSettingsWindow.setOnCloseRequest(event -> closeWindow(applicationSettingsWindow));
+        AbstractWindow window = WindowFactory.APPLICATION_MENU.createWindow(applicationProperties, this);
+        buildScene(applicationSettingsWindow, window);
+        applicationSettingsWindow.setOnCloseRequest(event -> {
+            window.getController().executeBeforeClose();
+            closeWindow(applicationSettingsWindow);
+        });
         applicationSettingsWindow.showAndWait();
     }
 

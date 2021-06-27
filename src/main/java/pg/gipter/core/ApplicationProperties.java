@@ -3,6 +3,7 @@ package pg.gipter.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.core.dao.configuration.*;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
@@ -134,7 +135,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitCredentialsSet() {
-        return !toolkitUsername().isEmpty() && !ArgName.toolkitUsername.defaultValue().equals(toolkitUsername()) &&
+        return !toolkitUsername().isEmpty() &&
                 !toolkitPassword().isEmpty() && !ArgName.toolkitPassword.defaultValue().equals(toolkitPassword());
     }
 
@@ -275,6 +276,26 @@ public abstract class ApplicationProperties {
         if (!runConfigMap.isEmpty()) {
             currentRunConfig = new LinkedList<>(runConfigMap.entrySet()).getFirst().getValue();
         }
+    }
+
+    public final CustomCommand getCustomCommand(VersionControlSystem vcs) {
+        if (applicationConfig.getCustomCommands() == null) {
+            return new CustomCommand(vcs);
+        }
+        return applicationConfig.getCustomCommands()
+                .stream()
+                .filter(cc -> cc.getVcs() == vcs)
+                .findFirst()
+                .orElseGet(() -> new CustomCommand(vcs));
+    }
+
+    public final void addCustomCommand(CustomCommand customCommand) {
+        Set<CustomCommand> customCommandSet = applicationConfig.getCustomCommands();
+        if (customCommandSet == null) {
+            customCommandSet = new LinkedHashSet<>();
+        }
+        customCommandSet.add(customCommand);
+        applicationConfig.setCustomCommands(customCommandSet);
     }
 
     protected final String log() {

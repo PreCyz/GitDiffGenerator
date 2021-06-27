@@ -2,6 +2,7 @@ package pg.gipter.services.platforms;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.utils.SystemUtils;
 
 public class AppManagerFactory {
 
@@ -10,7 +11,7 @@ public class AppManagerFactory {
     private AppManagerFactory() {}
 
     public static AppManager getInstance() {
-        String platform = System.getProperty("os.name").toLowerCase();
+        String platform = SystemUtils.osName().toLowerCase();
         if (platform.contains("win")) {
             return new WindowsAppManager();
         } else if (platform.contains("nix") || platform.contains("nux") || platform.contains("aix")) {

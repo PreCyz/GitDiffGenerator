@@ -175,6 +175,7 @@ public class WizardLauncher implements Launcher {
 
         gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.username")), 0, row);
         TextField username = createTextField(ArgName.toolkitUsername.name());
+        username.setText(ArgName.toolkitUsername.defaultValue());
         gridPane.add(username, 1, row++);
 
         gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.password")), 0, row);

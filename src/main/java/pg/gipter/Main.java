@@ -15,6 +15,7 @@ import pg.gipter.services.ConcurrentService;
 import pg.gipter.services.keystore.CertificateServiceFactory;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -32,10 +33,10 @@ public class Main extends Application {
         logger.info("Gipter started.");
         Main mObj = new Main(args);
         mObj.setLoggerLevel(applicationProperties.loggerLevel());
-        logger.info("Java version '{}'.", System.getProperty("java.version"));
+        logger.info("Java version '{}'.", SystemUtils.javaVersion());
         logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
         logger.info("Gipter can use '{}' threads.", ConcurrentService.getInstance().availableThreads());
-        mObj.runConverters();
+        mObj.runConverters(applicationProperties);
         mObj.setDefaultConfig();
         if (Main.applicationProperties.isUseUI()) {
             launch(args);
@@ -56,8 +57,7 @@ public class Main extends Application {
             System.setProperty("javax.net.ssl.trustStore",
                         CertificateServiceFactory.getInstance(true).getKeystorePath().toString());
                 System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
-                logger.info("New JAVA_HOME {}.", System.getProperty("java.home"));
-
+                logger.info("New JAVA_HOME {}.", SystemUtils.javaHome());
         }
     }
 
@@ -87,8 +87,8 @@ public class Main extends Application {
         }
     }
 
-    private void runConverters() {
-        ConverterFactory.getConverters().forEach(Converter::convert);
+    private void runConverters(ApplicationProperties applicationProperties) {
+        ConverterFactory.getConverters(applicationProperties).forEach(Converter::convert);
     }
 
     private void setDefaultConfig() {

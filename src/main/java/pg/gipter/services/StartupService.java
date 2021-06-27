@@ -18,7 +18,7 @@ public class StartupService {
     private final String systemUsername;
 
     public StartupService() {
-        systemUsername = System.getProperty("user.name");
+        systemUsername = SystemUtils.userName();
     }
 
     public void startOnStartup() {

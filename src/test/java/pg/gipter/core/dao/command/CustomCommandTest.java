@@ -211,4 +211,36 @@ class CustomCommandTest {
 
         assertThat(actual).containsExactly("git", "log", "--author='Obiwan Kenobi'", "--oneline", "startDate 2020-06-05");
     }
+
+    @Test
+    void givenGITCustomCommands_whenEquals_thenReturnTrue() {
+        CustomCommand customCommand1 = new CustomCommand(VersionControlSystem.GIT, "git --version", true);
+        CustomCommand customCommand2 = new CustomCommand(VersionControlSystem.GIT, "git log", false);
+
+        assertThat(customCommand1.equals(customCommand2)).isTrue();
+    }
+
+    @Test
+    void givenGitAndSvnCustomCommands_whenEquals_thenReturnFalse() {
+        CustomCommand customCommand1 = new CustomCommand(VersionControlSystem.GIT, "git --version", true);
+        CustomCommand customCommand2 = new CustomCommand(VersionControlSystem.SVN, "svn update", false);
+
+        assertThat(customCommand1.equals(customCommand2)).isFalse();
+    }
+
+    @Test
+    void givenGitAndSvnCustomCommands_whenHash_thenReturnNotEqual() {
+        CustomCommand customCommand1 = new CustomCommand(VersionControlSystem.GIT, "git --version", true);
+        CustomCommand customCommand2 = new CustomCommand(VersionControlSystem.SVN, "svn update", false);
+
+        assertThat(customCommand1.hashCode()).isNotEqualTo(customCommand2.hashCode());
+    }
+
+    @Test
+    void givenGitCustomCommands_whenHash_thenReturnEqual() {
+        CustomCommand customCommand1 = new CustomCommand(VersionControlSystem.GIT, "git --version", true);
+        CustomCommand customCommand2 = new CustomCommand(VersionControlSystem.GIT, "svn update", false);
+
+        assertThat(customCommand1.hashCode()).isEqualTo(customCommand2.hashCode());
+    }
 }

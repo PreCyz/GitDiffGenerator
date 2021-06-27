@@ -3,11 +3,11 @@ package pg.gipter.core.model;
 import org.slf4j.event.Level;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 public class ApplicationConfig {
 
@@ -23,6 +23,7 @@ public class ApplicationConfig {
     private Boolean certImportEnabled;
     private Boolean checkLastItemEnabled;
     private String checkLastItemJobCronExpression;
+    private Set<CustomCommand> customCommands;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -133,6 +134,14 @@ public class ApplicationConfig {
 
     public void setCheckLastItemJobCronExpression(String checkLastItemJobCronExpression) {
         this.checkLastItemJobCronExpression = checkLastItemJobCronExpression;
+    }
+
+    public Set<CustomCommand> getCustomCommands() {
+        return customCommands;
+    }
+
+    public void setCustomCommands(Set<CustomCommand> customCommands) {
+        this.customCommands = customCommands;
     }
 
     public String[] toArgumentArray() {
