@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.LogLinkAction;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JarHelper;
+import pg.gipter.utils.*;
 
 import java.io.*;
 import java.nio.file.*;
@@ -116,7 +115,7 @@ public class UpgradeService extends TaskService<Void> {
 
     private void restartApplication() throws IOException {
         updateMsg(BundleUtils.getMsg("upgrade.progress.restarting"));
-        final String javaBin = Paths.get(System.getProperty("java.home"), "bin", "java").toString();
+        final String javaBin = Paths.get(SystemUtils.javaHome(), "bin", "java").toString();
         Optional<Path> jarPath = JarHelper.getJarPath();
 
         if (!jarPath.isPresent()) {

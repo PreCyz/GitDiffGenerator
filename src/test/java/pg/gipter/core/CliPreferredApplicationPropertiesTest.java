@@ -9,6 +9,7 @@ import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SemanticVersioning;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -888,7 +889,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUsername();
 
-        assertThat(actual).isEqualTo("UNKNOWN_USER");
+        assertThat(actual).isEqualTo(SystemUtils.userName().toUpperCase());
     }
 
     @Test
@@ -1183,7 +1184,9 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUserFolder();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/UNKNOWN_USER");
+        assertThat(actual).isEqualTo(
+                "https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/" + SystemUtils.userName().toUpperCase()
+        );
     }
 
     @Test
@@ -1491,7 +1494,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUserFolder();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue().toUpperCase());
     }
 
     @Test

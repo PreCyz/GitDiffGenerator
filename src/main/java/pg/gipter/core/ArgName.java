@@ -2,6 +2,7 @@ package pg.gipter.core;
 
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.time.LocalDate;
 
@@ -190,7 +191,7 @@ public enum ArgName {
     toolkitUsername {
         @Override
         public String defaultValue() {
-            return "UNKNOWN_USER";
+            return SystemUtils.userName();
         }
     },
     toolkitPassword {

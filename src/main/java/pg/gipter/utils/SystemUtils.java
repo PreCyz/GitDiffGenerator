@@ -5,8 +5,8 @@ public final class SystemUtils {
 
     private SystemUtils() { }
 
-    public static final String OS = System.getProperty("os.name").toLowerCase();
-    private static final String OS_LOWER_CASE = OS.toLowerCase();
+    public static final String OS = osName().toLowerCase();
+    private static final String OS_LOWER_CASE = osName().toLowerCase();
 
     public static boolean isWindows() {
         return OS_LOWER_CASE.contains("win");
@@ -26,6 +26,22 @@ public final class SystemUtils {
 
     public static String lineSeparator() {
         return System.getProperty("line.separator");
+    }
+
+    public static String javaVersion() {
+        return System.getProperty("java.version");
+    }
+
+    public static String javaHome() {
+        return System.getProperty("java.home");
+    }
+
+    public static String userName() {
+        return System.getProperty("user.name");
+    }
+
+    public static String osName() {
+        return System.getProperty("os.name");
     }
 
 }

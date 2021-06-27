@@ -14,6 +14,7 @@ import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.ConcurrentService;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -33,7 +34,7 @@ public class Main extends Application {
         logger.info("Gipter started.");
         Main mObj = new Main(args);
         mObj.setLoggerLevel(applicationProperties.loggerLevel());
-        logger.info("Java version '{}'.", System.getProperty("java.version"));
+        logger.info("Java version '{}'.", SystemUtils.javaVersion());
         logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
         logger.info("Gipter can use '{}' threads.", ConcurrentService.getInstance().availableThreads());
         mObj.runConverters(applicationProperties);
@@ -55,7 +56,7 @@ public class Main extends Application {
         Optional<String> javaHome = Stream.of(args).filter(arg -> arg.startsWith("java.home")).findFirst();
         if (javaHome.isPresent()) {
             System.setProperty("java.home", javaHome.get().split("=")[1]);
-            logger.info("New JAVA_HOME {}.", System.getProperty("java.home"));
+            logger.info("New JAVA_HOME {}.", SystemUtils.javaHome());
         }
     }
 

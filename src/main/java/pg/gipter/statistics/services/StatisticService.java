@@ -11,6 +11,7 @@ import pg.gipter.statistics.Statistic;
 import pg.gipter.statistics.dao.StatisticDao;
 import pg.gipter.statistics.dto.RunDetails;
 import pg.gipter.ui.UploadStatus;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -44,8 +45,8 @@ public class StatisticService {
         statistic.setUsername(appProperties.toolkitUsername());
         statistic.setFirstExecutionDate(now);
         statistic.setLastExecutionDate(now);
-        statistic.setJavaVersion(System.getProperty("java.version"));
-        statistic.setSystemUsers(new HashSet<>(Collections.singletonList(System.getProperty("user.name"))));
+        statistic.setJavaVersion(SystemUtils.javaVersion());
+        statistic.setSystemUsers(new HashSet<>(Collections.singletonList(SystemUtils.userName())));
         statistic.setLastUpdateStatus(runDetails.getStatus());
         statistic.setLastRunType(runDetails.getRunType());
         if (EnumSet.of(UploadStatus.FAIL, UploadStatus.N_A).contains(runDetails.getStatus())) {

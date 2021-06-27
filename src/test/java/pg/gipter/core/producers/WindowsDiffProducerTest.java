@@ -1,22 +1,19 @@
 package pg.gipter.core.producers;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.producers.command.DiffCommand;
 import pg.gipter.core.producers.command.VersionControlSystem;
-import pg.gipter.jobs.json.LocalDateTimeAdapter;
+import pg.gipter.services.SecurityService;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,35 +43,22 @@ class WindowsDiffProducerTest {
         assertThat(actual).containsExactly("c", "\"c2\"", "c3");
     }
 
-    private void writeToFile(CustomCommand customCommand) {
-        final Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter().nullSafe())
-                .create();
-        String json = gson.toJson(customCommand, CustomCommand.class);
-        try (OutputStream os = new FileOutputStream(DaoConstants.CUSTOM_COMMAND_JSON);
-             Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8)
-        ) {
-            writer.write(json);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Error when writing custom command into json.");
-        }
-    }
-
     @Test
     void givenCustomCommand_whenCalculateCommand_thenUseCustomCommand() {
-        WindowsDiffProducer producer = new WindowsDiffProducer(
-                ApplicationPropertiesFactory.getInstance(new String[]{"preferredArgSource=FILE"})
+        SecurityService.getInstance().writeCipherDetails(SecurityService.getInstance().generateCipherDetails());
+        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
+                new String[]{"preferredArgSource=FILE"}
         );
-        CustomCommand customCommand = new CustomCommand();
-        customCommand.setVcs(VersionControlSystem.GIT);
-        customCommand.setCommand("git log");
-        writeToFile(customCommand);
+        WindowsDiffProducer producer = new WindowsDiffProducer(applicationProperties);
+        CustomCommand customCommand = new CustomCommand(VersionControlSystem.GIT, "git log", true);
+        applicationProperties.addCustomCommand(customCommand);
+        applicationProperties.save();
         final DiffCommand diffCommandMock = mock(DiffCommand.class);
 
         final List<String> actual = producer.calculateCommand(diffCommandMock, VersionControlSystem.GIT);
 
         assertThat(actual).containsExactly("git", "log");
-        verifyZeroInteractions(diffCommandMock);
+        verifyNoInteractions(diffCommandMock);
     }
 
     @Test

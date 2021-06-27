@@ -135,7 +135,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitCredentialsSet() {
-        return !toolkitUsername().isEmpty() && !ArgName.toolkitUsername.defaultValue().equals(toolkitUsername()) &&
+        return !toolkitUsername().isEmpty() &&
                 !toolkitPassword().isEmpty() && !ArgName.toolkitPassword.defaultValue().equals(toolkitPassword());
     }
 

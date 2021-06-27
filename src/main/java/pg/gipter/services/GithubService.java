@@ -8,6 +8,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.*;
 import java.nio.file.Paths;
@@ -179,7 +180,7 @@ public class GithubService {
 
         boolean result = !assetName.isJsonNull();
         result &= assetName.getAsString().contains(name);
-        if (System.getProperty("java.version").startsWith(version_1_8)) {
+        if (SystemUtils.javaVersion().startsWith(version_1_8)) {
             result &= !assetName.getAsString().startsWith(elevenPlus);
         } else {
             result &= assetName.getAsString().startsWith(elevenPlus);
