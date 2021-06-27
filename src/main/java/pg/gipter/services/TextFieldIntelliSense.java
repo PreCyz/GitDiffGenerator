@@ -21,6 +21,10 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
     private boolean ignoreListener = false;
     private String currentValue = "";
 
+    private int caretPosition;
+    private Integer caretAfterChange;
+    private String previousValue = "";
+
     TextFieldIntelliSense(TextField textField, Class<E> enumClass) {
         definedPatterns = EnumSet.allOf(enumClass)
                 .stream()
@@ -59,9 +63,9 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
     Set<String> getFilteredValues(String text) {
         Set<String> result = Collections.emptySet();
         final String uncompleted = getUncompleted(text).toLowerCase();
-        if (text.endsWith("{")) {
+        if (text.endsWith("{") || text.charAt(caretPosition) == '{') {
             result = new LinkedHashSet<>(definedPatterns);
-        } else if (!uncompleted.isEmpty() ) {
+        } else if (!uncompleted.isEmpty()) {
             result = definedPatterns.stream()
                     .filter(pattern -> pattern.contains(uncompleted) || pattern.contains(uncompleted.toUpperCase()))
                     .collect(toCollection(LinkedHashSet::new));
@@ -79,19 +83,21 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
     }
 
     String getValue(String oldValue, String newValue) {
-        if (oldValue != null) {
+        caretAfterChange = null;
+        if (!previousValue.isEmpty()) {
+            String firstPart = previousValue.substring(0, caretPosition);
+            String secondPart = previousValue.substring(caretPosition);
+            String result = firstPart + newValue + secondPart;
+            caretAfterChange = (firstPart + newValue).length();
+            return result;
+        } else if (oldValue != null) {
             return oldValue.substring(0, oldValue.lastIndexOf("{")) + newValue;
         }
         return newValue;
     }
 
     private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> suggestionsCallback() {
-        return param -> {
-            if (textField.getCaretPosition() < param.getUserText().length()) {
-                textField.positionCaret(param.getUserText().length());
-            }
-            return getFilteredValues(param.getUserText());
-        };
+        return param -> getFilteredValues(param.getUserText());
     }
 
     private EventHandler<KeyEvent> keyReleasedEventHandler() {
@@ -99,7 +105,10 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
             if (EnumSet.of(KeyCode.ENTER, KeyCode.TAB).contains(event.getCode())) {
                 ignoreListener = true;
                 textField.setText(currentValue);
-                textField.positionCaret(currentValue.length());
+                Optional.ofNullable(caretAfterChange).ifPresentOrElse(
+                        textField::positionCaret,
+                        () -> textField.positionCaret(currentValue.length())
+                );
                 ignoreListener = false;
             } else if (KeyCode.BACK_SPACE == event.getCode()) {
                 final Optional<Integer> startPosition = getSelectedStartPosition(currentValue);
@@ -107,6 +116,7 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
                     final int endSelectionPosition = textField.getCaretPosition();
                     textField.selectRange(startPosition.get(), endSelectionPosition);
                 }
+                caretPosition--;
             }
         };
     }
@@ -122,7 +132,23 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
                 textField.setText(currentValue);
                 ignoreListener = false;
             }
-            textField.positionCaret(currentValue.length());
+            int idx = 0;
+            boolean goNext = true;
+            while (goNext) {
+                caretPosition = idx;
+                if (!oldValue.isEmpty() && idx < oldValue.length()) {
+                    goNext = idx < newValue.length() && newValue.charAt(idx) == oldValue.charAt(idx);
+                } else {
+                    goNext = false;
+                }
+                idx++;
+            }
+            if (idx < newValue.length() - 1) {
+                previousValue = oldValue;
+            } else {
+                previousValue = "";
+            }
+            textField.positionCaret(caretPosition);
         };
     }
 
