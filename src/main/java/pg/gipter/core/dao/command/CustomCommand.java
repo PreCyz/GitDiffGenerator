@@ -14,6 +14,20 @@ public class CustomCommand {
     private VersionControlSystem vcs;
     private String command;
     private List<String> commandList;
+    private boolean override;
+
+    public CustomCommand() {
+    }
+
+    public CustomCommand(VersionControlSystem vcs) {
+        this.vcs = vcs;
+    }
+
+    public CustomCommand(VersionControlSystem vcs, String command, boolean override) {
+        this(vcs);
+        this.command = command;
+        this.override = override;
+    }
 
     public VersionControlSystem getVcs() {
         return vcs;
@@ -37,6 +51,14 @@ public class CustomCommand {
 
     public void setCommandList(List<String> commandList) {
         this.commandList = commandList;
+    }
+
+    public boolean isOverride() {
+        return override;
+    }
+
+    public void setOverride(boolean override) {
+        this.override = override;
     }
 
     public LinkedList<String> fullCommand(ApplicationProperties applicationProperties) {
@@ -149,5 +171,18 @@ public class CustomCommand {
             return getVcs() == vcs || getCommandList().get(0).startsWith(vcs.command());
         }
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomCommand that = (CustomCommand) o;
+        return vcs == that.vcs;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vcs);
     }
 }

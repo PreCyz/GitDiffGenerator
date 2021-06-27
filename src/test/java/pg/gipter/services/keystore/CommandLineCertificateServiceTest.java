@@ -2,6 +2,7 @@ package pg.gipter.services.keystore;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -16,7 +17,7 @@ class CommandLineCertificateServiceTest {
         final String keytoolPath = new CommandLineCertificateService().getKeytoolPath().toString();
 
         assertThat(keytoolPath).isNotNull();
-        assertThat(keytoolPath).startsWith(System.getProperty("java.home"));
+        assertThat(keytoolPath).startsWith(SystemUtils.javaHome());
         assertThat(keytoolPath).endsWith(Paths.get("bin", "keytool").toString());
     }
 

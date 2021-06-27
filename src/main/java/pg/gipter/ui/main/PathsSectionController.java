@@ -1,27 +1,24 @@
 package pg.gipter.ui.main;
 
-import javafx.beans.value.ChangeListener;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.controlsfx.control.textfield.TextFields;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.model.NamePatternValue;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.InteliSenseService;
+import pg.gipter.services.TextFieldIntelliSense;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.utils.*;
 
 import java.io.File;
 import java.net.URL;
@@ -29,7 +26,6 @@ import java.nio.file.*;
 import java.util.*;
 
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toCollection;
 
 class PathsSectionController extends AbstractController {
 
@@ -41,33 +37,23 @@ class PathsSectionController extends AbstractController {
 
     private final MainController mainController;
 
-    private final Set<String> definedPatterns;
-    private String currentItemFileNamePrefixValue = "";
-    private final InteliSenseService inteliSenseService;
-    boolean ignoreItemPrefixNameListener = false;
-
     PathsSectionController(UILauncher uiLauncher, ApplicationProperties applicationProperties, MainController mainController) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
         this.mainController = mainController;
-        this.definedPatterns = EnumSet.allOf(NamePatternValue.class)
-                .stream()
-                .map(e -> String.format("{%s}", e.name()))
-                .collect(toCollection(LinkedHashSet::new));
-        inteliSenseService = new InteliSenseService();
     }
 
     public void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
         super.initialize(location, resources);
-        projectPathLabel = (Label)controlsMap.get("projectPathLabel");
-        itemPathLabel = (Label)controlsMap.get("itemPathLabel");
-        itemFileNamePrefixTextField = (TextField)controlsMap.get("itemFileNamePrefixTextField");
-        projectPathButton = (Button)controlsMap.get("projectPathButton");
-        itemPathButton = (Button)controlsMap.get("itemPathButton");
+        projectPathLabel = (Label) controlsMap.get("projectPathLabel");
+        itemPathLabel = (Label) controlsMap.get("itemPathLabel");
+        itemFileNamePrefixTextField = (TextField) controlsMap.get("itemFileNamePrefixTextField");
+        projectPathButton = (Button) controlsMap.get("projectPathButton");
+        itemPathButton = (Button) controlsMap.get("itemPathButton");
         setInitValues();
         setProperties(resources);
         setActions(resources);
-        setListeners();
+        TextFieldIntelliSense.init(itemFileNamePrefixTextField, NamePatternValue.class);
     }
 
     private void setInitValues() {
@@ -83,6 +69,19 @@ class PathsSectionController extends AbstractController {
             String itemPath = applicationProperties.itemPath()
                     .substring(0, applicationProperties.itemPath().indexOf(itemFileName) - 1);
             itemPathLabel.setText(itemPath);
+            Platform.runLater(() -> {
+                if (Files.notExists(Paths.get(itemPath))) {
+                    new AlertWindowBuilder()
+                            .withAlertType(Alert.AlertType.ERROR)
+                            .withMessage(BundleUtils.getMsg(
+                                    "paths.panel.itemPath.nonExists",
+                                    itemPath,
+                                    SystemUtils.lineSeparator()
+                            ))
+                            .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                            .buildAndDisplayWindow();
+                }
+            });
         }
         if (applicationProperties.itemType() == ItemType.STATEMENT) {
             itemPathLabel.setText(applicationProperties.itemPath());
@@ -114,23 +113,11 @@ class PathsSectionController extends AbstractController {
         } else {
             itemPathButton.setText(resources.getString("button.change"));
         }
-
-        TextFields.bindAutoCompletion(itemFileNamePrefixTextField, itemNameSuggestionsCallback());
-    }
-
-    private Callback<AutoCompletionBinding.ISuggestionRequest, Collection<String>> itemNameSuggestionsCallback() {
-        return param -> {
-            if (itemFileNamePrefixTextField.getCaretPosition() < param.getUserText().length()) {
-                itemFileNamePrefixTextField.positionCaret(param.getUserText().length());
-            }
-            return inteliSenseService.getFilteredValues(param.getUserText());
-        };
     }
 
     private void setActions(ResourceBundle resources) {
         projectPathButton.setOnAction(projectPathActionEventHandler());
         itemPathButton.setOnAction(itemPathActionEventHandler(resources));
-        itemFileNamePrefixTextField.setOnKeyReleased(itemNameKeyReleasedEventHandler());
     }
 
     private EventHandler<ActionEvent> projectPathActionEventHandler() {
@@ -173,42 +160,6 @@ class PathsSectionController extends AbstractController {
                     itemPathLabel.getTooltip().setText(itemPathDirectory.get().toAbsolutePath().toString());
                 }
             }
-        };
-    }
-
-    private EventHandler<KeyEvent> itemNameKeyReleasedEventHandler() {
-        return event -> {
-            if (EnumSet.of(KeyCode.ENTER, KeyCode.TAB).contains(event.getCode())) {
-                ignoreItemPrefixNameListener = true;
-                itemFileNamePrefixTextField.setText(currentItemFileNamePrefixValue);
-                itemFileNamePrefixTextField.positionCaret(currentItemFileNamePrefixValue.length());
-                ignoreItemPrefixNameListener = false;
-            } else if (KeyCode.BACK_SPACE == event.getCode()) {
-                final Optional<Integer> startPosition = inteliSenseService.getSelectedStartPosition(currentItemFileNamePrefixValue);
-                if (startPosition.isPresent()) {
-                    final int endSelectionPosition = itemFileNamePrefixTextField.getCaretPosition();
-                    itemFileNamePrefixTextField.selectRange(startPosition.get(), endSelectionPosition);
-                }
-            }
-        };
-    }
-
-    private void setListeners() {
-        itemFileNamePrefixTextField.textProperty().addListener(itemFileNameChangeListener());
-    }
-
-    private ChangeListener<String> itemFileNameChangeListener() {
-        return (observable, oldValue, newValue) -> {
-            if (ignoreItemPrefixNameListener) return;
-
-            currentItemFileNamePrefixValue = newValue;
-            if (definedPatterns.contains(newValue)) {
-                currentItemFileNamePrefixValue = inteliSenseService.getValue(oldValue, newValue);
-                ignoreItemPrefixNameListener = true;
-                itemFileNamePrefixTextField.setText(currentItemFileNamePrefixValue);
-                ignoreItemPrefixNameListener = false;
-            }
-            itemFileNamePrefixTextField.positionCaret(currentItemFileNamePrefixValue.length());
         };
     }
 
