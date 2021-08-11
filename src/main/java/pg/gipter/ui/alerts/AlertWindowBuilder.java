@@ -159,7 +159,7 @@ public class AlertWindowBuilder {
                 }
                 messageLabel.setStyle(style);
 
-                final String[] lines = entry.getValue().logMsg().split(System.getProperty("line.separator"));
+                final String[] lines = entry.getValue().logMsg().split(SystemUtils.lineSeparator());
 
                 preferredWidth = pixelsPerLetterFactor * Arrays.stream(lines)
                         .map(String::length)
@@ -184,7 +184,7 @@ public class AlertWindowBuilder {
             messageLabel.setStyle(style);
             gridPane.add(messageLabel, 0, gridPaneRow++);
 
-            double messageWidth = pixelsPerLetterFactor * Arrays.stream(message.split(System.getProperty("line.separator")))
+            double messageWidth = pixelsPerLetterFactor * Arrays.stream(message.split(SystemUtils.lineSeparator()))
                     .map(String::length)
                     .max((o1, o2) -> o1 > o2 ? o1 : o2)
                     .orElseGet(() -> 0);

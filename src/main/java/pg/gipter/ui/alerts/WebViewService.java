@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.ui.UploadStatus;
 import pg.gipter.utils.ResourceUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.*;
 import java.net.URL;
@@ -107,7 +108,7 @@ public class WebViewService {
              final InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
              final BufferedReader bufferedReader = new BufferedReader(isr)) {
 
-            String htmlContent = bufferedReader.lines().collect(joining(System.getProperty("line.separator")));
+            String htmlContent = bufferedReader.lines().collect(joining(SystemUtils.lineSeparator()));
 
             return htmlContent.replaceAll(URL_PLACEHOLDER, gif.url());
         } catch (IOException e) {

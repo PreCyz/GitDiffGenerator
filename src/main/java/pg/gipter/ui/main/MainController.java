@@ -170,7 +170,6 @@ public class MainController extends AbstractController {
     private Map<String, Control> initConfigurationSectionMap() {
         Map<String, Control> map = new HashMap<>();
         map.put("configurationNameComboBox", configurationNameComboBox);
-        //map.put("configurationNameTextField", configurationNameTextField);
         map.put("addConfigurationButton", addConfigurationButton);
         map.put("removeConfigurationButton", removeConfigurationButton);
         map.put("saveConfigurationButton", saveConfigurationButton);
@@ -249,8 +248,8 @@ public class MainController extends AbstractController {
         toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
         configurationSectionController.initialize(location, resources, initConfigurationSectionMap());
         menuSectionController.initialize(location, resources, initMenuSectionMap());
-        pathsSectionController.initialize(location, resources, initPathsSectionMap());
         //this is executed through configurationSectionController
+        //pathsSectionController.initialize(location, resources, initPathsSectionMap());
         //datesSectionController.initialize(location, resources, initDatesSectionMap());
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
         //this is executed later in the flow
