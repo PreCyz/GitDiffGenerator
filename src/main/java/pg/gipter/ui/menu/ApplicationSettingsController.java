@@ -105,6 +105,8 @@ public class ApplicationSettingsController extends AbstractController {
         setAccelerators();
         createLabelsMap();
         TextFieldIntelliSense.init(gitCommandTextField, CommandPatternValue.class);
+        TextFieldIntelliSense.init(svnCommandTextField, CommandPatternValue.class);
+        TextFieldIntelliSense.init(mercurialCommandTextField, CommandPatternValue.class);
     }
 
     @Override
