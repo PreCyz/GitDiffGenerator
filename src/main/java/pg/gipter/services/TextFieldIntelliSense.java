@@ -21,7 +21,7 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
     private boolean ignoreListener = false;
     private String currentValue = "";
 
-    private int caretPosition;
+    int caretPosition;
     private Integer caretAfterChange;
     private String previousValue = "";
 
@@ -63,7 +63,7 @@ public class TextFieldIntelliSense<E extends Enum<E>> {
     Set<String> getFilteredValues(String text) {
         Set<String> result = Collections.emptySet();
         final String uncompleted = getUncompleted(text).toLowerCase();
-        if (text.endsWith("{") || text.charAt(caretPosition) == '{') {
+        if (text.endsWith("{") || (!text.isEmpty() && text.charAt(caretPosition) == '{')) {
             result = new LinkedHashSet<>(definedPatterns);
         } else if (!uncompleted.isEmpty()) {
             result = definedPatterns.stream()
