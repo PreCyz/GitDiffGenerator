@@ -13,8 +13,7 @@ import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.*;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.IOException;
@@ -70,7 +69,7 @@ public class MenuSectionController extends AbstractController {
 
         setUpgradeMenuItemDisabled();
 
-        final boolean enableImportCert = StringUtils.notEmpty(System.getProperty("java.home")) &&
+        final boolean enableImportCert = StringUtils.notEmpty(SystemUtils.javaHome()) &&
                 applicationProperties.isCertImportEnabled() &&
                 CertificateServiceFactory.getInstance(true).hasCertToImport();
         importCertMenuItem.setDisable(!enableImportCert);

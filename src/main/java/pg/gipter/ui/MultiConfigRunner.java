@@ -1,7 +1,6 @@
 package pg.gipter.ui;
 
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +17,7 @@ import pg.gipter.statistics.dto.RunDetails;
 import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.task.UpdatableTask;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDate;
@@ -25,13 +25,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
 
 /** Created by Pawel Gawedzki on 15-Jul-2019. */
-public class MultiConfigRunner extends Task<Void> implements Starter {
+public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiConfigRunner.class);
 
@@ -39,8 +38,6 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     private final Executor executor;
     private static Boolean toolkitCredentialsSet = null;
     private final Map<String, UploadResult> resultMap = new LinkedHashMap<>();
-    private final long totalProgress;
-    private final AtomicLong workDone;
     private Collection<ApplicationProperties> applicationPropertiesCollection;
     private final ConfigurationDao configurationDao;
     private final DataDao dataDao;
@@ -53,10 +50,9 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     }
 
     public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType, LocalDate startDate) {
+        super();
         this.configurationNames = new LinkedList<>(configurationNames);
         this.executor = executor;
-        this.totalProgress = configurationNames.size() * 5L;
-        this.workDone = new AtomicLong(0);
         this.applicationPropertiesCollection = Collections.emptyList();
         this.configurationDao = DaoFactory.getCachedConfiguration();
         this.dataDao = DaoFactory.getDataDao();
@@ -99,6 +95,10 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
                 if (applicationPropertiesCollection.isEmpty()) {
                     executeForNames();
                 } else {
+                    int totalNumberOfProjects = applicationPropertiesCollection.stream()
+                            .mapToInt(ap -> ap.projectPaths().size())
+                            .sum();
+                    setMaxProgress(INCREMENT_FACTOR * totalNumberOfProjects + NUMBER_OF_STEPS);
                     executeForApplicationProperties();
                 }
             } catch (Exception ex) {
@@ -148,7 +148,8 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
             if (applicationProperties.isToolkitCredentialsSet()) {
                 CompletableFuture<Boolean> withUpload = CompletableFuture
                         .supplyAsync(() -> applicationProperties, executor)
-                        .thenApply(this::produce).thenApply(this::upload)
+                        .thenApply(this::produce)
+                        .thenApply(this::upload)
                         .handle((isUploaded, throwable) -> handleUploadResult(configName, throwable == null, throwable));
 
                 tasks.add(withUpload);
@@ -197,10 +198,10 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     private ApplicationProperties produce(ApplicationProperties applicationProperties) {
         try {
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
-            updateProgress(workDone.incrementAndGet(), totalProgress);
+            incrementProgress();
             updateMessage(BundleUtils.getMsg("progress.generatingDiff"));
-            diffProducer.produceDiff();
-            updateProgress(workDone.incrementAndGet(), totalProgress);
+            diffProducer.produceDiff(this);
+            incrementProgress();
             updateMessage(BundleUtils.getMsg("progress.diffGenerated"));
             return applicationProperties;
         } catch (Exception ex) {
@@ -212,10 +213,10 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
     private boolean upload(ApplicationProperties applicationProperties) {
         try {
             DiffUploader diffUploader = new DiffUploader(applicationProperties);
-            updateProgress(workDone.incrementAndGet(), totalProgress);
+            incrementProgress();
             updateMessage(BundleUtils.getMsg("progress.uploadingToToolkit"));
             diffUploader.uploadDiff();
-            updateProgress(workDone.incrementAndGet(), totalProgress);
+            incrementProgress();
             updateMessage(BundleUtils.getMsg("progress.itemUploaded"));
             logger.info("Diff upload complete.");
             return true;
@@ -278,7 +279,7 @@ public class MultiConfigRunner extends Task<Void> implements Starter {
 
     private void saveUploadStatus(UploadStatus status) {
         dataDao.saveUploadStatus(status);
-        updateProgress(totalProgress, totalProgress);
+        updateProgress(getMax(), getMax());
         updateMessage(BundleUtils.getMsg("progress.finished", status.name()));
         logger.info("{} ended.", this.getClass().getName());
     }

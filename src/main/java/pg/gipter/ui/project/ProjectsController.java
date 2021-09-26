@@ -22,6 +22,7 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -220,15 +221,12 @@ public class ProjectsController extends AbstractController {
                 .filter(pd -> VersionControlSystem.GIT.name().equals(pd.getVcsType()))
                 .findAny();
         gitRepo.ifPresent(pd -> vcsService.setProjectPath(pd.getPath()));
-        if (gitRepo.isPresent() && !vcsService.isGitAvailableInCommandLine()) {
+        if (gitRepo.isPresent() && !vcsService.isVcsAvailableInCommandLine()) {
+            String lineSeparator = SystemUtils.lineSeparator();
             new AlertWindowBuilder().withAlertType(Alert.AlertType.ERROR)
                     .withHeaderText(BundleUtils.getMsg("projects.alert.git.unavailable.header"))
-                    .withMessage(BundleUtils.getMsg(
-                            "projects.alert.git.unavailable.msg",
-                            System.getProperty("line.separator"),
-                            System.getProperty("line.separator"),
-                            System.getProperty("line.separator")
-                    ))
+                    .withMessage(BundleUtils.getMsg("projects.alert.git.unavailable.msg",
+                            lineSeparator, lineSeparator, lineSeparator))
                     .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
                     .buildAndDisplayWindow();
         }

@@ -10,11 +10,11 @@ import javafx.scene.control.*;
 import pg.gipter.core.*;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -41,7 +41,7 @@ class ConfigurationSectionController extends AbstractController {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    void initialize(URL location, ResourceBundle resources, Map<String, Object> controlsMap) {
+    void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
         super.initialize(location, resources);
 
         configurationNameComboBox = (ComboBox) controlsMap.get("configurationNameComboBox");
@@ -83,8 +83,8 @@ class ConfigurationSectionController extends AbstractController {
     }
 
     void saveConfiguration() {
-
         RunConfig runConfigFromUI = mainController.createRunConfigFromUI();
+        Optional<AlertWindowBuilder> alertWindow = displayAuthorChangeWarning(runConfigFromUI);
         applicationProperties.updateCurrentRunConfig(runConfigFromUI);
         CacheManager.removeFromCache(applicationProperties.configurationName());
         uiLauncher.executeOutsideUIThread(mainController::updateRunConfig);
@@ -95,7 +95,99 @@ class ConfigurationSectionController extends AbstractController {
                 .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                 .withAlertType(Alert.AlertType.INFORMATION)
                 .withImageFile(ImageFile.FINGER_UP_PNG);
-        Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
+        alertWindow.orElseGet(() -> alertWindowBuilder);
+        Platform.runLater(() -> alertWindow.orElseGet(() -> alertWindowBuilder).buildAndDisplayWindow());
+    }
+
+    private Optional<AlertWindowBuilder> displayAuthorChangeWarning(RunConfig runConfig) {
+        Optional<AlertWindowBuilder> result = Optional.empty();
+        AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                .withHeaderText(BundleUtils.getMsg("main.config.changed"))
+                .withAlertType(Alert.AlertType.INFORMATION)
+                .withWebViewDetails(WebViewService.getInstance().pullPartialSuccessWebView());
+        boolean isOverride = applicationProperties.getCustomCommand(VersionControlSystem.GIT).isOverride() ||
+                applicationProperties.getCustomCommand(VersionControlSystem.SVN).isOverride() ||
+                applicationProperties.getCustomCommand(VersionControlSystem.MERCURIAL).isOverride();
+        if (isOverride && Objects.nonNull(runConfig.getAuthor()) &&
+                !runConfig.getAuthor().equals(String.join(",", applicationProperties.authors()))) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.author.changed",
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        } else if (isOverride && Objects.nonNull(runConfig.getCommitterEmail()) &&
+                !runConfig.getCommitterEmail().equals(applicationProperties.committerEmail())) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.committerEmail.changed",
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        } else if (Objects.nonNull(runConfig.getGitAuthor()) && Objects.nonNull(applicationProperties.gitAuthor()) &&
+                !runConfig.getGitAuthor().equals(applicationProperties.gitAuthor()) &&
+                applicationProperties.getCustomCommand(VersionControlSystem.GIT).isOverride()) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.cvsAuthor.changed",
+                    VersionControlSystem.GIT.name(),
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        } else if (Objects.nonNull(runConfig.getSvnAuthor()) && Objects.nonNull(applicationProperties.svnAuthor()) &&
+                !runConfig.getSvnAuthor().equals(applicationProperties.svnAuthor()) &&
+                applicationProperties.getCustomCommand(VersionControlSystem.SVN).isOverride()) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.cvsAuthor.changed",
+                    VersionControlSystem.SVN.name(),
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        } else if (Objects.nonNull(runConfig.getMercurialAuthor()) && Objects.nonNull(applicationProperties.mercurialAuthor()) &&
+                !runConfig.getMercurialAuthor().equals(applicationProperties.mercurialAuthor()) &&
+                applicationProperties.getCustomCommand(VersionControlSystem.MERCURIAL).isOverride()) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.cvsAuthor.changed",
+                    VersionControlSystem.MERCURIAL.name(),
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        } else if (isOverride && Objects.isNull(runConfig.getAuthor()) && !applicationProperties.authors().isEmpty()) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.author.removed",
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        } else if (isOverride && Objects.isNull(runConfig.getCommitterEmail()) &&
+                !StringUtils.nullOrEmpty(applicationProperties.committerEmail())) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.committerEmail.removed",
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        } else if (Objects.isNull(runConfig.getGitAuthor()) && Objects.nonNull(applicationProperties.gitAuthor()) &&
+                applicationProperties.getCustomCommand(VersionControlSystem.GIT).isOverride()) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.cvsAuthor.removed",
+                    VersionControlSystem.GIT.name(),
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        } else if (Objects.isNull(runConfig.getSvnAuthor()) && Objects.nonNull(applicationProperties.svnAuthor()) &&
+                applicationProperties.getCustomCommand(VersionControlSystem.SVN).isOverride()) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.cvsAuthor.removed",
+                    VersionControlSystem.SVN.name(),
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        } else if (Objects.isNull(runConfig.getMercurialAuthor()) && Objects.nonNull(applicationProperties.mercurialAuthor()) &&
+                applicationProperties.getCustomCommand(VersionControlSystem.MERCURIAL).isOverride()) {
+            alertWindowBuilder.withMessage(BundleUtils.getMsg(
+                    "main.cvsAuthor.removed",
+                    VersionControlSystem.MERCURIAL.name(),
+                    SystemUtils.lineSeparator()
+            ));
+            result = Optional.of(alertWindowBuilder);
+        }
+        return result;
     }
 
     void updateConfigurationNameComboBox(String oldValue, String newValue) {

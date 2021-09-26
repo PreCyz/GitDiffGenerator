@@ -10,19 +10,31 @@ import javafx.scene.layout.AnchorPane;
 import org.quartz.SchedulerException;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.model.CommandPatternValue;
+import pg.gipter.core.producers.command.DiffCommandFactory;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.jobs.JobCreator;
 import pg.gipter.jobs.JobCreatorFactory;
 import pg.gipter.services.StartupService;
+import pg.gipter.services.TextFieldIntelliSense;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ApplicationSettingsController extends AbstractController {
 
+    @FXML
+    private TabPane applicationSettingsTabPane;
+
+    @FXML
+    private Tab applicationSettingsTab;
     @FXML
     private Label confirmationWindowLabel;
     @FXML
@@ -37,8 +49,6 @@ public class ApplicationSettingsController extends AbstractController {
     private Label importCertLabel;
     @FXML
     private Label checkLastItemLabel;
-    @FXML
-    private TitledPane titledPane;
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -61,6 +71,23 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private ComboBox<String> languageComboBox;
 
+    @FXML
+    private Tab customCommandTab;
+    @FXML
+    private TextField gitCommandTextField;
+    @FXML
+    private TextField svnCommandTextField;
+    @FXML
+    private TextField mercurialCommandTextField;
+    @FXML
+    private CheckBox overrideGitCheckBox;
+    @FXML
+    private CheckBox overrideSvnCheckBox;
+    @FXML
+    private CheckBox overrideMercurialCheckBox;
+    @FXML
+    private Label overrideLabel;
+
     private final Map<String, Labeled> labelsAffectedByLanguage;
 
     public ApplicationSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
@@ -77,6 +104,14 @@ public class ApplicationSettingsController extends AbstractController {
         setListeners();
         setAccelerators();
         createLabelsMap();
+        TextFieldIntelliSense.init(gitCommandTextField, CommandPatternValue.class);
+        TextFieldIntelliSense.init(svnCommandTextField, CommandPatternValue.class);
+        TextFieldIntelliSense.init(mercurialCommandTextField, CommandPatternValue.class);
+    }
+
+    @Override
+    public void executeBeforeClose() {
+        saveNewSettings();
     }
 
     private void setInitValues() {
@@ -94,6 +129,29 @@ public class ApplicationSettingsController extends AbstractController {
         languageComboBox.setValue(applicationProperties.uiLanguage());
         importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
         checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
+
+        final CustomCommand gitCustomCommand = applicationProperties.getCustomCommand(VersionControlSystem.GIT);
+        overrideGitCheckBox.setSelected(gitCustomCommand.isOverride());
+        gitCommandTextField.setText(gitCustomCommand.isOverride() ? gitCustomCommand.getCommand() : String.join(
+                " ",
+                DiffCommandFactory.getInstance(VersionControlSystem.GIT, applicationProperties).commandAsList())
+        );
+
+        final CustomCommand svnCustomCommand = applicationProperties.getCustomCommand(VersionControlSystem.SVN);
+        overrideSvnCheckBox.setSelected(svnCustomCommand.isOverride());
+        svnCommandTextField.setText(svnCustomCommand.isOverride() ? svnCustomCommand.getCommand() : String.join(
+                " ",
+                DiffCommandFactory.getInstance(VersionControlSystem.SVN, applicationProperties).commandAsList())
+        );
+
+        final CustomCommand mercurialCustomCommand = applicationProperties.getCustomCommand(VersionControlSystem.MERCURIAL);
+        overrideMercurialCheckBox.setSelected(mercurialCustomCommand.isOverride());
+        mercurialCommandTextField.setText(mercurialCustomCommand.isOverride() ? mercurialCustomCommand.getCommand() :
+                String.join(
+                        " ",
+                        DiffCommandFactory.getInstance(VersionControlSystem.MERCURIAL, applicationProperties).commandAsList()
+                )
+        );
     }
 
     private void setProperties() {
@@ -102,6 +160,9 @@ public class ApplicationSettingsController extends AbstractController {
         useUICheckBox.setDisable(true);
         preferredArgSourceComboBox.setDisable(true);
         silentModeCheckBox.setDisable(true);
+        gitCommandTextField.setDisable(!overrideGitCheckBox.isSelected());
+        svnCommandTextField.setDisable(!overrideSvnCheckBox.isSelected());
+        mercurialCommandTextField.setDisable(!overrideMercurialCheckBox.isSelected());
     }
 
     private void setListeners() {
@@ -110,6 +171,8 @@ public class ApplicationSettingsController extends AbstractController {
                 .addListener((options, oldValue, newValue) -> {
                     BundleUtils.changeBundle(languageComboBox.getValue());
                     labelsAffectedByLanguage.forEach((key, labeled) -> labeled.setText(BundleUtils.getMsg(key)));
+                    applicationSettingsTab.setText(BundleUtils.getMsg("launch.panel.title"));
+                    customCommandTab.setText(BundleUtils.getMsg("launch.customCommand.tab"));
                     uiLauncher.changeApplicationSettingsWindowTitle();
                     applicationProperties.updateApplicationConfig(createApplicationConfigFromUI());
                     applicationProperties.save();
@@ -150,6 +213,21 @@ public class ApplicationSettingsController extends AbstractController {
             processLastItemJob(newValue);
             saveNewSettings();
         });
+
+        overrideGitCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            gitCommandTextField.setDisable(oldValue);
+            saveNewSettings();
+        });
+
+        overrideSvnCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            svnCommandTextField.setDisable(oldValue);
+            saveNewSettings();
+        });
+
+        overrideMercurialCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            mercurialCommandTextField.setDisable(oldValue);
+            saveNewSettings();
+        });
     }
 
     private void processLastItemJob(Boolean shouldSchedule) {
@@ -169,7 +247,7 @@ public class ApplicationSettingsController extends AbstractController {
         ApplicationConfig applicationConfig = createApplicationConfigFromUI();
         applicationProperties.updateApplicationConfig(applicationConfig);
         applicationProperties.save();
-        logger.info("New application settings saved. [{}]", applicationConfig.toString());
+        logger.info("New application settings saved. [{}]", applicationConfig);
     }
 
     private ApplicationConfig createApplicationConfigFromUI() {
@@ -183,6 +261,25 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setUiLanguage(languageComboBox.getValue());
         applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
         applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
+        applicationConfig.setCustomCommands(
+                Stream.of(
+                        new CustomCommand(
+                                VersionControlSystem.GIT,
+                                gitCommandTextField.getText(),
+                                overrideGitCheckBox.isSelected()
+                        ),
+                        new CustomCommand(
+                                VersionControlSystem.SVN,
+                                svnCommandTextField.getText(),
+                                overrideSvnCheckBox.isSelected()
+                        ),
+                        new CustomCommand(
+                                VersionControlSystem.MERCURIAL,
+                                mercurialCommandTextField.getText(),
+                                overrideMercurialCheckBox.isSelected()
+                        )
+                ).collect(Collectors.toSet())
+        );
         return applicationConfig;
     }
 
@@ -190,6 +287,8 @@ public class ApplicationSettingsController extends AbstractController {
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
             if (KeyCode.ESCAPE == e.getCode()) {
                 uiLauncher.closeApplicationWindow();
+            } else if (e.isControlDown() && KeyCode.S == e.getCode()) {
+                saveNewSettings();
             }
         });
     }
@@ -202,8 +301,8 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.preferredArgSource", preferredArgSourceLabel);
         labelsAffectedByLanguage.put("launch.panel.useUI", useUICheckBox);
         labelsAffectedByLanguage.put("launch.panel.silentMode", silentModeCheckBox);
-        labelsAffectedByLanguage.put("launch.panel.title", titledPane);
         labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
         labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
+        labelsAffectedByLanguage.put("launch.customCommand.override", overrideLabel);
     }
 }

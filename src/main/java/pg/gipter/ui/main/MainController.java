@@ -82,6 +82,8 @@ public class MainController extends AbstractController {
     private CheckBox skipRemoteCheckBox;
     @FXML
     private CheckBox fetchAllCheckBox;
+    @FXML
+    private TextField fetchTimeoutTextField;
 
     @FXML
     private Label projectPathLabel;
@@ -155,8 +157,8 @@ public class MainController extends AbstractController {
         csvDetailsSectionController.setVcsService(vcsService);
     }
 
-    private Map<String, Object> initToolkitSectionMap() {
-        Map<String, Object> map = new HashMap<>();
+    private Map<String, Control> initToolkitSectionMap() {
+        Map<String, Control> map = new HashMap<>();
         map.put("toolkitUsernameTextField", toolkitUsernameTextField);
         map.put("toolkitPasswordField", toolkitPasswordField);
         map.put("toolkitDomainTextField", toolkitDomainTextField);
@@ -165,10 +167,9 @@ public class MainController extends AbstractController {
         return map;
     }
 
-    private Map<String, Object> initConfigurationSectionMap() {
-        Map<String, Object> map = new HashMap<>();
+    private Map<String, Control> initConfigurationSectionMap() {
+        Map<String, Control> map = new HashMap<>();
         map.put("configurationNameComboBox", configurationNameComboBox);
-        //map.put("configurationNameTextField", configurationNameTextField);
         map.put("addConfigurationButton", addConfigurationButton);
         map.put("removeConfigurationButton", removeConfigurationButton);
         map.put("saveConfigurationButton", saveConfigurationButton);
@@ -190,8 +191,8 @@ public class MainController extends AbstractController {
         return map;
     }
 
-    private Map<String, Object> initPathsSectionMap() {
-        Map<String, Object> map = new HashMap<>();
+    private Map<String, Control> initPathsSectionMap() {
+        Map<String, Control> map = new HashMap<>();
         map.put("projectPathLabel", projectPathLabel);
         map.put("itemPathLabel", itemPathLabel);
         map.put("itemFileNamePrefixTextField", itemFileNamePrefixTextField);
@@ -200,19 +201,20 @@ public class MainController extends AbstractController {
         return map;
     }
 
-    private Map<String, Object> initDatesSectionMap() {
-        Map<String, Object> map = new HashMap<>();
+    private Map<String, Control> initDatesSectionMap() {
+        Map<String, Control> map = new HashMap<>();
         map.put("startDatePicker", startDatePicker);
         map.put("endDatePicker", endDatePicker);
         map.put("useLastItemDateCheckbox", useLastItemDateCheckbox);
         return map;
     }
 
-    private Map<String, CheckBox> initAdditionalSettingsSectionMap() {
-        Map<String, CheckBox> map = new HashMap<>();
+    private Map<String, Control> initAdditionalSettingsSectionMap() {
+        Map<String, Control> map = new HashMap<>();
         map.put("deleteDownloadedFilesCheckBox", deleteDownloadedFilesCheckBox);
         map.put("skipRemoteCheckBox", skipRemoteCheckBox);
         map.put("fetchAllCheckBox", fetchAllCheckBox);
+        map.put("fetchTimeoutTextField", fetchTimeoutTextField);
         return map;
     }
 
@@ -246,8 +248,8 @@ public class MainController extends AbstractController {
         toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
         configurationSectionController.initialize(location, resources, initConfigurationSectionMap());
         menuSectionController.initialize(location, resources, initMenuSectionMap());
-        pathsSectionController.initialize(location, resources, initPathsSectionMap());
         //this is executed through configurationSectionController
+        //pathsSectionController.initialize(location, resources, initPathsSectionMap());
         //datesSectionController.initialize(location, resources, initDatesSectionMap());
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
         //this is executed later in the flow
@@ -348,8 +350,9 @@ public class MainController extends AbstractController {
         runConfig.setDeleteDownloadedFiles(additionalSettingsSectionController.getDeleteDownloadedFiles());
         runConfig.setSkipRemote(additionalSettingsSectionController.getSkipRemote());
         runConfig.setFetchAll(additionalSettingsSectionController.getFetchAll());
+        runConfig.setFetchTimeout(additionalSettingsSectionController.getFetchTimeout());
 
-        runConfig.setProjectPath(pathsSectionController.getProjectPathLabelValue());
+        runConfig.setProjectPath(pathsSectionController.getProjectPaths());
         runConfig.setItemPath(pathsSectionController.getItemPathLabelValue());
         if (!StringUtils.nullOrEmpty(pathsSectionController.getItemFileNamePrefix())) {
             runConfig.setItemFileNamePrefix(pathsSectionController.getItemFileNamePrefix());
@@ -389,12 +392,8 @@ public class MainController extends AbstractController {
         configurationSectionController.getConfigurationName();
         RunConfig runConfigWithoutDates = getRunConfigWithoutDates();
         applicationProperties.updateCurrentRunConfig(runConfigWithoutDates);
-        //new JobHelper().updateJobConfigs(oldConfigName, newConfigName);
         configurationSectionController.setDisableDependOnConfigurations();
         applicationProperties.save();
-        /*if (!StringUtils.nullOrEmpty(oldConfigName) && !newConfigName.equals(oldConfigName)) {
-            applicationProperties.removeConfig(oldConfigName);
-        }*/
     }
 
     RunConfig getRunConfigWithoutDates() {

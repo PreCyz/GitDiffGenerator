@@ -9,6 +9,7 @@ import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SemanticVersioning;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,7 +60,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{"author=cliAuthor"});
         applicationProperties.init(loader);
 
@@ -73,7 +74,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(loader);
 
@@ -87,7 +88,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{"startDate=2019-02-16"});
         applicationProperties.init(loader);
 
@@ -101,7 +102,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withCommitterEmail("email")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(loader);
 
@@ -115,7 +116,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withGitAuthor("author")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(loader);
 
@@ -129,7 +130,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withMercurialAuthor("author")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(loader);
 
@@ -143,7 +144,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withSvnAuthor("author")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(loader);
 
@@ -160,7 +161,7 @@ class CliPreferredApplicationPropertiesTest {
                 .withMercurialAuthor("author")
                 .withSvnAuthor("author")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(loader);
 
@@ -194,7 +195,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withGitAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{"gitAuthor=cliAuthor"});
         applicationProperties.init(loader);
 
@@ -208,7 +209,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withGitAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(loader);
 
@@ -222,7 +223,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withGitAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(loader);
 
@@ -256,7 +257,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withMercurialAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{"mercurialAuthor=cliAuthor"});
         applicationProperties.init(loader);
 
@@ -270,7 +271,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withMercurialAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(loader);
 
@@ -284,7 +285,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withMercurialAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(loader);
 
@@ -318,7 +319,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withSvnAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{"svnAuthor=cliAuthor"});
         applicationProperties.init(loader);
 
@@ -332,7 +333,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withSvnAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{});
         applicationProperties.init(loader);
 
@@ -346,7 +347,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withSvnAuthor("fileAuthor")
                 .create();
-        ConfigurationDao loader = TestUtils.mockConfigurtionDao(runConfig);
+        ConfigurationDao loader = TestUtils.mockConfigurationDao(runConfig);
         applicationProperties = new CliApplicationProperties(new String[]{"author=test"});
         applicationProperties.init(loader);
 
@@ -380,7 +381,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemPath("propertiesItemPath")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.itemPath();
 
@@ -394,7 +395,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemPath("propertiesItemPath")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.itemPath();
 
@@ -408,7 +409,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemPath("propertiesItemPath")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.itemPath();
 
@@ -442,7 +443,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemFileNamePrefix("propertiesItemFileNamePrefix")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.itemFileNamePrefix();
 
@@ -456,7 +457,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemFileNamePrefix("propertiesItemFileNamePrefix")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.itemPath();
 
@@ -470,7 +471,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemFileNamePrefix("propertiesItemFileNamePrefix")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.itemFileNamePrefix();
 
@@ -504,7 +505,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withProjectPath("propertiesProjectPath1,propertiesProjectPath2")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         Set<String> actual = applicationProperties.projectPaths();
 
@@ -518,7 +519,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withProjectPath("propertiesProjectPath1,propertiesProjectPath2")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         Set<String> actual = applicationProperties.projectPaths();
 
@@ -532,7 +533,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withProjectPath("propertiesProjectPath1,propertiesProjectPath2")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         Set<String> actual = applicationProperties.projectPaths();
 
@@ -566,7 +567,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withCommitterEmail("test@email.properties")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.committerEmail();
 
@@ -580,7 +581,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withCommitterEmail("test@email.properties")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
         String actual = applicationProperties.committerEmail();
 
         assertThat(actual).isEqualTo("test@email.properties");
@@ -593,7 +594,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withCommitterEmail("test@email.properties")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
         String actual = applicationProperties.committerEmail();
 
         assertThat(actual).isEqualTo("test@email.properties");
@@ -626,7 +627,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withStartDate(LocalDate.of(2019, 2, 9))
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         LocalDate actual = applicationProperties.startDate();
 
@@ -640,7 +641,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withStartDate(LocalDate.of(2019, 2, 9))
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         LocalDate actual = applicationProperties.startDate();
 
@@ -654,7 +655,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withStartDate(LocalDate.of(2019, 2, 9))
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         LocalDate actual = applicationProperties.startDate();
 
@@ -678,7 +679,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withPeriodInDays(6)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         LocalDate actual = applicationProperties.startDate();
 
@@ -692,7 +693,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withPeriodInDays(6)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         LocalDate actual = applicationProperties.startDate();
 
@@ -726,7 +727,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withEndDate(LocalDate.of(2019, 2, 9))
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         LocalDate actual = applicationProperties.endDate();
 
@@ -740,7 +741,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withEndDate(LocalDate.of(2019, 2, 9))
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         LocalDate actual = applicationProperties.endDate();
 
@@ -754,7 +755,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withEndDate(LocalDate.of(2019, 2, 9))
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         LocalDate actual = applicationProperties.endDate();
 
@@ -788,7 +789,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemType(ItemType.STATEMENT)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         ItemType actual = applicationProperties.itemType();
 
@@ -802,7 +803,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemType(ItemType.STATEMENT)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         ItemType actual = applicationProperties.itemType();
 
@@ -816,7 +817,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withItemType(ItemType.STATEMENT)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         ItemType actual = applicationProperties.itemType();
 
@@ -849,7 +850,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setConfirmationWindow(Boolean.FALSE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isConfirmationWindow();
 
@@ -862,7 +863,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setConfirmationWindow(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isConfirmationWindow();
 
@@ -875,7 +876,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setConfirmationWindow(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isConfirmationWindow();
 
@@ -888,7 +889,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUsername();
 
-        assertThat(actual).isEqualTo("UNKNOWN_USER");
+        assertThat(actual).isEqualTo(SystemUtils.userName().toUpperCase());
     }
 
     @Test
@@ -908,7 +909,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("propertiesUserName");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUsername();
 
@@ -921,7 +922,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("propertiesUserName");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUsername();
 
@@ -934,7 +935,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("propertiesUserName");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUsername();
 
@@ -967,7 +968,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitPassword("propertiesPassword");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitPassword();
 
@@ -980,7 +981,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitPassword("propertiesPassword");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitPassword();
 
@@ -993,7 +994,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitPassword("propertiesPassword");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitPassword();
 
@@ -1026,7 +1027,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitDomain("propertiesDomain");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitDomain();
 
@@ -1039,7 +1040,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitDomain("propertiesDomain");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitDomain();
 
@@ -1052,7 +1053,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitDomain("propertiesDomain");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitDomain();
 
@@ -1085,7 +1086,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUrl("propertiesUrl");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUrl();
 
@@ -1098,7 +1099,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUrl("propertiesUrl");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUrl();
 
@@ -1111,7 +1112,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUrl("propertiesUrl");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUrl();
 
@@ -1144,7 +1145,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitCopyListName("propertiesListName");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitCopyListName();
 
@@ -1157,7 +1158,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitCopyListName("propertiesListName");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitCopyListName();
 
@@ -1170,7 +1171,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitCopyListName("propertiesListName");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitCopyListName();
 
@@ -1183,7 +1184,9 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUserFolder();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/UNKNOWN_USER");
+        assertThat(actual).isEqualTo(
+                "https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/" + SystemUtils.userName().toUpperCase()
+        );
     }
 
     @Test
@@ -1203,7 +1206,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("propertiesUserName");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUserFolder();
 
@@ -1216,7 +1219,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("propertiesUserName");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUserFolder();
 
@@ -1229,7 +1232,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("propertiesUserName");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUserFolder();
 
@@ -1261,7 +1264,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withSkipRemote(Boolean.TRUE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         boolean actual = applicationProperties.isSkipRemote();
 
@@ -1275,7 +1278,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withSkipRemote(Boolean.FALSE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         boolean actual = applicationProperties.isSkipRemote();
 
@@ -1289,7 +1292,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withSkipRemote(Boolean.FALSE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         boolean actual = applicationProperties.isSkipRemote();
 
@@ -1321,7 +1324,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withFetchAll(Boolean.TRUE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         boolean actual = applicationProperties.isFetchAll();
 
@@ -1335,7 +1338,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withFetchAll(Boolean.FALSE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         boolean actual = applicationProperties.isFetchAll();
 
@@ -1349,7 +1352,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withFetchAll(Boolean.FALSE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         boolean actual = applicationProperties.isFetchAll();
 
@@ -1381,7 +1384,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withPreferredArgSource(PreferredArgSource.CLI)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         PreferredArgSource actual = applicationProperties.preferredArgSource();
 
@@ -1395,7 +1398,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withPreferredArgSource(PreferredArgSource.FILE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         PreferredArgSource actual = applicationProperties.preferredArgSource();
 
@@ -1409,7 +1412,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withPreferredArgSource(PreferredArgSource.FILE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         PreferredArgSource actual = applicationProperties.preferredArgSource();
 
@@ -1451,7 +1454,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setUseUI(Boolean.FALSE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isUseUI();
 
@@ -1464,7 +1467,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setUseUI(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isUseUI();
 
@@ -1477,7 +1480,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setUseUI(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isUseUI();
 
@@ -1491,7 +1494,7 @@ class CliPreferredApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUserFolder();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue().toUpperCase());
     }
 
     @Test
@@ -1510,7 +1513,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUserFolder();
 
@@ -1523,7 +1526,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUserFolder();
 
@@ -1536,7 +1539,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
-        applicationProperties.init(TestUtils.mockConfigurtionDao(toolkitConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         String actual = applicationProperties.toolkitUserFolder();
 
@@ -1570,7 +1573,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withToolkitProjectListNames("properties1,properties2")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         Set<String> actual = applicationProperties.toolkitProjectListNames();
 
@@ -1584,7 +1587,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withToolkitProjectListNames("properties1,properties2")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         Set<String> actual = applicationProperties.toolkitProjectListNames();
 
@@ -1598,7 +1601,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withToolkitProjectListNames("properties1,properties2")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         Set<String> actual = applicationProperties.toolkitProjectListNames();
 
@@ -1632,7 +1635,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withDeleteDownloadedFiles(Boolean.FALSE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         boolean actual = applicationProperties.isDeleteDownloadedFiles();
 
@@ -1646,7 +1649,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withDeleteDownloadedFiles(Boolean.FALSE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         boolean actual = applicationProperties.isDeleteDownloadedFiles();
 
@@ -1660,7 +1663,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withDeleteDownloadedFiles(Boolean.FALSE)
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         boolean actual = applicationProperties.isDeleteDownloadedFiles();
 
@@ -1693,7 +1696,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withConfigurationName("fileAuthor")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.configurationName();
 
@@ -1706,7 +1709,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withConfigurationName("fileAuthor")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.configurationName();
 
@@ -1719,7 +1722,7 @@ class CliPreferredApplicationPropertiesTest {
         RunConfig runConfig = new RunConfigBuilder()
                 .withConfigurationName("fileAuthor")
                 .create();
-        applicationProperties.init(TestUtils.mockConfigurtionDao(runConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
 
         String actual = applicationProperties.configurationName();
 
@@ -1924,7 +1927,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setUpgradeFinished(Boolean.FALSE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isUpgradeFinished();
 
@@ -1937,7 +1940,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setUpgradeFinished(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isUpgradeFinished();
 
@@ -1950,7 +1953,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setUpgradeFinished(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isUpgradeFinished();
 
@@ -2010,7 +2013,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setCertImportEnabled(Boolean.FALSE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isCertImportEnabled();
 
@@ -2023,7 +2026,7 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setCertImportEnabled(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isCertImportEnabled();
 
@@ -2036,10 +2039,67 @@ class CliPreferredApplicationPropertiesTest {
         applicationProperties = new CliApplicationProperties(args);
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setCertImportEnabled(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurtionDao(applicationConfig));
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         boolean actual = applicationProperties.isCertImportEnabled();
 
         assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenNoFetchTimeout_whenFetchTimeout_thenReturnDefault60() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        int actual = applicationProperties.fetchTimeout();
+
+        assertThat(actual).isEqualTo(60);
+    }
+
+    @Test
+    void givenFetchTimeoutFromCLI_whenFetchTimeout_thenReturnCliFetchTimeout() {
+        applicationProperties = new CliApplicationProperties(new String[]{"fetchTimeout=12"});
+
+        int actual = applicationProperties.fetchTimeout();
+
+        assertThat(actual).isEqualTo(12);
+    }
+
+    @Test
+    void givenFetchTimeoutFileAndCLI_whenFetchTimeout_thenReturnCliFetchTimeout() {
+        String[] args = {"fetchTimeout=2"};
+        applicationProperties = new CliApplicationProperties(args);
+        RunConfig runConfig = new RunConfig();
+        runConfig.setFetchTimeout(45);
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
+
+        int actual = applicationProperties.fetchTimeout();
+
+        assertThat(actual).isEqualTo(2);
+    }
+
+    @Test
+    void givenFetchTimeoutFromFile_whenFetchTimeout_thenReturnFetchTimeoutFromFile() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        RunConfig runConfig = new RunConfig();
+        runConfig.setFetchTimeout(13);
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
+
+        int actual = applicationProperties.fetchTimeout();
+
+        assertThat(actual).isEqualTo(13);
+    }
+
+    @Test
+    void givenFetchTimeoutFromFileAndOtherArgs_whenFetchTimeout_thenReturnFetchTimeoutFromFile() {
+        String[] args = {"author=test"};
+        applicationProperties = new CliApplicationProperties(args);
+        RunConfig runConfig = new RunConfig();
+        runConfig.setFetchTimeout(13);
+        applicationProperties.init(TestUtils.mockConfigurationDao(runConfig));
+
+        int actual = applicationProperties.fetchTimeout();
+
+        assertThat(actual).isEqualTo(13);
     }
 }

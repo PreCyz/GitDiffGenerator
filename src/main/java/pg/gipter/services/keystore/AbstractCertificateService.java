@@ -2,8 +2,7 @@ package pg.gipter.services.keystore;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.utils.JarHelper;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -22,7 +21,7 @@ abstract class AbstractCertificateService implements CertificateService {
     }
 
     protected Path getKeytoolPath() {
-        String javaHome = System.getProperty("java.home");
+        String javaHome = SystemUtils.javaHome();
         if (StringUtils.nullOrEmpty(javaHome)) {
             logger.error("Can't find java home.");
             throw new IllegalStateException("Can't find java home.");
@@ -31,7 +30,7 @@ abstract class AbstractCertificateService implements CertificateService {
     }
 
     protected Path getKeystorePath() {
-        String javaHome = System.getProperty("java.home");
+        String javaHome = SystemUtils.javaHome();
         if (StringUtils.nullOrEmpty(javaHome)) {
             logger.error("Can not find java home.");
             throw new IllegalStateException("Can not find java home.");

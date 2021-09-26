@@ -9,13 +9,13 @@ import java.util.*;
 import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class InteliSenseServiceTest {
+class TextFieldIntelliSenseTest {
 
-    private InteliSenseService service;
+    private TextFieldIntelliSense<NamePatternValue> service;
 
     @BeforeEach
     void setUp() {
-        service = new InteliSenseService();
+        service = new TextFieldIntelliSense<>(null, NamePatternValue.class);
     }
 
     @Test
@@ -69,6 +69,7 @@ class InteliSenseServiceTest {
 
     @Test
     void givenNoPhrase_whenGetFilteredValues_thenReturnNothing() {
+        service.caretPosition = 0;
         final Set<String> filteredValues = service.getFilteredValues("");
         assertThat(filteredValues).isEmpty();
     }
@@ -81,7 +82,9 @@ class InteliSenseServiceTest {
 
     @Test
     void givenPhrase_whenGetFilteredValues_thenReturnFiltered() {
-        final Set<String> filteredValues = service.getFilteredValues("{cur");
+        String text = "{cur";
+        service.caretPosition = text.length() - 1;
+        final Set<String> filteredValues = service.getFilteredValues(text);
         assertThat(filteredValues).containsExactly(
                 "{CURRENT_DATE}",
                 "{CURRENT_YEAR}",
@@ -107,7 +110,9 @@ class InteliSenseServiceTest {
 
     @Test
     void givenPhraseWithEnd_whenGetFilteredValues_thenReturnFiltered() {
-        final Set<String> filteredValues = service.getFilteredValues("{CURRENT_DATE}-some-text{end");
+        String text = "{CURRENT_DATE}-some-text{end";
+        service.caretPosition = text.length() - 1;
+        final Set<String> filteredValues = service.getFilteredValues(text);
         assertThat(filteredValues).containsExactly(
                 "{END_DATE}",
                 "{END_DATE_YEAR}",
@@ -120,7 +125,9 @@ class InteliSenseServiceTest {
 
     @Test
     void givenPhraseWithMonth_whenGetFilteredValues_thenReturnFiltered() {
-        final Set<String> filteredValues = service.getFilteredValues("{CURRENT_DATE}{MONTH");
+        String text = "{CURRENT_DATE}{MONTH";
+        service.caretPosition = text.length() - 1;
+        final Set<String> filteredValues = service.getFilteredValues(text);
         assertThat(filteredValues).containsExactly(
                 "{CURRENT_MONTH_NAME}",
                 "{current_month_name}",
@@ -136,7 +143,9 @@ class InteliSenseServiceTest {
 
     @Test
     void givenPhraseWithMonthName_whenGetFilteredValues_thenReturnFiltered() {
-        final Set<String> filteredValues = service.getFilteredValues("{CURRENT_DATE}{MONTH_NAME");
+        String text = "{CURRENT_DATE}{MONTH_NAME";
+        service.caretPosition = text.length() - 1;
+        final Set<String> filteredValues = service.getFilteredValues(text);
         assertThat(filteredValues).containsExactly(
                 "{CURRENT_MONTH_NAME}",
                 "{current_month_name}",

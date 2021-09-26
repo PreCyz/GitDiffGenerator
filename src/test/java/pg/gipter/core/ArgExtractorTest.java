@@ -2,6 +2,7 @@ package pg.gipter.core;
 
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.utils.SystemUtils;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -359,7 +360,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitUsername();
 
-        assertThat(actual).isEqualTo("UNKNOWN_USER");
+        assertThat(actual).isEqualTo(SystemUtils.userName());
     }
 
     @Test
