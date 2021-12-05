@@ -1,6 +1,5 @@
 package pg.gipter;
 
-import org.jetbrains.annotations.NotNull;
 import pg.gipter.core.ArgName;
 import pg.gipter.utils.StringUtils;
 
@@ -11,7 +10,6 @@ public class TestDataFactory {
 
     private TestDataFactory() { }
 
-    @NotNull
     public static Properties generateProperty() {
         Properties properties = new Properties();
         for (ArgName argName : ArgName.values()) {

@@ -12,7 +12,8 @@ import pg.gipter.ui.task.UpdatableTask;
 import pg.gipter.utils.SystemUtils;
 
 import java.io.*;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -33,7 +34,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
     @Override
     public void produceDiff() {
-        try (FileWriter fw = new FileWriter(Paths.get(applicationProperties.itemPath()).toFile())) {
+        try {
             List<Callable<DiffDetails>> diffs = new LinkedList<>();
             Set<VersionControlSystem> vcsSet = new HashSet<>();
 
@@ -49,7 +50,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
             applicationProperties.setVcs(vcsSet);
 
             List<DiffDetails> diffDetails = processCallable(diffs);
-            writeDiffToFile(fw, diffDetails);
+            createDiffFile(diffDetails);
 
             boolean noDiff = diffDetails.stream().noneMatch(DiffDetails::isDiff);
             if (noDiff) {
@@ -148,7 +149,6 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
     private DiffDetails createDiffDetails(String projectPath, List<String> cmd) throws IOException {
         DiffDetails diffDetails = new DiffDetails(projectPath);
-        StringBuilder stringBuilder = new StringBuilder();
         LinkedList<String> fullCommand = new LinkedList<>();
         fullCommand.add("powershell.exe");
         fullCommand.addAll(cmd);
@@ -158,26 +158,35 @@ abstract class AbstractDiffProducer implements DiffProducer {
         Process process = processBuilder.start();
 
         try (InputStream is = process.getInputStream();
-             InputStreamReader isr = new InputStreamReader(is);
-             BufferedReader br = new BufferedReader(isr)) {
+             Scanner sc = new Scanner(is, StandardCharsets.UTF_8.name())) {
+
+            Path newFilePath = createProjectFile(projectPath);
 
             boolean hasDiff = false;
-            String line;
-            while ((line = br.readLine()) != null) {
-                stringBuilder.append(String.format("%s%n", line));
+            while (sc.hasNextLine()) {
+                String line = String.format("%s%n", sc.nextLine());
                 hasDiff = true;
+                Files.write(newFilePath, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
             }
 
             if (hasDiff) {
-                stringBuilder.append(String.format("%nEnd-of-diff-for-%s%n%n%n", projectPath));
+                Files.write(
+                        newFilePath,
+                        String.format("%nEnd-of-diff-for-%s%n%n%n", projectPath).getBytes(StandardCharsets.UTF_8),
+                        StandardOpenOption.APPEND
+                );
             } else {
-                stringBuilder.append(String.format("For repository [%s] within period [from %s to %s] diff is unavailable!%n",
-                        projectPath,
-                        applicationProperties.startDate().format(ApplicationProperties.yyyy_MM_dd),
-                        applicationProperties.endDate().format(ApplicationProperties.yyyy_MM_dd)
-                ));
+                Files.write(
+                        newFilePath,
+                        String.format("For repository [%s] within period [from %s to %s] diff is unavailable!%n%n",
+                                projectPath,
+                                applicationProperties.startDate().format(ApplicationProperties.yyyy_MM_dd),
+                                applicationProperties.endDate().format(ApplicationProperties.yyyy_MM_dd)
+                        ).getBytes(StandardCharsets.UTF_8),
+                        StandardOpenOption.APPEND
+                );
             }
-            diffDetails.setContent(stringBuilder.toString());
+            diffDetails.setFilePath(newFilePath);
             diffDetails.setDiff(hasDiff);
         } catch (Exception ex) {
             logger.error(ex.getMessage());
@@ -188,6 +197,19 @@ abstract class AbstractDiffProducer implements DiffProducer {
             }
         }
         return diffDetails;
+    }
+
+    private Path createProjectFile(String projectPath) throws IOException {
+        String projectName = Paths.get(projectPath).toFile().getName() + "-tmp.txt";
+
+        Path newFilePath = Paths.get(applicationProperties.itemPath());
+        if (Files.isDirectory(newFilePath)) {
+            newFilePath = Paths.get(applicationProperties.itemPath(), projectName);
+        } else {
+            newFilePath = Paths.get(newFilePath.getParent().toString(), projectName);
+        }
+        Files.createFile(newFilePath);
+        return newFilePath;
     }
 
     private List<DiffDetails> processCallable(List<Callable<DiffDetails>> diffs) {
@@ -205,9 +227,36 @@ abstract class AbstractDiffProducer implements DiffProducer {
         return result;
     }
 
-    private void writeDiffToFile(FileWriter fw, List<DiffDetails> diffDetails) throws IOException {
+    private void createDiffFile(List<DiffDetails> diffDetails) {
+        try {
+            Files.deleteIfExists(Paths.get(applicationProperties.itemPath()));
+            Files.createFile(Paths.get(applicationProperties.itemPath()));
+        } catch (IOException ex) {
+            logger.error("Could not delete existing file with item: [{}].", Paths.get(applicationProperties.itemPath()));
+        }
+
         for (DiffDetails details : diffDetails) {
-            fw.write(details.getContent());
+            try (InputStream is = Files.newInputStream(details.getFilePath());
+                 Scanner sc = new Scanner(is, StandardCharsets.UTF_8.name())) {
+
+                while (sc.hasNextLine()) {
+                    String line = String.format("%s%n", sc.nextLine());
+                    Files.write(
+                            Paths.get(applicationProperties.itemPath()),
+                            line.getBytes(StandardCharsets.UTF_8),
+                            StandardOpenOption.APPEND
+                    );
+                }
+
+            } catch (Exception ex) {
+                logger.error("Could not append result from [{}].", details.getFilePath().toString());
+            } finally {
+                try {
+                    Files.deleteIfExists(details.getFilePath());
+                } catch (IOException ex) {
+                    logger.error("Problem with deleting file: [{}].", details.getFilePath().toString());
+                }
+            }
         }
     }
 

@@ -1,20 +1,38 @@
-db.statistics.find({
-    lastExecutionDate : {$gt : "2021-05-01T00:00:00.000"},
-    lastUpdateStatus : {$in : ["SUCCESS", "PARTIAL_SUCCESS"]}
-})
-   .projection({})
-   .sort({_id:-1});
-   
-db.statistics.find({
-    lastExecutionDate : {$gt : "2021-05-01T00:00:00.000"},
-    lastUpdateStatus : "FAIL"})
-   .projection({})
-   .sort({_id:-1});
-   
-db.statistics.aggregate({lastExecutionDate : {$gt : "2021-01-01T00:00:00.000"}})
-   .projection({user : "$username", lastExecutionDate : "$lastExecutionDate"})
-   .sort({user:1});
-   
-db.statistics.find({username : "LUFU"})
+db.statistics.find({"lastUpdateStatus" : "SUCCESS"})
    .projection({})
    .sort({_id:-1})
+   .limit(100);
+
+
+db.statistics.find({
+    "lastExecutionDate": {
+        $gte: "2021-06-01T00:00:00.000Z"
+    },
+    "lastUpdateStatus" : {$in : ["SUCCESS", "PARTIAL_SUCCESS"]}
+})
+.projection({username : "$username", status : "$lastUpdateStatus", executionDate : "$lastExecutionDate"})
+.sort({username:1})
+.limit(100);
+
+db.statistics
+.find({
+    "lastExecutionDate": {
+        $gte: "2021-07-01T00:00:00.000Z"
+    },
+    "lastUpdateStatus" : {$in : ["FAIL"]}
+})
+.projection({
+    username : "$username",
+    applicationVersion : "$applicationVersion",
+    status : "$lastUpdateStatus",
+    executionDate : "$lastExecutionDate",
+    exceptions : {
+        $filter : {
+            input : "$exceptions",
+            as : "exception",
+            cond: { $gte : ["$$exception.errorDate", "2021-07-01T00:00:00.000Z"] }
+        }
+    }
+})
+.sort({username:1})
+.limit(100);
