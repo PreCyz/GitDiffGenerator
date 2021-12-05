@@ -169,6 +169,12 @@ abstract class AbstractDiffProducer implements DiffProducer {
                 Files.write(newFilePath, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
             }
 
+            if (sc.ioException() != null) {
+                throw new IOException(
+                        String.format("Scanner is throwing IOException for [%s], when reading from PowerShell.", projectPath)
+                );
+            }
+
             if (hasDiff) {
                 Files.write(
                         newFilePath,
@@ -248,13 +254,19 @@ abstract class AbstractDiffProducer implements DiffProducer {
                     );
                 }
 
+                if (sc.ioException() != null) {
+                    throw new IOException(
+                            String.format("Diff scanner is throwing IOException for [%s].", details.getFilePath().toString())
+                    );
+                }
+
             } catch (Exception ex) {
-                logger.error("Could not append result from [{}].", details.getFilePath().toString());
+                logger.error("Could not append result from [{}].", details.getFilePath().toString(), ex);
             } finally {
                 try {
                     Files.deleteIfExists(details.getFilePath());
                 } catch (IOException ex) {
-                    logger.error("Problem with deleting file: [{}].", details.getFilePath().toString());
+                    logger.error("Problem with deleting file: [{}].", details.getFilePath().toString(), ex);
                 }
             }
         }
