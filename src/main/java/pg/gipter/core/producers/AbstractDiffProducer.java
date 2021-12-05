@@ -158,7 +158,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
         Process process = processBuilder.start();
 
         try (InputStream is = process.getInputStream();
-             Scanner sc = new Scanner(is, StandardCharsets.UTF_8)) {
+             Scanner sc = new Scanner(is, StandardCharsets.UTF_8.name())) {
 
             Path newFilePath = createProjectFile(projectPath);
 
@@ -237,7 +237,7 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
         for (DiffDetails details : diffDetails) {
             try (InputStream is = Files.newInputStream(details.getFilePath());
-                 Scanner sc = new Scanner(is, StandardCharsets.UTF_8)) {
+                 Scanner sc = new Scanner(is, StandardCharsets.UTF_8.name())) {
 
                 while (sc.hasNextLine()) {
                     String line = String.format("%s%n", sc.nextLine());

@@ -158,7 +158,7 @@
         <dependency>
             <groupId>com.github.vatbub</groupId>
             <artifactId>mslinks</artifactId>
-            <version>1.0.6.2</version>
+            <version>1.0.5.1</version>
         </dependency>
 
         <dependency>
