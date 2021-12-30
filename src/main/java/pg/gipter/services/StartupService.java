@@ -5,7 +5,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
-import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.JarHelper;
 import pg.gipter.utils.SystemUtils;
 
@@ -14,7 +13,7 @@ import java.nio.file.*;
 
 public class StartupService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UILauncher.class);
+    private static final Logger logger = LoggerFactory.getLogger(StartupService.class);
     private final String systemUsername;
 
     public StartupService() {
