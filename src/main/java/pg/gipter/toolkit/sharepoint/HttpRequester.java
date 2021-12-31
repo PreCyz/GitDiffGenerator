@@ -5,7 +5,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.*;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.*;
 import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -17,6 +17,8 @@ import pg.gipter.core.producers.processor.DownloadDetails;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class HttpRequester {
 
@@ -85,16 +87,22 @@ public class HttpRequester {
         }
     }
 
-    public JsonObject executePOST(SharePointConfig sharePointConfig, JsonObject jsonObject) throws IOException {
-        logger.info("Request json: {}", jsonObject.toString());
+    public JsonObject executePOST(
+            SharePointConfig sharePointConfig, JsonObject jsonObject, Map<String, String> requestHeaders
+    ) throws IOException {
 
-        StringEntity stringEntity = new StringEntity(jsonObject.toString());
         HttpPost httpPost = new HttpPost(replaceSpaces(sharePointConfig.getFullRequestUrl()));
-        httpPost.addHeader("Accept", "application/json;odata=nometadata");
-        httpPost.addHeader("Content-Type", "application/json;odata=nometadata");
-        httpPost.addHeader("Content-Length", String.valueOf(stringEntity.getContentLength()));
-        httpPost.addHeader("X-RequestDigest", requestDigest(sharePointConfig));
-        httpPost.setEntity(stringEntity);
+
+        if (jsonObject != null) {
+            logger.info("Request json: {}", jsonObject);
+            httpPost.setEntity(new StringEntity(jsonObject.toString(), ContentType.APPLICATION_JSON));
+        }
+
+        if (requestHeaders != null && !requestHeaders.isEmpty()) {
+            logger.info("Request headers [{}]", requestHeaders);
+            requestHeaders.forEach(httpPost::addHeader);
+        }
+        httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
 
         logger.info("Executing request {}", httpPost.getRequestLine());
 
@@ -104,21 +112,35 @@ public class HttpRequester {
              CloseableHttpResponse response = httpclient.execute(httpPost)
         ) {
             logger.info("Response {}", response.getStatusLine());
-            Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-            EntityUtils.consume(response.getEntity());
-            logIfError(result);
-            return result;
+            if (response.getStatusLine().getStatusCode() != 204) {
+                Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
+                JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                EntityUtils.consume(response.getEntity());
+                logIfError(result);
+                return result;
+            }
+            return new JsonObject();
         }
     }
 
-    public JsonObject executePOST2010(SharePointConfig sharePointConfig, JsonObject jsonObject) throws IOException {
-        logger.info("Request json: {}", jsonObject.toString());
+    public JsonObject executePOST(SharePointConfig sharePointConfig, JsonObject jsonObject) throws IOException {
+        Map<String, String> requestHeaders = new LinkedHashMap<>();
+        requestHeaders.put("Accept", "application/json;odata=nometadata");
+        requestHeaders.put("Content-Type", "application/json;odata=nometadata");
+        return executePOST(sharePointConfig, jsonObject, requestHeaders);
+    }
+
+    public JsonObject executePOST(SharePointConfig sharePointConfig, Map<String, String> requestHeaders) throws IOException {
+        return executePOST(sharePointConfig, null, requestHeaders);
+    }
+
+    public JsonObject executePOST(SharePointConfig sharePointConfig, File attachment) throws IOException {
+        logger.info("Attachment: {}", attachment.getAbsolutePath());
 
         HttpPost httpPost = new HttpPost(replaceSpaces(sharePointConfig.getFullRequestUrl()));
         httpPost.addHeader("Accept", "application/json");
-        httpPost.addHeader("Content-Type", "application/json");
-        httpPost.setEntity(new StringEntity(jsonObject.toString()));
+        httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
+        httpPost.setEntity(new FileEntity(attachment, ContentType.APPLICATION_OCTET_STREAM));
 
         logger.info("Executing request {}", httpPost.getRequestLine());
 
