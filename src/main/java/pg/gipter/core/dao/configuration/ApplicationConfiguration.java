@@ -1,6 +1,5 @@
 package pg.gipter.core.dao.configuration;
 
-import org.springframework.util.CollectionUtils;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
@@ -84,7 +83,7 @@ public class ApplicationConfiguration extends ApplicationJsonReader implements C
     @Override
     public void removeConfig(String configurationName) {
         Configuration configuration = readJsonConfig();
-        if (!CollectionUtils.isEmpty(configuration.getRunConfigs())) {
+        if (configuration.getRunConfigs() != null && !configuration.getRunConfigs().isEmpty()) {
             configuration.removeRunConfig(configurationName);
             logger.info("Removing run config [{}].", configurationName);
             writeJsonConfig(configuration, ApplicationConfig.class);

@@ -22,6 +22,7 @@ public class SharePointConfig {
     private String project;
     private Set<String> listNames;
     private transient String fullRequestUrl;
+    private String formDigest;
 
     public SharePointConfig() {
         username = ArgName.toolkitUsername.defaultValue();
@@ -38,19 +39,25 @@ public class SharePointConfig {
         project = sharePointConfig.getProject();
         listNames = sharePointConfig.getListNames();
         fullRequestUrl = sharePointConfig.getFullRequestUrl();
+        formDigest = sharePointConfig.getFormDigest();
     }
 
     public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl) {
-        this("", username, password, domain, url, fullRequestUrl);
+        this("", username, password, domain, url, fullRequestUrl, null);
     }
 
-    public SharePointConfig(String name, String username, String password, String domain, String url, String fullRequestUrl) {
+    public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl, String formDigest) {
+        this("", username, password, domain, url, fullRequestUrl, formDigest);
+    }
+
+    public SharePointConfig(String name, String username, String password, String domain, String url, String fullRequestUrl, String formDigest) {
         this.name = name;
         this.username = username;
         this.password = password;
         this.domain = domain;
         this.url = url;
         this.fullRequestUrl = fullRequestUrl;
+        this.formDigest = formDigest;
     }
 
     public String getName() {
@@ -117,6 +124,14 @@ public class SharePointConfig {
         this.fullRequestUrl = fullRequestUrl;
     }
 
+    public String getFormDigest() {
+        return formDigest;
+    }
+
+    public void setFormDigest(String formDigest) {
+        this.formDigest = formDigest;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -128,12 +143,15 @@ public class SharePointConfig {
                 Objects.equals(getDomain(), that.getDomain()) &&
                 Objects.equals(getUrl(), that.getUrl()) &&
                 Objects.equals(getProject(), that.getProject()) &&
-                Objects.equals(getListNames(), that.getListNames());
+                Objects.equals(getListNames(), that.getListNames()) &&
+                Objects.equals(getFormDigest(), that.getFormDigest());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getUsername(), getPassword(), getDomain(), getUrl(), getProject(), getListNames());
+        return Objects.hash(
+                getName(), getUsername(), getPassword(), getDomain(), getUrl(), getProject(), getListNames(), getFormDigest()
+        );
     }
 
     public String toString2() {
@@ -146,6 +164,7 @@ public class SharePointConfig {
                 ", project='" + getProject() + '\'' +
                 ", listName='" + getListNames() + '\'' +
                 ", fullRequestUrl='" + getFullRequestUrl() + '\'' +
+                ", getFormDigest='" + getFormDigest() + '\'' +
                 '}';
     }
 }

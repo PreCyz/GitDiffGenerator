@@ -2,28 +2,87 @@ package pg.gipter.toolkit.sharepoint.rest;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
 
 public class SharePointRestClient {
 
+    private static final Logger logger = LoggerFactory.getLogger(SharePointRestClient.class);
+
     private final ApplicationProperties applicationProperties;
     private final HttpRequester httpRequester;
+    private String formDigest;
 
     public SharePointRestClient(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         httpRequester = new HttpRequester(applicationProperties);
+    }
+
+    public String getFormDigest() throws IOException {
+        if (formDigest == null) {
+            SharePointConfig sharePointConfig = new SharePointConfig(
+                    applicationProperties.toolkitUsername(),
+                    applicationProperties.toolkitPassword(),
+                    applicationProperties.toolkitDomain(),
+                    applicationProperties.toolkitUrl(),
+                    null,
+                    null
+            );
+
+            formDigest = httpRequester.requestDigest(sharePointConfig);
+            logger.info("Form digest: [{}]", formDigest);
+        }
+        return formDigest;
+    }
+
+    public String createItem() throws IOException {
+        String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/AddValidateUpdateItemUsingPath",
+                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitCopyCase(),
+                applicationProperties.toolkitCopyListName()
+        );
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitUsername(),
+                applicationProperties.toolkitPassword(),
+                applicationProperties.toolkitDomain(),
+                applicationProperties.toolkitUrl(),
+                fullUrl,
+                getFormDigest()
+        );
+
+        JsonObject item = httpRequester.executePOST(sharePointConfig, createItemJson());
+
+        String itemId = "";
+        JsonArray value = item.get("value").getAsJsonArray();
+        for (int idx = 0; idx < value.size(); ++idx) {
+            JsonObject jsonObject = value.get(idx).getAsJsonObject();
+            if (Boolean.parseBoolean(jsonObject.get("HasException").getAsString())) {
+                String errMsg = String.format("Field name [%s], error message: [%s]",
+                        jsonObject.has("FieldName"),
+                        jsonObject.has("ErrorMessage")
+                );
+                logger.error(errMsg);
+                throw new IOException(errMsg);
+            }
+            if (jsonObject.has("FieldName") && "Id".equals(jsonObject.get("FieldName").getAsString())) {
+                itemId = jsonObject.get("FieldValue").getAsString();
+                logger.info("New item created. ItemId [{}]", itemId);
+            }
+        }
+        return itemId;
     }
 
     private JsonObject createItemJson() {
@@ -31,14 +90,10 @@ public class SharePointRestClient {
         String fileName = applicationProperties.fileName();
         String title = fileName.substring(0, fileName.indexOf("."));
         String allVcs = applicationProperties.vcsSet().stream().map(Enum::name).collect(joining(","));
-        String description = String.format("%s diff file.", allVcs);
-        if (applicationProperties.itemType() == ItemType.STATEMENT) {
-            description = String.format("%s file.", ItemType.STATEMENT);
-        }
+        String description = description(allVcs);
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 
         JsonObject decodedUrl = new JsonObject();
-        //decodedUrl.addProperty("DecodedUrl", "https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems");
         decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitUserFolder());
 
         JsonObject listItemCreateInfo = new JsonObject();
@@ -51,31 +106,15 @@ public class SharePointRestClient {
         arrayElement.addProperty("FieldValue", title);
         formValues.add(arrayElement);
         arrayElement = new JsonObject();
-        arrayElement.addProperty("FieldName", "Employee");
-        arrayElement.addProperty("FieldValue", "-1;#" + applicationProperties.toolkitUsername());
-        formValues.add(arrayElement);
-        arrayElement = new JsonObject();
         arrayElement.addProperty("FieldName", "SubmissionDate");
-        arrayElement.addProperty("FieldValue", submissionDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")));
-        formValues.add(arrayElement);
-        arrayElement = new JsonObject();
-        arrayElement.addProperty("FieldName", "ClassificationId");
-        //arrayElement.addProperty("FieldValue", "12;#Changeset (repository change report)");
-        arrayElement.addProperty("FieldValue", 12);
+        arrayElement.addProperty("FieldValue", submissionDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         formValues.add(arrayElement);
         arrayElement = new JsonObject();
         arrayElement.addProperty("FieldName", "Body");
         arrayElement.addProperty("FieldValue", description);
         formValues.add(arrayElement);
 
-        JsonObject type = new JsonObject();
-        type.addProperty("type", String.format("SP.Data.%sListItem", applicationProperties.toolkitCopyListName()));
-
         JsonObject item = new JsonObject();
-
-        item.add("__metadata", type);
-        item.addProperty("Title", applicationProperties.toolkitCopyListName());
-
         item.add("listItemCreateInfo", listItemCreateInfo);
         item.add("formValues", formValues);
         item.addProperty("bNewDocumentUpdate", false);
@@ -83,64 +122,142 @@ public class SharePointRestClient {
         return item;
     }
 
-    public void createItem() throws IOException {
-        String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/AddValidateUpdateItemUsingPath",
-                applicationProperties.toolkitUrl(),
-                applicationProperties.toolkitCopyCase(),
-                applicationProperties.toolkitCopyListName()
-        );
-        SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
-                applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
-                fullUrl
-        );
-
-        JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, createItemJson());
-
-        System.out.println(jsonObject.toString());
-    }
-
-    public void createItem2010() throws IOException {
-        String fullUrl = String.format("%s%s/_vti_bin/ListData.svc/%s",
-                applicationProperties.toolkitUrl(),
-                applicationProperties.toolkitCopyCase(),
-                applicationProperties.toolkitCopyListName()
-        );
-        SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
-                applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
-                fullUrl
-        );
-
-        JsonObject jsonObject = httpRequester.executePOST2010(sharePointConfig, createItemJson2010());
-
-        System.out.println(jsonObject.toString());
-    }
-
-    private JsonObject createItemJson2010() throws RuntimeException, UnsupportedEncodingException {
-        LocalDate endDate = applicationProperties.endDate();
-        String fileName = applicationProperties.fileName();
-        String title = fileName.substring(0, fileName.indexOf("."));
-        String allVcs = applicationProperties.vcsSet().stream().map(Enum::name).collect(joining(","));
-        //String description = String.format("\u003cp\u003e%s diff file.\u003c/p\u003e", allVcs);
-        String description = URLEncoder.encode(String.format("<p>%s diff file.</p>", allVcs), StandardCharsets.UTF_8.name());
+    private String description(String allVcs) {
+        String description = String.format("%s diff file.", allVcs);
         if (applicationProperties.itemType() == ItemType.STATEMENT) {
             description = String.format("%s file.", ItemType.STATEMENT);
+        } else if (applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
+            description = "Item as zipped file containing changed documents.";
         }
-        LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
-
-        JsonObject item = new JsonObject();
-        item.addProperty("Path", applicationProperties.toolkitUserFolder());
-        item.addProperty("Title", title);
-        item.addProperty("ClassificationId", 12);
-        //item.addProperty("Body", "");
-        //item.addProperty("Employee", "-1;#" + applicationProperties.toolkitUsername());
-        //item.addProperty("EmployeeId", 179);
-        //item.addProperty("SubmissionDate", submissionDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")));
-        return item;
+        return description;
     }
+
+    public void uploadAttachment(String itemId) throws IOException {
+        String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)/AttachmentFiles/add(FileName='%s')",
+                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitCopyCase(),
+                applicationProperties.toolkitCopyListName(),
+                itemId,
+                applicationProperties.fileName()
+        );
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitUsername(),
+                applicationProperties.toolkitPassword(),
+                applicationProperties.toolkitDomain(),
+                applicationProperties.toolkitUrl(),
+                fullUrl,
+                getFormDigest()
+        );
+
+        Path path = Paths.get(applicationProperties.itemPath());
+        if (Files.notExists(path)) {
+            String errMsg = String.format("File [%s] does not exist", path);
+            logger.error(errMsg);
+            cleanup(itemId);
+            throw new IOException(errMsg);
+        }
+        JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, path.toFile());
+
+        if (jsonObject.has("odata.error")) {
+            String errMsg = jsonObject.get("odata.error").getAsJsonObject()
+                    .get("message").getAsJsonObject()
+                    .get("value").getAsString();
+            logger.error(errMsg);
+            cleanup(itemId);
+            throw new IOException(errMsg);
+        }
+        logger.info("Attachment [{}] uploaded.", path);
+    }
+
+    public String getAuthorId(String itemId) throws IOException {
+        String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
+                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitCopyCase(),
+                applicationProperties.toolkitCopyListName(),
+                itemId
+        );
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitUsername(),
+                applicationProperties.toolkitPassword(),
+                applicationProperties.toolkitDomain(),
+                applicationProperties.toolkitUrl(),
+                fullUrl,
+                getFormDigest()
+        );
+
+        JsonObject jsonObject = httpRequester.executeGET(sharePointConfig);
+        if (jsonObject != null && jsonObject.has("d")) {
+            String authorId = jsonObject.get("d").getAsJsonObject().get("AuthorId").getAsString();
+            logger.info("AuthorId got from toolkit: {}", authorId);
+            return authorId;
+        }
+        cleanup(itemId);
+        throw new IOException("Can not get author id for itemId: " + itemId);
+    }
+
+    public void updateAuthor(String itemId, String authorId) throws IOException {
+        String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
+                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitCopyCase(),
+                applicationProperties.toolkitCopyListName(),
+                itemId
+        );
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitUsername(),
+                applicationProperties.toolkitPassword(),
+                applicationProperties.toolkitDomain(),
+                applicationProperties.toolkitUrl(),
+                fullUrl,
+                getFormDigest()
+        );
+
+        JsonObject payload = new JsonObject();
+        payload.addProperty("ClassificationId", 12);
+        payload.addProperty("EmployeeId", authorId);
+
+        Map<String, String> requestHeaders = new LinkedHashMap<>();
+        requestHeaders.put("Accept", "application/json;odata=verbose");
+        requestHeaders.put("If-Match", "*");
+        requestHeaders.put("X-HTTP-Method", "MERGE");
+
+        JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, payload, requestHeaders);
+        if (jsonObject.has("odata.error")) {
+            String errMsg = jsonObject.get("odata.error").getAsJsonObject()
+                    .get("message").getAsJsonObject()
+                    .get("value").getAsString();
+            logger.error(errMsg);
+            cleanup(itemId);
+            throw new IOException(errMsg);
+        }
+        logger.info("Author [{}] for the item [{}] updated.", authorId, itemId);
+    }
+
+    private void cleanup(String itemId) {
+        try {
+            String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
+                    applicationProperties.toolkitUrl(),
+                    applicationProperties.toolkitCopyCase(),
+                    applicationProperties.toolkitCopyListName(),
+                    itemId
+            );
+            SharePointConfig sharePointConfig = new SharePointConfig(
+                    applicationProperties.toolkitUsername(),
+                    applicationProperties.toolkitPassword(),
+                    applicationProperties.toolkitDomain(),
+                    applicationProperties.toolkitUrl(),
+                    fullUrl,
+                    getFormDigest()
+            );
+
+            Map<String, String> requestHeaders = new LinkedHashMap<>();
+            requestHeaders.put("Accept", "application/json;odata=verbose");
+            requestHeaders.put("If-Match", "*");
+            requestHeaders.put("X-HTTP-Method", "DELETE");
+            httpRequester.executePOST(sharePointConfig, requestHeaders);
+            logger.info("Cleanup done.");
+        } catch(IOException ex) {
+            logger.error("Problems with cleaning up.", ex);
+        }
+    }
+
 }
