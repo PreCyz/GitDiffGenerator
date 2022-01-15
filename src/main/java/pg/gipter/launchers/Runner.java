@@ -33,16 +33,17 @@ class Runner implements Starter {
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
             diffProducer.produceDiff();
 
-            if (!applicationProperties.isToolkitCredentialsSet()) {
-                String errorMsg = "Toolkit credentials not set. Check your settings.";
-                logger.error(errorMsg);
-                throw new IllegalArgumentException(errorMsg);
+            if (applicationProperties.isUploadItem()) {
+                if (!applicationProperties.isToolkitCredentialsSet()) {
+                    String errorMsg = "Toolkit credentials not set. Check your settings.";
+                    logger.error(errorMsg);
+                    throw new IllegalArgumentException(errorMsg);
+                }
+                DiffUploader diffUploader = new DiffUploader(applicationProperties);
+                diffUploader.uploadDiff();
+                logger.info("Diff upload complete.");
             }
 
-            DiffUploader diffUploader = new DiffUploader(applicationProperties);
-            diffUploader.uploadDiff();
-
-            logger.info("Diff upload complete.");
         } catch (Exception ex) {
             logger.error("Diff upload failure. Program will be terminated.", ex);
             error = true;

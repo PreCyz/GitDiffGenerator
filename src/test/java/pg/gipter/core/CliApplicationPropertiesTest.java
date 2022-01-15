@@ -21,7 +21,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CliPreferredApplicationPropertiesTest {
+class CliApplicationPropertiesTest {
 
     private CliApplicationProperties applicationProperties;
 
@@ -2101,5 +2101,63 @@ class CliPreferredApplicationPropertiesTest {
         int actual = applicationProperties.fetchTimeout();
 
         assertThat(actual).isEqualTo(13);
+    }
+
+    @Test
+    void givenFetchAll_whenIsUploadItem_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenFetchAllFromCLI_whenIsUploadItem_thenReturnCliUploadItem() {
+        applicationProperties = new CliApplicationProperties(new String[]{"uploadItem=N"});
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllFileAndCLI_whenIsUploadItem_thenReturnCliUploadItem() {
+        String[] args = {"uploadItem=n"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setUploadItem(Boolean.TRUE);
+
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllFromProperties_whenIsUploadItem_thenReturnUploadItemFromProperties() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setUploadItem(Boolean.FALSE);
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllFromPropertiesAndOtherArgs_whenIsUploadItem_thenReturnUploadItemFromProperties() {
+        String[] args = {"author=test"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setUploadItem(Boolean.FALSE);
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isFalse();
     }
 }

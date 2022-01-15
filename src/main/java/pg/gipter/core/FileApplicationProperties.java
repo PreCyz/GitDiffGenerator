@@ -309,4 +309,12 @@ class FileApplicationProperties extends ApplicationProperties {
         }
         return argExtractor.fetchTimeout();
     }
+
+    @Override
+    public boolean isUploadItem() {
+        if (applicationConfig.getUploadItem() != null) {
+            return applicationConfig.getUploadItem();
+        }
+        return argExtractor.isUploadItem();
+    }
 }

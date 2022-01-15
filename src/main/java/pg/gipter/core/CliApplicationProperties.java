@@ -327,4 +327,13 @@ class CliApplicationProperties extends ApplicationProperties {
         return Math.abs(fetchWaitTime);
     }
 
+    @Override
+    public boolean isUploadItem() {
+        boolean uploadItem = argExtractor.isUploadItem();
+        if (!containsArg(ArgName.uploadItem.name()) && applicationConfig.getUploadItem() != null) {
+            uploadItem = applicationConfig.getUploadItem();
+        }
+        return uploadItem;
+    }
+
 }

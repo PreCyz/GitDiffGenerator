@@ -120,7 +120,8 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
             if (isToolkitCredentialsSet()) {
                 CompletableFuture<Boolean> withUpload = CompletableFuture
                         .supplyAsync(() -> getApplicationProperties(configName), executor)
-                        .thenApply(this::produce).thenApply(this::upload)
+                        .thenApply(this::produce)
+                        .thenApply(this::upload)
                         .handle((isUploaded, throwable) -> handleUploadResult(
                                 configName, throwable == null, throwable)
                         );
@@ -212,14 +213,18 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
 
     private boolean upload(ApplicationProperties applicationProperties) {
         try {
-            DiffUploader diffUploader = new DiffUploader(applicationProperties);
-            incrementProgress();
-            updateMessage(BundleUtils.getMsg("progress.uploadingToToolkit"));
-            diffUploader.uploadDiff();
-            incrementProgress();
-            updateMessage(BundleUtils.getMsg("progress.itemUploaded"));
-            logger.info("Diff upload complete.");
-            return true;
+            if (applicationProperties.isUploadItem()) {
+                DiffUploader diffUploader = new DiffUploader(applicationProperties);
+                incrementProgress();
+                updateMessage(BundleUtils.getMsg("progress.uploadingToToolkit"));
+                diffUploader.uploadDiff();
+                incrementProgress();
+                updateMessage(BundleUtils.getMsg("progress.itemUploaded"));
+                logger.info("Diff upload complete.");
+                return true;
+            } else {
+                throw new IllegalArgumentException("Item upload switched off.");
+            }
         } catch (Exception ex) {
             logger.error("Diff upload failure.", ex);
             throw ex;

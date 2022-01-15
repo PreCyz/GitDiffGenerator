@@ -69,6 +69,8 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private CheckBox checkLastItemCheckBox;
     @FXML
+    private CheckBox uploadItemCheckBox;
+    @FXML
     private ComboBox<String> languageComboBox;
 
     @FXML
@@ -122,6 +124,7 @@ public class ApplicationSettingsController extends AbstractController {
         activateTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
         autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
         silentModeCheckBox.setSelected(applicationProperties.isSilentMode());
+        uploadItemCheckBox.setSelected(applicationProperties.isUploadItem());
 
         if (languageComboBox.getItems().isEmpty()) {
             languageComboBox.setItems(FXCollections.observableList(BundleUtils.getSupportedLanguages()));
@@ -261,6 +264,7 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setUiLanguage(languageComboBox.getValue());
         applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
         applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
+        applicationConfig.setUploadItem(uploadItemCheckBox.isSelected());
         applicationConfig.setCustomCommands(
                 Stream.of(
                         new CustomCommand(
@@ -304,5 +308,6 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
         labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
         labelsAffectedByLanguage.put("launch.customCommand.override", overrideLabel);
+        labelsAffectedByLanguage.put("launch.panel.uploadItem", uploadItemCheckBox);
     }
 }

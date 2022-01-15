@@ -24,6 +24,7 @@ public class ApplicationConfig {
     private Boolean checkLastItemEnabled;
     private String checkLastItemJobCronExpression;
     private Set<CustomCommand> customCommands;
+    private Boolean uploadItem;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -38,6 +39,7 @@ public class ApplicationConfig {
         certImportEnabled = StringUtils.getBoolean(ArgName.certImport.defaultValue());
         checkLastItemEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
         checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
+        uploadItem = StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
     }
 
     public Boolean getConfirmationWindow() {
@@ -144,6 +146,14 @@ public class ApplicationConfig {
         this.customCommands = customCommands;
     }
 
+    public Boolean getUploadItem() {
+        return uploadItem;
+    }
+
+    public void setUploadItem(Boolean uploadItem) {
+        this.uploadItem = uploadItem;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -182,6 +192,9 @@ public class ApplicationConfig {
         if (getCheckLastItemJobCronExpression() != null) {
             arguments.add(ArgName.checkLastItemJobCronExpression.name() + "=" + getCheckLastItemEnabled());
         }
+        if (getUploadItem() != null) {
+            arguments.add(ArgName.uploadItem.name() + "=" + getUploadItem());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -216,6 +229,8 @@ public class ApplicationConfig {
                     applicationConfig.setCheckLastItemEnabled(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.checkLastItemJobCronExpression.name().equals(argumentName)) {
                     applicationConfig.setCheckLastItemJobCronExpression(argumentValue);
+                } else if (ArgName.uploadItem.name().equals(argumentName)) {
+                    applicationConfig.setUploadItem(StringUtils.getBoolean(argumentValue));
                 }
             }
         }
@@ -237,6 +252,7 @@ public class ApplicationConfig {
                 ", certImportEnabled=" + certImportEnabled +
                 ", checkLastItemEnabled=" + checkLastItemEnabled +
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
+                ", uploadItem=" + uploadItem +
                 '}';
     }
 }
