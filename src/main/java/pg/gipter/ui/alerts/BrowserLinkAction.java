@@ -8,6 +8,10 @@ public class BrowserLinkAction extends AbstractLinkAction {
         super(link);
     }
 
+    public BrowserLinkAction(String link, String text) {
+        super(link, text);
+    }
+
     @Override
     public void run() {
         AppManagerFactory.getInstance().launchDefaultBrowser(link);
