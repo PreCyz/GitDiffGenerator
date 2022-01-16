@@ -25,6 +25,7 @@ public class ApplicationConfig {
     private String checkLastItemJobCronExpression;
     private Set<CustomCommand> customCommands;
     private Boolean uploadItem;
+    private Boolean smartZip;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -40,6 +41,7 @@ public class ApplicationConfig {
         checkLastItemEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
         checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
         uploadItem = StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
+        smartZip = StringUtils.getBoolean(ArgName.smartZip.defaultValue());
     }
 
     public Boolean getConfirmationWindow() {
@@ -154,6 +156,14 @@ public class ApplicationConfig {
         this.uploadItem = uploadItem;
     }
 
+    public Boolean getSmartZip() {
+        return smartZip;
+    }
+
+    public void setSmartZip(Boolean smartZip) {
+        this.smartZip = smartZip;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -195,6 +205,9 @@ public class ApplicationConfig {
         if (getUploadItem() != null) {
             arguments.add(ArgName.uploadItem.name() + "=" + getUploadItem());
         }
+        if (getSmartZip() != null) {
+            arguments.add(ArgName.smartZip.name() + "=" + getSmartZip());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -231,6 +244,8 @@ public class ApplicationConfig {
                     applicationConfig.setCheckLastItemJobCronExpression(argumentValue);
                 } else if (ArgName.uploadItem.name().equals(argumentName)) {
                     applicationConfig.setUploadItem(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.smartZip.name().equals(argumentName)) {
+                    applicationConfig.setSmartZip(StringUtils.getBoolean(argumentValue));
                 }
             }
         }
@@ -253,6 +268,7 @@ public class ApplicationConfig {
                 ", checkLastItemEnabled=" + checkLastItemEnabled +
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
                 ", uploadItem=" + uploadItem +
+                ", smartZip=" + smartZip +
                 '}';
     }
 }

@@ -336,4 +336,12 @@ class CliApplicationProperties extends ApplicationProperties {
         return uploadItem;
     }
 
+    @Override
+    public boolean isSmartZip() {
+        boolean smartZip = argExtractor.isSmartZip();
+        if (!containsArg(ArgName.smartZip.name()) && applicationConfig.getSmartZip() != null) {
+            smartZip = applicationConfig.getSmartZip();
+        }
+        return smartZip;
+    }
 }

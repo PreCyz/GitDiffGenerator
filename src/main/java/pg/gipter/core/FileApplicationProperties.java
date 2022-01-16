@@ -317,4 +317,12 @@ class FileApplicationProperties extends ApplicationProperties {
         }
         return argExtractor.isUploadItem();
     }
+
+    @Override
+    public boolean isSmartZip() {
+        if (applicationConfig.getSmartZip() != null) {
+            return applicationConfig.getSmartZip();
+        }
+        return argExtractor.isSmartZip();
+    }
 }

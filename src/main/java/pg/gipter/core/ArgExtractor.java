@@ -312,4 +312,11 @@ final class ArgExtractor {
         }
         return StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
     }
+
+    boolean isSmartZip() {
+        if (containsArg(ArgName.smartZip.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.smartZip, ArgName.smartZip.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.smartZip.defaultValue());
+    }
 }

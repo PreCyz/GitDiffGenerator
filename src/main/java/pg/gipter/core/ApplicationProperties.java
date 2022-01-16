@@ -327,6 +327,7 @@ public abstract class ApplicationProperties {
                     ", loggerLevel='" + loggerLevel() + '\'' +
                     ", checkLastItemEnabled='" + isCheckLastItemEnabled() + '\'' +
                     ", uploadItem='" + isUploadItem() + '\'' +
+                    ", smartZip='" + isSmartZip() + '\'' +
                     ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
         }
         if (toolkitConfig != null) {
@@ -379,6 +380,7 @@ public abstract class ApplicationProperties {
     public abstract String getCheckLastItemJobCronExpression();
     public abstract int fetchTimeout();
     public abstract boolean isUploadItem();
+    public abstract boolean isSmartZip();
 
     public abstract boolean isUpgradeFinished();
 }
