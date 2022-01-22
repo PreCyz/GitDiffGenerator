@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.*;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -47,5 +48,28 @@ public class SmartZipService {
         }
         logger.info("Item [{}] has been already zipped.", pathToFile);
         return false;
+    }
+
+    public void zipDocumentsAndWriteToFile(List<Path> documents, String itemPath) {
+        try (FileOutputStream fos = new FileOutputStream(itemPath);
+             ZipOutputStream zipOut = new ZipOutputStream(fos)) {
+
+            for (Path document : documents) {
+                FileInputStream fis = new FileInputStream(document.toFile());
+                ZipEntry zipEntry = new ZipEntry(document.getFileName().toString());
+                zipOut.putNextEntry(zipEntry);
+
+                byte[] bytes = new byte[1024];
+                int length;
+                while ((length = fis.read(bytes)) >= 0) {
+                    zipOut.write(bytes, 0, length);
+                }
+                fis.close();
+            }
+        } catch (IOException ex) {
+            String errMsg = "Could not produce diff.";
+            logger.error(errMsg);
+            throw new IllegalArgumentException(errMsg, ex);
+        }
     }
 }

@@ -5,14 +5,13 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.processor.DocumentFinder;
 import pg.gipter.core.producers.processor.DocumentFinderFactory;
+import pg.gipter.services.SmartZipService;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
 
@@ -44,32 +43,9 @@ class SharePointDocumentsDiffProducer extends AbstractDiffProducer {
             throw new IllegalArgumentException("Given projects do not contain any items.");
         }
 
-        zipDocumentsAndWriteToFile(documents);
+        new SmartZipService().zipDocumentsAndWriteToFile(documents, applicationProperties.itemPath());
         if (applicationProperties.isDeleteDownloadedFiles()) {
             deleteFiles(documents);
-        }
-    }
-
-    private void zipDocumentsAndWriteToFile(List<Path> documents) {
-        try (FileOutputStream fos = new FileOutputStream(applicationProperties.itemPath());
-             ZipOutputStream zipOut = new ZipOutputStream(fos)) {
-
-            for (Path document : documents) {
-                FileInputStream fis = new FileInputStream(document.toFile());
-                ZipEntry zipEntry = new ZipEntry(document.getFileName().toString());
-                zipOut.putNextEntry(zipEntry);
-
-                byte[] bytes = new byte[1024];
-                int length;
-                while ((length = fis.read(bytes)) >= 0) {
-                    zipOut.write(bytes, 0, length);
-                }
-                fis.close();
-            }
-        } catch (IOException ex) {
-            String errMsg = "Could not produce diff.";
-            logger.error(errMsg);
-            throw new IllegalArgumentException(errMsg, ex);
         }
     }
 
