@@ -32,8 +32,6 @@ public class MainController extends AbstractController {
     @FXML
     private MenuItem toolkitMenuItem;
     @FXML
-    private MenuItem readMeMenuItem;
-    @FXML
     private MenuItem instructionMenuItem;
     @FXML
     private MenuItem upgradeMenuItem;
@@ -41,10 +39,6 @@ public class MainController extends AbstractController {
     private MenuItem wizardMenuItem;
     @FXML
     private MenuItem wikiMenuItem;
-    @FXML
-    private MenuItem importCertMenuItem;
-    @FXML
-    private MenuItem importCertProgrammaticMenuItem;
 
     @FXML
     private TextField authorsTextField;
@@ -181,13 +175,10 @@ public class MainController extends AbstractController {
         Map<String, MenuItem> map = new HashMap<>();
         map.put("applicationMenuItem", applicationMenuItem);
         map.put("toolkitMenuItem", toolkitMenuItem);
-        map.put("readMeMenuItem", readMeMenuItem);
         map.put("instructionMenuItem", instructionMenuItem);
         map.put("upgradeMenuItem", upgradeMenuItem);
         map.put("wizardMenuItem", wizardMenuItem);
         map.put("wikiMenuItem", wikiMenuItem);
-        map.put("importCertMenuItem", importCertMenuItem);
-        map.put("importCertProgrammaticMenuItem", importCertProgrammaticMenuItem);
         return map;
     }
 
