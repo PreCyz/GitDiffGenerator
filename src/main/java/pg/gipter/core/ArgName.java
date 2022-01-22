@@ -242,6 +242,18 @@ public enum ArgName {
         public String defaultValue() {
             return "60";
         }
+    },
+    uploadItem {
+        @Override
+        public String defaultValue() {
+            return "Y";
+        }
+    },
+    smartZip {
+        @Override
+        public String defaultValue() {
+            return "Y";
+        }
     };
 
     public abstract String defaultValue();
