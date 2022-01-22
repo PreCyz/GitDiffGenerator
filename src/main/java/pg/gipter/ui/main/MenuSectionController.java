@@ -8,33 +8,27 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.*;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.services.GithubService;
-import pg.gipter.services.keystore.*;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.*;
 import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.*;
+import pg.gipter.utils.BundleUtils;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.*;
-import java.util.List;
-import java.util.*;
-
-import static java.util.stream.Collectors.joining;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class MenuSectionController extends AbstractController {
 
     private MenuItem applicationMenuItem;
     private MenuItem toolkitMenuItem;
-    private MenuItem readMeMenuItem;
     private MenuItem instructionMenuItem;
     private MenuItem upgradeMenuItem;
     private MenuItem wizardMenuItem;
     private MenuItem wikiMenuItem;
-    private MenuItem importCertMenuItem;
-    private MenuItem importCertProgrammaticMenuItem;
 
     private final MainController mainController;
 
@@ -51,13 +45,10 @@ public class MenuSectionController extends AbstractController {
 
         applicationMenuItem = controlsMap.get("applicationMenuItem");
         toolkitMenuItem = controlsMap.get("toolkitMenuItem");
-        readMeMenuItem = controlsMap.get("readMeMenuItem");
         instructionMenuItem = controlsMap.get("instructionMenuItem");
         upgradeMenuItem = controlsMap.get("upgradeMenuItem");
         wizardMenuItem = controlsMap.get("wizardMenuItem");
         wikiMenuItem = controlsMap.get("wikiMenuItem");
-        importCertMenuItem = controlsMap.get("importCertMenuItem");
-        importCertProgrammaticMenuItem = controlsMap.get("importCertProgrammaticMenuItem");
 
         setProperties();
         setAccelerators();
@@ -68,12 +59,6 @@ public class MenuSectionController extends AbstractController {
         instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
 
         setUpgradeMenuItemDisabled();
-
-        final boolean enableImportCert = StringUtils.notEmpty(SystemUtils.javaHome()) &&
-                applicationProperties.isCertImportEnabled() &&
-                CertificateServiceFactory.getInstance(true).hasCertToImport();
-        importCertMenuItem.setDisable(!enableImportCert);
-        importCertProgrammaticMenuItem.setDisable(!enableImportCert);
     }
 
     private void setUpgradeMenuItemDisabled() {
@@ -100,9 +85,6 @@ public class MenuSectionController extends AbstractController {
         upgradeMenuItem.setAccelerator(
                 new KeyCodeCombination(KeyCode.U, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
         );
-        readMeMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
         instructionMenuItem.setAccelerator(
                 new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
         );
@@ -112,24 +94,15 @@ public class MenuSectionController extends AbstractController {
         wikiMenuItem.setAccelerator(
                 new KeyCodeCombination(KeyCode.K, KeyCombination.CONTROL_DOWN, KeyCombination.SHORTCUT_DOWN)
         );
-        importCertMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
-        importCertProgrammaticMenuItem.setAccelerator(
-                new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN)
-        );
     }
 
     private void setActions() {
         applicationMenuItem.setOnAction(applicationActionEventHandler());
         toolkitMenuItem.setOnAction(toolkitActionEventHandler());
-        readMeMenuItem.setOnAction(readMeActionEventHandler());
         instructionMenuItem.setOnAction(instructionActionEventHandler());
         upgradeMenuItem.setOnAction(upgradeActionEventHandler());
         wizardMenuItem.setOnAction(launchWizardActionEventHandler());
         wikiMenuItem.setOnAction(wikiActionEventHandler());
-        importCertMenuItem.setOnAction(importCertEventHandler());
-        importCertProgrammaticMenuItem.setOnAction(importCertProgrammaticEventHandler());
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
@@ -140,13 +113,6 @@ public class MenuSectionController extends AbstractController {
         return event -> {
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.showToolkitSettingsWindow();
-        };
-    }
-
-    private EventHandler<ActionEvent> readMeActionEventHandler() {
-        return event -> {
-            AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser(GithubService.GITHUB_URL + "#gitdiffgenerator");
         };
     }
 
@@ -194,55 +160,5 @@ public class MenuSectionController extends AbstractController {
             AppManager instance = AppManagerFactory.getInstance();
             instance.launchDefaultBrowser(GithubService.GITHUB_URL + "/wiki");
         };
-    }
-
-    private EventHandler<ActionEvent> importCertEventHandler() {
-        return actionEvent -> {
-            final java.util.List<CertImportResult> certs = CertificateServiceFactory.getInstance(true).automaticImport();
-            autoImport(certs);
-        };
-    }
-
-    private EventHandler<ActionEvent> importCertProgrammaticEventHandler() {
-        return actionEvent -> {
-            final java.util.List<CertImportResult> certs = CertificateServiceFactory.getInstance(false).automaticImport();
-            autoImport(certs);
-        };
-    }
-
-    private void autoImport(List<CertImportResult> certs) {
-        String successMsg = certs.stream()
-                .filter(r -> r.getStatus() == CertImportStatus.SUCCESS)
-                .map(CertImportResult::getCertName)
-                .collect(joining(","));
-        String importedMsg = certs.stream()
-                .filter(r -> r.getStatus() == CertImportStatus.ALREADY_IMPORTED)
-                .map(CertImportResult::getCertName)
-                .collect(joining(","));
-        String failMsg = certs.stream()
-                .filter(r -> r.getStatus() == CertImportStatus.FAILED)
-                .map(CertImportResult::getCertName)
-                .collect(joining(","));
-
-        String finalMsg = "";
-        EnumSet<CertImportStatus> statuses = EnumSet.noneOf(CertImportStatus.class);
-        if (StringUtils.notEmpty(successMsg)) {
-            finalMsg = BundleUtils.getMsg("certificate.add.success", successMsg) + "\n";
-            statuses.add(CertImportStatus.SUCCESS);
-        }
-        if (StringUtils.notEmpty(successMsg)) {
-            finalMsg += BundleUtils.getMsg("certificate.add.failed", failMsg) + "\n";
-            statuses.add(CertImportStatus.FAILED);
-        }
-        if (StringUtils.notEmpty(importedMsg)) {
-            finalMsg += BundleUtils.getMsg("certificate.add.exists", importedMsg);
-            statuses.add(CertImportStatus.ALREADY_IMPORTED);
-        }
-        AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder();
-        alertWindowBuilder.withMessage(finalMsg)
-                .withAlertType(Alert.AlertType.INFORMATION)
-                .withWebViewDetails(statuses.containsAll(EnumSet.of(CertImportStatus.SUCCESS)) ?
-                        WebViewService.getInstance().pullSuccessWebView() : WebViewService.getInstance().pullFailWebView())
-                .buildAndDisplayWindow();
     }
 }
