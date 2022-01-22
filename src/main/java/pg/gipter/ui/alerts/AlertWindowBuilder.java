@@ -1,5 +1,8 @@
 package pg.gipter.ui.alerts;
 
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -7,7 +10,9 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.UploadResult;
+import pg.gipter.ui.alerts.controls.CustomControl;
 import pg.gipter.utils.*;
 
 import java.net.URL;
@@ -27,6 +32,7 @@ public class AlertWindowBuilder {
     private String okButtonText;
     private Map<String, UploadResult> msgResultMap;
     private int gridPaneRow;
+    private CustomControl customControl;
 
     public AlertWindowBuilder() {
         linkActions = Collections.emptySet();
@@ -77,10 +83,15 @@ public class AlertWindowBuilder {
         return this;
     }
 
+    public AlertWindowBuilder withCustomControl(CustomControl customControl) {
+        this.customControl = customControl;
+        return this;
+    }
+
     public void buildAndDisplayWindow() {
         Alert alert = buildDefaultAlert();
         List<Hyperlink> hyperLinks = buildHyperlinks(alert);
-        GridPane gridPane = buildGridPane(hyperLinks);
+        GridPane gridPane = buildGridPane(hyperLinks, alert);
 
         alert.getDialogPane().contentProperty().set(gridPane);
         alert.showAndWait();
@@ -101,7 +112,7 @@ public class AlertWindowBuilder {
     private List<Hyperlink> buildHyperlinks(Alert alert) {
         List<Hyperlink> hyperlinks = new LinkedList<>();
         for (AbstractLinkAction linkAction : linkActions) {
-            Hyperlink hyperLink = new Hyperlink(linkAction.getLink());
+            Hyperlink hyperLink = new Hyperlink(linkAction.getText().isEmpty() ? linkAction.getLink() : linkAction.getText());
             hyperLink.setOnAction((evt) -> {
                 alert.close();
                 linkAction.run();
@@ -112,7 +123,7 @@ public class AlertWindowBuilder {
         return hyperlinks;
 }
 
-    private GridPane buildGridPane(List<Hyperlink> hyperLinks) {
+    private GridPane buildGridPane(List<Hyperlink> hyperLinks, Alert alert) {
         gridPaneRow = 0;
 
         GridPane gridPane = new GridPane();
@@ -121,6 +132,9 @@ public class AlertWindowBuilder {
         gridPane.setAlignment(Pos.CENTER);
 
         double preferredWidth = addHyperLinks(hyperLinks, gridPane);
+
+        final double customControlWidth = addCustomControl(gridPane, alert);
+        preferredWidth = Math.max(preferredWidth, customControlWidth);
 
         final double labelWidth = addLabels(gridPane);
         preferredWidth = Math.max(preferredWidth, labelWidth);
@@ -204,6 +218,26 @@ public class AlertWindowBuilder {
         return preferredWidth;
     }
 
+    private double addCustomControl(GridPane gridPane, Alert alert) {
+        double preferredWidth = 0;
+        if (customControl != null) {
+            final UILauncher uiLauncher = customControl.getUiLauncher();
+            EventHandler<ActionEvent> eventHandler = event -> {
+                alert.close();
+                Platform.runLater(() -> {
+                    uiLauncher.hideMainWindow();
+                    uiLauncher.showUpgradeWindow();
+                });
+            };
+            Control control = customControl.create(eventHandler);
+
+            gridPane.add(control, 0, gridPaneRow++);
+            preferredWidth = Math.max(preferredWidth, control.getWidth());
+            return preferredWidth;
+        }
+        return preferredWidth;
+    }
+
     private double addImageView(GridPane gridPane) {
         double preferredWidth = 0;
         if (webViewDetails != null && webViewDetails.getImageView() != null) {
@@ -255,7 +289,7 @@ public class AlertWindowBuilder {
         ButtonType cancelButton = new ButtonType(cancelButtonText, ButtonBar.ButtonData.CANCEL_CLOSE);
         alert.getButtonTypes().addAll(okButton, cancelButton);
 
-        GridPane fp = buildGridPane(Collections.singletonList(new Hyperlink("")));
+        GridPane fp = buildGridPane(Collections.singletonList(new Hyperlink("")), alert);
         alert.getDialogPane().contentProperty().set(fp);
 
         return alert.showAndWait().orElse(cancelButton) == okButton;

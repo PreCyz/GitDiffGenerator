@@ -163,12 +163,6 @@ public enum ArgName {
             return "";
         }
     },
-    certImport {
-        @Override
-        public String defaultValue() {
-            return "N";
-        }
-    },
     checkLastItem {
         @Override
         public String defaultValue() {
@@ -241,6 +235,18 @@ public enum ArgName {
         @Override
         public String defaultValue() {
             return "60";
+        }
+    },
+    uploadItem {
+        @Override
+        public String defaultValue() {
+            return "Y";
+        }
+    },
+    smartZip {
+        @Override
+        public String defaultValue() {
+            return "Y";
         }
     };
 

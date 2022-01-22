@@ -21,7 +21,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CliPreferredApplicationPropertiesTest {
+class CliApplicationPropertiesTest {
 
     private CliApplicationProperties applicationProperties;
 
@@ -1990,63 +1990,6 @@ class CliPreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenCertImportEnabled_whenIsCertImportEnabled_thenReturnDefault() {
-        applicationProperties = new CliApplicationProperties(new String[]{});
-
-        boolean actual = applicationProperties.isCertImportEnabled();
-
-        assertThat(actual).isFalse();
-    }
-
-    @Test
-    void givenCertImportEnabledFromCLI_whenIsCertImportEnabled_thenReturnCliCertImportEnabled() {
-        applicationProperties = new CliApplicationProperties(new String[]{"certImport=T"});
-
-        boolean actual = applicationProperties.isCertImportEnabled();
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void givenCertImportEnabledFileAndCLI_whenIsCertImportEnabled_thenReturnCliCertImportEnabled() {
-        String[] args = {"certImport=t"};
-        applicationProperties = new CliApplicationProperties(args);
-        ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setCertImportEnabled(Boolean.FALSE);
-        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
-
-        boolean actual = applicationProperties.isCertImportEnabled();
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void givenCertImportEnabledFromFile_whenIsCertImportEnabled_thenReturnCertImportEnabledFromFile() {
-        String[] args = {};
-        applicationProperties = new CliApplicationProperties(args);
-        ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setCertImportEnabled(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
-
-        boolean actual = applicationProperties.isCertImportEnabled();
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
-    void givenCertImportEnabledFromFileAndOtherArgs_whenIsCertImportEnabled_thenReturnCertImportEnabledFromFile() {
-        String[] args = {"author=test"};
-        applicationProperties = new CliApplicationProperties(args);
-        ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setCertImportEnabled(Boolean.TRUE);
-        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
-
-        boolean actual = applicationProperties.isCertImportEnabled();
-
-        assertThat(actual).isTrue();
-    }
-
-    @Test
     void givenNoFetchTimeout_whenFetchTimeout_thenReturnDefault60() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
@@ -2101,5 +2044,63 @@ class CliPreferredApplicationPropertiesTest {
         int actual = applicationProperties.fetchTimeout();
 
         assertThat(actual).isEqualTo(13);
+    }
+
+    @Test
+    void givenFetchAll_whenIsUploadItem_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenFetchAllFromCLI_whenIsUploadItem_thenReturnCliUploadItem() {
+        applicationProperties = new CliApplicationProperties(new String[]{"uploadItem=N"});
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllFileAndCLI_whenIsUploadItem_thenReturnCliUploadItem() {
+        String[] args = {"uploadItem=n"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setUploadItem(Boolean.TRUE);
+
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllFromProperties_whenIsUploadItem_thenReturnUploadItemFromProperties() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setUploadItem(Boolean.FALSE);
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void givenFetchAllFromPropertiesAndOtherArgs_whenIsUploadItem_thenReturnUploadItemFromProperties() {
+        String[] args = {"author=test"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setUploadItem(Boolean.FALSE);
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        boolean actual = applicationProperties.isUploadItem();
+
+        assertThat(actual).isFalse();
     }
 }

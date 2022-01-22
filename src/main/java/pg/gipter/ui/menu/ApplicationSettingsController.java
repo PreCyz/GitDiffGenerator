@@ -46,8 +46,6 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private Label preferredArgSourceLabel;
     @FXML
-    private Label importCertLabel;
-    @FXML
     private Label checkLastItemLabel;
 
     @FXML
@@ -65,9 +63,11 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private CheckBox silentModeCheckBox;
     @FXML
-    private CheckBox importCertCheckBox;
-    @FXML
     private CheckBox checkLastItemCheckBox;
+    @FXML
+    private CheckBox uploadItemCheckBox;
+    @FXML
+    private CheckBox smartZipCheckBox;
     @FXML
     private ComboBox<String> languageComboBox;
 
@@ -122,12 +122,13 @@ public class ApplicationSettingsController extends AbstractController {
         activateTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
         autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
         silentModeCheckBox.setSelected(applicationProperties.isSilentMode());
+        uploadItemCheckBox.setSelected(applicationProperties.isUploadItem());
+        smartZipCheckBox.setSelected(applicationProperties.isSmartZip());
 
         if (languageComboBox.getItems().isEmpty()) {
             languageComboBox.setItems(FXCollections.observableList(BundleUtils.getSupportedLanguages()));
         }
         languageComboBox.setValue(applicationProperties.uiLanguage());
-        importCertCheckBox.setSelected(applicationProperties.isCertImportEnabled());
         checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
 
         final CustomCommand gitCustomCommand = applicationProperties.getCustomCommand(VersionControlSystem.GIT);
@@ -208,7 +209,6 @@ public class ApplicationSettingsController extends AbstractController {
         final ChangeListener<Boolean> saveNewSettingsChangeListener = (observable, oldValue, newValue) -> saveNewSettings();
         confirmationWindowCheckBox.selectedProperty().addListener(saveNewSettingsChangeListener);
 
-        importCertCheckBox.selectedProperty().addListener(saveNewSettingsChangeListener);
         checkLastItemCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
             processLastItemJob(newValue);
             saveNewSettings();
@@ -259,8 +259,9 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setEnableOnStartup(autostartCheckBox.isSelected());
         applicationConfig.setSilentMode(silentModeCheckBox.isSelected());
         applicationConfig.setUiLanguage(languageComboBox.getValue());
-        applicationConfig.setCertImportEnabled(importCertCheckBox.isSelected());
         applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
+        applicationConfig.setUploadItem(uploadItemCheckBox.isSelected());
+        applicationConfig.setSmartZip(smartZipCheckBox.isSelected());
         applicationConfig.setCustomCommands(
                 Stream.of(
                         new CustomCommand(
@@ -301,8 +302,9 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.preferredArgSource", preferredArgSourceLabel);
         labelsAffectedByLanguage.put("launch.panel.useUI", useUICheckBox);
         labelsAffectedByLanguage.put("launch.panel.silentMode", silentModeCheckBox);
-        labelsAffectedByLanguage.put("launch.panel.certImport", importCertLabel);
         labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
         labelsAffectedByLanguage.put("launch.customCommand.override", overrideLabel);
+        labelsAffectedByLanguage.put("launch.panel.uploadItem", uploadItemCheckBox);
+        labelsAffectedByLanguage.put("launch.panel.smartZip", smartZipCheckBox);
     }
 }

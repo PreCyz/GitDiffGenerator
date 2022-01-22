@@ -279,14 +279,6 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public boolean isCertImportEnabled() {
-        if (applicationConfig.getCertImportEnabled() != null) {
-            return applicationConfig.getCertImportEnabled();
-        }
-        return argExtractor.isCertImportEnabled();
-    }
-
-    @Override
     public boolean isCheckLastItemEnabled() {
         if (applicationConfig.getCheckLastItemEnabled() != null) {
             return applicationConfig.getCheckLastItemEnabled();
@@ -308,5 +300,21 @@ class FileApplicationProperties extends ApplicationProperties {
             return Math.abs(currentRunConfig.getFetchTimeout());
         }
         return argExtractor.fetchTimeout();
+    }
+
+    @Override
+    public boolean isUploadItem() {
+        if (applicationConfig.getUploadItem() != null) {
+            return applicationConfig.getUploadItem();
+        }
+        return argExtractor.isUploadItem();
+    }
+
+    @Override
+    public boolean isSmartZip() {
+        if (applicationConfig.getSmartZip() != null) {
+            return applicationConfig.getSmartZip();
+        }
+        return argExtractor.isSmartZip();
     }
 }

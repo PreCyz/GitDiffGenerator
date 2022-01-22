@@ -4,7 +4,7 @@ public enum SupportedLanguages {
     PL("pl"),
     EN("en");
 
-    private String language;
+    private final String language;
 
     SupportedLanguages(String language) {
         this.language = language;
