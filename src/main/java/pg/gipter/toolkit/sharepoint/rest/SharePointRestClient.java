@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.services.SmartZipService;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.io.IOException;
@@ -133,12 +134,24 @@ public class SharePointRestClient {
     }
 
     public void uploadAttachment(String itemId) throws IOException {
+        SmartZipService smartZipService = new SmartZipService();
+        Path path = Paths.get(applicationProperties.itemPath());
+        if (applicationProperties.isSmartZip()) {
+            path = smartZipService.zipFile(path);
+        }
+        if (Files.notExists(path)) {
+            String errMsg = String.format("File [%s] does not exist", path);
+            logger.error(errMsg);
+            cleanup(itemId);
+            throw new IOException(errMsg);
+        }
+
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)/AttachmentFiles/add(FileName='%s')",
                 applicationProperties.toolkitUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 itemId,
-                applicationProperties.fileName()
+                path.getFileName().toString()
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitUsername(),
@@ -149,13 +162,6 @@ public class SharePointRestClient {
                 getFormDigest()
         );
 
-        Path path = Paths.get(applicationProperties.itemPath());
-        if (Files.notExists(path)) {
-            String errMsg = String.format("File [%s] does not exist", path);
-            logger.error(errMsg);
-            cleanup(itemId);
-            throw new IOException(errMsg);
-        }
         JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, path.toFile());
 
         if (jsonObject.has("odata.error")) {
@@ -167,6 +173,14 @@ public class SharePointRestClient {
             throw new IOException(errMsg);
         }
         logger.info("Attachment [{}] uploaded.", path);
+        if (applicationProperties.isSmartZip() && smartZipService.shouldZip(path)) {
+            try {
+                Files.deleteIfExists(path);
+                logger.info("Zipped file [{}] deleted from the hard drive.", path);
+            } catch (IOException ex) {
+                logger.error("Could not delete zipped file [{}].", path);
+            }
+        }
     }
 
     public String getAuthorId(String itemId) throws IOException {

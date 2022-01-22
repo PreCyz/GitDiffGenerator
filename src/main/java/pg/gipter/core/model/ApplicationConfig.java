@@ -24,6 +24,8 @@ public class ApplicationConfig {
     private Boolean checkLastItemEnabled;
     private String checkLastItemJobCronExpression;
     private Set<CustomCommand> customCommands;
+    private Boolean uploadItem;
+    private Boolean smartZip;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -38,6 +40,8 @@ public class ApplicationConfig {
         certImportEnabled = StringUtils.getBoolean(ArgName.certImport.defaultValue());
         checkLastItemEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
         checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
+        uploadItem = StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
+        smartZip = StringUtils.getBoolean(ArgName.smartZip.defaultValue());
     }
 
     public Boolean getConfirmationWindow() {
@@ -144,6 +148,22 @@ public class ApplicationConfig {
         this.customCommands = customCommands;
     }
 
+    public Boolean getUploadItem() {
+        return uploadItem;
+    }
+
+    public void setUploadItem(Boolean uploadItem) {
+        this.uploadItem = uploadItem;
+    }
+
+    public Boolean getSmartZip() {
+        return smartZip;
+    }
+
+    public void setSmartZip(Boolean smartZip) {
+        this.smartZip = smartZip;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -182,6 +202,12 @@ public class ApplicationConfig {
         if (getCheckLastItemJobCronExpression() != null) {
             arguments.add(ArgName.checkLastItemJobCronExpression.name() + "=" + getCheckLastItemEnabled());
         }
+        if (getUploadItem() != null) {
+            arguments.add(ArgName.uploadItem.name() + "=" + getUploadItem());
+        }
+        if (getSmartZip() != null) {
+            arguments.add(ArgName.smartZip.name() + "=" + getSmartZip());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -216,6 +242,10 @@ public class ApplicationConfig {
                     applicationConfig.setCheckLastItemEnabled(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.checkLastItemJobCronExpression.name().equals(argumentName)) {
                     applicationConfig.setCheckLastItemJobCronExpression(argumentValue);
+                } else if (ArgName.uploadItem.name().equals(argumentName)) {
+                    applicationConfig.setUploadItem(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.smartZip.name().equals(argumentName)) {
+                    applicationConfig.setSmartZip(StringUtils.getBoolean(argumentValue));
                 }
             }
         }
@@ -237,6 +267,8 @@ public class ApplicationConfig {
                 ", certImportEnabled=" + certImportEnabled +
                 ", checkLastItemEnabled=" + checkLastItemEnabled +
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
+                ", uploadItem=" + uploadItem +
+                ", smartZip=" + smartZip +
                 '}';
     }
 }

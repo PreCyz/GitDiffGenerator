@@ -292,17 +292,31 @@ final class ArgExtractor {
         return StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
     }
 
-    public String checkLastItemJobCronExpression() {
+    String checkLastItemJobCronExpression() {
         if (containsArg(ArgName.checkLastItemJobCronExpression.name())) {
             return getValue(ArgName.checkLastItemJobCronExpression, ArgName.checkLastItemJobCronExpression.defaultValue());
         }
         return ArgName.checkLastItemJobCronExpression.defaultValue();
     }
 
-    public int fetchTimeout() {
+    int fetchTimeout() {
         if (containsArg(ArgName.fetchTimeout.name())) {
             return Integer.parseInt(getValue(ArgName.fetchTimeout, ArgName.fetchTimeout.defaultValue()));
         }
         return Integer.parseInt(ArgName.fetchTimeout.defaultValue());
+    }
+
+    boolean isUploadItem() {
+        if (containsArg(ArgName.uploadItem.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.uploadItem, ArgName.uploadItem.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
+    }
+
+    boolean isSmartZip() {
+        if (containsArg(ArgName.smartZip.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.smartZip, ArgName.smartZip.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.smartZip.defaultValue());
     }
 }

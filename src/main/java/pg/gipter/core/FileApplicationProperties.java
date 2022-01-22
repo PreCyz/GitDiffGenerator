@@ -309,4 +309,20 @@ class FileApplicationProperties extends ApplicationProperties {
         }
         return argExtractor.fetchTimeout();
     }
+
+    @Override
+    public boolean isUploadItem() {
+        if (applicationConfig.getUploadItem() != null) {
+            return applicationConfig.getUploadItem();
+        }
+        return argExtractor.isUploadItem();
+    }
+
+    @Override
+    public boolean isSmartZip() {
+        if (applicationConfig.getSmartZip() != null) {
+            return applicationConfig.getSmartZip();
+        }
+        return argExtractor.isSmartZip();
+    }
 }
