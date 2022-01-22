@@ -163,12 +163,6 @@ public enum ArgName {
             return "";
         }
     },
-    certImport {
-        @Override
-        public String defaultValue() {
-            return "N";
-        }
-    },
     checkLastItem {
         @Override
         public String defaultValue() {

@@ -290,15 +290,6 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public boolean isCertImportEnabled() {
-        boolean certImportEnabled = argExtractor.isCertImportEnabled();
-        if (!containsArg(ArgName.certImport.name()) && applicationConfig.getCertImportEnabled() != null) {
-            certImportEnabled = applicationConfig.getCertImportEnabled();
-        }
-        return certImportEnabled;
-    }
-
-    @Override
     public boolean isCheckLastItemEnabled() {
         boolean checkLastItemEnabled = argExtractor.isCheckLastItemEnabled();
         if (!containsArg(ArgName.checkLastItem.name()) && applicationConfig.getCheckLastItemEnabled() != null) {

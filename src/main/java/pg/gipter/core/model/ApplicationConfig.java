@@ -37,7 +37,6 @@ public class ApplicationConfig {
         loggingLevel = Level.INFO;
         upgradeFinished = StringUtils.getBoolean(ArgName.upgradeFinished.defaultValue());
         uiLanguage = BundleUtils.getDefaultLanguage();
-        certImportEnabled = StringUtils.getBoolean(ArgName.certImport.defaultValue());
         checkLastItemEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
         checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
         uploadItem = StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
@@ -193,9 +192,6 @@ public class ApplicationConfig {
         if (getUiLanguage() != null) {
             arguments.add(ArgName.uiLanguage.name() + "=" + getUiLanguage());
         }
-        if (getCertImportEnabled() != null) {
-            arguments.add(ArgName.certImport.name() + "=" + getCertImportEnabled());
-        }
         if (getCheckLastItemEnabled() != null) {
             arguments.add(ArgName.checkLastItem.name() + "=" + getCheckLastItemEnabled());
         }
@@ -236,8 +232,6 @@ public class ApplicationConfig {
                     applicationConfig.setUpgradeFinished(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.uiLanguage.name().equals(argumentName)) {
                     applicationConfig.setUiLanguage(argumentValue);
-                } else if (ArgName.certImport.name().equals(argumentName)) {
-                    applicationConfig.setCertImportEnabled(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.checkLastItem.name().equals(argumentName)) {
                     applicationConfig.setCheckLastItemEnabled(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.checkLastItemJobCronExpression.name().equals(argumentName)) {
@@ -264,7 +258,6 @@ public class ApplicationConfig {
                 ", loggingLevel=" + loggingLevel +
                 ", upgradeFinished=" + upgradeFinished +
                 ", uiLanguage=" + uiLanguage +
-                ", certImportEnabled=" + certImportEnabled +
                 ", checkLastItemEnabled=" + checkLastItemEnabled +
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
                 ", uploadItem=" + uploadItem +
