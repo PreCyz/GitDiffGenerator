@@ -157,10 +157,10 @@ abstract class AbstractDiffProducer implements DiffProducer {
         processBuilder.environment().put("LANG", "pl_PL.UTF-8");
         Process process = processBuilder.start();
 
+        Path newFilePath = createProjectFile(projectPath);
+
         try (InputStream is = process.getInputStream();
              Scanner sc = new Scanner(is, StandardCharsets.UTF_8)) {
-
-            Path newFilePath = createProjectFile(projectPath);
 
             boolean hasDiff = false;
             while (sc.hasNextLine()) {
@@ -214,8 +214,14 @@ abstract class AbstractDiffProducer implements DiffProducer {
         } else {
             newFilePath = Paths.get(newFilePath.getParent().toString(), projectName);
         }
-        Files.createFile(newFilePath);
-        return newFilePath;
+        try {
+            Files.deleteIfExists(newFilePath);
+            Files.createFile(newFilePath);
+            return newFilePath;
+        } catch (IOException ex) {
+            logger.error("Could not create the file [{}].", newFilePath, ex);
+            throw ex;
+        }
     }
 
     private List<DiffDetails> processCallable(List<Callable<DiffDetails>> diffs) {
