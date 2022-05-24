@@ -65,7 +65,7 @@ public class ProjectDetails {
     public String toString() {
         return "ProjectDetails{" +
                 "name=" + name +
-                ", cvsType=" + vcsType +
+                ", vcsType=" + vcsType +
                 ", path=" + path +
                 '}';
     }
