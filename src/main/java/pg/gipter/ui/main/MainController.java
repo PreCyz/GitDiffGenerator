@@ -302,8 +302,7 @@ public class MainController extends AbstractController {
     void updateLastItemUploadDate() {
         try {
             ProgramData programData = dataService.loadProgramData();
-            if (programData.getUploadStatus() != null &&
-                    EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(programData.getUploadStatus())) {
+            if (programData.getUploadStatus() != null && UploadStatus.isSuccess(programData.getUploadStatus())) {
                 uiLauncher.setLastItemSubmissionDate(null);
             }
         } catch (Exception ex) {
@@ -367,7 +366,7 @@ public class MainController extends AbstractController {
     }
 
     void setDisable(ItemType itemType) {
-        boolean disable = EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(itemType);
+        boolean disable = !ItemType.isCodeRelated(itemType);
         datesSectionController.disableEndDatePicker(itemType);
         additionalSettingsSectionController.disableSkipRemote(disable);
         additionalSettingsSectionController.disableFetchAll(disable);

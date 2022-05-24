@@ -130,7 +130,7 @@ public class DatesSectionController extends AbstractController {
     }
 
     void disableEndDatePicker(ItemType itemType) {
-        endDatePicker.setDisable(EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(itemType));
+        endDatePicker.setDisable(ItemType.isDocsRelated(itemType));
     }
 
     void setEndDatePicker(LocalDate localDate) {
