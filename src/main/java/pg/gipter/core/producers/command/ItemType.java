@@ -20,4 +20,12 @@ public enum ItemType {
         }
         throw new IllegalArgumentException(errMsg);
     }
+
+    public static boolean isCodeRelated(ItemType itemType) {
+        return EnumSet.of(ItemType.SIMPLE, ItemType.PROTECTED).contains(itemType);
+    }
+
+    public static boolean isDocsRelated(ItemType itemType) {
+        return EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(itemType);
+    }
 }
