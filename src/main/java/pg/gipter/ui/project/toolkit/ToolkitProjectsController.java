@@ -77,12 +77,12 @@ public class ToolkitProjectsController extends AbstractController {
         nameColumn.setEditable(false);
 
         column = projectsTableView.getColumns().get(1);
-        TableColumn<ProjectDetails, String> cvsTypeColumn = new TableColumn<>();
-        cvsTypeColumn.setText(column.getText());
-        cvsTypeColumn.setPrefWidth(column.getPrefWidth());
-        cvsTypeColumn.setCellValueFactory(new PropertyValueFactory<>("cvsType"));
-        cvsTypeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        cvsTypeColumn.setEditable(false);
+        TableColumn<ProjectDetails, String> vcsTypeColumn = new TableColumn<>();
+        vcsTypeColumn.setText(column.getText());
+        vcsTypeColumn.setPrefWidth(column.getPrefWidth());
+        vcsTypeColumn.setCellValueFactory(new PropertyValueFactory<>("vcsType"));
+        vcsTypeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        vcsTypeColumn.setEditable(false);
 
         column = projectsTableView.getColumns().get(2);
         TableColumn<ProjectDetails, String> baseWordsColumn = new TableColumn<>();
@@ -93,7 +93,7 @@ public class ToolkitProjectsController extends AbstractController {
         baseWordsColumn.setEditable(false);
 
         projectsTableView.getColumns().clear();
-        projectsTableView.getColumns().addAll(nameColumn, cvsTypeColumn, baseWordsColumn);
+        projectsTableView.getColumns().addAll(nameColumn, vcsTypeColumn, baseWordsColumn);
 
         projectsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
