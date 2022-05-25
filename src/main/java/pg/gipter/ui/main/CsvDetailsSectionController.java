@@ -80,6 +80,12 @@ class CsvDetailsSectionController extends AbstractController {
             gitAuthorTextField.setText(applicationProperties.gitAuthor());
             mercurialAuthorTextField.setText(applicationProperties.mercurialAuthor());
             svnAuthorTextField.setText(applicationProperties.svnAuthor());
+        } else {
+            authorsTextField.setText(null);
+            committerEmailTextField.setText(null);
+            gitAuthorTextField.setText(null);
+            mercurialAuthorTextField.setText(null);
+            svnAuthorTextField.setText(null);
         }
     }
 
