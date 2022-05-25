@@ -8,7 +8,8 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 
 import java.net.URL;
-import java.util.*;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 class AdditionalSettingsSectionController extends AbstractController {
 
@@ -43,9 +44,7 @@ class AdditionalSettingsSectionController extends AbstractController {
     }
 
     private void setProperties() {
-        deleteDownloadedFilesCheckBox.setDisable(
-                !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(applicationProperties.itemType())
-        );
+        deleteDownloadedFilesCheckBox.setDisable(!ItemType.isDocsRelated(applicationProperties.itemType()));
         fetchTimeoutTextField.setDisable(fetchAllCheckBox.isSelected() && !fetchAllCheckBox.isDisabled());
     }
 

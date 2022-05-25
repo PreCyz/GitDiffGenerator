@@ -49,9 +49,9 @@ public class StatisticService {
         statistic.setSystemUsers(new HashSet<>(Collections.singletonList(SystemUtils.userName())));
         statistic.setLastUpdateStatus(runDetails.getStatus());
         statistic.setLastRunType(runDetails.getRunType());
-        if (EnumSet.of(UploadStatus.FAIL, UploadStatus.N_A).contains(runDetails.getStatus())) {
+        if (UploadStatus.isFailed(runDetails.getStatus())) {
             statistic.setLastFailedDate(now);
-        } else if (EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(runDetails.getStatus())) {
+        } else if (UploadStatus.isSuccess(runDetails.getStatus())) {
             statistic.setLastSuccessDate(now);
         }
         statistic.setControlSystemMap(createControlSystemMap(runDetails.getApplicationPropertiesCollection()));

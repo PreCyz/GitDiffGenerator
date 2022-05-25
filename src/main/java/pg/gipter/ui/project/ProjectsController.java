@@ -70,12 +70,12 @@ public class ProjectsController extends AbstractController {
         nameColumn.setEditable(false);
 
         column = projectsTableView.getColumns().get(1);
-        TableColumn<ProjectDetails, String> cvsTypeColumn = new TableColumn<>();
-        cvsTypeColumn.setText(column.getText());
-        cvsTypeColumn.setPrefWidth(column.getPrefWidth());
-        cvsTypeColumn.setCellValueFactory(new PropertyValueFactory<>("vcsType"));
-        cvsTypeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        cvsTypeColumn.setEditable(false);
+        TableColumn<ProjectDetails, String> vcsTypeColumn = new TableColumn<>();
+        vcsTypeColumn.setText(column.getText());
+        vcsTypeColumn.setPrefWidth(column.getPrefWidth());
+        vcsTypeColumn.setCellValueFactory(new PropertyValueFactory<>("vcsType"));
+        vcsTypeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        vcsTypeColumn.setEditable(false);
 
         column = projectsTableView.getColumns().get(2);
         TableColumn<ProjectDetails, String> path = new TableColumn<>();
@@ -86,7 +86,7 @@ public class ProjectsController extends AbstractController {
         path.setEditable(false);
 
         projectsTableView.getColumns().clear();
-        projectsTableView.getColumns().addAll(nameColumn, cvsTypeColumn, path);
+        projectsTableView.getColumns().addAll(nameColumn, vcsTypeColumn, path);
 
         projectsTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
