@@ -326,6 +326,8 @@ public abstract class ApplicationProperties {
                     ", upgradeFinished='" + isUpgradeFinished() + '\'' +
                     ", loggerLevel='" + loggerLevel() + '\'' +
                     ", checkLastItemEnabled='" + isCheckLastItemEnabled() + '\'' +
+                    ", uploadItem='" + isUploadItem() + '\'' +
+                    ", smartZip='" + isSmartZip() + '\'' +
                     ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
         }
         if (toolkitConfig != null) {
@@ -373,10 +375,11 @@ public abstract class ApplicationProperties {
     public abstract boolean isUseUI();
     public abstract String loggerLevel();
     public abstract String uiLanguage();
-    public abstract boolean isCertImportEnabled();
     public abstract boolean isCheckLastItemEnabled();
     public abstract String getCheckLastItemJobCronExpression();
     public abstract int fetchTimeout();
+    public abstract boolean isUploadItem();
+    public abstract boolean isSmartZip();
 
     public abstract boolean isUpgradeFinished();
 }

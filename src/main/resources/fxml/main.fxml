@@ -18,12 +18,9 @@
                   <Menu mnemonicParsing="false" text="%main.menu.help">
                      <items>
                         <MenuItem fx:id="wikiMenuItem" mnemonicParsing="false" text="%main.menu.help.wiki" />
-                        <MenuItem fx:id="readMeMenuItem" mnemonicParsing="false" text="%main.menu.help.readMe" />
                         <MenuItem fx:id="instructionMenuItem" mnemonicParsing="false" text="%main.menu.help.pdf" />
                         <MenuItem fx:id="upgradeMenuItem" mnemonicParsing="false" text="%main.menu.help.upgradeApplication" />
                         <MenuItem fx:id="wizardMenuItem" mnemonicParsing="false" text="%main.menu.help.launchWizard" />
-                        <MenuItem fx:id="importCertMenuItem" mnemonicParsing="false" text="Importuj cert" />
-                        <MenuItem fx:id="importCertProgrammaticMenuItem" mnemonicParsing="false" text="Importuj cert" />
                      </items>
                   </Menu>
                </menus>

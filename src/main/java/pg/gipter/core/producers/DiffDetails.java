@@ -1,19 +1,19 @@
 package pg.gipter.core.producers;
 
+import java.nio.file.Path;
+
 class DiffDetails {
 
-    private String content;
+    private Path filePath;
     private boolean diff;
     private final String projectPath;
 
     DiffDetails(String projectPath) {
-        this.content = content;
-        this.diff = diff;
         this.projectPath = projectPath;
     }
 
-    public String getContent() {
-        return content;
+    public Path getFilePath() {
+        return filePath;
     }
 
     public boolean isDiff() {
@@ -24,8 +24,8 @@ class DiffDetails {
         return projectPath;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setFilePath(Path filePath) {
+        this.filePath = filePath;
     }
 
     public void setDiff(boolean diff) {

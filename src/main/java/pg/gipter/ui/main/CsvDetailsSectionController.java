@@ -71,20 +71,26 @@ class CsvDetailsSectionController extends AbstractController {
     }
 
     private void setInitValues() {
-        authorsTextField.setText(String.join(",", applicationProperties.authors()));
-        committerEmailTextField.setText(applicationProperties.committerEmail());
-        gitAuthorTextField.setText(applicationProperties.gitAuthor());
-        mercurialAuthorTextField.setText(applicationProperties.mercurialAuthor());
-        svnAuthorTextField.setText(applicationProperties.svnAuthor());
         itemTypeComboBox.setItems(FXCollections.observableArrayList(ItemType.values()));
         itemTypeComboBox.setValue(applicationProperties.itemType());
         toolkitProjectListNamesTextField.setText(String.join(",", applicationProperties.toolkitProjectListNames()));
+        if (ItemType.isCodeRelated(applicationProperties.itemType())) {
+            authorsTextField.setText(String.join(",", applicationProperties.authors()));
+            committerEmailTextField.setText(applicationProperties.committerEmail());
+            gitAuthorTextField.setText(applicationProperties.gitAuthor());
+            mercurialAuthorTextField.setText(applicationProperties.mercurialAuthor());
+            svnAuthorTextField.setText(applicationProperties.svnAuthor());
+        } else {
+            authorsTextField.setText(null);
+            committerEmailTextField.setText(null);
+            gitAuthorTextField.setText(null);
+            mercurialAuthorTextField.setText(null);
+            svnAuthorTextField.setText(null);
+        }
     }
 
     private void setProperties() {
-        toolkitProjectListNamesTextField.setDisable(
-                !EnumSet.of(ItemType.TOOLKIT_DOCS).contains(applicationProperties.itemType())
-        );
+        toolkitProjectListNamesTextField.setDisable(ItemType.TOOLKIT_DOCS != applicationProperties.itemType());
         setTooltipOnProjectListNames();
 
         setDisable(applicationProperties.itemType());
@@ -93,7 +99,11 @@ class CsvDetailsSectionController extends AbstractController {
         setTooltipOnUseDefaultAuthor();
         useDefaultEmailCheckBox.setDisable(disableDefaultEmail());
         setTooltipOnUseDefaultEmail();
-        if (applicationProperties.projectPaths().stream().noneMatch(projectPath -> ArgName.projectPath.defaultValue().equals(projectPath))) {
+        if (ItemType.isCodeRelated(applicationProperties.itemType()) &&
+                applicationProperties.projectPaths()
+                        .stream()
+                        .noneMatch(projectPath -> ArgName.projectPath.defaultValue().equals(projectPath))
+        ) {
             gitAuthorTextField.setDisable(applicationProperties.projectPaths()
                     .stream()
                     .noneMatch(path -> VersionControlSystem.valueFrom(Paths.get(path)) == VersionControlSystem.GIT)
@@ -140,7 +150,7 @@ class CsvDetailsSectionController extends AbstractController {
 
     private boolean disableDefaultAuthor() {
         boolean disabled = true;
-        if (EnumSet.of(ItemType.SIMPLE, ItemType.PROTECTED).contains(applicationProperties.itemType())) {
+        if (ItemType.isCodeRelated(applicationProperties.itemType())) {
             Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
                     .stream()
                     .map(versionControlSystemFunction())
@@ -171,9 +181,7 @@ class CsvDetailsSectionController extends AbstractController {
 
     private boolean disableDefaultEmail() {
         boolean disabled = true;
-        if (EnumSet.of(ItemType.STATEMENT, ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS)
-                .contains(applicationProperties.itemType())) {
-
+        if (ItemType.isCodeRelated(applicationProperties.itemType())) {
             Set<VersionControlSystem> vcsSet = applicationProperties.projectPaths()
                     .stream()
                     .map(versionControlSystemFunction())
@@ -206,8 +214,7 @@ class CsvDetailsSectionController extends AbstractController {
                 mainController.setEndDatePicker(LocalDate.now());
             }
             toolkitProjectListNamesTextField.setDisable(itemTypeComboBox.getValue() != ItemType.TOOLKIT_DOCS);
-            boolean disable = !EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS)
-                    .contains(itemTypeComboBox.getValue());
+            boolean disable = !ItemType.isDocsRelated(itemTypeComboBox.getValue());
             mainController.disableDeleteDownloadedFiles(disable);
             setDisable(itemTypeComboBox.getValue());
             setTooltipOnProjectListNames();
@@ -268,7 +275,7 @@ class CsvDetailsSectionController extends AbstractController {
     }
 
     void setDisable(ItemType itemType) {
-        boolean disable = EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(itemType);
+        boolean disable = !ItemType.isCodeRelated(itemType);
         authorsTextField.setDisable(disable);
         committerEmailTextField.setDisable(disable);
         gitAuthorTextField.setDisable(disable);

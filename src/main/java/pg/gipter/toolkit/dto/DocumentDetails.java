@@ -5,23 +5,22 @@ import java.util.List;
 
 public class DocumentDetails {
 
-    private String docType;
-    private String fileLeafRef;
-    private String fileRef;
-    private String guid;
-    private int majorVersion;
-    private int minorVersion;
-    private String fileName;
-    private String serverRelativeUrl;
-    private String project;
-    private LocalDateTime timeLastModified;
-    private LocalDateTime created;
-    private LocalDateTime modified;
-    private String title;
-    private String currentVersion;
-    private User author;
-    private User lastModifier;
-
+    private final String docType;
+    private final String fileLeafRef;
+    private final String fileRef;
+    private final String guid;
+    private final int majorVersion;
+    private final int minorVersion;
+    private final String fileName;
+    private final String serverRelativeUrl;
+    private final String project;
+    private final LocalDateTime timeLastModified;
+    private final LocalDateTime created;
+    private final LocalDateTime modified;
+    private final String title;
+    private final String currentVersion;
+    private final User author;
+    private final User lastModifier;
     private List<VersionDetails> versions;
 
     DocumentDetails(String docType, String fileLeafRef, String fileRef, String guid, int majorVersion, int minorVersion,

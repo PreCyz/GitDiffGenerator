@@ -32,8 +32,6 @@ public class MainController extends AbstractController {
     @FXML
     private MenuItem toolkitMenuItem;
     @FXML
-    private MenuItem readMeMenuItem;
-    @FXML
     private MenuItem instructionMenuItem;
     @FXML
     private MenuItem upgradeMenuItem;
@@ -41,10 +39,6 @@ public class MainController extends AbstractController {
     private MenuItem wizardMenuItem;
     @FXML
     private MenuItem wikiMenuItem;
-    @FXML
-    private MenuItem importCertMenuItem;
-    @FXML
-    private MenuItem importCertProgrammaticMenuItem;
 
     @FXML
     private TextField authorsTextField;
@@ -181,13 +175,10 @@ public class MainController extends AbstractController {
         Map<String, MenuItem> map = new HashMap<>();
         map.put("applicationMenuItem", applicationMenuItem);
         map.put("toolkitMenuItem", toolkitMenuItem);
-        map.put("readMeMenuItem", readMeMenuItem);
         map.put("instructionMenuItem", instructionMenuItem);
         map.put("upgradeMenuItem", upgradeMenuItem);
         map.put("wizardMenuItem", wizardMenuItem);
         map.put("wikiMenuItem", wikiMenuItem);
-        map.put("importCertMenuItem", importCertMenuItem);
-        map.put("importCertProgrammaticMenuItem", importCertProgrammaticMenuItem);
         return map;
     }
 
@@ -311,8 +302,7 @@ public class MainController extends AbstractController {
     void updateLastItemUploadDate() {
         try {
             ProgramData programData = dataService.loadProgramData();
-            if (programData.getUploadStatus() != null &&
-                    EnumSet.of(UploadStatus.SUCCESS, UploadStatus.PARTIAL_SUCCESS).contains(programData.getUploadStatus())) {
+            if (programData.getUploadStatus() != null && UploadStatus.isSuccess(programData.getUploadStatus())) {
                 uiLauncher.setLastItemSubmissionDate(null);
             }
         } catch (Exception ex) {
@@ -376,7 +366,7 @@ public class MainController extends AbstractController {
     }
 
     void setDisable(ItemType itemType) {
-        boolean disable = EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.STATEMENT, ItemType.SHARE_POINT_DOCS).contains(itemType);
+        boolean disable = !ItemType.isCodeRelated(itemType);
         datesSectionController.disableEndDatePicker(itemType);
         additionalSettingsSectionController.disableSkipRemote(disable);
         additionalSettingsSectionController.disableFetchAll(disable);

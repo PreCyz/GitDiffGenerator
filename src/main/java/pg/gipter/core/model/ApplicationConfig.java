@@ -24,6 +24,8 @@ public class ApplicationConfig {
     private Boolean checkLastItemEnabled;
     private String checkLastItemJobCronExpression;
     private Set<CustomCommand> customCommands;
+    private Boolean uploadItem;
+    private Boolean smartZip;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -35,9 +37,10 @@ public class ApplicationConfig {
         loggingLevel = Level.INFO;
         upgradeFinished = StringUtils.getBoolean(ArgName.upgradeFinished.defaultValue());
         uiLanguage = BundleUtils.getDefaultLanguage();
-        certImportEnabled = StringUtils.getBoolean(ArgName.certImport.defaultValue());
         checkLastItemEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
         checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
+        uploadItem = StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
+        smartZip = StringUtils.getBoolean(ArgName.smartZip.defaultValue());
     }
 
     public Boolean getConfirmationWindow() {
@@ -144,6 +147,22 @@ public class ApplicationConfig {
         this.customCommands = customCommands;
     }
 
+    public Boolean getUploadItem() {
+        return uploadItem;
+    }
+
+    public void setUploadItem(Boolean uploadItem) {
+        this.uploadItem = uploadItem;
+    }
+
+    public Boolean getSmartZip() {
+        return smartZip;
+    }
+
+    public void setSmartZip(Boolean smartZip) {
+        this.smartZip = smartZip;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -173,14 +192,17 @@ public class ApplicationConfig {
         if (getUiLanguage() != null) {
             arguments.add(ArgName.uiLanguage.name() + "=" + getUiLanguage());
         }
-        if (getCertImportEnabled() != null) {
-            arguments.add(ArgName.certImport.name() + "=" + getCertImportEnabled());
-        }
         if (getCheckLastItemEnabled() != null) {
             arguments.add(ArgName.checkLastItem.name() + "=" + getCheckLastItemEnabled());
         }
         if (getCheckLastItemJobCronExpression() != null) {
             arguments.add(ArgName.checkLastItemJobCronExpression.name() + "=" + getCheckLastItemEnabled());
+        }
+        if (getUploadItem() != null) {
+            arguments.add(ArgName.uploadItem.name() + "=" + getUploadItem());
+        }
+        if (getSmartZip() != null) {
+            arguments.add(ArgName.smartZip.name() + "=" + getSmartZip());
         }
         return arguments.toArray(new String[0]);
     }
@@ -210,12 +232,14 @@ public class ApplicationConfig {
                     applicationConfig.setUpgradeFinished(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.uiLanguage.name().equals(argumentName)) {
                     applicationConfig.setUiLanguage(argumentValue);
-                } else if (ArgName.certImport.name().equals(argumentName)) {
-                    applicationConfig.setCertImportEnabled(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.checkLastItem.name().equals(argumentName)) {
                     applicationConfig.setCheckLastItemEnabled(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.checkLastItemJobCronExpression.name().equals(argumentName)) {
                     applicationConfig.setCheckLastItemJobCronExpression(argumentValue);
+                } else if (ArgName.uploadItem.name().equals(argumentName)) {
+                    applicationConfig.setUploadItem(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.smartZip.name().equals(argumentName)) {
+                    applicationConfig.setSmartZip(StringUtils.getBoolean(argumentValue));
                 }
             }
         }
@@ -234,9 +258,10 @@ public class ApplicationConfig {
                 ", loggingLevel=" + loggingLevel +
                 ", upgradeFinished=" + upgradeFinished +
                 ", uiLanguage=" + uiLanguage +
-                ", certImportEnabled=" + certImportEnabled +
                 ", checkLastItemEnabled=" + checkLastItemEnabled +
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
+                ", uploadItem=" + uploadItem +
+                ", smartZip=" + smartZip +
                 '}';
     }
 }

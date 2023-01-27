@@ -21,6 +21,7 @@ import pg.gipter.jobs.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.services.*;
 import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.controls.ControlFactory;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
@@ -152,8 +153,12 @@ public class UILauncher implements Launcher {
                     logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
                             .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
-                            .withLinkAction(new BrowserLinkAction(GithubService.GITHUB_URL + "/releases/latest"))
+                            .withLinkAction(new BrowserLinkAction(
+                                    GithubService.GITHUB_URL + "/releases/latest",
+                                    BundleUtils.getMsg("upgrade.readReleaseNotes")
+                            ))
                             .withAlertType(Alert.AlertType.INFORMATION)
+                            .withCustomControl(ControlFactory.createUpgradeButton(this))
                             .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
                             .buildAndDisplayWindow()
                     );
