@@ -1,0 +1,8 @@
+**Release notes:**
+
+Improvements:
+* None.
+
+Fixes:
+* Can not determine the vcs for toolkit items - fixed.
+* Exception related to vcs type when loading toolkit project window - fixed.

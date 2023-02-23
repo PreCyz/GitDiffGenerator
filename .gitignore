@@ -11,4 +11,4 @@ libs
 *.json
 dependency-reduced-pom.xml
 !command.json
-!releaseNotes/
+!releaseNotes/release-notes-*.txt
