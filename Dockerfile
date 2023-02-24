@@ -31,18 +31,20 @@ ENV JAVA_HOME=/tmp/zulu8.68.0.21-ca-fx-jdk8.0.362-linux_x64/
 RUN export JAVA_HOME
 RUN java -version
 
-COPY src /home/app/src
-COPY pom.xml /home/app
+WORKDIR /home/app
 
-RUN mvn -f /home/app/pom.xml versions:set -DnewVersion=$VERSION \
-    && mvn -f /home/app/pom.xml clean package
+COPY src ./src
+COPY pom.xml ./
 
-COPY docs/Gipter-ui-description.pdf /home/app/target/Gipter-ui-description.pdf
+RUN mvn versions:set -DnewVersion=$VERSION \
+    && mvn clean package
 
-RUN mv /home/app/target/Gipter-${VERSION}-jar-with-dependencies.jar /home/app/target/Gipter.jar \
-    && 7z a /home/app/target/Gipter_v${VERSION}.7z /home/app/target/Gipter-ui-description.pdf /home/app/target/Gipter.jar
+COPY docs/Gipter-ui-description.pdf ./target/Gipter-ui-description.pdf
 
-RUN ls -lah /home/app/target \
+RUN mv ./target/Gipter-${VERSION}-jar-with-dependencies.jar ./target/Gipter.jar \
+    && 7z a ./target/Gipter_v${VERSION}.7z ./target/Gipter-ui-description.pdf ./target/Gipter.jar
+
+RUN ls -lah ./target \
     && RELEASE_ID=$(curl \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer $GITHUB_TOKEN" \
@@ -55,4 +57,4 @@ RUN ls -lah /home/app/target \
     -H "X-GitHub-Api-Version: 2022-11-28" \
     -H "Content-Type: application/octet-stream" \
     https://uploads.github.com/repos/PreCyz/GitDiffGenerator/releases/$RELEASE_ID/assets?name=Gipter_v${VERSION}.7z \
-    --data-binary "@/home/app/target/Gipter_v${VERSION}.7z"
+    --data-binary "@./target/Gipter_v${VERSION}.7z"
