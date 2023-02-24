@@ -11,20 +11,22 @@ RUN apt-get update \
     git \
     jq
 
-COPY src /home/app/src
-COPY pom.xml /home/app
-COPY releaseNotes/release-notes-$VERSION.txt /home/app
+WORKDIR /home/app/
 
-RUN mvn -f /home/app/pom.xml versions:set -DnewVersion=$VERSION \
-    && mvn -f /home/app/pom.xml clean package
+COPY src ./src
+COPY pom.xml ./
+COPY releaseNotes/release-notes-$VERSION.txt ./
 
-COPY docs/Gipter-ui-description.pdf /home/app/target/Gipter-ui-description.pdf
+RUN mvn versions:set -DnewVersion=$VERSION \
+    && mvn clean package
 
-RUN mv /home/app/target/Gipter-${VERSION}.jar /home/app/target/Gipter.jar \
-    && 7z a /home/app/target/11+Gipter_v${VERSION}.7z /home/app/target/Gipter-ui-description.pdf /home/app/target/Gipter.jar
+COPY docs/Gipter-ui-description.pdf ./target/Gipter-ui-description.pdf
 
-RUN ls -lah /home/app/target \
-    && RELEASE_NOTES=`cat /home/app/release-notes-$VERSION.txt` \
+RUN mv ./target/Gipter-${VERSION}.jar ./target/Gipter.jar \
+    && 7z a ./target/11+Gipter_v${VERSION}.7z ./target/Gipter-ui-description.pdf ./target/Gipter.jar
+
+RUN ls -lah ./target \
+    && RELEASE_NOTES=`cat ./release-notes-$VERSION.txt` \
     && JSON_STRING=$( jq -n \
                       --arg tag "v$VERSION" \
                       --arg gv "Gipter_v$VERSION" \
@@ -44,4 +46,4 @@ RUN ls -lah /home/app/target \
     -H "X-GitHub-Api-Version: 2022-11-28" \
     -H "Content-Type: application/octet-stream" \
     https://uploads.github.com/repos/PreCyz/GitDiffGenerator/releases/$RELEASE_ID/assets?name=11%2BGipter_v${VERSION}.7z \
-    --data-binary "@/home/app/target/11+Gipter_v${VERSION}.7z"
+    --data-binary "@./target/11+Gipter_v${VERSION}.7z"
