@@ -32,7 +32,7 @@ class CustomCommandConverterTest {
     private CustomCommandConverter converter;
 
     @AfterEach
-    private void teardown() {
+    void teardown() {
         ConfigurationDaoFactory.getCachedConfigurationDao().resetCache();
         try {
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));

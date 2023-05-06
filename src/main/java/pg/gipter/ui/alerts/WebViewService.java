@@ -130,10 +130,10 @@ public class WebViewService {
     public WebViewDetails pullWebView(UploadStatus uploadStatus, Gif nextGif) {
         WebViewDetails result = cachedWebViewMap.get(uploadStatus);
 
-        logger.info("Web view [{}] pulled from cache.", Optional.ofNullable(result.getGif())
+        String gifName = Optional.ofNullable(result.getGif())
                 .map(Gif::name)
-                .orElseGet(result::getResourceUrl)
-        );
+                .orElseGet(result::getResourceUrl);
+        logger.info("Web view [{}] pulled from cache.", gifName);
 
         WebViewDetails webViewDetails = createWebViewDetails(nextGif);
         webViewDetails.setUploadStatus(uploadStatus);

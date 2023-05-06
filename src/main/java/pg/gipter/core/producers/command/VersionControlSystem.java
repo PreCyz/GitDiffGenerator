@@ -29,10 +29,9 @@ public enum VersionControlSystem {
     }
 
     public static VersionControlSystem valueFrom(Path path) {
-        final IllegalArgumentException iae = new IllegalArgumentException("Can not determine version control system.");
-        if (path == null) {
-            throw iae;
-        }
+        final IllegalArgumentException iae = new IllegalArgumentException(
+                String.format("Can not determine version control system for%n[%s].", path.toString())
+        );
         try {
             if (Files.list(path) != null) {
                 final Map<String, VersionControlSystem> vcsStringMap = EnumSet.allOf(VersionControlSystem.class)

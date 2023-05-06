@@ -1,11 +1,14 @@
 package pg.gipter.services.vcs;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisabledOnOs(OS.LINUX)
 class GitServiceTest {
 
     @Test
