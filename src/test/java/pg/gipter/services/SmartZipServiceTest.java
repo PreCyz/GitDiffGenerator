@@ -26,7 +26,7 @@ class SmartZipServiceTest {
     }
 
     @AfterEach
-    private void teardown() {
+    void teardown() {
         try {
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
             Files.deleteIfExists(Paths.get("applicationProperties.zip"));

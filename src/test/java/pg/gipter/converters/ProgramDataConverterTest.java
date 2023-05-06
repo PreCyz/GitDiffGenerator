@@ -50,7 +50,7 @@ class ProgramDataConverterTest {
     }
 
     @AfterEach
-    private void teardown() {
+    void teardown() {
         ConfigurationDaoFactory.getCachedConfigurationDao().resetCache();
         try {
             Files.deleteIfExists(Paths.get(DaoConstants.DATA_JSON));
