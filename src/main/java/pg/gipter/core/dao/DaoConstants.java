@@ -15,6 +15,7 @@ public final class DaoConstants {
     public static final String DATA_PROPERTIES = "data.properties";
     public static final String DATA_JSON = "data.json";
     public static final String CUSTOM_COMMAND_JSON = "command.json";
+    public static final String CUSTOM_GIFS_JSON = "gifs.json";
 
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 

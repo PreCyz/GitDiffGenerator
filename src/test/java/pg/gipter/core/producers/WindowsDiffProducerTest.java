@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class WindowsDiffProducerTest {
 
     @AfterEach
-    private void teardown() {
+    void teardown() {
         ConfigurationDaoFactory.getCachedConfigurationDao().resetCache();
         try {
             Files.deleteIfExists(Paths.get(DaoConstants.CUSTOM_COMMAND_JSON));
