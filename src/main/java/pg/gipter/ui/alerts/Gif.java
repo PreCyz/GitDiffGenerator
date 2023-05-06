@@ -109,6 +109,25 @@ public enum Gif {
     SING_PIGS("https://media1.tenor.com/images/c2e706c2030e9c4bede5e48ae2b20baa/tenor.gif", 370, 220),
     ANNA_FROZEN("https://media1.tenor.com/images/9adfaac613d3c3586a371c129a57bc93/tenor.gif", 425, 520),
     ACE_VENTURA_AAAA("https://media.giphy.com/media/EOWVPMCalaDpm/giphy.gif", 230, 290),
+    DARTH_VADER_DANCE("https://media.tenor.com/12XMXV7DcfQAAAAC/darth-vader-storm-troopers.gif", 220, 238),
+    BRAD_PITT_EH("https://media.tenor.com/aKAYCOcwAtQAAAAd/brad-pitt.gif", 498, 498),
+    BRAD_PITT_ACTOR("https://media.tenor.com/ioxDIjWs_gwAAAAd/brad-pitt-actor.gif", 445, 498),
+    RAGNAR_SKOL("https://media.tenor.com/wa6oTC6T3EAAAAAC/ragnarskol.gif", 445, 498),
+    SYLVANAS_WORLD_OF_WARCRAFT("https://media.tenor.com/O3mLAJH4ZAIAAAAd/sylvanas-world-of-warcraft.gif", 498, 407),
+    STAR_WARS_CAT_VS_DOG("https://media.tenor.com/0mNBx_xpJFEAAAAd/star-wars-cat-vs-dog.gif", 498, 395),
+    SWTOR_THE_OLD_REPUBLIC("https://media.tenor.com/OIxml5GzZ20AAAAd/swtor-the-old-republic.gif", 498, 312),
+    CUTE_SAD("https://media.tenor.com/pE6Ll7jsCTkAAAAC/cute-sad.gif", 498, 320),
+    PORG_LIGHT_SABER("https://media.tenor.com/GDxds9bJuyAAAAAC/porg-light-saber.gif", 498, 390),
+    STAR_WARS_PORG("https://media.tenor.com/YE66dMAuat4AAAAC/star-wars.gif", 498, 250),
+    CAPTAIN_REX_REX("https://media.tenor.com/X3xgtM3zFZkAAAAd/captain-rex-rex.gif", 480, 498),
+    GENERAL_GRIEVOUS_STAR_WARS("https://media.tenor.com/2gIn6DLSTOcAAAAd/general-grievous-star-wars.gif", 498, 290),
+    AHSOKA_TANO_ANAKIN_SKYWALKER("https://media.tenor.com/oAy32K2SR18AAAAC/ahsoka-tano-anakin-skywalker.gif", 498, 400),
+    DUNE_DUNCAN_IDAHO("https://media.tenor.com/7cODcNJthUsAAAAd/dune-duncanidaho.gif", 498, 280),
+    SHANI_GERALT("https://media.tenor.com/tVQHpVy0PlIAAAAd/shani-heralt.gif", 498, 290),
+    GAME_OF_THRONES_SHAME("https://media.tenor.com/3FOVil5NxugAAAAC/game-of-thrones-shame.gif", 220, 226),
+    PINGPONG_TABLETENNIS("https://media.tenor.com/HpDqnL-PTgEAAAAM/pingpong-tabletennis.gif", 498, 415),
+    STOCH_ZYLA_KUBACKI("https://media.tenor.com/bD6rnBj8kG8AAAAC/na-chwile.gif", 498, 290),
+    SUCCESS_BOUN("https://media.tenor.com/KaAnHz2pD68AAAAC/success-boun.gif", 498, 290),
     ;
 
     private final String url;
@@ -145,7 +164,8 @@ public enum Gif {
                 VOLDEMORT, ACE_VENTURA_AJAJAJ, CHICKENS, MINION_CROWD, MINION_BOX, MINION_PARTY, MINION_KISS, AL_BUNDY,
                 CHRIS_PATT, PENGUIN_JUMP, GANDALF_BILBO, HAVE_A_NICE_DAY, SAVED_BY_THE_BELL_WOW, BILLY_MIND_BLOW,
                 MILLIE_BOBBY_BROWN_MIND_BLOWN, UNDERPANTS_ROOM, PREDATOR_ALIEN, PREDATOR_DISAPPEAR, PREDATOR_ALIEN_METRO,
-                FIRE_GHOST, PICARD_RICKER, PICARD_KLAP, PICARD_RICKER_2, PICARD_HAT, ARIA_HIGH_5
+                FIRE_GHOST, PICARD_RICKER, PICARD_KLAP, PICARD_RICKER_2, PICARD_HAT, ARIA_HIGH_5, BRAD_PITT_ACTOR,
+                PORG_LIGHT_SABER, CAPTAIN_REX_REX, DUNE_DUNCAN_IDAHO
         ));
     }
 
@@ -155,7 +175,9 @@ public enum Gif {
                 BARNEY_STINSON_DANCE, BAYERN_MUNICH_CELEBRATING, YODA_DANCING, MINION_DANCE, FOX, HOMER, AAAA_JOY,
                 BARNEY_ROBIN, BRAD_PITT, GANDALF_BILBO, HAVE_A_NICE_DAY, DEAN_AWESOME, PATRICK_STAR, SING_PIGS,
                 ANNA_KENDRICK_MIND_BLOWN, UNDERPANTS_HIDDEN, PREDATOR_DANCE, BUBU_KLAP, SING_PIG_DANCE, OLAF_SMILE,
-                FROZEN_HAPPY_END, SEVEN_OF_9_FUN, PICARD_JOY, DUMBELDOR_DANCE, SING_PIG_JOY, UNDERPANTS_TRA_LA_LA
+                FROZEN_HAPPY_END, SEVEN_OF_9_FUN, PICARD_JOY, DUMBELDOR_DANCE, SING_PIG_JOY, UNDERPANTS_TRA_LA_LA,
+                DARTH_VADER_DANCE, RAGNAR_SKOL, AHSOKA_TANO_ANAKIN_SKYWALKER, SHANI_GERALT, PINGPONG_TABLETENNIS,
+                STOCH_ZYLA_KUBACKI, SUCCESS_BOUN
         ));
     }
 
@@ -165,8 +187,9 @@ public enum Gif {
                 BARNEY_STINSON_GUN, BARNEY_STINSON_AAHH, KYLO_REN, ACE_VENTURA_SUCKS, MINION_SPLASH, ARAGORN_JOLO,
                 SADNESS, SADNESS_CRY, DOWSON_CRY, ARNOLD_SCREAM, ANGER, ACE_VENTURA_ANGRY, DEAN_PUNCH, ASHOKA_FLAWED,
                 ASHOKA_BLOW, MIND_BLOW_FAIL, SHOCKED_JOEY, UNDERPANTS_OPR, UNDERPANTS_SCREAM, UNDERPANTS_WORRY,
-                PREDATOR_ULTRA, SONGO_BUBU, FROZEN_TRACH, FROZEN_ANNA_AAA, FROZEN_SISTER_FAIL, PICARD_HEAD, PICARD_HEAD,
-                FROZEN_FIRE_FIRE, ANNA_FROZEN, ACE_VENTURA_AAAA
+                PREDATOR_ULTRA, SONGO_BUBU, FROZEN_TRACH, FROZEN_ANNA_AAA, FROZEN_SISTER_FAIL, PICARD_HEAD, ANNA_FROZEN,
+                FROZEN_FIRE_FIRE, ACE_VENTURA_AAAA, BRAD_PITT_EH, SYLVANAS_WORLD_OF_WARCRAFT, STAR_WARS_CAT_VS_DOG,
+                SWTOR_THE_OLD_REPUBLIC, CUTE_SAD, STAR_WARS_PORG, GENERAL_GRIEVOUS_STAR_WARS, GAME_OF_THRONES_SHAME
         ));
     }
 }
