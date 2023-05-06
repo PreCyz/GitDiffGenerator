@@ -232,6 +232,15 @@ public class UILauncher implements Launcher {
             stage.sizeToScene();
         } catch (IOException ex) {
             logger.error("Building scene error.", ex);
+            Platform.requestNextPulse();
+            new AlertWindowBuilder()
+                    .withAlertType(Alert.AlertType.ERROR)
+                    .withHeaderText(String.format("I can't show you the %s!", window.getClass().getSimpleName()))
+                    .withLinkAction(new LogLinkAction())
+                    .withMessage(ex.getCause().getMessage())
+                    .withImageFile(ImageFile.ERROR_CHICKEN_PNG)
+                    .buildAndDisplayWindow();
+            System.exit(-1);
         }
     }
 
