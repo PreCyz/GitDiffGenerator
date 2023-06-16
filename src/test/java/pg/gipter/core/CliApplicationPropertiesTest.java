@@ -17,7 +17,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -1066,7 +1068,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+        assertThat(actual).isEqualTo("https://int-goto.netcompany.com");
     }
 
     @Test
@@ -1077,7 +1079,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+        assertThat(actual).isEqualTo("cliUrl");
     }
 
     @Test
@@ -1090,7 +1092,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+        assertThat(actual).isEqualTo("cliUrl");
     }
 
     @Test
@@ -1176,6 +1178,67 @@ class CliApplicationPropertiesTest {
         String actual = applicationProperties.toolkitCopyListName();
 
         assertThat(actual).isEqualTo("propertiesListName");
+    }
+
+    @Test
+    void givenNoToolkitUserFolder_whenToolkitUserFolder_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(
+                "https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/" + SystemUtils.userName().toUpperCase()
+        );
+    }
+
+    @Test
+    void given_toolkitUserNameFromCLI_when_toolkitUserFolder_then_returnProperFolder() {
+        applicationProperties = new CliApplicationProperties(
+                new String[]{"toolkitUsername=cliUserName"}
+        );
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
+    }
+
+    @Test
+    void given_toolkitUserFolderFileAndCLI_when_toolkitUserFolder_then_returnWithCliUser() {
+        String[] args = {"toolkitUsername=cliUserName"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("propertiesUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
+    }
+
+    @Test
+    void given_toolkitUsernameFromProperties_when_toolkitUserFolder_then_returnWithToolkitUsernameFromProperties() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("propertiesUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
+    }
+
+    @Test
+    void given_toolkitUserNameFromPropertiesAndOtherArgs_when_toolkitUserFolder_then_returnProperWithUserNameFromProperties() {
+        String[] args = {"uploadType=statement"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("propertiesUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
     }
 
     @Test

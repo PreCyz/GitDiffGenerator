@@ -15,7 +15,7 @@ public class ToolkitConfig {
     protected String toolkitPassword;
     private transient String toolkitDomain;
     private transient String toolkitCopyListName;
-    private transient String toolkitUrl;
+    private String toolkitUrl;
     private transient String toolkitCopyCase;
     private transient String toolkitWSUrl;
     private transient String toolkitUserFolder;
@@ -29,6 +29,7 @@ public class ToolkitConfig {
     public ToolkitConfig(ToolkitConfig toolkitConfig) {
         toolkitUsername = toolkitConfig.getToolkitUsername();
         toolkitPassword = toolkitConfig.getToolkitPassword();
+        toolkitUrl = toolkitConfig.getToolkitUrl();
         toolkitProjectListNames = toolkitConfig.getToolkitProjectListNames();
     }
 

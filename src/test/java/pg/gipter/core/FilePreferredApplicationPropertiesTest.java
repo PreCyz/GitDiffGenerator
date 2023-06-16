@@ -5,7 +5,10 @@ import org.junit.jupiter.api.Test;
 import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.model.*;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.RunConfigBuilder;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 
 import java.io.IOException;
@@ -14,7 +17,9 @@ import java.nio.file.Paths;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -755,6 +760,65 @@ class FilePreferredApplicationPropertiesTest {
         boolean actual = appProps.isUseUI();
 
         assertThat(actual).isTrue();
+    }
+
+    @Test
+    void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnDefault() {
+        String[] args = {};
+        appProps = new FileApplicationProperties(args);
+
+        String actual = appProps.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
+    }
+
+    @Test
+    void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
+        String[] args = {"toolkitUsername=xxx"};
+        appProps = new FileApplicationProperties(args);
+
+        String actual = appProps.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "XXX");
+    }
+
+    @Test
+    void givenToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnFileCustomUserFolder() {
+        String[] args = {"toolkitUsername=xxx"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("aaa");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
+    }
+
+    @Test
+    void givenNoToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnFileCustomUserFolder() {
+        String[] args = {};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("aaa");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
+    }
+
+    @Test
+    void givenToolkitCustomUserFolderCliAndFileToolkitUsername_whenToolkitUserFolder_then_returnUserFolderWithFileToolkitUsername() {
+        String[] args = {"toolkitCustomUserFolder=qqq"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("aaa");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolder();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
     }
 
     @Test

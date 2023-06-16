@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.command.CustomCommand;
-import pg.gipter.core.dao.configuration.*;
+import pg.gipter.core.dao.configuration.CachedConfiguration;
+import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dao.configuration.SecurityProviderFactory;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
@@ -365,6 +367,7 @@ public abstract class ApplicationProperties {
     public abstract String toolkitPassword();
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
+    public abstract String toolkitUserWSFolder();
     public abstract String toolkitCopyListName();
     public abstract Set<String> toolkitProjectListNames();
 
