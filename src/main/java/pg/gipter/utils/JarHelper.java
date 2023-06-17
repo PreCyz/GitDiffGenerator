@@ -28,10 +28,10 @@ public final class JarHelper {
     }
 
     public static String logsFolder() {
-        return homeDirectoryPath().map(s -> s + LOGS_FOLDER_NAME).orElse("");
+        return homeDirectoryPath().map(s -> s + LOGS_FOLDER_NAME).orElseGet(() -> "");
     }
 
     public static String certFolder() {
-        return homeDirectoryPath().map(s -> s + CERT_FOLDER_NAME).orElse("");
+        return homeDirectoryPath().map(s -> s + CERT_FOLDER_NAME).orElseGet(() -> "");
     }
 }
