@@ -95,7 +95,7 @@ public class SharePointRestClient {
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 
         JsonObject decodedUrl = new JsonObject();
-        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitUserFolder());
+        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitWSUserFolder());
 
         JsonObject listItemCreateInfo = new JsonObject();
         listItemCreateInfo.add("FolderPath", decodedUrl);

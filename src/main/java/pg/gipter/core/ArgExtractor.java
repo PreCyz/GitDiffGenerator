@@ -166,6 +166,9 @@ final class ArgExtractor {
     }
 
     String toolkitUrl() {
+        if (containsArg(ArgName.toolkitUrl.name())) {
+            return getValue(ArgName.toolkitUrl, ArgName.toolkitUrl.defaultValue());
+        }
         return ArgName.toolkitUrl.defaultValue();
     }
 
@@ -183,6 +186,10 @@ final class ArgExtractor {
 
     String toolkitUserFolder() {
         return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+    }
+
+    String toolkitWSUserFolder() {
+        return ArgName.toolkitWSUserFolder.defaultValue() + toolkitUsername();
     }
 
     PreferredArgSource preferredArgSource() {

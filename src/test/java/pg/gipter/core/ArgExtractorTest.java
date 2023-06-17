@@ -414,7 +414,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+        assertThat(actual).isEqualTo("https://int-goto.netcompany.com");
     }
 
     @Test
@@ -423,12 +423,12 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_toolkitUrlFromCommandLine_when_toolkitUrl_then_returnDefaultUrl() {
+    void given_toolkitUrlFromCommandLine_when_toolkitUrl_thenReturnParam() {
         argExtractor = new ArgExtractor(new String[]{"toolkitUrl=sthElse"});
 
         String actual = argExtractor.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+        assertThat(actual).isEqualTo("sthElse");
     }
 
     @Test
@@ -437,7 +437,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitWSUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
+        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
     }
 
     @Test

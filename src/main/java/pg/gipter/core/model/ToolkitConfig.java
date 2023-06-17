@@ -15,10 +15,11 @@ public class ToolkitConfig {
     protected String toolkitPassword;
     private transient String toolkitDomain;
     private transient String toolkitCopyListName;
-    private transient String toolkitUrl;
+    private String toolkitUrl;
     private transient String toolkitCopyCase;
     private transient String toolkitWSUrl;
     private transient String toolkitUserFolder;
+    private transient String toolkitWSUserFolder;
     protected String toolkitProjectListNames;
 
     public ToolkitConfig() {
@@ -29,6 +30,7 @@ public class ToolkitConfig {
     public ToolkitConfig(ToolkitConfig toolkitConfig) {
         toolkitUsername = toolkitConfig.getToolkitUsername();
         toolkitPassword = toolkitConfig.getToolkitPassword();
+        toolkitUrl = toolkitConfig.getToolkitUrl();
         toolkitProjectListNames = toolkitConfig.getToolkitProjectListNames();
     }
 
@@ -104,6 +106,14 @@ public class ToolkitConfig {
         this.toolkitProjectListNames = toolkitProjectListNames;
     }
 
+    public String getToolkitWSUserFolder() {
+        return toolkitWSUserFolder;
+    }
+
+    public void setToolkitWSUserFolder(String toolkitWSUserFolder) {
+        this.toolkitWSUserFolder = toolkitWSUserFolder;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getToolkitUsername() != null) {
@@ -133,6 +143,9 @@ public class ToolkitConfig {
         if (getToolkitProjectListNames() != null) {
             arguments.add(ArgName.toolkitProjectListNames.name() + "=" + getToolkitProjectListNames());
         }
+        if (getToolkitWSUserFolder() != null) {
+            arguments.add(ArgName.toolkitWSUserFolder.name() + "=" + getToolkitWSUserFolder());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -161,6 +174,8 @@ public class ToolkitConfig {
                     toolkitConfig.setToolkitUserFolder(argumentValue);
                 } else if (ArgName.toolkitProjectListNames.name().equals(argumentName)) {
                     toolkitConfig.setToolkitProjectListNames(argumentValue);
+                } else if (ArgName.toolkitWSUserFolder.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitWSUserFolder(argumentValue);
                 }
             }
         }
@@ -183,6 +198,7 @@ public class ToolkitConfig {
                 ", toolkitCopyCase='" + toolkitCopyCase + '\'' +
                 ", toolkitWSUrl='" + toolkitWSUrl + '\'' +
                 ", toolkitUserFolder='" + toolkitUserFolder + '\'' +
+                ", toolkitWSUserFolder='" + toolkitWSUserFolder + '\'' +
                 ", toolkitProjectListNames='" + toolkitProjectListNames + '\'' +
                 '}';
     }
