@@ -816,9 +816,9 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {};
         appProps = new FileApplicationProperties(args);
 
-        String actual = appProps.toolkitUserWSFolder();
+        String actual = appProps.toolkitWSUserFolder();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserWSFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
+        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
     }
 
     @Test
@@ -826,9 +826,9 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"toolkitUsername=xxx"};
         appProps = new FileApplicationProperties(args);
 
-        String actual = appProps.toolkitUserWSFolder();
+        String actual = appProps.toolkitWSUserFolder();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserWSFolder.defaultValue() + "XXX");
+        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "XXX");
     }
 
 
@@ -840,9 +840,9 @@ class FilePreferredApplicationPropertiesTest {
         toolkitConfig.setToolkitUsername("aaa");
         appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = appProps.toolkitUserWSFolder();
+        String actual = appProps.toolkitWSUserFolder();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserWSFolder.defaultValue() + "AAA");
+        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "AAA");
     }
 
     @Test
@@ -853,9 +853,9 @@ class FilePreferredApplicationPropertiesTest {
         toolkitConfig.setToolkitUsername("aaa");
         appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = appProps.toolkitUserWSFolder();
+        String actual = appProps.toolkitWSUserFolder();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserWSFolder.defaultValue() + "AAA");
+        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "AAA");
     }
 
     @Test
@@ -866,9 +866,9 @@ class FilePreferredApplicationPropertiesTest {
         toolkitConfig.setToolkitUsername("aaa");
         appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = appProps.toolkitUserWSFolder();
+        String actual = appProps.toolkitWSUserFolder();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserWSFolder.defaultValue() + "AAA");
+        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "AAA");
     }
 
     @Test

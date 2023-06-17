@@ -234,8 +234,8 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitUserWSFolder() {
-        return ArgName.toolkitUserWSFolder.defaultValue() + toolkitUsername();
+    public String toolkitWSUserFolder() {
+        return ArgName.toolkitWSUserFolder.defaultValue() + toolkitUsername();
     }
 
     @Override

@@ -231,7 +231,7 @@ public enum ArgName {
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
     },
-    toolkitUserWSFolder {
+    toolkitWSUserFolder {
         @Override
         public String defaultValue() {
             return toolkitUrl.defaultValue() + toolkitCopyCase.defaultValue() +

@@ -1243,7 +1243,7 @@ class CliApplicationPropertiesTest {
     void givenNoToolkitUserFolder_whenToolkitUserWSFolder_thenReturnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        String actual = applicationProperties.toolkitUserWSFolder();
+        String actual = applicationProperties.toolkitWSUserFolder();
 
         assertThat(actual).isEqualTo(
                 "https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/" + SystemUtils.userName().toUpperCase()
@@ -1256,7 +1256,7 @@ class CliApplicationPropertiesTest {
                 new String[]{"toolkitUsername=cliUserName"}
         );
 
-        String actual = applicationProperties.toolkitUserWSFolder();
+        String actual = applicationProperties.toolkitWSUserFolder();
 
         assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
     }
@@ -1269,7 +1269,7 @@ class CliApplicationPropertiesTest {
         toolkitConfig.setToolkitUsername("propertiesUserName");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUserWSFolder();
+        String actual = applicationProperties.toolkitWSUserFolder();
 
         assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
     }
@@ -1282,7 +1282,7 @@ class CliApplicationPropertiesTest {
         toolkitConfig.setToolkitUsername("propertiesUserName");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUserWSFolder();
+        String actual = applicationProperties.toolkitWSUserFolder();
 
         assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
     }
@@ -1295,7 +1295,7 @@ class CliApplicationPropertiesTest {
         toolkitConfig.setToolkitUsername("propertiesUserName");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUserWSFolder();
+        String actual = applicationProperties.toolkitWSUserFolder();
 
         assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
     }
