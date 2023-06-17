@@ -209,7 +209,7 @@ public enum ArgName {
     toolkitUrl {
         @Override
         public String defaultValue() {
-            return "https://goto.netcompany.com";
+            return "https://int-goto.netcompany.com";
         }
     },
     toolkitCopyCase {
@@ -225,6 +225,13 @@ public enum ArgName {
         }
     },
     toolkitUserFolder {
+        @Override
+        public String defaultValue() {
+            return "https://goto.netcompany.com" + toolkitCopyCase.defaultValue() +
+                    "/Lists/" + toolkitCopyListName.defaultValue() + "/";
+        }
+    },
+    toolkitWSUserFolder {
         @Override
         public String defaultValue() {
             return toolkitUrl.defaultValue() + toolkitCopyCase.defaultValue() +
