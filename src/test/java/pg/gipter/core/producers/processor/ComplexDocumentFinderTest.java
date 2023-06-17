@@ -3,12 +3,18 @@ package pg.gipter.core.producers.processor;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helpers.XmlHelper;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,13 +47,13 @@ class ComplexDocumentFinderTest {
 
         assertThat(filesToDownload).hasSize(4);
         assertThat(filesToDownload.get("1.0v-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
         assertThat(filesToDownload.get("2.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
         assertThat(filesToDownload.get("3.0v-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
         assertThat(filesToDownload.get("5.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
@@ -71,7 +77,7 @@ class ComplexDocumentFinderTest {
 
         assertThat(filesToDownload).hasSize(1);
         assertThat(filesToDownload.get("1.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
@@ -95,13 +101,13 @@ class ComplexDocumentFinderTest {
 
         assertThat(filesToDownload).hasSize(4);
         assertThat(filesToDownload.get("1.0v-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
         assertThat(filesToDownload.get("2.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3072/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
         assertThat(filesToDownload.get("3.0v-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
         assertThat(filesToDownload.get("4.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
@@ -125,7 +131,7 @@ class ComplexDocumentFinderTest {
 
         assertThat(filesToDownload).hasSize(1);
         assertThat(filesToDownload.get("4.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
@@ -171,7 +177,7 @@ class ComplexDocumentFinderTest {
 
         assertThat(filesToDownload).hasSize(1);
         assertThat(filesToDownload.get("3.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/4096/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
@@ -195,9 +201,9 @@ class ComplexDocumentFinderTest {
 
         assertThat(filesToDownload).hasSize(2);
         assertThat(filesToDownload.get("4.0v-my-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/3584/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
         assertThat(filesToDownload.get("1.0v-D0180 - Integration Design - Topdanmark integrations - Party Master.docx"))
-                .isEqualTo("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
+                .isEqualTo("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_vti_history/2560/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
     }
 
     @Test
@@ -219,7 +225,7 @@ class ComplexDocumentFinderTest {
                 documentId
         );
 
-        assertThat(actual).startsWith("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items" +
+        assertThat(actual).startsWith("https://int-goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items" +
                 "?$select=Id,Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
                 "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
                 "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +

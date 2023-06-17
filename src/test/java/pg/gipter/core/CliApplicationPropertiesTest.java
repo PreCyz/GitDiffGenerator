@@ -1066,7 +1066,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+        assertThat(actual).isEqualTo("https://int-goto.netcompany.com");
     }
 
     @Test
@@ -1077,7 +1077,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+        assertThat(actual).isEqualTo("cliUrl");
     }
 
     @Test
@@ -1090,7 +1090,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+        assertThat(actual).isEqualTo("cliUrl");
     }
 
     @Test
@@ -1237,6 +1237,67 @@ class CliApplicationPropertiesTest {
         String actual = applicationProperties.toolkitUserFolder();
 
         assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
+    }
+
+    @Test
+    void givenNoToolkitUserFolder_whenToolkitUserWSFolder_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.toolkitWSUserFolder();
+
+        assertThat(actual).isEqualTo(
+                "https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/" + SystemUtils.userName().toUpperCase()
+        );
+    }
+
+    @Test
+    void given_toolkitUserNameFromCLI_whenToolkitUserWSFolder_then_returnProperFolder() {
+        applicationProperties = new CliApplicationProperties(
+                new String[]{"toolkitUsername=cliUserName"}
+        );
+
+        String actual = applicationProperties.toolkitWSUserFolder();
+
+        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
+    }
+
+    @Test
+    void givenToolkitUserFolderFileAndCLI_whenToolkitUserWSFolder_thenReturnWithCliUser() {
+        String[] args = {"toolkitUsername=cliUserName"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("propertiesUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitWSUserFolder();
+
+        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
+    }
+
+    @Test
+    void givenToolkitUsernameFromProperties_whenToolkitUserWSFolder_thenReturnWithToolkitUsernameFromProperties() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("propertiesUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitWSUserFolder();
+
+        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
+    }
+
+    @Test
+    void givenToolkitUserNameFromPropertiesAndOtherArgs_whenToolkitWSUserFolder_thenReturnProperWithUserNameFromProperties() {
+        String[] args = {"uploadType=statement"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("propertiesUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitWSUserFolder();
+
+        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
     }
 
     @Test
