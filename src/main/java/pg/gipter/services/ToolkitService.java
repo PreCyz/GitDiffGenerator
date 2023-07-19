@@ -1,6 +1,8 @@
 package pg.gipter.services;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.concurrent.Task;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,7 +18,9 @@ import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 /** Created by Pawel Gawedzki on 26-Jul-2019. */
 public class ToolkitService extends Task<Set<String>> {
@@ -91,8 +95,9 @@ public class ToolkitService extends Task<Set<String>> {
                 top
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+
+                //applicationProperties.toolkitUsername(),
+                //applicationProperties.toolkitPassword(),
                 applicationProperties.toolkitDomain(),
                 applicationProperties.toolkitUrl(),
                 url
