@@ -20,7 +20,6 @@ class GETCallTest {
     void pocForDownloadingTheLastUploadDate() throws Exception {
         String[] args = new String[]{
                 ArgName.toolkitUsername.name() + "=PAWG",
-                ArgName.toolkitPassword.name() + "=give-password-here",
         };
 
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(args);
@@ -36,7 +35,7 @@ class GETCallTest {
 
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                "give-password-here",
                 applicationProperties.toolkitDomain(),
                 applicationProperties.toolkitUrl(),
                 url

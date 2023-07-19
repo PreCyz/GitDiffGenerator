@@ -2,7 +2,6 @@ package pg.gipter.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.SecurityProvider;
 import pg.gipter.core.model.CipherDetails;
@@ -45,7 +44,7 @@ public class SecurityService {
         } catch (GeneralSecurityException e) {
             logger.warn("Can not encrypt password. {}", e.getMessage(), e);
         }
-        return ArgName.toolkitPassword.defaultValue();
+        return "";
     }
 
     public String encrypt(String value, CipherDetails cipherDetails) {
@@ -58,7 +57,7 @@ public class SecurityService {
         } catch (GeneralSecurityException e) {
             logger.warn("Can not encrypt password. {}", e.getMessage(), e);
         }
-        return ArgName.toolkitPassword.defaultValue();
+        return "";
     }
 
     public String decrypt(String value) {
@@ -72,7 +71,7 @@ public class SecurityService {
         } catch (GeneralSecurityException e) {
             logger.warn("Can not decrypt password. {}", e.getMessage(), e);
         }
-        return ArgName.toolkitPassword.defaultValue();
+        return "";
     }
 
     public String decrypt(String value, CipherDetails cipherDetails) {
@@ -85,7 +84,7 @@ public class SecurityService {
         } catch (GeneralSecurityException e) {
             logger.warn("Can not decrypt password. {}", e.getMessage(), e);
         }
-        return ArgName.toolkitPassword.defaultValue();
+        return "";
     }
 
     public Optional<CipherDetails> readCipherDetails() {

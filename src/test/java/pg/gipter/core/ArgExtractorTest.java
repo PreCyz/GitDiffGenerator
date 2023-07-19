@@ -373,24 +373,6 @@ class ArgExtractorTest {
     }
 
     @Test
-    void givenNoToolkitPassword_whenToolkitPassword_thenReturnDefaultValue() {
-        argExtractor = new ArgExtractor(new String[]{});
-
-        String actual = argExtractor.toolkitPassword();
-
-        assertThat(actual).isEqualTo("UNKNOWN");
-    }
-
-    @Test
-    void given_toolkitPassword_when_toolkitPassword_then_returnThatPassword() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitPassword=password"});
-
-        String actual = argExtractor.toolkitPassword();
-
-        assertThat(actual).isEqualTo("password");
-    }
-
-    @Test
     void when_toolkitDomain_then_returnNCDMZ() {
         argExtractor = new ArgExtractor(new String[]{});
 

@@ -12,6 +12,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.GETCall;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
+import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
@@ -24,10 +25,12 @@ public class ToolkitService extends Task<Set<String>> {
     protected final static Logger logger = LoggerFactory.getLogger(ToolkitService.class);
     private final ApplicationProperties applicationProperties;
     private final HttpRequester httpRequester;
+    private final SuperUserService superUserService;
 
     public ToolkitService(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         this.httpRequester = new HttpRequester(applicationProperties);
+        superUserService = SuperUserService.getInstance();
     }
 
     @Override
@@ -38,8 +41,8 @@ public class ToolkitService extends Task<Set<String>> {
         try {
             updateMessage(BundleUtils.getMsg("toolkit.projects.downloading"));
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    applicationProperties.toolkitUsername(),
-                    applicationProperties.toolkitPassword(),
+                    superUserService.getUserName(),
+                    superUserService.getPassword(),
                     applicationProperties.toolkitDomain(),
                     applicationProperties.toolkitUrl(),
                     applicationProperties.toolkitUrl() + "/toolkit/default.aspx"
@@ -91,8 +94,8 @@ public class ToolkitService extends Task<Set<String>> {
                 top
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                superUserService.getUserName(),
+                superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
                 applicationProperties.toolkitUrl(),
                 url
@@ -138,8 +141,8 @@ public class ToolkitService extends Task<Set<String>> {
         );
 
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                superUserService.getUserName(),
+                superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
                 applicationProperties.toolkitUrl(),
                 url

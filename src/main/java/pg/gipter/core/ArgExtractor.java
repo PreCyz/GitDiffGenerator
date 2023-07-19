@@ -154,13 +154,6 @@ final class ArgExtractor {
         return ArgName.toolkitUsername.defaultValue();
     }
 
-    String toolkitPassword() {
-        if (containsArg(ArgName.toolkitPassword.name())) {
-            return getValue(ArgName.toolkitPassword, ArgName.toolkitPassword.defaultValue());
-        }
-        return ArgName.toolkitPassword.defaultValue();
-    }
-
     String toolkitDomain() {
         return ArgName.toolkitDomain.defaultValue();
     }

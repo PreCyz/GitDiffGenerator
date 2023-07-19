@@ -5,6 +5,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.toolkit.dto.DocumentDetails;
+import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Path;
@@ -57,8 +58,8 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
                 sharePointConfig.setUrl(applicationProperties.toolkitUrl());
                 sharePointConfig.setDomain(applicationProperties.toolkitDomain());
                 sharePointConfig.setListNames(Stream.of(listTitle).collect(toSet()));
-                sharePointConfig.setUsername(applicationProperties.toolkitUsername());
-                sharePointConfig.setPassword(applicationProperties.toolkitPassword());
+                sharePointConfig.setUsername(SuperUserService.getInstance().getUserName());
+                sharePointConfig.setPassword(SuperUserService.getInstance().getPassword());
                 result.add(sharePointConfig);
             }
         }

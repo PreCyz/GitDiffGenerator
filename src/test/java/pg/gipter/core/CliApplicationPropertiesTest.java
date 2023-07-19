@@ -943,65 +943,6 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void givenNoToolkitPassword_whenToolkitPassword_thenReturnDefault() {
-        applicationProperties = new CliApplicationProperties(new String[]{});
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("UNKNOWN");
-    }
-
-    @Test
-    void given_toolkitPasswordFromCLI_when_toolkitPassword_then_returnCliToolkitPassword() {
-        applicationProperties = new CliApplicationProperties(
-                new String[]{"toolkitPassword=cliPassword"}
-        );
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("cliPassword");
-    }
-
-    @Test
-    void given_toolkitPasswordFileAndCLI_when_toolkitPassword_then_returnCliToolkitPassword() {
-        String[] args = {"toolkitPassword=cliPassword"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("propertiesPassword");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("cliPassword");
-    }
-
-    @Test
-    void given_toolkitPasswordFromProperties_when_toolkitPassword_then_returnToolkitPasswordFromProperties() {
-        String[] args = {};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("propertiesPassword");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("propertiesPassword");
-    }
-
-    @Test
-    void given_toolkitPasswordFromPropertiesAndOtherArgs_when_toolkitPassword_then_returnToolkitPasswordFromProperties() {
-        String[] args = {"uploadType=statement"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("propertiesPassword");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("propertiesPassword");
-    }
-
-    @Test
     void given_noToolkitDomain_when_toolkitDomain_then_returnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 

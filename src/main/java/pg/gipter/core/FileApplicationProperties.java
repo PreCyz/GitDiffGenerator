@@ -184,15 +184,6 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitPassword() {
-        if (StringUtils.notEmpty(toolkitConfig.getToolkitPassword()) &&
-                !ArgName.toolkitPassword.defaultValue().equals(toolkitConfig.getToolkitPassword())) {
-            return toolkitConfig.getToolkitPassword();
-        }
-        return argExtractor.toolkitPassword();
-    }
-
-    @Override
     public String toolkitDomain() {
         if (StringUtils.notEmpty(toolkitConfig.getToolkitDomain())) {
             return toolkitConfig.getToolkitDomain();

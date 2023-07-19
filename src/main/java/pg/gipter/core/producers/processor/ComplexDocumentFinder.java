@@ -5,6 +5,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.toolkit.dto.DocumentDetails;
+import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Path;
@@ -19,8 +20,11 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
 
     private static final int TOP_LIMIT = 100;
 
+    private final SuperUserService superUserService;
+
     ComplexDocumentFinder(ApplicationProperties applicationProperties) {
         super(applicationProperties);
+        superUserService = SuperUserService.getInstance();
     }
 
     @Override
@@ -70,8 +74,8 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
                 for (int i = 0; i < numberOfPages; ++i) {
                     String fullRequestUrl = buildPageableUrl(response.getProject(), response.getListName(), TOP_LIMIT * i);
                     SharePointConfig sharePointConfig = new SharePointConfig(
-                            applicationProperties.toolkitUsername(),
-                            applicationProperties.toolkitPassword(),
+                            superUserService.getUserName(),
+                            superUserService.getPassword(),
                             applicationProperties.toolkitDomain(),
                             applicationProperties.toolkitUrl(),
                             fullRequestUrl
