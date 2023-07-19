@@ -188,12 +188,6 @@ public enum ArgName {
             return SystemUtils.userName();
         }
     },
-    toolkitPassword {
-        @Override
-        public String defaultValue() {
-            return "UNKNOWN";
-        }
-    },
     toolkitDomain {
         @Override
         public String defaultValue() {

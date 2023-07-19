@@ -138,7 +138,6 @@ public class WizardLauncher implements Launcher {
                     ApplicationProperties applicationProperties = propertiesWithCredentials();
                     if (applicationProperties.isToolkitCredentialsSet()) {
                         wizard.getSettings().put(ArgName.toolkitUsername.name(), applicationProperties.toolkitUsername());
-                        wizard.getSettings().put(ArgName.toolkitPassword.name(), applicationProperties.toolkitPassword());
                     }
                 }
                 String uploadType = wizardProperties.getProperty(ArgName.itemType.name());
@@ -178,10 +177,6 @@ public class WizardLauncher implements Launcher {
         username.setText(ArgName.toolkitUsername.defaultValue());
         gridPane.add(username, 1, row++);
 
-        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.password")), 0, row);
-        PasswordField password = createPasswordField(ArgName.toolkitPassword.name());
-        gridPane.add(password, 1, row);
-
         page.setHeaderText(BundleUtils.getMsg("wizard.toolkit.credentials") + " (" + step + "/6)");
         page.setContent(gridPane);
         return page;
@@ -191,7 +186,6 @@ public class WizardLauncher implements Launcher {
         properties.put(ArgName.configurationName.name(), getValue(wizard, ArgName.configurationName.name()));
         properties.put(ArgName.itemType.name(), getValue(wizard, ArgName.itemType.name()));
         properties.put(ArgName.toolkitUsername.name(), getValue(wizard, ArgName.toolkitUsername.name()).toUpperCase());
-        properties.put(ArgName.toolkitPassword.name(), getValue(wizard, ArgName.toolkitPassword.name()));
         properties.put(ArgName.author.name(), getValue(wizard, ArgName.author.name()));
         properties.put(ArgName.committerEmail.name(), getValue(wizard, ArgName.committerEmail.name()));
         properties.put(ArgName.itemPath.name(), getValue(wizard, ArgName.itemPath.name()));
@@ -214,13 +208,6 @@ public class WizardLauncher implements Launcher {
         textField.setId(id);
         GridPane.setHgrow(textField, Priority.ALWAYS);
         return textField;
-    }
-
-    private PasswordField createPasswordField(String id) {
-        PasswordField passwordField = new PasswordField();
-        passwordField.setId(id);
-        GridPane.setHgrow(passwordField, Priority.ALWAYS);
-        return passwordField;
     }
 
     private ComboBox<ItemType> createUploadTypeComboBox(String id) {

@@ -80,32 +80,27 @@ class ApplicationConfigurationDaoTest {
     void whenSaveToolkitConfig_thenFileWithDataSaved() {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("ququ");
-        toolkitConfig.setToolkitPassword("ququ");
 
         dao.saveToolkitConfig(toolkitConfig);
 
         Configuration configuration = dao.readJsonConfig();
         ToolkitConfig actual = configuration.getToolkitConfig();
         assertThat(actual.getToolkitUsername()).isEqualTo("ququ");
-        assertThat(actual.getToolkitPassword()).isEqualTo("ququ");
     }
 
     @Test
     void givenToolkitConfig_whenSaveToolkitConfig_thenOverrideExistingOne() {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("ququ");
-        toolkitConfig.setToolkitPassword("ququ");
         dao.saveToolkitConfig(toolkitConfig);
         toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("se");
-        toolkitConfig.setToolkitPassword("test");
         dao.saveToolkitConfig(toolkitConfig);
 
         Configuration configuration = dao.readJsonConfig();
         ToolkitConfig actual = configuration.getToolkitConfig();
 
         assertThat(actual.getToolkitUsername()).isEqualTo("se");
-        assertThat(actual.getToolkitPassword()).isEqualTo("test");
     }
 
     @Test
@@ -115,7 +110,6 @@ class ApplicationConfigurationDaoTest {
         ToolkitConfig actual = dao.loadToolkitConfig();
 
         assertThat(actual.getToolkitUsername()).isEqualTo(ArgName.toolkitUsername.defaultValue());
-        assertThat(actual.getToolkitPassword()).isEqualTo(ArgName.toolkitPassword.defaultValue());
     }
 
     @Test

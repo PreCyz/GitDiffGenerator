@@ -9,6 +9,7 @@ import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SmartZipService;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
+import pg.gipter.users.SuperUserService;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -25,18 +26,20 @@ public class SharePointRestClient {
 
     private final ApplicationProperties applicationProperties;
     private final HttpRequester httpRequester;
+    private final SuperUserService superUserService;
     private String formDigest;
 
     public SharePointRestClient(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         httpRequester = new HttpRequester(applicationProperties);
+        superUserService = SuperUserService.getInstance();
     }
 
     public String getFormDigest() throws IOException {
         if (formDigest == null) {
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    applicationProperties.toolkitUsername(),
-                    applicationProperties.toolkitPassword(),
+                    superUserService.getUserName(),
+                    superUserService.getPassword(),
                     applicationProperties.toolkitDomain(),
                     applicationProperties.toolkitUrl(),
                     null,
@@ -56,8 +59,8 @@ public class SharePointRestClient {
                 applicationProperties.toolkitCopyListName()
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                superUserService.getUserName(),
+                superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
                 applicationProperties.toolkitUrl(),
                 fullUrl,
@@ -154,8 +157,8 @@ public class SharePointRestClient {
                 path.getFileName().toString()
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                superUserService.getUserName(),
+                superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
                 applicationProperties.toolkitUrl(),
                 fullUrl,
@@ -191,8 +194,8 @@ public class SharePointRestClient {
                 itemId
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                superUserService.getUserName(),
+                superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
                 applicationProperties.toolkitUrl(),
                 fullUrl,
@@ -217,8 +220,8 @@ public class SharePointRestClient {
                 itemId
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                superUserService.getUserName(),
+                superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
                 applicationProperties.toolkitUrl(),
                 fullUrl,
@@ -255,8 +258,8 @@ public class SharePointRestClient {
                     itemId
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    applicationProperties.toolkitUsername(),
-                    applicationProperties.toolkitPassword(),
+                    superUserService.getUserName(),
+                    superUserService.getPassword(),
                     applicationProperties.toolkitDomain(),
                     applicationProperties.toolkitUrl(),
                     fullUrl,
@@ -269,7 +272,7 @@ public class SharePointRestClient {
             requestHeaders.put("X-HTTP-Method", "DELETE");
             httpRequester.executePOST(sharePointConfig, requestHeaders);
             logger.info("Cleanup done.");
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             logger.error("Problems with cleaning up.", ex);
         }
     }

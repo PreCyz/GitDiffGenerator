@@ -16,7 +16,6 @@ class SharePointRestClientTest {
     @Disabled
     void name() {
         String[] strings = {
-                ArgName.toolkitPassword.name()+"=Password-here",
                 ArgName.toolkitUsername.name()+"=PAWG"
         };
         SharePointRestClient client = new SharePointRestClient(ApplicationPropertiesFactory.getInstance(strings));

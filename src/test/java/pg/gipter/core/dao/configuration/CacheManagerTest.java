@@ -5,7 +5,6 @@ import pg.gipter.core.*;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.model.*;
-import pg.gipter.utils.CryptoUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +45,6 @@ class CacheManagerTest {
         String confName = "confName";
         RunConfig runConfig = new RunConfigBuilder().withConfigurationName(confName).create();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword(CryptoUtils.encryptSafe("somePassword"));
         ApplicationConfig applicationConfig = new ApplicationConfig();
         DaoFactory.getCachedConfiguration().saveConfiguration(
                 new Configuration(applicationConfig, toolkitConfig, Arrays.asList(runConfig), null)

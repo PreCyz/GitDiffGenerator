@@ -1,8 +1,6 @@
 package pg.gipter.core.model;
 
 import pg.gipter.core.ArgName;
-import pg.gipter.utils.CryptoUtils;
-import pg.gipter.utils.StringUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -12,7 +10,6 @@ public class ToolkitConfig {
     public static final String TOOLKIT_CONFIG = "toolkitConfig";
 
     protected String toolkitUsername;
-    protected String toolkitPassword;
     private transient String toolkitDomain;
     private transient String toolkitCopyListName;
     private String toolkitUrl;
@@ -24,12 +21,10 @@ public class ToolkitConfig {
 
     public ToolkitConfig() {
         toolkitUsername = ArgName.toolkitUsername.defaultValue();
-        toolkitPassword = ArgName.toolkitPassword.defaultValue();
     }
 
     public ToolkitConfig(ToolkitConfig toolkitConfig) {
         toolkitUsername = toolkitConfig.getToolkitUsername();
-        toolkitPassword = toolkitConfig.getToolkitPassword();
         toolkitUrl = toolkitConfig.getToolkitUrl();
         toolkitProjectListNames = toolkitConfig.getToolkitProjectListNames();
     }
@@ -40,14 +35,6 @@ public class ToolkitConfig {
 
     public void setToolkitUsername(String toolkitUsername) {
         this.toolkitUsername = toolkitUsername;
-    }
-
-    public String getToolkitPassword() {
-        return toolkitPassword;
-    }
-
-    public void setToolkitPassword(String toolkitPassword) {
-        this.toolkitPassword = toolkitPassword;
     }
 
     public String getToolkitDomain() {
@@ -119,9 +106,6 @@ public class ToolkitConfig {
         if (getToolkitUsername() != null) {
             arguments.add(ArgName.toolkitUsername.name() + "=" + getToolkitUsername());
         }
-        if (getToolkitPassword() != null) {
-            arguments.add(ArgName.toolkitPassword.name() + "=" + getToolkitPassword());
-        }
         if (getToolkitDomain() != null) {
             arguments.add(ArgName.toolkitDomain.name() + "=" + getToolkitDomain());
         }
@@ -158,8 +142,6 @@ public class ToolkitConfig {
                 String argumentValue = split[1];
                 if (ArgName.toolkitUsername.name().equals(argumentName)) {
                     toolkitConfig.setToolkitUsername(argumentValue);
-                } else if (ArgName.toolkitPassword.name().equals(argumentName)) {
-                    toolkitConfig.setToolkitPassword(argumentValue);
                 } else if (ArgName.toolkitDomain.name().equals(argumentName)) {
                     toolkitConfig.setToolkitDomain(argumentValue);
                 } else if (ArgName.toolkitCopyListName.name().equals(argumentName)) {
@@ -182,16 +164,10 @@ public class ToolkitConfig {
         return toolkitConfig;
     }
 
-    public final boolean isToolkitCredentialsSet() {
-        return StringUtils.notEmpty(toolkitUsername) && !ArgName.toolkitUsername.defaultValue().equals(toolkitUsername)
-                && StringUtils.notEmpty(toolkitPassword) && !ArgName.toolkitPassword.defaultValue().equals(toolkitPassword);
-    }
-
     @Override
     public String toString() {
         return "ToolkitConfig{" +
                 "toolkitUsername='" + toolkitUsername + '\'' +
-                ", toolkitPassword='" + CryptoUtils.encryptSafe(toolkitPassword) + '\'' +
                 ", toolkitDomain='" + toolkitDomain + '\'' +
                 ", toolkitCopyListName='" + toolkitCopyListName + '\'' +
                 ", toolkitUrl='" + toolkitUrl + '\'' +

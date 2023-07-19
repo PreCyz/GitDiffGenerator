@@ -9,6 +9,7 @@ import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.SemanticVersioning;
+import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
@@ -16,8 +17,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public abstract class ApplicationProperties {
@@ -58,10 +57,7 @@ public abstract class ApplicationProperties {
             logger.info("Configuration [{}] loaded.", currentRunConfig.getConfigurationName());
         } else {
             logger.warn("Can not load configuration [{}].", argExtractor.configurationName());
-            logger.info("Command line argument loaded: {}.",
-                    Stream.of(argExtractor.getArgs()).filter(arg -> !arg.startsWith(ArgName.toolkitPassword.name()))
-                            .collect(Collectors.joining(" "))
-            );
+            logger.info("Command line argument loaded: {}.", String.join(" ", argExtractor.getArgs()));
         }
         logger.info("Application properties loaded: {}.", log());
     }
@@ -111,7 +107,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitConfigExists() {
-        return toolkitConfig != null && toolkitConfig.isToolkitCredentialsSet();
+        return toolkitConfig != null && SuperUserService.getInstance().isCredentialsAvailable();
     }
 
     protected final boolean isOtherAuthorsExists() {
@@ -135,8 +131,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitCredentialsSet() {
-        return !toolkitUsername().isEmpty() &&
-                !toolkitPassword().isEmpty() && !ArgName.toolkitPassword.defaultValue().equals(toolkitPassword());
+        return SuperUserService.getInstance().isCredentialsAvailable();
     }
 
     public final String fileName() {
@@ -362,7 +357,6 @@ public abstract class ApplicationProperties {
     public abstract boolean isSkipRemote();
 
     public abstract String toolkitUsername();
-    public abstract String toolkitPassword();
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
     public abstract String toolkitWSUserFolder();

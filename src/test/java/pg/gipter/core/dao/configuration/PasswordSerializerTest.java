@@ -1,12 +1,10 @@
 package pg.gipter.core.dao.configuration;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.ArgName;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.SecurityService;
-import pg.gipter.utils.CryptoUtils;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -26,62 +24,6 @@ class PasswordSerializerTest {
         JsonElement actual = serializer.serialize(configuration, Configuration.class, null);
 
         assertThat(actual.getAsJsonObject().get(ToolkitConfig.TOOLKIT_CONFIG)).isNull();
-    }
-
-    @Test
-    void givenToolkitConfigWithEmptyPassword_whenSerialize_thenReturnConfigurationWithToolkitConfig() {
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("");
-        Configuration configuration = new Configuration();
-        configuration.setToolkitConfig(toolkitConfig);
-
-        JsonElement actual = serializer.serialize(configuration, Configuration.class, null);
-
-        JsonObject actualElement = actual.getAsJsonObject().getAsJsonObject(ToolkitConfig.TOOLKIT_CONFIG);
-        assertThat(actualElement.get(ArgName.toolkitPassword.name()).getAsString()).isEmpty();
-    }
-
-    @Test
-    void givenToolkitConfigWithNullPassword_whenSerialize_thenReturnConfigurationWithNullPassword() {
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword(null);
-        Configuration configuration = new Configuration();
-        configuration.setToolkitConfig(toolkitConfig);
-
-        JsonElement actual = serializer.serialize(configuration, Configuration.class, null);
-
-        JsonObject actualElement = actual.getAsJsonObject().getAsJsonObject(ToolkitConfig.TOOLKIT_CONFIG);
-        assertThat(actualElement.get(ArgName.toolkitPassword.name())).isNull();
-    }
-
-    @Test
-    void givenToolkitConfigAndGeneratedCipher_whenSerialize_thenReturnConfigurationWithDecryptedPassword() {
-        CipherDetails cipherDetails = SecurityService.getInstance().generateCipherDetails();
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("somePassword");
-        Configuration configuration = new Configuration();
-        configuration.setToolkitConfig(toolkitConfig);
-        configuration.setCipherDetails(cipherDetails);
-
-        JsonElement actual = serializer.serialize(configuration, Configuration.class, null);
-
-        JsonObject actualElement = actual.getAsJsonObject().getAsJsonObject(ToolkitConfig.TOOLKIT_CONFIG);
-        assertThat(actualElement.get(ArgName.toolkitPassword.name())).isNotNull();
-        assertThat(actualElement.get(ArgName.toolkitPassword.name()).getAsString()).isNotEqualTo("somePassword");
-    }
-
-    @Test
-    void givenToolkitConfigWithPasswordAndNoGeneratedCipher_whenSerialize_thenReturnConfigurationWithSimplyDecryptedPassword() {
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("somePassword");
-        Configuration configuration = new Configuration();
-        configuration.setToolkitConfig(toolkitConfig);
-
-        JsonElement actual = serializer.serialize(configuration, Configuration.class, null);
-
-        JsonObject actualElement = actual.getAsJsonObject().getAsJsonObject(ToolkitConfig.TOOLKIT_CONFIG);
-        assertThat(actualElement.get(ArgName.toolkitPassword.name())).isNotNull();
-        assertThat(actualElement.get(ArgName.toolkitPassword.name()).getAsString()).isEqualTo(CryptoUtils.encryptSafe("somePassword"));
     }
 
     @Test
@@ -154,8 +96,6 @@ class PasswordSerializerTest {
         assertThat(actualElement).hasSize(1);
         JsonArray spcArray = actualElement.get(0).getAsJsonObject().get(SharePointConfig.SHARE_POINT_CONFIGS).getAsJsonArray();
         assertThat(spcArray).hasSize(1);
-        assertThat(spcArray.get(0).getAsJsonObject().get("password").getAsString())
-                .isEqualTo(CryptoUtils.encryptSafe(ArgName.toolkitPassword.defaultValue()));
     }
 
     @Test
