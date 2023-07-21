@@ -200,10 +200,16 @@ public enum ArgName {
             return "WorkItems";
         }
     },
-    toolkitUrl {
+    toolkitRESTUrl {
         @Override
         public String defaultValue() {
             return "https://int-goto.netcompany.com";
+        }
+    },
+    toolkitHostUrl {
+        @Override
+        public String defaultValue() {
+            return "https://goto.netcompany.com";
         }
     },
     toolkitCopyCase {
@@ -215,20 +221,20 @@ public enum ArgName {
     toolkitWSUrl {
         @Override
         public String defaultValue() {
-            return toolkitUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/_vti_bin/lists.asmx";
+            return toolkitRESTUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/_vti_bin/lists.asmx";
         }
     },
     toolkitUserFolder {
         @Override
         public String defaultValue() {
-            return "https://goto.netcompany.com" + toolkitCopyCase.defaultValue() +
+            return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() +
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
     },
     toolkitWSUserFolder {
         @Override
         public String defaultValue() {
-            return toolkitUrl.defaultValue() + toolkitCopyCase.defaultValue() +
+            return toolkitRESTUrl.defaultValue() + toolkitCopyCase.defaultValue() +
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
     },

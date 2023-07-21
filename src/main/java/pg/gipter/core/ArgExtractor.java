@@ -158,11 +158,18 @@ final class ArgExtractor {
         return ArgName.toolkitDomain.defaultValue();
     }
 
-    String toolkitUrl() {
-        if (containsArg(ArgName.toolkitUrl.name())) {
-            return getValue(ArgName.toolkitUrl, ArgName.toolkitUrl.defaultValue());
+    String toolkitRESTUrl() {
+        if (containsArg(ArgName.toolkitRESTUrl.name())) {
+            return getValue(ArgName.toolkitRESTUrl, ArgName.toolkitRESTUrl.defaultValue());
         }
-        return ArgName.toolkitUrl.defaultValue();
+        return ArgName.toolkitRESTUrl.defaultValue();
+    }
+
+    String toolkitHostUrl() {
+        if (containsArg(ArgName.toolkitHostUrl.name())) {
+            return getValue(ArgName.toolkitHostUrl, ArgName.toolkitHostUrl.defaultValue());
+        }
+        return ArgName.toolkitHostUrl.defaultValue();
     }
 
     String toolkitCopyCase() {

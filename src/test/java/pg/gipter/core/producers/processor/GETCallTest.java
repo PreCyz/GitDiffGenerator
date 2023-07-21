@@ -28,7 +28,7 @@ class GETCallTest {
         String top = "$top=1";
 
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?",
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
         ) + select + "&" + orderBy + "&" + top;
@@ -37,7 +37,7 @@ class GETCallTest {
                 applicationProperties.toolkitUsername(),
                 "give-password-here",
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 url
         );
         JsonObject jsonObject = new GETCall(sharePointConfig, applicationProperties).call();

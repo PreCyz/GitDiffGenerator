@@ -202,10 +202,19 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitUrl() {
-        String toolkitUrl = argExtractor.toolkitUrl();
-        if (!containsArg(ArgName.toolkitUrl.name()) && StringUtils.notEmpty(toolkitConfig.getToolkitUrl())) {
-            toolkitUrl = toolkitConfig.getToolkitUrl();
+    public String toolkitRESTUrl() {
+        String toolkitUrl = argExtractor.toolkitRESTUrl();
+        if (!containsArg(ArgName.toolkitRESTUrl.name()) && StringUtils.notEmpty(toolkitConfig.getToolkitRESTUrl())) {
+            toolkitUrl = toolkitConfig.getToolkitRESTUrl();
+        }
+        return toolkitUrl;
+    }
+
+    @Override
+    public String toolkitHostUrl() {
+        String toolkitUrl = argExtractor.toolkitHostUrl();
+        if (!containsArg(ArgName.toolkitHostUrl.name()) && StringUtils.notEmpty(toolkitConfig.getToolkitHostUrl())) {
+            toolkitUrl = toolkitConfig.getToolkitHostUrl();
         }
         return toolkitUrl;
     }

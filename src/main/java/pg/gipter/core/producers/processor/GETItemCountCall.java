@@ -30,7 +30,7 @@ class GETItemCountCall implements Callable<ItemCountResponse> {
                 superUserService.getUserName(),
                 superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 fullUrl
         );
         return new ItemCountResponse(

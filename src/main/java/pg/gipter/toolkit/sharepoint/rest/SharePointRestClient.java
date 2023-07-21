@@ -41,7 +41,7 @@ public class SharePointRestClient {
                     superUserService.getUserName(),
                     superUserService.getPassword(),
                     applicationProperties.toolkitDomain(),
-                    applicationProperties.toolkitUrl(),
+                    applicationProperties.toolkitRESTUrl(),
                     null,
                     null
             );
@@ -54,7 +54,7 @@ public class SharePointRestClient {
 
     public String createItem() throws IOException {
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/AddValidateUpdateItemUsingPath",
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
         );
@@ -62,7 +62,7 @@ public class SharePointRestClient {
                 superUserService.getUserName(),
                 superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 fullUrl,
                 getFormDigest()
         );
@@ -117,6 +117,10 @@ public class SharePointRestClient {
         arrayElement.addProperty("FieldName", "Body");
         arrayElement.addProperty("FieldValue", description);
         formValues.add(arrayElement);
+        arrayElement = new JsonObject();
+        arrayElement.addProperty("FieldName", "Employee");
+        arrayElement.addProperty("FieldValue", "[{'Key':'" + applicationProperties.toolkitUsername() + "'}]");
+        formValues.add(arrayElement);
 
         JsonObject item = new JsonObject();
         item.add("listItemCreateInfo", listItemCreateInfo);
@@ -150,7 +154,7 @@ public class SharePointRestClient {
         }
 
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)/AttachmentFiles/add(FileName='%s')",
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 itemId,
@@ -160,7 +164,7 @@ public class SharePointRestClient {
                 superUserService.getUserName(),
                 superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 fullUrl,
                 getFormDigest()
         );
@@ -186,35 +190,34 @@ public class SharePointRestClient {
         }
     }
 
-    public String getAuthorId(String itemId) throws IOException {
-        String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
-                applicationProperties.toolkitUrl(),
+    public String getUserId(String itemId) throws IOException {
+        String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
-                applicationProperties.toolkitCopyListName(),
-                itemId
+                applicationProperties.toolkitUsername() + "@netcompany.com"
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
                 superUserService.getUserName(),
                 superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 fullUrl,
                 getFormDigest()
         );
 
         JsonObject jsonObject = httpRequester.executeGET(sharePointConfig);
         if (jsonObject != null && jsonObject.has("d")) {
-            String authorId = jsonObject.get("d").getAsJsonObject().get("AuthorId").getAsString();
-            logger.info("AuthorId got from toolkit: {}", authorId);
-            return authorId;
+            String userId = jsonObject.get("d").getAsJsonObject().get("Id").getAsString();
+            logger.info("UserId got from toolkit: {}", userId);
+            return userId;
         }
         cleanup(itemId);
-        throw new IOException("Can not get author id for itemId: " + itemId);
+        throw new IOException("Can not get user id for itemId: " + itemId);
     }
 
-    public void updateAuthor(String itemId, String authorId) throws IOException {
+    public void updateClassificationId(String itemId) throws IOException {
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 itemId
@@ -223,14 +226,13 @@ public class SharePointRestClient {
                 superUserService.getUserName(),
                 superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 fullUrl,
                 getFormDigest()
         );
 
         JsonObject payload = new JsonObject();
         payload.addProperty("ClassificationId", 12);
-        payload.addProperty("EmployeeId", authorId);
 
         Map<String, String> requestHeaders = new LinkedHashMap<>();
         requestHeaders.put("Accept", "application/json;odata=verbose");
@@ -246,13 +248,13 @@ public class SharePointRestClient {
             cleanup(itemId);
             throw new IOException(errMsg);
         }
-        logger.info("Author [{}] for the item [{}] updated.", authorId, itemId);
+        logger.info("Classification ID for the item [{}] updated.", itemId);
     }
 
     private void cleanup(String itemId) {
         try {
             String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
-                    applicationProperties.toolkitUrl(),
+                    applicationProperties.toolkitRESTUrl(),
                     applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitCopyListName(),
                     itemId
@@ -261,7 +263,7 @@ public class SharePointRestClient {
                     superUserService.getUserName(),
                     superUserService.getPassword(),
                     applicationProperties.toolkitDomain(),
-                    applicationProperties.toolkitUrl(),
+                    applicationProperties.toolkitRESTUrl(),
                     fullUrl,
                     getFormDigest()
             );

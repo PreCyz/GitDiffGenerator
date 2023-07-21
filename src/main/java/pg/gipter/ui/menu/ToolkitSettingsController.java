@@ -53,7 +53,7 @@ public class ToolkitSettingsController extends AbstractController {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
         toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
-        toolkitUrlTextField.setText(applicationProperties.toolkitUrl());
+        toolkitUrlTextField.setText(applicationProperties.toolkitRESTUrl());
         toolkitWSTextField.setText(applicationProperties.toolkitWSUrl());
         toolkitUserFolderHyperlink.setText(applicationProperties.toolkitUserFolder());
     }
