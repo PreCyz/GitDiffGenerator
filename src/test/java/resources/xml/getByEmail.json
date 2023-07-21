@@ -1,0 +1,35 @@
+{
+  "d": {
+    "__metadata": {
+      "id": "https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/_api/Web/GetUserById(179)",
+      "uri": "https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/_api/Web/GetUserById(179)",
+      "type": "SP.User"
+    },
+    "Alerts": {
+      "__deferred": {
+        "uri": "https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/_api/Web/GetUserById(179)/Alerts"
+      }
+    },
+    "Groups": {
+      "__deferred": {
+        "uri": "https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/_api/Web/GetUserById(179)/Groups"
+      }
+    },
+    "Id": 179,
+    "IsHiddenInUI": false,
+    "LoginName": "i:0e.t|azureadtrust|pawg@netcompany.com",
+    "Title": "Pawe\u0142 Gaw\u0119dzki",
+    "PrincipalType": 1,
+    "Email": "pawg@netcompany.com",
+    "IsEmailAuthenticationGuestUser": false,
+    "IsShareByEmailGuestUser": false,
+    "IsSiteAdmin": false,
+    "UserId": {
+      "__metadata": {
+        "type": "SP.UserIdInfo"
+      },
+      "NameId": "pawg@netcompany.com",
+      "NameIdIssuer": "TrustedProvider:azureadtrust"
+    }
+  }
+}
