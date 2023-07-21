@@ -52,7 +52,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
         for (String project : applicationProperties.projectPaths()) {
             for (String list : applicationProperties.toolkitProjectListNames()) {
                 String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/ItemCount",
-                        applicationProperties.toolkitUrl(),
+                        applicationProperties.toolkitRESTUrl(),
                         project,
                         list
                 );
@@ -77,7 +77,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
                             superUserService.getUserName(),
                             superUserService.getPassword(),
                             applicationProperties.toolkitDomain(),
-                            applicationProperties.toolkitUrl(),
+                            applicationProperties.toolkitRESTUrl(),
                             fullRequestUrl
                     );
                     sharePointConfigs.add(sharePointConfig);
@@ -103,7 +103,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
 
 
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items",
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 project,
                 listTitle
         );

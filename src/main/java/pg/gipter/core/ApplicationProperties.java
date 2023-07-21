@@ -328,7 +328,8 @@ public abstract class ApplicationProperties {
         if (toolkitConfig != null) {
             log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
                     ", toolkitUsername='" + toolkitUsername() + '\'' +
-                    ", toolkitUrl='" + toolkitUrl() + '\'' +
+                    ", toolkitRESTUrl='" + toolkitRESTUrl() + '\'' +
+                    ", toolkitHistUrl='" + toolkitHostUrl() + '\'' +
                     ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                     ", toolkitDomain='" + toolkitDomain() + '\'' +
                     ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
@@ -363,7 +364,8 @@ public abstract class ApplicationProperties {
     public abstract String toolkitCopyListName();
     public abstract Set<String> toolkitProjectListNames();
 
-    public abstract String toolkitUrl();
+    public abstract String toolkitRESTUrl();
+    public abstract String toolkitHostUrl();
     public abstract boolean isConfirmationWindow();
     public abstract boolean isActiveTray();
     public abstract boolean isEnableOnStartup();

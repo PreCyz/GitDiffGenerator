@@ -36,7 +36,7 @@ public class ToolkitService extends Task<Set<String>> {
     @Override
     protected Set<String> call() {
         String divIdSelector = "div#MSOZoneCell_WebPartWPQ2";
-        String aHrefSelector = "a[href^=" + applicationProperties.toolkitUrl() + "]";
+        String aHrefSelector = "a[href^=" + applicationProperties.toolkitRESTUrl() + "]";
         Set<String> result = new LinkedHashSet<>();
         try {
             updateMessage(BundleUtils.getMsg("toolkit.projects.downloading"));
@@ -44,8 +44,8 @@ public class ToolkitService extends Task<Set<String>> {
                     superUserService.getUserName(),
                     superUserService.getPassword(),
                     applicationProperties.toolkitDomain(),
-                    applicationProperties.toolkitUrl(),
-                    applicationProperties.toolkitUrl() + "/toolkit/default.aspx"
+                    applicationProperties.toolkitRESTUrl(),
+                    applicationProperties.toolkitRESTUrl() + "/toolkit/default.aspx"
             );
 
             String html = httpRequester.downloadPageSource(sharePointConfig);
@@ -86,7 +86,7 @@ public class ToolkitService extends Task<Set<String>> {
         String orderBy = "$orderby=SubmissionDate+desc";
         String top = "$top=1";
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 select,
@@ -97,7 +97,7 @@ public class ToolkitService extends Task<Set<String>> {
                 superUserService.getUserName(),
                 superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 url
         );
 
@@ -132,7 +132,7 @@ public class ToolkitService extends Task<Set<String>> {
         String orderBy = "$orderby=SubmissionDate+desc";
         String top = "$top=1";
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 select,
@@ -144,7 +144,7 @@ public class ToolkitService extends Task<Set<String>> {
                 superUserService.getUserName(),
                 superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 url
         );
         try {

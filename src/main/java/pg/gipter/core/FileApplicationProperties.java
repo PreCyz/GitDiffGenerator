@@ -192,11 +192,19 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitUrl() {
-        if (StringUtils.notEmpty(toolkitConfig.getToolkitUrl())) {
-            return toolkitConfig.getToolkitUrl();
+    public String toolkitRESTUrl() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitRESTUrl())) {
+            return toolkitConfig.getToolkitRESTUrl();
         }
-        return argExtractor.toolkitUrl();
+        return argExtractor.toolkitRESTUrl();
+    }
+
+    @Override
+    public String toolkitHostUrl() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitHostUrl())) {
+            return toolkitConfig.getToolkitHostUrl();
+        }
+        return argExtractor.toolkitHostUrl();
     }
 
     @Override

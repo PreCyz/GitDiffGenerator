@@ -45,7 +45,7 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
             Set<String> listTitles = applicationProperties.toolkitProjectListNames();
             for (String listTitle : listTitles) {
                 String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
-                        applicationProperties.toolkitUrl(),
+                        applicationProperties.toolkitRESTUrl(),
                         project,
                         listTitle,
                         select(),
@@ -55,7 +55,7 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
                 SharePointConfig sharePointConfig = new SharePointConfig();
                 sharePointConfig.setFullRequestUrl(fullUrl);;
                 sharePointConfig.setProject(project);
-                sharePointConfig.setUrl(applicationProperties.toolkitUrl());
+                sharePointConfig.setUrl(applicationProperties.toolkitRESTUrl());
                 sharePointConfig.setDomain(applicationProperties.toolkitDomain());
                 sharePointConfig.setListNames(Stream.of(listTitle).collect(toSet()));
                 sharePointConfig.setUsername(SuperUserService.getInstance().getUserName());

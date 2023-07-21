@@ -12,7 +12,8 @@ public class ToolkitConfig {
     protected String toolkitUsername;
     private transient String toolkitDomain;
     private transient String toolkitCopyListName;
-    private String toolkitUrl;
+    private String toolkitRESTUrl;
+    private String toolkitHostUrl;
     private transient String toolkitCopyCase;
     private transient String toolkitWSUrl;
     private transient String toolkitUserFolder;
@@ -25,7 +26,7 @@ public class ToolkitConfig {
 
     public ToolkitConfig(ToolkitConfig toolkitConfig) {
         toolkitUsername = toolkitConfig.getToolkitUsername();
-        toolkitUrl = toolkitConfig.getToolkitUrl();
+        toolkitRESTUrl = toolkitConfig.getToolkitRESTUrl();
         toolkitProjectListNames = toolkitConfig.getToolkitProjectListNames();
     }
 
@@ -53,12 +54,20 @@ public class ToolkitConfig {
         this.toolkitCopyListName = toolkitCopyListName;
     }
 
-    public String getToolkitUrl() {
-        return toolkitUrl;
+    public String getToolkitRESTUrl() {
+        return toolkitRESTUrl;
     }
 
-    public void setToolkitUrl(String toolkitUrl) {
-        this.toolkitUrl = toolkitUrl;
+    public void setToolkitRESTUrl(String toolkitRESTUrl) {
+        this.toolkitRESTUrl = toolkitRESTUrl;
+    }
+
+    public String getToolkitHostUrl() {
+        return toolkitHostUrl;
+    }
+
+    public void setToolkitHostUrl(String toolkitHostUrl) {
+        this.toolkitHostUrl = toolkitHostUrl;
     }
 
     public String getToolkitCopyCase() {
@@ -112,8 +121,11 @@ public class ToolkitConfig {
         if (getToolkitCopyListName() != null) {
             arguments.add(ArgName.toolkitCopyListName.name() + "=" + getToolkitCopyListName());
         }
-        if (getToolkitUrl() != null) {
-            arguments.add(ArgName.toolkitUrl.name() + "=" + getToolkitUrl());
+        if (getToolkitRESTUrl() != null) {
+            arguments.add(ArgName.toolkitRESTUrl.name() + "=" + getToolkitRESTUrl());
+        }
+        if (getToolkitHostUrl() != null) {
+            arguments.add(ArgName.toolkitHostUrl.name() + "=" + getToolkitHostUrl());
         }
         if (getToolkitCopyCase() != null) {
             arguments.add(ArgName.toolkitCopyCase.name() + "=" + getToolkitCopyCase());
@@ -146,8 +158,10 @@ public class ToolkitConfig {
                     toolkitConfig.setToolkitDomain(argumentValue);
                 } else if (ArgName.toolkitCopyListName.name().equals(argumentName)) {
                     toolkitConfig.setToolkitCopyListName(argumentValue);
-                } else if (ArgName.toolkitUrl.name().equals(argumentName)) {
-                    toolkitConfig.setToolkitUrl(argumentValue);
+                } else if (ArgName.toolkitRESTUrl.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitRESTUrl(argumentValue);
+                } else if (ArgName.toolkitHostUrl.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitHostUrl(argumentValue);
                 } else if (ArgName.toolkitCopyCase.name().equals(argumentName)) {
                     toolkitConfig.setToolkitCopyCase(argumentValue);
                 } else if (ArgName.toolkitWSUrl.name().equals(argumentName)) {
@@ -170,7 +184,8 @@ public class ToolkitConfig {
                 "toolkitUsername='" + toolkitUsername + '\'' +
                 ", toolkitDomain='" + toolkitDomain + '\'' +
                 ", toolkitCopyListName='" + toolkitCopyListName + '\'' +
-                ", toolkitUrl='" + toolkitUrl + '\'' +
+                ", toolkitUrl='" + toolkitRESTUrl + '\'' +
+                ", toolkitHostUrl='" + toolkitHostUrl + '\'' +
                 ", toolkitCopyCase='" + toolkitCopyCase + '\'' +
                 ", toolkitWSUrl='" + toolkitWSUrl + '\'' +
                 ", toolkitUserFolder='" + toolkitUserFolder + '\'' +
