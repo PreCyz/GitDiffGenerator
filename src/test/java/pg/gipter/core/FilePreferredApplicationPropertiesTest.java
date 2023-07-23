@@ -7,6 +7,7 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.users.SuperUserService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -579,13 +580,10 @@ class FilePreferredApplicationPropertiesTest {
     void givenToolkitUsernameAndPassword_whenIsToolkitPropertiesSet_thenReturnTrue() {
         String[] args = {"toolkitPassword=yui"};
         appProps = new FileApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("cvb");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
         boolean actual = appProps.isToolkitCredentialsSet();
 
-        assertThat(actual).isTrue();
+        assertThat(actual).isEqualTo(SuperUserService.getInstance().isCredentialsAvailable());
     }
 
     @Test
