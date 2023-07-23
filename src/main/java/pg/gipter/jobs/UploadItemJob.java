@@ -9,12 +9,14 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.services.ToolkitService;
+import pg.gipter.toolkit.sharepoint.rest.SharePointRestClient;
 import pg.gipter.ui.*;
 
 import java.text.ParseException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Optional;
 
 public class UploadItemJob implements Job {
 
@@ -56,8 +58,9 @@ public class UploadItemJob implements Job {
                 configurationDao.loadArgumentArray(jobParam.getConfigs().iterator().next())
         );
         uiLauncher.updateTray(applicationProperties);
-        if (applicationProperties.isToolkitCredentialsSet()) {
-            new ToolkitService(applicationProperties).lastItemUploadDate()
+        Optional<String> userId = new SharePointRestClient(applicationProperties).getUserId();
+        if (applicationProperties.isToolkitCredentialsSet() && userId.isPresent()) {
+            new ToolkitService(applicationProperties).lastItemModifiedDate(userId.get())
                     .ifPresent((lastUploadDate) -> uiLauncher.setLastItemSubmissionDate(
                             LocalDateTime.parse(lastUploadDate, DateTimeFormatter.ISO_DATE_TIME)
                     ));
