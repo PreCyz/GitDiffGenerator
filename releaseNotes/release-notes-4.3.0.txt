@@ -1,0 +1,7 @@
+**Release notes:**
+
+Improvements:
+* Adjusting to the SSO for toolkit.
+* Remove unneeded parameters.
+Fixes:
+* None.
