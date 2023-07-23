@@ -2,6 +2,7 @@
 
 Improvements:
 * Adjusting to the SSO for toolkit.
+* Adjust last upload date to use modified date.
 * Remove unneeded parameters.
 Fixes:
 * None.
