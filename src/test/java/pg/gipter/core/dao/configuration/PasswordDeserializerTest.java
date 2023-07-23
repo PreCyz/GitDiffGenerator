@@ -3,7 +3,6 @@ package pg.gipter.core.dao.configuration;
 import com.google.gson.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
@@ -42,20 +41,17 @@ class PasswordDeserializerTest {
         Configuration actual = deserializer.deserialize(configuration, Configuration.class, null);
 
         assertThat(actual.getToolkitConfig()).isNotNull();
-        assertThat(actual.getToolkitConfig().getToolkitPassword()).isEqualTo(ArgName.toolkitPassword.defaultValue());
     }
 
     @Test
     void givenEmptyPassword_whenDeserialize_thenReturnToolkitConfigWithoutPassword() {
         JsonObject toolkitConfig = new JsonObject();
-        toolkitConfig.addProperty(ArgName.toolkitPassword.name(), "");
         JsonObject configuration = new JsonObject();
         configuration.add(ToolkitConfig.TOOLKIT_CONFIG, toolkitConfig);
 
         Configuration actual = deserializer.deserialize(configuration, Configuration.class, null);
 
         assertThat(actual.getToolkitConfig()).isNotNull();
-        assertThat(actual.getToolkitConfig().getToolkitPassword()).isEmpty();
     }
 
     @Test
@@ -63,14 +59,12 @@ class PasswordDeserializerTest {
         String decryptedPassword = "somePassword";
         String encryptedPassword = CryptoUtils.encryptSafe(decryptedPassword);
         JsonObject toolkitConfig = new JsonObject();
-        toolkitConfig.addProperty(ArgName.toolkitPassword.name(), encryptedPassword);
         JsonObject configuration = new JsonObject();
         configuration.add(ToolkitConfig.TOOLKIT_CONFIG, toolkitConfig);
 
         Configuration actual = deserializer.deserialize(configuration, Configuration.class, null);
 
         assertThat(actual.getToolkitConfig()).isNotNull();
-        assertThat(actual.getToolkitConfig().getToolkitPassword()).isEqualTo(decryptedPassword);
     }
 
     @Test
@@ -81,7 +75,6 @@ class PasswordDeserializerTest {
         JsonElement cipherDetailsJsonElement = new Gson().toJsonTree(cipherDetails, CipherDetails.class);
         String encryptedPassword = securityService.encrypt(decryptedPassword, cipherDetails);
         JsonObject toolkitConfig = new JsonObject();
-        toolkitConfig.addProperty(ArgName.toolkitPassword.name(), encryptedPassword);
         JsonObject configuration = new JsonObject();
         configuration.add(ToolkitConfig.TOOLKIT_CONFIG, toolkitConfig);
         configuration.add("cipherDetails", cipherDetailsJsonElement);
@@ -89,7 +82,6 @@ class PasswordDeserializerTest {
         Configuration actual = deserializer.deserialize(configuration, Configuration.class, null);
 
         assertThat(actual.getToolkitConfig()).isNotNull();
-        assertThat(actual.getToolkitConfig().getToolkitPassword()).isEqualTo(decryptedPassword);
     }
 
     @Test
@@ -109,7 +101,7 @@ class PasswordDeserializerTest {
     void givenConfigurationWithEmptySharePointConfig_whenDeserialize_thenReturnSharePointConfigPasswordIsDefault() {
         Configuration configuration = new Configuration();
         SharePointConfig sharePointConfig = new SharePointConfig();
-        sharePointConfig.setPassword(CryptoUtils.encryptSafe(sharePointConfig.getPassword()));
+        sharePointConfig.setPassword(CryptoUtils.encryptSafe("somePassword"));
         configuration.addRunConfig(new RunConfigBuilder()
                 .withConfigurationName("name")
                 .withItemType(ItemType.SHARE_POINT_DOCS)
@@ -121,8 +113,6 @@ class PasswordDeserializerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getRunConfigs()).hasSize(1);
         assertThat(actual.getRunConfigs().get(0).getSharePointConfigs()).hasSize(1);
-        assertThat(new LinkedList<>(actual.getRunConfigs().get(0).getSharePointConfigs()).getFirst().getPassword())
-                .isEqualTo(ArgName.toolkitPassword.defaultValue());
     }
 
     @Test

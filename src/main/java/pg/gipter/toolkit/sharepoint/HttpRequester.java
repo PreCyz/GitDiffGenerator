@@ -172,7 +172,7 @@ public class HttpRequester {
     }
 
     public String requestDigest(SharePointConfig sharePointConfig) throws IOException {
-        String fullUrl = applicationProperties.toolkitUrl() + applicationProperties.toolkitCopyCase() + "/_api/contextinfo";
+        String fullUrl = applicationProperties.toolkitRESTUrl() + applicationProperties.toolkitCopyCase() + "/_api/contextinfo";
         HttpPost httpPost = new HttpPost(fullUrl);
         httpPost.addHeader("Accept", "application/json;odata=verbose");
         httpPost.addHeader("X-ClientService-ClientTag", "SDK-JAVA");

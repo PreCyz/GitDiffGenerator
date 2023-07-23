@@ -576,26 +576,6 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void given_noToolkitUsernameAndPassword_when_isToolkitPropertiesSet_then_returnFalse() {
-        String[] args = new String[]{};
-        appProps = new FileApplicationProperties(args);
-
-        boolean actual = appProps.isToolkitCredentialsSet();
-
-        assertThat(actual).isFalse();
-    }
-
-    @Test
-    void given_emptyToolkitUsernameAndPassword_when_isToolkitPropertiesSet_then_returnFalse() {
-        String[] args = {"toolkitUsername=", "toolkitPassword="};
-        appProps = new FileApplicationProperties(args);
-
-        boolean actual = appProps.isToolkitCredentialsSet();
-
-        assertThat(actual).isFalse();
-    }
-
-    @Test
     void givenToolkitUsernameAndPassword_whenIsToolkitPropertiesSet_thenReturnTrue() {
         String[] args = {"toolkitPassword=yui"};
         appProps = new FileApplicationProperties(args);

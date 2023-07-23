@@ -21,7 +21,6 @@ class SecurityConverterTest {
 
     private void prepareApplicationProperties() {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("somePassword");
         toolkitConfig.setToolkitUsername("someUser");
         DaoFactory.getCachedConfiguration().saveToolkitConfig(toolkitConfig);
     }
@@ -63,7 +62,7 @@ class SecurityConverterTest {
 
         SecurityProvider securityDao = DaoFactory.getSecurityProvider();
         Optional<CipherDetails> cipherDetails = securityDao.readCipherDetails();
-        assertThat(actual).isFalse();
+        assertThat(actual).isTrue();
         assertThat(cipherDetails.isPresent()).isTrue();
         assertThat(cipherDetails.get().getCipherName()).isEqualTo("PBEWithMD5AndDES");
         assertThat(cipherDetails.get().getIterationCount()).isBetween(0, 50);

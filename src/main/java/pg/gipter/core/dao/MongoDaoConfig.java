@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.Statistic;
+import pg.gipter.users.SuperUser;
 import pg.gipter.utils.CryptoUtils;
 
 import java.io.*;
@@ -23,7 +24,7 @@ public abstract class MongoDaoConfig {
 
     private static final String DB_CONFIG = "db.properties";
 
-    private String collectionName;
+    private final String collectionName;
     protected MongoCollection<Document> collection;
 
     private boolean statisticsAvailable;
@@ -56,9 +57,10 @@ public abstract class MongoDaoConfig {
             Codec<Document> documentCodec = codecRegistry.get(Document.class);
             Codec<Statistic> statisticCodec = new StatisticCodec(codecRegistry);
             Codec<ExceptionDetails> exceptionDetailsCodec = new ExceptionDetailsCodec(codecRegistry);
+            Codec<SuperUser> superUserCodec = new SuperUserCodec(codecRegistry);
             codecRegistry = CodecRegistries.fromRegistries(
                     MongoClient.getDefaultCodecRegistry(),
-                    CodecRegistries.fromCodecs(documentCodec, statisticCodec, exceptionDetailsCodec)
+                    CodecRegistries.fromCodecs(documentCodec, statisticCodec, exceptionDetailsCodec, superUserCodec)
             );
 
             String host = dbConfig.getProperty("db.host");
