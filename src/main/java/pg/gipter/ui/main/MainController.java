@@ -64,8 +64,6 @@ public class MainController extends AbstractController {
     @FXML
     private PasswordField toolkitPasswordField;
     @FXML
-    private TextField toolkitDomainTextField;
-    @FXML
     private Hyperlink verifyCredentialsHyperlink;
     @FXML
     private ProgressIndicator verifyProgressIndicator;
@@ -155,7 +153,6 @@ public class MainController extends AbstractController {
         Map<String, Control> map = new HashMap<>();
         map.put("toolkitUsernameTextField", toolkitUsernameTextField);
         map.put("toolkitPasswordField", toolkitPasswordField);
-        map.put("toolkitDomainTextField", toolkitDomainTextField);
         map.put("verifyCredentialsHyperlink", verifyCredentialsHyperlink);
         map.put("verifyProgressIndicator", verifyProgressIndicator);
         return map;

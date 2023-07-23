@@ -20,7 +20,6 @@ class GETCallTest {
     void pocForDownloadingTheLastUploadDate() throws Exception {
         String[] args = new String[]{
                 ArgName.toolkitUsername.name() + "=PAWG",
-                ArgName.toolkitPassword.name() + "=give-password-here",
         };
 
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(args);
@@ -29,16 +28,16 @@ class GETCallTest {
         String top = "$top=1";
 
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?",
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
         ) + select + "&" + orderBy + "&" + top;
 
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                "give-password-here",
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 url
         );
         JsonObject jsonObject = new GETCall(sharePointConfig, applicationProperties).call();

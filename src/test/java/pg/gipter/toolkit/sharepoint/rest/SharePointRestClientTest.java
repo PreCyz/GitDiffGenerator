@@ -16,7 +16,6 @@ class SharePointRestClientTest {
     @Disabled
     void name() {
         String[] strings = {
-                ArgName.toolkitPassword.name()+"=Password-here",
                 ArgName.toolkitUsername.name()+"=PAWG"
         };
         SharePointRestClient client = new SharePointRestClient(ApplicationPropertiesFactory.getInstance(strings));
@@ -27,9 +26,7 @@ class SharePointRestClientTest {
             System.out.println(itemId);
 
             client.uploadAttachment(itemId);
-            String authorId = client.getAuthorId(itemId);
-            System.out.println(authorId);
-            client.updateAuthor(itemId, authorId);
+            client.updateClassificationId(itemId);
 
         } catch (IOException e) {
             e.printStackTrace(System.out);

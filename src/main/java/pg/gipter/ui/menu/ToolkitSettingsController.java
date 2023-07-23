@@ -3,7 +3,8 @@ package pg.gipter.ui.menu;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.TextField;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import pg.gipter.core.ApplicationProperties;
@@ -22,8 +23,6 @@ public class ToolkitSettingsController extends AbstractController {
     private AnchorPane mainAnchorPane;
     @FXML
     private TextField toolkitUsernameTextField;
-    @FXML
-    private PasswordField toolkitPasswordField;
     @FXML
     private TextField toolkitDomainTextField;
     @FXML
@@ -52,10 +51,9 @@ public class ToolkitSettingsController extends AbstractController {
 
     private void setInitValues() {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitPassword());
         toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
         toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
-        toolkitUrlTextField.setText(applicationProperties.toolkitUrl());
+        toolkitUrlTextField.setText(applicationProperties.toolkitRESTUrl());
         toolkitWSTextField.setText(applicationProperties.toolkitWSUrl());
         toolkitUserFolderHyperlink.setText(applicationProperties.toolkitUserFolder());
     }
