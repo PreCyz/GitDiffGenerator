@@ -25,8 +25,6 @@ public class SharePointConfig {
     private String formDigest;
 
     public SharePointConfig() {
-        username = ArgName.toolkitUsername.defaultValue();
-        password = ArgName.toolkitPassword.defaultValue();
         listNames = Stream.of(ArgName.toolkitProjectListNames.defaultValue()).collect(toCollection(LinkedHashSet::new));
     }
 

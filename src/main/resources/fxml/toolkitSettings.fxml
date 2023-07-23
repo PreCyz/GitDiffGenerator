@@ -10,14 +10,12 @@
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="195.0" prefWidth="603.0">
                <children>
                   <Label layoutX="10.0" layoutY="9.0" text="%toolkit.panel.username" />
-                  <Label layoutX="10.0" layoutY="36.0" text="%toolkit.panel.password" />
                   <Label layoutX="10.0" layoutY="64.0" text="%toolkit.panel.domain" />
                   <Label layoutX="10.0" layoutY="91.0" text="%toolkit.panel.listName" />
                   <Label layoutX="10.0" layoutY="118.0" text="%toolkit.panel.url" />
                   <Label layoutX="10.0" layoutY="145.0" text="%toolkit.panel.wsUrl" />
                   <Label layoutX="10.0" layoutY="172.0" text="%toolkit.panel.userFolder" />
                   <TextField fx:id="toolkitUsernameTextField" editable="false" layoutX="107.0" layoutY="7.0" style="-fx-background-color: #e5e5e5;" />
-                  <PasswordField fx:id="toolkitPasswordField" editable="false" layoutX="107.0" layoutY="34.0" style="-fx-background-color: #e5e5e5;" />
                   <TextField fx:id="toolkitDomainTextField" editable="false" layoutX="107.0" layoutY="61.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
                   <TextField fx:id="toolkitListNameTextField" editable="false" layoutX="107.0" layoutY="88.0" style="-fx-background-color: #e5e5e5;" />
                   <TextField fx:id="toolkitUrlTextField" editable="false" layoutX="107.0" layoutY="115.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">

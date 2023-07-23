@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.services.ToolkitService;
+import pg.gipter.toolkit.sharepoint.rest.SharePointRestClient;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
@@ -30,8 +31,9 @@ public class LastItemJob implements Job {
     private void checkLastUploadedItem(JobDataMap jobDataMap) {
         final ApplicationProperties applicationProperties =
                 (ApplicationProperties) jobDataMap.get(ApplicationProperties.class.getSimpleName());
+        Optional<String> userId = new SharePointRestClient(applicationProperties).getUserId();
         final ToolkitService toolkitService = new ToolkitService(applicationProperties);
-        final Optional<String> lastItemUploadDate = toolkitService.lastItemUploadDate();
+        final Optional<String> lastItemUploadDate = toolkitService.lastItemModifiedDate(userId.orElseGet(() -> ""));
         boolean shouldDisplayWindow;
         String msg;
         if (lastItemUploadDate.isPresent()) {

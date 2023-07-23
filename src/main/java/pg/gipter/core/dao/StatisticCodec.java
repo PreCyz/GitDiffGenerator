@@ -45,8 +45,7 @@ public class StatisticCodec implements CollectibleCodec<Statistic> {
     @Override
     public Statistic decode(BsonReader reader, DecoderContext decoderContext) {
         Document document = documentCodec.decode(reader, decoderContext);
-        Statistic statistic = this.converter.convert(document);
-        return statistic;
+        return this.converter.convert(document);
     }
 
     @Override

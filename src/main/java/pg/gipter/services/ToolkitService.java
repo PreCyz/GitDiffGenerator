@@ -12,6 +12,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.GETCall;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
+import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
@@ -24,25 +25,27 @@ public class ToolkitService extends Task<Set<String>> {
     protected final static Logger logger = LoggerFactory.getLogger(ToolkitService.class);
     private final ApplicationProperties applicationProperties;
     private final HttpRequester httpRequester;
+    private final SuperUserService superUserService;
 
     public ToolkitService(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         this.httpRequester = new HttpRequester(applicationProperties);
+        superUserService = SuperUserService.getInstance();
     }
 
     @Override
     protected Set<String> call() {
         String divIdSelector = "div#MSOZoneCell_WebPartWPQ2";
-        String aHrefSelector = "a[href^=" + applicationProperties.toolkitUrl() + "]";
+        String aHrefSelector = "a[href^=" + applicationProperties.toolkitRESTUrl() + "]";
         Set<String> result = new LinkedHashSet<>();
         try {
             updateMessage(BundleUtils.getMsg("toolkit.projects.downloading"));
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    applicationProperties.toolkitUsername(),
-                    applicationProperties.toolkitPassword(),
+                    superUserService.getUserName(),
+                    superUserService.getPassword(),
                     applicationProperties.toolkitDomain(),
-                    applicationProperties.toolkitUrl(),
-                    applicationProperties.toolkitUrl() + "/toolkit/default.aspx"
+                    applicationProperties.toolkitRESTUrl(),
+                    applicationProperties.toolkitRESTUrl() + "/toolkit/default.aspx"
             );
 
             String html = httpRequester.downloadPageSource(sharePointConfig);
@@ -76,25 +79,31 @@ public class ToolkitService extends Task<Set<String>> {
         return call();
     }
 
-    public Optional<String> lastItemUploadDate() {
-        Optional<String> submissionDate = Optional.empty();
+    public Optional<String> lastItemModifiedDate(String userId) {
+        Optional<String> modifiedDate = Optional.empty();
+        if ("".equals(userId)) {
+            logger.warn("UserId is empty and I can not download last submission date.");
+            return modifiedDate;
+        }
 
-        String select = "$select=Body,SubmissionDate,GUID,Title";
-        String orderBy = "$orderby=SubmissionDate+desc";
+        String select = "$select=Body,SubmissionDate,GUID,Title,EmployeeId,Modified";
+        String filter = String.format("$filter=EmployeeId+eq+%s", userId);
+        String orderBy = "$orderby=Modified+desc";
         String top = "$top=1";
-        String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
-                applicationProperties.toolkitUrl(),
+        String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s&%s",
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 select,
+                filter,
                 orderBy,
                 top
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                superUserService.getUserName(),
+                superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 url
         );
 
@@ -112,15 +121,15 @@ public class ToolkitService extends Task<Set<String>> {
                 throw new IllegalArgumentException("Can not handle the response from toolkit. Array is empty.");
             }
             JsonObject firstElement = results.get(0).getAsJsonObject();
-            JsonElement submissionDateElement = firstElement.get("SubmissionDate");
-            if (submissionDateElement == null) {
+            JsonElement modifiedDateElement = firstElement.get("Modified");
+            if (modifiedDateElement == null) {
                 throw new IllegalArgumentException("Can not find submission date in the response from toolkit.");
             }
-            submissionDate = Optional.ofNullable(submissionDateElement.getAsString());
+            modifiedDate = Optional.ofNullable(modifiedDateElement.getAsString());
         } catch (Exception ex) {
             logger.error("Can not download last item submission date. {}", ex.getMessage());
         }
-        return submissionDate;
+        return modifiedDate;
     }
 
     public boolean hasProperCredentials() {
@@ -129,7 +138,7 @@ public class ToolkitService extends Task<Set<String>> {
         String orderBy = "$orderby=SubmissionDate+desc";
         String top = "$top=1";
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 select,
@@ -138,10 +147,10 @@ public class ToolkitService extends Task<Set<String>> {
         );
 
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                applicationProperties.toolkitPassword(),
+                superUserService.getUserName(),
+                superUserService.getPassword(),
                 applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitUrl(),
+                applicationProperties.toolkitRESTUrl(),
                 url
         );
         try {
