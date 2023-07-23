@@ -15,8 +15,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.joining;
 
@@ -190,29 +189,32 @@ public class SharePointRestClient {
         }
     }
 
-    public String getUserId(String itemId) throws IOException {
-        String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
-                applicationProperties.toolkitRESTUrl(),
-                applicationProperties.toolkitCopyCase(),
-                applicationProperties.toolkitUsername() + "@netcompany.com"
-        );
-        SharePointConfig sharePointConfig = new SharePointConfig(
-                superUserService.getUserName(),
-                superUserService.getPassword(),
-                applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitRESTUrl(),
-                fullUrl,
-                getFormDigest()
-        );
+    public Optional<String> getUserId() {
+        try {
+            String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
+                    applicationProperties.toolkitRESTUrl(),
+                    applicationProperties.toolkitCopyCase(),
+                    applicationProperties.toolkitUsername() + "@netcompany.com"
+            );
+            SharePointConfig sharePointConfig = new SharePointConfig(
+                    superUserService.getUserName(),
+                    superUserService.getPassword(),
+                    applicationProperties.toolkitDomain(),
+                    applicationProperties.toolkitRESTUrl(),
+                    fullUrl,
+                    getFormDigest()
+            );
 
-        JsonObject jsonObject = httpRequester.executeGET(sharePointConfig);
-        if (jsonObject != null && jsonObject.has("d")) {
-            String userId = jsonObject.get("d").getAsJsonObject().get("Id").getAsString();
-            logger.info("UserId got from toolkit: {}", userId);
-            return userId;
+            JsonObject jsonObject = httpRequester.executeGET(sharePointConfig);
+            if (jsonObject != null && jsonObject.has("d")) {
+                String userId = jsonObject.get("d").getAsJsonObject().get("Id").getAsString();
+                logger.info("UserId got from toolkit: {}", userId);
+                return Optional.ofNullable(userId);
+            }
+        } catch (Exception ex) {
+            logger.warn("Can not get user id by email");
         }
-        cleanup(itemId);
-        throw new IOException("Can not get user id for itemId: " + itemId);
+        return Optional.empty();
     }
 
     public void updateClassificationId(String itemId) throws IOException {
