@@ -373,24 +373,6 @@ class ArgExtractorTest {
     }
 
     @Test
-    void givenNoToolkitPassword_whenToolkitPassword_thenReturnDefaultValue() {
-        argExtractor = new ArgExtractor(new String[]{});
-
-        String actual = argExtractor.toolkitPassword();
-
-        assertThat(actual).isEqualTo("UNKNOWN");
-    }
-
-    @Test
-    void given_toolkitPassword_when_toolkitPassword_then_returnThatPassword() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitPassword=password"});
-
-        String actual = argExtractor.toolkitPassword();
-
-        assertThat(actual).isEqualTo("password");
-    }
-
-    @Test
     void when_toolkitDomain_then_returnNCDMZ() {
         argExtractor = new ArgExtractor(new String[]{});
 
@@ -409,26 +391,44 @@ class ArgExtractorTest {
     }
 
     @Test
-    void when_toolkitUrl_then_returnDefaultUrl() {
+    void whenToolkitRESTUrl_then_returnDefaultUrl() {
         argExtractor = new ArgExtractor(new String[]{});
 
-        String actual = argExtractor.toolkitUrl();
+        String actual = argExtractor.toolkitRESTUrl();
 
         assertThat(actual).isEqualTo("https://int-goto.netcompany.com");
     }
 
     @Test
-    void whenToolkitCopyCaseDefaultValue_thenReturnNCopyCase() {
-        assertThat(ArgName.toolkitCopyCase.defaultValue()).isEqualTo("/cases/GTE106/NCSCOPY");
+    void given_toolkitUrlFromCommandLine_whenToolkitRESTUrl_thenReturnParam() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitRESTUrl=sthElse"});
+
+        String actual = argExtractor.toolkitRESTUrl();
+
+        assertThat(actual).isEqualTo("sthElse");
     }
 
     @Test
-    void given_toolkitUrlFromCommandLine_when_toolkitUrl_thenReturnParam() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitUrl=sthElse"});
+    void when_toolkitHostUrl_thenReturnDefaultHostUrl() {
+        argExtractor = new ArgExtractor(new String[]{});
 
-        String actual = argExtractor.toolkitUrl();
+        String actual = argExtractor.toolkitHostUrl();
+
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+    }
+
+    @Test
+    void given_toolkitHostUrlFromCommandLine_when_toolkitHostUrl_thenReturnParam() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitHostUrl=sthElse"});
+
+        String actual = argExtractor.toolkitHostUrl();
 
         assertThat(actual).isEqualTo("sthElse");
+    }
+
+    @Test
+    void whenToolkitCopyCaseDefaultValue_thenReturnNCopyCase() {
+        assertThat(ArgName.toolkitCopyCase.defaultValue()).isEqualTo("/cases/GTE106/NCSCOPY");
     }
 
     @Test

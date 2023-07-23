@@ -245,7 +245,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
     }
 
     String getFullDownloadUrl(String fileReference) {
-        return String.format("%s%s", applicationProperties.toolkitUrl(), fileReference);
+        return String.format("%s%s", applicationProperties.toolkitRESTUrl(), fileReference);
     }
 
     List<Path> downloadDocuments(List<DownloadDetails> downloadDetails) {

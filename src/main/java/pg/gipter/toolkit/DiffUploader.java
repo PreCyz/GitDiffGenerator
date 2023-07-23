@@ -23,8 +23,7 @@ public class DiffUploader {
         try {
             String itemId = client.createItem();
             client.uploadAttachment(itemId);
-            String authorId = client.getAuthorId(itemId);
-            client.updateAuthor(itemId, authorId);
+            client.updateClassificationId(itemId);
         } catch (IOException e) {
             String errorMsg = String.format("Error during upload diff. %s", e.getMessage());
             logger.error(errorMsg, e);

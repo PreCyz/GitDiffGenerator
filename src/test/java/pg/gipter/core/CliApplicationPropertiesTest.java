@@ -943,65 +943,6 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void givenNoToolkitPassword_whenToolkitPassword_thenReturnDefault() {
-        applicationProperties = new CliApplicationProperties(new String[]{});
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("UNKNOWN");
-    }
-
-    @Test
-    void given_toolkitPasswordFromCLI_when_toolkitPassword_then_returnCliToolkitPassword() {
-        applicationProperties = new CliApplicationProperties(
-                new String[]{"toolkitPassword=cliPassword"}
-        );
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("cliPassword");
-    }
-
-    @Test
-    void given_toolkitPasswordFileAndCLI_when_toolkitPassword_then_returnCliToolkitPassword() {
-        String[] args = {"toolkitPassword=cliPassword"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("propertiesPassword");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("cliPassword");
-    }
-
-    @Test
-    void given_toolkitPasswordFromProperties_when_toolkitPassword_then_returnToolkitPasswordFromProperties() {
-        String[] args = {};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("propertiesPassword");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("propertiesPassword");
-    }
-
-    @Test
-    void given_toolkitPasswordFromPropertiesAndOtherArgs_when_toolkitPassword_then_returnToolkitPasswordFromProperties() {
-        String[] args = {"uploadType=statement"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitPassword("propertiesPassword");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitPassword();
-
-        assertThat(actual).isEqualTo("propertiesPassword");
-    }
-
-    @Test
     void given_noToolkitDomain_when_toolkitDomain_then_returnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
@@ -1061,60 +1002,119 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void given_noToolkitUrl_when_toolkitUrl_then_returnDefault() {
+    void givenNoToolkitUrl_whenToolkitRESTUrl_thenReturnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        String actual = applicationProperties.toolkitUrl();
+        String actual = applicationProperties.toolkitRESTUrl();
 
         assertThat(actual).isEqualTo("https://int-goto.netcompany.com");
     }
 
     @Test
-    void given_toolkitUrlFromCLI_when_toolkitUrl_then_returnDefault() {
+    void givenToolkitUrlFromCLI_whenToolkitRESTUrl_thenReturnDefault() {
         applicationProperties = new CliApplicationProperties(
-                new String[]{"toolkitUrl=cliUrl"}
+                new String[]{"toolkitRESTUrl=cliUrl"}
         );
 
-        String actual = applicationProperties.toolkitUrl();
+        String actual = applicationProperties.toolkitRESTUrl();
 
         assertThat(actual).isEqualTo("cliUrl");
     }
 
     @Test
-    void given_toolkitUrlFileAndCLI_when_toolkitUrl_then_returnDefault() {
-        String[] args = {"toolkitUrl=cliUrl"};
+    void givenToolkitUrlFileAndCLI_whenToolkitRESTUrl_thenReturnDefault() {
+        String[] args = {"toolkitRESTUrl=cliUrl"};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUrl("propertiesUrl");
+        toolkitConfig.setToolkitRESTUrl("propertiesUrl");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUrl();
+        String actual = applicationProperties.toolkitRESTUrl();
 
         assertThat(actual).isEqualTo("cliUrl");
     }
 
     @Test
-    void given_toolkitUrlFromProperties_when_toolkitUrl_then_returnToolkitUrlFromProperties() {
+    void givenToolkitUrlFromProperties_whenToolkitRESTUrl_thenReturnToolkitUrlFromProperties() {
         String[] args = {};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUrl("propertiesUrl");
+        toolkitConfig.setToolkitRESTUrl("propertiesUrl");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUrl();
+        String actual = applicationProperties.toolkitRESTUrl();
 
         assertThat(actual).isEqualTo("propertiesUrl");
     }
 
     @Test
-    void given_toolkitUrlFromPropertiesAndOtherArgs_when_toolkitUrl_then_returnToolkitUrlFromProperties() {
+    void givenToolkitUrlFromPropertiesAndOtherArgs_whenToolkitRESTUrl_thenReturnToolkitUrlFromProperties() {
         String[] args = {"uploadType=statement"};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUrl("propertiesUrl");
+        toolkitConfig.setToolkitRESTUrl("propertiesUrl");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUrl();
+        String actual = applicationProperties.toolkitRESTUrl();
+
+        assertThat(actual).isEqualTo("propertiesUrl");
+    }
+
+    @Test
+    void givenNoToolkitHostUrl_whenToolkitHostUrl_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.toolkitHostUrl();
+
+        assertThat(actual).isEqualTo("https://goto.netcompany.com");
+    }
+
+    @Test
+    void givenToolkitHostFromCLI_whenToolkitHostUrl_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(
+                new String[]{"toolkitHostUrl=cliUrl"}
+        );
+
+        String actual = applicationProperties.toolkitHostUrl();
+
+        assertThat(actual).isEqualTo("cliUrl");
+    }
+
+    @Test
+    void givenToolkitHostUrlFileAndCLI_whenToolkitHostUrl_thenReturnDefault() {
+        String[] args = {"toolkitHostUrl=cliUrl"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitHostUrl("propertiesUrl");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitHostUrl();
+
+        assertThat(actual).isEqualTo("cliUrl");
+    }
+
+    @Test
+    void givenToolkitHostUrlFromProperties_whenToolkitHostUrl_thenReturnToolkitHostUrlFromProperties() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitHostUrl("propertiesUrl");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitHostUrl();
+
+        assertThat(actual).isEqualTo("propertiesUrl");
+    }
+
+    @Test
+    void givenToolkitHostUrlFromPropertiesAndOtherArgs_whenToolkitHostUrl_thenReturnToolkitUrlFromProperties() {
+        String[] args = {"uploadType=statement"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitHostUrl("propertiesUrl");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitHostUrl();
 
         assertThat(actual).isEqualTo("propertiesUrl");
     }

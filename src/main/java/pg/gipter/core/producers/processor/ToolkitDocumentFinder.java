@@ -5,6 +5,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.toolkit.dto.DocumentDetails;
+import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Path;
@@ -44,7 +45,7 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
             Set<String> listTitles = applicationProperties.toolkitProjectListNames();
             for (String listTitle : listTitles) {
                 String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
-                        applicationProperties.toolkitUrl(),
+                        applicationProperties.toolkitRESTUrl(),
                         project,
                         listTitle,
                         select(),
@@ -54,11 +55,11 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
                 SharePointConfig sharePointConfig = new SharePointConfig();
                 sharePointConfig.setFullRequestUrl(fullUrl);;
                 sharePointConfig.setProject(project);
-                sharePointConfig.setUrl(applicationProperties.toolkitUrl());
+                sharePointConfig.setUrl(applicationProperties.toolkitRESTUrl());
                 sharePointConfig.setDomain(applicationProperties.toolkitDomain());
                 sharePointConfig.setListNames(Stream.of(listTitle).collect(toSet()));
-                sharePointConfig.setUsername(applicationProperties.toolkitUsername());
-                sharePointConfig.setPassword(applicationProperties.toolkitPassword());
+                sharePointConfig.setUsername(SuperUserService.getInstance().getUserName());
+                sharePointConfig.setPassword(SuperUserService.getInstance().getPassword());
                 result.add(sharePointConfig);
             }
         }

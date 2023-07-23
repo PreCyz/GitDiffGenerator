@@ -176,7 +176,7 @@ public class ToolkitProjectsController extends AbstractController {
     private EventHandler<? super MouseEvent> showMyProjectsMouseClickEventHandler() {
         return event -> {
             AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser(applicationProperties.toolkitUrl() + "/toolkit/default.aspx");
+            instance.launchDefaultBrowser(applicationProperties.toolkitHostUrl() + "/toolkit/default.aspx");
             showMyProjectsHyperlink.setVisited(false);
         };
     }
@@ -184,7 +184,7 @@ public class ToolkitProjectsController extends AbstractController {
     private EventHandler<MouseEvent> checkProjectsMouseClickEventHandler() {
         return event -> Platform.runLater(() -> {
             String projectUrl = String.format("%s%s%s/%s/default.aspx",
-                    applicationProperties.toolkitUrl(),
+                    applicationProperties.toolkitHostUrl(),
                     CASES,
                     projectIdTextField.getText(),
                     projectNameTextField.getText()
