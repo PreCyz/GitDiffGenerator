@@ -1,6 +1,11 @@
 package pg.gipter.testfx.main;
 
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.testfx.api.FxRobot;
 import pg.gipter.core.producers.command.ItemType;

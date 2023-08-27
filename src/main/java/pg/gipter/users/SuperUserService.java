@@ -2,7 +2,6 @@ package pg.gipter.users;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.model.CipherDetails;
 import pg.gipter.services.SecurityService;
 
 public class SuperUserService {
@@ -11,7 +10,6 @@ public class SuperUserService {
     protected SuperUser superUser;
 
     private static class InstanceHolder {
-
         public static final SuperUserService INSTANCE = new SuperUserService();
     }
     private SuperUserService() {
@@ -31,17 +29,11 @@ public class SuperUserService {
     }
 
     private String decryptSuper(String value) {
-        CipherDetails cipher = new CipherDetails();
-        cipher.setCipherName("PBEwithSHA1AndDESede");
-        cipher.setIterationCount(10);
-        cipher.setKeySpecValue("97742dd8-9e89-492a-a2cd-15fee66e64da");
-        cipher.setSaltValue("1689777695012");
-        return SecurityService.getInstance().decrypt(value, cipher);
+        return SecurityService.getInstance().decrypt(value, getSuperUser().getCipherDetails());
     }
 
     public String getUserName() {
         return decryptSuper(getSuperUser().getUsername());
-
     }
 
     public String getPassword() {
@@ -49,6 +41,10 @@ public class SuperUserService {
     }
 
     public boolean isCredentialsAvailable() {
+        if (superUser == null) {
+            logger.info("Credentials are not available. Trying to extract them.");
+            superUser = getSuperUser();
+        }
         return superUser != null;
     }
 }

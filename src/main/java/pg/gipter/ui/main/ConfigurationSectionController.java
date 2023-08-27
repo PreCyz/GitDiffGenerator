@@ -6,19 +6,38 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.*;
-import pg.gipter.core.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.*;
-import pg.gipter.utils.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
+import pg.gipter.ui.alerts.LogLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 class ConfigurationSectionController extends AbstractController {
 

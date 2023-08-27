@@ -1,14 +1,23 @@
 package pg.gipter.core.dao.configuration;
 
-import com.google.gson.*;
-import pg.gipter.core.model.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import pg.gipter.core.model.CipherDetails;
+import pg.gipter.core.model.Configuration;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toSet;

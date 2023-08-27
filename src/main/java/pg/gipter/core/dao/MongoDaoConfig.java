@@ -1,6 +1,9 @@
 package pg.gipter.core.dao;
 
-import com.mongodb.*;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientURI;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.codecs.Codec;
@@ -8,12 +11,17 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.core.model.CipherDetails;
 import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.Statistic;
 import pg.gipter.users.SuperUser;
 import pg.gipter.utils.CryptoUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.Properties;
@@ -58,9 +66,14 @@ public abstract class MongoDaoConfig {
             Codec<Statistic> statisticCodec = new StatisticCodec(codecRegistry);
             Codec<ExceptionDetails> exceptionDetailsCodec = new ExceptionDetailsCodec(codecRegistry);
             Codec<SuperUser> superUserCodec = new SuperUserCodec(codecRegistry);
+            Codec<CipherDetails> cipherDetailsCodec = new CipherDetailsCodec(codecRegistry);
             codecRegistry = CodecRegistries.fromRegistries(
                     MongoClient.getDefaultCodecRegistry(),
-                    CodecRegistries.fromCodecs(documentCodec, statisticCodec, exceptionDetailsCodec, superUserCodec)
+                    CodecRegistries.fromCodecs(documentCodec,
+                            statisticCodec,
+                            exceptionDetailsCodec,
+                            superUserCodec,
+                            cipherDetailsCodec)
             );
 
             String host = dbConfig.getProperty("db.host");

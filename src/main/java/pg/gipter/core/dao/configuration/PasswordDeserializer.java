@@ -1,7 +1,16 @@
 package pg.gipter.core.dao.configuration;
 
-import com.google.gson.*;
-import pg.gipter.core.model.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import pg.gipter.core.model.CipherDetails;
+import pg.gipter.core.model.Configuration;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 

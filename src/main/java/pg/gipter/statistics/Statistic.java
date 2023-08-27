@@ -6,7 +6,9 @@ import pg.gipter.ui.RunType;
 import pg.gipter.ui.UploadStatus;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Statistic implements Serializable {
 

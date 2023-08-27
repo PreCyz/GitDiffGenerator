@@ -12,7 +12,13 @@ import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.Statistic;
 import pg.gipter.utils.StringUtils;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 class StatisticRepository extends MongoDaoConfig implements StatisticDao {
 

@@ -1,15 +1,26 @@
 package pg.gipter.core.model;
 
+import org.bson.types.ObjectId;
+
 import java.nio.charset.StandardCharsets;
 
 public class CipherDetails {
 
     public static final String CIPHER_DETAILS = "cipherDetails";
 
+    private ObjectId id;
     private String cipherName;
     private int iterationCount;
     private String keySpecValue;
     private String saltValue;
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
 
     public String getCipherName() {
         return cipherName;
