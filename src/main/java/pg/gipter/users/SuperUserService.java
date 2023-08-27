@@ -11,7 +11,6 @@ public class SuperUserService {
     protected SuperUser superUser;
 
     private static class InstanceHolder {
-
         public static final SuperUserService INSTANCE = new SuperUserService();
     }
     private SuperUserService() {
@@ -41,7 +40,6 @@ public class SuperUserService {
 
     public String getUserName() {
         return decryptSuper(getSuperUser().getUsername());
-
     }
 
     public String getPassword() {
@@ -49,6 +47,10 @@ public class SuperUserService {
     }
 
     public boolean isCredentialsAvailable() {
+        if (superUser == null) {
+            logger.info("Credentials are not available. Trying to extract them.");
+            superUser = getSuperUser();
+        }
         return superUser != null;
     }
 }

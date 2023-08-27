@@ -1,7 +1,9 @@
 package pg.gipter.core.dao.command;
 
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.producers.command.VersionControlSystem;
 
 import java.util.Arrays;

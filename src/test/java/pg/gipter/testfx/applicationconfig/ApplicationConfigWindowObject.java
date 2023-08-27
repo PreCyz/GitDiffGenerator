@@ -1,6 +1,8 @@
 package pg.gipter.testfx.applicationconfig;
 
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxRobotInterface;

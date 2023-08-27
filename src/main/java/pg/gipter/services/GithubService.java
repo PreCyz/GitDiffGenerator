@@ -1,7 +1,14 @@
 package pg.gipter.services;
 
-import com.google.gson.*;
-import org.apache.http.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -10,7 +17,12 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.SystemUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;

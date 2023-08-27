@@ -3,7 +3,12 @@ package pg.gipter.ui.main;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
@@ -18,12 +23,19 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.WebViewService;
-import pg.gipter.utils.*;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 import static java.util.stream.Collectors.joining;
 

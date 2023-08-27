@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.converters.Converter;
 import pg.gipter.converters.ConverterFactory;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.ConcurrentService;
@@ -16,7 +18,10 @@ import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
 import pg.gipter.utils.SystemUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;

@@ -2,7 +2,9 @@ package pg.gipter.ui.main;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.DatePicker;
 import javafx.util.StringConverter;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.producers.command.ItemType;
@@ -16,7 +18,9 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 

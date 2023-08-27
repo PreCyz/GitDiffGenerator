@@ -11,10 +11,16 @@ import pg.gipter.ui.UploadStatus;
 import pg.gipter.utils.ResourceUtils;
 import pg.gipter.utils.SystemUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 

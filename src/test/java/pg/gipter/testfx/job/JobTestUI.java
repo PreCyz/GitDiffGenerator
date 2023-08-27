@@ -15,9 +15,13 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.dao.data.DataDaoFactory;
-import pg.gipter.jobs.*;
+import pg.gipter.jobs.JobParam;
+import pg.gipter.jobs.JobService;
+import pg.gipter.jobs.JobType;
 import pg.gipter.testfx.UITestUtils;
-import pg.gipter.ui.*;
+import pg.gipter.ui.AbstractWindow;
+import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.WindowFactory;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
@@ -26,7 +30,10 @@ import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;

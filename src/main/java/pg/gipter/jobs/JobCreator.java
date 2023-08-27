@@ -1,6 +1,10 @@
 package pg.gipter.jobs;
 
-import org.quartz.*;
+import org.quartz.JobDetail;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 
 import java.text.ParseException;
 

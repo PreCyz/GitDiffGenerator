@@ -18,9 +18,13 @@ import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.jobs.*;
+import pg.gipter.jobs.JobCreator;
+import pg.gipter.jobs.JobCreatorFactory;
+import pg.gipter.jobs.JobService;
 import pg.gipter.testfx.UITestUtils;
-import pg.gipter.ui.*;
+import pg.gipter.ui.AbstractWindow;
+import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.WindowFactory;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
@@ -30,7 +34,13 @@ import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith({ApplicationExtension.class, MockitoExtension.class})
 public class ApplicationConfigTraySupportedUI {
