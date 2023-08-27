@@ -1,7 +1,0 @@
-**Release notes:**
-
-Improvements:
-* Custom gif.
-
-Fixes:
-* Can not load main window when can't determine the vcs for none existing path - fixed.

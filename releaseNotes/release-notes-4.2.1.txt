@@ -1,7 +1,0 @@
-**Release notes:**
-
-Improvements:
-* Upgrading dependencies to the newest versions.
-
-Fixes:
-* Changing the WS url due to MFA deployment for toolkit.
