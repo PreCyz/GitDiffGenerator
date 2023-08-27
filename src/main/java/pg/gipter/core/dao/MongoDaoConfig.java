@@ -11,6 +11,7 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.core.model.CipherDetails;
 import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.Statistic;
 import pg.gipter.users.SuperUser;
@@ -65,9 +66,14 @@ public abstract class MongoDaoConfig {
             Codec<Statistic> statisticCodec = new StatisticCodec(codecRegistry);
             Codec<ExceptionDetails> exceptionDetailsCodec = new ExceptionDetailsCodec(codecRegistry);
             Codec<SuperUser> superUserCodec = new SuperUserCodec(codecRegistry);
+            Codec<CipherDetails> cipherDetailsCodec = new CipherDetailsCodec(codecRegistry);
             codecRegistry = CodecRegistries.fromRegistries(
                     MongoClient.getDefaultCodecRegistry(),
-                    CodecRegistries.fromCodecs(documentCodec, statisticCodec, exceptionDetailsCodec, superUserCodec)
+                    CodecRegistries.fromCodecs(documentCodec,
+                            statisticCodec,
+                            exceptionDetailsCodec,
+                            superUserCodec,
+                            cipherDetailsCodec)
             );
 
             String host = dbConfig.getProperty("db.host");
