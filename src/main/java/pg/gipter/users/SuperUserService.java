@@ -2,7 +2,6 @@ package pg.gipter.users;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.model.CipherDetails;
 import pg.gipter.services.SecurityService;
 
 public class SuperUserService {
@@ -30,12 +29,7 @@ public class SuperUserService {
     }
 
     private String decryptSuper(String value) {
-        CipherDetails cipher = new CipherDetails();
-        cipher.setCipherName("PBEwithSHA1AndDESede");
-        cipher.setIterationCount(10);
-        cipher.setKeySpecValue("97742dd8-9e89-492a-a2cd-15fee66e64da");
-        cipher.setSaltValue("1689777695012");
-        return SecurityService.getInstance().decrypt(value, cipher);
+        return SecurityService.getInstance().decrypt(value, getSuperUser().getCipherDetails());
     }
 
     public String getUserName() {
