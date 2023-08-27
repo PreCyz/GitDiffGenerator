@@ -1,8 +1,15 @@
 package pg.gipter.core.dao;
 
 import com.mongodb.MongoClient;
-import org.bson.*;
-import org.bson.codecs.*;
+import org.bson.BsonReader;
+import org.bson.BsonString;
+import org.bson.BsonValue;
+import org.bson.BsonWriter;
+import org.bson.Document;
+import org.bson.codecs.Codec;
+import org.bson.codecs.CollectibleCodec;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.types.ObjectId;
 import pg.gipter.statistics.Statistic;

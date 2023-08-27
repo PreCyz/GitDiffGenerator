@@ -2,7 +2,9 @@ package pg.gipter.testfx.sharepoint;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import org.testfx.api.FxRobot;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.testfx.BaseWindowObject;

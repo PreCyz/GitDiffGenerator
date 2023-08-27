@@ -7,7 +7,9 @@ import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class ApplicationConfig {
 

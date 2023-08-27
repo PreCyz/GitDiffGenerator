@@ -4,7 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.model.NamePatternValue;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;

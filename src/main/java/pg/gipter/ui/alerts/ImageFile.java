@@ -1,6 +1,9 @@
 package pg.gipter.ui.alerts;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Random;
+import java.util.Set;
 
 public enum ImageFile {
 

@@ -4,7 +4,9 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.jobs.JobParam;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toCollection;
 

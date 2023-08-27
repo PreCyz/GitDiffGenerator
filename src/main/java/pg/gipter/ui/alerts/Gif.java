@@ -3,7 +3,10 @@ package pg.gipter.ui.alerts;
 import pg.gipter.core.dao.gif.CustomGif;
 import pg.gipter.core.dao.gif.GifDao;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
