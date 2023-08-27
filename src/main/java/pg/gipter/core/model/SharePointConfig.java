@@ -23,6 +23,7 @@ public class SharePointConfig {
     private Set<String> listNames;
     private transient String fullRequestUrl;
     private String formDigest;
+    private String fedAuth;
 
     public SharePointConfig() {
         listNames = Stream.of(ArgName.toolkitProjectListNames.defaultValue()).collect(toCollection(LinkedHashSet::new));
@@ -38,17 +39,21 @@ public class SharePointConfig {
         listNames = sharePointConfig.getListNames();
         fullRequestUrl = sharePointConfig.getFullRequestUrl();
         formDigest = sharePointConfig.getFormDigest();
+        fedAuth = sharePointConfig.getFedAuth();
     }
 
     public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl) {
-        this("", username, password, domain, url, fullRequestUrl, null);
+        this("", username, password, domain, url, fullRequestUrl, null, null);
+    }
+    public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl, String fedAuth) {
+        this("", username, password, domain, url, fullRequestUrl, null, fedAuth);
     }
 
-    public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl, String formDigest) {
-        this("", username, password, domain, url, fullRequestUrl, formDigest);
+    public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl, String fedAuth, String formDigest) {
+        this("", username, password, domain, url, fullRequestUrl, formDigest, fedAuth);
     }
 
-    public SharePointConfig(String name, String username, String password, String domain, String url, String fullRequestUrl, String formDigest) {
+    public SharePointConfig(String name, String username, String password, String domain, String url, String fullRequestUrl, String formDigest, String fedAuth) {
         this.name = name;
         this.username = username;
         this.password = password;
@@ -56,6 +61,7 @@ public class SharePointConfig {
         this.url = url;
         this.fullRequestUrl = fullRequestUrl;
         this.formDigest = formDigest;
+        this.fedAuth = fedAuth;
     }
 
     public String getName() {
@@ -130,6 +136,14 @@ public class SharePointConfig {
         this.formDigest = formDigest;
     }
 
+    public String getFedAuth() {
+        return fedAuth;
+    }
+
+    public void setFedAuth(String fedAuth) {
+        this.fedAuth = fedAuth;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -142,13 +156,14 @@ public class SharePointConfig {
                 Objects.equals(getUrl(), that.getUrl()) &&
                 Objects.equals(getProject(), that.getProject()) &&
                 Objects.equals(getListNames(), that.getListNames()) &&
-                Objects.equals(getFormDigest(), that.getFormDigest());
+                Objects.equals(getFormDigest(), that.getFormDigest()) &&
+                Objects.equals(getFedAuth(), that.getFedAuth());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                getName(), getUsername(), getPassword(), getDomain(), getUrl(), getProject(), getListNames(), getFormDigest()
+                getName(), getUsername(), getPassword(), getDomain(), getUrl(), getProject(), getListNames(), getFormDigest(), getFedAuth()
         );
     }
 
@@ -163,6 +178,7 @@ public class SharePointConfig {
                 ", listName='" + getListNames() + '\'' +
                 ", fullRequestUrl='" + getFullRequestUrl() + '\'' +
                 ", getFormDigest='" + getFormDigest() + '\'' +
+                ", getFedAuth='" + getFedAuth() + '\'' +
                 '}';
     }
 }

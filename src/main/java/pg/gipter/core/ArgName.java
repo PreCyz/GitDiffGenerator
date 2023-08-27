@@ -188,6 +188,12 @@ public enum ArgName {
             return SystemUtils.userName();
         }
     },
+    toolkitSSOPassword {
+        @Override
+        public String defaultValue() {
+            return "";
+        }
+    },
     toolkitDomain {
         @Override
         public String defaultValue() {

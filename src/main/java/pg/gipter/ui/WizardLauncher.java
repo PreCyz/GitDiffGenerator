@@ -138,6 +138,7 @@ public class WizardLauncher implements Launcher {
                     ApplicationProperties applicationProperties = propertiesWithCredentials();
                     if (applicationProperties.isToolkitCredentialsSet()) {
                         wizard.getSettings().put(ArgName.toolkitUsername.name(), applicationProperties.toolkitUsername());
+                        wizard.getSettings().put(ArgName.toolkitSSOPassword.name(), applicationProperties.toolkitSSOPassword());
                     }
                 }
                 String uploadType = wizardProperties.getProperty(ArgName.itemType.name());
@@ -177,6 +178,10 @@ public class WizardLauncher implements Launcher {
         username.setText(ArgName.toolkitUsername.defaultValue());
         gridPane.add(username, 1, row++);
 
+        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.password")), 0, row);
+        PasswordField password = createPasswordField(ArgName.toolkitSSOPassword.name());
+        gridPane.add(password, 1, row);
+
         page.setHeaderText(BundleUtils.getMsg("wizard.toolkit.credentials") + " (" + step + "/6)");
         page.setContent(gridPane);
         return page;
@@ -186,14 +191,15 @@ public class WizardLauncher implements Launcher {
         properties.put(ArgName.configurationName.name(), getValue(wizard, ArgName.configurationName.name()));
         properties.put(ArgName.itemType.name(), getValue(wizard, ArgName.itemType.name()));
         properties.put(ArgName.toolkitUsername.name(), getValue(wizard, ArgName.toolkitUsername.name()).toUpperCase());
+        properties.put(ArgName.toolkitSSOPassword.name(), getValue(wizard, ArgName.toolkitSSOPassword.name()));
         properties.put(ArgName.author.name(), getValue(wizard, ArgName.author.name()));
         properties.put(ArgName.committerEmail.name(), getValue(wizard, ArgName.committerEmail.name()));
         properties.put(ArgName.itemPath.name(), getValue(wizard, ArgName.itemPath.name()));
         @SuppressWarnings("unchecked")
         LinkedHashSet<SharePointConfig> sharePointConfigs =
                 Optional.ofNullable(wizard.getSettings().get(SharePointConfig.SHARE_POINT_CONFIGS))
-                .map(value -> (LinkedHashSet<SharePointConfig>) value)
-                .orElseGet(LinkedHashSet::new);
+                        .map(value -> (LinkedHashSet<SharePointConfig>) value)
+                        .orElseGet(LinkedHashSet::new);
         if (!sharePointConfigs.isEmpty()) {
             properties.put(SharePointConfig.SHARE_POINT_CONFIGS, sharePointConfigs);
         }
@@ -208,6 +214,13 @@ public class WizardLauncher implements Launcher {
         textField.setId(id);
         GridPane.setHgrow(textField, Priority.ALWAYS);
         return textField;
+    }
+
+    private PasswordField createPasswordField(String id) {
+        PasswordField passwordField = new PasswordField();
+        passwordField.setId(id);
+        GridPane.setHgrow(passwordField, Priority.ALWAYS);
+        return passwordField;
     }
 
     private ComboBox<ItemType> createUploadTypeComboBox(String id) {

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import pg.gipter.core.*;
 import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.toolkit.sharepoint.HttpRequesterNTML;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -40,7 +41,7 @@ class GETCallTest {
                 applicationProperties.toolkitRESTUrl(),
                 url
         );
-        JsonObject jsonObject = new GETCall(sharePointConfig, applicationProperties).call();
+        JsonObject jsonObject = new GETCall(sharePointConfig, new HttpRequesterNTML(applicationProperties)).call();
 
         assertThat(jsonObject).isNotNull();
 

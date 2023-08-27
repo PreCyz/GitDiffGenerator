@@ -136,8 +136,7 @@ public class ToolkitProjectsController extends AbstractController {
                         projects.addAll(projectsTableView.getItems());
                     }
                     projects.addAll(links.stream()
-                            .map(link -> link.substring(link.indexOf(CASES)))
-                            .map(p -> new ProjectDetails(p.replace(CASES, ""), ItemType.TOOLKIT_DOCS.name(), p))
+                            .map(p -> new ProjectDetails(p, ItemType.TOOLKIT_DOCS.name(), CASES + p))
                             .collect(toList()));
                     projectsTableView.setItems(FXCollections.observableArrayList(projects));
                     saveButton.setDisable(false);

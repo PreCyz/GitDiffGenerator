@@ -8,7 +8,7 @@ import pg.gipter.core.dao.configuration.*;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
-import pg.gipter.services.SemanticVersioning;
+import pg.gipter.services.*;
 import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.StringUtils;
 
@@ -17,6 +17,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public abstract class ApplicationProperties {
@@ -57,7 +59,10 @@ public abstract class ApplicationProperties {
             logger.info("Configuration [{}] loaded.", currentRunConfig.getConfigurationName());
         } else {
             logger.warn("Can not load configuration [{}].", argExtractor.configurationName());
-            logger.info("Command line argument loaded: {}.", String.join(" ", argExtractor.getArgs()));
+            logger.info("Command line argument loaded: {}.",
+                    Stream.of(argExtractor.getArgs()).filter(arg -> !arg.startsWith(ArgName.toolkitSSOPassword.name()))
+                            .collect(Collectors.joining(" "))
+            );
         }
         logger.info("Application properties loaded: {}.", log());
     }
@@ -293,6 +298,20 @@ public abstract class ApplicationProperties {
         applicationConfig.setCustomCommands(customCommandSet);
     }
 
+    public final String toolkitUserEmail() {
+        return toolkitUsername().toLowerCase() + "@netcompany.com";
+    }
+
+    public boolean isSSOPassword() {
+        return !toolkitSSOPassword().trim().isEmpty();
+    }
+
+    public boolean hasConnectionToToolkit() {
+        CookiesService cookiesService = new CookiesService(this);
+        return cookiesService.hasValidFedAuth()
+                && new ToolkitService(this).isCookieWorking(cookiesService.getFedAuthString());
+    }
+
     protected final String log() {
         String log = "version='" + version().getVersion() + '\'';
         if (currentRunConfig != null) {
@@ -328,6 +347,7 @@ public abstract class ApplicationProperties {
         if (toolkitConfig != null) {
             log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
                     ", toolkitUsername='" + toolkitUsername() + '\'' +
+                    ", toolkitUserEmail='" + toolkitUserEmail() + '\'' +
                     ", toolkitRESTUrl='" + toolkitRESTUrl() + '\'' +
                     ", toolkitHistUrl='" + toolkitHostUrl() + '\'' +
                     ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
@@ -358,6 +378,7 @@ public abstract class ApplicationProperties {
     public abstract boolean isSkipRemote();
 
     public abstract String toolkitUsername();
+    public abstract String toolkitSSOPassword();
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
     public abstract String toolkitWSUserFolder();

@@ -1,6 +1,7 @@
 package pg.gipter.core.dao.configuration;
 
 import com.google.gson.*;
+import pg.gipter.core.ArgName;
 import pg.gipter.core.model.*;
 import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
@@ -23,9 +24,16 @@ class PasswordDeserializer implements JsonDeserializer<Configuration> {
     public Configuration deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext deserializationContext)
             throws JsonParseException {
         JsonObject configuration = jsonElement.getAsJsonObject();
+        JsonObject toolkitConfig = configuration.getAsJsonObject(ToolkitConfig.TOOLKIT_CONFIG);
         Gson gson = new Gson();
+        if (toolkitConfig != null && toolkitConfig.get(ArgName.toolkitSSOPassword.name()) != null) {
+            String password = toolkitConfig.get(ArgName.toolkitSSOPassword.name()).getAsString();
+            String decryptedPassword = decryptPassword(configuration, password);
+            toolkitConfig.addProperty(ArgName.toolkitSSOPassword.name(), decryptedPassword);
+        }
+
         JsonArray runConfigs = configuration.getAsJsonArray(RunConfig.RUN_CONFIGS);
-        if (runConfigs != null && runConfigs.size() > 0) {
+        if (runConfigs != null && !runConfigs.isEmpty()) {
             for (int rci = 0; rci < runConfigs.size(); ++rci) {
                 JsonElement runConfig = runConfigs.get(rci);
                 if (runConfig != null) {

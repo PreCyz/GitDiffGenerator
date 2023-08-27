@@ -1,7 +1,7 @@
 package pg.gipter.core.producers.processor;
 
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.toolkit.sharepoint.HttpRequester;
+import pg.gipter.toolkit.sharepoint.HttpRequesterNTML;
 
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
@@ -9,15 +9,15 @@ import java.util.concurrent.Callable;
 class DownloadFileCall implements Callable<Path> {
 
     private DownloadDetails downloadDetails;
-    private HttpRequester httpRequester;
+    private HttpRequesterNTML httpRequesterNTML;
 
     DownloadFileCall(DownloadDetails downloadDetails, ApplicationProperties applicationProperties) {
         this.downloadDetails = downloadDetails;
-        httpRequester = new HttpRequester(applicationProperties);
+        httpRequesterNTML = new HttpRequesterNTML(applicationProperties);
     }
 
     @Override
     public Path call() throws Exception {
-        return httpRequester.downloadFile(downloadDetails);
+        return httpRequesterNTML.downloadFile(downloadDetails);
     }
 }

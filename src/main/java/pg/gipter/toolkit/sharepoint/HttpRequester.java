@@ -1,223 +1,73 @@
 package pg.gipter.toolkit.sharepoint;
 
-import com.google.gson.*;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.NTCredentials;
-import org.apache.http.client.CredentialsProvider;
+import com.google.gson.JsonObject;
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.*;
-import org.apache.http.entity.*;
-import org.apache.http.impl.client.*;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.core.producers.processor.DownloadDetails;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
-public class HttpRequester {
-
-    protected final static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
-
-    private final ApplicationProperties applicationProperties;
+public class HttpRequester extends HttpRequesterBase {
 
     public HttpRequester(ApplicationProperties applicationProperties) {
-        this.applicationProperties = applicationProperties;
+        super(applicationProperties);
     }
 
-    private String replaceSpaces(String fileReference) {
-        return fileReference.replaceAll(" ", "%20");
-    }
-
+    @Override
     public JsonObject executeGET(SharePointConfig sharePointConfig) throws IOException {
         HttpGet httpget = new HttpGet(replaceSpaces(sharePointConfig.getFullRequestUrl()));
-        httpget.addHeader("accept", "application/json;odata=verbose");
+        setHeaders(sharePointConfig, httpget);
         logger.info("Executing request {}", httpget.getRequestLine());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(getCredentialsProvider(sharePointConfig))
-                .build();
+        try (CloseableHttpClient httpclient = HttpClients.custom().build();
              CloseableHttpResponse response = httpclient.execute(httpget)
         ) {
-            logger.info("Response {}", response.getStatusLine());
-            Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-            logIfError(result);
-            EntityUtils.consume(response.getEntity());
-            return result;
+            return retriveJsonObject(response);
         }
     }
 
-    private CredentialsProvider getCredentialsProvider(SharePointConfig sharePointConfig) {
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(
-                new AuthScope(AuthScope.ANY),
-                new NTCredentials(
-                        sharePointConfig.getUsername(),
-                        sharePointConfig.getPassword(),
-                        sharePointConfig.getUrl(),
-                        sharePointConfig.getDomain()
-                )
-        );
-        return credentialsProvider;
+    private void setHeaders(SharePointConfig sharePointConfig, HttpRequestBase requestBase) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HttpHeaders.ACCEPT, "application/json;odata=verbose");
+        headers.put("Cookie", sharePointConfig.getFedAuth());
+        addHeaders(requestBase, headers);
     }
 
-    public Path downloadFile(DownloadDetails downloadDetails) throws Exception {
-        HttpGet httpget = new HttpGet(replaceSpaces(downloadDetails.getDownloadLink()));
-        String callId = this.toString().substring(this.toString().lastIndexOf("@") + 1);
-        logger.info("Executing request {} {}", callId, httpget.getRequestLine());
-
-        try (CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(getCredentialsProvider(downloadDetails.getSharePointConfig()))
-                .build();
-             CloseableHttpResponse response = httpclient.execute(httpget)
-        ) {
-            logger.info("Response {} {}", callId, response.getStatusLine());
-            String downloadFilePath = applicationProperties.itemPath()
-                    .substring(0, applicationProperties.itemPath().lastIndexOf(File.separator));
-            Path downloadedPath = Paths.get(downloadFilePath, downloadDetails.getFileName());
-            Files.copy(response.getEntity().getContent(), downloadedPath);
-            EntityUtils.consume(response.getEntity());
-            return downloadedPath;
-        }
-    }
-
-    public JsonObject executePOST(
-            SharePointConfig sharePointConfig, JsonObject jsonObject, Map<String, String> requestHeaders
-    ) throws IOException {
+    public JsonObject executePOST(SharePointConfig sharePointConfig, JsonObject jsonObject, Map<String, String> headers)
+            throws IOException {
 
         HttpPost httpPost = new HttpPost(replaceSpaces(sharePointConfig.getFullRequestUrl()));
-
-        if (jsonObject != null) {
-            logger.info("Request json: {}", jsonObject);
-            httpPost.setEntity(new StringEntity(jsonObject.toString(), ContentType.APPLICATION_JSON));
-        }
-
-        if (requestHeaders != null && !requestHeaders.isEmpty()) {
-            logger.info("Request headers [{}]", requestHeaders);
-            requestHeaders.forEach(httpPost::addHeader);
-        }
-        httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
+        addStringEntity(jsonObject, httpPost);
+        headers = Optional.ofNullable(headers).orElseGet(HashMap::new);
+        headers.put("X-RequestDigest", sharePointConfig.getFormDigest());
+        setHeaders(sharePointConfig, httpPost);
+        logger.info("Request headers [{}]", headers);
 
         logger.info("Executing request {}", httpPost.getRequestLine());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(getCredentialsProvider(sharePointConfig))
-                .build();
+        try (CloseableHttpClient httpclient = HttpClients.custom().build();
              CloseableHttpResponse response = httpclient.execute(httpPost)
         ) {
             logger.info("Response {}", response.getStatusLine());
             if (response.getStatusLine().getStatusCode() != 204) {
-                Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                EntityUtils.consume(response.getEntity());
-                logIfError(result);
-                return result;
+                return retriveJsonObject(response);
             }
             return new JsonObject();
         }
     }
 
     public JsonObject executePOST(SharePointConfig sharePointConfig, JsonObject jsonObject) throws IOException {
-        Map<String, String> requestHeaders = new LinkedHashMap<>();
-        requestHeaders.put("Accept", "application/json;odata=nometadata");
-        requestHeaders.put("Content-Type", "application/json;odata=nometadata");
+        Map<String, String> requestHeaders = new HashMap<>();
+        requestHeaders.put(HttpHeaders.ACCEPT, "application/json;odata=nometadata");
+        requestHeaders.put(HttpHeaders.CONTENT_TYPE, "application/json;odata=nometadata");
         return executePOST(sharePointConfig, jsonObject, requestHeaders);
     }
 
     public JsonObject executePOST(SharePointConfig sharePointConfig, Map<String, String> requestHeaders) throws IOException {
         return executePOST(sharePointConfig, null, requestHeaders);
-    }
-
-    public JsonObject executePOST(SharePointConfig sharePointConfig, File attachment) throws IOException {
-        logger.info("Attachment: {}", attachment.getAbsolutePath());
-
-        HttpPost httpPost = new HttpPost(replaceSpaces(sharePointConfig.getFullRequestUrl()));
-        httpPost.addHeader("Accept", "application/json");
-        httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
-        httpPost.setEntity(new FileEntity(attachment, ContentType.APPLICATION_OCTET_STREAM));
-
-        logger.info("Executing request {}", httpPost.getRequestLine());
-
-        try (CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(getCredentialsProvider(sharePointConfig))
-                .build();
-
-             CloseableHttpResponse response = httpclient.execute(httpPost)
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-            EntityUtils.consume(response.getEntity());
-            logIfError(result);
-            return result;
-        }
-    }
-
-    private void logIfError(JsonObject result) {
-        if (result == null) {
-            logger.error("Could not get the response: response is null.");
-        } else {
-            JsonElement error = result.get("error");
-            if (error != null) {
-                String errorMessage = error.getAsJsonObject().get("message").getAsJsonObject().get("value").getAsString();
-                logger.error("Error when calling Sharepoint REST API: {}", errorMessage);
-            }
-        }
-    }
-
-    public String requestDigest(SharePointConfig sharePointConfig) throws IOException {
-        String fullUrl = applicationProperties.toolkitRESTUrl() + applicationProperties.toolkitCopyCase() + "/_api/contextinfo";
-        HttpPost httpPost = new HttpPost(fullUrl);
-        httpPost.addHeader("Accept", "application/json;odata=verbose");
-        httpPost.addHeader("X-ClientService-ClientTag", "SDK-JAVA");
-
-        try (CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(getCredentialsProvider(sharePointConfig))
-                .build();
-             CloseableHttpResponse response = httpclient.execute(httpPost)
-        ) {
-            Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-            EntityUtils.consume(response.getEntity());
-
-            return result.get("d").getAsJsonObject()
-                    .get("GetContextWebInformation").getAsJsonObject()
-                    .get("FormDigestValue").getAsString();
-        }
-    }
-
-    public String downloadPageSource(SharePointConfig sharePointConfig) throws IOException {
-        HttpGet httpget = new HttpGet(replaceSpaces(sharePointConfig.getFullRequestUrl()));
-        httpget.addHeader("accept", "application/json;odata=verbose");
-        logger.info("Executing request {}", httpget.getRequestLine());
-
-        try (CloseableHttpClient httpclient = HttpClients.custom()
-                .setDefaultCredentialsProvider(getCredentialsProvider(sharePointConfig))
-                .build();
-             CloseableHttpResponse response = httpclient.execute(httpget)
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            InputStreamReader inputStreamReader = new InputStreamReader(
-                    response.getEntity().getContent(), StandardCharsets.UTF_8
-            );
-            BufferedReader reader = new BufferedReader(inputStreamReader);
-
-            String line;
-            StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-            }
-            inputStreamReader.close();
-            reader.close();
-            EntityUtils.consume(response.getEntity());
-            return sb.toString();
-        }
     }
 }

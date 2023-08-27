@@ -40,6 +40,11 @@ class PasswordSerializer implements JsonSerializer<Configuration> {
         ToolkitConfig result = configuration.getToolkitConfig();
         if (configuration.getToolkitConfig() != null) {
             result = new ToolkitConfig(configuration.getToolkitConfig());
+            String password = result.getToolkitSSOPassword();
+            if (!StringUtils.nullOrEmpty(password)) {
+                String encryptedPassword = encryptPassword(configuration.getCipherDetails(), password);
+                result.setToolkitSSOPassword(encryptedPassword);
+            }
         }
         return result;
     }

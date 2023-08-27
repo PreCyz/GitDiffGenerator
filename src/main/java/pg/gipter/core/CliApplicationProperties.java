@@ -193,6 +193,15 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public String toolkitSSOPassword() {
+        String toolkitPassword = argExtractor.toolkitSSOPassword();
+        if (!containsArg(ArgName.toolkitSSOPassword.name()) && StringUtils.notEmpty(toolkitConfig.getToolkitSSOPassword())) {
+            toolkitPassword = toolkitConfig.getToolkitSSOPassword();
+        }
+        return toolkitPassword;
+    }
+
+    @Override
     public String toolkitDomain() {
         String toolkitDomain = argExtractor.toolkitDomain();
         if (!containsArg(ArgName.toolkitDomain.name()) && StringUtils.notEmpty(toolkitConfig.getToolkitDomain())) {

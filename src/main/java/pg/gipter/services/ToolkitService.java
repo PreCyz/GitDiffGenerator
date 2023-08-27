@@ -2,77 +2,68 @@ package pg.gipter.services;
 
 import com.google.gson.*;
 import javafx.concurrent.Task;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.GETCall;
-import pg.gipter.toolkit.sharepoint.HttpRequester;
+import pg.gipter.services.dto.*;
+import pg.gipter.toolkit.sharepoint.HttpRequesterNTML;
 import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** Created by Pawel Gawedzki on 26-Jul-2019. */
 public class ToolkitService extends Task<Set<String>> {
 
     protected final static Logger logger = LoggerFactory.getLogger(ToolkitService.class);
     private final ApplicationProperties applicationProperties;
-    private final HttpRequester httpRequester;
+    private final HttpRequesterNTML httpRequesterNTML;
     private final SuperUserService superUserService;
 
     public ToolkitService(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.httpRequester = new HttpRequester(applicationProperties);
+        this.httpRequesterNTML = new HttpRequesterNTML(applicationProperties);
         superUserService = SuperUserService.getInstance();
     }
 
     @Override
     protected Set<String> call() {
-        String divIdSelector = "div#MSOZoneCell_WebPartWPQ2";
-        String aHrefSelector = "a[href^=" + applicationProperties.toolkitRESTUrl() + "]";
-        Set<String> result = new LinkedHashSet<>();
-        try {
-            updateMessage(BundleUtils.getMsg("toolkit.projects.downloading"));
-            SharePointConfig sharePointConfig = new SharePointConfig(
-                    superUserService.getUserName(),
-                    superUserService.getPassword(),
-                    applicationProperties.toolkitDomain(),
-                    applicationProperties.toolkitRESTUrl(),
-                    applicationProperties.toolkitRESTUrl() + "/toolkit/default.aspx"
-            );
+        return getAvailableCases();
+    }
 
-            String html = httpRequester.downloadPageSource(sharePointConfig);
-            if (!StringUtils.notEmpty(html)) {
-                throw new IOException("Downloaded source page is empty.");
-            }
-            Document document = Jsoup.parse(html);
-            Element divWithId = document.selectFirst(divIdSelector);
-            if (divWithId == null) {
-                throw new IOException(String.format("Downloaded source page does not contain element [%s].", divIdSelector));
-            }
-            Elements aElements = divWithId.select(aHrefSelector);
-            if (aElements == null) {
-                throw new IOException(String.format("Downloaded source page does not contain element [%s].", aHrefSelector));
-            }
-            for (Element a : aElements) {
-                result.add(a.attr("href"));
-            }
-            logger.info("For user [{}] following projects were downloaded: [{}].", applicationProperties.toolkitUsername(), result);
-            updateMessage(BundleUtils.getMsg("toolkit.projects.downloaded"));
+    private Set<String> getAvailableCases() {
+        CookiesService cookiesService = new CookiesService(applicationProperties);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
+        headers.put("Cookie", cookiesService.getFedAuthString());
+        String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
+        Set<String> cases = new HashSet<>();
+        try {
+            ToolkitCasePayload payload = new ToolkitCasePayload(
+                    new SortFieldDefinition("ows_Created", "datetime"),
+                    List.of(
+                            new ItemField("title", "", "ows_Title"),
+                            new ItemField("id", "", "CaseID"),
+                            new ItemField("created", "", "ows_Created")
+                    ),
+                    false
+            );
+            ToolkitCaseResponse response = httpRequesterNTML.post(url, headers, payload, ToolkitCaseResponse.class);
+            cases = response.cases.stream().map(it -> it.id).collect(Collectors.toSet());
         } catch (IOException ex) {
             updateMessage(BundleUtils.getMsg("toolkit.projects.downloadFail"));
             logger.error("Could not download toolkit projects for user [{}]. ", applicationProperties.toolkitUsername(), ex);
         } finally {
             updateProgress(1, 1);
         }
-        return result;
+        return cases;
     }
 
     public Set<String> downloadUserProjects() {
@@ -108,7 +99,7 @@ public class ToolkitService extends Task<Set<String>> {
         );
 
         try {
-            JsonObject jsonObject = new GETCall(sharePointConfig, applicationProperties).call();
+            JsonObject jsonObject = new GETCall(sharePointConfig, new HttpRequesterNTML(applicationProperties)).call();
             if (jsonObject == null) {
                 throw new IllegalArgumentException("Null response from toolkit.");
             }
@@ -117,7 +108,7 @@ public class ToolkitService extends Task<Set<String>> {
                 throw new IllegalArgumentException("Can not handle the response from toolkit.");
             }
             JsonArray results = dElement.getAsJsonArray("results");
-            if (results == null || results.size() == 0) {
+            if (results == null || results.isEmpty()) {
                 throw new IllegalArgumentException("Can not handle the response from toolkit. Array is empty.");
             }
             JsonObject firstElement = results.get(0).getAsJsonObject();
@@ -154,7 +145,7 @@ public class ToolkitService extends Task<Set<String>> {
                 url
         );
         try {
-            result = new GETCall(sharePointConfig, applicationProperties).call() != null;
+            result = new GETCall(sharePointConfig, new HttpRequesterNTML(applicationProperties)).call() != null;
         } catch (Exception ex) {
             logger.error("Toolkit credentials are not valid. {}", ex.getMessage());
             result = false;
@@ -163,4 +154,30 @@ public class ToolkitService extends Task<Set<String>> {
         return result;
     }
 
+    public boolean isCookieWorking(String fedAuthString) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
+        headers.put("Cookie", fedAuthString);
+        String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
+        ToolkitCasePayload payload = new ToolkitCasePayload(
+                new SortFieldDefinition("ows_Created", "datetime"),
+                List.of(
+                        new ItemField("title", "", "ows_Title"),
+                        new ItemField("id", "", "CaseID"),
+                        new ItemField("created", "", "ows_Created")
+                ),
+                false
+        );
+        try {
+            int statusCode = httpRequesterNTML.postForStatusCode(url, headers, payload);
+            return Stream.of(HttpStatus.SC_FORBIDDEN, HttpStatus.SC_UNAUTHORIZED, HttpStatus.SC_INTERNAL_SERVER_ERROR)
+                    .noneMatch(sc -> sc == statusCode);
+        } catch (IOException ex) {
+            updateMessage(BundleUtils.getMsg("toolkit.projects.downloadFail"));
+            logger.error("Could not download toolkit projects for user [{}]. ", applicationProperties.toolkitUsername(), ex);
+        } finally {
+            updateProgress(1, 1);
+        }
+        return false;
+    }
 }

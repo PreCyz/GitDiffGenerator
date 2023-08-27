@@ -8,7 +8,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SmartZipService;
-import pg.gipter.toolkit.sharepoint.HttpRequester;
+import pg.gipter.toolkit.sharepoint.HttpRequesterNTML;
 import pg.gipter.users.SuperUserService;
 
 import java.io.IOException;
@@ -24,13 +24,13 @@ public class SharePointRestClient {
     private static final Logger logger = LoggerFactory.getLogger(SharePointRestClient.class);
 
     private final ApplicationProperties applicationProperties;
-    private final HttpRequester httpRequester;
+    private final HttpRequesterNTML httpRequesterNTML;
     private final SuperUserService superUserService;
     private String formDigest;
 
     public SharePointRestClient(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        httpRequester = new HttpRequester(applicationProperties);
+        httpRequesterNTML = new HttpRequesterNTML(applicationProperties);
         superUserService = SuperUserService.getInstance();
     }
 
@@ -45,8 +45,8 @@ public class SharePointRestClient {
                     null
             );
 
-            formDigest = httpRequester.requestDigest(sharePointConfig);
-            logger.info("Form digest: [{}]", formDigest);
+            formDigest = httpRequesterNTML.requestDigest(sharePointConfig);
+            logger.debug("Form digest: [{}]", formDigest);
         }
         return formDigest;
     }
@@ -66,7 +66,7 @@ public class SharePointRestClient {
                 getFormDigest()
         );
 
-        JsonObject item = httpRequester.executePOST(sharePointConfig, createItemJson());
+        JsonObject item = httpRequesterNTML.executePOST(sharePointConfig, createItemJson());
 
         String itemId = "";
         JsonArray value = item.get("value").getAsJsonArray();
@@ -168,7 +168,7 @@ public class SharePointRestClient {
                 getFormDigest()
         );
 
-        JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, path.toFile());
+        JsonObject jsonObject = httpRequesterNTML.executePOST(sharePointConfig, path.toFile());
 
         if (jsonObject.has("odata.error")) {
             String errMsg = jsonObject.get("odata.error").getAsJsonObject()
@@ -194,7 +194,7 @@ public class SharePointRestClient {
             String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
                     applicationProperties.toolkitRESTUrl(),
                     applicationProperties.toolkitCopyCase(),
-                    applicationProperties.toolkitUsername() + "@netcompany.com"
+                    applicationProperties.toolkitUserEmail()
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
                     superUserService.getUserName(),
@@ -205,7 +205,7 @@ public class SharePointRestClient {
                     getFormDigest()
             );
 
-            JsonObject jsonObject = httpRequester.executeGET(sharePointConfig);
+            JsonObject jsonObject = httpRequesterNTML.executeGET(sharePointConfig);
             if (jsonObject != null && jsonObject.has("d")) {
                 String userId = jsonObject.get("d").getAsJsonObject().get("Id").getAsString();
                 logger.info("UserId got from toolkit: {}", userId);
@@ -241,7 +241,7 @@ public class SharePointRestClient {
         requestHeaders.put("If-Match", "*");
         requestHeaders.put("X-HTTP-Method", "MERGE");
 
-        JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, payload, requestHeaders);
+        JsonObject jsonObject = httpRequesterNTML.executePOST(sharePointConfig, payload, requestHeaders);
         if (jsonObject.has("odata.error")) {
             String errMsg = jsonObject.get("odata.error").getAsJsonObject()
                     .get("message").getAsJsonObject()
@@ -274,7 +274,7 @@ public class SharePointRestClient {
             requestHeaders.put("Accept", "application/json;odata=verbose");
             requestHeaders.put("If-Match", "*");
             requestHeaders.put("X-HTTP-Method", "DELETE");
-            httpRequester.executePOST(sharePointConfig, requestHeaders);
+            httpRequesterNTML.executePOST(sharePointConfig, requestHeaders);
             logger.info("Cleanup done.");
         } catch (IOException ex) {
             logger.error("Problems with cleaning up.", ex);

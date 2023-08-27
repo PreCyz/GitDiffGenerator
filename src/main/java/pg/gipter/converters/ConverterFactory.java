@@ -15,7 +15,8 @@ public final class ConverterFactory {
                 new ItemTypeConverter(),
                 new SecurityConverter(),
                 new ProgramDataConverter(),
-                new CustomCommandConverter(applicationProperties)
+                new CustomCommandConverter(applicationProperties),
+                new SSOPasswordConverter()
         ).collect(Collectors.toList());
     }
 }

@@ -154,6 +154,13 @@ final class ArgExtractor {
         return ArgName.toolkitUsername.defaultValue();
     }
 
+    String toolkitSSOPassword() {
+        if (containsArg(ArgName.toolkitSSOPassword.name())) {
+            return getValue(ArgName.toolkitSSOPassword, ArgName.toolkitSSOPassword.defaultValue());
+        }
+        return ArgName.toolkitSSOPassword.defaultValue();
+    }
+
     String toolkitDomain() {
         return ArgName.toolkitDomain.defaultValue();
     }
