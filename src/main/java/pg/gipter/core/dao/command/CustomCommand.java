@@ -6,7 +6,13 @@ import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.utils.StringUtils;
 
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class CustomCommand {

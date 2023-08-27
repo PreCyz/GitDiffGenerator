@@ -2,7 +2,9 @@ package pg.gipter.core.producers;
 
 import pg.gipter.core.ApplicationProperties;
 
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 class StatementDiffProducer extends AbstractDiffProducer {

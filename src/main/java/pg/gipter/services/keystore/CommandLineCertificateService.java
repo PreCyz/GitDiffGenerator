@@ -2,8 +2,15 @@ package pg.gipter.services.keystore;
 
 import pg.gipter.utils.StringUtils;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 class CommandLineCertificateService extends AbstractCertificateService {
 

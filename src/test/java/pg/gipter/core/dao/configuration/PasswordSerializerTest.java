@@ -3,7 +3,11 @@ package pg.gipter.core.dao.configuration;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import org.junit.jupiter.api.Test;
-import pg.gipter.core.model.*;
+import pg.gipter.core.model.Configuration;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.RunConfigBuilder;
+import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 
 import java.util.Collections;

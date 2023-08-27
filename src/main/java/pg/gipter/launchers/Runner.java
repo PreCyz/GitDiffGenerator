@@ -11,7 +11,10 @@ import pg.gipter.core.producers.DiffProducer;
 import pg.gipter.core.producers.DiffProducerFactory;
 import pg.gipter.toolkit.DiffUploader;
 import pg.gipter.ui.UploadStatus;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.BrowserLinkAction;
+import pg.gipter.ui.alerts.LogLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 
 class Runner implements Starter {

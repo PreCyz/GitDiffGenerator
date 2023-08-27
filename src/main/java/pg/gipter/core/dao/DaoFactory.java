@@ -1,6 +1,9 @@
 package pg.gipter.core.dao;
 
-import pg.gipter.core.dao.configuration.*;
+import pg.gipter.core.dao.configuration.CachedConfiguration;
+import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
+import pg.gipter.core.dao.configuration.SecurityProvider;
+import pg.gipter.core.dao.configuration.SecurityProviderFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.DataDaoFactory;
 import pg.gipter.statistics.dao.StatisticDao;
