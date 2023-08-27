@@ -1,0 +1,6 @@
+**Release notes:**
+
+Improvements:
+* Improving security.
+Fixes:
+* Fixing the job.
