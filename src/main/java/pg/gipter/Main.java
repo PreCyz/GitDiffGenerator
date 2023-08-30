@@ -37,6 +37,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         logger.info("Gipter started.");
+        initProgramSettings(args);
         Main mObj = new Main(args);
         mObj.setLoggerLevel(applicationProperties.loggerLevel());
         logger.info("Java version '{}'.", SystemUtils.javaVersion());
@@ -49,6 +50,14 @@ public class Main extends Application {
         } else {
             Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
             launcher.execute();
+        }
+    }
+
+    private static void initProgramSettings(String[] args) {
+        if (args != null && Arrays.asList(args).contains("env=dev")) {
+            ProgramSettings.initProgramSettings(Environment.DEV);
+        } else {
+            ProgramSettings.initProgramSettings(Environment.PROD);
         }
     }
 
