@@ -288,6 +288,13 @@ final class ArgExtractor {
         return ArgName.uiLanguage.defaultValue();
     }
 
+    String githubToken() {
+        if (containsArg(ArgName.githubToken.name())) {
+            return getValue(ArgName.githubToken, ArgName.githubToken.defaultValue());
+        }
+        return ArgName.githubToken.defaultValue();
+    }
+
     boolean isCheckLastItemEnabled() {
         if (containsArg(ArgName.checkLastItem.name())) {
             return StringUtils.getBoolean(getValue(ArgName.checkLastItem, ArgName.checkLastItem.defaultValue()));

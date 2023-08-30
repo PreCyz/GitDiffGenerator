@@ -11,6 +11,7 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.core.config.GeneralSettings;
 import pg.gipter.core.model.CipherDetails;
 import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.Statistic;
@@ -67,13 +68,15 @@ public abstract class MongoDaoConfig {
             Codec<ExceptionDetails> exceptionDetailsCodec = new ExceptionDetailsCodec(codecRegistry);
             Codec<SuperUser> superUserCodec = new SuperUserCodec(codecRegistry);
             Codec<CipherDetails> cipherDetailsCodec = new CipherDetailsCodec(codecRegistry);
+            Codec<GeneralSettings> generalSettingsCodec = new GeneralSettingsCodec(codecRegistry);
             codecRegistry = CodecRegistries.fromRegistries(
                     MongoClient.getDefaultCodecRegistry(),
                     CodecRegistries.fromCodecs(documentCodec,
                             statisticCodec,
                             exceptionDetailsCodec,
                             superUserCodec,
-                            cipherDetailsCodec)
+                            cipherDetailsCodec,
+                            generalSettingsCodec)
             );
 
             String host = dbConfig.getProperty("db.host");
@@ -93,7 +96,7 @@ public abstract class MongoDaoConfig {
 
             logger.info("Connection to the database established. [host: {}, databaseName: {}]", host, databaseName);
         } catch (Exception ex) {
-            logger.error("Can not establish connection to the database.");
+            logger.error("Can not establish connection to the database.", ex);
             statisticsAvailable = false;
         }
     }

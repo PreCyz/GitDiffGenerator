@@ -1077,4 +1077,41 @@ class FilePreferredApplicationPropertiesTest {
 
         assertThat(actual).isEqualTo(2);
     }
+
+    @Test
+    void givenEmptyGithubToken_whenGithubToken_thenReturnDefault() {
+        String[] args = {""};
+        appProps = new FileApplicationProperties(args);
+        appProps.init(TestUtils.mockConfigurationDao(new ApplicationConfig()));
+
+        String actual = appProps.githubToken();
+
+        assertThat(actual).isEqualTo(ArgName.githubToken.defaultValue());
+    }
+
+    @Test
+    void given_GithubTokenFromCliAndFile_when_githubToken_then_returnItFromFile() {
+        String[] args = {"githubToken=cli"};
+        appProps = new FileApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = appProps.githubToken();
+
+        assertThat(actual).isEqualTo("file");
+    }
+
+    @Test
+    void given_GithubTokenFromFile_when_githubToken_then_returnIt() {
+        String[] args = {""};
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        appProps = new FileApplicationProperties(args);
+        appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = appProps.githubToken();
+
+        assertThat(actual).isEqualTo("file");
+    }
 }

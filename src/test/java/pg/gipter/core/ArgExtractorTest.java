@@ -266,7 +266,7 @@ class ArgExtractorTest {
         try {
             argExtractor.startDate();
             fail("Should be NumberFormatException: For input string: 2018/10/14");
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             assertThat(ex).isInstanceOf(NumberFormatException.class);
         }
     }
@@ -656,5 +656,23 @@ class ArgExtractorTest {
         boolean actual = argExtractor.isFetchAll();
 
         assertThat(actual).isTrue();
+    }
+
+    @Test
+    void whenGithubToken_thenReturnDefault() {
+        argExtractor = new ArgExtractor(new String[]{});
+
+        String actual = argExtractor.githubToken();
+
+        assertThat(actual).isEqualTo("dada");
+    }
+
+    @Test
+    void givenGithubToken_whenGithubToken_thenReturnGiven() {
+        argExtractor = new ArgExtractor(new String[]{"githubToken=1"});
+
+        String actual = argExtractor.githubToken();
+
+        assertThat(actual).isEqualTo("1");
     }
 }

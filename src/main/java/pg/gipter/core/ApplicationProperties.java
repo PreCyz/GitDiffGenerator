@@ -339,7 +339,8 @@ public abstract class ApplicationProperties {
                     ", checkLastItemEnabled='" + isCheckLastItemEnabled() + '\'' +
                     ", uploadItem='" + isUploadItem() + '\'' +
                     ", smartZip='" + isSmartZip() + '\'' +
-                    ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
+                    ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'' +
+                    ", githubToken='" + Optional.of(githubToken()).map(it -> "***").orElseGet(() -> "N/A") + '\'';
         }
         if (toolkitConfig != null) {
             log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
@@ -393,6 +394,7 @@ public abstract class ApplicationProperties {
     public abstract int fetchTimeout();
     public abstract boolean isUploadItem();
     public abstract boolean isSmartZip();
+    public abstract String githubToken();
 
     public abstract boolean isUpgradeFinished();
 }

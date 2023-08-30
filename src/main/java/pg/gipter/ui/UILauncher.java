@@ -167,7 +167,7 @@ public class UILauncher implements Launcher {
     private void checkUpgrades() {
         if (!upgradeChecked) {
             executor.execute(() -> {
-                GithubService service = new GithubService(applicationProperties.version());
+                GithubService service = new GithubService(applicationProperties.version(), applicationProperties.githubToken());
                 if (service.isNewVersion()) {
                     logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
