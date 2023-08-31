@@ -2,7 +2,9 @@ package pg.gipter.testfx.main;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.testfx.api.FxRobot;
@@ -19,7 +21,9 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.vcs.VcsService;
 import pg.gipter.testfx.UITestUtils;
-import pg.gipter.ui.*;
+import pg.gipter.ui.AbstractWindow;
+import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.WindowFactory;
 import pg.gipter.ui.main.MainController;
 import pg.gipter.utils.StringUtils;
 

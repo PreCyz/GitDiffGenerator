@@ -2,6 +2,7 @@ package pg.gipter.core.producers.processor;
 
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.toolkit.sharepoint.HttpRequester;
 import pg.gipter.toolkit.sharepoint.HttpRequesterNTML;
 import pg.gipter.users.SuperUserService;
 

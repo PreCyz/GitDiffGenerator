@@ -18,7 +18,9 @@ import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.testfx.UITestUtils;
-import pg.gipter.ui.*;
+import pg.gipter.ui.AbstractWindow;
+import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.WindowFactory;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;

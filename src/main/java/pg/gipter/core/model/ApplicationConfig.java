@@ -7,7 +7,10 @@ import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public class ApplicationConfig {
 
@@ -26,6 +29,7 @@ public class ApplicationConfig {
     private Set<CustomCommand> customCommands;
     private Boolean uploadItem;
     private Boolean smartZip;
+    private String githubToken;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -41,6 +45,7 @@ public class ApplicationConfig {
         checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
         uploadItem = StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
         smartZip = StringUtils.getBoolean(ArgName.smartZip.defaultValue());
+        githubToken = ArgName.githubToken.defaultValue();
     }
 
     public Boolean getConfirmationWindow() {
@@ -163,6 +168,14 @@ public class ApplicationConfig {
         this.smartZip = smartZip;
     }
 
+    public String getGithubToken() {
+        return githubToken;
+    }
+
+    public void setGithubToken(String githubToken) {
+        this.githubToken = githubToken;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -204,6 +217,9 @@ public class ApplicationConfig {
         if (getSmartZip() != null) {
             arguments.add(ArgName.smartZip.name() + "=" + getSmartZip());
         }
+        if (getGithubToken() != null) {
+            arguments.add(ArgName.githubToken.name() + "=" + getGithubToken());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -240,6 +256,8 @@ public class ApplicationConfig {
                     applicationConfig.setUploadItem(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.smartZip.name().equals(argumentName)) {
                     applicationConfig.setSmartZip(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.githubToken.name().equals(argumentName)) {
+                    applicationConfig.setGithubToken(argumentValue);
                 }
             }
         }
@@ -262,6 +280,7 @@ public class ApplicationConfig {
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
                 ", uploadItem=" + uploadItem +
                 ", smartZip=" + smartZip +
+                ", githubToken=" + Optional.of(githubToken).map(it -> "***").orElseGet(() -> "N/A") +
                 '}';
     }
 }

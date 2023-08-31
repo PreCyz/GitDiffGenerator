@@ -181,7 +181,12 @@ public enum ArgName {
             return BundleUtils.getDefaultLanguage();
         }
     },
-
+    githubToken {
+        @Override
+        public String defaultValue() {
+            return "dada";
+        }
+    },
     toolkitUsername {
         @Override
         public String defaultValue() {

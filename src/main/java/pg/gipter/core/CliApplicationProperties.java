@@ -1,5 +1,6 @@
 package pg.gipter.core;
 
+import pg.gipter.core.config.service.GeneralSettingsService;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -7,6 +8,7 @@ import pg.gipter.utils.StringUtils;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -291,6 +293,19 @@ class CliApplicationProperties extends ApplicationProperties {
             loggerLevel = applicationConfig.getLoggingLevel().toString();
         }
         return loggerLevel;
+    }
+
+    @Override
+    public String githubToken() {
+        Optional<String> gt = GeneralSettingsService.getInstance().getGithubToken();
+        if (gt.isPresent()) {
+            return gt.get();
+        }
+        String githubToken = argExtractor.githubToken();
+        if (!containsArg(ArgName.githubToken.name()) && applicationConfig.getGithubToken() != null) {
+            githubToken = applicationConfig.getGithubToken();
+        }
+        return githubToken;
     }
 
     @Override

@@ -6,9 +6,14 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.PreferredArgSource;
 import pg.gipter.services.GithubService;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.BrowserLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDateTime;
@@ -23,7 +28,8 @@ public class UpgradeJob implements Job {
 
     UpgradeJob() {
         String[] args = {ArgName.preferredArgSource + "=" + PreferredArgSource.UI};
-        githubService = new GithubService(ApplicationPropertiesFactory.getInstance(args).version());
+        ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(args);
+        githubService = new GithubService(properties.version(), properties.githubToken());
     }
 
     @Override

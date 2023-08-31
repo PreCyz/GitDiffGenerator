@@ -4,7 +4,10 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -290,6 +293,13 @@ final class ArgExtractor {
             return getValue(ArgName.uiLanguage, ArgName.uiLanguage.defaultValue());
         }
         return ArgName.uiLanguage.defaultValue();
+    }
+
+    String githubToken() {
+        if (containsArg(ArgName.githubToken.name())) {
+            return getValue(ArgName.githubToken, ArgName.githubToken.defaultValue());
+        }
+        return ArgName.githubToken.defaultValue();
     }
 
     boolean isCheckLastItemEnabled() {

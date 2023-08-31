@@ -1,18 +1,31 @@
 package pg.gipter.core.producers.processor;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.toolkit.dto.*;
+import pg.gipter.toolkit.dto.DocumentDetails;
+import pg.gipter.toolkit.dto.DocumentDetailsBuilder;
+import pg.gipter.toolkit.dto.User;
+import pg.gipter.toolkit.dto.VersionDetails;
 import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toCollection;
 

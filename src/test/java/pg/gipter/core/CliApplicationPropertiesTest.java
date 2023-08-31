@@ -6,7 +6,11 @@ import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.model.*;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.model.NamePatternValue;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.RunConfigBuilder;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SemanticVersioning;
 import pg.gipter.utils.SystemUtils;
@@ -17,7 +21,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -2163,5 +2169,62 @@ class CliApplicationPropertiesTest {
         boolean actual = applicationProperties.isUploadItem();
 
         assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_noGithubToken_when_githubToken_then_returnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.githubToken();
+
+        assertThat(actual).isEqualTo(ArgName.githubToken.defaultValue());
+    }
+
+    @Test
+    void given_githubTokenFromCLI_when_githubToken_then_returnCliGithubToken() {
+        applicationProperties = new CliApplicationProperties(new String[]{"githubToken=1"});
+
+        String actual = applicationProperties.githubToken();
+
+        assertThat(actual).isEqualTo("1");
+    }
+
+    @Test
+    void given_githubTokenFileAndCLI_when_githubToken_then_returnCliGithubToken() {
+        String[] args = {"githubToken=cli"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = applicationProperties.githubToken();
+
+        assertThat(actual).isEqualTo("cli");
+    }
+
+    @Test
+    void given_githubTokenFromProperties_when_githubToken_then_returnGithubTokenFromProperties() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = applicationProperties.githubToken();
+
+        assertThat(actual).isEqualTo("file");
+    }
+
+    @Test
+    void given_githubTokenFromPropertiesAndOtherArgs_when_githubToken_then_returnGithubTokenFromProperties() {
+        String[] args = {"author=test"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = applicationProperties.githubToken();
+
+        assertThat(actual).isEqualTo("file");
     }
 }

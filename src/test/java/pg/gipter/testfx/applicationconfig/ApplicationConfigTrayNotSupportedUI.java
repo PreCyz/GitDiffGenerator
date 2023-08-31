@@ -15,7 +15,9 @@ import pg.gipter.core.ArgName;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.testfx.UITestUtils;
-import pg.gipter.ui.*;
+import pg.gipter.ui.AbstractWindow;
+import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.WindowFactory;
 import pg.gipter.utils.StringUtils;
 
 import java.io.IOException;

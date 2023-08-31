@@ -9,10 +9,17 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.LogLinkAction;
-import pg.gipter.utils.*;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.JarHelper;
+import pg.gipter.utils.SystemUtils;
 
-import java.io.*;
-import java.nio.file.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,9 +31,9 @@ public class UpgradeService extends TaskService<Void> {
 
     private final GithubService githubService;
 
-    public UpgradeService(SemanticVersioning currentVersion) {
+    public UpgradeService(SemanticVersioning currentVersion, String githubToken) {
         super();
-        githubService = new GithubService(currentVersion);
+        githubService = new GithubService(currentVersion, githubToken);
     }
 
     void upgradeAndRestartApplication() {
