@@ -6,7 +6,6 @@ import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.CookiesService;
 import pg.gipter.toolkit.dto.DocumentDetails;
-import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Path;
@@ -22,7 +21,7 @@ import static java.util.stream.Collectors.toSet;
 
 class ToolkitDocumentFinder extends AbstractDocumentFinder {
 
-    private CookiesService cookiesService;
+    private final CookiesService cookiesService;
 
     ToolkitDocumentFinder(ApplicationProperties applicationProperties) {
         super(applicationProperties);
@@ -63,11 +62,8 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
                 SharePointConfig sharePointConfig = new SharePointConfig();
                 sharePointConfig.setFullRequestUrl(fullUrl);;
                 sharePointConfig.setProject(project);
-                sharePointConfig.setUrl(applicationProperties.toolkitRESTUrl());
-                sharePointConfig.setDomain(applicationProperties.toolkitDomain());
+                sharePointConfig.setUrl(applicationProperties.toolkitWSUrl());
                 sharePointConfig.setListNames(Stream.of(listTitle).collect(toSet()));
-                sharePointConfig.setUsername(SuperUserService.getInstance().getUserName());
-                sharePointConfig.setPassword(SuperUserService.getInstance().getPassword());
                 sharePointConfig.setFedAuth(cookiesService.getFedAuthString());
                 result.add(sharePointConfig);
             }

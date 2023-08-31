@@ -16,14 +16,11 @@ import pg.gipter.services.dto.SortFieldDefinition;
 import pg.gipter.services.dto.ToolkitCasePayload;
 import pg.gipter.services.dto.ToolkitCaseResponse;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
-import pg.gipter.toolkit.sharepoint.HttpRequesterNTML;
-import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.BundleUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,13 +33,11 @@ public class ToolkitService extends Task<Set<String>> {
 
     protected final static Logger logger = LoggerFactory.getLogger(ToolkitService.class);
     private final ApplicationProperties applicationProperties;
-    private final HttpRequesterNTML httpRequesterNTML;
-    private final SuperUserService superUserService;
+    private final HttpRequester httpRequester;
 
     public ToolkitService(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.httpRequesterNTML = new HttpRequesterNTML(applicationProperties);
-        superUserService = SuperUserService.getInstance();
+        this.httpRequester = new HttpRequester(applicationProperties);
     }
 
     @Override
@@ -67,7 +62,7 @@ public class ToolkitService extends Task<Set<String>> {
                     ),
                     false
             );
-            ToolkitCaseResponse response = httpRequesterNTML.post(url, headers, payload, ToolkitCaseResponse.class);
+            ToolkitCaseResponse response = httpRequester.post(url, headers, payload, ToolkitCaseResponse.class);
             cases = response.cases.stream().map(it -> it.id).collect(Collectors.toSet());
         } catch (IOException ex) {
             updateMessage(BundleUtils.getMsg("toolkit.projects.downloadFail"));
@@ -93,8 +88,8 @@ public class ToolkitService extends Task<Set<String>> {
         String filter = String.format("$filter=EmployeeId+eq+%s", userId);
         String orderBy = "$orderby=Modified+desc";
         String top = "$top=1";
-        String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s&%s",
-                applicationProperties.toolkitRESTUrl(),
+        String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s&%s",
+                applicationProperties.toolkitWSUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 select,
@@ -103,15 +98,13 @@ public class ToolkitService extends Task<Set<String>> {
                 top
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                superUserService.getUserName(),
-                superUserService.getPassword(),
-                applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitRESTUrl(),
-                url
+                applicationProperties.toolkitWSUrl(),
+                fullUrl,
+                new CookiesService(applicationProperties).getFedAuthString()
         );
 
         try {
-            JsonObject jsonObject = new GETCall(sharePointConfig, new HttpRequesterNTML(applicationProperties)).call();
+            JsonObject jsonObject = new GETCall(sharePointConfig, new HttpRequester(applicationProperties)).call();
             if (jsonObject == null) {
                 throw new IllegalArgumentException("Null response from toolkit.");
             }
@@ -135,37 +128,6 @@ public class ToolkitService extends Task<Set<String>> {
         return modifiedDate;
     }
 
-    public boolean hasProperCredentials() {
-        boolean result = true;
-        String select = "$select=Body,SubmissionDate,GUID,Title";
-        String orderBy = "$orderby=SubmissionDate+desc";
-        String top = "$top=1";
-        String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
-                applicationProperties.toolkitRESTUrl(),
-                applicationProperties.toolkitCopyCase(),
-                applicationProperties.toolkitCopyListName(),
-                select,
-                orderBy,
-                top
-        );
-
-        SharePointConfig sharePointConfig = new SharePointConfig(
-                superUserService.getUserName(),
-                superUserService.getPassword(),
-                applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitRESTUrl(),
-                url
-        );
-        try {
-            result = new GETCall(sharePointConfig, new HttpRequesterNTML(applicationProperties)).call() != null;
-        } catch (Exception ex) {
-            logger.error("Toolkit credentials are not valid. {}", ex.getMessage());
-            result = false;
-        }
-
-        return result;
-    }
-
     public boolean isCookieWorking(String fedAuthString) {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
@@ -181,7 +143,7 @@ public class ToolkitService extends Task<Set<String>> {
                 false
         );
         try {
-            int statusCode = httpRequesterNTML.postForStatusCode(url, headers, payload);
+            int statusCode = httpRequester.postForStatusCode(url, headers, payload);
             return Stream.of(HttpStatus.SC_FORBIDDEN, HttpStatus.SC_UNAUTHORIZED, HttpStatus.SC_INTERNAL_SERVER_ERROR)
                     .noneMatch(sc -> sc == statusCode);
         } catch (IOException ex) {

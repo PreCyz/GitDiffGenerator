@@ -7,12 +7,10 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import pg.gipter.core.ArgName;
 import pg.gipter.core.model.CipherDetails;
 import pg.gipter.core.model.Configuration;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.services.SecurityService;
 import pg.gipter.utils.CryptoUtils;
 
@@ -34,13 +32,7 @@ class PasswordDeserializer implements JsonDeserializer<Configuration> {
     public Configuration deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext deserializationContext)
             throws JsonParseException {
         JsonObject configuration = jsonElement.getAsJsonObject();
-        JsonObject toolkitConfig = configuration.getAsJsonObject(ToolkitConfig.TOOLKIT_CONFIG);
         Gson gson = new Gson();
-        if (toolkitConfig != null && toolkitConfig.get(ArgName.toolkitSSOPassword.name()) != null) {
-            String password = toolkitConfig.get(ArgName.toolkitSSOPassword.name()).getAsString();
-            String decryptedPassword = decryptPassword(configuration, password);
-            toolkitConfig.addProperty(ArgName.toolkitSSOPassword.name(), decryptedPassword);
-        }
 
         JsonArray runConfigs = configuration.getAsJsonArray(RunConfig.RUN_CONFIGS);
         if (runConfigs != null && !runConfigs.isEmpty()) {

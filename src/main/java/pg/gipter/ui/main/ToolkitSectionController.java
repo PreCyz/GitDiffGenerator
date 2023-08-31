@@ -3,9 +3,9 @@ package pg.gipter.ui.main;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Control;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -18,6 +18,9 @@ import pg.gipter.services.FXWebService;
 import pg.gipter.services.ToolkitService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
+import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
 import java.util.List;
@@ -31,7 +34,6 @@ import static java.util.stream.Collectors.toList;
 class ToolkitSectionController extends AbstractController {
 
     private TextField toolkitUsernameTextField;
-    private PasswordField toolkitPasswordField;
     private Hyperlink verifyCredentialsHyperlink;
     private ProgressIndicator verifyProgressIndicator;
 
@@ -45,7 +47,6 @@ class ToolkitSectionController extends AbstractController {
     public void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
         super.initialize(location, resources);
         toolkitUsernameTextField = (TextField)controlsMap.get("toolkitUsernameTextField");
-        toolkitPasswordField = (PasswordField)controlsMap.get("toolkitPasswordField");
         verifyCredentialsHyperlink = (Hyperlink) controlsMap.get("verifyCredentialsHyperlink");
         verifyProgressIndicator = (ProgressIndicator) controlsMap.get("verifyProgressIndicator");
         setInitValues();
@@ -55,7 +56,6 @@ class ToolkitSectionController extends AbstractController {
 
     private void setInitValues() {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitSSOPassword());
     }
 
     private void setProperties() {
@@ -80,7 +80,6 @@ class ToolkitSectionController extends AbstractController {
     ToolkitConfig createToolkitConfigFromUI() {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername(toolkitUsernameTextField.getText());
-        toolkitConfig.setToolkitSSOPassword(toolkitPasswordField.getText());
         return toolkitConfig;
     }
 
@@ -102,7 +101,13 @@ class ToolkitSectionController extends AbstractController {
                             ToolkitService toolkitService = new ToolkitService(appProps);
                             hasConnection = toolkitService.isCookieWorking(cookiesService.getFedAuthString());
                         }
-                        if (!hasConnection) {
+                        if (hasConnection) {
+                            new AlertWindowBuilder()
+                                    .withHeaderText(BundleUtils.getMsg("toolkit.panel.ssoValid"))
+                                    .withAlertType(Alert.AlertType.INFORMATION)
+                                    .withImageFile(ImageFile.FINGER_UP_PNG)
+                                    .buildAndDisplayWindow();
+                        } else {
                             new FXWebService(appProps).initSSO();
                         }
                         verifyProgressIndicator.setVisible(false);
@@ -116,6 +121,5 @@ class ToolkitSectionController extends AbstractController {
 
     void setToolkitCredentialsIfAvailable() {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
-        toolkitPasswordField.setText(applicationProperties.toolkitSSOPassword());
     }
 }

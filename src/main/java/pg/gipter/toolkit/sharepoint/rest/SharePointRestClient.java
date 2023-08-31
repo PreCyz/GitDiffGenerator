@@ -7,10 +7,9 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.services.CookiesService;
 import pg.gipter.services.SmartZipService;
 import pg.gipter.toolkit.sharepoint.HttpRequester;
-import pg.gipter.toolkit.sharepoint.HttpRequesterNTML;
-import pg.gipter.users.SuperUserService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,28 +30,22 @@ public class SharePointRestClient {
     private static final Logger logger = LoggerFactory.getLogger(SharePointRestClient.class);
 
     private final ApplicationProperties applicationProperties;
-    private final HttpRequesterNTML httpRequesterNTML;
-    private final SuperUserService superUserService;
+    private final HttpRequester httpRequester;
     private String formDigest;
 
     public SharePointRestClient(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        httpRequesterNTML = new HttpRequesterNTML(applicationProperties);
-        superUserService = SuperUserService.getInstance();
+        httpRequester = new HttpRequester(applicationProperties);
     }
 
     public String getFormDigest() throws IOException {
         if (formDigest == null) {
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    superUserService.getUserName(),
-                    superUserService.getPassword(),
-                    applicationProperties.toolkitDomain(),
-                    applicationProperties.toolkitRESTUrl(),
-                    null,
-                    null
+                    applicationProperties.toolkitWSUrl(),
+                    new CookiesService(applicationProperties).getFedAuthString()
             );
 
-            formDigest = httpRequesterNTML.requestDigest(sharePointConfig);
+            formDigest = httpRequester.requestDigest(sharePointConfig);
             logger.debug("Form digest: [{}]", formDigest);
         }
         return formDigest;
@@ -60,20 +53,18 @@ public class SharePointRestClient {
 
     public String createItem() throws IOException {
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/AddValidateUpdateItemUsingPath",
-                applicationProperties.toolkitRESTUrl(),
+                applicationProperties.toolkitWSUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                superUserService.getUserName(),
-                superUserService.getPassword(),
-                applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitRESTUrl(),
+                applicationProperties.toolkitWSUrl(),
                 fullUrl,
+                new CookiesService(applicationProperties).getFedAuthString(),
                 getFormDigest()
         );
 
-        JsonObject item = httpRequesterNTML.executePOST(sharePointConfig, createItemJson());
+        JsonObject item = httpRequester.executePOST(sharePointConfig, createItemJson());
 
         String itemId = "";
         JsonArray value = item.get("value").getAsJsonArray();
@@ -160,22 +151,20 @@ public class SharePointRestClient {
         }
 
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)/AttachmentFiles/add(FileName='%s')",
-                applicationProperties.toolkitRESTUrl(),
+                applicationProperties.toolkitWSUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 itemId,
                 path.getFileName().toString()
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                superUserService.getUserName(),
-                superUserService.getPassword(),
-                applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitRESTUrl(),
+                applicationProperties.toolkitWSUrl(),
                 fullUrl,
+                new CookiesService(applicationProperties).getFedAuthString(),
                 getFormDigest()
         );
 
-        JsonObject jsonObject = httpRequesterNTML.executePOST(sharePointConfig, path.toFile());
+        JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, path.toFile());
 
         if (jsonObject.has("odata.error")) {
             String errMsg = jsonObject.get("odata.error").getAsJsonObject()
@@ -199,20 +188,18 @@ public class SharePointRestClient {
     public Optional<String> getUserId() {
         try {
             String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
-                    applicationProperties.toolkitRESTUrl(),
+                    applicationProperties.toolkitWSUrl(),
                     applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitUserEmail()
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    superUserService.getUserName(),
-                    superUserService.getPassword(),
-                    applicationProperties.toolkitDomain(),
-                    applicationProperties.toolkitRESTUrl(),
+                    applicationProperties.toolkitWSUrl(),
                     fullUrl,
+                    new CookiesService(applicationProperties).getFedAuthString(),
                     getFormDigest()
             );
 
-            JsonObject jsonObject = httpRequesterNTML.executeGET(sharePointConfig);
+            JsonObject jsonObject = httpRequester.executeGET(sharePointConfig);
             if (jsonObject != null && jsonObject.has("d")) {
                 String userId = jsonObject.get("d").getAsJsonObject().get("Id").getAsString();
                 logger.info("UserId got from toolkit: {}", userId);
@@ -226,17 +213,15 @@ public class SharePointRestClient {
 
     public void updateClassificationId(String itemId) throws IOException {
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
-                applicationProperties.toolkitRESTUrl(),
+                applicationProperties.toolkitWSUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 itemId
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                superUserService.getUserName(),
-                superUserService.getPassword(),
-                applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitRESTUrl(),
+                applicationProperties.toolkitWSUrl(),
                 fullUrl,
+                new CookiesService(applicationProperties).getFedAuthString(),
                 getFormDigest()
         );
 
@@ -247,8 +232,9 @@ public class SharePointRestClient {
         requestHeaders.put("Accept", "application/json;odata=verbose");
         requestHeaders.put("If-Match", "*");
         requestHeaders.put("X-HTTP-Method", "MERGE");
+        requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
 
-        JsonObject jsonObject = httpRequesterNTML.executePOST(sharePointConfig, payload, requestHeaders);
+        JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, payload, requestHeaders);
         if (jsonObject.has("odata.error")) {
             String errMsg = jsonObject.get("odata.error").getAsJsonObject()
                     .get("message").getAsJsonObject()
@@ -263,17 +249,15 @@ public class SharePointRestClient {
     private void cleanup(String itemId) {
         try {
             String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
-                    applicationProperties.toolkitRESTUrl(),
+                    applicationProperties.toolkitWSUrl(),
                     applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitCopyListName(),
                     itemId
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    superUserService.getUserName(),
-                    superUserService.getPassword(),
-                    applicationProperties.toolkitDomain(),
-                    applicationProperties.toolkitRESTUrl(),
+                    applicationProperties.toolkitWSUrl(),
                     fullUrl,
+                    new CookiesService(applicationProperties).getFedAuthString(),
                     getFormDigest()
             );
 
@@ -281,7 +265,8 @@ public class SharePointRestClient {
             requestHeaders.put("Accept", "application/json;odata=verbose");
             requestHeaders.put("If-Match", "*");
             requestHeaders.put("X-HTTP-Method", "DELETE");
-            httpRequesterNTML.executePOST(sharePointConfig, requestHeaders);
+            requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
+            httpRequester.executePOST(sharePointConfig, requestHeaders);
             logger.info("Cleanup done.");
         } catch (IOException ex) {
             logger.error("Problems with cleaning up.", ex);

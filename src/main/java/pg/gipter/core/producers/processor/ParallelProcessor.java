@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.toolkit.sharepoint.HttpRequesterNTML;
+import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ class ParallelProcessor {
 
     List<JsonObject> processConfigs(List<SharePointConfig> sharePointConfigs) {
         CompletionService<JsonObject> ecs = new ExecutorCompletionService<>(executor);
-        sharePointConfigs.forEach(scp -> ecs.submit(new GETCall(scp, new HttpRequesterNTML(applicationProperties))));
+        sharePointConfigs.forEach(scp -> ecs.submit(new GETCall(scp, new HttpRequester(applicationProperties))));
 
         List<JsonObject> result = new LinkedList<>();
         for (int i = 0; i < sharePointConfigs.size(); i++) {

@@ -12,10 +12,17 @@ import java.lang.reflect.Type;
 import java.net.CookieHandler;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 public class CookiesService {
@@ -179,7 +186,7 @@ public class CookiesService {
         }
     }
 
-    private void loadCookies() {
+    public void loadCookies() {
         if (isCookiesNotExist()) {
             logger.info("File with the cookies does not exist. [{}]", COOKIES_PATH.toAbsolutePath());
         } else {

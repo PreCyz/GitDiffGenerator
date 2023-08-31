@@ -95,9 +95,6 @@ class SharePointProjectAddConfigTestUI {
             assertThat(rc.getSharePointConfigs()).hasSize(1);
             final SharePointConfig spc = new LinkedList<>(rc.getSharePointConfigs()).getFirst();
             assertThat(spc.getName()).isEqualTo("someName");
-            assertThat(spc.getUsername()).isEqualTo("someUser");
-            assertThat(spc.getPassword()).isNotNull();
-            assertThat(spc.getDomain()).isEqualTo("someDomain");
             assertThat(windowObject.getComboBoxItems().get(0)).isEqualTo(spc);
         });
         assertThat(windowObject.getSharePointLink()).isNotBlank();

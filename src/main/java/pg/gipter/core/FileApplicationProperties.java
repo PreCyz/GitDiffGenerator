@@ -186,28 +186,11 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitSSOPassword() {
-        if (StringUtils.notEmpty(toolkitConfig.getToolkitSSOPassword()) &&
-                !ArgName.toolkitSSOPassword.defaultValue().equals(toolkitConfig.getToolkitSSOPassword())) {
-            return toolkitConfig.getToolkitSSOPassword();
-        }
-        return argExtractor.toolkitSSOPassword();
-    }
-
-    @Override
     public String toolkitDomain() {
         if (StringUtils.notEmpty(toolkitConfig.getToolkitDomain())) {
             return toolkitConfig.getToolkitDomain();
         }
         return argExtractor.toolkitDomain();
-    }
-
-    @Override
-    public String toolkitRESTUrl() {
-        if (StringUtils.notEmpty(toolkitConfig.getToolkitRESTUrl())) {
-            return toolkitConfig.getToolkitRESTUrl();
-        }
-        return argExtractor.toolkitRESTUrl();
     }
 
     @Override

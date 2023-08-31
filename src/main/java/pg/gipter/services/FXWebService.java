@@ -21,7 +21,9 @@ import java.lang.reflect.Field;
 import java.net.CookieHandler;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class FXWebService {
 
@@ -52,7 +54,7 @@ public class FXWebService {
         stage.setScene(new Scene(stackPane, 600, 600));
         stage.show();
 
-        //loadCookies();
+        new CookiesService(applicationProperties).loadCookies();
         webEngine.setJavaScriptEnabled(true);
         webEngine.getLoadWorker().stateProperty().addListener(changeListener());
         webEngine.load(applicationProperties.toolkitUserFolder());
@@ -65,7 +67,6 @@ public class FXWebService {
                 if (webEngine.getLocation().startsWith("https://goto.netcompany.com/_trust/default.aspx")) {
                     ((HTMLInputElement) webEngine.getDocument().getElementById("azure")).click();
                 }
-                logger.info(webEngine.getLocation());
                 if (webEngine.getLocation().startsWith("https://login.microsoftonline.com/")) {
                     HTMLInputElement idSIButton9 = (HTMLInputElement) webEngine.getDocument().getElementById("idSIButton9");
                     Element emailInput = webEngine.getDocument().getElementById("i0116");
@@ -74,19 +75,6 @@ public class FXWebService {
                         ((HTMLInputElement) emailInput).blur();
                         ((HTMLInputElement) emailInput).focus();
                         idSIButton9.click();
-                    }
-
-                    Element passwordInput = webEngine.getDocument().getElementById("i0118");
-                    if (applicationProperties.isSSOPassword() && passwordInput != null) {
-                        passwordInput.setAttribute("value", applicationProperties.toolkitSSOPassword());
-                        ((HTMLInputElement) passwordInput).blur();
-                        ((HTMLInputElement) passwordInput).focus();
-                        idSIButton9.click();
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        logger.warn("Can not sleep.");
                     }
                 }
                 if (webEngine.getLocation().contains(applicationProperties.toolkitCopyCase())) {
@@ -120,6 +108,7 @@ public class FXWebService {
             String json = gson.toJson(cookiesToSave);
 
             Files.write(CookiesService.COOKIES_PATH, json.getBytes(StandardCharsets.UTF_8));
+            logger.info("Cookies saved in [{}]", CookiesService.COOKIES_PATH);
         } catch (Exception e) {
             logger.error("Could not save cookies.", e);
         }

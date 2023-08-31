@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -107,7 +106,6 @@ class PasswordDeserializerTest {
     void givenConfigurationWithEmptySharePointConfig_whenDeserialize_thenReturnSharePointConfigPasswordIsDefault() {
         Configuration configuration = new Configuration();
         SharePointConfig sharePointConfig = new SharePointConfig();
-        sharePointConfig.setPassword(CryptoUtils.encryptSafe("somePassword"));
         configuration.addRunConfig(new RunConfigBuilder()
                 .withConfigurationName("name")
                 .withItemType(ItemType.SHARE_POINT_DOCS)
@@ -126,7 +124,6 @@ class PasswordDeserializerTest {
         String testPassword = "testPassword";
         Configuration configuration = new Configuration();
         SharePointConfig sharePointConfig = new SharePointConfig();
-        sharePointConfig.setPassword(CryptoUtils.encryptSafe(testPassword));
         configuration.addRunConfig(new RunConfigBuilder()
                 .withConfigurationName("name")
                 .withItemType(ItemType.SHARE_POINT_DOCS)
@@ -138,7 +135,5 @@ class PasswordDeserializerTest {
         assertThat(actual).isNotNull();
         assertThat(actual.getRunConfigs()).hasSize(1);
         assertThat(actual.getRunConfigs().get(0).getSharePointConfigs()).hasSize(1);
-        assertThat(new LinkedList<>(actual.getRunConfigs().get(0).getSharePointConfigs()).getFirst().getPassword())
-                .isEqualTo(testPassword);
     }
 }

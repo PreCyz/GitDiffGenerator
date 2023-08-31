@@ -1,7 +1,6 @@
 package pg.gipter.core.model;
 
 import pg.gipter.core.ArgName;
-import pg.gipter.utils.CryptoUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -17,9 +16,6 @@ public class SharePointConfig {
     public static final String URL_SUFFIX = "/Forms/AllItems.aspx";
 
     private String name;
-    private String username;
-    private String password;
-    private String domain;
     private String url;
     private String project;
     private Set<String> listNames;
@@ -33,9 +29,6 @@ public class SharePointConfig {
 
     public SharePointConfig(SharePointConfig sharePointConfig) {
         name = sharePointConfig.getName();
-        username = sharePointConfig.getUsername();
-        password = sharePointConfig.getPassword();
-        domain = sharePointConfig.getDomain();
         url = sharePointConfig.getUrl();
         project = sharePointConfig.getProject();
         listNames = sharePointConfig.getListNames();
@@ -44,22 +37,23 @@ public class SharePointConfig {
         fedAuth = sharePointConfig.getFedAuth();
     }
 
-    public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl) {
-        this("", username, password, domain, url, fullRequestUrl, null, null);
-    }
-    public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl, String fedAuth) {
-        this("", username, password, domain, url, fullRequestUrl, null, fedAuth);
+    public SharePointConfig(String url) {
+        this(null, null, null);
     }
 
-    public SharePointConfig(String username, String password, String domain, String url, String fullRequestUrl, String fedAuth, String formDigest) {
-        this("", username, password, domain, url, fullRequestUrl, formDigest, fedAuth);
+    public SharePointConfig(String url, String fullRequestUrl) {
+        this(fullRequestUrl, null, null);
+    }
+    public SharePointConfig(String url, String fullRequestUrl, String fedAuth) {
+        this(url, fullRequestUrl, null, fedAuth);
     }
 
-    public SharePointConfig(String name, String username, String password, String domain, String url, String fullRequestUrl, String formDigest, String fedAuth) {
+    public SharePointConfig(String url, String fullRequestUrl, String fedAuth, String formDigest) {
+        this("", url, fullRequestUrl, formDigest, fedAuth);
+    }
+
+    public SharePointConfig(String name, String url, String fullRequestUrl, String formDigest, String fedAuth) {
         this.name = name;
-        this.username = username;
-        this.password = password;
-        this.domain = domain;
         this.url = url;
         this.fullRequestUrl = fullRequestUrl;
         this.formDigest = formDigest;
@@ -72,30 +66,6 @@ public class SharePointConfig {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
     }
 
     public String getUrl() {
@@ -152,9 +122,6 @@ public class SharePointConfig {
         if (o == null || getClass() != o.getClass()) return false;
         SharePointConfig that = (SharePointConfig) o;
         return Objects.equals(getName(), that.getName()) &&
-                Objects.equals(getUsername(), that.getUsername()) &&
-                Objects.equals(getPassword(), that.getPassword()) &&
-                Objects.equals(getDomain(), that.getDomain()) &&
                 Objects.equals(getUrl(), that.getUrl()) &&
                 Objects.equals(getProject(), that.getProject()) &&
                 Objects.equals(getListNames(), that.getListNames()) &&
@@ -165,16 +132,13 @@ public class SharePointConfig {
     @Override
     public int hashCode() {
         return Objects.hash(
-                getName(), getUsername(), getPassword(), getDomain(), getUrl(), getProject(), getListNames(), getFormDigest(), getFedAuth()
+                getName(), getUrl(), getProject(), getListNames(), getFormDigest(), getFedAuth()
         );
     }
 
     public String toString2() {
         return "SharePointConfig{" +
                 "name='" + getName() + '\'' +
-                ", username='" + getUsername() + '\'' +
-                ", password='" + CryptoUtils.encryptSafe(getPassword()) + '\'' +
-                ", domain='" + getDomain() + '\'' +
                 ", url='" + getUrl() + '\'' +
                 ", project='" + getProject() + '\'' +
                 ", listName='" + getListNames() + '\'' +

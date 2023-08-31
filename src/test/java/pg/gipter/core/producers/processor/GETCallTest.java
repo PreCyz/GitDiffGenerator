@@ -9,7 +9,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.toolkit.sharepoint.HttpRequesterNTML;
+import pg.gipter.toolkit.sharepoint.HttpRequester;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,19 +37,16 @@ class GETCallTest {
         String top = "$top=1";
 
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?",
-                applicationProperties.toolkitRESTUrl(),
+                applicationProperties.toolkitWSUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
         ) + select + "&" + orderBy + "&" + top;
 
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitUsername(),
-                "give-password-here",
-                applicationProperties.toolkitDomain(),
-                applicationProperties.toolkitRESTUrl(),
+                applicationProperties.toolkitWSUrl(),
                 url
         );
-        JsonObject jsonObject = new GETCall(sharePointConfig, new HttpRequesterNTML(applicationProperties)).call();
+        JsonObject jsonObject = new GETCall(sharePointConfig, new HttpRequester(applicationProperties)).call();
 
         assertThat(jsonObject).isNotNull();
 

@@ -391,24 +391,6 @@ class ArgExtractorTest {
     }
 
     @Test
-    void whenToolkitRESTUrl_then_returnDefaultUrl() {
-        argExtractor = new ArgExtractor(new String[]{});
-
-        String actual = argExtractor.toolkitRESTUrl();
-
-        assertThat(actual).isEqualTo("https://int-goto.netcompany.com");
-    }
-
-    @Test
-    void given_toolkitUrlFromCommandLine_whenToolkitRESTUrl_thenReturnParam() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitRESTUrl=sthElse"});
-
-        String actual = argExtractor.toolkitRESTUrl();
-
-        assertThat(actual).isEqualTo("sthElse");
-    }
-
-    @Test
     void when_toolkitHostUrl_thenReturnDefaultHostUrl() {
         argExtractor = new ArgExtractor(new String[]{});
 

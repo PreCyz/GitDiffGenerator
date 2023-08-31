@@ -157,22 +157,8 @@ final class ArgExtractor {
         return ArgName.toolkitUsername.defaultValue();
     }
 
-    String toolkitSSOPassword() {
-        if (containsArg(ArgName.toolkitSSOPassword.name())) {
-            return getValue(ArgName.toolkitSSOPassword, ArgName.toolkitSSOPassword.defaultValue());
-        }
-        return ArgName.toolkitSSOPassword.defaultValue();
-    }
-
     String toolkitDomain() {
         return ArgName.toolkitDomain.defaultValue();
-    }
-
-    String toolkitRESTUrl() {
-        if (containsArg(ArgName.toolkitRESTUrl.name())) {
-            return getValue(ArgName.toolkitRESTUrl, ArgName.toolkitRESTUrl.defaultValue());
-        }
-        return ArgName.toolkitRESTUrl.defaultValue();
     }
 
     String toolkitHostUrl() {

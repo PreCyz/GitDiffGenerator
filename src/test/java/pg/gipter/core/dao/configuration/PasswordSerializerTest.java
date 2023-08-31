@@ -32,9 +32,9 @@ class PasswordSerializerTest {
 
     @Test
     void givenRunConfigsWithSharePointConfigsAndSharePointPassword_whenSerialize_thenEncryptSharePointPassword() {
-        SharePointConfig spc1 = new SharePointConfig("user1", "password1", "domain", "url", "fullUrl");
+        SharePointConfig spc1 = new SharePointConfig("url", "fullUrl");
         spc1.setProject("project1");
-        SharePointConfig spc2 = new SharePointConfig("user2", "password2", "domain", "url", "fullUrl");
+        SharePointConfig spc2 = new SharePointConfig("url", "fullUrl");
         spc2.setProject("project2");
 
         RunConfig runConfig = new RunConfigBuilder()
@@ -60,7 +60,7 @@ class PasswordSerializerTest {
 
     @Test
     void givenRunConfigsWithSharePointConfigsWithoutPassword_whenSerialize_thenDoNothing() {
-        SharePointConfig spc1 = new SharePointConfig("user1", "", "domain", "url", "fullUrl");
+        SharePointConfig spc1 = new SharePointConfig("url", "fullUrl");
         spc1.setProject("project1");
 
         RunConfig runConfig = new RunConfigBuilder()

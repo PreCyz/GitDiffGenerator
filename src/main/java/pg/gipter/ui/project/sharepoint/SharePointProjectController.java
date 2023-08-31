@@ -107,9 +107,6 @@ public class SharePointProjectController extends AbstractController {
 
     private void updateUIControls(SharePointConfig valueToSelect) {
         nameTextField.setText(valueToSelect.getName());
-        usernameTextField.setText(valueToSelect.getUsername());
-        passwordField.setText(valueToSelect.getPassword());
-        domainTextField.setText(valueToSelect.getDomain());
         urlTextField.setText(valueToSelect.getUrl());
         projectTextField.setText(valueToSelect.getProject());
         listNameTextField.setText(
@@ -178,9 +175,6 @@ public class SharePointProjectController extends AbstractController {
         return actionEvent -> {
             SharePointConfig sharePointConfig = new SharePointConfig();
             sharePointConfig.setName(nameTextField.getText());
-            sharePointConfig.setUsername(usernameTextField.getText());
-            sharePointConfig.setPassword(passwordField.getText());
-            sharePointConfig.setDomain(domainTextField.getText());
             sharePointConfig.setUrl(urlTextField.getText());
             sharePointConfig.setProject(projectTextField.getText());
             sharePointConfig.setListNames(

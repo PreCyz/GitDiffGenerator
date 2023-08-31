@@ -193,12 +193,6 @@ public enum ArgName {
             return SystemUtils.userName();
         }
     },
-    toolkitSSOPassword {
-        @Override
-        public String defaultValue() {
-            return "";
-        }
-    },
     toolkitDomain {
         @Override
         public String defaultValue() {
@@ -209,12 +203,6 @@ public enum ArgName {
         @Override
         public String defaultValue() {
             return "WorkItems";
-        }
-    },
-    toolkitRESTUrl {
-        @Override
-        public String defaultValue() {
-            return "https://int-goto.netcompany.com";
         }
     },
     toolkitHostUrl {
@@ -232,7 +220,7 @@ public enum ArgName {
     toolkitWSUrl {
         @Override
         public String defaultValue() {
-            return toolkitRESTUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/_vti_bin/lists.asmx";
+            return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/_vti_bin/lists.asmx";
         }
     },
     toolkitUserFolder {
@@ -245,7 +233,7 @@ public enum ArgName {
     toolkitWSUserFolder {
         @Override
         public String defaultValue() {
-            return toolkitRESTUrl.defaultValue() + toolkitCopyCase.defaultValue() +
+            return toolkitWSUrl.defaultValue() + toolkitCopyCase.defaultValue() +
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
     },

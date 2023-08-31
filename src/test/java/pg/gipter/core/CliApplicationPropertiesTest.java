@@ -1011,7 +1011,7 @@ class CliApplicationPropertiesTest {
     void givenNoToolkitUrl_whenToolkitRESTUrl_thenReturnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        String actual = applicationProperties.toolkitRESTUrl();
+        String actual = applicationProperties.toolkitWSUrl();
 
         assertThat(actual).isEqualTo("https://int-goto.netcompany.com");
     }
@@ -1022,7 +1022,7 @@ class CliApplicationPropertiesTest {
                 new String[]{"toolkitRESTUrl=cliUrl"}
         );
 
-        String actual = applicationProperties.toolkitRESTUrl();
+        String actual = applicationProperties.toolkitWSUrl();
 
         assertThat(actual).isEqualTo("cliUrl");
     }
@@ -1032,10 +1032,10 @@ class CliApplicationPropertiesTest {
         String[] args = {"toolkitRESTUrl=cliUrl"};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitRESTUrl("propertiesUrl");
+        toolkitConfig.setToolkitWSUrl("propertiesUrl");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitRESTUrl();
+        String actual = applicationProperties.toolkitWSUrl();
 
         assertThat(actual).isEqualTo("cliUrl");
     }
@@ -1045,10 +1045,10 @@ class CliApplicationPropertiesTest {
         String[] args = {};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitRESTUrl("propertiesUrl");
+        toolkitConfig.setToolkitWSUrl("propertiesUrl");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitRESTUrl();
+        String actual = applicationProperties.toolkitWSUrl();
 
         assertThat(actual).isEqualTo("propertiesUrl");
     }
@@ -1058,10 +1058,10 @@ class CliApplicationPropertiesTest {
         String[] args = {"uploadType=statement"};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitRESTUrl("propertiesUrl");
+        toolkitConfig.setToolkitWSUrl("propertiesUrl");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitRESTUrl();
+        String actual = applicationProperties.toolkitWSUrl();
 
         assertThat(actual).isEqualTo("propertiesUrl");
     }

@@ -1,7 +1,6 @@
 package pg.gipter.core.model;
 
 import pg.gipter.core.ArgName;
-import pg.gipter.utils.CryptoUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -11,10 +10,8 @@ public class ToolkitConfig {
     public static final String TOOLKIT_CONFIG = "toolkitConfig";
 
     protected String toolkitUsername;
-    protected String toolkitSSOPassword;
     private transient String toolkitDomain;
     private transient String toolkitCopyListName;
-    private String toolkitRESTUrl;
     private String toolkitHostUrl;
     private transient String toolkitCopyCase;
     private transient String toolkitWSUrl;
@@ -24,13 +21,10 @@ public class ToolkitConfig {
 
     public ToolkitConfig() {
         toolkitUsername = ArgName.toolkitUsername.defaultValue();
-        toolkitSSOPassword = ArgName.toolkitSSOPassword.defaultValue();
     }
 
     public ToolkitConfig(ToolkitConfig toolkitConfig) {
         toolkitUsername = toolkitConfig.getToolkitUsername();
-        toolkitSSOPassword = toolkitConfig.getToolkitSSOPassword();
-        toolkitRESTUrl = toolkitConfig.getToolkitRESTUrl();
         toolkitProjectListNames = toolkitConfig.getToolkitProjectListNames();
     }
 
@@ -40,14 +34,6 @@ public class ToolkitConfig {
 
     public void setToolkitUsername(String toolkitUsername) {
         this.toolkitUsername = toolkitUsername;
-    }
-
-    public String getToolkitSSOPassword() {
-        return toolkitSSOPassword;
-    }
-
-    public void setToolkitSSOPassword(String toolkitSSOPassword) {
-        this.toolkitSSOPassword = toolkitSSOPassword;
     }
 
     public String getToolkitDomain() {
@@ -64,14 +50,6 @@ public class ToolkitConfig {
 
     public void setToolkitCopyListName(String toolkitCopyListName) {
         this.toolkitCopyListName = toolkitCopyListName;
-    }
-
-    public String getToolkitRESTUrl() {
-        return toolkitRESTUrl;
-    }
-
-    public void setToolkitRESTUrl(String toolkitRESTUrl) {
-        this.toolkitRESTUrl = toolkitRESTUrl;
     }
 
     public String getToolkitHostUrl() {
@@ -127,17 +105,11 @@ public class ToolkitConfig {
         if (getToolkitUsername() != null) {
             arguments.add(ArgName.toolkitUsername.name() + "=" + getToolkitUsername());
         }
-        if (getToolkitSSOPassword() != null) {
-            arguments.add(ArgName.toolkitSSOPassword.name() + "=" + getToolkitSSOPassword());
-        }
         if (getToolkitDomain() != null) {
             arguments.add(ArgName.toolkitDomain.name() + "=" + getToolkitDomain());
         }
         if (getToolkitCopyListName() != null) {
             arguments.add(ArgName.toolkitCopyListName.name() + "=" + getToolkitCopyListName());
-        }
-        if (getToolkitRESTUrl() != null) {
-            arguments.add(ArgName.toolkitRESTUrl.name() + "=" + getToolkitRESTUrl());
         }
         if (getToolkitHostUrl() != null) {
             arguments.add(ArgName.toolkitHostUrl.name() + "=" + getToolkitHostUrl());
@@ -169,14 +141,10 @@ public class ToolkitConfig {
                 String argumentValue = split[1];
                 if (ArgName.toolkitUsername.name().equals(argumentName)) {
                     toolkitConfig.setToolkitUsername(argumentValue);
-                } else if (ArgName.toolkitSSOPassword.name().equals(argumentName)) {
-                    toolkitConfig.setToolkitSSOPassword(argumentValue);
                 } else if (ArgName.toolkitDomain.name().equals(argumentName)) {
                     toolkitConfig.setToolkitDomain(argumentValue);
                 } else if (ArgName.toolkitCopyListName.name().equals(argumentName)) {
                     toolkitConfig.setToolkitCopyListName(argumentValue);
-                } else if (ArgName.toolkitRESTUrl.name().equals(argumentName)) {
-                    toolkitConfig.setToolkitRESTUrl(argumentValue);
                 } else if (ArgName.toolkitHostUrl.name().equals(argumentName)) {
                     toolkitConfig.setToolkitHostUrl(argumentValue);
                 } else if (ArgName.toolkitCopyCase.name().equals(argumentName)) {
@@ -199,10 +167,8 @@ public class ToolkitConfig {
     public String toString() {
         return "ToolkitConfig{" +
                 "toolkitUsername='" + toolkitUsername + '\'' +
-                ", toolkitSSOPassword='" + CryptoUtils.encryptSafe(toolkitSSOPassword) + '\'' +
                 ", toolkitDomain='" + toolkitDomain + '\'' +
                 ", toolkitCopyListName='" + toolkitCopyListName + '\'' +
-                ", toolkitUrl='" + toolkitRESTUrl + '\'' +
                 ", toolkitHostUrl='" + toolkitHostUrl + '\'' +
                 ", toolkitCopyCase='" + toolkitCopyCase + '\'' +
                 ", toolkitWSUrl='" + toolkitWSUrl + '\'' +

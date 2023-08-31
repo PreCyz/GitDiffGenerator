@@ -22,9 +22,6 @@ class SharePointDocumentFinderTest {
     @Test
     void givenSharePointConfigAndDownloadLink_whenCreateDownloadDetails_thenReturnListOfDownloadDetails() {
         SharePointConfig sharePointConfig = new SharePointConfig();
-        sharePointConfig.setUsername("userName");
-        sharePointConfig.setPassword("password");
-        sharePointConfig.setDomain("password");
         sharePointConfig.setProject("/cases/GTE440/TOEDNLD");
         sharePointConfig.setUrl("https://netcompany.sharepoint.com");
 

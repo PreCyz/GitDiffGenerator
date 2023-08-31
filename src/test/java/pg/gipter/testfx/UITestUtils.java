@@ -26,9 +26,6 @@ public final class UITestUtils {
             final SharePointConfig spc = new SharePointConfig(
                     UUID.randomUUID().toString(),
                     UUID.randomUUID().toString(),
-                    UUID.randomUUID().toString(),
-                    UUID.randomUUID().toString(),
-                    UUID.randomUUID().toString(),
                     UUID.randomUUID().toString()
             );
             spc.setProject(UUID.randomUUID().toString());

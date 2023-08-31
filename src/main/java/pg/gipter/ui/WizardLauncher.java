@@ -163,7 +163,6 @@ public class WizardLauncher implements Launcher {
                     ApplicationProperties applicationProperties = propertiesWithCredentials();
                     if (applicationProperties.isToolkitCredentialsSet()) {
                         wizard.getSettings().put(ArgName.toolkitUsername.name(), applicationProperties.toolkitUsername());
-                        wizard.getSettings().put(ArgName.toolkitSSOPassword.name(), applicationProperties.toolkitSSOPassword());
                     }
                 }
                 String uploadType = wizardProperties.getProperty(ArgName.itemType.name());
@@ -185,8 +184,6 @@ public class WizardLauncher implements Launcher {
     }
 
     private WizardPane buildToolkitCredentialsPage(short step) {
-        int row = 0;
-
         WizardPane page = new WizardPane() {
             @Override
             public void onEnteringPage(Wizard wizard) {
@@ -198,14 +195,10 @@ public class WizardLauncher implements Launcher {
         gridPane.setVgap(10);
         gridPane.setHgap(10);
 
-        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.username")), 0, row);
+        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.username")), 0, 0);
         TextField username = createTextField(ArgName.toolkitUsername.name());
         username.setText(ArgName.toolkitUsername.defaultValue());
-        gridPane.add(username, 1, row++);
-
-        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.password")), 0, row);
-        PasswordField password = createPasswordField(ArgName.toolkitSSOPassword.name());
-        gridPane.add(password, 1, row);
+        gridPane.add(username, 1, 0);
 
         page.setHeaderText(BundleUtils.getMsg("wizard.toolkit.credentials") + " (" + step + "/6)");
         page.setContent(gridPane);
@@ -216,7 +209,6 @@ public class WizardLauncher implements Launcher {
         properties.put(ArgName.configurationName.name(), getValue(wizard, ArgName.configurationName.name()));
         properties.put(ArgName.itemType.name(), getValue(wizard, ArgName.itemType.name()));
         properties.put(ArgName.toolkitUsername.name(), getValue(wizard, ArgName.toolkitUsername.name()).toUpperCase());
-        properties.put(ArgName.toolkitSSOPassword.name(), getValue(wizard, ArgName.toolkitSSOPassword.name()));
         properties.put(ArgName.author.name(), getValue(wizard, ArgName.author.name()));
         properties.put(ArgName.committerEmail.name(), getValue(wizard, ArgName.committerEmail.name()));
         properties.put(ArgName.itemPath.name(), getValue(wizard, ArgName.itemPath.name()));
