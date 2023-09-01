@@ -21,11 +21,8 @@ import static java.util.stream.Collectors.toSet;
 
 class ToolkitDocumentFinder extends AbstractDocumentFinder {
 
-    private final CookiesService cookiesService;
-
     ToolkitDocumentFinder(ApplicationProperties applicationProperties) {
         super(applicationProperties);
-        this.cookiesService = new CookiesService(applicationProperties);
     }
 
     @Override
@@ -64,7 +61,7 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
                 sharePointConfig.setProject(project);
                 sharePointConfig.setUrl(applicationProperties.toolkitWSUrl());
                 sharePointConfig.setListNames(Stream.of(listTitle).collect(toSet()));
-                sharePointConfig.setFedAuth(cookiesService.getFedAuthString());
+                sharePointConfig.setFedAuth(CookiesService.getFedAuthString());
                 result.add(sharePointConfig);
             }
         }

@@ -14,6 +14,8 @@ import pg.gipter.core.ArgName;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.ConcurrentService;
+import pg.gipter.services.CookiesService;
+import pg.gipter.services.FXWebService;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
 import pg.gipter.utils.SystemUtils;
@@ -37,19 +39,23 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         logger.info("Gipter started.");
-        initProgramSettings(args);
-        Main mObj = new Main(args);
-        mObj.setLoggerLevel(applicationProperties.loggerLevel());
-        logger.info("Java version '{}'.", SystemUtils.javaVersion());
-        logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
-        logger.info("Gipter can use '{}' threads.", ConcurrentService.getInstance().availableThreads());
-        mObj.runConverters(applicationProperties);
-        mObj.setDefaultConfig();
-        if (Main.applicationProperties.isUseUI()) {
-            launch(args);
+        if (CookiesService.isCookiesExist()) {
+            initProgramSettings(args);
+            Main mObj = new Main(args);
+            mObj.setLoggerLevel(applicationProperties.loggerLevel());
+            logger.info("Java version '{}'.", SystemUtils.javaVersion());
+            logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
+            logger.info("Gipter can use '{}' threads.", ConcurrentService.getInstance().availableThreads());
+            mObj.runConverters(applicationProperties);
+            mObj.setDefaultConfig();
+            if (Main.applicationProperties.isUseUI()) {
+                launch(args);
+            } else {
+                Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
+                launcher.execute();
+            }
         } else {
-            Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
-            launcher.execute();
+            new FXWebService().initSSO();
         }
     }
 

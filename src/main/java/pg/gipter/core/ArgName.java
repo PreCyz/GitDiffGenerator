@@ -237,6 +237,12 @@ public enum ArgName {
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
     },
+    toolkitSiteAssetsUrl {
+        @Override
+        public String defaultValue() {
+            return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/SiteAssets/";
+        }
+    },
     fetchTimeout {
         @Override
         public String defaultValue() {

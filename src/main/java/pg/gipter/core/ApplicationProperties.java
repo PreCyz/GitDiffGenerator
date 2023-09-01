@@ -17,7 +17,6 @@ import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.CookiesService;
 import pg.gipter.services.SemanticVersioning;
 import pg.gipter.services.ToolkitService;
-import pg.gipter.users.SuperUserService;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
@@ -125,7 +124,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitConfigExists() {
-        return toolkitConfig != null && SuperUserService.getInstance().isCredentialsAvailable();
+        return toolkitConfig != null;
     }
 
     protected final boolean isOtherAuthorsExists() {
@@ -149,7 +148,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitCredentialsSet() {
-        return SuperUserService.getInstance().isCredentialsAvailable();
+        return CookiesService.hasValidFedAuth();
     }
 
     public final String fileName() {
@@ -316,9 +315,8 @@ public abstract class ApplicationProperties {
     }
 
     public boolean hasConnectionToToolkit() {
-        CookiesService cookiesService = new CookiesService(this);
-        return cookiesService.hasValidFedAuth()
-                && new ToolkitService(this).isCookieWorking(cookiesService.getFedAuthString());
+        return CookiesService.hasValidFedAuth()
+                && new ToolkitService(this).isCookieWorking(CookiesService.getFedAuthString());
     }
 
     protected final String log() {

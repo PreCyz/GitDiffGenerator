@@ -16,7 +16,6 @@ import pg.gipter.core.config.GeneralSettings;
 import pg.gipter.core.model.CipherDetails;
 import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.Statistic;
-import pg.gipter.users.SuperUser;
 import pg.gipter.utils.CryptoUtils;
 
 import java.util.Properties;
@@ -44,7 +43,6 @@ public abstract class MongoDaoConfig {
                 Codec<Document> documentCodec = codecRegistry.get(Document.class);
                 Codec<Statistic> statisticCodec = new StatisticCodec(codecRegistry);
                 Codec<ExceptionDetails> exceptionDetailsCodec = new ExceptionDetailsCodec(codecRegistry);
-                Codec<SuperUser> superUserCodec = new SuperUserCodec(codecRegistry);
                 Codec<CipherDetails> cipherDetailsCodec = new CipherDetailsCodec(codecRegistry);
                 Codec<GeneralSettings> generalSettingsCodec = new GeneralSettingsCodec(codecRegistry);
                 codecRegistry = CodecRegistries.fromRegistries(
@@ -52,7 +50,6 @@ public abstract class MongoDaoConfig {
                         CodecRegistries.fromCodecs(documentCodec,
                                 statisticCodec,
                                 exceptionDetailsCodec,
-                                superUserCodec,
                                 cipherDetailsCodec,
                                 generalSettingsCodec)
                 );

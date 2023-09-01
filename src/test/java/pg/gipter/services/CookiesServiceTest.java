@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
-import pg.gipter.core.ApplicationPropertiesFactory;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,16 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Disabled
 class CookiesServiceTest {
 
-    private CookiesService cookiesService;
-
     @Start
     public void start(Stage stage) {
-        cookiesService = new CookiesService(ApplicationPropertiesFactory.getInstance(new String[]{"toolkitUsername=PAWG"}));
     }
 
     @Test
     void name(FxRobot robot) {
-        cookiesService.getFedAuthString();
+        CookiesService.getFedAuthString();
         assertTrue(true);
     }
 
@@ -44,8 +40,6 @@ class CookiesServiceTest {
 
     @Test
     void getFedAuth() {
-        String fedAuth = cookiesService.getFedAuthString();
-
-        assertThat(fedAuth).isEqualTo("aaaa");
+        assertThat(CookiesService.getFedAuthString()).isEqualTo("aaaa");
     }
 }

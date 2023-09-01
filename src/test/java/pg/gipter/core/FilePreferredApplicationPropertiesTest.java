@@ -10,7 +10,6 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.RunConfigBuilder;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.users.SuperUserService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -581,12 +580,12 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void givenToolkitUsernameAndPassword_whenIsToolkitPropertiesSet_thenReturnTrue() {
-        String[] args = {"toolkitPassword=yui"};
+        String[] args = {};
         appProps = new FileApplicationProperties(args);
 
         boolean actual = appProps.isToolkitCredentialsSet();
 
-        assertThat(actual).isEqualTo(SuperUserService.getInstance().isCredentialsAvailable());
+        assertThat(actual).isTrue();
     }
 
     @Test

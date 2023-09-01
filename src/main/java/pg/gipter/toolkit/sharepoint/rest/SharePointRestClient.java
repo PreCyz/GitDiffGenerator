@@ -42,7 +42,7 @@ public class SharePointRestClient {
         if (formDigest == null) {
             SharePointConfig sharePointConfig = new SharePointConfig(
                     applicationProperties.toolkitWSUrl(),
-                    new CookiesService(applicationProperties).getFedAuthString()
+                    CookiesService.getFedAuthString()
             );
 
             formDigest = httpRequester.requestDigest(sharePointConfig);
@@ -60,7 +60,7 @@ public class SharePointRestClient {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitWSUrl(),
                 fullUrl,
-                new CookiesService(applicationProperties).getFedAuthString(),
+                CookiesService.getFedAuthString(),
                 getFormDigest()
         );
 
@@ -160,7 +160,7 @@ public class SharePointRestClient {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitWSUrl(),
                 fullUrl,
-                new CookiesService(applicationProperties).getFedAuthString(),
+                CookiesService.getFedAuthString(),
                 getFormDigest()
         );
 
@@ -195,7 +195,7 @@ public class SharePointRestClient {
             SharePointConfig sharePointConfig = new SharePointConfig(
                     applicationProperties.toolkitWSUrl(),
                     fullUrl,
-                    new CookiesService(applicationProperties).getFedAuthString(),
+                    CookiesService.getFedAuthString(),
                     getFormDigest()
             );
 
@@ -221,7 +221,7 @@ public class SharePointRestClient {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitWSUrl(),
                 fullUrl,
-                new CookiesService(applicationProperties).getFedAuthString(),
+                CookiesService.getFedAuthString(),
                 getFormDigest()
         );
 
@@ -257,7 +257,7 @@ public class SharePointRestClient {
             SharePointConfig sharePointConfig = new SharePointConfig(
                     applicationProperties.toolkitWSUrl(),
                     fullUrl,
-                    new CookiesService(applicationProperties).getFedAuthString(),
+                    CookiesService.getFedAuthString(),
                     getFormDigest()
             );
 

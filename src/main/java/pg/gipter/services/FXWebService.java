@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.html.HTMLInputElement;
-import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ArgName;
 import pg.gipter.utils.SystemUtils;
 
 import java.lang.reflect.Field;
@@ -28,12 +28,9 @@ import java.util.Map;
 public class FXWebService {
 
     private static final Logger logger = LoggerFactory.getLogger(FXWebService.class);
-    private final ApplicationProperties applicationProperties;
     private WebEngine webEngine;
 
-    public FXWebService(ApplicationProperties applicationProperties) {
-        this.applicationProperties = applicationProperties;
-    }
+    public FXWebService() {}
 
     public void initSSO() {
         logger.info("Initiating SSO");
@@ -41,10 +38,9 @@ public class FXWebService {
 
         webEngine = webView.getEngine();
         webEngine.setJavaScriptEnabled(true);
-        webEngine.setUserAgent(String.format("Mozilla/5.0 (%s; %s) Gipter-WebView %s",
+        webEngine.setUserAgent(String.format("Mozilla/5.0 (%s; %s) Gipter-WebView",
                 SystemUtils.osName(),
-                SystemUtils.processorArchitecture(),
-                applicationProperties.version().getVersion())
+                SystemUtils.processorArchitecture())
         );
 
         StackPane stackPane = new StackPane();
@@ -54,10 +50,10 @@ public class FXWebService {
         stage.setScene(new Scene(stackPane, 600, 600));
         stage.show();
 
-        new CookiesService(applicationProperties).loadCookies();
+        CookiesService.loadCookies();
         webEngine.setJavaScriptEnabled(true);
         webEngine.getLoadWorker().stateProperty().addListener(changeListener());
-        webEngine.load(applicationProperties.toolkitUserFolder());
+        webEngine.load(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
     }
 
     private ChangeListener<Worker.State> changeListener() {
@@ -71,13 +67,13 @@ public class FXWebService {
                     HTMLInputElement idSIButton9 = (HTMLInputElement) webEngine.getDocument().getElementById("idSIButton9");
                     Element emailInput = webEngine.getDocument().getElementById("i0116");
                     if (emailInput != null) {
-                        emailInput.setAttribute("value", applicationProperties.toolkitUserEmail());
+                        emailInput.setAttribute("value", ArgName.toolkitUsername.defaultValue() + "@netcompany.com");
                         ((HTMLInputElement) emailInput).blur();
                         ((HTMLInputElement) emailInput).focus();
                         idSIButton9.click();
                     }
                 }
-                if (webEngine.getLocation().contains(applicationProperties.toolkitCopyCase())) {
+                if (webEngine.getLocation().contains(ArgName.toolkitCopyCase.defaultValue())) {
                     saveCookies();
                 }
             }

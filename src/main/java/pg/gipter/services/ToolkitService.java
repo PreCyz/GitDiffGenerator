@@ -46,10 +46,9 @@ public class ToolkitService extends Task<Set<String>> {
     }
 
     private Set<String> getAvailableCases() {
-        CookiesService cookiesService = new CookiesService(applicationProperties);
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
-        headers.put("Cookie", cookiesService.getFedAuthString());
+        headers.put("Cookie", CookiesService.getFedAuthString());
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
         Set<String> cases = new HashSet<>();
         try {
@@ -100,7 +99,7 @@ public class ToolkitService extends Task<Set<String>> {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitWSUrl(),
                 fullUrl,
-                new CookiesService(applicationProperties).getFedAuthString()
+                CookiesService.getFedAuthString()
         );
 
         try {

@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ArgName;
 import pg.gipter.services.dto.CookieDetails;
 
 import java.lang.reflect.Type;
@@ -25,20 +25,17 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-public class CookiesService {
+public final class CookiesService {
 
     private static final Logger logger = LoggerFactory.getLogger(CookiesService.class);
     private static final String[] DAYS = {"Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     private static final String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"};
 
     static final Path COOKIES_PATH = Paths.get("cookies.json");
-    private final ApplicationProperties applicationProperties;
 
-    public CookiesService(ApplicationProperties applicationProperties) {
-        this.applicationProperties = applicationProperties;
-    }
+    private CookiesService() {}
 
-    public boolean hasValidFedAuth() {
+    public static boolean hasValidFedAuth() {
         try {
             CookieDetails fedAuthCookie = loadFedAuthCookie()
                     .orElseThrow(() -> new IllegalStateException("The cookie file does not exist."));
@@ -53,23 +50,21 @@ public class CookiesService {
         }
     }
 
-    public String getFedAuthString() {
+    public static String getFedAuthString() {
         CookieDetails fedAuthCookie = loadFedAuthCookie().orElseThrow(() -> new IllegalStateException("The cookie file does not exist."));
         return fedAuthCookie.name + "=" + fedAuthCookie.value;
     }
 
-    private Optional<CookieDetails> loadFedAuthCookie() {
+    private static Optional<CookieDetails> loadFedAuthCookie() {
         Optional<CookieDetails> result;
-        if (isCookiesNotExist()) {
-            result = Optional.empty();
-        } else {
+        if (isCookiesExist()) {
             try {
                 byte[] bytes = Files.readAllBytes(COOKIES_PATH);
                 String json = new String(bytes, StandardCharsets.UTF_8);
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 Type type = new TypeToken<Map<String, Collection<CookieDetails>>>() {}.getType();
                 Map<String, Collection<CookieDetails>> cookiesToLoad = gson.fromJson(json, type);
-                result = cookiesToLoad.get(applicationProperties.toolkitHostUrl().replace("https://", ""))
+                result = cookiesToLoad.get(ArgName.toolkitHostUrl.defaultValue().replace("https://", ""))
                         .stream()
                         .filter(cookie -> cookie.name.equals("FedAuth"))
                         .findFirst();
@@ -77,15 +72,17 @@ public class CookiesService {
                 logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath());
                 result = Optional.empty();
             }
+        } else {
+            result = Optional.empty();
         }
         return result;
     }
 
-    private boolean isCookiesNotExist() {
-        return !Files.exists(COOKIES_PATH);
+    public static boolean isCookiesExist() {
+        return Files.exists(COOKIES_PATH);
     }
 
-    private String format(
+    private static String format(
             final String name,
             final String value,
             final String domain,
@@ -135,7 +132,7 @@ public class CookiesService {
      * Format "EEE, dd-MMM-yy HH:mm:ss 'GMT'" for cookies
      * @param date the date in milliseconds
      */
-    private String formatCookieDate(long date) {
+    private static String formatCookieDate(long date) {
         LocalDateTime gc = LocalDateTime.ofInstant(Instant.ofEpochMilli(date), TimeZone.getTimeZone("GMT").toZoneId());
 
         int day_of_week = gc.getDayOfWeek().getValue();
@@ -179,17 +176,15 @@ public class CookiesService {
      * @param buf the buffer to append to
      * @param i   the value to append
      */
-    private void append2digits(StringBuilder buf, int i) {
+    private static void append2digits(StringBuilder buf, int i) {
         if (i < 100) {
             buf.append((char) (i / 10 + '0'));
             buf.append((char) (i % 10 + '0'));
         }
     }
 
-    public void loadCookies() {
-        if (isCookiesNotExist()) {
-            logger.info("File with the cookies does not exist. [{}]", COOKIES_PATH.toAbsolutePath());
-        } else {
+    public static void loadCookies() {
+        if (isCookiesExist()) {
             try {
                 byte[] bytes = Files.readAllBytes(COOKIES_PATH);
                 String json = new String(bytes, StandardCharsets.UTF_8);
@@ -217,6 +212,8 @@ public class CookiesService {
             } catch (Exception e) {
                 logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath());
             }
+        } else {
+            logger.info("File with the cookies does not exist. [{}]", COOKIES_PATH.toAbsolutePath());
         }
     }
 

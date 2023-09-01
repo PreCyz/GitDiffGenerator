@@ -96,10 +96,9 @@ class ToolkitSectionController extends AbstractController {
                     final ApplicationProperties appProps = ApplicationPropertiesFactory.getInstance(arguments.toArray(String[]::new));
                     Platform.runLater(() -> {
                         boolean hasConnection = false;
-                        CookiesService cookiesService = new CookiesService(appProps);
-                        if (cookiesService.hasValidFedAuth()) {
+                        if (CookiesService.hasValidFedAuth()) {
                             ToolkitService toolkitService = new ToolkitService(appProps);
-                            hasConnection = toolkitService.isCookieWorking(cookiesService.getFedAuthString());
+                            hasConnection = toolkitService.isCookieWorking(CookiesService.getFedAuthString());
                         }
                         if (hasConnection) {
                             new AlertWindowBuilder()
@@ -108,7 +107,7 @@ class ToolkitSectionController extends AbstractController {
                                     .withImageFile(ImageFile.FINGER_UP_PNG)
                                     .buildAndDisplayWindow();
                         } else {
-                            new FXWebService(appProps).initSSO();
+                            new FXWebService().initSSO();
                         }
                         verifyProgressIndicator.setVisible(false);
                     });
