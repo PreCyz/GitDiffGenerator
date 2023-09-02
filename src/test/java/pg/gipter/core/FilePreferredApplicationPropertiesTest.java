@@ -792,66 +792,6 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserWSFolder_thenReturnDefault() {
-        String[] args = {};
-        appProps = new FileApplicationProperties(args);
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
-    }
-
-    @Test
-    void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserWSFolder_thenReturnUserFolderWithCliUser() {
-        String[] args = {"toolkitUsername=xxx"};
-        appProps = new FileApplicationProperties(args);
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "XXX");
-    }
-
-
-    @Test
-    void givenToolkitUserCliAndFileToolkitUser_whenToolkitUserWSFolder_thenReturnFileCustomUserFolder() {
-        String[] args = {"toolkitUsername=xxx"};
-        appProps = new FileApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
-    void givenNoToolkitUserCliAndFileToolkitUser_whenToolkitUserWSFolder_then_returnFileCustomUserFolder() {
-        String[] args = {};
-        appProps = new FileApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
-    void givenToolkitCustomUserFolderCliAndFileToolkitUsername_whenToolkitWSUserFolder_thenReturnUserFolderWithFileToolkitUsername() {
-        String[] args = {"toolkitCustomUserFolder=qqq"};
-        appProps = new FileApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
     void givenToolkitProjectListNames_whenToolkitProjectListNames_thenReturnSetWithThatToolkitProjectListNames() {
         appProps = new FileApplicationProperties(new String[]{"toolkitProjectListNames=name1"});
 

@@ -26,7 +26,7 @@ public class SettingsService {
 
         logger.info("Executing request {}", httpget.getRequestLine());
         try (CloseableHttpClient httpclient = HttpClients.custom().build();
-             CloseableHttpResponse response = httpclient.execute(httpget);
+             CloseableHttpResponse response = httpclient.execute(httpget)
         ) {
             logger.info("Response {}", response.getStatusLine());
             FileUtils.copyInputStreamToFile(response.getEntity().getContent(), destination);

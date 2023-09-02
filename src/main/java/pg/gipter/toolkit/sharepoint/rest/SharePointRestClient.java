@@ -40,8 +40,10 @@ public class SharePointRestClient {
 
     public String getFormDigest() throws IOException {
         if (formDigest == null) {
+            String fullUrl = applicationProperties.toolkitHostUrl() + applicationProperties.toolkitCopyCase() + "/_api/contextinfo";
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    applicationProperties.toolkitWSUrl(),
+                    applicationProperties.toolkitHostUrl(),
+                    fullUrl,
                     CookiesService.getFedAuthString()
             );
 
@@ -53,18 +55,23 @@ public class SharePointRestClient {
 
     public String createItem() throws IOException {
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/AddValidateUpdateItemUsingPath",
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 fullUrl,
                 CookiesService.getFedAuthString(),
                 getFormDigest()
         );
 
-        JsonObject item = httpRequester.executePOST(sharePointConfig, createItemJson());
+        Map<String, String> requestHeaders = new LinkedHashMap<>();
+        requestHeaders.put("Accept", "application/json;odata=nometadata");
+        requestHeaders.put("Content-Type", "application/json;odata=nometadata");
+        requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
+
+        JsonObject item = httpRequester.executePOST(sharePointConfig, createItemJson(), requestHeaders);
 
         String itemId = "";
         JsonArray value = item.get("value").getAsJsonArray();
@@ -95,7 +102,7 @@ public class SharePointRestClient {
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 
         JsonObject decodedUrl = new JsonObject();
-        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitWSUserFolder());
+        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitUserFolder());
 
         JsonObject listItemCreateInfo = new JsonObject();
         listItemCreateInfo.add("FolderPath", decodedUrl);
@@ -151,14 +158,14 @@ public class SharePointRestClient {
         }
 
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)/AttachmentFiles/add(FileName='%s')",
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 itemId,
                 path.getFileName().toString()
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 fullUrl,
                 CookiesService.getFedAuthString(),
                 getFormDigest()
@@ -188,12 +195,12 @@ public class SharePointRestClient {
     public Optional<String> getUserId() {
         try {
             String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
-                    applicationProperties.toolkitWSUrl(),
+                    applicationProperties.toolkitHostUrl(),
                     applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitUserEmail()
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    applicationProperties.toolkitWSUrl(),
+                    applicationProperties.toolkitHostUrl(),
                     fullUrl,
                     CookiesService.getFedAuthString(),
                     getFormDigest()
@@ -213,13 +220,13 @@ public class SharePointRestClient {
 
     public void updateClassificationId(String itemId) throws IOException {
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 itemId
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 fullUrl,
                 CookiesService.getFedAuthString(),
                 getFormDigest()
@@ -249,13 +256,13 @@ public class SharePointRestClient {
     private void cleanup(String itemId) {
         try {
             String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
-                    applicationProperties.toolkitWSUrl(),
+                    applicationProperties.toolkitHostUrl(),
                     applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitCopyListName(),
                     itemId
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
-                    applicationProperties.toolkitWSUrl(),
+                    applicationProperties.toolkitHostUrl(),
                     fullUrl,
                     CookiesService.getFedAuthString(),
                     getFormDigest()
@@ -266,6 +273,7 @@ public class SharePointRestClient {
             requestHeaders.put("If-Match", "*");
             requestHeaders.put("X-HTTP-Method", "DELETE");
             requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
+
             httpRequester.executePOST(sharePointConfig, requestHeaders);
             logger.info("Cleanup done.");
         } catch (IOException ex) {

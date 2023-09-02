@@ -88,7 +88,7 @@ public class ToolkitService extends Task<Set<String>> {
         String orderBy = "$orderby=Modified+desc";
         String top = "$top=1";
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s&%s",
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName(),
                 select,
@@ -97,7 +97,7 @@ public class ToolkitService extends Task<Set<String>> {
                 top
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 fullUrl,
                 CookiesService.getFedAuthString()
         );

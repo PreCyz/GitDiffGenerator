@@ -37,15 +37,11 @@ public class SharePointConfig {
         fedAuth = sharePointConfig.getFedAuth();
     }
 
-    public SharePointConfig(String url) {
-        this(null, null, null);
-    }
-
     public SharePointConfig(String url, String fullRequestUrl) {
-        this(fullRequestUrl, null, null);
+        this("", url, fullRequestUrl, null, null);
     }
     public SharePointConfig(String url, String fullRequestUrl, String fedAuth) {
-        this(url, fullRequestUrl, null, fedAuth);
+        this("", url, fullRequestUrl, null, fedAuth);
     }
 
     public SharePointConfig(String url, String fullRequestUrl, String fedAuth, String formDigest) {

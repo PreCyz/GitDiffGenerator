@@ -184,10 +184,6 @@ final class ArgExtractor {
         return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
     }
 
-    String toolkitWSUserFolder() {
-        return ArgName.toolkitWSUserFolder.defaultValue() + toolkitUsername();
-    }
-
     PreferredArgSource preferredArgSource() {
         if (containsArg(ArgName.preferredArgSource.name())) {
             String preferredArgSrc = getValue(ArgName.preferredArgSource, ArgName.preferredArgSource.defaultValue());

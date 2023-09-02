@@ -35,6 +35,7 @@ public class Main extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private String[] args;
+    private static boolean EXECUTE_SSO = false;
     private static ApplicationProperties applicationProperties;
 
     public static void main(String[] args) {
@@ -54,8 +55,14 @@ public class Main extends Application {
                 Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
                 launcher.execute();
             }
+        } else if (Stream.of(args).filter(it -> it.startsWith(ArgName.useUI.name()))
+                    .map(it -> it.substring(it.indexOf("=") + 1))
+                    .anyMatch(it -> it.toLowerCase().startsWith("n"))) {
+            logger.error("Cookies are not available. Commandline is available only if [cookies.json] is present.");
+            System.exit(-1);
         } else {
-            new FXWebService().initSSO();
+            EXECUTE_SSO = true;
+            launch(args);
         }
     }
 
@@ -82,9 +89,13 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        WebViewService.getInstance();
-        Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
-        launcher.execute();
+        if (EXECUTE_SSO) {
+            new FXWebService().initSSO(true);
+        } else {
+            WebViewService.getInstance();
+            Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
+            launcher.execute();
+        }
     }
 
     private void setLoggerLevel(String loggerLevel) {

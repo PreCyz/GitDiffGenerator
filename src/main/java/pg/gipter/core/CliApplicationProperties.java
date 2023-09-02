@@ -227,11 +227,6 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitWSUserFolder() {
-        return ArgName.toolkitWSUserFolder.defaultValue() + toolkitUsername();
-    }
-
-    @Override
     public boolean isConfirmationWindow() {
         boolean confirmation = argExtractor.isConfirmationWindow();
         if (!containsArg(ArgName.confirmationWindow.name()) && applicationConfig.getConfirmationWindow() != null) {

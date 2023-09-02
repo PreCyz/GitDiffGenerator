@@ -387,7 +387,6 @@ public abstract class ApplicationProperties {
     public abstract String toolkitUsername();
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
-    public abstract String toolkitWSUserFolder();
     public abstract String toolkitCopyListName();
     public abstract Set<String> toolkitProjectListNames();
 

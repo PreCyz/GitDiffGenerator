@@ -218,14 +218,6 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitWSUserFolder() {
-        if (StringUtils.notEmpty(toolkitUsername())) {
-            return ArgName.toolkitWSUserFolder.defaultValue() + toolkitUsername();
-        }
-        return argExtractor.toolkitWSUserFolder();
-    }
-
-    @Override
     public Set<String> toolkitProjectListNames() {
         if (StringUtils.notEmpty(toolkitConfig.getToolkitProjectListNames())) {
             return Stream.of(toolkitConfig.getToolkitProjectListNames().split(",")).collect(Collectors.toSet());

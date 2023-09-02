@@ -21,7 +21,6 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.DownloadDetails;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,7 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -120,13 +118,6 @@ public class HttpRequester {
         }
     }
 
-    public JsonObject executePOST(SharePointConfig sharePointConfig, JsonObject jsonObject) throws IOException {
-        Map<String, String> requestHeaders = new LinkedHashMap<>();
-        requestHeaders.put("Accept", "application/json;odata=nometadata");
-        requestHeaders.put("Content-Type", "application/json;odata=nometadata");
-        return executePOST(sharePointConfig, jsonObject, requestHeaders);
-    }
-
     public JsonObject executePOST(SharePointConfig sharePointConfig, Map<String, String> requestHeaders) throws IOException {
         return executePOST(sharePointConfig, null, requestHeaders);
     }
@@ -168,8 +159,7 @@ public class HttpRequester {
     }
 
     public String requestDigest(SharePointConfig sharePointConfig) throws IOException {
-        String fullUrl = applicationProperties.toolkitWSUrl() + applicationProperties.toolkitCopyCase() + "/_api/contextinfo";
-        HttpPost httpPost = new HttpPost(fullUrl);
+        HttpPost httpPost = new HttpPost(sharePointConfig.getFullRequestUrl());
         httpPost.addHeader("Accept", "application/json;odata=verbose");
         httpPost.addHeader("X-ClientService-ClientTag", "SDK-JAVA");
         httpPost.addHeader("Cookie", sharePointConfig.getFedAuth());
@@ -184,34 +174,6 @@ public class HttpRequester {
             return result.get("d").getAsJsonObject()
                     .get("GetContextWebInformation").getAsJsonObject()
                     .get("FormDigestValue").getAsString();
-        }
-    }
-
-    public String downloadPageSource(SharePointConfig sharePointConfig) throws IOException {
-        HttpGet httpget = new HttpGet(replaceSpaces(sharePointConfig.getFullRequestUrl()));
-        httpget.addHeader(HttpHeaders.ACCEPT, "application/json;odata=verbose");
-        httpget.addHeader("Cookie", sharePointConfig.getFedAuth());
-        logger.info("Executing request {}", httpget.getRequestLine());
-
-        try (CloseableHttpClient httpclient = HttpClients.custom().build();
-             CloseableHttpResponse response = httpclient.execute(httpget)
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            InputStreamReader inputStreamReader = new InputStreamReader(
-                    response.getEntity().getContent(), StandardCharsets.UTF_8
-            );
-            BufferedReader reader = new BufferedReader(inputStreamReader);
-
-            String line;
-            StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-            }
-            inputStreamReader.close();
-            reader.close();
-            EntityUtils.consume(response.getEntity());
-            return sb.toString();
         }
     }
 
