@@ -47,7 +47,9 @@ class DevSettings implements EnvSettings {
              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(isr)
         ) {
-            result = Optional.ofNullable(this.cipherDetails = new Gson().fromJson(reader, CipherDetails.class));
+            result = Optional.ofNullable(
+                    this.cipherDetails = new Gson().fromJson(reader, CipherDetails.Settings.class).toCipherDetails()
+            );
             logger.info("Program settings loaded from [{}].", settingsFileName);
         } catch (IOException | NullPointerException e) {
             logger.warn("Could not load [{}] because: {}", settingsFileName, e.getMessage());
