@@ -36,6 +36,12 @@ public abstract class MongoDaoConfig {
         init(ProgramSettings.getInstance().getDbProperties());
     }
 
+    public void refresh(Properties dbConfig) {
+        mongoClient.close();
+        mongoClient = null;
+        init(dbConfig);
+    }
+
     private void init(Properties dbConfig) {
         if (mongoClient == null) {
             try {
