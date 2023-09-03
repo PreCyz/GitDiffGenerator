@@ -184,7 +184,7 @@ public enum ArgName {
     githubToken {
         @Override
         public String defaultValue() {
-            return "dada";
+            return "";
         }
     },
     toolkitUsername {
@@ -234,6 +234,12 @@ public enum ArgName {
         @Override
         public String defaultValue() {
             return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/SiteAssets/";
+        }
+    },
+    emailDomain {
+        @Override
+        public String defaultValue() {
+            return "@netcompany.com";
         }
     },
     fetchTimeout {

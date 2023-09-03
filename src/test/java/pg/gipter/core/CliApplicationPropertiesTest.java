@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 class CliApplicationPropertiesTest {
 
@@ -1005,65 +1006,6 @@ class CliApplicationPropertiesTest {
         String actual = applicationProperties.toolkitDomain();
 
         assertThat(actual).isEqualTo("propertiesDomain");
-    }
-
-    @Test
-    void givenNoToolkitUrl_whenToolkitRESTUrl_thenReturnDefault() {
-        applicationProperties = new CliApplicationProperties(new String[]{});
-
-        String actual = applicationProperties.toolkitWSUrl();
-
-        assertThat(actual).isEqualTo("https://int-goto.netcompany.com");
-    }
-
-    @Test
-    void givenToolkitUrlFromCLI_whenToolkitRESTUrl_thenReturnDefault() {
-        applicationProperties = new CliApplicationProperties(
-                new String[]{"toolkitRESTUrl=cliUrl"}
-        );
-
-        String actual = applicationProperties.toolkitWSUrl();
-
-        assertThat(actual).isEqualTo("cliUrl");
-    }
-
-    @Test
-    void givenToolkitUrlFileAndCLI_whenToolkitRESTUrl_thenReturnDefault() {
-        String[] args = {"toolkitRESTUrl=cliUrl"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitWSUrl("propertiesUrl");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitWSUrl();
-
-        assertThat(actual).isEqualTo("cliUrl");
-    }
-
-    @Test
-    void givenToolkitUrlFromProperties_whenToolkitRESTUrl_thenReturnToolkitUrlFromProperties() {
-        String[] args = {};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitWSUrl("propertiesUrl");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitWSUrl();
-
-        assertThat(actual).isEqualTo("propertiesUrl");
-    }
-
-    @Test
-    void givenToolkitUrlFromPropertiesAndOtherArgs_whenToolkitRESTUrl_thenReturnToolkitUrlFromProperties() {
-        String[] args = {"uploadType=statement"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitWSUrl("propertiesUrl");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitWSUrl();
-
-        assertThat(actual).isEqualTo("propertiesUrl");
     }
 
     @Test
@@ -2111,12 +2053,15 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void given_noGithubToken_when_githubToken_then_returnDefault() {
+    void given_noGithubToken_when_githubToken_then_returnThrowNullPointerException() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        String actual = applicationProperties.githubToken();
-
-        assertThat(actual).isEqualTo(ArgName.githubToken.defaultValue());
+        try {
+            applicationProperties.githubToken();
+            fail("Should throw NPE");
+        } catch (RuntimeException ex) {
+            assertThat(ex).isInstanceOf(NullPointerException.class);
+        }
     }
 
     @Test

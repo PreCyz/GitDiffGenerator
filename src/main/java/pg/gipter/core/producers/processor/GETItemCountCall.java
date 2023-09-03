@@ -24,7 +24,7 @@ class GETItemCountCall implements Callable<ItemCountResponse> {
     @Override
     public ItemCountResponse call() throws Exception {
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 fullUrl,
                 CookiesService.getFedAuthString()
         );

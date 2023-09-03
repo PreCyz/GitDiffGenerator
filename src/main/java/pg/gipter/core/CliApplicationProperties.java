@@ -274,13 +274,15 @@ class CliApplicationProperties extends ApplicationProperties {
 
     @Override
     public String githubToken() {
-        Optional<String> gt = GeneralSettingsService.getInstance().getGithubToken();
-        if (gt.isPresent()) {
-            return gt.get();
-        }
         String githubToken = argExtractor.githubToken();
         if (!containsArg(ArgName.githubToken.name()) && applicationConfig.getGithubToken() != null) {
             githubToken = applicationConfig.getGithubToken();
+        }
+        if (ArgName.githubToken.defaultValue().equals(githubToken)) {
+            Optional<String> gt = GeneralSettingsService.getInstance().getGithubToken();
+            if (gt.isPresent()) {
+                return gt.get();
+            }
         }
         return githubToken;
     }

@@ -419,7 +419,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.toolkitWSUrl();
 
-        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
     }
 
     @Test
@@ -646,7 +646,7 @@ class ArgExtractorTest {
 
         String actual = argExtractor.githubToken();
 
-        assertThat(actual).isEqualTo("dada");
+        assertThat(actual).isEqualTo("");
     }
 
     @Test

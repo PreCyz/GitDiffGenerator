@@ -49,7 +49,7 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
             Set<String> listTitles = applicationProperties.toolkitProjectListNames();
             for (String listTitle : listTitles) {
                 String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?%s&%s&%s",
-                        applicationProperties.toolkitWSUrl(),
+                        applicationProperties.toolkitHostUrl(),
                         project,
                         listTitle,
                         select(),
@@ -59,7 +59,7 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
                 SharePointConfig sharePointConfig = new SharePointConfig();
                 sharePointConfig.setFullRequestUrl(fullUrl);;
                 sharePointConfig.setProject(project);
-                sharePointConfig.setUrl(applicationProperties.toolkitWSUrl());
+                sharePointConfig.setUrl(applicationProperties.toolkitHostUrl());
                 sharePointConfig.setListNames(Stream.of(listTitle).collect(toSet()));
                 sharePointConfig.setFedAuth(CookiesService.getFedAuthString());
                 result.add(sharePointConfig);

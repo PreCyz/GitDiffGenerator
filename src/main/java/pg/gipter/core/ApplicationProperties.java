@@ -311,7 +311,7 @@ public abstract class ApplicationProperties {
     }
 
     public final String toolkitUserEmail() {
-        return toolkitUsername().toLowerCase() + "@netcompany.com";
+        return toolkitUsername().toLowerCase() + argExtractor.emailDomain();
     }
 
     public boolean hasConnectionToToolkit() {
@@ -349,8 +349,7 @@ public abstract class ApplicationProperties {
                     ", checkLastItemEnabled='" + isCheckLastItemEnabled() + '\'' +
                     ", uploadItem='" + isUploadItem() + '\'' +
                     ", smartZip='" + isSmartZip() + '\'' +
-                    ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'' +
-                    ", githubToken='" + Optional.of(githubToken()).map(it -> "***").orElseGet(() -> "N/A") + '\'';
+                    ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
         }
         if (toolkitConfig != null) {
             log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +

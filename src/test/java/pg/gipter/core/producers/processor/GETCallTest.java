@@ -37,13 +37,13 @@ class GETCallTest {
         String top = "$top=1";
 
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items?",
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitCopyListName()
         ) + select + "&" + orderBy + "&" + top;
 
         SharePointConfig sharePointConfig = new SharePointConfig(
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 url
         );
         JsonObject jsonObject = new GETCall(sharePointConfig, new HttpRequester(applicationProperties)).call();

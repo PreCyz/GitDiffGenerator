@@ -1,6 +1,5 @@
 package pg.gipter.core;
 
-import pg.gipter.core.config.service.GeneralSettingsService;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -8,7 +7,6 @@ import pg.gipter.utils.StringUtils;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -235,10 +233,6 @@ class FileApplicationProperties extends ApplicationProperties {
 
     @Override
     public String githubToken() {
-        Optional<String> gt = GeneralSettingsService.getInstance().getGithubToken();
-        if (gt.isPresent()) {
-            return gt.get();
-        }
         if (StringUtils.notEmpty(applicationConfig.getGithubToken())) {
             return applicationConfig.getGithubToken();
         }

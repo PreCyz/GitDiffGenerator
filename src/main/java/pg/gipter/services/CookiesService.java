@@ -38,20 +38,20 @@ public final class CookiesService {
     public static boolean hasValidFedAuth() {
         try {
             CookieDetails fedAuthCookie = loadFedAuthCookie()
-                    .orElseThrow(() -> new IllegalStateException("The cookie file does not exist."));
+                    .orElseThrow(() -> new IllegalStateException("The cookie FedAuth does not exist."));
             LocalDateTime expirationDate = LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(fedAuthCookie.expiryTime),
                     TimeZone.getDefault().toZoneId()
             );
             return expirationDate.isAfter(LocalDateTime.now());
         } catch (Exception ex) {
-            logger.error("Could not load cookies [{}].", COOKIES_PATH.toAbsolutePath());
+            logger.error("Problem with FedAuth cookie. Source of cookie [{}].", COOKIES_PATH.toAbsolutePath());
             return false;
         }
     }
 
     public static String getFedAuthString() {
-        CookieDetails fedAuthCookie = loadFedAuthCookie().orElseThrow(() -> new IllegalStateException("The cookie file does not exist."));
+        CookieDetails fedAuthCookie = loadFedAuthCookie().orElseThrow(() -> new IllegalStateException("The cookie FedAuth does not exist."));
         return fedAuthCookie.name + "=" + fedAuthCookie.value;
     }
 

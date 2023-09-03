@@ -53,7 +53,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
         for (String project : applicationProperties.projectPaths()) {
             for (String list : applicationProperties.toolkitProjectListNames()) {
                 String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/ItemCount",
-                        applicationProperties.toolkitWSUrl(),
+                        applicationProperties.toolkitHostUrl(),
                         project,
                         list
                 );
@@ -75,7 +75,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
                 for (int i = 0; i < numberOfPages; ++i) {
                     String fullRequestUrl = buildPageableUrl(response.getProject(), response.getListName(), TOP_LIMIT * i);
                     SharePointConfig sharePointConfig = new SharePointConfig(
-                            applicationProperties.toolkitWSUrl(),
+                            applicationProperties.toolkitHostUrl(),
                             fullRequestUrl,
                             CookiesService.getFedAuthString()
                     );
@@ -102,7 +102,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
 
 
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items",
-                applicationProperties.toolkitWSUrl(),
+                applicationProperties.toolkitHostUrl(),
                 project,
                 listTitle
         );

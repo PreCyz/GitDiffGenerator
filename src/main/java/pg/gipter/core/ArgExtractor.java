@@ -318,4 +318,11 @@ final class ArgExtractor {
         }
         return StringUtils.getBoolean(ArgName.smartZip.defaultValue());
     }
+
+    String emailDomain() {
+        if (containsArg(ArgName.emailDomain.name())) {
+            return getValue(ArgName.emailDomain, ArgName.emailDomain.defaultValue());
+        }
+        return ArgName.emailDomain.defaultValue();
+    }
 }

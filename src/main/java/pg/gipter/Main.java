@@ -90,7 +90,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         if (EXECUTE_SSO) {
-            new FXWebService().initSSO(true);
+            new FXWebService(primaryStage).initSSO(InitSource.MAIN);
         } else {
             WebViewService.getInstance();
             Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
