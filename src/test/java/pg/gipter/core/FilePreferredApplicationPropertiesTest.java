@@ -1018,14 +1018,17 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenEmptyGithubToken_whenGithubToken_thenReturnDefault() {
+    void givenEmptyGithubToken_whenGithubToken_thenThrowNPE() {
         String[] args = {""};
         appProps = new FileApplicationProperties(args);
         appProps.init(TestUtils.mockConfigurationDao(new ApplicationConfig()));
 
-        String actual = appProps.githubToken();
-
-        assertThat(actual).isEqualTo(ArgName.githubToken.defaultValue());
+        try {
+            appProps.githubToken();
+            fail("Should throw NPE");
+        } catch (Exception ex) {
+            assertThat(ex).isInstanceOf(NullPointerException.class);
+        }
     }
 
     @Test
