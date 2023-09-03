@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 public enum ItemType {
-    SIMPLE, PROTECTED, STATEMENT, TOOLKIT_DOCS, SHARE_POINT_DOCS;
+    SIMPLE, PROTECTED, STATEMENT, TOOLKIT_DOCS;
 
     public static ItemType valueFor(String value) {
         String errMsg;
@@ -26,6 +26,6 @@ public enum ItemType {
     }
 
     public static boolean isDocsRelated(ItemType itemType) {
-        return EnumSet.of(ItemType.TOOLKIT_DOCS, ItemType.SHARE_POINT_DOCS).contains(itemType);
+        return ItemType.TOOLKIT_DOCS == itemType;
     }
 }

@@ -47,6 +47,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -529,22 +530,6 @@ public class UILauncher implements Launcher {
         return wizardProperties != null && !wizardProperties.isEmpty();
     }
 
-    private void showSharePointProjectWindow(Properties wizardProperties) {
-        this.wizardProperties = wizardProperties;
-        Platform.runLater(() -> {
-            sharePointConfigWindow = new Stage();
-            sharePointConfigWindow.initModality(Modality.APPLICATION_MODAL);
-            buildScene(sharePointConfigWindow, WindowFactory.SHARE_POINT_PROJECTS.createWindow(applicationProperties, this));
-            sharePointConfigWindow.setOnCloseRequest(event -> {
-                hideSharePointConfigWindow();
-                if (hasNoWizardProperties()) {
-                    execute();
-                }
-            });
-            sharePointConfigWindow.showAndWait();
-        });
-    }
-
     private void hideSharePointConfigWindow() {
         sharePointConfigWindow.close();
         sharePointConfigWindow = null;
@@ -555,15 +540,10 @@ public class UILauncher implements Launcher {
     }
 
     public void showProject(ItemType itemType, Properties properties) {
-        switch (itemType) {
-            case TOOLKIT_DOCS:
-                showToolkitProjectsWindow(properties);
-                break;
-            case SHARE_POINT_DOCS:
-                showSharePointProjectWindow(properties);
-                break;
-            default:
-                showProjectsWindow(properties);
+        if (Objects.requireNonNull(itemType) == ItemType.TOOLKIT_DOCS) {
+            showToolkitProjectsWindow(properties);
+        } else {
+            showProjectsWindow(properties);
         }
     }
 

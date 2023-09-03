@@ -50,12 +50,9 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Properties;
-
-import static java.util.stream.Collectors.toCollection;
 
 public class WizardLauncher implements Launcher {
 
@@ -375,17 +372,6 @@ public class WizardLauncher implements Launcher {
                 .toArray(String[]::new);
         RunConfig runConfig = RunConfig.valueFrom(args);
 
-        @SuppressWarnings("unchecked")
-        LinkedHashSet<SharePointConfig> sharePointConfigs = wizardProperties.entrySet()
-                    .stream()
-                    .filter(entry -> SharePointConfig.SHARE_POINT_CONFIGS.equals(entry.getKey()))
-                    .map(entry -> (LinkedHashSet<SharePointConfig>) entry.getValue())
-                    .flatMap(Collection::stream)
-                    .collect(toCollection(LinkedHashSet::new));
-        if (!sharePointConfigs.isEmpty()) {
-            runConfig.setSharePointConfigs(sharePointConfigs);
-        }
-
         applicationProperties.updateCurrentRunConfig(runConfig);
         applicationProperties.updateToolkitConfig(ToolkitConfig.valueFrom(args));
         applicationProperties.updateApplicationConfig(ApplicationConfig.valueFrom(args));
@@ -498,8 +484,6 @@ public class WizardLauncher implements Launcher {
                 switch (ItemType.valueFor(property)) {
                     case TOOLKIT_DOCS:
                     case STATEMENT:
-                    case SHARE_POINT_DOCS:
-                        return projectPage;
                     default:
                         return committerPage;
                 }

@@ -31,20 +31,6 @@ class DocumentFinderFactoryTest {
     }
 
     @Test
-    void givenItemTypeSharePointDocs_whenGetInstance_thenReturnSharePointDocumentFinder() {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{
-                        ArgName.itemType + "=" + ItemType.SHARE_POINT_DOCS.name(),
-                }
-        );
-
-        Optional<DocumentFinder> documentFinder = DocumentFinderFactory.getInstance(applicationProperties);
-
-        assertThat(documentFinder.isPresent()).isTrue();
-        assertThat(documentFinder.get()).isInstanceOf(SharePointDocumentFinder.class);
-    }
-
-    @Test
     @Disabled("Until ComplexDocumentFinder is ready.")
     void givenEndDateNotEqualNow_whenGetInstance_thenReturnSimpleDocumentFinder() {
         ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
