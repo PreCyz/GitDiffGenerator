@@ -31,7 +31,6 @@ import pg.gipter.services.ConcurrentService;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.StartupService;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.BrowserLinkAction;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.ui.alerts.LogLinkAction;
 import pg.gipter.ui.alerts.WebViewService;
@@ -168,15 +167,12 @@ public class UILauncher implements Launcher {
     private void checkUpgrades() {
         if (!upgradeChecked) {
             executor.execute(() -> {
-                GithubService service = new GithubService(applicationProperties.version(), applicationProperties.githubToken());
+                final GithubService service = new GithubService(applicationProperties.version(), applicationProperties.githubToken());
                 if (service.isNewVersion()) {
                     logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
                             .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
-                            .withLinkAction(new BrowserLinkAction(
-                                    GithubService.GITHUB_URL + "/releases/latest",
-                                    BundleUtils.getMsg("upgrade.readReleaseNotes")
-                            ))
+                            .withMessage(service.getReleaseNotes().orElseGet(() -> ""))
                             .withAlertType(Alert.AlertType.INFORMATION)
                             .withCustomControl(ControlFactory.createUpgradeButton(this))
                             .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())

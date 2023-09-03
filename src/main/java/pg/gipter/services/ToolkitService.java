@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.GETCall;
+import pg.gipter.services.dto.CasesData;
 import pg.gipter.services.dto.ItemField;
 import pg.gipter.services.dto.SortFieldDefinition;
 import pg.gipter.services.dto.ToolkitCasePayload;
@@ -20,16 +21,14 @@ import pg.gipter.utils.BundleUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /** Created by Pawel Gawedzki on 26-Jul-2019. */
-public class ToolkitService extends Task<Set<String>> {
+public class ToolkitService extends Task<List<CasesData>> {
 
     protected final static Logger logger = LoggerFactory.getLogger(ToolkitService.class);
     private final ApplicationProperties applicationProperties;
@@ -41,16 +40,16 @@ public class ToolkitService extends Task<Set<String>> {
     }
 
     @Override
-    protected Set<String> call() {
+    protected List<CasesData> call() {
         return getAvailableCases();
     }
 
-    private Set<String> getAvailableCases() {
+    private List<CasesData> getAvailableCases() {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
         headers.put("Cookie", CookiesService.getFedAuthString());
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
-        Set<String> cases = new HashSet<>();
+        List<CasesData> cases = new LinkedList<>();
         try {
             ToolkitCasePayload payload = new ToolkitCasePayload(
                     new SortFieldDefinition("ows_Created", "datetime"),
@@ -62,7 +61,7 @@ public class ToolkitService extends Task<Set<String>> {
                     false
             );
             ToolkitCaseResponse response = httpRequester.post(url, headers, payload, ToolkitCaseResponse.class);
-            cases = response.cases.stream().map(it -> it.id).collect(Collectors.toSet());
+            cases = response.cases;
         } catch (IOException ex) {
             updateMessage(BundleUtils.getMsg("toolkit.projects.downloadFail"));
             logger.error("Could not download toolkit projects for user [{}]. ", applicationProperties.toolkitUsername(), ex);
@@ -72,7 +71,7 @@ public class ToolkitService extends Task<Set<String>> {
         return cases;
     }
 
-    public Set<String> downloadUserProjects() {
+    public List<CasesData> downloadUserProjects() {
         return call();
     }
 

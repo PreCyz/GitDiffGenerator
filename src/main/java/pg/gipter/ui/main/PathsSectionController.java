@@ -71,6 +71,7 @@ class PathsSectionController extends AbstractController {
     private void setInitValues() {
         projectPathLabel.setText(applicationProperties.projectPaths()
                 .stream()
+                .map(path -> path.substring(path.lastIndexOf("/") + 1))
                 .map(path -> path.substring(path.lastIndexOf(File.separator) + 1))
                 .collect(joining(","))
         );

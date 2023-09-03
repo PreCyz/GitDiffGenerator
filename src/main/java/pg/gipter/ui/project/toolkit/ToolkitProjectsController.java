@@ -23,6 +23,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.ToolkitService;
+import pg.gipter.services.dto.CasesData;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.AbstractController;
@@ -37,6 +38,7 @@ import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -125,10 +127,8 @@ public class ToolkitProjectsController extends AbstractController {
         } else {
             ObservableList<ProjectDetails> projectsPaths = FXCollections.observableArrayList();
             for (String path : projects) {
-                if (path.startsWith(CASES)) {
-                    String name = path.replace(CASES, "");
-                    projectsPaths.add(new ProjectDetails(name, ItemType.TOOLKIT_DOCS.name(), path));
-                }
+                String name = path.substring(path.lastIndexOf("/") + 1);
+                projectsPaths.add(new ProjectDetails(name, ItemType.TOOLKIT_DOCS.name(), path));
             }
             if (projectsPaths.isEmpty()) {
                 projectsPaths.add(ProjectDetails.DEFAULT);
@@ -143,14 +143,18 @@ public class ToolkitProjectsController extends AbstractController {
             final ToolkitService toolkitService = new ToolkitService(applicationProperties);
             resetIndicatorProperties(toolkitService);
             uiLauncher.executeOutsideUIThread(() -> {
-                Set<String> links = toolkitService.downloadUserProjects();
-                if (!links.isEmpty()) {
+                List<CasesData> cases = toolkitService.downloadUserProjects();
+                if (!cases.isEmpty()) {
                     Set<ProjectDetails> projects = new LinkedHashSet<>();
                     if (!projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
                         projects.addAll(projectsTableView.getItems());
                     }
-                    projects.addAll(links.stream()
-                            .map(p -> new ProjectDetails(p, ItemType.TOOLKIT_DOCS.name(), CASES + p))
+                    projects.addAll(cases.stream()
+                            .map(c -> new ProjectDetails(
+                                    c.id,
+                                    ItemType.TOOLKIT_DOCS.name(),
+                                    c.caseAbsoluteUrl.replace(applicationProperties.toolkitHostUrl(), "")
+                            ))
                             .collect(toList()));
                     projectsTableView.setItems(FXCollections.observableArrayList(projects));
                     saveButton.setDisable(false);
