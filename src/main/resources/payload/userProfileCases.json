@@ -1,0 +1,24 @@
+{
+  "SortFieldDefinition": {
+    "InternalName": "ows_Created",
+    "DataType": "datetime"
+  },
+  "ItemFields": [
+    {
+      "DisplayName": "title",
+      "FieldType": "",
+      "InternalName": "ows_Title"
+    },
+    {
+      "DisplayName": "id",
+      "FieldType": "",
+      "InternalName": "CaseID"
+    },
+    {
+      "DisplayName": "created",
+      "FieldType": "",
+      "InternalName": "ows_Created"
+    }
+  ],
+  "SortAscending": false
+}

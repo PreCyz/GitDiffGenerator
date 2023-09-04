@@ -9,8 +9,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +18,11 @@ import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.SystemUtils;
 
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
@@ -35,12 +35,14 @@ public class GithubService {
 
     private static JsonObject latestReleaseDetails;
     private SemanticVersioning serverVersion;
+    private final String githubToken;
     String distributionName;
     private final SemanticVersioning currentVersion;
     private final String JSON_TAG_NAME = "tag_name";
 
-    public GithubService(SemanticVersioning semanticVersioning) {
+    public GithubService(SemanticVersioning semanticVersioning, String githubToken) {
         this.currentVersion = semanticVersioning;
+        this.githubToken = githubToken;
     }
 
     public String getServerVersion() {
@@ -72,11 +74,11 @@ public class GithubService {
     }
 
     Optional<JsonObject> downloadLatestDistributionDetails() {
-        HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet request = new HttpGet("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest");
-        request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
-
-        try {
+        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()){
+            HttpGet request = new HttpGet("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest");
+            request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
+            request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
+            request.addHeader("X-GitHub-Api-Version", "2022-11-28");
             HttpResponse response = httpClient.execute(request);
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -94,7 +96,7 @@ public class GithubService {
                     Optional<JsonObject> distributionDetails = Optional.ofNullable(gson.fromJson(result.toString(), JsonObject.class));
                     if (distributionDetails.isPresent()) {
                         logger.info("Last distribution details downloaded.");
-                        logger.debug("Last distribution details: {}", result.toString());
+                        logger.debug("Last distribution details: {}", result);
                     } else {
                         logger.warn("Last distribution details is not available.");
                     }
@@ -122,9 +124,11 @@ public class GithubService {
         if (latestReleaseDetails != null) {
             Optional<String> downloadLink = getDownloadLink(latestReleaseDetails);
             if (downloadLink.isPresent()) {
-                HttpClient httpClient = HttpClientBuilder.create().build();
-                HttpGet request = new HttpGet(downloadLink.get());
-                try {
+                try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+                    HttpGet request = new HttpGet(downloadLink.get());
+                    request.addHeader(HttpHeaders.ACCEPT, "application/octet-stream");
+                    request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
+                    request.addHeader("X-GitHub-Api-Version", "2022-11-28");
                     HttpResponse response = httpClient.execute(request);
                     HttpEntity entity = response.getEntity();
 
@@ -150,7 +154,7 @@ public class GithubService {
 
     private void downloadFile(HttpEntity entity, String downloadLocation, TaskService<?> taskService) throws IOException {
         taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.downloading", getLastVersion()));
-        try (OutputStream outStream = new FileOutputStream(Paths.get(downloadLocation, distributionName).toFile());
+        try (OutputStream outStream = Files.newOutputStream(Paths.get(downloadLocation, distributionName));
              InputStream entityContent = entity.getContent()) {
 
             byte[] buffer = new byte[8 * 1024];
@@ -174,7 +178,7 @@ public class GithubService {
             JsonElement assetName = element.get("name");
             if (isProperAsset(name, assetName)) {
                 distributionName = assetName.getAsString();
-                downloadLink = Optional.ofNullable(element.get("browser_download_url").getAsString());
+                downloadLink = Optional.ofNullable(element.get("url").getAsString());
                 logger.info("New version download link: [{}]", downloadLink.orElseGet(() -> "N/A"));
                 break;
             }

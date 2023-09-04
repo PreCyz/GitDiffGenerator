@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 class CliApplicationPropertiesTest {
 
@@ -1008,65 +1009,6 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void givenNoToolkitUrl_whenToolkitRESTUrl_thenReturnDefault() {
-        applicationProperties = new CliApplicationProperties(new String[]{});
-
-        String actual = applicationProperties.toolkitRESTUrl();
-
-        assertThat(actual).isEqualTo("https://int-goto.netcompany.com");
-    }
-
-    @Test
-    void givenToolkitUrlFromCLI_whenToolkitRESTUrl_thenReturnDefault() {
-        applicationProperties = new CliApplicationProperties(
-                new String[]{"toolkitRESTUrl=cliUrl"}
-        );
-
-        String actual = applicationProperties.toolkitRESTUrl();
-
-        assertThat(actual).isEqualTo("cliUrl");
-    }
-
-    @Test
-    void givenToolkitUrlFileAndCLI_whenToolkitRESTUrl_thenReturnDefault() {
-        String[] args = {"toolkitRESTUrl=cliUrl"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitRESTUrl("propertiesUrl");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitRESTUrl();
-
-        assertThat(actual).isEqualTo("cliUrl");
-    }
-
-    @Test
-    void givenToolkitUrlFromProperties_whenToolkitRESTUrl_thenReturnToolkitUrlFromProperties() {
-        String[] args = {};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitRESTUrl("propertiesUrl");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitRESTUrl();
-
-        assertThat(actual).isEqualTo("propertiesUrl");
-    }
-
-    @Test
-    void givenToolkitUrlFromPropertiesAndOtherArgs_whenToolkitRESTUrl_thenReturnToolkitUrlFromProperties() {
-        String[] args = {"uploadType=statement"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitRESTUrl("propertiesUrl");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitRESTUrl();
-
-        assertThat(actual).isEqualTo("propertiesUrl");
-    }
-
-    @Test
     void givenNoToolkitHostUrl_whenToolkitHostUrl_thenReturnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
@@ -1243,67 +1185,6 @@ class CliApplicationPropertiesTest {
         String actual = applicationProperties.toolkitUserFolder();
 
         assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
-    }
-
-    @Test
-    void givenNoToolkitUserFolder_whenToolkitUserWSFolder_thenReturnDefault() {
-        applicationProperties = new CliApplicationProperties(new String[]{});
-
-        String actual = applicationProperties.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(
-                "https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/" + SystemUtils.userName().toUpperCase()
-        );
-    }
-
-    @Test
-    void given_toolkitUserNameFromCLI_whenToolkitUserWSFolder_then_returnProperFolder() {
-        applicationProperties = new CliApplicationProperties(
-                new String[]{"toolkitUsername=cliUserName"}
-        );
-
-        String actual = applicationProperties.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
-    }
-
-    @Test
-    void givenToolkitUserFolderFileAndCLI_whenToolkitUserWSFolder_thenReturnWithCliUser() {
-        String[] args = {"toolkitUsername=cliUserName"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("propertiesUserName");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
-    }
-
-    @Test
-    void givenToolkitUsernameFromProperties_whenToolkitUserWSFolder_thenReturnWithToolkitUsernameFromProperties() {
-        String[] args = {};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("propertiesUserName");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
-    }
-
-    @Test
-    void givenToolkitUserNameFromPropertiesAndOtherArgs_whenToolkitWSUserFolder_thenReturnProperWithUserNameFromProperties() {
-        String[] args = {"uploadType=statement"};
-        applicationProperties = new CliApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("propertiesUserName");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo("https://int-goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
     }
 
     @Test
@@ -2169,5 +2050,65 @@ class CliApplicationPropertiesTest {
         boolean actual = applicationProperties.isUploadItem();
 
         assertThat(actual).isFalse();
+    }
+
+    @Test
+    void given_noGithubToken_when_githubToken_then_returnThrowNullPointerException() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        try {
+            applicationProperties.githubToken();
+            fail("Should throw NPE");
+        } catch (RuntimeException ex) {
+            assertThat(ex).isInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Test
+    void given_githubTokenFromCLI_when_githubToken_then_returnCliGithubToken() {
+        applicationProperties = new CliApplicationProperties(new String[]{"githubToken=1"});
+
+        String actual = applicationProperties.githubToken();
+
+        assertThat(actual).isEqualTo("1");
+    }
+
+    @Test
+    void given_githubTokenFileAndCLI_when_githubToken_then_returnCliGithubToken() {
+        String[] args = {"githubToken=cli"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = applicationProperties.githubToken();
+
+        assertThat(actual).isEqualTo("cli");
+    }
+
+    @Test
+    void given_githubTokenFromProperties_when_githubToken_then_returnGithubTokenFromProperties() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = applicationProperties.githubToken();
+
+        assertThat(actual).isEqualTo("file");
+    }
+
+    @Test
+    void given_githubTokenFromPropertiesAndOtherArgs_when_githubToken_then_returnGithubTokenFromProperties() {
+        String[] args = {"author=test"};
+        applicationProperties = new CliApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = applicationProperties.githubToken();
+
+        assertThat(actual).isEqualTo("file");
     }
 }

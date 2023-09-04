@@ -54,7 +54,6 @@ public class JobTestUI {
         try {
             Files.deleteIfExists(Paths.get(DaoConstants.APPLICATION_PROPERTIES_JSON));
             Files.deleteIfExists(Paths.get(DaoConstants.DATA_JSON));
-            Files.deleteIfExists(Paths.get(DaoConstants.DATA_PROPERTIES));
         } catch (IOException e) {
             System.err.println("There is something weird going on.");
         }

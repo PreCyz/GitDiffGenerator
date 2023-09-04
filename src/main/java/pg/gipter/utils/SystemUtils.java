@@ -44,4 +44,7 @@ public final class SystemUtils {
         return System.getProperty("os.name");
     }
 
+    public static String processorArchitecture() {
+        return System.getProperty("processor.architecture");
+    }
 }

@@ -1,5 +1,6 @@
 package pg.gipter.core;
 
+import pg.gipter.core.config.service.GeneralSettingsService;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -7,6 +8,7 @@ import pg.gipter.utils.StringUtils;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -192,14 +194,6 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitRESTUrl() {
-        if (StringUtils.notEmpty(toolkitConfig.getToolkitRESTUrl())) {
-            return toolkitConfig.getToolkitRESTUrl();
-        }
-        return argExtractor.toolkitRESTUrl();
-    }
-
-    @Override
     public String toolkitHostUrl() {
         if (StringUtils.notEmpty(toolkitConfig.getToolkitHostUrl())) {
             return toolkitConfig.getToolkitHostUrl();
@@ -224,14 +218,6 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitWSUserFolder() {
-        if (StringUtils.notEmpty(toolkitUsername())) {
-            return ArgName.toolkitWSUserFolder.defaultValue() + toolkitUsername();
-        }
-        return argExtractor.toolkitWSUserFolder();
-    }
-
-    @Override
     public Set<String> toolkitProjectListNames() {
         if (StringUtils.notEmpty(toolkitConfig.getToolkitProjectListNames())) {
             return Stream.of(toolkitConfig.getToolkitProjectListNames().split(",")).collect(Collectors.toSet());
@@ -245,6 +231,16 @@ class FileApplicationProperties extends ApplicationProperties {
             return applicationConfig.getUseUI();
         }
         return argExtractor.isUseUI();
+    }
+
+    @Override
+    public String githubToken() {
+        if (StringUtils.notEmpty(applicationConfig.getGithubToken())) {
+            return applicationConfig.getGithubToken();
+        }
+        Optional<String> gt = GeneralSettingsService.getInstance().getGithubToken();
+        return gt.orElseGet(argExtractor::githubToken);
+
     }
 
     @Override

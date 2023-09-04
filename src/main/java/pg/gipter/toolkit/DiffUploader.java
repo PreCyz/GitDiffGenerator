@@ -3,7 +3,7 @@ package pg.gipter.toolkit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.toolkit.sharepoint.rest.SharePointRestClient;
+import pg.gipter.services.ToolkitService;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ public class DiffUploader {
     }
 
     public void uploadDiff() {
-        SharePointRestClient client = new SharePointRestClient(applicationProperties);
+        ToolkitService client = new ToolkitService(applicationProperties);
         try {
             String itemId = client.createItem();
             client.uploadAttachment(itemId);

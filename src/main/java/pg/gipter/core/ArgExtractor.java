@@ -161,13 +161,6 @@ final class ArgExtractor {
         return ArgName.toolkitDomain.defaultValue();
     }
 
-    String toolkitRESTUrl() {
-        if (containsArg(ArgName.toolkitRESTUrl.name())) {
-            return getValue(ArgName.toolkitRESTUrl, ArgName.toolkitRESTUrl.defaultValue());
-        }
-        return ArgName.toolkitRESTUrl.defaultValue();
-    }
-
     String toolkitHostUrl() {
         if (containsArg(ArgName.toolkitHostUrl.name())) {
             return getValue(ArgName.toolkitHostUrl, ArgName.toolkitHostUrl.defaultValue());
@@ -189,10 +182,6 @@ final class ArgExtractor {
 
     String toolkitUserFolder() {
         return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
-    }
-
-    String toolkitWSUserFolder() {
-        return ArgName.toolkitWSUserFolder.defaultValue() + toolkitUsername();
     }
 
     PreferredArgSource preferredArgSource() {
@@ -288,6 +277,13 @@ final class ArgExtractor {
         return ArgName.uiLanguage.defaultValue();
     }
 
+    String githubToken() {
+        if (containsArg(ArgName.githubToken.name())) {
+            return getValue(ArgName.githubToken, ArgName.githubToken.defaultValue());
+        }
+        return ArgName.githubToken.defaultValue();
+    }
+
     boolean isCheckLastItemEnabled() {
         if (containsArg(ArgName.checkLastItem.name())) {
             return StringUtils.getBoolean(getValue(ArgName.checkLastItem, ArgName.checkLastItem.defaultValue()));
@@ -321,5 +317,12 @@ final class ArgExtractor {
             return StringUtils.getBoolean(getValue(ArgName.smartZip, ArgName.smartZip.defaultValue()));
         }
         return StringUtils.getBoolean(ArgName.smartZip.defaultValue());
+    }
+
+    String emailDomain() {
+        if (containsArg(ArgName.emailDomain.name())) {
+            return getValue(ArgName.emailDomain, ArgName.emailDomain.defaultValue());
+        }
+        return ArgName.emailDomain.defaultValue();
     }
 }

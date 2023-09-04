@@ -14,6 +14,8 @@ import pg.gipter.core.ArgName;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.ConcurrentService;
+import pg.gipter.services.CookiesService;
+import pg.gipter.services.FXWebService;
 import pg.gipter.services.keystore.CertificateServiceFactory;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
@@ -32,22 +34,42 @@ public class Main extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private String[] args;
+    private static boolean EXECUTE_SSO = false;
     private static ApplicationProperties applicationProperties;
 
     public static void main(String[] args) {
         logger.info("Gipter started.");
-        Main mObj = new Main(args);
-        mObj.setLoggerLevel(applicationProperties.loggerLevel());
-        logger.info("Java version '{}'.", SystemUtils.javaVersion());
-        logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
-        logger.info("Gipter can use '{}' threads.", ConcurrentService.getInstance().availableThreads());
-        mObj.runConverters(applicationProperties);
-        mObj.setDefaultConfig();
-        if (Main.applicationProperties.isUseUI()) {
-            launch(args);
+        if (CookiesService.isCookiesExist()) {
+            initProgramSettings(args);
+            Main mObj = new Main(args);
+            mObj.setLoggerLevel(applicationProperties.loggerLevel());
+            logger.info("Java version '{}'.", SystemUtils.javaVersion());
+            logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
+            logger.info("Gipter can use '{}' threads.", ConcurrentService.getInstance().availableThreads());
+            mObj.runConverters(applicationProperties);
+            mObj.setDefaultConfig();
+            if (Main.applicationProperties.isUseUI()) {
+                launch(args);
+            } else {
+                Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
+                launcher.execute();
+            }
+        } else if (Stream.of(args).filter(it -> it.startsWith(ArgName.useUI.name()))
+                    .map(it -> it.substring(it.indexOf("=") + 1))
+                    .anyMatch(it -> it.toLowerCase().startsWith("n"))) {
+            logger.error("Cookies are not available. Commandline is available only if [cookies.json] is present.");
+            System.exit(-1);
         } else {
-            Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
-            launcher.execute();
+            EXECUTE_SSO = true;
+            launch(args);
+        }
+    }
+
+    private static void initProgramSettings(String[] args) {
+        if (args != null && Arrays.asList(args).contains("env=dev")) {
+            ProgramSettings.initProgramSettings(Environment.DEV);
+        } else {
+            ProgramSettings.initProgramSettings(Environment.PROD);
         }
     }
 
@@ -68,9 +90,13 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        WebViewService.getInstance();
-        Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
-        launcher.execute();
+        if (EXECUTE_SSO) {
+            new FXWebService(primaryStage).initSSO(InitSource.MAIN);
+        } else {
+            WebViewService.getInstance();
+            Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
+            launcher.execute();
+        }
     }
 
     private void setLoggerLevel(String loggerLevel) {

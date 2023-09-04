@@ -224,35 +224,6 @@ public class MainTestUI {
     }
 
     @Test
-    void givenSHARE_POINT_DOCSItemType_whenAddConfiguration_thenDisabledFields(FxRobot robot) {
-        final MainWindowObject windowObject = new MainWindowObject(robot)
-                .pressAddConfigurationButton()
-                .enterTextInDialog("config")
-                .pressEnter()
-                .pressOkOnPopup()
-                .chooseItemType(ItemType.SHARE_POINT_DOCS)
-                .pressSaveButton()
-                .pressOkOnPopup();
-
-        final Map<String, RunConfig> map = dao.loadRunConfigMap();
-
-        assertThat(map.keySet()).containsExactly("config");
-        assertThat(windowObject.getAuthorsTextField().isDisabled()).isTrue();
-        assertThat(windowObject.getCommitterEmailTextField().isDisabled()).isTrue();
-        assertThat(windowObject.getGitAuthorTextField().isDisabled()).isTrue();
-        assertThat(windowObject.getMercurialAuthorTextField().isDisabled()).isTrue();
-        assertThat(windowObject.getSvnAuthorTextField().isDisabled()).isTrue();
-        assertThat(windowObject.getSkipRemoteCheckBox().isDisabled()).isTrue();
-        assertThat(windowObject.getFetchAllCheckBox().isDisabled()).isTrue();
-        assertThat(windowObject.getFetchTimeoutTextField().isDisabled()).isTrue();
-        assertThat(windowObject.getDeleteDownloadedFilesCheckBox().isDisabled()).isFalse();
-        assertThat(windowObject.getStartDatePicker().isDisabled()).isFalse();
-        assertThat(windowObject.getEndDatePicker().isDisabled()).isTrue();
-        assertThat(windowObject.getUseDefaultAuthorCheckBox().isDisabled()).isTrue();
-        assertThat(windowObject.getUseDefaultEmailCheckBox().isDisabled()).isTrue();
-    }
-
-    @Test
     @Disabled("From some reason it does not work.")
     void given2DifferentConfigs_whenRemoveFirstConfig_thenOneIsRemovedAndLoaded(FxRobot robot) {
         final MainWindowObject windowObject = new MainWindowObject(robot)

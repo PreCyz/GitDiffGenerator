@@ -181,7 +181,12 @@ public enum ArgName {
             return BundleUtils.getDefaultLanguage();
         }
     },
-
+    githubToken {
+        @Override
+        public String defaultValue() {
+            return "";
+        }
+    },
     toolkitUsername {
         @Override
         public String defaultValue() {
@@ -200,12 +205,6 @@ public enum ArgName {
             return "WorkItems";
         }
     },
-    toolkitRESTUrl {
-        @Override
-        public String defaultValue() {
-            return "https://int-goto.netcompany.com";
-        }
-    },
     toolkitHostUrl {
         @Override
         public String defaultValue() {
@@ -221,7 +220,7 @@ public enum ArgName {
     toolkitWSUrl {
         @Override
         public String defaultValue() {
-            return toolkitRESTUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/_vti_bin/lists.asmx";
+            return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/_vti_bin/lists.asmx";
         }
     },
     toolkitUserFolder {
@@ -231,11 +230,16 @@ public enum ArgName {
                     "/Lists/" + toolkitCopyListName.defaultValue() + "/";
         }
     },
-    toolkitWSUserFolder {
+    toolkitSiteAssetsUrl {
         @Override
         public String defaultValue() {
-            return toolkitRESTUrl.defaultValue() + toolkitCopyCase.defaultValue() +
-                    "/Lists/" + toolkitCopyListName.defaultValue() + "/";
+            return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/SiteAssets/";
+        }
+    },
+    emailDomain {
+        @Override
+        public String defaultValue() {
+            return "@netcompany.com";
         }
     },
     fetchTimeout {

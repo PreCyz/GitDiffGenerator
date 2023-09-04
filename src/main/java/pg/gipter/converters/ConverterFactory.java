@@ -14,7 +14,6 @@ public final class ConverterFactory {
         return Stream.of(
                 new ItemTypeConverter(),
                 new SecurityConverter(),
-                new ProgramDataConverter(),
                 new CustomCommandConverter(applicationProperties)
         ).collect(Collectors.toList());
     }
