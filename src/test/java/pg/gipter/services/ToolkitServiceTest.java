@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.sharepoint.rest;
+package pg.gipter.services;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
-class SharePointRestClientTest {
+class ToolkitServiceTest {
 
     @Test
     @Disabled
@@ -18,7 +18,7 @@ class SharePointRestClientTest {
         String[] strings = {
                 ArgName.toolkitUsername.name()+"=PAWG"
         };
-        SharePointRestClient client = new SharePointRestClient(ApplicationPropertiesFactory.getInstance(strings));
+        ToolkitService client = new ToolkitService(ApplicationPropertiesFactory.getInstance(strings));
 
         try {
             String itemId = client.createItem();
@@ -33,4 +33,5 @@ class SharePointRestClientTest {
             fail("Should not be any exception here");
         }
     }
+
 }

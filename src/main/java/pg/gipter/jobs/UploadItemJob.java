@@ -17,7 +17,6 @@ import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.services.CookiesService;
 import pg.gipter.services.FXWebService;
 import pg.gipter.services.ToolkitService;
-import pg.gipter.toolkit.sharepoint.rest.SharePointRestClient;
 import pg.gipter.ui.MultiConfigRunner;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.UILauncher;
@@ -79,7 +78,7 @@ public class UploadItemJob implements Job {
                 configurationDao.loadArgumentArray(jobParam.getConfigs().iterator().next())
         );
         uiLauncher.updateTray(applicationProperties);
-        Optional<String> userId = new SharePointRestClient(applicationProperties).getUserId();
+        Optional<String> userId = new ToolkitService(applicationProperties).getUserId();
         if (applicationProperties.isToolkitCredentialsSet() && userId.isPresent()) {
             new ToolkitService(applicationProperties).lastItemModifiedDate(userId.get())
                     .ifPresent((lastUploadDate) -> uiLauncher.setLastItemSubmissionDate(

@@ -1,4 +1,4 @@
-package pg.gipter.toolkit.sharepoint;
+package pg.gipter.toolkit;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

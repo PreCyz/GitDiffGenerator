@@ -9,7 +9,6 @@ import javafx.util.StringConverter;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.ToolkitService;
-import pg.gipter.toolkit.sharepoint.rest.SharePointRestClient;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.utils.BundleUtils;
@@ -65,7 +64,7 @@ public class DatesSectionController extends AbstractController {
     void setLastItemSubmissionDate() {
         uiLauncher.executeOutsideUIThread(() -> {
             if (uiLauncher.getLastItemSubmissionDate() == null) {
-                Optional<String> userId = new SharePointRestClient(applicationProperties).getUserId();
+                Optional<String> userId = new ToolkitService(applicationProperties).getUserId();
                 Optional<String> submissionDate = new ToolkitService(applicationProperties).lastItemModifiedDate(userId.orElseGet(() -> ""));
                 if (submissionDate.isPresent()) {
                     uiLauncher.setLastItemSubmissionDate(LocalDateTime.parse(submissionDate.get(), DateTimeFormatter.ISO_DATE_TIME));
