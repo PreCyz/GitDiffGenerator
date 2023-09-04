@@ -1,8 +1,5 @@
 package pg.gipter.services;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.sun.webkit.network.CookieManager;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
@@ -23,20 +20,16 @@ import pg.gipter.InitSource;
 import pg.gipter.core.ArgName;
 import pg.gipter.jobs.UploadItemJob;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.JarHelper;
 import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.CookieHandler;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
@@ -50,7 +43,7 @@ public class FXWebService {
     private static final Logger logger = LoggerFactory.getLogger(FXWebService.class);
     private final ExecutorService executorService;
     private final Stage stage;
-    private final JobDataMap jobDataMap;
+    private final Map<String, ?> jobDataMap;
     private WebEngine webEngine;
     private InitSource initSource;
 
@@ -63,10 +56,10 @@ public class FXWebService {
     }
 
     public FXWebService(Stage stage) {
-        this(stage, new JobDataMap());
+        this(stage, Collections.emptyMap());
     }
 
-    private FXWebService(Stage stage, JobDataMap jobDataMap) {
+    private FXWebService(Stage stage, Map<String, ?> jobDataMap) {
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         this.stage = stage;
         this.jobDataMap = jobDataMap;
@@ -78,7 +71,6 @@ public class FXWebService {
 
     public void initSSO(InitSource initSource) {
         this.initSource = initSource;
-        WebViewService.getInstance();
         String ssoUrl = ArgName.toolkitUserFolder.defaultValue();
         logger.info("Launching SSO for [{}]", ssoUrl);
 
@@ -134,8 +126,7 @@ public class FXWebService {
         }
         if ("DEV".equals(System.getenv().get("PROGRAM-PROFILE"))) {
             final String classesPath = jarPath.get().toAbsolutePath().toString();
-            jarPath = Optional.of(classesPath.replaceFirst("classes", "Gipter.jar"))
-                    .map(Paths::get);
+            jarPath = Optional.of(classesPath.replaceFirst("classes", "Gipter.jar")).map(Paths::get);
         }
 
         if (!Files.exists(jarPath.get()) || !Files.isRegularFile(jarPath.get())) {
@@ -183,18 +174,18 @@ public class FXWebService {
                 }
                 if (webEngine.getLocation().contains(ArgName.toolkitCopyCase.defaultValue())) {
                     try {
-                        saveCookies();
+                        CookiesService.extractAndSaveCookies();
                         new AlertWindowBuilder()
                                 .withHeaderText(BundleUtils.getMsg("webview.cookies.saved"))
                                 .withAlertType(Alert.AlertType.INFORMATION)
-                                .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
+                                .withImageFile(ImageFile.FINGER_UP_PNG)
                                 .buildAndDisplayWindow();
                     } catch (IOException | NoSuchFieldException | ClassNotFoundException | IllegalAccessException e) {
                         logger.error("Could not save cookies.", e);
                         new AlertWindowBuilder()
                                 .withHeaderText(BundleUtils.getMsg("webview.cookies.error"))
                                 .withAlertType(Alert.AlertType.ERROR)
-                                .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                                .withImageFile(ImageFile.ERROR_CHICKEN_PNG)
                                 .buildAndDisplayWindow();
                     } finally {
                         stage.close();
@@ -203,33 +194,5 @@ public class FXWebService {
                 }
             }
         };
-    }
-
-    @SuppressWarnings({"rawtypes"})
-    private void saveCookies() throws IOException, NoSuchFieldException, IllegalAccessException, ClassNotFoundException {
-        CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
-        Field f = cookieManager.getClass().getDeclaredField("store");
-        f.setAccessible(true);
-        Object cookieStore = f.get(cookieManager);
-
-        Field bucketsField = Class.forName("com.sun.webkit.network.CookieStore").getDeclaredField("buckets");
-        bucketsField.setAccessible(true);
-        Map buckets = (Map) bucketsField.get(cookieStore);
-        f.setAccessible(true);
-        Map<String, Collection> cookiesToSave = new LinkedHashMap<>();
-        for (Object o : buckets.entrySet()) {
-            Map.Entry entry = (Map.Entry) o;
-            String domain = (String) entry.getKey();
-            Map cookies = (Map) entry.getValue();
-            cookiesToSave.put(domain, cookies.values());
-        }
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(cookiesToSave);
-
-        if (!json.isEmpty() && !"{}".equals(json)) {
-            Files.write(CookiesService.COOKIES_PATH, json.getBytes(StandardCharsets.UTF_8));
-        }
-        logger.info("Cookies saved in [{}]", CookiesService.COOKIES_PATH);
     }
 }

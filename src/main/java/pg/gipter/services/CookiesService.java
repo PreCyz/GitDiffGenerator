@@ -3,11 +3,15 @@ package pg.gipter.services;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.sun.webkit.network.CookieManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.services.dto.CookieDetails;
+import pg.gipter.utils.StringUtils;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.net.CookieHandler;
 import java.net.URI;
@@ -59,11 +63,7 @@ public final class CookiesService {
         Optional<CookieDetails> result;
         if (isCookiesExist()) {
             try {
-                byte[] bytes = Files.readAllBytes(COOKIES_PATH);
-                String json = new String(bytes, StandardCharsets.UTF_8);
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                Type type = new TypeToken<Map<String, Collection<CookieDetails>>>() {}.getType();
-                Map<String, Collection<CookieDetails>> cookiesToLoad = gson.fromJson(json, type);
+                Map<String, Collection<CookieDetails>> cookiesToLoad = readCookiesFromFile();
                 result = cookiesToLoad.get(ArgName.toolkitHostUrl.defaultValue().replace("https://", ""))
                         .stream()
                         .filter(cookie -> cookie.name.equals("FedAuth"))
@@ -82,6 +82,14 @@ public final class CookiesService {
         return Files.exists(COOKIES_PATH);
     }
 
+    private static Map<String, Collection<CookieDetails>> readCookiesFromFile() throws IOException {
+        byte[] bytes = Files.readAllBytes(COOKIES_PATH);
+        String json = new String(bytes, StandardCharsets.UTF_8);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Type type = new TypeToken<Map<String, Collection<CookieDetails>>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
+
     private static String format(
             final String name,
             final String value,
@@ -91,19 +99,19 @@ public final class CookiesService {
             final boolean isSecure,
             final boolean isHttpOnly) {
 
-        if (name == null || name.isEmpty()) {
+        if (StringUtils.nullOrEmpty(name)) {
             throw new IllegalArgumentException("Bad cookie name");
         }
 
-        StringBuilder buf = new StringBuilder();
+        final StringBuilder buf = new StringBuilder();
         buf.setLength(0);
         buf.append(name).append('=').append(Optional.ofNullable(value).orElseGet(() -> ""));
 
-        if (path != null && !path.isEmpty()) {
+        if (StringUtils.notEmpty(path)) {
             buf.append(";Path=").append(path);
         }
 
-        if (domain != null && !domain.isEmpty()) {
+        if (StringUtils.notEmpty(domain)) {
             buf.append(";Domain=").append(domain);
         }
 
@@ -186,12 +194,7 @@ public final class CookiesService {
     public static void loadCookies() {
         if (isCookiesExist()) {
             try {
-                byte[] bytes = Files.readAllBytes(COOKIES_PATH);
-                String json = new String(bytes, StandardCharsets.UTF_8);
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                Type type = new TypeToken<Map<String, Collection<CookieDetails>>>() {
-                }.getType();
-                Map<String, Collection<CookieDetails>> cookiesToLoad = gson.fromJson(json, type);
+                Map<String, Collection<CookieDetails>> cookiesToLoad = readCookiesFromFile();
                 for (String domain : cookiesToLoad.keySet()) {
                     Collection<CookieDetails> cookies = cookiesToLoad.get(domain);
                     List<String> list = cookies.stream()
@@ -217,4 +220,39 @@ public final class CookiesService {
         }
     }
 
+    public static void extractAndSaveCookies() throws NoSuchFieldException, ClassNotFoundException, IllegalAccessException, IOException {
+        Map<String, Collection<?>> cookiesToSave = extractCookies();
+        saveCookies(cookiesToSave);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static Map<String, Collection<?>> extractCookies() throws NoSuchFieldException, IllegalAccessException, ClassNotFoundException {
+        CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
+        Field f = cookieManager.getClass().getDeclaredField("store");
+        f.setAccessible(true);
+        Object cookieStore = f.get(cookieManager);
+
+        Field bucketsField = Class.forName("com.sun.webkit.network.CookieStore").getDeclaredField("buckets");
+        bucketsField.setAccessible(true);
+        Map<String, Collection<?>> buckets = (Map) bucketsField.get(cookieStore);
+        f.setAccessible(true);
+        Map<String, Collection<?>> cookiesToSave = new LinkedHashMap<>();
+        for (Object o : buckets.entrySet()) {
+            Map.Entry<String, Collection<?>> entry = (Map.Entry) o;
+            String domain = entry.getKey();
+            Map<String, ?> cookies = (Map) entry.getValue();
+            cookiesToSave.put(domain, cookies.values());
+        }
+        return cookiesToSave;
+    }
+
+    private static void saveCookies(Map<String, Collection<?>> cookiesToSave) throws IOException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(cookiesToSave);
+
+        if (!json.isEmpty() && !"{}".equals(json)) {
+            Files.write(CookiesService.COOKIES_PATH, json.getBytes(StandardCharsets.UTF_8));
+        }
+        logger.info("Cookies saved in [{}]", CookiesService.COOKIES_PATH);
+    }
 }

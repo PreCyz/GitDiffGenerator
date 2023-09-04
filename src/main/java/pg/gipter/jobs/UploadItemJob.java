@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 
 public class UploadItemJob implements Job {
@@ -57,7 +58,7 @@ public class UploadItemJob implements Job {
         }
     }
 
-    public void runJob(JobDataMap jobDataMap) throws JobExecutionException {
+    public void runJob(Map<String, ?> jobDataMap) throws JobExecutionException {
         final JobParam jobParam = (JobParam) jobDataMap.get(JobParam.class.getSimpleName());
         calculateDates(jobParam);
 
