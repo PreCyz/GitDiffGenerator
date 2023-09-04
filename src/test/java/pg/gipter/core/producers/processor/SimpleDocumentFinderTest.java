@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
@@ -11,6 +13,7 @@ import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.services.CookiesService;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helpers.XmlHelper;
 import pg.gipter.utils.StringUtils;
@@ -288,22 +291,25 @@ class SimpleDocumentFinderTest {
 
     @Test
     void givenProperties_whenBuildUrls_thenReturnUrls() {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{
-                        ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
-                        ArgName.startDate + "=2019-04-06",
-                        ArgName.endDate + "=2019-04-13",
-                        ArgName.toolkitUsername + "=pawg",
-                        ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
-                });
-        finder = new ToolkitDocumentFinder(applicationProperties);
+        try (MockedStatic<CookiesService> utilities = Mockito.mockStatic(CookiesService.class)) {
+            utilities.when(CookiesService::getFedAuthString).thenReturn("qq");
+            ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
+                    new String[]{
+                            ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
+                            ArgName.startDate + "=2019-04-06",
+                            ArgName.endDate + "=2019-04-13",
+                            ArgName.toolkitUsername + "=pawg",
+                            ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
+                    });
+            finder = new ToolkitDocumentFinder(applicationProperties);
 
-        List<SharePointConfig> actual = finder.buildSharePointConfigs();
+            List<SharePointConfig> actual = finder.buildSharePointConfigs();
 
-        assertThat(actual).hasSize(1);
-        assertThat(actual.get(0).getFullRequestUrl()).startsWith("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items?$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString,File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel,File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email,File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email,File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel,File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email&$filter=Modified+ge+datetime'2019-04-06");
-        assertThat(actual.get(0).getFullRequestUrl()).contains("+and+Modified+le+datetime'2019-04-13");
-        assertThat(actual.get(0).getFullRequestUrl()).endsWith("&$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy");
+            assertThat(actual).hasSize(1);
+            assertThat(actual.get(0).getFullRequestUrl()).startsWith("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items?$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString,File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel,File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email,File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email,File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel,File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email&$filter=Modified+ge+datetime'2019-04-06");
+            assertThat(actual.get(0).getFullRequestUrl()).contains("+and+Modified+le+datetime'2019-04-13");
+            assertThat(actual.get(0).getFullRequestUrl()).endsWith("&$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy");
+        }
     }
 
     @Test
