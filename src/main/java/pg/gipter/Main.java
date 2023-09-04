@@ -28,9 +28,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 
-/**
- * Created by Pawel Gawedzki on 17-Sep-2018
- */
+/** Created by Pawel Gawedzki on 17-Sep-2018 */
 public class Main extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);

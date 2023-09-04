@@ -24,12 +24,9 @@ public final class ProgramSettings {
     }
 
     public static void initProgramSettings() {
-        if (InstanceHolder.INSTANCE.environment == null) {
-            throw new RuntimeException("Environment is not set!");
-        }
-        EnvSettings instance = EnvSettingsFactory.getInstance(InstanceHolder.INSTANCE.environment);
-        InstanceHolder.INSTANCE.cipherDetails = instance.loadCipherDetails().orElseThrow();
-        InstanceHolder.INSTANCE.dbProperties = instance.loadDbProperties().orElseThrow();
+        EnvSettings envSettings = EnvSettingsFactory.getInstance(InstanceHolder.INSTANCE.environment);
+        InstanceHolder.INSTANCE.cipherDetails = envSettings.loadCipherDetails().orElseGet(envSettings::backupCipherDetails);
+        InstanceHolder.INSTANCE.dbProperties = envSettings.loadDbProperties().orElseGet(Properties::new);
     }
 
     public static ProgramSettings getInstance() {
