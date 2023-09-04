@@ -51,7 +51,7 @@ class DevSettings implements EnvSettings {
                     this.cipherDetails = new Gson().fromJson(reader, CipherDetails.Settings.class).toCipherDetails()
             );
             logger.info("Program settings loaded from [{}].", settingsFileName);
-        } catch (IOException | NullPointerException e) {
+        } catch (Exception e) {
             logger.warn("Could not load [{}] because: {}", settingsFileName, e.getMessage());
         }
         return result;

@@ -18,6 +18,7 @@ import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.Statistic;
 import pg.gipter.utils.CryptoUtils;
 
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 public abstract class MongoDaoConfig {
@@ -36,40 +37,19 @@ public abstract class MongoDaoConfig {
         init(ProgramSettings.getInstance().getDbProperties());
     }
 
-    public void refresh(Properties dbConfig) {
-        mongoClient.close();
-        mongoClient = null;
-        init(dbConfig);
+    public static void refresh(Properties dbConfig) {
+        try {
+            mongoClient.close();
+            mongoClient = createMongoClient(dbConfig);
+        } catch (Exception ex) {
+            LoggerFactory.getLogger(MongoDaoConfig.class).error("Can not establish connection to the database.", ex);
+        }
     }
 
     private void init(Properties dbConfig) {
         if (mongoClient == null) {
             try {
-                CodecRegistry codecRegistry = MongoClient.getDefaultCodecRegistry();
-                Codec<Document> documentCodec = codecRegistry.get(Document.class);
-                Codec<Statistic> statisticCodec = new StatisticCodec(codecRegistry);
-                Codec<ExceptionDetails> exceptionDetailsCodec = new ExceptionDetailsCodec(codecRegistry);
-                Codec<CipherDetails> cipherDetailsCodec = new CipherDetailsCodec(codecRegistry);
-                Codec<GeneralSettings> generalSettingsCodec = new GeneralSettingsCodec(codecRegistry);
-                codecRegistry = CodecRegistries.fromRegistries(
-                        MongoClient.getDefaultCodecRegistry(),
-                        CodecRegistries.fromCodecs(documentCodec,
-                                statisticCodec,
-                                exceptionDetailsCodec,
-                                cipherDetailsCodec,
-                                generalSettingsCodec)
-                );
-
-                String host = dbConfig.getProperty("db.host");
-                String username = dbConfig.getProperty("db.username");
-                String password = CryptoUtils.decrypt(dbConfig.getProperty("db.password"));
-
-                MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
-                        .writeConcern(WriteConcern.ACKNOWLEDGED)
-                        .codecRegistry(codecRegistry);
-                String uri = String.format("mongodb+srv://%s:%s@%s", username, password, host);
-                MongoClientURI mongoClientURI = new MongoClientURI(uri, mongoClientOptionsBuilder);
-                mongoClient = new MongoClient(mongoClientURI);
+                mongoClient = createMongoClient(dbConfig);
             } catch (Exception ex) {
                 logger.error("Can not establish connection to the database.", ex);
                 statisticsAvailable = false;
@@ -82,6 +62,34 @@ public abstract class MongoDaoConfig {
             statisticsAvailable = true;
             logger.info("Connection to the database established. [databaseName: {}]", databaseName);
         }
+    }
+
+    private static MongoClient createMongoClient(Properties dbConfig) throws GeneralSecurityException {
+        CodecRegistry codecRegistry = MongoClient.getDefaultCodecRegistry();
+        Codec<Document> documentCodec = codecRegistry.get(Document.class);
+        Codec<Statistic> statisticCodec = new StatisticCodec(codecRegistry);
+        Codec<ExceptionDetails> exceptionDetailsCodec = new ExceptionDetailsCodec(codecRegistry);
+        Codec<CipherDetails> cipherDetailsCodec = new CipherDetailsCodec(codecRegistry);
+        Codec<GeneralSettings> generalSettingsCodec = new GeneralSettingsCodec(codecRegistry);
+        codecRegistry = CodecRegistries.fromRegistries(
+                MongoClient.getDefaultCodecRegistry(),
+                CodecRegistries.fromCodecs(documentCodec,
+                        statisticCodec,
+                        exceptionDetailsCodec,
+                        cipherDetailsCodec,
+                        generalSettingsCodec)
+        );
+
+        String host = dbConfig.getProperty("db.host");
+        String username = dbConfig.getProperty("db.username");
+        String password = CryptoUtils.decrypt(dbConfig.getProperty("db.password"));
+
+        MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
+                .writeConcern(WriteConcern.ACKNOWLEDGED)
+                .codecRegistry(codecRegistry);
+        String uri = String.format("mongodb+srv://%s:%s@%s", username, password, host);
+        MongoClientURI mongoClientURI = new MongoClientURI(uri, mongoClientOptionsBuilder);
+        return new MongoClient(mongoClientURI);
     }
 
     public boolean isStatisticsAvailable() {
