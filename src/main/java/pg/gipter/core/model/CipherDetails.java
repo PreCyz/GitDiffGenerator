@@ -63,24 +63,24 @@ public class CipherDetails {
     }
 
     public static class Settings {
-        private final String name;
-        private final int iterations;
-        private final String uuid;
-        private final String value;
+        private final String cup;
+        private final int laps;
+        private final String owner;
+        private final String joke;
 
-        public Settings(String name, int iterations, String uuid, String value) {
-            this.name = name;
-            this.iterations = iterations;
-            this.uuid = uuid;
-            this.value = value;
+        public Settings(String cup, int laps, String owner, String joke) {
+            this.cup = cup;
+            this.laps = laps;
+            this.owner = owner;
+            this.joke = joke;
         }
 
         public CipherDetails toCipherDetails() {
             CipherDetails cipherDetails = new CipherDetails();
-            cipherDetails.setCipherName(name);
-            cipherDetails.setIterationCount(iterations);
-            cipherDetails.setKeySpecValue(uuid);
-            cipherDetails.setSaltValue(value);
+            cipherDetails.setCipherName(cup);
+            cipherDetails.setIterationCount(laps);
+            cipherDetails.setKeySpecValue(owner);
+            cipherDetails.setSaltValue(joke);
             return cipherDetails;
         }
     }
