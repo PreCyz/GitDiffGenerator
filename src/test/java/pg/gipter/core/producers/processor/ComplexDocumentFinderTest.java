@@ -3,11 +3,14 @@ package pg.gipter.core.producers.processor;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.services.CookiesService;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helpers.XmlHelper;
 
@@ -243,35 +246,38 @@ class ComplexDocumentFinderTest {
 
     @Test
     void givenProperties_whenBuildUrls_thenReturnListOfUrls() throws FileNotFoundException {
-        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
-                new String[]{
-                        ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
-                        ArgName.startDate + "=2019-02-24",
-                        ArgName.endDate + "=2019-03-02",
-                        ArgName.toolkitUsername + "=pawg",
-                        ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
-                });
-        finder = new ComplexDocumentFinder(applicationProperties);
+        try (MockedStatic<CookiesService> utilities = Mockito.mockStatic(CookiesService.class)) {
+            utilities.when(CookiesService::getFedAuthString).thenReturn("qq");
+            ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
+                    new String[]{
+                            ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
+                            ArgName.startDate + "=2019-02-24",
+                            ArgName.endDate + "=2019-03-02",
+                            ArgName.toolkitUsername + "=pawg",
+                            ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
+                    });
+            finder = new ComplexDocumentFinder(applicationProperties);
 
-        String path = XmlHelper.getFullXmlPath("item-count.json");
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
-        Gson gson = new Gson();
-        JsonObject itemCount = gson.fromJson(bufferedReader, JsonObject.class);
+            String path = XmlHelper.getFullXmlPath("item-count.json");
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
+            Gson gson = new Gson();
+            JsonObject itemCount = gson.fromJson(bufferedReader, JsonObject.class);
 
-        List<ItemCountResponse> responses = Stream.of(new ItemCountResponse(
-                applicationProperties.projectPaths().toArray(new String[1])[0],
-                applicationProperties.toolkitProjectListNames().toArray(new String[1])[0],
-                itemCount
-        )).collect(Collectors.toList());
+            List<ItemCountResponse> responses = Stream.of(new ItemCountResponse(
+                    applicationProperties.projectPaths().toArray(new String[1])[0],
+                    applicationProperties.toolkitProjectListNames().toArray(new String[1])[0],
+                    itemCount
+            )).collect(Collectors.toList());
 
-        List<SharePointConfig> actual = finder.buildSharePointConfigs(responses);
+            List<SharePointConfig> actual = finder.buildSharePointConfigs(responses);
 
-        assertThat(actual).hasSize(12);
-        for (int i = 0; i < actual.size(); ++i) {
-            if (i == 0) {
-                assertThat(actual.get(i).getFullRequestUrl()).doesNotEndWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=");
-            } else {
-                assertThat(actual.get(i).getFullRequestUrl()).endsWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=" + 100 * i);
+            assertThat(actual).hasSize(12);
+            for (int i = 0; i < actual.size(); ++i) {
+                if (i == 0) {
+                    assertThat(actual.get(i).getFullRequestUrl()).doesNotEndWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=");
+                } else {
+                    assertThat(actual.get(i).getFullRequestUrl()).endsWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=" + 100 * i);
+                }
             }
         }
     }
