@@ -1,5 +1,6 @@
 package pg.gipter.core;
 
+import pg.gipter.core.config.service.GeneralSettingsService;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -7,6 +8,7 @@ import pg.gipter.utils.StringUtils;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -202,15 +204,6 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitRESTUrl() {
-        String toolkitUrl = argExtractor.toolkitRESTUrl();
-        if (!containsArg(ArgName.toolkitRESTUrl.name()) && StringUtils.notEmpty(toolkitConfig.getToolkitRESTUrl())) {
-            toolkitUrl = toolkitConfig.getToolkitRESTUrl();
-        }
-        return toolkitUrl;
-    }
-
-    @Override
     public String toolkitHostUrl() {
         String toolkitUrl = argExtractor.toolkitHostUrl();
         if (!containsArg(ArgName.toolkitHostUrl.name()) && StringUtils.notEmpty(toolkitConfig.getToolkitHostUrl())) {
@@ -231,11 +224,6 @@ class CliApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitUserFolder() {
         return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
-    }
-
-    @Override
-    public String toolkitWSUserFolder() {
-        return ArgName.toolkitWSUserFolder.defaultValue() + toolkitUsername();
     }
 
     @Override
@@ -282,6 +270,21 @@ class CliApplicationProperties extends ApplicationProperties {
             loggerLevel = applicationConfig.getLoggingLevel().toString();
         }
         return loggerLevel;
+    }
+
+    @Override
+    public String githubToken() {
+        String githubToken = argExtractor.githubToken();
+        if (!containsArg(ArgName.githubToken.name()) && applicationConfig.getGithubToken() != null) {
+            githubToken = applicationConfig.getGithubToken();
+        }
+        if (ArgName.githubToken.defaultValue().equals(githubToken)) {
+            Optional<String> gt = GeneralSettingsService.getInstance().getGithubToken();
+            if (gt.isPresent()) {
+                return gt.get();
+            }
+        }
+        return githubToken;
     }
 
     @Override

@@ -10,7 +10,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -75,8 +74,6 @@ public class MainController extends AbstractController {
 
     @FXML
     private TextField toolkitUsernameTextField;
-    @FXML
-    private PasswordField toolkitPasswordField;
     @FXML
     private Hyperlink verifyCredentialsHyperlink;
     @FXML
@@ -166,7 +163,6 @@ public class MainController extends AbstractController {
     private Map<String, Control> initToolkitSectionMap() {
         Map<String, Control> map = new HashMap<>();
         map.put("toolkitUsernameTextField", toolkitUsernameTextField);
-        map.put("toolkitPasswordField", toolkitPasswordField);
         map.put("verifyCredentialsHyperlink", verifyCredentialsHyperlink);
         map.put("verifyProgressIndicator", verifyProgressIndicator);
         return map;
@@ -250,12 +246,7 @@ public class MainController extends AbstractController {
         toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
         configurationSectionController.initialize(location, resources, initConfigurationSectionMap());
         menuSectionController.initialize(location, resources, initMenuSectionMap());
-        //this is executed through configurationSectionController
-        //pathsSectionController.initialize(location, resources, initPathsSectionMap());
-        //datesSectionController.initialize(location, resources, initDatesSectionMap());
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
-        //this is executed later in the flow
-        //csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
         buttonController.initialize(location, resources, initButtonMap());
 
         setProperties();

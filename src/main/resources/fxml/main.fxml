@@ -4,6 +4,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -19,7 +20,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<BorderPane fx:id="mainBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="664.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="mainBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <Pane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" BorderPane.alignment="CENTER">
          <children>
@@ -53,23 +54,29 @@
       <Pane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" BorderPane.alignment="CENTER" />
    </bottom>
    <center>
-      <AnchorPane fx:id="mainAnchorPane" prefHeight="659.0" prefWidth="589.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+      <AnchorPane fx:id="mainAnchorPane" prefHeight="705.0" prefWidth="590.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
          <children>
-            <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="2.0" prefHeight="70.0" prefWidth="587.0" text="%toolkit.panel.title" textFill="#2302f8">
+            <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="2.0" prefHeight="61.0" prefWidth="587.0" text="%toolkit.panel.title" textFill="#2302f8">
                <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="50.0" prefWidth="586.0">
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="200.0">
                      <children>
-                        <GridPane layoutX="8.0" layoutY="3.0" prefHeight="37.0" prefWidth="256.0">
+                        <Hyperlink fx:id="verifyCredentialsHyperlink" layoutX="404.0" layoutY="6.0" prefHeight="23.0" text="%toolkit.panel.link">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Hyperlink>
+                        <ProgressIndicator fx:id="verifyProgressIndicator" layoutX="551.0" layoutY="6.0" prefHeight="25.0" prefWidth="25.0" />
+                        <GridPane layoutX="8.0" layoutY="3.0" prefHeight="27.0" prefWidth="368.0">
                            <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="30.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="142.0" minWidth="10.0" prefWidth="97.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="281.0" minWidth="10.0" prefWidth="266.0" />
                            </columnConstraints>
                            <rowConstraints>
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                            </rowConstraints>
                            <children>
                               <Label text="%toolkit.panel.username" />
-                              <TextField fx:id="toolkitUsernameTextField" stylesheets="@../css/main.css" GridPane.columnIndex="1" />
+                              <TextField fx:id="toolkitUsernameTextField" prefWidth="276.0" stylesheets="@../css/main.css" GridPane.columnIndex="1" />
                            </children>
                         </GridPane>
                      </children>
@@ -79,7 +86,7 @@
                   <Font name="System Bold" size="12.0" />
                </font>
             </TitledPane>
-            <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="71.0" prefHeight="558.0" prefWidth="587.0" text="%main.configuration" textFill="#2102f8">
+            <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="62.0" prefHeight="558.0" prefWidth="587.0" text="%main.configuration" textFill="#2102f8">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="185.0" prefWidth="200.0">
                      <children>

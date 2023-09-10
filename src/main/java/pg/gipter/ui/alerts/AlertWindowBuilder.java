@@ -202,19 +202,7 @@ public class AlertWindowBuilder {
         }
 
         if (!StringUtils.nullOrEmpty(message)) {
-            Label messageLabel = new Label(message);
-            String style = "-fx-font-family:monospace; " +
-                    String.format("-fx-font-size:%spx; ", fontSize) +
-                    "-fx-text-alignment:left; " +
-                    "-fx-font-style:normal; ";
-            if (alertType == Alert.AlertType.ERROR) {
-                style += "-fx-font-weight:bolder; " +
-                        "-fx-text-fill:crimson;";
-            } else {
-                style += "-fx-text-fill:mediumblue;";
-            }
-            messageLabel.setStyle(style);
-            gridPane.add(messageLabel, 0, gridPaneRow++);
+            gridPane.add(createMsgLabel(fontSize), 0, gridPaneRow++);
 
             double messageWidth = pixelsPerLetterFactor * Arrays.stream(message.split(SystemUtils.lineSeparator()))
                     .map(String::length)
@@ -224,6 +212,22 @@ public class AlertWindowBuilder {
         }
 
         return preferredWidth;
+    }
+
+    private Label createMsgLabel(double fontSize) {
+        Label messageLabel = new Label(message);
+        String style = "-fx-font-family:monospace; " +
+                String.format("-fx-font-size:%spx; ", fontSize) +
+                "-fx-text-alignment:left; " +
+                "-fx-font-style:normal; ";
+        if (alertType == Alert.AlertType.ERROR) {
+            style += "-fx-font-weight:bolder; " +
+                    "-fx-text-fill:crimson;";
+        } else {
+            style += "-fx-text-fill:mediumblue;";
+        }
+        messageLabel.setStyle(style);
+        return messageLabel;
     }
 
     private double addHyperLinks(List<Hyperlink> hyperLinks, GridPane gridPane) {

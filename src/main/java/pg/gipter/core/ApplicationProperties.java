@@ -14,8 +14,9 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
+import pg.gipter.services.CookiesService;
 import pg.gipter.services.SemanticVersioning;
-import pg.gipter.users.SuperUserService;
+import pg.gipter.services.ToolkitService;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
@@ -123,7 +124,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitConfigExists() {
-        return toolkitConfig != null && SuperUserService.getInstance().isCredentialsAvailable();
+        return toolkitConfig != null;
     }
 
     protected final boolean isOtherAuthorsExists() {
@@ -147,7 +148,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitCredentialsSet() {
-        return SuperUserService.getInstance().isCredentialsAvailable();
+        return CookiesService.hasValidFedAuth();
     }
 
     public final String fileName() {
@@ -309,6 +310,15 @@ public abstract class ApplicationProperties {
         applicationConfig.setCustomCommands(customCommandSet);
     }
 
+    public final String toolkitUserEmail() {
+        return toolkitUsername().toLowerCase() + argExtractor.emailDomain();
+    }
+
+    public boolean hasConnectionToToolkit() {
+        return CookiesService.hasValidFedAuth()
+                && new ToolkitService(this).isCookieWorking(CookiesService.getFedAuthString());
+    }
+
     protected final String log() {
         String log = "version='" + version().getVersion() + '\'';
         if (currentRunConfig != null) {
@@ -344,7 +354,7 @@ public abstract class ApplicationProperties {
         if (toolkitConfig != null) {
             log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
                     ", toolkitUsername='" + toolkitUsername() + '\'' +
-                    ", toolkitRESTUrl='" + toolkitRESTUrl() + '\'' +
+                    ", toolkitUserEmail='" + toolkitUserEmail() + '\'' +
                     ", toolkitHistUrl='" + toolkitHostUrl() + '\'' +
                     ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                     ", toolkitDomain='" + toolkitDomain() + '\'' +
@@ -376,11 +386,9 @@ public abstract class ApplicationProperties {
     public abstract String toolkitUsername();
     public abstract String toolkitDomain();
     public abstract String toolkitUserFolder();
-    public abstract String toolkitWSUserFolder();
     public abstract String toolkitCopyListName();
     public abstract Set<String> toolkitProjectListNames();
 
-    public abstract String toolkitRESTUrl();
     public abstract String toolkitHostUrl();
     public abstract boolean isConfirmationWindow();
     public abstract boolean isActiveTray();
@@ -393,6 +401,7 @@ public abstract class ApplicationProperties {
     public abstract int fetchTimeout();
     public abstract boolean isUploadItem();
     public abstract boolean isSmartZip();
+    public abstract String githubToken();
 
     public abstract boolean isUpgradeFinished();
 }

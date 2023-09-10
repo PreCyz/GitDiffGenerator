@@ -138,21 +138,25 @@ class CsvDetailsSectionController extends AbstractController {
     }
 
     private void setTooltipOnUseDefaultAuthor() {
-        vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-        String userName = vcsService.getUserName().orElseGet(() -> "");
-        Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultAuthor.tooltip", userName));
-        tooltip.setTextAlignment(TextAlignment.LEFT);
-        tooltip.setFont(Font.font("Courier New", 16));
-        useDefaultAuthorCheckBox.setTooltip(tooltip);
+        if (ItemType.isCodeRelated(applicationProperties.itemType())) {
+            vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+            String userName = vcsService.getUserName().orElseGet(() -> "");
+            Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultAuthor.tooltip", userName));
+            tooltip.setTextAlignment(TextAlignment.LEFT);
+            tooltip.setFont(Font.font("Courier New", 16));
+            useDefaultAuthorCheckBox.setTooltip(tooltip);
+        }
     }
 
     private void setTooltipOnUseDefaultEmail() {
-        vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-        String userEmail = vcsService.getUserEmail().orElseGet(() -> "");
-        Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultEmail.tooltip", userEmail));
-        tooltip.setTextAlignment(TextAlignment.LEFT);
-        tooltip.setFont(Font.font("Courier New", 16));
-        useDefaultEmailCheckBox.setTooltip(tooltip);
+        if (ItemType.isCodeRelated(applicationProperties.itemType())) {
+            vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
+            String userEmail = vcsService.getUserEmail().orElseGet(() -> "");
+            Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultEmail.tooltip", userEmail));
+            tooltip.setTextAlignment(TextAlignment.LEFT);
+            tooltip.setFont(Font.font("Courier New", 16));
+            useDefaultEmailCheckBox.setTooltip(tooltip);
+        }
     }
 
     private boolean disableDefaultAuthor() {

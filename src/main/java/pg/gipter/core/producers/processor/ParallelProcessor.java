@@ -5,7 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
+import pg.gipter.services.CookiesService;
+import pg.gipter.toolkit.HttpRequester;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -31,7 +34,9 @@ class ParallelProcessor {
 
     List<Path> downloadFiles(List<DownloadDetails> downloadDetails) {
         CompletionService<Path> ecs = new ExecutorCompletionService<>(executor);
-        downloadDetails.forEach(downloadDetail -> ecs.submit(new DownloadFileCall(downloadDetail, applicationProperties)));
+        downloadDetails.forEach(downloadDetail ->
+                ecs.submit(() -> new HttpRequester(applicationProperties).downloadFile(downloadDetail))
+        );
 
         int numberOfCalls = downloadDetails.size();
         List<Path> result = new ArrayList<>(numberOfCalls);
@@ -47,7 +52,7 @@ class ParallelProcessor {
 
     List<JsonObject> processConfigs(List<SharePointConfig> sharePointConfigs) {
         CompletionService<JsonObject> ecs = new ExecutorCompletionService<>(executor);
-        sharePointConfigs.forEach(scp -> ecs.submit(new GETCall(scp, applicationProperties)));
+        sharePointConfigs.forEach(scp -> ecs.submit(() -> new HttpRequester(applicationProperties).executeGET(scp)));
 
         List<JsonObject> result = new LinkedList<>();
         for (int i = 0; i < sharePointConfigs.size(); i++) {
@@ -62,7 +67,8 @@ class ParallelProcessor {
 
     List<ItemCountResponse> processMap(Map<CustomizedTuple, String> projectUrlsMap) {
         CompletionService<ItemCountResponse> ecs = new ExecutorCompletionService<>(executor);
-        projectUrlsMap.forEach((listAndProject, url) -> ecs.submit(new GETItemCountCall(url, listAndProject, applicationProperties)));
+
+        projectUrlsMap.forEach((listAndProject, fullUrl) -> ecs.submit(() -> getItemCountResponse(listAndProject, fullUrl)));
 
         List<ItemCountResponse> result = new LinkedList<>();
         for (int i = 0; i < projectUrlsMap.size(); i++) {
@@ -73,5 +79,18 @@ class ParallelProcessor {
             }
         }
         return result;
+    }
+
+    private ItemCountResponse getItemCountResponse(CustomizedTuple listAndProject, String fullUrl) throws IOException {
+        SharePointConfig sharePointConfig = new SharePointConfig(
+                applicationProperties.toolkitHostUrl(),
+                fullUrl,
+                CookiesService.getFedAuthString()
+        );
+        return new ItemCountResponse(
+                listAndProject.getProject(),
+                listAndProject.getListName(),
+                new HttpRequester(applicationProperties).executeGET(sharePointConfig)
+        );
     }
 }

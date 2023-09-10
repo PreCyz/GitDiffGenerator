@@ -31,7 +31,6 @@ import pg.gipter.services.ConcurrentService;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.StartupService;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.BrowserLinkAction;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.ui.alerts.LogLinkAction;
 import pg.gipter.ui.alerts.WebViewService;
@@ -47,6 +46,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -167,15 +167,12 @@ public class UILauncher implements Launcher {
     private void checkUpgrades() {
         if (!upgradeChecked) {
             executor.execute(() -> {
-                GithubService service = new GithubService(applicationProperties.version());
+                final GithubService service = new GithubService(applicationProperties.version(), applicationProperties.githubToken());
                 if (service.isNewVersion()) {
                     logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
                             .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
-                            .withLinkAction(new BrowserLinkAction(
-                                    GithubService.GITHUB_URL + "/releases/latest",
-                                    BundleUtils.getMsg("upgrade.readReleaseNotes")
-                            ))
+                            .withMessage(service.getReleaseNotes().orElseGet(() -> ""))
                             .withAlertType(Alert.AlertType.INFORMATION)
                             .withCustomControl(ControlFactory.createUpgradeButton(this))
                             .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
@@ -529,22 +526,6 @@ public class UILauncher implements Launcher {
         return wizardProperties != null && !wizardProperties.isEmpty();
     }
 
-    private void showSharePointProjectWindow(Properties wizardProperties) {
-        this.wizardProperties = wizardProperties;
-        Platform.runLater(() -> {
-            sharePointConfigWindow = new Stage();
-            sharePointConfigWindow.initModality(Modality.APPLICATION_MODAL);
-            buildScene(sharePointConfigWindow, WindowFactory.SHARE_POINT_PROJECTS.createWindow(applicationProperties, this));
-            sharePointConfigWindow.setOnCloseRequest(event -> {
-                hideSharePointConfigWindow();
-                if (hasNoWizardProperties()) {
-                    execute();
-                }
-            });
-            sharePointConfigWindow.showAndWait();
-        });
-    }
-
     private void hideSharePointConfigWindow() {
         sharePointConfigWindow.close();
         sharePointConfigWindow = null;
@@ -555,15 +536,10 @@ public class UILauncher implements Launcher {
     }
 
     public void showProject(ItemType itemType, Properties properties) {
-        switch (itemType) {
-            case TOOLKIT_DOCS:
-                showToolkitProjectsWindow(properties);
-                break;
-            case SHARE_POINT_DOCS:
-                showSharePointProjectWindow(properties);
-                break;
-            default:
-                showProjectsWindow(properties);
+        if (Objects.requireNonNull(itemType) == ItemType.TOOLKIT_DOCS) {
+            showToolkitProjectsWindow(properties);
+        } else {
+            showProjectsWindow(properties);
         }
     }
 

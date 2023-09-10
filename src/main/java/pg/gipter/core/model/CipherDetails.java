@@ -61,4 +61,27 @@ public class CipherDetails {
     public void setSaltValue(String saltValue) {
         this.saltValue = saltValue;
     }
+
+    public static class Settings {
+        private final String cup;
+        private final int laps;
+        private final String owner;
+        private final String joke;
+
+        public Settings(String cup, int laps, String owner, String joke) {
+            this.cup = cup;
+            this.laps = laps;
+            this.owner = owner;
+            this.joke = joke;
+        }
+
+        public CipherDetails toCipherDetails() {
+            CipherDetails cipherDetails = new CipherDetails();
+            cipherDetails.setCipherName(cup);
+            cipherDetails.setIterationCount(laps);
+            cipherDetails.setKeySpecValue(owner);
+            cipherDetails.setSaltValue(joke);
+            return cipherDetails;
+        }
+    }
 }

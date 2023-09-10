@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -49,12 +50,9 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Properties;
-
-import static java.util.stream.Collectors.toCollection;
 
 public class WizardLauncher implements Launcher {
 
@@ -183,8 +181,6 @@ public class WizardLauncher implements Launcher {
     }
 
     private WizardPane buildToolkitCredentialsPage(short step) {
-        int row = 0;
-
         WizardPane page = new WizardPane() {
             @Override
             public void onEnteringPage(Wizard wizard) {
@@ -196,10 +192,10 @@ public class WizardLauncher implements Launcher {
         gridPane.setVgap(10);
         gridPane.setHgap(10);
 
-        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.username")), 0, row);
+        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.username")), 0, 0);
         TextField username = createTextField(ArgName.toolkitUsername.name());
         username.setText(ArgName.toolkitUsername.defaultValue());
-        gridPane.add(username, 1, row++);
+        gridPane.add(username, 1, 0);
 
         page.setHeaderText(BundleUtils.getMsg("wizard.toolkit.credentials") + " (" + step + "/6)");
         page.setContent(gridPane);
@@ -216,8 +212,8 @@ public class WizardLauncher implements Launcher {
         @SuppressWarnings("unchecked")
         LinkedHashSet<SharePointConfig> sharePointConfigs =
                 Optional.ofNullable(wizard.getSettings().get(SharePointConfig.SHARE_POINT_CONFIGS))
-                .map(value -> (LinkedHashSet<SharePointConfig>) value)
-                .orElseGet(LinkedHashSet::new);
+                        .map(value -> (LinkedHashSet<SharePointConfig>) value)
+                        .orElseGet(LinkedHashSet::new);
         if (!sharePointConfigs.isEmpty()) {
             properties.put(SharePointConfig.SHARE_POINT_CONFIGS, sharePointConfigs);
         }
@@ -232,6 +228,13 @@ public class WizardLauncher implements Launcher {
         textField.setId(id);
         GridPane.setHgrow(textField, Priority.ALWAYS);
         return textField;
+    }
+
+    private PasswordField createPasswordField(String id) {
+        PasswordField passwordField = new PasswordField();
+        passwordField.setId(id);
+        GridPane.setHgrow(passwordField, Priority.ALWAYS);
+        return passwordField;
     }
 
     private ComboBox<ItemType> createUploadTypeComboBox(String id) {
@@ -369,17 +372,6 @@ public class WizardLauncher implements Launcher {
                 .toArray(String[]::new);
         RunConfig runConfig = RunConfig.valueFrom(args);
 
-        @SuppressWarnings("unchecked")
-        LinkedHashSet<SharePointConfig> sharePointConfigs = wizardProperties.entrySet()
-                    .stream()
-                    .filter(entry -> SharePointConfig.SHARE_POINT_CONFIGS.equals(entry.getKey()))
-                    .map(entry -> (LinkedHashSet<SharePointConfig>) entry.getValue())
-                    .flatMap(Collection::stream)
-                    .collect(toCollection(LinkedHashSet::new));
-        if (!sharePointConfigs.isEmpty()) {
-            runConfig.setSharePointConfigs(sharePointConfigs);
-        }
-
         applicationProperties.updateCurrentRunConfig(runConfig);
         applicationProperties.updateToolkitConfig(ToolkitConfig.valueFrom(args));
         applicationProperties.updateApplicationConfig(ApplicationConfig.valueFrom(args));
@@ -492,8 +484,6 @@ public class WizardLauncher implements Launcher {
                 switch (ItemType.valueFor(property)) {
                     case TOOLKIT_DOCS:
                     case STATEMENT:
-                    case SHARE_POINT_DOCS:
-                        return projectPage;
                     default:
                         return committerPage;
                 }

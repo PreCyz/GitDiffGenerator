@@ -26,7 +26,7 @@ public class UpgradeController  extends AbstractController {
     public UpgradeController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        this.upgradeService = new UpgradeService(applicationProperties.version());
+        this.upgradeService = new UpgradeService(applicationProperties.version(), applicationProperties.githubToken());
     }
 
     @Override
