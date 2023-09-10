@@ -182,7 +182,8 @@ public class FXWebService {
                         checkSomethingWrong(webEngine.getDocument());
                         CookiesService.extractAndSaveCookies();
                         new AlertWindowBuilder()
-                                .withHeaderText(BundleUtils.getMsg("webview.cookies.saved"))
+                                .withHeaderText(BundleUtils.getMsg(this.initSource == InitSource.MAIN ?
+                                        "webview.cookies.restarted" : "webview.cookies.saved"))
                                 .withAlertType(Alert.AlertType.INFORMATION)
                                 .withImageFile(ImageFile.FINGER_UP_PNG)
                                 .buildAndDisplayWindow();
