@@ -8,6 +8,11 @@ public final class ResourceUtils {
 
     private ResourceUtils() { }
 
+
+    public static InputStream getPayloadResource(String resourceName) {
+        return ResourceUtils.class.getClassLoader().getResourceAsStream(getResourcePath("payload", resourceName));
+    }
+
     public static Optional<URL> getImgResource(String resourceName) {
         return Optional.ofNullable(getResource("img", resourceName));
     }

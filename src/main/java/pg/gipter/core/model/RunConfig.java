@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class RunConfig {
@@ -35,7 +34,6 @@ public class RunConfig {
     private String toolkitProjectListNames;
     private Boolean deleteDownloadedFiles;
     private PreferredArgSource preferredArgSource;
-    private Set<SharePointConfig> sharePointConfigs;
 
     public RunConfig() {
         configurationName = ArgName.configurationName.defaultValue();
@@ -65,7 +63,6 @@ public class RunConfig {
         this.toolkitProjectListNames = toolkitProjectListNames;
         this.deleteDownloadedFiles = deleteDownloadedFiles;
         this.preferredArgSource = preferredArgSource;
-        this.sharePointConfigs = sharePointConfigs;
         this.fetchTimeout = fetchTimeout;
     }
 
@@ -88,9 +85,6 @@ public class RunConfig {
         toolkitProjectListNames = runConfig.getToolkitProjectListNames();
         deleteDownloadedFiles = runConfig.getDeleteDownloadedFiles();
         preferredArgSource = runConfig.getPreferredArgSource();
-        sharePointConfigs = Optional.ofNullable(runConfig.getSharePointConfigs())
-                .map(LinkedHashSet::new)
-                .orElseGet(LinkedHashSet::new);
         fetchTimeout = runConfig.getFetchTimeout();
     }
 
@@ -238,33 +232,12 @@ public class RunConfig {
         this.preferredArgSource = preferredArgSource;
     }
 
-    public Set<SharePointConfig> getSharePointConfigs() {
-        return sharePointConfigs;
-    }
-
-    public void setSharePointConfigs(Set<SharePointConfig> sharePointConfigs) {
-        this.sharePointConfigs = sharePointConfigs;
-    }
-
     public Integer getFetchTimeout() {
         return fetchTimeout;
     }
 
     public void setFetchTimeout(Integer fetchTimeout) {
         this.fetchTimeout = fetchTimeout;
-    }
-
-    public void addSharePointConfig(SharePointConfig sharePointConfig) {
-        if (sharePointConfigs == null) {
-            sharePointConfigs = new LinkedHashSet<>();
-        }
-        sharePointConfigs.add(sharePointConfig);
-    }
-
-    public void removeSharePointConfig(SharePointConfig sharePointConfig) {
-        if (sharePointConfigs != null) {
-            sharePointConfigs.remove(sharePointConfig);
-        }
     }
 
     public String[] toArgumentArray() {

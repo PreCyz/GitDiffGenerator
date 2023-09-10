@@ -11,8 +11,8 @@ import java.util.Optional;
 
 public class SecurityConverter implements Converter {
 
-    private final CachedConfiguration cachedConfiguration;
-    private final SecurityService securityService;
+    protected final CachedConfiguration cachedConfiguration;
+    protected final SecurityService securityService;
 
     private final Logger logger = LoggerFactory.getLogger(SecurityConverter.class);
 
@@ -23,14 +23,16 @@ public class SecurityConverter implements Converter {
 
     @Override
     public boolean convert() {
+        boolean result = false;
         Optional<CipherDetails> cipherDetails = securityService.readCipherDetails();
         if (!cipherDetails.isPresent()) {
             CipherDetails generatedCipher = securityService.generateCipherDetails();
             securityService.writeCipherDetails(generatedCipher);
         } else {
             logger.info("Security file detected.");
+            result = true;
         }
-        return true;
+        return result;
     }
 
 }

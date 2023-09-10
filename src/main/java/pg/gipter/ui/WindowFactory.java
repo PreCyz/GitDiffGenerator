@@ -11,8 +11,6 @@ import pg.gipter.ui.menu.ToolkitSettingsController;
 import pg.gipter.ui.menu.ToolkitSettingsWindow;
 import pg.gipter.ui.project.ProjectsController;
 import pg.gipter.ui.project.ProjectsWindow;
-import pg.gipter.ui.project.sharepoint.SharePointProjectController;
-import pg.gipter.ui.project.sharepoint.SharePointProjectWindow;
 import pg.gipter.ui.project.toolkit.ToolkitProjectsController;
 import pg.gipter.ui.project.toolkit.ToolkitProjectsWindow;
 import pg.gipter.ui.upgrade.UpgradeController;
@@ -60,12 +58,6 @@ public enum WindowFactory {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
             return new UpgradeWindow(new UpgradeController(applicationProperties, uiLauncher));
-        }
-    },
-    SHARE_POINT_PROJECTS {
-        @Override
-        public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new SharePointProjectWindow(new SharePointProjectController(applicationProperties, uiLauncher));
         }
     };
 

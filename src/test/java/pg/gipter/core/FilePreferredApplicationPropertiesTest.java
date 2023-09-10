@@ -2,6 +2,8 @@ package pg.gipter.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
@@ -10,7 +12,7 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.RunConfigBuilder;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.users.SuperUserService;
+import pg.gipter.services.CookiesService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -581,12 +583,15 @@ class FilePreferredApplicationPropertiesTest {
 
     @Test
     void givenToolkitUsernameAndPassword_whenIsToolkitPropertiesSet_thenReturnTrue() {
-        String[] args = {"toolkitPassword=yui"};
-        appProps = new FileApplicationProperties(args);
+        try (MockedStatic<CookiesService> utilities = Mockito.mockStatic(CookiesService.class)) {
+            utilities.when(CookiesService::hasValidFedAuth).thenReturn(true);
+            String[] args = {};
+            appProps = new FileApplicationProperties(args);
 
-        boolean actual = appProps.isToolkitCredentialsSet();
+            boolean actual = appProps.isToolkitCredentialsSet();
 
-        assertThat(actual).isEqualTo(SuperUserService.getInstance().isCredentialsAvailable());
+            assertThat(actual).isTrue();
+        }
     }
 
     @Test
@@ -790,66 +795,6 @@ class FilePreferredApplicationPropertiesTest {
         String actual = appProps.toolkitUserFolder();
 
         assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
-    void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserWSFolder_thenReturnDefault() {
-        String[] args = {};
-        appProps = new FileApplicationProperties(args);
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
-    }
-
-    @Test
-    void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserWSFolder_thenReturnUserFolderWithCliUser() {
-        String[] args = {"toolkitUsername=xxx"};
-        appProps = new FileApplicationProperties(args);
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "XXX");
-    }
-
-
-    @Test
-    void givenToolkitUserCliAndFileToolkitUser_whenToolkitUserWSFolder_thenReturnFileCustomUserFolder() {
-        String[] args = {"toolkitUsername=xxx"};
-        appProps = new FileApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
-    void givenNoToolkitUserCliAndFileToolkitUser_whenToolkitUserWSFolder_then_returnFileCustomUserFolder() {
-        String[] args = {};
-        appProps = new FileApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "AAA");
-    }
-
-    @Test
-    void givenToolkitCustomUserFolderCliAndFileToolkitUsername_whenToolkitWSUserFolder_thenReturnUserFolderWithFileToolkitUsername() {
-        String[] args = {"toolkitCustomUserFolder=qqq"};
-        appProps = new FileApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = appProps.toolkitWSUserFolder();
-
-        assertThat(actual).isEqualTo(ArgName.toolkitWSUserFolder.defaultValue() + "AAA");
     }
 
     @Test
@@ -1076,5 +1021,45 @@ class FilePreferredApplicationPropertiesTest {
         int actual = appProps.fetchTimeout();
 
         assertThat(actual).isEqualTo(2);
+    }
+
+    @Test
+    void givenEmptyGithubToken_whenGithubToken_thenThrowNPE() {
+        String[] args = {""};
+        appProps = new FileApplicationProperties(args);
+        appProps.init(TestUtils.mockConfigurationDao(new ApplicationConfig()));
+
+        try {
+            appProps.githubToken();
+            fail("Should throw NPE");
+        } catch (Exception ex) {
+            assertThat(ex).isInstanceOf(NullPointerException.class);
+        }
+    }
+
+    @Test
+    void given_GithubTokenFromCliAndFile_when_githubToken_then_returnItFromFile() {
+        String[] args = {"githubToken=cli"};
+        appProps = new FileApplicationProperties(args);
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = appProps.githubToken();
+
+        assertThat(actual).isEqualTo("file");
+    }
+
+    @Test
+    void given_GithubTokenFromFile_when_githubToken_then_returnIt() {
+        String[] args = {""};
+        ApplicationConfig applicationConfig = new ApplicationConfig();
+        applicationConfig.setGithubToken("file");
+        appProps = new FileApplicationProperties(args);
+        appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
+
+        String actual = appProps.githubToken();
+
+        assertThat(actual).isEqualTo("file");
     }
 }

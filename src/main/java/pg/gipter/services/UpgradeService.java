@@ -31,9 +31,9 @@ public class UpgradeService extends TaskService<Void> {
 
     private final GithubService githubService;
 
-    public UpgradeService(SemanticVersioning currentVersion) {
+    public UpgradeService(SemanticVersioning currentVersion, String githubToken) {
         super();
-        githubService = new GithubService(currentVersion);
+        githubService = new GithubService(currentVersion, githubToken);
     }
 
     void upgradeAndRestartApplication() {

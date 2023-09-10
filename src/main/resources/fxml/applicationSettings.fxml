@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
@@ -8,7 +9,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="mainAnchorPane" prefHeight="180.0" prefWidth="513.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="mainAnchorPane" prefHeight="180.0" prefWidth="513.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TabPane fx:id="applicationSettingsTabPane" prefHeight="180.0" prefWidth="513.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -32,6 +33,10 @@
                         <CheckBox fx:id="checkLastItemCheckBox" layoutX="170.0" layoutY="91.0" mnemonicParsing="false" />
                         <CheckBox fx:id="uploadItemCheckBox" layoutX="202.0" layoutY="63.0" mnemonicParsing="false" text="%launch.panel.uploadItem" />
                         <CheckBox fx:id="smartZipCheckBox" layoutX="202.0" layoutY="91.0" mnemonicParsing="false" text="%launch.panel.smartZip" />
+                        <Button fx:id="refreshSettingsButton" layoutX="387.0" layoutY="13.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="123.0" styleClass="blue" stylesheets="@../css/buttons.css" text="%launch.panel.refreshSettings" textFill="#32a1c9">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font></Button>
                      </children>
                   </AnchorPane>
                </content>

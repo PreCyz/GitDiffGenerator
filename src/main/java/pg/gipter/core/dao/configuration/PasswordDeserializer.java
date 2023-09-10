@@ -33,8 +33,9 @@ class PasswordDeserializer implements JsonDeserializer<Configuration> {
             throws JsonParseException {
         JsonObject configuration = jsonElement.getAsJsonObject();
         Gson gson = new Gson();
+
         JsonArray runConfigs = configuration.getAsJsonArray(RunConfig.RUN_CONFIGS);
-        if (runConfigs != null && runConfigs.size() > 0) {
+        if (runConfigs != null && !runConfigs.isEmpty()) {
             for (int rci = 0; rci < runConfigs.size(); ++rci) {
                 JsonElement runConfig = runConfigs.get(rci);
                 if (runConfig != null) {

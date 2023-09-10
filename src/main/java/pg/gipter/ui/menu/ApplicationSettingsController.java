@@ -3,6 +3,8 @@ package pg.gipter.ui.menu;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -14,8 +16,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import org.quartz.SchedulerException;
+import pg.gipter.ProgramSettings;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.dao.MongoDaoConfig;
 import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.core.model.ApplicationConfig;
 import pg.gipter.core.model.CommandPatternValue;
@@ -23,12 +27,16 @@ import pg.gipter.core.producers.command.DiffCommandFactory;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.jobs.JobCreator;
 import pg.gipter.jobs.JobCreatorFactory;
+import pg.gipter.services.FXWebService;
 import pg.gipter.services.StartupService;
 import pg.gipter.services.TextFieldIntelliSense;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,6 +103,8 @@ public class ApplicationSettingsController extends AbstractController {
     private CheckBox overrideMercurialCheckBox;
     @FXML
     private Label overrideLabel;
+    @FXML
+    private Button refreshSettingsButton;
 
     private final Map<String, Labeled> labelsAffectedByLanguage;
 
@@ -111,6 +121,7 @@ public class ApplicationSettingsController extends AbstractController {
         setProperties();
         setListeners();
         setAccelerators();
+        setActions();
         createLabelsMap();
         TextFieldIntelliSense.init(gitCommandTextField, CommandPatternValue.class);
         TextFieldIntelliSense.init(svnCommandTextField, CommandPatternValue.class);
@@ -302,6 +313,22 @@ public class ApplicationSettingsController extends AbstractController {
         });
     }
 
+    private void setActions() {
+        refreshSettingsButton.setOnAction(actionEvent -> {
+            try {
+                ProgramSettings.initProgramSettings();
+                MongoDaoConfig.refresh(ProgramSettings.getInstance().getDbProperties());
+                new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("launch.panel.refreshed"))
+                        .withAlertType(Alert.AlertType.INFORMATION)
+                        .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
+                        .buildAndDisplayWindow();
+            } catch (IOException e) {
+                new FXWebService().initSSO();
+            }
+        });
+    }
+
     private void createLabelsMap() {
         labelsAffectedByLanguage.put("launch.panel.confirmationWindow", confirmationWindowLabel);
         labelsAffectedByLanguage.put("launch.panel.activateTray", activateTrayLabel);
@@ -314,5 +341,6 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.customCommand.override", overrideLabel);
         labelsAffectedByLanguage.put("launch.panel.uploadItem", uploadItemCheckBox);
         labelsAffectedByLanguage.put("launch.panel.smartZip", smartZipCheckBox);
+        labelsAffectedByLanguage.put("launch.panel.refreshSettings", refreshSettingsButton);
     }
 }
