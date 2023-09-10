@@ -1,0 +1,9 @@
+**Release notes:**
+
+Improvements:
+* Improving security.
+* Removing service user.
+* Using SSO.
+* TOOLKIT_DOCS works again.
+Fixes:
+* NONE.
