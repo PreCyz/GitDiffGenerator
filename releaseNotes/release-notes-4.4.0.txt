@@ -5,5 +5,6 @@ Improvements:
 * Removing service user.
 * Using SSO.
 * TOOLKIT_DOCS works again.
+* Removing SHAREPOINT_DOCS.
 Fixes:
 * NONE.
