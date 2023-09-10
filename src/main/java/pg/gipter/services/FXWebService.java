@@ -14,7 +14,10 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLInputElement;
 import pg.gipter.InitSource;
 import pg.gipter.core.ArgName;
@@ -35,8 +38,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toCollection;
 
 public class FXWebService {
 
@@ -87,6 +91,7 @@ public class FXWebService {
 
         stage.setScene(new Scene(stackPane, 600, 600));
         stage.setOnCloseRequest(createOnCloseRequest(initSource));
+        stage.setTitle(BundleUtils.getMsg("webview.title"));
         stage.show();
 
         CookiesService.loadCookies();
@@ -138,7 +143,7 @@ public class FXWebService {
                 javaHome, "-jar",
                 jarPath.get().toAbsolutePath().toString(),
                 ArgName.useUI.name() + "=Y"
-        ).collect(Collectors.toCollection(LinkedList::new));
+        ).collect(toCollection(LinkedList::new));
 
         try {
             new ProcessBuilder(command).start();
@@ -174,6 +179,7 @@ public class FXWebService {
                 }
                 if (webEngine.getLocation().contains(ArgName.toolkitCopyCase.defaultValue())) {
                     try {
+                        checkSomethingWrong(webEngine.getDocument());
                         CookiesService.extractAndSaveCookies();
                         new AlertWindowBuilder()
                                 .withHeaderText(BundleUtils.getMsg("webview.cookies.saved"))
@@ -194,5 +200,22 @@ public class FXWebService {
                 }
             }
         };
+    }
+
+    private void checkSomethingWrong(Document document) throws IOException {
+        NodeList childNodes = document.getChildNodes();
+        checkProblem(childNodes);
+    }
+
+    private void checkProblem(NodeList childNodes) throws IOException {
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node item = childNodes.item(i);
+            if (item.getChildNodes().getLength() > 0) {
+                checkProblem(item.getChildNodes());
+            }
+            if (item.getNodeValue() != null && item.getNodeValue().contains("Sorry, something went wrong")) {
+                throw new IOException("Sorry, something went wrong with SSO.");
+            }
+        }
     }
 }

@@ -27,6 +27,7 @@ import pg.gipter.core.producers.command.DiffCommandFactory;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.jobs.JobCreator;
 import pg.gipter.jobs.JobCreatorFactory;
+import pg.gipter.services.FXWebService;
 import pg.gipter.services.StartupService;
 import pg.gipter.services.TextFieldIntelliSense;
 import pg.gipter.ui.AbstractController;
@@ -35,6 +36,7 @@ import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -313,13 +315,17 @@ public class ApplicationSettingsController extends AbstractController {
 
     private void setActions() {
         refreshSettingsButton.setOnAction(actionEvent -> {
-            ProgramSettings.initProgramSettings();
-            MongoDaoConfig.refresh(ProgramSettings.getInstance().getDbProperties());
-            new AlertWindowBuilder()
-                    .withHeaderText(BundleUtils.getMsg("launch.panel.refreshed"))
-                    .withAlertType(Alert.AlertType.INFORMATION)
-                    .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
-                    .buildAndDisplayWindow();
+            try {
+                ProgramSettings.initProgramSettings();
+                MongoDaoConfig.refresh(ProgramSettings.getInstance().getDbProperties());
+                new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("launch.panel.refreshed"))
+                        .withAlertType(Alert.AlertType.INFORMATION)
+                        .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
+                        .buildAndDisplayWindow();
+            } catch (IOException e) {
+                new FXWebService().initSSO();
+            }
         });
     }
 

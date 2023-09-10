@@ -1,6 +1,7 @@
 package pg.gipter.services;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -13,6 +14,7 @@ import pg.gipter.core.ArgName;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 public class SettingsService {
 
@@ -29,6 +31,9 @@ public class SettingsService {
              CloseableHttpResponse response = httpclient.execute(httpget)
         ) {
             logger.info("Response {}", response.getStatusLine());
+            if (Arrays.asList(HttpStatus.SC_FORBIDDEN, HttpStatus.SC_UNAUTHORIZED).contains(response.getStatusLine().getStatusCode())) {
+                throw new IOException("Authentication failed.");
+            }
             FileUtils.copyInputStreamToFile(response.getEntity().getContent(), destination);
             EntityUtils.consume(response.getEntity());
             return destination;

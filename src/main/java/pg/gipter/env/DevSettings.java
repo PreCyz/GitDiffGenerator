@@ -40,7 +40,7 @@ class DevSettings implements EnvSettings {
     }
 
     @Override
-    public Optional<CipherDetails> loadCipherDetails() {
+    public Optional<CipherDetails> loadCipherDetails() throws IOException {
         Optional<CipherDetails> result = Optional.empty();
         String settingsFileName = getFileName(SETTINGS_JSON);
         try (InputStream fis = new FileInputStream(settingsFileName);
@@ -53,6 +53,7 @@ class DevSettings implements EnvSettings {
             logger.info("Program settings loaded from [{}].", settingsFileName);
         } catch (Exception e) {
             logger.warn("Could not load [{}] because: {}", settingsFileName, e.getMessage());
+            throw new IOException(e);
         }
         return result;
     }
