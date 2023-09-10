@@ -23,12 +23,12 @@ public class ProdSettings extends DevSettings {
     }
 
     @Override
-    public Optional<CipherDetails> loadCipherDetails() {
+    public Optional<CipherDetails> loadCipherDetails() throws IOException {
         downloadSettingsFile();
         return super.loadCipherDetails();
     }
 
-    private void downloadSettingsFile() {
+    private void downloadSettingsFile() throws IOException {
         String settingsFileName = "settings.txt";
         try {
             File settingsTxt = settingsService.downloadAsset(settingsFileName, CookiesService.getFedAuthString());
@@ -38,7 +38,8 @@ public class ProdSettings extends DevSettings {
                 logger.warn("Could not rename the file [{}].", settingsFileName);
             }
         } catch (IOException e) {
-            logger.error("Could not download asset [{}]", settingsFileName);
+            logger.error("Could not download asset [{}]", settingsFileName, e);
+            throw e;
         }
     }
 

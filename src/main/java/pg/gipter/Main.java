@@ -16,10 +16,12 @@ import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.ConcurrentService;
 import pg.gipter.services.CookiesService;
 import pg.gipter.services.FXWebService;
+import pg.gipter.services.ToolkitService;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
 import pg.gipter.utils.SystemUtils;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -38,8 +40,11 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         logger.info("Gipter started.");
-        if (CookiesService.isCookiesExist()) {
-            initProgramSettings(args);
+        boolean regularFlow = isCookieWorking(args);
+        if (regularFlow) {
+            regularFlow = initProgramSettings(args);
+        }
+        if (regularFlow) {
             Main mObj = new Main(args);
             mObj.setLoggerLevel(applicationProperties.loggerLevel());
             logger.info("Java version '{}'.", SystemUtils.javaVersion());
@@ -64,11 +69,25 @@ public class Main extends Application {
         }
     }
 
-    private static void initProgramSettings(String[] args) {
-        if (args != null && Arrays.asList(args).contains("env=dev")) {
-            ProgramSettings.initProgramSettings(Environment.DEV);
-        } else {
-            ProgramSettings.initProgramSettings(Environment.PROD);
+    private static boolean isCookieWorking(String[] args) {
+        try {
+            return new ToolkitService(ApplicationPropertiesFactory.getInstance(args))
+                    .isCookieWorking(CookiesService.getFedAuthString());
+        } catch (IllegalStateException ex) {
+            return false;
+        }
+    }
+
+    private static boolean initProgramSettings(String[] args){
+        try {
+            if (args != null && Arrays.asList(args).contains("env=dev")) {
+                ProgramSettings.initProgramSettings(Environment.DEV);
+            } else {
+                ProgramSettings.initProgramSettings(Environment.PROD);
+            }
+            return true;
+        } catch (IOException ex) {
+            return false;
         }
     }
 
