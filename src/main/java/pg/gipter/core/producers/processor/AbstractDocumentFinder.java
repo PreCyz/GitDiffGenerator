@@ -200,7 +200,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
     final Map<String, String> getFilesToDownload(List<DocumentDetails> documentDetails) {
         Map<String, String> filesToDownloadMap = new HashMap<>();
         for (DocumentDetails dd : documentDetails) {
-            final String author = applicationProperties.toolkitUsername();
+            final String author = applicationProperties.toolkitUserEmail();
             if (dd.getVersions().isEmpty() && dd.getLastModifier().getLoginName().equals(author)) {
                 filesToDownloadMap.put(dd.getCurrentVersion() + "v-" + dd.getFileLeafRef(), getFullDownloadUrl(dd.getFileRef()));
             } else if (!dd.getVersions().isEmpty()) {
@@ -209,7 +209,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
                 do {
                     final double currentVersion = minMeCurrentVersion;
                     minMe = dd.getVersions().stream()
-                            .filter(vd -> vd.getCreator().getLoginName().equalsIgnoreCase(author))
+                            .filter(vd -> vd.getCreator().getLoginName().contains(author))
                             .filter(vd -> vd.getCreated().isAfter(LocalDateTime.of(applicationProperties.startDate(), LocalTime.now())))
                             .filter(vd -> vd.getCreated().isBefore(LocalDateTime.of(applicationProperties.endDate(), LocalTime.now())))
                             .filter(vd -> vd.getVersionLabel() > currentVersion)
@@ -218,7 +218,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
                     if (minMe.isPresent()) {
                         final VersionDetails minMeV = minMe.get();
                         dd.getVersions().stream()
-                                .filter(vd -> !vd.getCreator().getLoginName().equalsIgnoreCase(author))
+                                .filter(vd -> !vd.getCreator().getLoginName().contains(author))
                                 .filter(vd -> vd.getVersionLabel() < minMeV.getVersionLabel())
                                 .max(Comparator.comparingDouble(VersionDetails::getVersionLabel))
                                 .ifPresent(versionDetails -> filesToDownloadMap.put(
@@ -230,7 +230,7 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
                         do {
                             final double diff = ++difference;
                             nextMinMe = dd.getVersions().stream()
-                                    .filter(vd -> vd.getCreator().getLoginName().equalsIgnoreCase(author))
+                                    .filter(vd -> vd.getCreator().getLoginName().contains(author))
                                     .filter(vd -> vd.getCreated().isAfter(LocalDateTime.of(applicationProperties.startDate(), LocalTime.now())))
                                     .filter(vd -> vd.getCreated().isBefore(LocalDateTime.of(applicationProperties.endDate(), LocalTime.now())))
                                     .filter(vd -> vd.getVersionLabel() > minMeV.getVersionLabel())
