@@ -1,0 +1,6 @@
+**Release notes:**
+
+Improvements:
+* NONE.
+Fixes:
+* Fixing author check for TOOLKIT_DOCS.
