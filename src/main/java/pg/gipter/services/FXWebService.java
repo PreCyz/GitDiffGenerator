@@ -96,7 +96,6 @@ public class FXWebService {
 
         CookiesService.loadCookies();
 
-        webEngine.setJavaScriptEnabled(true);
         webEngine.getLoadWorker().stateProperty().addListener(changeListener());
         webEngine.load(ssoUrl);
     }
@@ -179,7 +178,7 @@ public class FXWebService {
                 }
                 if (webEngine.getLocation().contains(ArgName.toolkitCopyCase.defaultValue())) {
                     try {
-                        checkSomethingWrong(webEngine.getDocument());
+                        checkProblem(webEngine.getDocument());
                         CookiesService.extractAndSaveCookies();
                         new AlertWindowBuilder()
                                 .withHeaderText(BundleUtils.getMsg(this.initSource == InitSource.MAIN ?
@@ -203,16 +202,16 @@ public class FXWebService {
         };
     }
 
-    private void checkSomethingWrong(Document document) throws IOException {
+    private void checkProblem(Document document) throws IOException {
         NodeList childNodes = document.getChildNodes();
-        checkProblem(childNodes);
+        checkSomethingWrong(childNodes);
     }
 
-    private void checkProblem(NodeList childNodes) throws IOException {
+    private void checkSomethingWrong(NodeList childNodes) throws IOException {
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node item = childNodes.item(i);
             if (item.getChildNodes().getLength() > 0) {
-                checkProblem(item.getChildNodes());
+                checkSomethingWrong(item.getChildNodes());
             }
             if (item.getNodeValue() != null && item.getNodeValue().contains("Sorry, something went wrong")) {
                 throw new IOException("Sorry, something went wrong with SSO.");

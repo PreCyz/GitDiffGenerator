@@ -4434,7 +4434,7 @@
               "type": "SP.User"
             },
             "Id": 228,
-            "LoginName": "i:0#.w|ncdmz\\mawy",
+            "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
             "Title": "Marek Wysocki",
             "Email": "mawy@netcompany.com"
           },
@@ -4445,7 +4445,7 @@
               "type": "SP.User"
             },
             "Id": 308,
-            "LoginName": "i:0#.w|ncdmz\\pawg",
+            "LoginName": "i:0e.t|azureadtrust|pawg@netcompany.com",
             "Title": "Pawe\u0142 Gaw\u0119dzki",
             "Email": "pawg@netcompany.com"
           },
@@ -4463,7 +4463,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionf10ae33c-99f0-48ba-a4aa-7e8f5af41514/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4487,7 +4487,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionc4182bb4-a75b-482c-99d0-77eabfc8a33c/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4511,7 +4511,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersione67ee3b8-66e8-4bc6-b1f0-997d4afb1ffb/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4535,7 +4535,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion2dea0270-fe04-44d7-ab5c-6c383e009edb/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4559,7 +4559,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion8b5b9289-b835-43ae-98f4-f98e0a46d283/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4583,7 +4583,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion51f8dc4f-fa75-4f70-87e0-2db0ac15a803/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\pawg",
+                  "LoginName": "i:0e.t|azureadtrust|pawg@netcompany.com",
                   "Title": "Pawe\u0142 Gaw\u0119dzki",
                   "Email": "pawg@netcompany.com"
                 },
@@ -4607,7 +4607,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion56c74c0c-515b-491b-8ef0-fc44425dfbdb/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\pawg",
+                  "LoginName": "i:0e.t|azureadtrust|pawg@netcompany.com",
                   "Title": "Pawe\u0142 Gaw\u0119dzki",
                   "Email": "pawg@netcompany.com"
                 },
@@ -4631,7 +4631,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion0439bebb-3d02-4b1f-8e46-3ea619e9e4b1/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4655,7 +4655,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion8d714f1a-62f8-4511-b076-7952b8f1ae3e/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4679,7 +4679,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionf8bbf464-b195-4398-bdd6-ed84d798e4a7/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4703,7 +4703,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion7d6fab17-cabe-491d-a0f3-507c0f2d60e9/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4727,7 +4727,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion411881bf-0c79-4943-8f7d-ee8b5fc7fd89/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4751,7 +4751,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion7fcf6756-e486-4d99-9e05-0dc55d4dc47b/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4775,7 +4775,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionbac23b9a-dce8-4e96-99b1-6028dfb55c15/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4799,7 +4799,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion093c2408-41a1-402e-b8a1-084a06bc840d/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4823,7 +4823,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion803a66f3-df1c-48f2-99b8-000b15d5b65a/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4847,7 +4847,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersioncd0270ec-8e4e-41a8-a162-d64e7705fe2e/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4871,7 +4871,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionb65a12df-2927-40a0-afbc-24ed7a14d7a2/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4919,7 +4919,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion063b9c6f-f3f4-452b-8e3c-c8e0bbe6ac36/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4943,7 +4943,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion223a4aa2-8106-403d-8e96-4202a530a90d/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4967,7 +4967,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionc83380aa-2dc7-451f-9f5d-9ffdb2d0c483/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -4991,7 +4991,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionb3678fd4-44d1-4eb5-a547-2405738c54fa/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5015,7 +5015,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion1a0957ec-eea6-4801-8e93-af0c9061ab19/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5039,7 +5039,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion5259388d-95f5-4e83-b512-532220ac1710/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5063,7 +5063,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionc4cc4551-3f8f-4e94-a86e-a1563f3c9c55/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\pawg",
+                  "LoginName": "i:0e.t|azureadtrust|pawg@netcompany.com",
                   "Title": "Pawe\u0142 Gaw\u0119dzki",
                   "Email": "pawg@netcompany.com"
                 },
@@ -5087,7 +5087,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion025b93d5-c813-4ee8-84cf-034a26bf06ad/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\pawg",
+                  "LoginName": "i:0e.t|azureadtrust|pawg@netcompany.com",
                   "Title": "Pawe\u0142 Gaw\u0119dzki",
                   "Email": "pawg@netcompany.com"
                 },
@@ -5111,7 +5111,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion165e5d40-87dd-4074-b7b5-27209b95c853/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\pawg",
+                  "LoginName": "i:0e.t|azureadtrust|pawg@netcompany.com",
                   "Title": "Pawe\u0142 Gaw\u0119dzki",
                   "Email": "pawg@netcompany.com"
                 },
@@ -5135,7 +5135,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersiona47107a4-b433-443f-9340-4623deffed39/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5159,7 +5159,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersioneacb32ad-1168-459e-af88-afab9a8b623f/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5183,7 +5183,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersiona8fa6e01-b664-4b20-83ae-e70333ad7164/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5207,7 +5207,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersiondf4824a1-3da7-4107-ac9e-2ce0a80f7e76/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5231,7 +5231,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion789bbf09-26b4-48e3-be37-89492cc07cd7/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5255,7 +5255,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion73aa017f-3db5-439a-b053-9d201224712c/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5279,7 +5279,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion39cf067d-5d7d-44bb-ae99-07630a6d77fa/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5303,7 +5303,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionc025e4cc-265f-47a9-a21c-04e585ade498/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5327,7 +5327,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersion1a52ac1d-dda2-4c08-9669-669e889c629e/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5375,7 +5375,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersione5afe8b2-d845-4a4a-b150-1f43f5c154d4/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\pawg",
+                  "LoginName": "i:0e.t|azureadtrust|pawg@netcompany.com",
                   "Title": "Pawe\u0142 Gaw\u0119dzki",
                   "Email": "pawg@netcompany.com"
                 },
@@ -5399,7 +5399,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionc25af17f-581a-43c6-a944-47e72eb11f15/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5423,7 +5423,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionaed03c86-40dd-403d-80ce-9b06698c0cac/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5447,7 +5447,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionffcc8aca-d7a4-4a9a-9ba7-85e1a4ae6830/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\mawy",
+                  "LoginName": "i:0e.t|azureadtrust|mawy@netcompany.com",
                   "Title": "Marek Wysocki",
                   "Email": "mawy@netcompany.com"
                 },
@@ -5471,7 +5471,7 @@
                     "uri": "https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/SP.FileVersionef8f60ca-5fdd-496e-80bc-27fd53ea400d/CreatedBy",
                     "type": "SP.User"
                   },
-                  "LoginName": "i:0#.w|ncdmz\\pawg",
+                  "LoginName": "i:0e.t|azureadtrust|pawg@netcompany.com",
                   "Title": "Pawe\u0142 Gaw\u0119dzki",
                   "Email": "pawg@netcompany.com"
                 },
