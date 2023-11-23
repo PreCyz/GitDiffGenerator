@@ -1,8 +1,11 @@
 package pg.gipter.ui.alerts;
 
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.web.WebView;
+import org.slf4j.LoggerFactory;
 import pg.gipter.ui.UploadStatus;
+import pg.gipter.utils.ResourceUtils;
 
 public class WebViewDetails {
     private UploadStatus uploadStatus;
@@ -19,17 +22,26 @@ public class WebViewDetails {
         this.gif = gif;
     }
 
-    public WebViewDetails(ImageView imageView) {
-        this(UploadStatus.N_A, imageView);
+    public WebViewDetails(ImageFile imageFile) {
+        this(UploadStatus.N_A);
+        this.imageView = createImageView(imageFile);
     }
 
     public WebViewDetails(Gif gif) {
         this(UploadStatus.N_A, gif);
     }
 
-    public WebViewDetails(UploadStatus uploadStatus, ImageView imageView) {
+    public WebViewDetails(UploadStatus uploadStatus, ImageFile imageFile) {
         this(uploadStatus);
-        this.imageView = imageView;
+        this.imageView = createImageView(imageFile);
+    }
+
+    public static ImageView createImageView(ImageFile imageFile) {
+        LoggerFactory.getLogger(WebViewDetails.class).info("New web view was created with gif [{}] from [{}]."
+                , imageFile.name(), imageFile.fileUrl());
+        return ResourceUtils.getImgResource(imageFile.fileUrl())
+                .map(url -> new ImageView(new Image(url.toString())))
+                .orElseGet(ImageView::new);
     }
 
     public Gif getGif() {
