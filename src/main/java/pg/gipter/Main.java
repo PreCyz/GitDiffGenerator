@@ -68,9 +68,11 @@ public class Main extends Application {
                 logger.error("Cookies are not available. Commandline is available only if [cookies.json] is present.");
                 System.exit(-1);
             } else {
-                EXECUTE_SSO = !Arrays.asList(args).contains(
-                        String.format("%s=%s", ArgName.noSSO.name(), ArgName.noSSO.defaultValue())
+                List<String> noSSOArgs = List.of(
+                        String.format("%s=Y", ArgName.noSSO.name()),
+                        String.format("%s=y", ArgName.noSSO.name())
                 );
+                EXECUTE_SSO = Stream.of(args).noneMatch(noSSOArgs::contains);
                 launch(args);
             }
         }
