@@ -87,7 +87,7 @@ public class AlertWindowBuilder {
     }
 
     public AlertWindowBuilder withImageFile(ImageFile imageFile) {
-        this.webViewDetails = new WebViewDetails(WebViewService.getInstance().createImageView(imageFile));
+        this.webViewDetails = new WebViewDetails(imageFile);
         return this;
     }
 
