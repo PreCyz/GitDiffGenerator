@@ -141,10 +141,12 @@ public class FXWebService {
         final LinkedList<String> command = Stream.of(
                 javaHome, "-jar",
                 jarPath.get().toAbsolutePath().toString(),
-                ArgName.useUI.name() + "=Y"
+                String.format("%s=%s", ArgName.useUI.name(), ArgName.useUI.defaultValue()),
+                String.format("%s=%s", ArgName.noSSO.name(), ArgName.noSSO.defaultValue())
         ).collect(toCollection(LinkedList::new));
 
         try {
+            logger.info("Restarting the application with the following command: {}", command);
             new ProcessBuilder(command).start();
         } catch (IOException e) {
             logger.error("Could not restart application gracefully. Shutting it down.");
