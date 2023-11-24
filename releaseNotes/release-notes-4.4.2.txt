@@ -1,0 +1,7 @@
+**Release notes:**
+
+Improvements:
+* NONE.
+Fixes:
+* Interrupting infinite loop after failed SSO.
+* Improving performance of WebViewService.
