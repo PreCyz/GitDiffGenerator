@@ -259,6 +259,12 @@ public enum ArgName {
         public String defaultValue() {
             return "Y";
         }
+    },
+    noSSO {
+        @Override
+        public String defaultValue() {
+            return "N";
+        }
     };
 
     public abstract String defaultValue();

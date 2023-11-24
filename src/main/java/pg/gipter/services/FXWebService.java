@@ -141,13 +141,15 @@ public class FXWebService {
         final LinkedList<String> command = Stream.of(
                 javaHome, "-jar",
                 jarPath.get().toAbsolutePath().toString(),
-                ArgName.useUI.name() + "=Y"
+                String.format("%s=%s", ArgName.useUI.name(), ArgName.useUI.defaultValue()),
+                ArgName.noSSO.name() + "=Y"
         ).collect(toCollection(LinkedList::new));
 
         try {
+            logger.info("Restarting the application with the following command: {}", command);
             new ProcessBuilder(command).start();
         } catch (IOException e) {
-            logger.error("Could not restart application gracefully. Shutting it down.");
+            logger.error("Could not restart application gracefully. Shutting it down.", e);
         }
         System.exit(0);
     }
@@ -186,7 +188,7 @@ public class FXWebService {
                                 .withAlertType(Alert.AlertType.INFORMATION)
                                 .withImageFile(ImageFile.FINGER_UP_PNG)
                                 .buildAndDisplayWindow();
-                    } catch (IOException | NoSuchFieldException | ClassNotFoundException | IllegalAccessException e) {
+                    } catch (Exception e) {
                         logger.error("Could not save cookies.", e);
                         new AlertWindowBuilder()
                                 .withHeaderText(BundleUtils.getMsg("webview.cookies.error"))
@@ -214,7 +216,7 @@ public class FXWebService {
                 checkSomethingWrong(item.getChildNodes());
             }
             if (item.getNodeValue() != null && item.getNodeValue().contains("Sorry, something went wrong")) {
-                throw new IOException("Sorry, something went wrong with SSO.");
+                throw new IOException("Sorry, something went wrong with SSO. " + item.getNodeValue());
             }
         }
     }

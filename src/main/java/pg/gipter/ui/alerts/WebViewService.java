@@ -1,8 +1,6 @@
 package pg.gipter.ui.alerts;
 
 import javafx.application.Platform;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.slf4j.Logger;
@@ -57,9 +55,9 @@ public class WebViewService {
                 });
             }
         } else {
-            webViewDetails.add(new WebViewDetails(UploadStatus.FAIL, createImageView(ImageFile.randomFailImage())));
-            webViewDetails.add(new WebViewDetails(UploadStatus.PARTIAL_SUCCESS, createImageView(ImageFile.randomPartialSuccessImage())));
-            webViewDetails.add(new WebViewDetails(UploadStatus.SUCCESS, createImageView(ImageFile.randomSuccessImage())));
+            webViewDetails.add(new WebViewDetails(UploadStatus.FAIL, ImageFile.randomFailImage()));
+            webViewDetails.add(new WebViewDetails(UploadStatus.PARTIAL_SUCCESS, ImageFile.randomPartialSuccessImage()));
+            webViewDetails.add(new WebViewDetails(UploadStatus.SUCCESS, ImageFile.randomSuccessImage()));
         }
 
         for (WebViewDetails wvd : webViewDetails) {
@@ -71,13 +69,6 @@ public class WebViewService {
 
     public static WebViewService getInstance() {
         return WebViewServiceHolder.INSTANCE;
-    }
-
-    public ImageView createImageView(ImageFile imageFile) {
-        logger.info("New web view was created with gif [{}] from [{}].", imageFile.name(), imageFile.fileUrl());
-        return ResourceUtils.getImgResource(imageFile.fileUrl())
-                .map(url -> new ImageView(new Image(url.toString())))
-                .orElseGet(ImageView::new);
     }
 
     private WebViewDetails createWebViewDetails(final Gif gif) {
@@ -93,10 +84,7 @@ public class WebViewService {
             });
         } else {
             ImageFile imageFile = ImageFile.randomImage(EnumSet.allOf(ImageFile.class));
-            final ImageView imageView = ResourceUtils.getImgResource(imageFile.fileUrl())
-                    .map(url -> new ImageView(new Image(url.toString())))
-                    .orElseGet(ImageView::new);
-            wvd = new WebViewDetails(UploadStatus.N_A, imageView);
+            wvd = new WebViewDetails(UploadStatus.N_A, imageFile);
             logger.info("New web view was created with image [{}] from [{}].",
                     imageFile.name(),
                     imageFile.fileUrl()
