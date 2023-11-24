@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /** Created by Pawel Gawedzki on 17-Sep-2018 */
@@ -61,18 +62,18 @@ public class Main extends Application {
                 launcher.execute();
             }
         } else {
-            List<String> uiArgs = List.of(
+            List<String> uiArgs = Stream.of(
                     String.format("%s=N", ArgName.useUI.name()),
                     String.format("%s=n", ArgName.useUI.name())
-            );
+            ).collect(toList());
             if (Stream.of(args).anyMatch(uiArgs::contains)) {
                 logger.error("Cookies are not available. Commandline is available only if [cookies.json] is present.");
                 System.exit(-1);
             } else {
-                List<String> noSSOArgs = List.of(
+                List<String> noSSOArgs = Stream.of(
                         String.format("%s=Y", ArgName.noSSO.name()),
                         String.format("%s=y", ArgName.noSSO.name())
-                );
+                ).collect(toList());
                 EXECUTE_SSO = Stream.of(args).noneMatch(noSSOArgs::contains);
                 launch(args);
             }
