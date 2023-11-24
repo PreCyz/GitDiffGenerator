@@ -83,9 +83,10 @@ public final class CookiesService {
     }
 
     private static Map<String, Collection<CookieDetails>> readCookiesFromFile() throws IOException {
+        byte[] bytes = Files.readAllBytes(COOKIES_PATH);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Type type = new TypeToken<Map<String, Collection<CookieDetails>>>() {}.getType();
-        return gson.fromJson(Files.readString(COOKIES_PATH, StandardCharsets.UTF_8), type);
+        return gson.fromJson(new String(bytes, StandardCharsets.UTF_8), type);
     }
 
     private static String format(
