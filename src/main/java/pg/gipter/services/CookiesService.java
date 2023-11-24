@@ -49,7 +49,7 @@ public final class CookiesService {
             );
             return expirationDate.isAfter(LocalDateTime.now());
         } catch (Exception ex) {
-            logger.error("Problem with FedAuth cookie. Source of cookie [{}].", COOKIES_PATH.toAbsolutePath());
+            logger.error("Problem with FedAuth cookie. Source of cookie [{}].", COOKIES_PATH.toAbsolutePath(), ex);
             return false;
         }
     }
@@ -66,10 +66,10 @@ public final class CookiesService {
                 Map<String, Collection<CookieDetails>> cookiesToLoad = readCookiesFromFile();
                 result = cookiesToLoad.get(ArgName.toolkitHostUrl.defaultValue().replace("https://", ""))
                         .stream()
-                        .filter(cookie -> cookie.name.equals("FedAuth"))
+                        .filter(cookie -> "FedAuth".equals(cookie.name))
                         .findFirst();
             } catch (Exception e) {
-                logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath());
+                logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath(), e);
                 result = Optional.empty();
             }
         } else {
@@ -83,11 +83,9 @@ public final class CookiesService {
     }
 
     private static Map<String, Collection<CookieDetails>> readCookiesFromFile() throws IOException {
-        byte[] bytes = Files.readAllBytes(COOKIES_PATH);
-        String json = new String(bytes, StandardCharsets.UTF_8);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Type type = new TypeToken<Map<String, Collection<CookieDetails>>>() {}.getType();
-        return gson.fromJson(json, type);
+        return gson.fromJson(Files.readString(COOKIES_PATH, StandardCharsets.UTF_8), type);
     }
 
     private static String format(
@@ -213,7 +211,7 @@ public final class CookiesService {
                     logger.info("Cookies successfully loaded from [{}]", COOKIES_PATH.toAbsolutePath());
                 }
             } catch (Exception e) {
-                logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath());
+                logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath(), e);
             }
         } else {
             logger.info("File with the cookies does not exist. [{}]", COOKIES_PATH.toAbsolutePath());

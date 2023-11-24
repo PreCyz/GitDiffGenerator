@@ -24,6 +24,7 @@ import pg.gipter.utils.SystemUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -39,7 +40,7 @@ public class Main extends Application {
     private static ApplicationProperties applicationProperties;
 
     public static void main(String[] args) {
-        logger.info("Gipter started.");
+        logger.info("Gipter is starting ...");
         boolean regularFlow = isCookieWorking(args);
         if (regularFlow) {
             regularFlow = initProgramSettings(args);
@@ -47,9 +48,9 @@ public class Main extends Application {
         if (regularFlow) {
             Main mObj = new Main(args);
             mObj.setLoggerLevel(applicationProperties.loggerLevel());
-            logger.info("Java version '{}'.", SystemUtils.javaVersion());
-            logger.info("Version of application '{}'.", applicationProperties.version().getVersion());
-            logger.info("Gipter can use '{}' threads.", ConcurrentService.getInstance().availableThreads());
+            logger.info("Java version [{}].", SystemUtils.javaVersion());
+            logger.info("Version of application [{}].", applicationProperties.version().getVersion());
+            logger.info("Gipter can use [{}] threads.", ConcurrentService.getInstance().availableThreads());
             mObj.runConverters(applicationProperties);
             mObj.setDefaultConfig();
             if (Main.applicationProperties.isUseUI()) {
@@ -58,14 +59,22 @@ public class Main extends Application {
                 Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
                 launcher.execute();
             }
-        } else if (Stream.of(args).filter(it -> it.startsWith(ArgName.useUI.name()))
-                    .map(it -> it.substring(it.indexOf("=") + 1))
-                    .anyMatch(it -> it.toLowerCase().startsWith("n"))) {
-            logger.error("Cookies are not available. Commandline is available only if [cookies.json] is present.");
-            System.exit(-1);
         } else {
-            EXECUTE_SSO = true;
-            launch(args);
+            List<String> uiArgs = List.of(
+                    String.format("%s=N", ArgName.useUI.name()),
+                    String.format("%s=n", ArgName.useUI.name())
+            );
+            if (Stream.of(args).anyMatch(uiArgs::contains)) {
+                logger.error("Cookies are not available. Commandline is available only if [cookies.json] is present.");
+                System.exit(-1);
+            } else {
+                List<String> noSSOArgs = List.of(
+                        String.format("%s=Y", ArgName.noSSO.name()),
+                        String.format("%s=y", ArgName.noSSO.name())
+                );
+                EXECUTE_SSO = Stream.of(args).noneMatch(noSSOArgs::contains);
+                launch(args);
+            }
         }
     }
 
@@ -74,11 +83,12 @@ public class Main extends Application {
             return new ToolkitService(ApplicationPropertiesFactory.getInstance(args))
                     .isCookieWorking(CookiesService.getFedAuthString());
         } catch (IllegalStateException ex) {
+            logger.error("SSO is not working: {}", ex.getMessage(), ex);
             return false;
         }
     }
 
-    private static boolean initProgramSettings(String[] args){
+    private static boolean initProgramSettings(String[] args) {
         try {
             if (args != null && Arrays.asList(args).contains("env=dev")) {
                 ProgramSettings.initProgramSettings(Environment.DEV);
@@ -87,6 +97,7 @@ public class Main extends Application {
             }
             return true;
         } catch (IOException ex) {
+            logger.error("Program settings can't be initialized: {}", ex.getMessage(), ex);
             return false;
         }
     }
