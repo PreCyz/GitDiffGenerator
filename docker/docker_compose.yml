@@ -1,0 +1,18 @@
+services:
+  release_java11:
+    build:
+      context: .
+      dockerfile: ./java11.Dockerfile
+      args:
+        - VERSION=${VERSION}
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    container_name: gipter_release
+  release_java8:
+    build:
+      context: ./.
+      dockerfile: ./java8.Dockerfile
+      args:
+        - VERSION=${VERSION}
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    depends_on:
+      - release_java11
