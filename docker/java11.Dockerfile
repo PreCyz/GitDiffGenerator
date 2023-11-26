@@ -13,16 +13,13 @@ RUN apt-get update \
 
 WORKDIR /home/app/
 
-COPY src ./src
-COPY pom.xml ./
-COPY releaseNotes/release-notes-$VERSION.txt ./
+RUN git clone https://github.com/PreCyz/GitDiffGenerator.git
 
-RUN mvn versions:set -DnewVersion=$VERSION \
+WORKDIR /home/app/GitDiffGenerator/
+
+RUN git checkout origin/release/java11+
+RUN mvn versions:set -DnewVersion=${VERSION} \
     && mvn clean package
-
-COPY docs/Gipter-ui-description.pdf ./target/Gipter-ui-description.pdf
-COPY docs/gifs.json ./target/gifs.json
-
 RUN mv ./target/Gipter-${VERSION}.jar ./target/Gipter.jar \
     && 7z a ./target/11+Gipter_v${VERSION}.7z ./target/Gipter-ui-description.pdf ./target/Gipter.jar ./target/gifs.json
 
