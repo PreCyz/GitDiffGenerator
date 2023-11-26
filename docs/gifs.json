@@ -1,0 +1,1118 @@
+[
+  {
+    "name": "BACKPACK_DANCE",
+    "url": "https://media.giphy.com/media/LPkfppCDJOE5rvSCId/giphy.gif",
+    "height": 500.0,
+    "width": 300.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "NEVIL_FINIGAN_JOY",
+    "url": "https://media.giphy.com/media/bCYK1Cmi1VCso/giphy.gif",
+    "height": 225.0,
+    "width": 495.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "SNAPE_SNAP",
+    "url": "https://media.giphy.com/media/AisOYaOZdrS1i/giphy.gif",
+    "height": 215.0,
+    "width": 315.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "PICARD_DAMN",
+    "url": "https://media.giphy.com/media/999fcCCj45Bde/giphy.gif",
+    "height": 205.0,
+    "width": 265.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "TUK_TUK",
+    "url": "https://media.giphy.com/media/icZdyW06hn0js2OeOL/giphy.gif",
+    "height": 290.0,
+    "width": 500.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "MINION_IOIO",
+    "url": "https://media.giphy.com/media/YAlhwn67KT76E/giphy.gif",
+    "height": 220.0,
+    "width": 220.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "MINION_FART",
+    "url": "https://media.giphy.com/media/fnkyJXcCXZngY/giphy.gif",
+    "height": 170.0,
+    "width": 260.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "MINION_NAKED_GRU",
+    "url": "https://media.giphy.com/media/Q7omesiu4NYzeM9LPT/giphy.gif",
+    "height": 290.0,
+    "width": 500.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "MINION_CROWD",
+    "url": "https://media.giphy.com/media/mPOGx4hJtOWSA/giphy.gif",
+    "height": 295.0,
+    "width": 525.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "MINION_DANCE",
+    "url": "https://media.giphy.com/media/3EfgWHj0YIDrW/giphy.gif",
+    "height": 200.0,
+    "width": 420.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "MINION_SPLASH",
+    "url": "https://media.giphy.com/media/qugzlUdW5CkeI/giphy.gif",
+    "height": 220.0,
+    "width": 380.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "MINION_AAAA",
+    "url": "https://media.giphy.com/media/WxxsVAJLSBsFa/giphy.gif",
+    "height": 240.0,
+    "width": 420.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "MINION_BOX",
+    "url": "https://media.giphy.com/media/UttZVMEzceMOQ/giphy.gif",
+    "height": 245.0,
+    "width": 420.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "MINION_PARTY",
+    "url": "https://media.giphy.com/media/W6Lwg2xvTr6tJpuSTd/giphy.gif",
+    "height": 500.0,
+    "width": 500.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "MINION_KISS",
+    "url": "https://media.giphy.com/media/kP3VObToocJos/giphy.gif",
+    "height": 245.0,
+    "width": 415.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "FROZEN_ANNA_JOY",
+    "url": "https://media.giphy.com/media/lwXbNSQr4QEtq/giphy.gif",
+    "height": 180.0,
+    "width": 260.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "SVEN",
+    "url": "https://media.giphy.com/media/VECTSz9Kc7aCs/giphy.gif",
+    "height": 220.0,
+    "width": 180.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "OLAF",
+    "url": "https://media.giphy.com/media/nIWSZ6Pukcnbq/giphy.gif",
+    "height": 200.0,
+    "width": 420.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "MOANA_BABY",
+    "url": "https://media.giphy.com/media/H68cGIIrUQVHO/giphy.gif",
+    "height": 230.0,
+    "width": 520.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "MAUI_TATOO",
+    "url": "https://media.giphy.com/media/l3vRiFOixCouKnAxa/giphy.gif",
+    "height": 220.0,
+    "width": 490.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "MAUI_OH",
+    "url": "https://media.giphy.com/media/l0MYEF46L9RcroEOk/giphy.gif",
+    "height": 220.0,
+    "width": 495.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "MOANA_MAUI",
+    "url": "https://media.giphy.com/media/3oz8xZfA4u5TCk9Esw/giphy.gif",
+    "height": 230.0,
+    "width": 495.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "MAUI_ANGRY",
+    "url": "https://media.giphy.com/media/mQr6BVw0J0PbW/giphy.gif",
+    "height": 270.0,
+    "width": 350.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "CHUCK_NORRIS_OK",
+    "url": "https://media.giphy.com/media/qanrUMM3x50mA/giphy.gif",
+    "height": 335.0,
+    "width": 500.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "CHUCK_NORRIS_FIST",
+    "url": "https://media.giphy.com/media/l1J3G5lf06vi58EIE/giphy.gif",
+    "height": 325.0,
+    "width": 460.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "SPIDER_MAN",
+    "url": "https://media.giphy.com/media/SF9Z0shNT07T2/giphy.gif",
+    "height": 180.0,
+    "width": 180.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "ASOKA_TANO",
+    "url": "https://media.giphy.com/media/26hp5qT9t94h8HkFW/giphy.gif",
+    "height": 290.0,
+    "width": 500.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "PALPATINE",
+    "url": "https://media.giphy.com/media/3ornk7nts29Am5LIfm/giphy.gif",
+    "height": 235.0,
+    "width": 470.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "MISSED_KICK",
+    "url": "https://media.giphy.com/media/KGTTNpVuGVhN6/giphy.gif",
+    "height": 190.0,
+    "width": 195.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "BARNEY_STINSON_GUN",
+    "url": "https://media.giphy.com/media/jSxK33dwEMbkY/giphy.gif",
+    "height": 190.0,
+    "width": 280.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "BARNEY_STINSON_AAHH",
+    "url": "https://media.giphy.com/media/TK3vwIvfBULfO/giphy.gif",
+    "height": 200.0,
+    "width": 260.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "BARNEY_STINSON_DANCE",
+    "url": "https://media.giphy.com/media/kJGLD1ctyrlqU/giphy.gif",
+    "height": 360.0,
+    "width": 220.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "TED_MARSHAL",
+    "url": "https://media.giphy.com/media/Zh0ukrpK77Tos/giphy.gif",
+    "height": 305.0,
+    "width": 510.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "KYLO_REN",
+    "url": "https://media.giphy.com/media/sgWHkkjwcnKes/giphy.gif",
+    "height": 230.0,
+    "width": 510.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "BAYERN_MUNICH_CELEBRATING",
+    "url": "https://media.giphy.com/media/BkwEoWNhSQL9bJc4TH/giphy.gif",
+    "height": 300.0,
+    "width": 510.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "LEWY_NEUER",
+    "url": "https://media.giphy.com/media/qOlfLk1yTKWDti7jdI/giphy.gif",
+    "height": 510.0,
+    "width": 510.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "VOLDEMORT",
+    "url": "https://media.giphy.com/media/wLBS2GlPDALS0/giphy.gif",
+    "height": 200.0,
+    "width": 260.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "ACE_VENTURA_SUCKS",
+    "url": "https://media.giphy.com/media/VQxdDzvRoEwrm/giphy.gif",
+    "height": 370.0,
+    "width": 480.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "ACE_VENTURA_AJAJAJ",
+    "url": "https://media.giphy.com/media/Qs1aHvvivlnm8/giphy.gif",
+    "height": 370.0,
+    "width": 370.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "ACE_VENTURA_ANGRY",
+    "url": "https://media1.tenor.com/images/4a361171ba31a5a9b387b200bdb99c4c/tenor.gif",
+    "height": 340.0,
+    "width": 340.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "CHICKENS",
+    "url": "https://media.giphy.com/media/24FMDDRwtF4uaMTmEQ/giphy.gif",
+    "height": 430.0,
+    "width": 430.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "YODA_DANCING",
+    "url": "https://media.giphy.com/media/6fScAIQR0P0xW/giphy.gif",
+    "height": 210.0,
+    "width": 170.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "FOX",
+    "url": "https://media.giphy.com/media/U62BquOqbxgIM/giphy.gif",
+    "height": 285.0,
+    "width": 365.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "SADNESS",
+    "url": "https://media.giphy.com/media/WBeGELD0ezW8w/giphy.gif",
+    "height": 285.0,
+    "width": 495.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "SADNESS_CRY",
+    "url": "https://media.giphy.com/media/10tIjpzIu8fe0/giphy.gif",
+    "height": 320.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "DOWSON_CRY",
+    "url": "https://media.giphy.com/media/k61nOBRRBMxva/giphy.gif",
+    "height": 350.0,
+    "width": 495.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "HOMER",
+    "url": "https://media.giphy.com/media/xT5LMHxhOfscxPfIfm/giphy.gif",
+    "height": 385.0,
+    "width": 495.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "AAAA_JOY",
+    "url": "https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif",
+    "height": 205.0,
+    "width": 250.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "BARNEY_ROBIN",
+    "url": "https://media.giphy.com/media/rjkJD1v80CjYs/giphy.gif",
+    "height": 265.0,
+    "width": 265.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "BRAD_PITT",
+    "url": "https://media.giphy.com/media/JltOMwYmi0VrO/giphy.gif",
+    "height": 260.0,
+    "width": 300.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "PENGUIN_JUMP",
+    "url": "https://media.giphy.com/media/otnqsqqzmsw7K/giphy.gif",
+    "height": 190.0,
+    "width": 315.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "AL_BUNDY",
+    "url": "https://media.giphy.com/media/JsUoy8b2ZbgIw/giphy.gif",
+    "height": 220.0,
+    "width": 220.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "ARNOLD_SCREAM",
+    "url": "https://media.giphy.com/media/12bamrdTlRBOyQ/giphy.gif",
+    "height": 260.0,
+    "width": 335.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "GANDALF_BILBO",
+    "url": "https://media.giphy.com/media/jX3XmgJ0wocdG/giphy.gif",
+    "height": 270.0,
+    "width": 270.0,
+    "success": true,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "HAVE_A_NICE_DAY",
+    "url": "https://media.giphy.com/media/68UVRQ6KpJpFnbZpsY/giphy.gif",
+    "height": 290.0,
+    "width": 495.0,
+    "success": true,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "ANGER",
+    "url": "https://media1.tenor.com/images/54d526fd183bb842780b9df05ebf6af6/tenor.gif",
+    "height": 300.0,
+    "width": 510.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "DEAN_PUNCH",
+    "url": "https://media1.tenor.com/images/06e385b17c90ff54fa06911a2b941d83/tenor.gif",
+    "height": 310.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "DEAN_AWESOME",
+    "url": "https://media1.tenor.com/images/794e77a3489db6984fcd963c4c84c9e8/tenor.gif",
+    "height": 175.0,
+    "width": 265.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "ASHOKA_FLAWED",
+    "url": "https://media1.tenor.com/images/d59bfc67426b550933e952e934c9de37/tenor.gif",
+    "height": 230.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "ASHOKA_BLOW",
+    "url": "https://media1.tenor.com/images/552037e6cb6f16c38d705e6160f77588/tenor.gif",
+    "height": 250.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "MIND_BLOW_FAIL",
+    "url": "https://media1.tenor.com/images/0b39bd2af30929a80c851be215c03d1a/tenor.gif",
+    "height": 225.0,
+    "width": 380.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "CHRIS_PATT",
+    "url": "https://media1.tenor.com/images/04b5971f0b024a6f59ab3972a254f491/tenor.gif",
+    "height": 300.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "MILLIE_BOBBY_BROWN_MIND_BLOWN",
+    "url": "https://media1.tenor.com/images/d459a240cce8a40130bde1fd7d9f2e38/tenor.gif",
+    "height": 500.0,
+    "width": 650.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "ANNA_KENDRICK_MIND_BLOWN",
+    "url": "https://media1.tenor.com/images/8ab286d5beb7b82bd23508a43c166ae6/tenor.gif",
+    "height": 260.0,
+    "width": 435.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "SAVED_BY_THE_BELL_WOW",
+    "url": "https://media1.tenor.com/images/d962e8902b34db0e769a1d3c1fa03c27/tenor.gif",
+    "height": 335.0,
+    "width": 455.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "SHOCKED_JOEY",
+    "url": "https://media1.tenor.com/images/e356deeba608e05e43fa742429110bb9/tenor.gif",
+    "height": 245.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "BILLY_MIND_BLOW",
+    "url": "https://media1.tenor.com/images/9f7f248f52c8c3b9a7e20bc45927a8ba/tenor.gif",
+    "height": 225.0,
+    "width": 360.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "PATRICK_STAR",
+    "url": "https://media1.tenor.com/images/286eb36305ec001ccded095971fc229b/tenor.gif",
+    "height": 500.0,
+    "width": 475.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "UNDERPANTS_TRA_LA_LA",
+    "url": "https://media1.tenor.com/images/209b59cfe3759fbc4a4343202a91e124/tenor.gif",
+    "height": 370.0,
+    "width": 510.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "UNDERPANTS_ROOM",
+    "url": "https://media1.tenor.com/images/f5e382ed4f164715589a96d6af640db9/tenor.gif",
+    "height": 300.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "UNDERPANTS_SCREAM",
+    "url": "https://media1.tenor.com/images/9df5473084c7b868c54112f6d2ad1bb0/tenor.gif",
+    "height": 300.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "UNDERPANTS_ANGRY_CRAB",
+    "url": "https://media1.tenor.com/images/fac48ef5f440105766d8eff1948fde67/tenor.gif",
+    "height": 370.0,
+    "width": 510.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "UNDERPANTS_HIDDEN",
+    "url": "https://media1.tenor.com/images/c0b0cd24586642de55e71fac295eb22e/tenor.gif",
+    "height": 385.0,
+    "width": 515.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "UNDERPANTS_WORRY",
+    "url": "https://media1.tenor.com/images/5c41373b753ac6f8770a4a8dc64ecafb/tenor.gif",
+    "height": 375.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "PREDATOR_ALIEN",
+    "url": "https://media1.tenor.com/images/1da6031d9d5a9f4b8a883d64178b0fa1/tenor.gif",
+    "height": 300.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "PREDATOR_ULTRA",
+    "url": "https://media1.tenor.com/images/566b0c512d627f380d40b811989594a9/tenor.gif",
+    "height": 320.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "PREDATOR_DISAPPEAR",
+    "url": "https://media1.tenor.com/images/4a82d458ba2aed255b19fba488e757c9/tenor.gif",
+    "height": 470.0,
+    "width": 470.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "PREDATOR_ALIEN_METRO",
+    "url": "https://media1.tenor.com/images/f9720b509636e2d6b6c60605c8616cba/tenor.gif",
+    "height": 300.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "PREDATOR_DANCE",
+    "url": "https://media1.tenor.com/images/89fe1be3da2485c8fc7a275713692ae2/tenor.gif",
+    "height": 510.0,
+    "width": 655.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "BUBU_KLAP",
+    "url": "https://media1.tenor.com/images/af10428b4417babb9f176ce6860a8368/tenor.gif",
+    "height": 300.0,
+    "width": 515.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "SONGO_VEGETA_DANCE",
+    "url": "https://media1.tenor.com/images/c4b7b5cca2f6fb32a733f97d4d496ee9/tenor.gif",
+    "height": 395.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "SONGO_BUBU",
+    "url": "https://media1.tenor.com/images/e2d38dda5ac5f3d984e345377a77386d/tenor.gif",
+    "height": 300.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "SING_PIG_DANCE",
+    "url": "https://media1.tenor.com/images/bdec569a483fb8a92efa969197a9eb55/tenor.gif",
+    "height": 560.0,
+    "width": 600.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "OLAF_SMILE",
+    "url": "https://media1.tenor.com/images/475663035f88d4bc83565f3e2001dab1/tenor.gif",
+    "height": 355.0,
+    "width": 500.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "FIRE_GHOST",
+    "url": "https://media1.tenor.com/images/f353a5caaff4e6af7c560cebe721faf6/tenor.gif",
+    "height": 625.0,
+    "width": 650.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "FROZEN_HAPPY_END",
+    "url": "https://media1.tenor.com/images/cc54d62c6c98c787c728743c48f9c0dd/tenor.gif",
+    "height": 370.0,
+    "width": 655.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "FROZEN_TRACH",
+    "url": "https://media1.tenor.com/images/5d339a4c47ddc5d017f94a1cd8714baf/tenor.gif",
+    "height": 335.0,
+    "width": 520.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "FROZEN_ANNA_AAA",
+    "url": "https://media1.tenor.com/images/c8586d55c4b6d8911f9625a43813c197/tenor.gif",
+    "height": 305.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "FROZEN_OLAF_SPIN",
+    "url": "https://media1.tenor.com/images/752e1065a4b57a3a4fda7947e349df8b/tenor.gif",
+    "height": 615.0,
+    "width": 615.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "FROZEN_SISTER_FAIL",
+    "url": "https://media1.tenor.com/images/745dd692f5418e0b170e700a95901389/tenor.gif",
+    "height": 295.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "FROZEN_FIRE_FIRE",
+    "url": "https://media1.tenor.com/images/e07d48ef395f20421231ea1edaf8019b/tenor.gif",
+    "height": 520.0,
+    "width": 520.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "SEVEN_OF_9_FUN",
+    "url": "https://media1.tenor.com/images/e9f19453e78a472a244f08819cf95d40/tenor.gif",
+    "height": 355.0,
+    "width": 460.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "PICARD_RICKER",
+    "url": "https://media1.tenor.com/images/1c45522fa5ed7b20e0787bce94c9bba3/tenor.gif",
+    "height": 210.0,
+    "width": 260.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "PICARD_HEAD",
+    "url": "https://media1.tenor.com/images/d3b3130e9badf32693956295ade7979f/tenor.gif",
+    "height": 285.0,
+    "width": 365.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "PICARD_KLAP",
+    "url": "https://media1.tenor.com/images/8770ef5b6a1c4e54ac7d0f19736f927b/tenor.gif",
+    "height": 210.0,
+    "width": 265.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "PICARD_JOY",
+    "url": "https://media1.tenor.com/images/bed4428488135052a9ef71812730a065/tenor.gif",
+    "height": 295.0,
+    "width": 360.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "PICARD_RICKER_2",
+    "url": "https://media1.tenor.com/images/079ca24fd4aacad66d8c02d32a65f4eb/tenor.gif",
+    "height": 290.0,
+    "width": 270.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "PICARD_HAT",
+    "url": "https://media1.tenor.com/images/f076cb04b60d9dfe158be700e3c881e5/tenor.gif",
+    "height": 380.0,
+    "width": 495.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "DUMBELDOR_DANCE",
+    "url": "https://media1.tenor.com/images/a577ff4e72607c2a47478f556877f02f/tenor.gif",
+    "height": 195.0,
+    "width": 315.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "ARIA_HIGH_5",
+    "url": "https://media1.tenor.com/images/19a124a36bf0b3b4f0207fd38dceb5c3/tenor.gif",
+    "height": 300.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "ARAGORN_JOLO",
+    "url": "https://media1.tenor.com/images/9f214837ad3e55325b226503f3f450c0/tenor.gif",
+    "height": 250.0,
+    "width": 515.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "SING_PIG_JOY",
+    "url": "https://media1.tenor.com/images/dd2970d7cbfb952469344090c8689af6/tenor.gif",
+    "height": 500.0,
+    "width": 500.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "SING_PIGS",
+    "url": "https://media1.tenor.com/images/c2e706c2030e9c4bede5e48ae2b20baa/tenor.gif",
+    "height": 220.0,
+    "width": 370.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "ANNA_FROZEN",
+    "url": "https://media1.tenor.com/images/9adfaac613d3c3586a371c129a57bc93/tenor.gif",
+    "height": 520.0,
+    "width": 425.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "ACE_VENTURA_AAAA",
+    "url": "https://media.giphy.com/media/EOWVPMCalaDpm/giphy.gif",
+    "height": 290.0,
+    "width": 230.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "DARTH_VADER_DANCE",
+    "url": "https://media.tenor.com/12XMXV7DcfQAAAAC/darth-vader-storm-troopers.gif",
+    "height": 238.0,
+    "width": 220.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "BRAD_PITT_EH",
+    "url": "https://media.tenor.com/aKAYCOcwAtQAAAAd/brad-pitt.gif",
+    "height": 498.0,
+    "width": 498.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "BRAD_PITT_ACTOR",
+    "url": "https://media.tenor.com/ioxDIjWs_gwAAAAd/brad-pitt-actor.gif",
+    "height": 498.0,
+    "width": 445.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "RAGNAR_SKOL",
+    "url": "https://media.tenor.com/wa6oTC6T3EAAAAAC/ragnarskol.gif",
+    "height": 498.0,
+    "width": 445.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "SYLVANAS_WORLD_OF_WARCRAFT",
+    "url": "https://media.tenor.com/O3mLAJH4ZAIAAAAd/sylvanas-world-of-warcraft.gif",
+    "height": 407.0,
+    "width": 498.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "STAR_WARS_CAT_VS_DOG",
+    "url": "https://media.tenor.com/0mNBx_xpJFEAAAAd/star-wars-cat-vs-dog.gif",
+    "height": 395.0,
+    "width": 498.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "SWTOR_THE_OLD_REPUBLIC",
+    "url": "https://media.tenor.com/OIxml5GzZ20AAAAd/swtor-the-old-republic.gif",
+    "height": 312.0,
+    "width": 498.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "CUTE_SAD",
+    "url": "https://media.tenor.com/pE6Ll7jsCTkAAAAC/cute-sad.gif",
+    "height": 320.0,
+    "width": 498.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "PORG_LIGHT_SABER",
+    "url": "https://media.tenor.com/GDxds9bJuyAAAAAC/porg-light-saber.gif",
+    "height": 390.0,
+    "width": 498.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "STAR_WARS_PORG",
+    "url": "https://media.tenor.com/YE66dMAuat4AAAAC/star-wars.gif",
+    "height": 250.0,
+    "width": 498.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "CAPTAIN_REX_REX",
+    "url": "https://media.tenor.com/X3xgtM3zFZkAAAAd/captain-rex-rex.gif",
+    "height": 498.0,
+    "width": 480.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "GENERAL_GRIEVOUS_STAR_WARS",
+    "url": "https://media.tenor.com/2gIn6DLSTOcAAAAd/general-grievous-star-wars.gif",
+    "height": 290.0,
+    "width": 498.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "AHSOKA_TANO_ANAKIN_SKYWALKER",
+    "url": "https://media.tenor.com/oAy32K2SR18AAAAC/ahsoka-tano-anakin-skywalker.gif",
+    "height": 400.0,
+    "width": 498.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "DUNE_DUNCAN_IDAHO",
+    "url": "https://media.tenor.com/7cODcNJthUsAAAAd/dune-duncanidaho.gif",
+    "height": 280.0,
+    "width": 498.0,
+    "success": false,
+    "partialSuccess": true,
+    "fail": false
+  },
+  {
+    "name": "SHANI_GERALT",
+    "url": "https://media.tenor.com/tVQHpVy0PlIAAAAd/shani-heralt.gif",
+    "height": 290.0,
+    "width": 498.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "GAME_OF_THRONES_SHAME",
+    "url": "https://media.tenor.com/3FOVil5NxugAAAAC/game-of-thrones-shame.gif",
+    "height": 226.0,
+    "width": 220.0,
+    "success": false,
+    "partialSuccess": false,
+    "fail": true
+  },
+  {
+    "name": "PINGPONG_TABLETENNIS",
+    "url": "https://media.tenor.com/HpDqnL-PTgEAAAAM/pingpong-tabletennis.gif",
+    "height": 415.0,
+    "width": 498.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "STOCH_ZYLA_KUBACKI",
+    "url": "https://media.tenor.com/bD6rnBj8kG8AAAAC/na-chwile.gif",
+    "height": 290.0,
+    "width": 498.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  },
+  {
+    "name": "SUCCESS_BOUN",
+    "url": "https://media.tenor.com/KaAnHz2pD68AAAAC/success-boun.gif",
+    "height": 290.0,
+    "width": 498.0,
+    "success": true,
+    "partialSuccess": false,
+    "fail": false
+  }
+]

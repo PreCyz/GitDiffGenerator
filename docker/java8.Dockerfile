@@ -29,18 +29,16 @@ RUN curl -fsSL -o /tmp/zulu8.68.0.21-ca-fx-jdk8.0.362-linux_x64.tar.gz  https://
 
 ENV JAVA_HOME=/tmp/zulu8.68.0.21-ca-fx-jdk8.0.362-linux_x64/
 RUN export JAVA_HOME
-RUN java -version
 
-WORKDIR /home/app
+WORKDIR /home/app/
 
-COPY src ./src
-COPY pom.xml ./
+RUN git clone https://github.com/PreCyz/GitDiffGenerator.git
 
-RUN mvn versions:set -DnewVersion=$VERSION \
+WORKDIR /home/app/GitDiffGenerator/
+
+RUN git checkout origin/release/java8
+RUN mvn versions:set -DnewVersion=${VERSION} \
     && mvn clean package
-
-COPY docs/Gipter-ui-description.pdf ./target/Gipter-ui-description.pdf
-COPY docs/gifs.json ./target/gifs.json
 
 RUN mv ./target/Gipter-${VERSION}-jar-with-dependencies.jar ./target/Gipter.jar \
     && 7z a ./target/Gipter_v${VERSION}.7z ./target/Gipter-ui-description.pdf ./target/Gipter.jar ./target/gifs.json
