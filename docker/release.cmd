@@ -1,1 +1,1 @@
-docker-compose -f ./docker-compose.yml build --build-arg "VERSION=%VERSION% GITHUB_TOKEN=%GITHUB_TOKEN% "
+docker-compose -f ./docker-compose.yml build --no-cache
