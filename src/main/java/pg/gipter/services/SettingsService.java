@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class SettingsService {
         String url = ArgName.toolkitSiteAssetsUrl.defaultValue() + assetName;
         File destination = Paths.get(".", assetName).toFile();
         HttpGet httpget = new HttpGet(url);
-        httpget.addHeader("Cookie", fedAuth);
+        httpget.addHeader(HttpHeaders.COOKIE, fedAuth);
 
         logger.info("Executing request {}", httpget.getRequestUri());
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {

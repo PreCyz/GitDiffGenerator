@@ -2,8 +2,7 @@ package pg.gipter.services;
 
 import com.google.gson.*;
 import javafx.concurrent.Task;
-import org.apache.hc.core5.http.HttpHeaders;
-import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
@@ -42,8 +41,8 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     private List<CasesData> getAvailableCases() {
         Map<String, String> headers = new HashMap<>();
-        headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
-        headers.put("Cookie", CookiesService.getFedAuthString());
+        headers.put(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        headers.put(HttpHeaders.COOKIE, CookiesService.getFedAuthString());
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
         List<CasesData> cases = new LinkedList<>();
         try {
@@ -125,7 +124,7 @@ public class ToolkitService extends Task<List<CasesData>> {
     public boolean isCookieWorking(String fedAuthString) {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
-        headers.put("Cookie", fedAuthString);
+        headers.put(HttpHeaders.COOKIE, fedAuthString);
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
         ToolkitCasePayload payload = new ToolkitCasePayload(
                 new SortFieldDefinition("ows_Created", "datetime"),
@@ -175,9 +174,9 @@ public class ToolkitService extends Task<List<CasesData>> {
         );
 
         Map<String, String> requestHeaders = new LinkedHashMap<>();
-        requestHeaders.put("Accept", "application/json;odata=nometadata");
-        requestHeaders.put("Content-Type", "application/json;odata=nometadata");
-        requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
+        requestHeaders.put(HttpHeaders.ACCEPT, "application/json;odata=nometadata");
+        requestHeaders.put(HttpHeaders.CONTENT_TYPE, "application/json;odata=nometadata");
+        requestHeaders.put(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
 
         JsonObject item = httpRequester.executePOST(sharePointConfig, createItemJson(), requestHeaders);
 
@@ -344,10 +343,10 @@ public class ToolkitService extends Task<List<CasesData>> {
         payload.addProperty("ClassificationId", 12);
 
         Map<String, String> requestHeaders = new LinkedHashMap<>();
-        requestHeaders.put("Accept", "application/json;odata=verbose");
-        requestHeaders.put("If-Match", "*");
+        requestHeaders.put(HttpHeaders.ACCEPT, "application/json;odata=verbose");
+        requestHeaders.put(HttpHeaders.IF_MATCH, "*");
         requestHeaders.put("X-HTTP-Method", "MERGE");
-        requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
+        requestHeaders.put(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
 
         JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, payload, requestHeaders);
         if (jsonObject.has("odata.error")) {
@@ -377,10 +376,10 @@ public class ToolkitService extends Task<List<CasesData>> {
             );
 
             Map<String, String> requestHeaders = new LinkedHashMap<>();
-            requestHeaders.put("Accept", "application/json;odata=verbose");
-            requestHeaders.put("If-Match", "*");
+            requestHeaders.put(HttpHeaders.ACCEPT, "application/json;odata=verbose");
+            requestHeaders.put(HttpHeaders.IF_MATCH, "*");
             requestHeaders.put("X-HTTP-Method", "DELETE");
-            requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
+            requestHeaders.put(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
 
             httpRequester.executePOST(sharePointConfig, requestHeaders);
             logger.info("Cleanup done.");

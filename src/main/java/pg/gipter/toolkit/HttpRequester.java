@@ -35,7 +35,7 @@ public class HttpRequester {
     public JsonObject executeGET(SharePointConfig sharePointConfig) throws IOException {
         HttpGet httpGet = new HttpGet(replaceSpaces(sharePointConfig.getFullRequestUrl()));
         httpGet.addHeader(HttpHeaders.ACCEPT, "application/json;odata=verbose");
-        httpGet.addHeader("Cookie", sharePointConfig.getFedAuth());
+        httpGet.addHeader(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
         logRequest(httpGet);
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
@@ -57,7 +57,7 @@ public class HttpRequester {
 
     public Path downloadFile(DownloadDetails downloadDetails) throws Exception {
         HttpGet httpGet = new HttpGet(replaceSpaces(downloadDetails.getDownloadLink()));
-        httpGet.addHeader("Cookie", downloadDetails.getSharePointConfig().getFedAuth());
+        httpGet.addHeader(HttpHeaders.COOKIE, downloadDetails.getSharePointConfig().getFedAuth());
         String callId = this.toString().substring(this.toString().lastIndexOf("@") + 1);
         logger.info("Executing request {} {}", callId, httpGet.getRequestUri());
 
@@ -88,7 +88,7 @@ public class HttpRequester {
 
         if (requestHeaders != null && !requestHeaders.isEmpty()) {
             Map<String, String> filteredHeaders = new HashMap<>(requestHeaders);
-            filteredHeaders.replace("Cookie", "***");
+            filteredHeaders.replace(HttpHeaders.COOKIE, "***");
             logger.info("Request headers [{}]", filteredHeaders);
             requestHeaders.forEach(httpPost::addHeader);
         }
@@ -121,9 +121,9 @@ public class HttpRequester {
         logger.info("Attachment: {}", attachment.getAbsolutePath());
 
         HttpPost httpPost = new HttpPost(replaceSpaces(sharePointConfig.getFullRequestUrl()));
-        httpPost.addHeader("Accept", "application/json");
+        httpPost.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON);
         httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
-        httpPost.addHeader("Cookie", sharePointConfig.getFedAuth());
+        httpPost.addHeader(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
         httpPost.setEntity(new FileEntity(attachment, ContentType.APPLICATION_OCTET_STREAM));
 
         logRequest(httpPost);
@@ -155,9 +155,9 @@ public class HttpRequester {
 
     public String requestDigest(SharePointConfig sharePointConfig) throws IOException {
         HttpPost httpPost = new HttpPost(sharePointConfig.getFullRequestUrl());
-        httpPost.addHeader("Accept", "application/json;odata=verbose");
+        httpPost.addHeader(HttpHeaders.ACCEPT, "application/json;odata=verbose");
         httpPost.addHeader("X-ClientService-ClientTag", "SDK-JAVA");
-        httpPost.addHeader("Cookie", sharePointConfig.getFedAuth());
+        httpPost.addHeader(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
         httpPost.setEntity(new StringEntity(""));
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
