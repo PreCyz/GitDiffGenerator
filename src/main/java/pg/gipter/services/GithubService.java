@@ -1,27 +1,18 @@
 package pg.gipter.services;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
+import com.google.gson.*;
+import org.apache.http.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.SystemUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -74,12 +65,12 @@ public class GithubService {
     }
 
     Optional<JsonObject> downloadLatestDistributionDetails() {
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()){
-            HttpGet request = new HttpGet("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest");
-            request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
-            request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
-            request.addHeader("X-GitHub-Api-Version", "2022-11-28");
-            HttpResponse response = httpClient.execute(request);
+        HttpGet request = new HttpGet("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest");
+        request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
+        request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
+        request.addHeader("X-GitHub-Api-Version", "2022-11-28");
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(request)) {
 
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 try (InputStream content = response.getEntity().getContent();
@@ -124,16 +115,18 @@ public class GithubService {
         if (latestReleaseDetails != null) {
             Optional<String> downloadLink = getDownloadLink(latestReleaseDetails);
             if (downloadLink.isPresent()) {
-                try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-                    HttpGet request = new HttpGet(downloadLink.get());
-                    request.addHeader(HttpHeaders.ACCEPT, "application/octet-stream");
-                    request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
-                    request.addHeader("X-GitHub-Api-Version", "2022-11-28");
-                    HttpResponse response = httpClient.execute(request);
+                HttpGet request = new HttpGet(downloadLink.get());
+                request.addHeader(HttpHeaders.ACCEPT, "application/octet-stream");
+                request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
+                request.addHeader("X-GitHub-Api-Version", "2022-11-28");
+                try (CloseableHttpClient httpClient = HttpClients.createDefault();
+                     CloseableHttpResponse response = httpClient.execute(request)) {
+
                     HttpEntity entity = response.getEntity();
 
                     if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK && entity != null) {
                         downloadFile(entity, downloadLocation, taskService);
+                        EntityUtils.consume(entity);
                         return Optional.of(distributionName);
                     }
                 } catch (IOException e) {
