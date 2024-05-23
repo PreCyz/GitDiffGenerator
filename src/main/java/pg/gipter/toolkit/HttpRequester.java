@@ -80,6 +80,7 @@ public class HttpRequester {
 
         HttpPost httpPost = new HttpPost(replaceSpaces(sharePointConfig.getFullRequestUrl()));
 
+        httpPost.setEntity(new StringEntity(""));
         if (jsonObject != null) {
             logger.info("Request json: {}", jsonObject);
             httpPost.setEntity(new StringEntity(jsonObject.toString(), ContentType.APPLICATION_JSON));
@@ -157,6 +158,7 @@ public class HttpRequester {
         httpPost.addHeader("Accept", "application/json;odata=verbose");
         httpPost.addHeader("X-ClientService-ClientTag", "SDK-JAVA");
         httpPost.addHeader("Cookie", sharePointConfig.getFedAuth());
+        httpPost.setEntity(new StringEntity(""));
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             return httpclient.execute(httpPost, res -> {
