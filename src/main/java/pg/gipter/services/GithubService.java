@@ -1,12 +1,11 @@
 package pg.gipter.services;
 
 import com.google.gson.*;
-import org.apache.http.*;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.utils.BundleUtils;
@@ -15,7 +14,6 @@ import pg.gipter.utils.SystemUtils;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -69,41 +67,39 @@ public class GithubService {
         request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
         request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
         request.addHeader("X-GitHub-Api-Version", "2022-11-28");
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpClient.execute(request)) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            return httpClient.execute(request, res -> {
+                if (res.getCode() == HttpStatus.SC_OK) {
+                    try (InputStream content = res.getEntity().getContent();
+                         InputStreamReader inputStreamReader = new InputStreamReader(content);
+                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                try (InputStream content = response.getEntity().getContent();
-                     InputStreamReader inputStreamReader = new InputStreamReader(content);
-                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                        StringBuilder result = new StringBuilder();
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            result.append(line);
+                        }
 
-                    StringBuilder result = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        result.append(line);
+                        Gson gson = new Gson();
+                        Optional<JsonObject> distributionDetails = Optional.ofNullable(gson.fromJson(result.toString(), JsonObject.class));
+                        if (distributionDetails.isPresent()) {
+                            logger.info("Last distribution details downloaded.");
+                            logger.debug("Last distribution details: {}", result);
+                        } else {
+                            logger.warn("Last distribution details is not available.");
+                        }
+                        return distributionDetails;
                     }
-
-                    Gson gson = new Gson();
-                    Optional<JsonObject> distributionDetails = Optional.ofNullable(gson.fromJson(result.toString(), JsonObject.class));
-                    if (distributionDetails.isPresent()) {
-                        logger.info("Last distribution details downloaded.");
-                        logger.debug("Last distribution details: {}", result);
-                    } else {
-                        logger.warn("Last distribution details is not available.");
-                    }
-                    return distributionDetails;
+                } else {
+                    Stream.of(res.getHeaders())
+                            .forEach(header -> logger.error("Name: {}, Value {}.", header.getName(), header.getValue()));
                 }
-            } else {
-                Stream.of(response.getAllHeaders())
-                        .map(Header::getElements)
-                        .flatMap(Arrays::stream)
-                        .forEach(headerElement -> logger.error("Name: {}, Value {}.", headerElement.getName(), headerElement.getValue()));
-            }
+                return Optional.empty();
+            });
         } catch (IOException e) {
             logger.warn("Can not download latest distribution details.", e);
         }
         return Optional.empty();
-
     }
 
     Optional<String> downloadLatestDistribution(String downloadLocation, TaskService<?> taskService) {
@@ -119,16 +115,16 @@ public class GithubService {
                 request.addHeader(HttpHeaders.ACCEPT, "application/octet-stream");
                 request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
                 request.addHeader("X-GitHub-Api-Version", "2022-11-28");
-                try (CloseableHttpClient httpClient = HttpClients.createDefault();
-                     CloseableHttpResponse response = httpClient.execute(request)) {
-
-                    HttpEntity entity = response.getEntity();
-
-                    if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK && entity != null) {
-                        downloadFile(entity, downloadLocation, taskService);
-                        EntityUtils.consume(entity);
-                        return Optional.of(distributionName);
-                    }
+                try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                    return httpClient.execute(request, res -> {
+                        HttpEntity entity = res.getEntity();
+                        if (res.getCode() == HttpStatus.SC_OK && entity != null) {
+                            downloadFile(entity, downloadLocation, taskService);
+                            EntityUtils.consume(entity);
+                            return Optional.of(distributionName);
+                        }
+                        return Optional.empty();
+                    });
                 } catch (IOException e) {
                     taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
                     taskService.workCompleted();

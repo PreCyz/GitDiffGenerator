@@ -2,12 +2,11 @@ package pg.gipter.toolkit;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.*;
-import org.apache.http.entity.*;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
@@ -34,39 +33,44 @@ public class HttpRequester {
     }
 
     public JsonObject executeGET(SharePointConfig sharePointConfig) throws IOException {
-        HttpGet httpget = new HttpGet(replaceSpaces(sharePointConfig.getFullRequestUrl()));
-        httpget.addHeader(HttpHeaders.ACCEPT, "application/json;odata=verbose");
-        httpget.addHeader("Cookie", sharePointConfig.getFedAuth());
-        logger.info("Executing request {}", httpget.getRequestLine());
+        HttpGet httpGet = new HttpGet(replaceSpaces(sharePointConfig.getFullRequestUrl()));
+        httpGet.addHeader(HttpHeaders.ACCEPT, "application/json;odata=verbose");
+        httpGet.addHeader("Cookie", sharePointConfig.getFedAuth());
+        logRequest(httpGet);
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpclient.execute(httpget);
-             Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-            logIfError(result);
-            EntityUtils.consume(response.getEntity());
-            return result;
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpGet, res -> {
+                try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    logResponse(res);
+                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                    logIfError(result);
+                    EntityUtils.consume(res.getEntity());
+                    return result;
+                }
+            });
         }
     }
 
-    public Path downloadFile(DownloadDetails downloadDetails) throws Exception {
-        HttpGet httpget = new HttpGet(replaceSpaces(downloadDetails.getDownloadLink()));
-        httpget.addHeader("Cookie", downloadDetails.getSharePointConfig().getFedAuth());
-        String callId = this.toString().substring(this.toString().lastIndexOf("@") + 1);
-        logger.info("Executing request {} {}", callId, httpget.getRequestLine());
+    private void logResponse(ClassicHttpResponse res) {
+        logger.info("Response: {} {} {}", res.getVersion().format(), res.getCode(), res.getReasonPhrase());
+    }
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpclient.execute(httpget)
-        ) {
-            logger.info("Response {} {}", callId, response.getStatusLine());
-            String downloadFilePath = applicationProperties.itemPath()
-                    .substring(0, applicationProperties.itemPath().lastIndexOf(File.separator));
-            Path downloadedPath = Paths.get(downloadFilePath, downloadDetails.getFileName());
-            Files.copy(response.getEntity().getContent(), downloadedPath);
-            EntityUtils.consume(response.getEntity());
-            return downloadedPath;
+    public Path downloadFile(DownloadDetails downloadDetails) throws Exception {
+        HttpGet httpGet = new HttpGet(replaceSpaces(downloadDetails.getDownloadLink()));
+        httpGet.addHeader("Cookie", downloadDetails.getSharePointConfig().getFedAuth());
+        String callId = this.toString().substring(this.toString().lastIndexOf("@") + 1);
+        logger.info("Executing request {} {}", callId, httpGet.getRequestUri());
+
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpGet, res -> {
+                logResponse(res);
+                String downloadFilePath = applicationProperties.itemPath()
+                        .substring(0, applicationProperties.itemPath().lastIndexOf(File.separator));
+                Path downloadedPath = Paths.get(downloadFilePath, downloadDetails.getFileName());
+                Files.copy(res.getEntity().getContent(), downloadedPath);
+                EntityUtils.consume(res.getEntity());
+                return downloadedPath;
+            });
         }
     }
 
@@ -89,21 +93,22 @@ public class HttpRequester {
         }
         httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
 
-        logger.info("Executing request {}", httpPost.getRequestLine());
+        logRequest(httpPost);
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpclient.execute(httpPost)
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            if (response.getStatusLine().getStatusCode() != 204) {
-                Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-                JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                reader.close();
-                EntityUtils.consume(response.getEntity());
-                logIfError(result);
-                return result;
-            }
-            return new JsonObject();
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpPost, res -> {
+                logResponse(res);
+                if (res.getCode() != HttpStatus.SC_NO_CONTENT) {
+                    try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                        JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                        reader.close();
+                        EntityUtils.consume(res.getEntity());
+                        logIfError(result);
+                        return result;
+                    }
+                }
+                return new JsonObject();
+            });
         }
     }
 
@@ -120,17 +125,18 @@ public class HttpRequester {
         httpPost.addHeader("Cookie", sharePointConfig.getFedAuth());
         httpPost.setEntity(new FileEntity(attachment, ContentType.APPLICATION_OCTET_STREAM));
 
-        logger.info("Executing request {}", httpPost.getRequestLine());
+        logRequest(httpPost);
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpclient.execute(httpPost);
-             Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-            EntityUtils.consume(response.getEntity());
-            logIfError(result);
-            return result;
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpPost, res -> {
+                try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    logResponse(res);
+                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                    EntityUtils.consume(res.getEntity());
+                    logIfError(result);
+                    return result;
+                }
+            });
         }
     }
 
@@ -152,34 +158,36 @@ public class HttpRequester {
         httpPost.addHeader("X-ClientService-ClientTag", "SDK-JAVA");
         httpPost.addHeader("Cookie", sharePointConfig.getFedAuth());
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpclient.execute(httpPost);
-             Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
-        ) {
-            JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-            EntityUtils.consume(response.getEntity());
-            return result.get("d").getAsJsonObject()
-                    .get("GetContextWebInformation").getAsJsonObject()
-                    .get("FormDigestValue").getAsString();
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpPost, res -> {
+                try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                    EntityUtils.consume(res.getEntity());
+                    return result.get("d").getAsJsonObject()
+                            .get("GetContextWebInformation").getAsJsonObject()
+                            .get("FormDigestValue").getAsString();
+                }
+            });
         }
     }
 
     public <T> T post(String url, Map<String, String> headers, Object payload, Class<T> expectedType) throws IOException {
-        HttpPost httppost = new HttpPost(url);
-        headers.forEach(httppost::addHeader);
-        httppost.setEntity(new StringEntity(new Gson().toJson(payload)));
-        logger.info("Executing request {}", httppost.getRequestLine());
+        HttpPost httpPost = new HttpPost(url);
+        headers.forEach(httpPost::addHeader);
+        httpPost.setEntity(new StringEntity(new Gson().toJson(payload)));
+        logRequest(httpPost);
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpclient.execute(httppost);
-             InputStreamReader inputStreamReader = new InputStreamReader(
-                     response.getEntity().getContent(), StandardCharsets.UTF_8)
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            Gson gson = new GsonBuilder().create();
-            T entity = gson.fromJson(inputStreamReader, TypeToken.get(expectedType));
-            EntityUtils.consume(response.getEntity());
-            return entity;
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpPost, res -> {
+                try (InputStreamReader isr = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    logResponse(res);
+                    Gson gson = new GsonBuilder().create();
+                    T entity = gson.fromJson(isr, TypeToken.get(expectedType));
+                    EntityUtils.consume(res.getEntity());
+                    return entity;
+                }
+            });
+
         }
     }
 
@@ -187,33 +195,36 @@ public class HttpRequester {
         HttpPost httppost = new HttpPost(url);
         httppost.setEntity(new StringEntity(new Gson().toJson(payload)));
         Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httppost::addHeader);
-        logger.info("Executing request {}", httppost.getRequestLine());
+        logRequest(httppost);
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpclient.execute(httppost)
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            EntityUtils.consume(response.getEntity());
-            return response.getStatusLine().getStatusCode();
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httppost, res -> {
+                logResponse(res);
+                EntityUtils.consume(res.getEntity());
+                return res.getCode();
+            });
         }
     }
 
     public <T> T get(String url, Map<String, String> headers, Class<T> expectedType) throws IOException {
-        HttpGet httpget = new HttpGet(url);
-        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpget::addHeader);
-        logger.info("Executing request {}", httpget.getRequestLine());
+        HttpGet httpGet = new HttpGet(url);
+        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpGet::addHeader);
+        logRequest(httpGet);
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpclient.execute(httpget);
-             InputStreamReader inputStreamReader = new InputStreamReader(
-                     response.getEntity().getContent(), StandardCharsets.UTF_8
-             );
-        ) {
-            logger.info("Response {}", response.getStatusLine());
-            Gson gson = new GsonBuilder().create();
-            T entity = gson.fromJson(inputStreamReader, TypeToken.get(expectedType));
-            EntityUtils.consume(response.getEntity());
-            return entity;
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpGet, res -> {
+                try (InputStreamReader isr = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    logResponse(res);
+                    Gson gson = new GsonBuilder().create();
+                    T entity = gson.fromJson(isr, TypeToken.get(expectedType));
+                    EntityUtils.consume(res.getEntity());
+                    return entity;
+                }
+            });
         }
+    }
+
+    private void logRequest(HttpUriRequestBase requestBase) {
+        logger.info("Executing request {}", requestBase.getRequestUri());
     }
 }
