@@ -1,17 +1,10 @@
 package pg.gipter.toolkit;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.client.methods.*;
+import org.apache.http.entity.*;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -21,17 +14,10 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.DownloadDetails;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.nio.file.*;
+import java.util.*;
 
 public class HttpRequester {
 
@@ -53,11 +39,11 @@ public class HttpRequester {
         httpget.addHeader("Cookie", sharePointConfig.getFedAuth());
         logger.info("Executing request {}", httpget.getRequestLine());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().build();
-             CloseableHttpResponse response = httpclient.execute(httpget)
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpclient.execute(httpget);
+             Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
         ) {
             logger.info("Response {}", response.getStatusLine());
-            Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
             JsonObject result = new Gson().fromJson(reader, JsonObject.class);
             logIfError(result);
             EntityUtils.consume(response.getEntity());
@@ -71,7 +57,7 @@ public class HttpRequester {
         String callId = this.toString().substring(this.toString().lastIndexOf("@") + 1);
         logger.info("Executing request {} {}", callId, httpget.getRequestLine());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().build();
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
              CloseableHttpResponse response = httpclient.execute(httpget)
         ) {
             logger.info("Response {} {}", callId, response.getStatusLine());
@@ -96,20 +82,23 @@ public class HttpRequester {
         }
 
         if (requestHeaders != null && !requestHeaders.isEmpty()) {
-            logger.info("Request headers [{}]", requestHeaders);
+            Map<String, String> filteredHeaders = new HashMap<>(requestHeaders);
+            filteredHeaders.replace("Cookie", "***");
+            logger.info("Request headers [{}]", filteredHeaders);
             requestHeaders.forEach(httpPost::addHeader);
         }
         httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
 
         logger.info("Executing request {}", httpPost.getRequestLine());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().build();
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
              CloseableHttpResponse response = httpclient.execute(httpPost)
         ) {
             logger.info("Response {}", response.getStatusLine());
             if (response.getStatusLine().getStatusCode() != 204) {
                 Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
                 JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                reader.close();
                 EntityUtils.consume(response.getEntity());
                 logIfError(result);
                 return result;
@@ -133,12 +122,11 @@ public class HttpRequester {
 
         logger.info("Executing request {}", httpPost.getRequestLine());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().build();
-
-             CloseableHttpResponse response = httpclient.execute(httpPost)
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpclient.execute(httpPost);
+             Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
         ) {
             logger.info("Response {}", response.getStatusLine());
-            Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
             JsonObject result = new Gson().fromJson(reader, JsonObject.class);
             EntityUtils.consume(response.getEntity());
             logIfError(result);
@@ -164,13 +152,12 @@ public class HttpRequester {
         httpPost.addHeader("X-ClientService-ClientTag", "SDK-JAVA");
         httpPost.addHeader("Cookie", sharePointConfig.getFedAuth());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().build();
-             CloseableHttpResponse response = httpclient.execute(httpPost)
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpclient.execute(httpPost);
+             Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
         ) {
-            Reader reader = new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8);
             JsonObject result = new Gson().fromJson(reader, JsonObject.class);
             EntityUtils.consume(response.getEntity());
-
             return result.get("d").getAsJsonObject()
                     .get("GetContextWebInformation").getAsJsonObject()
                     .get("FormDigestValue").getAsString();
@@ -183,16 +170,14 @@ public class HttpRequester {
         httppost.setEntity(new StringEntity(new Gson().toJson(payload)));
         logger.info("Executing request {}", httppost.getRequestLine());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().build();
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
              CloseableHttpResponse response = httpclient.execute(httppost);
              InputStreamReader inputStreamReader = new InputStreamReader(
                      response.getEntity().getContent(), StandardCharsets.UTF_8)
         ) {
             logger.info("Response {}", response.getStatusLine());
-
             Gson gson = new GsonBuilder().create();
             T entity = gson.fromJson(inputStreamReader, TypeToken.get(expectedType));
-
             EntityUtils.consume(response.getEntity());
             return entity;
         }
@@ -204,7 +189,7 @@ public class HttpRequester {
         Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httppost::addHeader);
         logger.info("Executing request {}", httppost.getRequestLine());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().build();
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
              CloseableHttpResponse response = httpclient.execute(httppost)
         ) {
             logger.info("Response {}", response.getStatusLine());
@@ -218,17 +203,15 @@ public class HttpRequester {
         Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpget::addHeader);
         logger.info("Executing request {}", httpget.getRequestLine());
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().build();
-             CloseableHttpResponse response = httpclient.execute(httpget)
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpclient.execute(httpget);
+             InputStreamReader inputStreamReader = new InputStreamReader(
+                     response.getEntity().getContent(), StandardCharsets.UTF_8
+             );
         ) {
             logger.info("Response {}", response.getStatusLine());
-            InputStreamReader inputStreamReader = new InputStreamReader(
-                    response.getEntity().getContent(), StandardCharsets.UTF_8
-            );
             Gson gson = new GsonBuilder().create();
             T entity = gson.fromJson(inputStreamReader, TypeToken.get(expectedType));
-
-            inputStreamReader.close();
             EntityUtils.consume(response.getEntity());
             return entity;
         }
