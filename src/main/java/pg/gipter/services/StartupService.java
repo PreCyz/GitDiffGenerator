@@ -1,7 +1,6 @@
 package pg.gipter.services;
 
 import mslinks.ShellLink;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
@@ -9,9 +8,7 @@ import pg.gipter.utils.JarHelper;
 import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 public class StartupService {
 
@@ -82,7 +79,7 @@ public class StartupService {
             );
             if (Files.exists(shortcutLnkPath) && Files.isRegularFile(shortcutLnkPath)) {
                 try {
-                    FileUtils.forceDelete(shortcutLnkPath.toFile());
+                    Files.deleteIfExists(shortcutLnkPath);
                     logger.info("Deletion of link done: [{}]", shortcutLnkPath);
                 } catch (IOException e) {
                     logger.error("Can not delete link: [{}]", shortcutLnkPath, e);

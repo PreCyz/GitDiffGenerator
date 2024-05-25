@@ -1,6 +1,5 @@
 package pg.gipter.services;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
@@ -8,7 +7,7 @@ import pg.gipter.core.ArgName;
 import java.io.*;
 import java.net.URI;
 import java.net.http.*;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Arrays;
 
 public class SettingsService {
@@ -33,7 +32,7 @@ public class SettingsService {
             if (Arrays.asList(403, 401).contains(res.statusCode())) {
                 throw new IOException("Authentication failed.");
             }
-            FileUtils.copyInputStreamToFile(res.body(), destination);
+            Files.copy(res.body(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
             res.body().close();
             return destination;
         } catch (InterruptedException e) {
