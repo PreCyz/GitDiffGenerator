@@ -18,7 +18,7 @@ import java.util.*;
 public class HttpRequester {
 
     protected final static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
-    private static final HttpClient CLIENT = HttpClient.newHttpClient();
+    private static final HttpClient CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
     private final ApplicationProperties applicationProperties;
 
@@ -253,7 +253,9 @@ public class HttpRequester {
     }
 
     private void logRequest(HttpRequest request) {
+        HashMap<String, List<String>> headers = new HashMap<>(request.headers().map());
+        headers.replace("Cookie", List.of("***"));
         logger.info("Executing request: {} {} {} Headers: {}",
-                request.version(), request.method(), request.uri().toString(), request.headers());
+                request.version(), request.method(), request.uri().toString(), headers);
     }
 }

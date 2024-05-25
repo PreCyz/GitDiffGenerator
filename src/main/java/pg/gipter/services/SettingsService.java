@@ -18,7 +18,7 @@ public class SettingsService {
         String url = ArgName.toolkitSiteAssetsUrl.defaultValue() + assetName;
         File destination = Paths.get(".", assetName).toFile();
 
-        HttpClient client = HttpClient.newHttpClient();
+        HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))

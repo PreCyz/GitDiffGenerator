@@ -17,7 +17,7 @@ public class GithubService {
 
     public static final String GITHUB_URL = "https://github.com/PreCyz/GitDiffGenerator";
     private static final Logger logger = LoggerFactory.getLogger(GithubService.class);
-    private static final HttpClient CLIENT = HttpClient.newHttpClient();
+    private static final HttpClient CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
     private static JsonObject latestReleaseDetails;
     private SemanticVersioning serverVersion;
