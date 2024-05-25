@@ -55,7 +55,7 @@ public enum ArgName {
     fetchAll {
         @Override
         public String defaultValue() {
-            return "Y";
+            return "N";
         }
     },
     toolkitProjectListNames {
