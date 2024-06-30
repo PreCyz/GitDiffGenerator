@@ -2,6 +2,11 @@ package pg.gipter.toolkit;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
@@ -9,8 +14,6 @@ import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.DownloadDetails;
 
 import java.io.*;
-import java.net.URI;
-import java.net.http.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
@@ -18,7 +21,6 @@ import java.util.*;
 public class HttpRequester {
 
     protected final static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
-    private static final HttpClient CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
     private final ApplicationProperties applicationProperties;
 
@@ -31,53 +33,44 @@ public class HttpRequester {
     }
 
     public JsonObject executeGET(SharePointConfig sharePointConfig) throws IOException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(replaceSpaces(sharePointConfig.getFullRequestUrl())))
-                .GET()
-                .header("Accept", "application/json;odata=verbose")
-                .header("Cookie", sharePointConfig.getFedAuth())
-                .build();
-        logRequest(request);
+        HttpGet httpGet = new HttpGet(replaceSpaces(sharePointConfig.getFullRequestUrl()));
+        httpGet.addHeader(HttpHeaders.ACCEPT, "application/json;odata=verbose");
+        httpGet.addHeader(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
+        logRequest(httpGet);
 
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            try (InputStream inputStream = res.body();
-                 Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                logResponse(res);
-                JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                logIfError(result);
-                return result;
-            }
-        } catch (InterruptedException e) {
-            throw new IOException(e);
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpGet, res -> {
+                try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    logResponse(res);
+                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                    logIfError(result);
+                    EntityUtils.consume(res.getEntity());
+                    return result;
+                }
+            });
         }
     }
 
-    private void logResponse(HttpResponse<?> res) {
-        logger.info("Response: {} {}", res.version(), res.statusCode());
+    private void logResponse(ClassicHttpResponse res) {
+        logger.info("Response: {} {} {}", res.getVersion().format(), res.getCode(), res.getReasonPhrase());
     }
 
     public Path downloadFile(DownloadDetails downloadDetails) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(replaceSpaces(downloadDetails.getDownloadLink())))
-                .GET()
-                .header("Cookie", downloadDetails.getSharePointConfig().getFedAuth())
-                .build();
-        logRequest(request);
-
+        HttpGet httpGet = new HttpGet(replaceSpaces(downloadDetails.getDownloadLink()));
+        httpGet.addHeader(HttpHeaders.COOKIE, downloadDetails.getSharePointConfig().getFedAuth());
         String callId = this.toString().substring(this.toString().lastIndexOf("@") + 1);
-        logger.info("Executing request {} {}", callId, request.uri());
+        logger.info("Executing request {} {}", callId, httpGet.getRequestUri());
 
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            logResponse(res);
-            String downloadFilePath = applicationProperties.itemPath()
-                    .substring(0, applicationProperties.itemPath().lastIndexOf(File.separator));
-            Path downloadedPath = Paths.get(downloadFilePath, downloadDetails.getFileName());
-            Files.copy(res.body(), downloadedPath);
-            return downloadedPath;
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpGet, res -> {
+                logResponse(res);
+                String downloadFilePath = applicationProperties.itemPath()
+                        .substring(0, applicationProperties.itemPath().lastIndexOf(File.separator));
+                Path downloadedPath = Paths.get(downloadFilePath, downloadDetails.getFileName());
+                Files.copy(res.getEntity().getContent(), downloadedPath);
+                EntityUtils.consume(res.getEntity());
+                return downloadedPath;
+            });
         }
     }
 
@@ -85,40 +78,38 @@ public class HttpRequester {
             SharePointConfig sharePointConfig, JsonObject jsonObject, Map<String, String> requestHeaders
     ) throws IOException {
 
-        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .uri(URI.create(replaceSpaces(sharePointConfig.getFullRequestUrl())))
-                .POST(HttpRequest.BodyPublishers.noBody());
+        HttpPost httpPost = new HttpPost(replaceSpaces(sharePointConfig.getFullRequestUrl()));
 
+        httpPost.setEntity(new StringEntity(""));
         if (jsonObject != null) {
             logger.info("Request json: {}", jsonObject);
-            requestBuilder.POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString()));
+            httpPost.setEntity(new StringEntity(jsonObject.toString(), ContentType.APPLICATION_JSON));
         }
 
         if (requestHeaders != null && !requestHeaders.isEmpty()) {
             Map<String, String> filteredHeaders = new HashMap<>(requestHeaders);
-            filteredHeaders.replace("Cookie", "***");
+            filteredHeaders.replace(HttpHeaders.COOKIE, "***");
             logger.info("Request headers [{}]", filteredHeaders);
-            requestHeaders.forEach(requestBuilder::header);
+            requestHeaders.forEach(httpPost::addHeader);
         }
-        requestBuilder.header("X-RequestDigest", sharePointConfig.getFormDigest());
+        httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
 
-        HttpRequest request = requestBuilder.build();
-        logRequest(request);
+        logRequest(httpPost);
 
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            logResponse(res);
-            if (res.statusCode() != 204) {
-                try (InputStream inputStream = res.body();
-                     Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                    logIfError(result);
-                    return result;
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpPost, res -> {
+                logResponse(res);
+                if (res.getCode() != HttpStatus.SC_NO_CONTENT) {
+                    try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                        JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                        reader.close();
+                        EntityUtils.consume(res.getEntity());
+                        logIfError(result);
+                        return result;
+                    }
                 }
-            }
-            return new JsonObject();
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
+                return new JsonObject();
+            });
         }
     }
 
@@ -129,28 +120,24 @@ public class HttpRequester {
     public JsonObject executePOST(SharePointConfig sharePointConfig, File attachment) throws IOException {
         logger.info("Attachment: {}", attachment.getAbsolutePath());
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(replaceSpaces(replaceSpaces(sharePointConfig.getFullRequestUrl()))))
-                .POST(HttpRequest.BodyPublishers.ofFile(attachment.toPath()))
-                .header("Content-Type", "application/octet-stream")
-                .header("Accept", "application/json")
-                .header("X-RequestDigest", sharePointConfig.getFormDigest())
-                .header("Cookie", sharePointConfig.getFedAuth())
-                .build();
-        logRequest(request);
+        HttpPost httpPost = new HttpPost(replaceSpaces(sharePointConfig.getFullRequestUrl()));
+        httpPost.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON);
+        httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
+        httpPost.addHeader(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
+        httpPost.setEntity(new FileEntity(attachment, ContentType.APPLICATION_OCTET_STREAM));
 
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        logRequest(httpPost);
 
-            try (InputStream inputStream = res.body();
-                 Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                logResponse(res);
-                JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                logIfError(result);
-                return result;
-            }
-        } catch (InterruptedException e) {
-            throw new IOException(e);
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpPost, res -> {
+                try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    logResponse(res);
+                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                    EntityUtils.consume(res.getEntity());
+                    logIfError(result);
+                    return result;
+                }
+            });
         }
     }
 
@@ -167,95 +154,79 @@ public class HttpRequester {
     }
 
     public String requestDigest(SharePointConfig sharePointConfig) throws IOException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(sharePointConfig.getFullRequestUrl()))
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .header("Accept", "application/json;odata=verbose")
-                .header("X-ClientService-ClientTag", "SDK-JAVA")
-                .header("Cookie", sharePointConfig.getFedAuth())
-                .build();
-        logRequest(request);
+        HttpPost httpPost = new HttpPost(sharePointConfig.getFullRequestUrl());
+        httpPost.addHeader(HttpHeaders.ACCEPT, "application/json;odata=verbose");
+        httpPost.addHeader("X-ClientService-ClientTag", "SDK-JAVA");
+        httpPost.addHeader(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
+        httpPost.setEntity(new StringEntity(""));
 
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
-            try (InputStream inputStream = res.body();
-                 Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                return result.get("d").getAsJsonObject()
-                        .get("GetContextWebInformation").getAsJsonObject()
-                        .get("FormDigestValue").getAsString();
-            }
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpPost, res -> {
+                try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                    EntityUtils.consume(res.getEntity());
+                    return result.get("d").getAsJsonObject()
+                            .get("GetContextWebInformation").getAsJsonObject()
+                            .get("FormDigestValue").getAsString();
+                }
+            });
         }
     }
 
     public <T> T post(String url, Map<String, String> headers, Object payload, Class<T> expectedType) throws IOException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(payload)));
-        headers.forEach(builder::header);
-        HttpRequest request = builder.build();
-        logRequest(request);
+        HttpPost httpPost = new HttpPost(url);
+        headers.forEach(httpPost::addHeader);
+        httpPost.setEntity(new StringEntity(new Gson().toJson(payload)));
+        logRequest(httpPost);
 
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            try (InputStream inputStream = res.body();
-                 InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                logResponse(res);
-                Gson gson = new GsonBuilder().create();
-                return gson.fromJson(isr, TypeToken.get(expectedType));
-            }
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpPost, res -> {
+                try (InputStreamReader isr = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    logResponse(res);
+                    Gson gson = new GsonBuilder().create();
+                    T entity = gson.fromJson(isr, TypeToken.get(expectedType));
+                    EntityUtils.consume(res.getEntity());
+                    return entity;
+                }
+            });
+
         }
     }
 
     public int postForStatusCode(String url, Map<String, String> headers, Object payload) throws IOException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(payload)));
+        HttpPost httppost = new HttpPost(url);
+        httppost.setEntity(new StringEntity(new Gson().toJson(payload)));
+        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httppost::addHeader);
+        logRequest(httppost);
 
-        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(builder::header);
-        HttpRequest request = builder.build();
-        logRequest(request);
-
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            logResponse(res);
-            res.body().close();
-            return res.statusCode();
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httppost, res -> {
+                logResponse(res);
+                EntityUtils.consume(res.getEntity());
+                return res.getCode();
+            });
         }
     }
 
     public <T> T get(String url, Map<String, String> headers, Class<T> expectedType) throws IOException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET();
-        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(builder::header);
-        HttpRequest request = builder.build();
-        logRequest(request);
+        HttpGet httpGet = new HttpGet(url);
+        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpGet::addHeader);
+        logRequest(httpGet);
 
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            try (InputStream inputStream = res.body();
-                 InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                logResponse(res);
-                Gson gson = new GsonBuilder().create();
-                return gson.fromJson(isr, TypeToken.get(expectedType));
-            }
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+            return httpclient.execute(httpGet, res -> {
+                try (InputStreamReader isr = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
+                    logResponse(res);
+                    Gson gson = new GsonBuilder().create();
+                    T entity = gson.fromJson(isr, TypeToken.get(expectedType));
+                    EntityUtils.consume(res.getEntity());
+                    return entity;
+                }
+            });
         }
     }
 
-    private void logRequest(HttpRequest request) {
-        HashMap<String, List<String>> headers = new HashMap<>(request.headers().map());
-        headers.replace("Cookie", List.of("***"));
-        logger.info("Executing request: {} {} {} Headers: {}",
-                request.version(), request.method(), request.uri().toString(), headers);
+    private void logRequest(HttpUriRequestBase requestBase) {
+        logger.info("Executing request {}", requestBase.getRequestUri());
     }
 }
