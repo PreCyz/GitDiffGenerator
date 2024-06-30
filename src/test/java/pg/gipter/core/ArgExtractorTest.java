@@ -423,12 +423,12 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_toolkitUserFolderFromCommandLine_when_toolkitUserFolder_then_returnDefaultValue() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitUserFolder=sthElse", "toolkitUsername=XXX"});
+    void givenToolkitUserFolderFromCommandLine_whenToolkitUserFolderUrl_thenReturnDefaultValue() {
+        argExtractor = new ArgExtractor(new String[]{"toolkitFolderName=sthElse", "toolkitUsername=XXX"});
 
-        String actual = argExtractor.toolkitUserFolder();
+        String actual = argExtractor.toolkitUserFolderUrl();
 
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/XXX");
+        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/STHELSE");
     }
 
     @Test
@@ -542,21 +542,21 @@ class ArgExtractorTest {
     }
 
     @Test
-    void givenNoCustomUserFolderAndNoToolkitUserName_whenToolkitUserFolder_thenReturnDefault() {
+    void givenNoCustomUserFolderAndNoToolkitUserName_whenToolkitUserFolderUrl_thenReturnDefault() {
         argExtractor = new ArgExtractor(new String[]{""});
 
-        String actual = argExtractor.toolkitUserFolder();
+        String actual = argExtractor.toolkitUserFolderUrl();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + ArgName.toolkitUsername.defaultValue());
     }
 
     @Test
-    void givenNoCustomUserFolderAndToolkitUserName_whenToolkitUserFolder_thenReturnDefault() {
+    void givenNoCustomUserFolderAndToolkitUserName_whenToolkitUserFolderUrl_thenReturnDefault() {
         argExtractor = new ArgExtractor(new String[]{"toolkitUsername=XXX"});
 
-        String actual = argExtractor.toolkitUserFolder();
+        String actual = argExtractor.toolkitUserFolderUrl();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "XXX");
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "XXX");
     }
 
     @Test
@@ -614,12 +614,12 @@ class ArgExtractorTest {
     }
 
     @Test
-    void whenIsFetchAll_thenReturnTrue() {
+    void whenIsFetchAll_thenReturnFalse() {
         argExtractor = new ArgExtractor(new String[]{});
 
         boolean actual = argExtractor.isFetchAll();
 
-        assertThat(actual).isTrue();
+        assertThat(actual).isFalse();
     }
 
     @Test

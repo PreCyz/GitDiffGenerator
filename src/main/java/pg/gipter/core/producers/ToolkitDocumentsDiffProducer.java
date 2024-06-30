@@ -1,6 +1,5 @@
 package pg.gipter.core.producers;
 
-import org.apache.commons.io.FileUtils;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.processor.DocumentFinder;
@@ -55,11 +54,7 @@ class ToolkitDocumentsDiffProducer extends AbstractDiffProducer {
                 Files.deleteIfExists(doc);
                 logger.info("File [{}] deleted.", doc.getFileName().toString());
             } catch (IOException e) {
-                try {
-                    FileUtils.forceDelete(doc.toFile());
-                } catch (IOException ioException) {
-                    logger.warn("Can not delete file [{}].", doc.getFileName().toString());
-                }
+                logger.warn("Can not delete file [{}].", doc.getFileName().toString());
             }
         }
     }

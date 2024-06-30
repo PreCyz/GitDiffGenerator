@@ -6,11 +6,7 @@ import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.NamePatternValue;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.RunConfigBuilder;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SemanticVersioning;
 import pg.gipter.utils.SystemUtils;
@@ -21,9 +17,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.WeekFields;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -1127,10 +1121,132 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void givenNoToolkitUserFolder_whenToolkitUserFolder_thenReturnDefault() {
+    void givenNoToolkitUserFolder_whenToolkitFolderName_thenReturnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{});
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue());
+    }
+
+    @Test
+    void givenToolkitUserNameFromCLI_whenToolkitFolderName_then_returnThatFolderName() {
+        applicationProperties = new CliApplicationProperties(
+                new String[]{"toolkitUsername=cliUserName"}
+        );
+
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("CLIUSERNAME");
+    }
+
+    @Test
+    void givenToolkitUserNameFileAndCLI_whenToolkitUserFolder_thenReturnCliFolderName() {
+        String[] args = {"toolkitUsername=cliUserName"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("fileUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("CLIUSERNAME");
+    }
+
+    //disregard file settings
+    @Test
+    void givenToolkitUsernameFromFile_whenToolkitFolderName_thenReturnWithDefault() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("fileUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue());
+    }
+
+    //disregard file settings
+    @Test
+    void givenToolkitUserNameFromFileAndOtherArgs_whenToolkitFolderName_thenReturnDefaultFolderName() {
+        String[] args = {"uploadType=statement"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("fileUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue());
+    }
+
+    @Test
+    void givenToolkitFolderNameFromCLI_whenToolkitFolderName_thenReturnCliFolderName() {
+        String[] args = {"toolkitFolderName=cliFolderName"};
+        applicationProperties = new CliApplicationProperties(args);
+
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("CLIFOLDERNAME");
+    }
+
+    @Test
+    void givenToolkitUserNameAndFolderNameFromCLI_whenToolkitFolderName_thenReturnCliFolderName() {
+        String[] args = {"toolkitUsername=cliUserName", "toolkitFolderName=cliFolderName"};
+        applicationProperties = new CliApplicationProperties(args);
+
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("CLIFOLDERNAME");
+    }
+
+    @Test
+    void givenToolkitUserNameFileAndCLIAndFolderNameFileAndCli_whenToolkitUserFolder_thenReturnCliFolderName() {
+        String[] args = {"toolkitUsername=cliUserName", "toolkitFolderName=cliFolderName"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("fileUserName");
+        toolkitConfig.setToolkitFolderName("fileFolderName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("CLIFOLDERNAME");
+    }
+
+    @Test
+    void givenToolkitUserNameFileAndCLIAndFolderNameCli_whenToolkitUserFolder_thenReturnCliFolderName() {
+        String[] args = {"toolkitUsername=cliUserName", "toolkitFolderName=cliFolderName"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("fileUserName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("CLIFOLDERNAME");
+    }
+
+    @Test
+    void givenToolkitUserNameAndFolderNameFromFileAndOtherArgs_whenToolkitFolderName_thenReturnFileFolderName() {
+        String[] args = {"uploadType=statement"};
+        applicationProperties = new CliApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("fileUserName");
+        toolkitConfig.setToolkitFolderName("fileFolderName");
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = applicationProperties.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("FILEFOLDERNAME");
+    }
+
+    @Test
+    void givenNoToolkitUserFolder_whenToolkitUserFolder_Link_thenReturnDefault() {
+        applicationProperties = new CliApplicationProperties(new String[]{});
+
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
         assertThat(actual).isEqualTo(
                 "https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/" + SystemUtils.userName().toUpperCase()
@@ -1138,51 +1254,51 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void given_toolkitUserNameFromCLI_when_toolkitUserFolder_then_returnProperFolder() {
+    void given_toolkitUserNameFromCLI_when_toolkitUserFolder_then_returnProperFolderLink() {
         applicationProperties = new CliApplicationProperties(
                 new String[]{"toolkitUsername=cliUserName"}
         );
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
         assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
     }
 
     @Test
-    void given_toolkitUserFolderFileAndCLI_when_toolkitUserFolder_then_returnWithCliUser() {
+    void given_toolkitUserFolderFileAndCLI_when_toolkitUserFolder_then_returnWithCliUserLink() {
         String[] args = {"toolkitUsername=cliUserName"};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("propertiesUserName");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
         assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/CLIUSERNAME");
     }
 
     @Test
-    void given_toolkitUsernameFromProperties_when_toolkitUserFolder_then_returnWithToolkitUsernameFromProperties() {
+    void given_toolkitUsernameFromProperties_when_toolkitUserFolder_then_returnWithToolkitUsernameFromPropertiesLink() {
         String[] args = {};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("propertiesUserName");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
         assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
     }
 
     @Test
-    void given_toolkitUserNameFromPropertiesAndOtherArgs_when_toolkitUserFolder_then_returnProperWithUserNameFromProperties() {
+    void given_toolkitUserNameFromPropertiesAndOtherArgs_when_toolkitUserFolder_then_returnProperWithUserNameFromPropertiesLink() {
         String[] args = {"uploadType=statement"};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("propertiesUserName");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
         assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/Lists/WorkItems/PROPERTIESUSERNAME");
     }
@@ -1253,7 +1369,7 @@ class CliApplicationPropertiesTest {
 
         boolean actual = applicationProperties.isFetchAll();
 
-        assertThat(actual).isTrue();
+        assertThat(actual).isFalse();
     }
 
     @Test
@@ -1436,62 +1552,62 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnDefault() {
+    void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_Link_then_returnDefault() {
         String[] args = {};
         applicationProperties = new CliApplicationProperties(args);
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue().toUpperCase());
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + ArgName.toolkitUsername.defaultValue().toUpperCase());
     }
 
     @Test
-    void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
+    void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUserLink() {
         String[] args = {"toolkitUsername=xxx"};
         applicationProperties = new CliApplicationProperties(args);
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "XXX");
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "XXX");
     }
 
     @Test
-    void givenToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
+    void givenToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUserLink() {
         String[] args = {"toolkitUsername=xxx"};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "XXX");
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "XXX");
     }
 
     @Test
-    void givenNoToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
+    void givenNoToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUserLink() {
         String[] args = {};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "AAA");
     }
 
     @Test
-    void givenToolkitUserCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomUserFolder() {
+    void givenToolkitUserCliAndFileCustomUserFolder_whenToolkitUserFolder_then_returnUserFolderWithCliCustomUserFolderLink() {
         String[] args = {"toolkitUsername=qqq"};
         applicationProperties = new CliApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
         applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = applicationProperties.toolkitUserFolder();
+        String actual = applicationProperties.toolkitUserFolderUrl();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "QQQ");
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "QQQ");
     }
 
     @Test

@@ -6,34 +6,21 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import javafx.stage.*;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import pg.gipter.core.*;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.jobs.JobCreatorFactory;
-import pg.gipter.jobs.JobParam;
-import pg.gipter.jobs.JobService;
-import pg.gipter.jobs.UploadItemJob;
-import pg.gipter.jobs.UploadItemJobBuilder;
+import pg.gipter.jobs.*;
 import pg.gipter.launchers.Launcher;
-import pg.gipter.services.ConcurrentService;
-import pg.gipter.services.GithubService;
-import pg.gipter.services.StartupService;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.LogLinkAction;
-import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.services.*;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.ui.alerts.controls.ControlFactory;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -42,13 +29,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 /** Created by Gawa 2017-10-04 */
@@ -474,8 +455,12 @@ public class UILauncher implements Launcher {
     public void showToolkitSettingsWindow() {
         toolkitSettingsWindow = new Stage();
         toolkitSettingsWindow.initModality(Modality.APPLICATION_MODAL);
-        buildScene(toolkitSettingsWindow, WindowFactory.TOOLKIT_MENU.createWindow(applicationProperties, this));
-        toolkitSettingsWindow.setOnCloseRequest(event -> closeWindow(toolkitSettingsWindow));
+        AbstractWindow window = WindowFactory.TOOLKIT_MENU.createWindow(applicationProperties, this);
+        buildScene(toolkitSettingsWindow, window);
+        toolkitSettingsWindow.setOnCloseRequest(event -> {
+            window.getController().executeBeforeClose();
+            closeWindow(toolkitSettingsWindow);
+        });
         toolkitSettingsWindow.showAndWait();
     }
 

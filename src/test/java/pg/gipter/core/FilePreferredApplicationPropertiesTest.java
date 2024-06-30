@@ -7,10 +7,7 @@ import org.mockito.Mockito;
 import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.RunConfigBuilder;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.CookiesService;
 
@@ -674,7 +671,7 @@ class FilePreferredApplicationPropertiesTest {
 
         boolean actual = appProps.isFetchAll();
 
-        assertThat(actual).isTrue();
+        assertThat(actual).isFalse();
     }
 
     @Test
@@ -739,62 +736,228 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnDefault() {
+    void givenNoToolkitUserCliAndNoFolderNameCli_whenToolkitFolderName_thenReturnDefault() {
         String[] args = {};
         appProps = new FileApplicationProperties(args);
 
-        String actual = appProps.toolkitUserFolder();
+        String actual = appProps.toolkitFolderName();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + ArgName.toolkitUsername.defaultValue());
+        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue());
     }
 
     @Test
-    void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUser() {
+    void givenToolkitUserCliAndNoFolderNameCli_whenToolkitFolderName_thenReturnFolderNameWithCliUser() {
         String[] args = {"toolkitUsername=xxx"};
         appProps = new FileApplicationProperties(args);
 
-        String actual = appProps.toolkitUserFolder();
+        String actual = appProps.toolkitFolderName();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "XXX");
+        assertThat(actual).isEqualTo("XXX");
     }
 
     @Test
-    void givenToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnFileCustomUserFolder() {
+    void givenToolkitUserCliAndFileToolkitUser_whenToolkitFolderName_thenReturnFileFolderName() {
         String[] args = {"toolkitUsername=xxx"};
         appProps = new FileApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
         appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = appProps.toolkitUserFolder();
+        String actual = appProps.toolkitFolderName();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
+        assertThat(actual).isEqualTo("AAA");
     }
 
     @Test
-    void givenNoToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnFileCustomUserFolder() {
+    void givenNoToolkitUserCliAndFileToolkitUser_whenToolkitFolderName_thenReturnFileFolderName() {
         String[] args = {};
         appProps = new FileApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
         appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = appProps.toolkitUserFolder();
+        String actual = appProps.toolkitFolderName();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
+        assertThat(actual).isEqualTo("AAA");
     }
 
     @Test
-    void givenToolkitCustomUserFolderCliAndFileToolkitUsername_whenToolkitUserFolder_then_returnUserFolderWithFileToolkitUsername() {
-        String[] args = {"toolkitCustomUserFolder=qqq"};
+    void givenNoCliArgsAndFileToolkitUserAndFileFolderName_whenToolkitFolderName_thenReturnFileFolderName() {
+        String[] args = {};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("aaa");
+        toolkitConfig.setToolkitFolderName("file_folder");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("FILE_FOLDER");
+    }
+
+    @Test
+    void givenNoCliArgsAndFileFolderName_whenToolkitFolderName_thenReturnFileFolderName() {
+        String[] args = {};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitFolderName("file_folder");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("FILE_FOLDER");
+    }
+
+    // command line arguments are disregarded when parameter are also set through file.
+    @Test
+    void givenToolkitFolderNameCliAndFileToolkitUsername_whenToolkitFolderName_thenReturnFolderNameWithFileUsername() {
+        String[] args = {"toolkitFolderName=qqq"};
         appProps = new FileApplicationProperties(args);
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
         appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
 
-        String actual = appProps.toolkitUserFolder();
+        String actual = appProps.toolkitFolderName();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitUserFolder.defaultValue() + "AAA");
+        assertThat(actual).isEqualTo("AAA");
+    }
+
+    @Test
+    void givenToolkitFolderNameCliAndFileToolkitFolderName_whenToolkitFolderName_thenReturnFileFolderName() {
+        String[] args = {"toolkitFolderName=qqq"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitFolderName("file_folder");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitFolderName();
+
+        assertThat(actual).isEqualTo("FILE_FOLDER");
+    }
+
+    @Test
+    void givenNoToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_Link_then_returnDefault() {
+        String[] args = {};
+        appProps = new FileApplicationProperties(args);
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + ArgName.toolkitUsername.defaultValue());
+    }
+
+    @Test
+    void givenToolkitUserCliAndNoFileToolkitUser_whenToolkitUserFolder_then_returnUserFolderWithCliUserLink() {
+        String[] args = {"toolkitUsername=xxx"};
+        appProps = new FileApplicationProperties(args);
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "XXX");
+    }
+
+    @Test
+    void givenToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnFileCustomUserFolderLink() {
+        String[] args = {"toolkitUsername=xxx"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("aaa");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "AAA");
+    }
+
+    @Test
+    void givenNoToolkitUserCliAndFileToolkitUser_whenToolkitUserFolder_then_returnFileCustomUserFolderLink() {
+        String[] args = {};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("aaa");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "AAA");
+    }
+
+    @Test
+    void givenToolkitFolderNameCliAndFileToolkitUsername_whenToolkitUserFolder_thenReturnLinkWithUsername() {
+        String[] args = {"toolkitFolderName=qqq"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("aaa");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "AAA");
+    }
+
+    @Test
+    void givenToolkitFolderNameCliAndFileToolkitUsernameAndFolderNameFromFile_whenToolkitFolderName_thenReturnUserFolderWithFileFolderName() {
+        String[] args = {"toolkitFolderName=qqq"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("aaa");
+        toolkitConfig.setToolkitFolderName("sss");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "SSS");
+    }
+
+    @Test
+    void givenToolkitFolderNameCli_whenToolkitUserFolderUrl_thenReturnUrlWithCliFolderName() {
+        String[] args = {"toolkitFolderName=qqq"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "QQQ");
+    }
+
+    @Test
+    void givenToolkitFolderNameCliAndUsernameCli_whenToolkitUserFolderUrl_thenReturnUrlWithFileFolderName() {
+        String[] args = {"toolkitFolderName=qqq", "toolkitUsername=ddd"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "QQQ");
+    }
+
+    @Test
+    void givenToolkitFolderNameCliAndUsernameCliAndFileUserNameAndFileFolderName_whenToolkitUserFolderUrl_thenReturnUrlWithFileFolderName() {
+        String[] args = {"toolkitFolderName=qqq", "toolkitUsername=ddd"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("fileUser");
+        toolkitConfig.setToolkitFolderName("fileFolder");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "FILEFOLDER");
+    }
+
+    // whenever program is executed with file settings, then program disregard cli arguments.
+    @Test
+    void givenToolkitFolderNameCliAndUsernameCliAndFileUserName_whenToolkitUserFolderUrl_thenReturnUrlWithFileUsername() {
+        String[] args = {"toolkitFolderName=qqq", "toolkitUsername=ddd"};
+        appProps = new FileApplicationProperties(args);
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername("fileUser");
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        String actual = appProps.toolkitUserFolderUrl();
+
+        assertThat(actual).isEqualTo(ArgName.toolkitUserFolderUrl.defaultValue() + "FILEUSER");
     }
 
     @Test
@@ -807,12 +970,12 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenToolkitProjectListNamesFromPropertiesAndCLI_whenToolkitProjectListNames_thenReturnToolkitProjectListNamesFromProperties() {
+    void givenToolkitProjectListNamesFromFileAndCLI_whenToolkitProjectListNames_thenReturnToolkitProjectListNamesFromFile() {
         String[] args = {"toolkitProjectListNames=Proj1,Proj2"};
         appProps = new FileApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitProjectListNames("Proj3");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        RunConfig runConfig = new RunConfig();
+        runConfig.setToolkitProjectListNames("Proj3");
+        appProps.init(TestUtils.mockConfigurationDao(runConfig));
 
         Set<String> actual = appProps.toolkitProjectListNames();
 

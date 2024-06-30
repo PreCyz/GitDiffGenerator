@@ -28,7 +28,7 @@ public final class ProgramSettings {
     public static void initProgramSettings() throws IOException {
         EnvSettings envSettings = EnvSettingsFactory.getInstance(InstanceHolder.INSTANCE.environment);
         InstanceHolder.INSTANCE.cipherDetails = envSettings.loadCipherDetails()
-                .orElseGet(() ->  getbackupCipherDetails(envSettings));
+                .orElseGet(() -> getbackupCipherDetails(envSettings));
         InstanceHolder.INSTANCE.dbProperties = envSettings.loadDbProperties().orElseGet(Properties::new);
     }
 
