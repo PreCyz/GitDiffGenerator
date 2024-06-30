@@ -1,43 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Hyperlink?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <AnchorPane fx:id="mainAnchorPane" prefHeight="195.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TitledPane animated="false" collapsible="false" text="%toolkit.panel.title">
+      <TitledPane animated="false" collapsible="false" prefHeight="222.0" prefWidth="678.0" text="%toolkit.panel.title">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="195.0" prefWidth="603.0">
                <children>
                   <Label layoutX="10.0" layoutY="9.0" text="%toolkit.panel.username" />
-                  <Label layoutX="10.0" layoutY="64.0" text="%toolkit.panel.domain" />
-                  <Label layoutX="10.0" layoutY="91.0" text="%toolkit.panel.listName" />
-                  <Label layoutX="10.0" layoutY="118.0" text="%toolkit.panel.url" />
-                  <Label layoutX="10.0" layoutY="145.0" text="%toolkit.panel.wsUrl" />
-                  <Label layoutX="10.0" layoutY="172.0" text="%toolkit.panel.userFolder" />
-                  <TextField fx:id="toolkitUsernameTextField" editable="false" layoutX="107.0" layoutY="7.0" style="-fx-background-color: #e5e5e5;" />
-                  <TextField fx:id="toolkitDomainTextField" editable="false" layoutX="107.0" layoutY="61.0" prefHeight="23.0" style="-fx-background-color: #e5e5e5;" />
-                  <TextField fx:id="toolkitListNameTextField" editable="false" layoutX="107.0" layoutY="88.0" style="-fx-background-color: #e5e5e5;" />
-                  <TextField fx:id="toolkitUrlTextField" editable="false" layoutX="107.0" layoutY="115.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <Label layoutX="10.0" layoutY="63.0" text="%toolkit.panel.domain" />
+                  <Label layoutX="10.0" layoutY="90.0" text="%toolkit.panel.listName" />
+                  <Label layoutX="10.0" layoutY="117.0" text="%toolkit.panel.url" />
+                  <Label layoutX="10.0" layoutY="144.0" text="%toolkit.panel.wsUrl" />
+                  <Label layoutX="10.0" layoutY="171.0" text="%toolkit.panel.userFolderLink" />
+                  <TextField fx:id="toolkitUsernameTextField" editable="false" layoutX="106.0" layoutY="7.0" prefHeight="26.0" prefWidth="216.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitDomainTextField" editable="false" layoutX="106.0" layoutY="61.0" prefHeight="23.0" prefWidth="216.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitListNameTextField" editable="false" layoutX="106.0" layoutY="88.0" prefWidth="216.0" style="-fx-background-color: #e5e5e5;" />
+                  <TextField fx:id="toolkitUrlTextField" editable="false" layoutX="106.0" layoutY="115.0" prefWidth="565.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font>
                   </TextField>
-                  <TextField fx:id="toolkitWSTextField" editable="false" layoutX="107.0" layoutY="142.0" prefWidth="485.0" style="-fx-background-color: #e5e5e5;">
+                  <TextField fx:id="toolkitWSTextField" editable="false" layoutX="106.0" layoutY="142.0" prefWidth="565.0" style="-fx-background-color: #e5e5e5;">
                      <font>
                         <Font size="12.0" />
                      </font>
                   </TextField>
-                  <Hyperlink fx:id="toolkitUserFolderHyperlink" layoutX="107.0" layoutY="169.0" prefWidth="485.0">
+                  <Hyperlink fx:id="toolkitUserFolderHyperlink" layoutX="106.0" layoutY="169.0" prefHeight="24.0" prefWidth="565.0">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Hyperlink>
-                  <Pane id="amazing-pane" layoutX="265.0" layoutY="2.0" prefHeight="111.0" prefWidth="335.0" stylesheets="@../css/toolkitSettings.css" />
+                  <Pane id="amazing-pane" layoutX="332.0" layoutY="2.0" prefHeight="111.0" prefWidth="335.0" stylesheets="@../css/toolkitSettings.css" />
+                  <Label layoutX="10.0" layoutY="36.0" text="%toolkit.panel.folderName" />
+                  <TextField fx:id="toolkitFolderNameTextField" layoutX="106.0" layoutY="34.0" prefHeight="26.0" prefWidth="216.0" />
                </children>
             </AnchorPane>
          </content>

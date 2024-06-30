@@ -252,7 +252,8 @@ public abstract class ApplicationProperties {
 
         Configuration configuration = new Configuration(
                 applicationConfig,
-                toolkitConfig, new LinkedList<>(tmpRunConfigs.values()),
+                toolkitConfig,
+                new ArrayList<>(tmpRunConfigs.values()),
                 SecurityProviderFactory.getSecurityProvider()
                         .readCipherDetails()
                         .orElseThrow(() -> new IllegalStateException("There is no CipherDetails"))
@@ -341,7 +342,7 @@ public abstract class ApplicationProperties {
                     ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                     ", toolkitDomain='" + toolkitDomain() + '\'' +
                     ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
-                    ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
+                    ", toolkitUserFolder='" + toolkitUserFolderUrl() + '\'' +
                     ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + "'";
 
         }
@@ -366,12 +367,13 @@ public abstract class ApplicationProperties {
     public abstract boolean isSkipRemote();
 
     public abstract String toolkitUsername();
+    public abstract String toolkitFolderName();
     public abstract String toolkitDomain();
-    public abstract String toolkitUserFolder();
+    public abstract String toolkitUserFolderUrl();
     public abstract String toolkitCopyListName();
     public abstract Set<String> toolkitProjectListNames();
-
     public abstract String toolkitHostUrl();
+
     public abstract boolean isConfirmationWindow();
     public abstract boolean isActiveTray();
     public abstract boolean isEnableOnStartup();

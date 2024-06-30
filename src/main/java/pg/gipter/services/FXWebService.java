@@ -14,28 +14,18 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.w3c.dom.html.HTMLInputElement;
 import pg.gipter.InitSource;
 import pg.gipter.core.ArgName;
 import pg.gipter.jobs.UploadItemJob;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.JarHelper;
-import pg.gipter.utils.SystemUtils;
+import pg.gipter.utils.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
+import java.nio.file.*;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
@@ -75,7 +65,7 @@ public class FXWebService {
 
     public void initSSO(InitSource initSource) {
         this.initSource = initSource;
-        String ssoUrl = ArgName.toolkitUserFolder.defaultValue();
+        String ssoUrl = ArgName.toolkitUserFolderUrl.defaultValue();
         logger.info("Launching SSO for [{}]", ssoUrl);
 
         WebView webView = new WebView();

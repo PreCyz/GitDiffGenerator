@@ -7,9 +7,7 @@ import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -195,6 +193,15 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public String toolkitFolderName() {
+        String toolkitFolderName = argExtractor.toolkitFolderName();
+        if (!containsArg(ArgName.toolkitFolderName.name()) && StringUtils.notEmpty(toolkitConfig.getToolkitFolderName())) {
+            toolkitFolderName = toolkitConfig.getToolkitFolderName().trim().toUpperCase();
+        }
+        return toolkitFolderName;
+    }
+
+    @Override
     public String toolkitDomain() {
         String toolkitDomain = argExtractor.toolkitDomain();
         if (!containsArg(ArgName.toolkitDomain.name()) && StringUtils.notEmpty(toolkitConfig.getToolkitDomain())) {
@@ -222,8 +229,8 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitUserFolder() {
-        return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+    public String toolkitUserFolderUrl() {
+        return ArgName.toolkitUserFolderUrl.defaultValue() + toolkitUsername();
     }
 
     @Override

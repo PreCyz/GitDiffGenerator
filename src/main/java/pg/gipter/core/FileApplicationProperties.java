@@ -7,9 +7,7 @@ import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -186,6 +184,19 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public String toolkitFolderName() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitFolderName()) &&
+                !toolkitConfig.getToolkitFolderName().equals(ArgName.toolkitFolderName.defaultValue())) {
+            return toolkitConfig.getToolkitFolderName().trim().toUpperCase();
+        }
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitUsername()) &&
+                !toolkitConfig.getToolkitUsername().equals(ArgName.toolkitUsername.defaultValue())) {
+            return toolkitConfig.getToolkitUsername().trim().toUpperCase();
+        }
+        return argExtractor.toolkitFolderName();
+    }
+
+    @Override
     public String toolkitDomain() {
         if (StringUtils.notEmpty(toolkitConfig.getToolkitDomain())) {
             return toolkitConfig.getToolkitDomain();
@@ -210,11 +221,11 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitUserFolder() {
-        if (StringUtils.notEmpty(toolkitUsername())) {
-            return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+    public String toolkitUserFolderUrl() {
+        if (StringUtils.notEmpty(toolkitFolderName())) {
+            return ArgName.toolkitUserFolderUrl.defaultValue() + toolkitFolderName();
         }
-        return argExtractor.toolkitUserFolder();
+        return argExtractor.toolkitUserFolderUrl();
     }
 
     @Override

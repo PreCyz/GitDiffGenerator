@@ -207,7 +207,7 @@ public class ToolkitService extends Task<List<CasesData>> {
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 
         JsonObject decodedUrl = new JsonObject();
-        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitUserFolder());
+        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitUserFolderUrl());
 
         JsonObject listItemCreateInfo = new JsonObject();
         listItemCreateInfo.add("FolderPath", decodedUrl);

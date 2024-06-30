@@ -193,6 +193,12 @@ public enum ArgName {
             return SystemUtils.userName();
         }
     },
+    toolkitFolderName {
+        @Override
+        public String defaultValue() {
+            return SystemUtils.userName();
+        }
+    },
     toolkitDomain {
         @Override
         public String defaultValue() {
@@ -223,7 +229,7 @@ public enum ArgName {
             return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/_vti_bin/lists.asmx";
         }
     },
-    toolkitUserFolder {
+    toolkitUserFolderUrl {
         @Override
         public String defaultValue() {
             return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() +
