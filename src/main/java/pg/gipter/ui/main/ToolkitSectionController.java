@@ -46,8 +46,6 @@ class ToolkitSectionController extends AbstractController {
     }
 
     private void setProperties() {
-        toolkitFolderNameTextField.setEditable(false);
-        toolkitFolderNameTextField.setDisable(true);
         verifyProgressIndicator.setVisible(false);
         if (connectionCheckInProgress == null) {
             connectionCheckInProgress = new AtomicBoolean(true);

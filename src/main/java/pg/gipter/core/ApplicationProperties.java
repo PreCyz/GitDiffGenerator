@@ -344,7 +344,7 @@ public abstract class ApplicationProperties {
                     ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                     ", toolkitDomain='" + toolkitDomain() + '\'' +
                     ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
-                    ", toolkitUserFolder='" + toolkitUserFolderUrl() + '\'';
+                    ", toolkitUserFolderUrl='" + toolkitUserFolderUrl() + '\'';
         }
         return  log;
     }

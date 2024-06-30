@@ -52,7 +52,7 @@
                         <Label layoutX="10.0" layoutY="9.0" text="%toolkit.panel.username" />
                         <TextField fx:id="toolkitUsernameTextField" layoutX="78.0" layoutY="4.0" prefHeight="27.0" prefWidth="90.0" stylesheets="@../css/main.css" />
                         <Label layoutX="176.0" layoutY="10.0" text="%toolkit.panel.folderName" />
-                        <TextField fx:id="toolkitFolderNameTextField" editable="false" layoutX="258.0" layoutY="4.0" prefHeight="27.0" prefWidth="148.0" stylesheets="@../css/main.css">
+                        <TextField fx:id="toolkitFolderNameTextField" editable="false" layoutX="258.0" layoutY="4.0" prefHeight="27.0" prefWidth="148.0" style="-fx-background-color: #e5e5e5;" stylesheets="@../css/main.css">
                            <font>
                               <Font size="10.0" />
                            </font>
