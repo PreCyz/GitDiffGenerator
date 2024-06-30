@@ -1126,7 +1126,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitFolderName();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue());
+        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue().toUpperCase());
     }
 
     @Test
@@ -1137,7 +1137,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitFolderName();
 
-        assertThat(actual).isEqualTo("CLIUSERNAME");
+        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue().toUpperCase());
     }
 
     @Test
@@ -1150,7 +1150,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitFolderName();
 
-        assertThat(actual).isEqualTo("CLIUSERNAME");
+        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue().toUpperCase());
     }
 
     //disregard file settings
@@ -1164,7 +1164,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitFolderName();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue());
+        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue().toUpperCase());
     }
 
     //disregard file settings
@@ -1178,7 +1178,7 @@ class CliApplicationPropertiesTest {
 
         String actual = applicationProperties.toolkitFolderName();
 
-        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue());
+        assertThat(actual).isEqualTo(ArgName.toolkitFolderName.defaultValue().toUpperCase());
     }
 
     @Test
