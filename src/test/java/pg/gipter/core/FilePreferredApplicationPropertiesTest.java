@@ -970,12 +970,12 @@ class FilePreferredApplicationPropertiesTest {
     }
 
     @Test
-    void givenToolkitProjectListNamesFromPropertiesAndCLI_whenToolkitProjectListNames_thenReturnToolkitProjectListNamesFromProperties() {
+    void givenToolkitProjectListNamesFromFileAndCLI_whenToolkitProjectListNames_thenReturnToolkitProjectListNamesFromFile() {
         String[] args = {"toolkitProjectListNames=Proj1,Proj2"};
         appProps = new FileApplicationProperties(args);
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitProjectListNames("Proj3");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        RunConfig runConfig = new RunConfig();
+        runConfig.setToolkitProjectListNames("Proj3");
+        appProps.init(TestUtils.mockConfigurationDao(runConfig));
 
         Set<String> actual = appProps.toolkitProjectListNames();
 

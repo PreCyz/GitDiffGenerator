@@ -8,7 +8,6 @@ import pg.gipter.utils.StringUtils;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -230,8 +229,9 @@ class FileApplicationProperties extends ApplicationProperties {
 
     @Override
     public Set<String> toolkitProjectListNames() {
-        if (StringUtils.notEmpty(toolkitConfig.getToolkitProjectListNames())) {
-            return Stream.of(toolkitConfig.getToolkitProjectListNames().split(",")).collect(Collectors.toSet());
+        if (StringUtils.notEmpty(currentRunConfig.getToolkitProjectListNames())) {
+            return Stream.of(currentRunConfig.getToolkitProjectListNames().split(","))
+                    .collect(toCollection(LinkedHashSet::new));
         }
         return argExtractor.toolkitProjectListNames();
     }

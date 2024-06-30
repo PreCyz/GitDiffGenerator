@@ -78,10 +78,11 @@ public class ToolkitSettingsController extends AbstractController {
 
     private void setAccelerators() {
         mainAnchorPane.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
-            saveToolkitSettings();
             if (KeyCode.ESCAPE == e.getCode()) {
+                saveToolkitSettings();
                 uiLauncher.closeToolkitWindow();
             } else if (e.isControlDown() && e.getCode() == KeyCode.S) {
+                saveToolkitSettings();
                 new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                         .withAlertType(Alert.AlertType.INFORMATION)
@@ -98,9 +99,9 @@ public class ToolkitSettingsController extends AbstractController {
 
     private void saveToolkitSettings() {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitUsername(toolkitUsernameTextField.getText());
         toolkitConfig.setToolkitFolderName(toolkitFolderNameTextField.getText());
         applicationProperties.updateToolkitConfig(toolkitConfig);
-
         applicationProperties.save();
     }
 }

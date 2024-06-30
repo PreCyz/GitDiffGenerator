@@ -311,6 +311,7 @@ public abstract class ApplicationProperties {
                     ", mercurialAuthor='" + mercurialAuthor() + '\'' +
                     ", svnAuthor='" + svnAuthor() + '\'' +
                     ", committerEmail='" + committerEmail() + '\'' +
+                    ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + "'" +
                     ", itemPath='" + itemPath() + '\'' +
                     ", fileName='" + fileName() + '\'' +
                     ", projectPath='" + String.join(",", projectPaths()) + '\'' +
@@ -337,14 +338,13 @@ public abstract class ApplicationProperties {
         if (toolkitConfig != null) {
             log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
                     ", toolkitUsername='" + toolkitUsername() + '\'' +
+                    ", toolkitFolderName='" + toolkitFolderName() + '\'' +
                     ", toolkitUserEmail='" + toolkitUserEmail() + '\'' +
                     ", toolkitHostUrl='" + toolkitHostUrl() + '\'' +
                     ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                     ", toolkitDomain='" + toolkitDomain() + '\'' +
                     ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
-                    ", toolkitUserFolder='" + toolkitUserFolderUrl() + '\'' +
-                    ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + "'";
-
+                    ", toolkitUserFolder='" + toolkitUserFolderUrl() + '\'';
         }
         return  log;
     }

@@ -17,7 +17,6 @@ public class ToolkitConfig {
     private transient String toolkitCopyCase;
     private transient String toolkitWSUrl;
     private transient String toolkitUserFolderUrl;
-    protected String toolkitProjectListNames;
 
     public ToolkitConfig() {
         toolkitUsername = ArgName.toolkitUsername.defaultValue();
@@ -93,14 +92,6 @@ public class ToolkitConfig {
         this.toolkitUserFolderUrl = toolkitUserFolder;
     }
 
-    public String getToolkitProjectListNames() {
-        return toolkitProjectListNames;
-    }
-
-    public void setToolkitProjectListNames(String toolkitProjectListNames) {
-        this.toolkitProjectListNames = toolkitProjectListNames;
-    }
-
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getToolkitUsername() != null) {
@@ -126,9 +117,6 @@ public class ToolkitConfig {
         }
         if (getToolkitUserFolderUrl() != null) {
             arguments.add(ArgName.toolkitUserFolderUrl.name() + "=" + getToolkitUserFolderUrl());
-        }
-        if (getToolkitProjectListNames() != null) {
-            arguments.add(ArgName.toolkitProjectListNames.name() + "=" + getToolkitProjectListNames());
         }
         return arguments.toArray(new String[0]);
     }
@@ -156,8 +144,6 @@ public class ToolkitConfig {
                     toolkitConfig.setToolkitWSUrl(argumentValue);
                 } else if (ArgName.toolkitUserFolderUrl.name().equals(argumentName)) {
                     toolkitConfig.setToolkitUserFolderUrl(argumentValue);
-                } else if (ArgName.toolkitProjectListNames.name().equals(argumentName)) {
-                    toolkitConfig.setToolkitProjectListNames(argumentValue);
                 }
             }
         }

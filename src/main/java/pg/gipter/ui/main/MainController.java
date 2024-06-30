@@ -2,16 +2,7 @@ package pg.gipter.ui.main;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -24,16 +15,12 @@ import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.DataService;
 import pg.gipter.services.vcs.VcsService;
-import pg.gipter.ui.AbstractController;
-import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.UploadStatus;
+import pg.gipter.ui.*;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainController extends AbstractController {
 
@@ -74,6 +61,8 @@ public class MainController extends AbstractController {
 
     @FXML
     private TextField toolkitUsernameTextField;
+    @FXML
+    private TextField toolkitFolderNameTextField;
     @FXML
     private Hyperlink verifyCredentialsHyperlink;
     @FXML
@@ -163,6 +152,7 @@ public class MainController extends AbstractController {
     private Map<String, Control> initToolkitSectionMap() {
         Map<String, Control> map = new HashMap<>();
         map.put("toolkitUsernameTextField", toolkitUsernameTextField);
+        map.put("toolkitFolderNameTextField", toolkitFolderNameTextField);
         map.put("verifyCredentialsHyperlink", verifyCredentialsHyperlink);
         map.put("verifyProgressIndicator", verifyProgressIndicator);
         return map;
