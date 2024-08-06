@@ -7,14 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DateCell;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.quartz.SchedulerException;
@@ -27,33 +20,17 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.RunConfig;
-import pg.gipter.jobs.JobCreator;
-import pg.gipter.jobs.JobParam;
-import pg.gipter.jobs.JobProperty;
-import pg.gipter.jobs.JobService;
-import pg.gipter.jobs.JobType;
-import pg.gipter.jobs.UploadItemJobBuilder;
+import pg.gipter.jobs.*;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.LogLinkAction;
-import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -354,6 +331,11 @@ public class JobController extends AbstractController {
             try {
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), uiLauncher);
+
+                String configName = configurationNameComboBox.getSelectionModel().getSelectedItem();
+                if (ALL_CONFIGS.equals(configName)) {
+                    configName = String.join(JobService.CONFIG_DELIMITER, runConfigMap.keySet());
+                }
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
                         .withJobType(calculateJobType())
                         .withStartDate(startDatePicker.getValue())
@@ -362,7 +344,7 @@ public class JobController extends AbstractController {
                         .withMinuteOfHour(minuteComboBox.getValue())
                         .withDayOfWeek(dayNameComboBox.getValue())
                         .withCronExpression(cronExpressionTextField.getText())
-                        .withConfigs(configsLabel.getText())
+                        .withConfigs(configName)
                         .withAdditionalParams(additionalJobParams);
 
                 JobService jobService = uiLauncher.getJobService();
@@ -404,7 +386,7 @@ public class JobController extends AbstractController {
                 .addListener((options, oldValue, newValue) -> {
                     if (ALL_CONFIGS.equals(newValue)) {
                         configsLabel.setText(String.join(JobService.CONFIG_DELIMITER, runConfigMap.keySet()));
-                    } else if (oldValue.equals(ALL_CONFIGS)) {
+                    } else if (ALL_CONFIGS.equals(oldValue)) {
                         configsLabel.setText(newValue);
                     } else {
                         Set<String> currentSelection = Stream.of(configsLabel.getText().split(JobService.CONFIG_DELIMITER))
