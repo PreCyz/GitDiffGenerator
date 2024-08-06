@@ -156,7 +156,7 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
                 tasks.add(withUpload);
             } else {
                 CompletableFuture<Boolean> withoutUpload = CompletableFuture
-                        .supplyAsync(() -> getApplicationProperties(configName), executor)
+                        .supplyAsync(() -> applicationProperties, executor)
                         .thenApply(this::produce)
                         .handle((isUploaded, throwable) -> handleUploadResult(
                                 configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")
