@@ -38,7 +38,11 @@ public abstract class ApplicationProperties {
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
         cachedConfiguration = DaoFactory.getCachedConfiguration();
+    }
+
+    public final ApplicationProperties init() {
         init(cachedConfiguration);
+        return this;
     }
 
     protected final void init(ConfigurationDao configurationDao) {
@@ -326,6 +330,7 @@ public abstract class ApplicationProperties {
         if (applicationConfig != null) {
             log += ", preferredArgSource='" + preferredArgSource() + '\'' +
                     ", useUI='" + isUseUI() + '\'' +
+                    ", noSSO='" + isNoSSO() + '\'' +
                     ", silentMode='" + isSilentMode() + '\'' +
                     ", enableOnStartup='" + isEnableOnStartup() + '\'' +
                     ", upgradeFinished='" + isUpgradeFinished() + '\'' +
@@ -336,8 +341,7 @@ public abstract class ApplicationProperties {
                     ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
         }
         if (toolkitConfig != null) {
-            log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
-                    ", toolkitUsername='" + toolkitUsername() + '\'' +
+            log += ", toolkitUsername='" + toolkitUsername() + '\'' +
                     ", toolkitFolderName='" + toolkitFolderName() + '\'' +
                     ", toolkitUserEmail='" + toolkitUserEmail() + '\'' +
                     ", toolkitHostUrl='" + toolkitHostUrl() + '\'' +
@@ -378,6 +382,7 @@ public abstract class ApplicationProperties {
     public abstract boolean isActiveTray();
     public abstract boolean isEnableOnStartup();
     public abstract boolean isUseUI();
+    public abstract boolean isNoSSO();
     public abstract String loggerLevel();
     public abstract String uiLanguage();
     public abstract boolean isCheckLastItemEnabled();

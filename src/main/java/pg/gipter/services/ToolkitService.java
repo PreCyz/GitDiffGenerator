@@ -124,18 +124,13 @@ public class ToolkitService extends Task<List<CasesData>> {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         headers.put("Cookie", fedAuthString);
-        String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
-        ToolkitCasePayload payload = new ToolkitCasePayload(
-                new SortFieldDefinition("ows_Created", "datetime"),
-                List.of(
-                        new ItemField("title", "", "ows_Title"),
-                        new ItemField("id", "", "CaseID"),
-                        new ItemField("created", "", "ows_Created")
-                ),
-                false
+        String url = String.format("%s/_api/web/siteusers/getbyemail('%s')",
+                applicationProperties.toolkitHostUrl(),
+                applicationProperties.toolkitUserEmail()
         );
+
         try {
-            int statusCode = httpRequester.postForStatusCode(url, headers, payload);
+            int statusCode = httpRequester.getForStatusCode(url, headers);
             return Stream.of(401, 403, 500).noneMatch(sc -> sc == statusCode);
         } catch (IOException ex) {
             logger.error("Could not download toolkit projects for user [{}]. ", applicationProperties.toolkitUsername(), ex);
@@ -299,9 +294,8 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public Optional<String> getUserId() {
         try {
-            String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
+            String fullUrl = String.format("%s/_api/web/siteusers/getbyemail('%s')",
                     applicationProperties.toolkitHostUrl(),
-                    applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitUserEmail()
             );
             SharePointConfig sharePointConfig = new SharePointConfig(

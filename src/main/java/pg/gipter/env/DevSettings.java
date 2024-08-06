@@ -7,21 +7,11 @@ import pg.gipter.Environment;
 import pg.gipter.core.model.CipherDetails;
 import pg.gipter.services.SecurityService;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Scanner;
+import java.util.*;
 
 class DevSettings implements EnvSettings {
-
-    protected static final String SETTINGS_JSON = "settings.json";
-    protected static final String DB_CONNECTION = "db.connection";
 
     protected final Environment environment;
 
@@ -42,7 +32,7 @@ class DevSettings implements EnvSettings {
     @Override
     public Optional<CipherDetails> loadCipherDetails() throws IOException {
         Optional<CipherDetails> result = Optional.empty();
-        String settingsFileName = getFileName(SETTINGS_JSON);
+        String settingsFileName = getFileName(settingsPath().getFileName().toString());
         try (InputStream fis = new FileInputStream(settingsFileName);
              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(isr)
@@ -61,7 +51,7 @@ class DevSettings implements EnvSettings {
     @Override
     public Optional<Properties> loadDbProperties() {
         Optional<Properties> properties = Optional.empty();
-        String dbConnectionFileName = getFileName(DB_CONNECTION);
+        String dbConnectionFileName = getFileName(connectionPath().getFileName().toString());
         try (InputStream fis = new FileInputStream(dbConnectionFileName);
              Scanner scanner = new Scanner(fis)) {
 

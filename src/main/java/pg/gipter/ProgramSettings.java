@@ -5,6 +5,7 @@ import pg.gipter.env.EnvSettings;
 import pg.gipter.env.EnvSettingsFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Properties;
 
 public final class ProgramSettings {
@@ -14,6 +15,13 @@ public final class ProgramSettings {
     private Environment environment;
 
     private ProgramSettings() {
+    }
+
+    public static void refresh() throws IOException {
+        EnvSettings envSettings = EnvSettingsFactory.getInstance(InstanceHolder.INSTANCE.environment);
+        Files.deleteIfExists(envSettings.connectionPath());
+        Files.deleteIfExists(envSettings.settingsPath());
+        initProgramSettings();
     }
 
     private static class InstanceHolder {

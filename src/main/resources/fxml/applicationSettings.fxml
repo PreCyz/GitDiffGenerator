@@ -31,6 +31,7 @@
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font></Button>
+                        <CheckBox fx:id="noSSOCheckBox" layoutX="387.0" layoutY="63.0" mnemonicParsing="false" text="%launch.panel.noSSO" />
                      </children>
                   </AnchorPane>
                </content>

@@ -16,17 +16,10 @@ import java.lang.reflect.Type;
 import java.net.CookieHandler;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class CookiesService {
@@ -49,7 +42,7 @@ public final class CookiesService {
             );
             return expirationDate.isAfter(LocalDateTime.now());
         } catch (Exception ex) {
-            logger.error("Problem with FedAuth cookie. Source of cookie [{}].", COOKIES_PATH.toAbsolutePath(), ex);
+            logger.error("Problem with FedAuth cookie. Source of cookie [{}]. {}", COOKIES_PATH.toAbsolutePath(), ex.getMessage());
             return false;
         }
     }
@@ -69,7 +62,7 @@ public final class CookiesService {
                         .filter(cookie -> "FedAuth".equals(cookie.name))
                         .findFirst();
             } catch (Exception e) {
-                logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath(), e);
+                logger.error("Could not load cookies from [{}]. {}", COOKIES_PATH.toAbsolutePath(), e.getMessage());
                 result = Optional.empty();
             }
         } else {

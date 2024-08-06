@@ -212,19 +212,18 @@ public class HttpRequester {
         }
     }
 
-    public int postForStatusCode(String url, Map<String, String> headers, Object payload) throws IOException {
+    public int getForStatusCode(String url, Map<String, String> headers) throws IOException {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(payload)));
+                .GET();
 
         Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(builder::header);
         HttpRequest request = builder.build();
         logRequest(request);
 
         try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            HttpResponse<String> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
             logResponse(res);
-            res.body().close();
             return res.statusCode();
         } catch (InterruptedException ex) {
             throw new IOException(ex);
@@ -256,6 +255,10 @@ public class HttpRequester {
         HashMap<String, List<String>> headers = new HashMap<>(request.headers().map());
         headers.replace("Cookie", List.of("***"));
         logger.info("Executing request: {} {} {} Headers: {}",
-                request.version(), request.method(), request.uri().toString(), headers);
+                request.version().map(Enum::toString).orElseGet(() -> ""),
+                request.method(),
+                request.uri().toString(),
+                headers
+        );
     }
 }

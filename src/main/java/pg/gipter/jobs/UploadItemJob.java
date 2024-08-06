@@ -1,34 +1,21 @@
 package pg.gipter.jobs;
 
-import javafx.application.Platform;
-import org.quartz.CronExpression;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.InitSource;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.services.CookiesService;
-import pg.gipter.services.FXWebService;
 import pg.gipter.services.ToolkitService;
-import pg.gipter.ui.MultiConfigRunner;
-import pg.gipter.ui.RunType;
-import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.*;
 
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class UploadItemJob implements Job {
 
@@ -50,11 +37,10 @@ public class UploadItemJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
-        if (CookiesService.hasValidFedAuth()) {
-            runJob(jobDataMap);
-        } else {
-            Platform.runLater(() -> new FXWebService(jobDataMap).initSSO(InitSource.JOB));
+        if (!CookiesService.hasValidFedAuth()) {
+            logger.warn("Cookies are not set. Item is going to be generated BUT NOT UPLOADED!!!");
         }
+        runJob(jobDataMap);
     }
 
     public void runJob(Map<String, ?> jobDataMap) throws JobExecutionException {

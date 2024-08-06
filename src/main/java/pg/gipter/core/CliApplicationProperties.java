@@ -252,6 +252,15 @@ class CliApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public boolean isNoSSO() {
+        boolean noSSO = argExtractor.isUseUI();
+        if (!containsArg(ArgName.noSSO.name()) && applicationConfig.getNoSSO() != null) {
+            noSSO = applicationConfig.getNoSSO();
+        }
+        return noSSO;
+    }
+
+    @Override
     public boolean isActiveTray() {
         return false;
     }
