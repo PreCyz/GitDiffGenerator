@@ -12,6 +12,7 @@ import java.net.http.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 public class GithubService {
 
@@ -112,29 +113,7 @@ public class GithubService {
         if (latestReleaseDetails != null) {
             Optional<String> downloadLink = getDownloadLink(latestReleaseDetails);
             if (downloadLink.isPresent()) {
-
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(downloadLink.get()))
-                        .GET()
-                        .header("Accept", "application/octet-stream")
-                        .header("Authorization", "Bearer " + githubToken)
-                        .header("X-GitHub-Api-Version", "2022-11-28")
-                        .build();
-
-                try {
-                    HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-                    if (res.statusCode() == 200) {
-                        downloadFile(res.body(), downloadLocation, taskService);
-                        res.body().close();
-                        return Optional.of(distributionName);
-                    }
-                    return Optional.empty();
-                } catch (InterruptedException | IOException e) {
-                    taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
-                    taskService.workCompleted();
-                    logger.error("Can not download latest distribution details.", e);
-                    throw new IllegalStateException("Can not download latest distribution details.");
-                }
+                return executeRequest(downloadLocation, taskService, downloadLink.get());
             }
         } else {
             taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
@@ -143,6 +122,37 @@ public class GithubService {
             throw new IllegalStateException("Can not download latest distribution details.");
         }
         return Optional.empty();
+    }
+
+    private Optional<String> executeRequest(String downloadLocation, TaskService<?> taskService, String requestUrl) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(requestUrl))
+                    .GET()
+                    .header("Accept", "application/octet-stream")
+                    .header("Authorization", "Bearer " + githubToken)
+                    .header("X-GitHub-Api-Version", "2022-11-28")
+                    .build();
+            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            if (res.statusCode() == 200) {
+                downloadFile(res.body(), downloadLocation, taskService);
+                res.body().close();
+                return Optional.of(distributionName);
+            } else if (IntStream.of(301, 302, 307).anyMatch(it -> it == res.statusCode())) {
+                String newLocationUrl = res.headers()
+                        .firstValue("location")
+                        .orElseThrow(() -> new IllegalStateException(
+                                "Github reallocated asset and there is no location header in the response."
+                        ));
+                return executeRequest(downloadLocation, taskService, newLocationUrl);
+            }
+            return Optional.empty();
+        } catch (InterruptedException | IOException e) {
+            taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
+            taskService.workCompleted();
+            logger.error("Can not download latest distribution details. {}", e.getMessage());
+            throw new IllegalStateException("Can not download latest distribution details.");
+        }
     }
 
     private void downloadFile(InputStream content, String downloadLocation, TaskService<?> taskService) throws IOException {
@@ -205,7 +215,7 @@ public class GithubService {
             if (isProperAsset(name, assetName)) {
                 distributionName = assetName.getAsString();
                 size = Optional.of(element.get("size").getAsLong());
-                logger.info("New version file size: [{}]", size.orElseGet(() -> 0L));
+                logger.info("New version file size: [{}]", size.orElse(0L));
                 break;
             }
         }
