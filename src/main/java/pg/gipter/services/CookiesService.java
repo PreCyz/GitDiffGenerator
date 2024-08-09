@@ -54,7 +54,7 @@ public final class CookiesService {
 
     private static Optional<CookieDetails> loadFedAuthCookie() {
         Optional<CookieDetails> result;
-        if (isCookiesExist()) {
+        if (isCookiesFileExist()) {
             try {
                 Map<String, Collection<CookieDetails>> cookiesToLoad = readCookiesFromFile();
                 result = cookiesToLoad.get(ArgName.toolkitHostUrl.defaultValue().replace("https://", ""))
@@ -71,7 +71,7 @@ public final class CookiesService {
         return result;
     }
 
-    public static boolean isCookiesExist() {
+    public static boolean isCookiesFileExist() {
         return Files.exists(COOKIES_PATH);
     }
 
@@ -183,7 +183,7 @@ public final class CookiesService {
     }
 
     public static void loadCookies() {
-        if (isCookiesExist()) {
+        if (isCookiesFileExist()) {
             try {
                 Map<String, Collection<CookieDetails>> cookiesToLoad = readCookiesFromFile();
                 for (String domain : cookiesToLoad.keySet()) {

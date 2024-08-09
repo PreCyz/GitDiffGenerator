@@ -36,11 +36,11 @@ public final class ProgramSettings {
     public static void initProgramSettings() throws IOException {
         EnvSettings envSettings = EnvSettingsFactory.getInstance(InstanceHolder.INSTANCE.environment);
         InstanceHolder.INSTANCE.cipherDetails = envSettings.loadCipherDetails()
-                .orElseGet(() -> getbackupCipherDetails(envSettings));
+                .orElseGet(() -> getBackupCipherDetails(envSettings));
         InstanceHolder.INSTANCE.dbProperties = envSettings.loadDbProperties().orElseGet(Properties::new);
     }
 
-    private static CipherDetails getbackupCipherDetails(EnvSettings envSettings) {
+    private static CipherDetails getBackupCipherDetails(EnvSettings envSettings) {
         try {
             return envSettings.backupCipherDetails();
         } catch (IOException ex) {

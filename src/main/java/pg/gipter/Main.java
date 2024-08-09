@@ -27,15 +27,17 @@ public class Main extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private static ApplicationProperties applicationProperties;
+    private static FlowType flowType;
 
     @Override
     public void start(Stage primaryStage) {
-        if (applicationProperties.isNoSSO()) {
+        logger.info("Calculated flow type is [{}].", flowType);
+        if (FlowType.INIT == flowType) {
+            new FXWebService(primaryStage).initSSO(flowType);
+        } else {
             WebViewService.getInstance();
             Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
             launcher.execute();
-        } else {
-            new FXWebService(primaryStage).initSSO(InitSource.MAIN);
         }
     }
 
@@ -50,25 +52,42 @@ public class Main extends Application {
         mObj.runConverters(applicationProperties);
         mObj.setDefaultConfig();
 
-        boolean regularFlow = false;
-        if (!applicationProperties.isNoSSO()) {
-            regularFlow = isCookieWorking(args);
+        flowType = Stream.of(args)
+                .filter(a -> a.startsWith(ArgName.flowType.name()))
+                .map(a -> {
+                    String flowName = a.split("=")[1];
+                    logger.info("Flow passed as program argument: [{}]", flowName);
+                    return FlowType.valueOf(flowName);
+                })
+                .findFirst()
+                .orElse(FlowType.REGULAR)
+        ;
+
+        if (flowType != FlowType.INIT) {
+            flowType = CookiesService.isCookiesFileExist() ? FlowType.REGULAR : FlowType.INIT;
         }
-        if (regularFlow) {
-            regularFlow = initProgramSettings(args);
+
+        if (applicationProperties.isNoSSO()) {
+            flowType = FlowType.NO_UPLOAD;
+        } else if (flowType != FlowType.INIT) {
+            boolean cookieWorking = isCookieWorking(args);
+            if (cookieWorking) {
+                flowType = FlowType.REGULAR;
+            } else {
+                flowType = FlowType.NO_UPLOAD;
+                logger.warn("Cookies are not available. Upload is not going to be executed.");
+            }
         }
-        if (regularFlow) {
+
+        if (flowType == FlowType.INIT) {
+            launch(args);
+        } else {
+            if (flowType == FlowType.REGULAR) {
+                flowType = initProgramSettings(args) ? FlowType.REGULAR : FlowType.NO_UPLOAD;
+            }
             if (Main.applicationProperties.isUseUI()) {
                 launch(args);
             } else {
-                Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
-                launcher.execute();
-            }
-        } else {
-            if (applicationProperties.isUseUI()) {
-                launch(args);
-            } else {
-                logger.warn("Cookies are not available. Upload is not going to be executed.");
                 Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
                 launcher.execute();
             }
@@ -112,6 +131,10 @@ public class Main extends Application {
             if (javaHome.isPresent()) {
                 System.setProperty("java.home", javaHome.get().split("=")[1]);
                 logger.info("New JAVA_HOME {}.", SystemUtils.javaHome());
+            }
+            if (Stream.of(args).anyMatch("env=dev"::equalsIgnoreCase)) {
+                System.setProperty(RestartService.PROFILE_ENV_PARAM_NAME, "DEV");
+                logger.warn("DEV profile is on.");
             }
         }
 

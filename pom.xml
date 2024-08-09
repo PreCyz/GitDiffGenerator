@@ -6,7 +6,7 @@
 
     <groupId>pg.gipter</groupId>
     <artifactId>Gipter</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>4.0.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -118,13 +118,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.26.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-io</groupId>
-                    <artifactId>commons-io</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>1.26.2</version>
         </dependency>
         <dependency>
             <groupId>org.tukaani</groupId>
