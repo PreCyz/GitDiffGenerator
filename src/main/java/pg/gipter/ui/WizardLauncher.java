@@ -6,57 +6,34 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.*;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.ResourceUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Properties;
+import java.nio.file.*;
+import java.util.*;
 
 public class WizardLauncher implements Launcher {
 
     private static final Logger logger = LoggerFactory.getLogger(WizardLauncher.class);
+    private static final short MAX_STEPS = 5;
     private final Stage primaryStage;
     private final Properties wizardProperties;
     private final String lastChosenConfiguration;
@@ -83,12 +60,11 @@ public class WizardLauncher implements Launcher {
         wizard.setTitle(BundleUtils.getMsg("wizard.title"));
         WizardPane welcomePage = buildWelcomePage(step++);
         WizardPane configurationPage = buildConfigurationPage(step++);
-        WizardPane toolkitCredentialsPage = buildToolkitCredentialsPage(step++);
         WizardPane committerPage = buildCommitterPage(step++);
         WizardPane projectPage = buildProjectPage(step++);
         WizardPane finishPage = buildFinishPage(step);
 
-        wizard.setFlow(buildFlow(welcomePage, configurationPage, toolkitCredentialsPage, committerPage, projectPage, finishPage));
+        wizard.setFlow(buildFlow(welcomePage, configurationPage, committerPage, projectPage, finishPage));
 
         wizard.showAndWait().ifPresent(result -> {
             ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(new String[]{});
@@ -126,7 +102,7 @@ public class WizardLauncher implements Launcher {
         anchorPane.getChildren().addAll(imageView);
 
         wizardPane.setContent(anchorPane);
-        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.welcome.text", String.valueOf(step)));
+        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.welcome.text", String.valueOf(step), String.valueOf(MAX_STEPS)));
         return wizardPane;
     }
 
@@ -168,7 +144,7 @@ public class WizardLauncher implements Launcher {
                 }
             }
         };
-        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.configuration.details") + " (" + step + "/6)");
+        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.configuration.details") + stepMsg(step));
         wizardPane.setContent(gridPane);
         return wizardPane;
     }
@@ -178,28 +154,6 @@ public class WizardLauncher implements Launcher {
             applicationProperties.updateToolkitConfig(new ToolkitConfig());
         }
         return applicationProperties;
-    }
-
-    private WizardPane buildToolkitCredentialsPage(short step) {
-        WizardPane page = new WizardPane() {
-            @Override
-            public void onEnteringPage(Wizard wizard) {
-                updateProperties(wizard, wizardProperties);
-            }
-        };
-
-        GridPane gridPane = new GridPane();
-        gridPane.setVgap(10);
-        gridPane.setHgap(10);
-
-        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.username")), 0, 0);
-        TextField username = createTextField(ArgName.toolkitUsername.name());
-        username.setText(ArgName.toolkitUsername.defaultValue());
-        gridPane.add(username, 1, 0);
-
-        page.setHeaderText(BundleUtils.getMsg("wizard.toolkit.credentials") + " (" + step + "/6)");
-        page.setContent(gridPane);
-        return page;
     }
 
     private void updateProperties(Wizard wizard, Properties properties) {
@@ -228,13 +182,6 @@ public class WizardLauncher implements Launcher {
         textField.setId(id);
         GridPane.setHgrow(textField, Priority.ALWAYS);
         return textField;
-    }
-
-    private PasswordField createPasswordField(String id) {
-        PasswordField passwordField = new PasswordField();
-        passwordField.setId(id);
-        GridPane.setHgrow(passwordField, Priority.ALWAYS);
-        return passwordField;
     }
 
     private ComboBox<ItemType> createUploadTypeComboBox(String id) {
@@ -275,9 +222,13 @@ public class WizardLauncher implements Launcher {
         TextField committerEmail = createTextField(ArgName.committerEmail.name());
         pageGrid.add(committerEmail, 1, row);
 
-        page2.setHeaderText(BundleUtils.getMsg("wizard.scv.details") + " (" + step + "/6)");
+        page2.setHeaderText(BundleUtils.getMsg("wizard.scv.details") + stepMsg(step));
         page2.setContent(pageGrid);
         return page2;
+    }
+
+    private String stepMsg(short step) {
+        return String.format(" (%d/%d)", step, MAX_STEPS);
     }
 
     private WizardPane buildProjectPage(short step) {
@@ -345,7 +296,7 @@ public class WizardLauncher implements Launcher {
                 wizard.getSettings().put(SharePointConfig.SHARE_POINT_CONFIGS, wizardProperties.get(SharePointConfig.SHARE_POINT_CONFIGS));
             }
         };
-        wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + " (" + step + "/6)");
+        wizardPane.setHeaderText(BundleUtils.getMsg("paths.panel.title") + stepMsg(step));
         wizardPane.setContent(pageGrid);
 
         return wizardPane;
@@ -428,7 +379,7 @@ public class WizardLauncher implements Launcher {
                 saveConfiguration();
             }
         };
-        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.finish.text", String.valueOf(step)));
+        wizardPane.setHeaderText(BundleUtils.getMsg("wizard.finish.text", String.valueOf(step), String.valueOf(MAX_STEPS)));
 
         AnchorPane anchorPane = new AnchorPane();
         ImageView imageView = ResourceUtils.getImgResource(ImageFile.MINION_APPLAUSE_GIF.fileUrl())
@@ -442,7 +393,7 @@ public class WizardLauncher implements Launcher {
         return wizardPane;
     }
 
-    private Wizard.Flow buildFlow(WizardPane welcomePage, WizardPane configurationPage, WizardPane toolkitCredentialsPage,
+    private Wizard.Flow buildFlow(WizardPane welcomePage, WizardPane configurationPage,
                                   WizardPane committerPage, WizardPane projectPage, WizardPane finishPage) {
         return new Wizard.Flow() {
 
@@ -462,30 +413,11 @@ public class WizardLauncher implements Launcher {
                 } else if (currentPage == welcomePage) {
                     return configurationPage;
                 } else if (currentPage == configurationPage) {
-                    ApplicationProperties applicationProperties = propertiesWithCredentials();
-                    if (applicationProperties.isToolkitCredentialsSet()) {
-                        return flowAdvancedLogic();
-                    }
-                    return toolkitCredentialsPage;
-                } else if (currentPage == toolkitCredentialsPage) {
-                    return flowAdvancedLogic();
+                    return committerPage;
                 } else if (currentPage == committerPage) {
                     return projectPage;
                 } else {
                     return finishPage;
-                }
-            }
-
-            private WizardPane flowAdvancedLogic() {
-                String property = wizardProperties.getProperty(ArgName.itemType.name());
-                if (StringUtils.nullOrEmpty(property)) {
-                    return committerPage;
-                }
-                switch (ItemType.valueFor(property)) {
-                    case TOOLKIT_DOCS:
-                    case STATEMENT:
-                    default:
-                        return committerPage;
                 }
             }
         };
