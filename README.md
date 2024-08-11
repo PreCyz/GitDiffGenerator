@@ -17,7 +17,12 @@ Application logs everything. Logs can be found inside following folder `${APP_HO
 There are few ways to execute this program:
 - from command line java -jar with params,
 - from command line java -jar + application.properties at the same location as _*.jar_ file,
-- double click on *.jar file will run the application in UI mode and this is the default mode, description of user interface can be found [here](https://github.com/PreCyz/GitDiffGenerator/tree/master/docs)
+- double-click on *.jar file will run the application in UI mode and this is the default mode.The description of user interface can be found [here](https://github.com/PreCyz/GitDiffGenerator/tree/master/docs)
+- shortcut to jar file can also be created to use any Java version. The shortcut should execute the following command:
+```
+%J11%\bin\javaw.exe -jar "C:\Workspace\GitDiffGenerator\target\tests\Gipter.jar"
+```
+where `%J11%` is an environment variable pointing to the Java 11 folder. 
 ### java -jar with params
 For *Windows*
 ```
@@ -51,7 +56,7 @@ When application is executed with `uploadType = TOOLKIT_DOCS', then item file is
 **projectPath** - comma separated project paths containing _.git_, _.svn_ or _.hg_ folders.<br />
 **periodInDays** - integer number. Default value is 7. It helps define start date of diff calculations. Start date is `now - periodInDays`, end date is now.<br />
 **startDate** - start date of diff given in format `yyyy-MM-dd`.<br />
-**endDate** - end date of diff given in format `yyyy-MM-dd`. By default it is set as now.<br />
+**endDate** - end date of diff given in format `yyyy-MM-dd`. By default, it is set as now.<br />
 **itemFileNamePrefix** - if given then this value will be used as prefix of the diff file name.<br />
 **gitAuthor** - author specific for git repository stored at git config under key '_user.name_'. When used together with _author_, this parameter has higher priority.<br />
 **mercurialAuthor** - author specific for mercurial repository. When used together with _author_, this parameter has higher priority.<br />
@@ -65,12 +70,13 @@ When application is executed with `uploadType = TOOLKIT_DOCS', then item file is
 **silentMode** - used in UI, tells if application should be executed and located directly in tray icon. It is used by startup functionality. Default value is `N`.<br/>
 **enableOnStartup** - used in UI, enables application on system start up, if value on  is `Y` then application will be launched on system start.<br/>
 **loggerLevel** - If given then all loggers in the application has that logger level.<br/>
+**noSSO** - specifies if users wants to log in into Toolkit. Default value is `N`, that means user shall go through log in process.<br/>
 
 Below parameters are mandatory for toolkit:<br/>
-**toolkitUsername** - user name used as a login to SharePoint. Also this value is taken when user's root folder in toolkit is calculated.<br />
-**toolkitPassword** - user password used to log in into SharePoint.<br /><br />
+**toolkitUsername** - username used as a login to SharePoint. Also, this value is taken when user's root folder in toolkit is calculated.<br />
+**toolkitFolderName** - folder name where user shall upload copyright items. <br />
 **toolkitProjectListNames** - comma separated names of the folders to scan on toolkit, when looking for changes in documents made by user. Default value is `Deliverables`.<br/>
-**deleteDownloadedFiles** - if `Y` then all downloaded files from toolkit will be downloaded afterwards. This parameter works together with item type `TOOLKIT_DOCS`<br/>
+**deleteDownloadedFiles** - if `Y` then all downloaded files from toolkit will be downloaded afterward. This parameter works together with item type `TOOLKIT_DOCS`<br/>
 
 _Note:_ When `periodInDays` is used together with `startDate` then **startDate** has higher priority.
 ### Explanation of *uploadType* parameter
@@ -144,7 +150,7 @@ No code! Just:
 It also may be that owner of the code forbids to share any kind of information about the code and changes, even headers.
 If so then user should upload to SharePoint file with the statement. Application can do it for user if only *uploadType* parameter is set as `STATEMENT`.
 ### Toolkit
-To setup toolkit details only two parameters has to be set: _toolkitUsername_ and _toolkitPassword_. If parameters are not set the application will generate diff file and report an error.
+To set up toolkit details only 1 parameter must be set: _toolkitUsername_. If parameter is not set the application will generate diff file and report an error.
 Popup window will be displayed and in the logs there will be relevant entry. If parameters are set then new item in the toolkit will be created. New item will contain attachment, which is generated
 file with diffs from repositories. Below are details of that item:<br />
 **Title**: _diff file name_<br />
@@ -211,7 +217,7 @@ If you want to create SVN diff for Project1 that is fully protected by the owner
 itemPath=/home/Vader/Path/to/statement/my-statement.docx
 uploadType=STATEMENT
 ```
-**To all above examples toolkit parameters (_toolkitUsername_ & _toolkitPassword_) has to be set up.** 
+**To all above examples _toolkitUsername_ must be set up.** 
 ### Download
 To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
 
