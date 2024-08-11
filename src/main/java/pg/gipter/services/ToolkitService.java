@@ -1,38 +1,21 @@
 package pg.gipter.services;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import javafx.concurrent.Task;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.dto.CasesData;
-import pg.gipter.services.dto.ItemField;
-import pg.gipter.services.dto.SortFieldDefinition;
-import pg.gipter.services.dto.ToolkitCasePayload;
-import pg.gipter.services.dto.ToolkitCaseResponse;
+import pg.gipter.services.dto.*;
 import pg.gipter.toolkit.HttpRequester;
 import pg.gipter.utils.BundleUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.nio.file.*;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -57,7 +40,7 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     private List<CasesData> getAvailableCases() {
         Map<String, String> headers = new HashMap<>();
-        headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
+        headers.put("Content-Type", "application/json");
         headers.put("Cookie", CookiesService.getFedAuthString());
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
         List<CasesData> cases = new LinkedList<>();
@@ -139,22 +122,16 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public boolean isCookieWorking(String fedAuthString) {
         Map<String, String> headers = new HashMap<>();
-        headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
+        headers.put("Content-Type", "application/json");
         headers.put("Cookie", fedAuthString);
-        String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
-        ToolkitCasePayload payload = new ToolkitCasePayload(
-                new SortFieldDefinition("ows_Created", "datetime"),
-                List.of(
-                        new ItemField("title", "", "ows_Title"),
-                        new ItemField("id", "", "CaseID"),
-                        new ItemField("created", "", "ows_Created")
-                ),
-                false
+        String url = String.format("%s/_api/web/siteusers/getbyemail('%s')",
+                applicationProperties.toolkitHostUrl(),
+                applicationProperties.toolkitUserEmail()
         );
+
         try {
-            int statusCode = httpRequester.postForStatusCode(url, headers, payload);
-            return Stream.of(HttpStatus.SC_FORBIDDEN, HttpStatus.SC_UNAUTHORIZED, HttpStatus.SC_INTERNAL_SERVER_ERROR)
-                    .noneMatch(sc -> sc == statusCode);
+            int statusCode = httpRequester.getForStatusCode(url, headers);
+            return Stream.of(401, 403, 500).noneMatch(sc -> sc == statusCode);
         } catch (IOException ex) {
             logger.error("Could not download toolkit projects for user [{}]. ", applicationProperties.toolkitUsername(), ex);
         }
@@ -225,7 +202,7 @@ public class ToolkitService extends Task<List<CasesData>> {
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 
         JsonObject decodedUrl = new JsonObject();
-        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitUserFolder());
+        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitUserFolderUrl());
 
         JsonObject listItemCreateInfo = new JsonObject();
         listItemCreateInfo.add("FolderPath", decodedUrl);
@@ -317,9 +294,8 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public Optional<String> getUserId() {
         try {
-            String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
+            String fullUrl = String.format("%s/_api/web/siteusers/getbyemail('%s')",
                     applicationProperties.toolkitHostUrl(),
-                    applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitUserEmail()
             );
             SharePointConfig sharePointConfig = new SharePointConfig(

@@ -5,27 +5,19 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
+import javafx.scene.input.*;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
-import pg.gipter.ui.AbstractController;
-import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.WizardLauncher;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.BrowserLinkAction;
-import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.ui.*;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -129,7 +121,7 @@ public class MenuSectionController extends AbstractController {
             String pdfFileName = "Gipter-ui-description.pdf";
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withMessage(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
-                    .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolder()))
+                    .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolderUrl()))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             try {

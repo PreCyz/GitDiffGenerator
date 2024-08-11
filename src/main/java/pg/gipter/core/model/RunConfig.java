@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 public class RunConfig {
 
@@ -43,7 +42,7 @@ public class RunConfig {
                      ItemType itemType, Boolean skipRemote, Boolean fetchAll, String itemPath, String projectPath,
                      String itemFileNamePrefix, Integer periodInDays, LocalDate startDate, LocalDate endDate,
                      String configurationName, String toolkitProjectListNames, Boolean deleteDownloadedFiles,
-                     PreferredArgSource preferredArgSource, Set<SharePointConfig> sharePointConfigs,
+                     PreferredArgSource preferredArgSource,
                      Integer fetchTimeout) {
         this.author = author;
         this.gitAuthor = gitAuthor;

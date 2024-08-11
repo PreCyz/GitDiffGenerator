@@ -1,6 +1,5 @@
 package pg.gipter.ui.upgrade;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -26,7 +25,11 @@ public class UpgradeController  extends AbstractController {
     public UpgradeController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        this.upgradeService = new UpgradeService(applicationProperties.version(), applicationProperties.githubToken());
+        this.upgradeService = new UpgradeService(
+                applicationProperties.version(),
+                applicationProperties.githubToken(),
+                uiLauncher.nonUIExecutor()
+        );
     }
 
     @Override
@@ -38,13 +41,9 @@ public class UpgradeController  extends AbstractController {
     }
 
     private void upgrade() {
-        uiLauncher.executeOutsideUIThread(() -> {
-            upgradeService.run();
-            Platform.runLater(() -> {
-                uiLauncher.hideUpgradeWindow();
-                uiLauncher.execute();
-            });
-        });
+        uiLauncher.executeOutsideUIThread(upgradeService);
+        uiLauncher.hideUpgradeWindow();
+        //uiLauncher.execute();
     }
 
     private void resetIndicatorProperties(Task<?> task) {

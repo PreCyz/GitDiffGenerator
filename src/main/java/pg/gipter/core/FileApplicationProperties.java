@@ -7,10 +7,7 @@ import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -186,6 +183,19 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public String toolkitFolderName() {
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitFolderName()) &&
+                !toolkitConfig.getToolkitFolderName().equals(ArgName.toolkitFolderName.defaultValue())) {
+            return toolkitConfig.getToolkitFolderName().trim().toUpperCase();
+        }
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitUsername()) &&
+                !toolkitConfig.getToolkitUsername().equals(ArgName.toolkitUsername.defaultValue())) {
+            return toolkitConfig.getToolkitUsername().trim().toUpperCase();
+        }
+        return argExtractor.toolkitFolderName();
+    }
+
+    @Override
     public String toolkitDomain() {
         if (StringUtils.notEmpty(toolkitConfig.getToolkitDomain())) {
             return toolkitConfig.getToolkitDomain();
@@ -210,17 +220,18 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitUserFolder() {
-        if (StringUtils.notEmpty(toolkitUsername())) {
-            return ArgName.toolkitUserFolder.defaultValue() + toolkitUsername();
+    public String toolkitUserFolderUrl() {
+        if (StringUtils.notEmpty(toolkitFolderName())) {
+            return ArgName.toolkitUserFolderUrl.defaultValue() + toolkitFolderName();
         }
-        return argExtractor.toolkitUserFolder();
+        return argExtractor.toolkitUserFolderUrl();
     }
 
     @Override
     public Set<String> toolkitProjectListNames() {
-        if (StringUtils.notEmpty(toolkitConfig.getToolkitProjectListNames())) {
-            return Stream.of(toolkitConfig.getToolkitProjectListNames().split(",")).collect(Collectors.toSet());
+        if (StringUtils.notEmpty(currentRunConfig.getToolkitProjectListNames())) {
+            return Stream.of(currentRunConfig.getToolkitProjectListNames().split(","))
+                    .collect(toCollection(LinkedHashSet::new));
         }
         return argExtractor.toolkitProjectListNames();
     }
@@ -231,6 +242,14 @@ class FileApplicationProperties extends ApplicationProperties {
             return applicationConfig.getUseUI();
         }
         return argExtractor.isUseUI();
+    }
+
+    @Override
+    public boolean isNoSSO() {
+        if (applicationConfig.getNoSSO() != null) {
+            return applicationConfig.getNoSSO();
+        }
+        return argExtractor.isNoSSO();
     }
 
     @Override

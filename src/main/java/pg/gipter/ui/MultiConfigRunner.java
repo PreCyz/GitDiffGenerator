@@ -16,28 +16,15 @@ import pg.gipter.statistics.ExceptionDetails;
 import pg.gipter.statistics.dto.RunDetails;
 import pg.gipter.statistics.services.StatisticService;
 import pg.gipter.toolkit.DiffUploader;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.BrowserLinkAction;
-import pg.gipter.ui.alerts.LogLinkAction;
-import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.ui.task.UpdatableTask;
 import pg.gipter.utils.BundleUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
@@ -169,7 +156,7 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
                 tasks.add(withUpload);
             } else {
                 CompletableFuture<Boolean> withoutUpload = CompletableFuture
-                        .supplyAsync(() -> getApplicationProperties(configName), executor)
+                        .supplyAsync(() -> applicationProperties, executor)
                         .thenApply(this::produce)
                         .handle((isUploaded, throwable) -> handleUploadResult(
                                 configName, Boolean.FALSE, new Throwable("Toolkit credentials not set.")
@@ -189,7 +176,7 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
 
     private String toolkitUserFolder() {
         return ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configurationNames.getFirst()))
-                .toolkitUserFolder();
+                .toolkitUserFolderUrl();
     }
 
     private boolean isToolkitCredentialsSet() {
