@@ -1,0 +1,12 @@
+**Release notes:**
+
+Improvements:
+* Job window.
+* Application flow.
+* Log msg.
+* Application upgrade.
+* Separate generate flow from upload flow.
+Fixes:
+* GitHub redirects for assets.
+* Calculating dates during the upload flow.
+* Scheduling jobs - proper config names calculation.
