@@ -7,18 +7,25 @@ public class ApplicationPropertiesFactory {
 
     public static ApplicationProperties getInstance(String[] args) {
         ArgExtractor argExtractor = new ArgExtractor(args);
+        ApplicationProperties applicationProperties;
         switch (argExtractor.preferredArgSource()) {
             case FILE:
-                return new FileApplicationProperties(args);
+                applicationProperties = new FileApplicationProperties(args);
+                break;
             case UI:
-                return new UIApplicationProperties(args);
+                applicationProperties = new UIApplicationProperties(args);
+                break;
             case CLI:
                 if (argExtractor.isUseUI()) {
-                    return new UIApplicationProperties(args);
+                    applicationProperties = new UIApplicationProperties(args);
+                } else {
+                    applicationProperties = new CliApplicationProperties(args);
                 }
-                return new CliApplicationProperties(args);
+                break;
             default:
-                return new CliApplicationProperties(args);
+                applicationProperties = new CliApplicationProperties(args);
+                break;
         }
+        return applicationProperties.init();
     }
 }

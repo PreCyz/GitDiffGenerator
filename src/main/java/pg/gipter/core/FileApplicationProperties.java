@@ -245,6 +245,14 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public boolean isNoSSO() {
+        if (applicationConfig.getNoSSO() != null) {
+            return applicationConfig.getNoSSO();
+        }
+        return argExtractor.isNoSSO();
+    }
+
+    @Override
     public String githubToken() {
         if (StringUtils.notEmpty(applicationConfig.getGithubToken())) {
             return applicationConfig.getGithubToken();

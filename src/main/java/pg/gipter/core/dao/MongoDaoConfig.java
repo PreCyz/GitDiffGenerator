@@ -1,9 +1,6 @@
 package pg.gipter.core.dao;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
-import com.mongodb.WriteConcern;
+import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.codecs.Codec;
@@ -47,6 +44,9 @@ public abstract class MongoDaoConfig {
     }
 
     private void init(Properties dbConfig) {
+        if (!isValidDbConfig(dbConfig)) {
+            return;
+        }
         if (mongoClient == null) {
             try {
                 mongoClient = createMongoClient(dbConfig);
@@ -94,6 +94,30 @@ public abstract class MongoDaoConfig {
 
     public boolean isStatisticsAvailable() {
         return statisticsAvailable;
+    }
+
+    private boolean isValidDbConfig(Properties dbConfig) {
+        if (dbConfig == null || dbConfig.isEmpty()) {
+            logger.warn("Database config is missing.");
+            return false;
+        }
+        boolean result = true;
+        String host = dbConfig.getProperty("db.host");
+        if (host == null || host.isEmpty()) {
+            result = false;
+            logger.warn("Database host is missing.");
+        }
+        String username = dbConfig.getProperty("db.username");
+        if (username == null || username.isEmpty()) {
+            logger.warn("Database username is missing.");
+            result = false;
+        }
+        String password = dbConfig.getProperty("db.password");
+        if (password == null || password.isEmpty()) {
+            logger.warn("Database password is missing.");
+            result = false;
+        }
+        return result;
     }
 
 }

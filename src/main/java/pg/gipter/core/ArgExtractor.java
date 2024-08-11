@@ -213,6 +213,13 @@ final class ArgExtractor {
         return StringUtils.getBoolean(ArgName.useUI.defaultValue());
     }
 
+    boolean isNoSSO() {
+        if (containsArg(ArgName.noSSO.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.noSSO, ArgName.noSSO.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.noSSO.defaultValue());
+    }
+
     boolean isActiveTray() {
         if (containsArg(ArgName.activeTray.name())) {
             return StringUtils.getBoolean(getValue(ArgName.activeTray, ArgName.activeTray.defaultValue()));

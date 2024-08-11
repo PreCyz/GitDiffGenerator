@@ -5,6 +5,7 @@ import pg.gipter.env.EnvSettings;
 import pg.gipter.env.EnvSettingsFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Properties;
 
 public final class ProgramSettings {
@@ -14,6 +15,13 @@ public final class ProgramSettings {
     private Environment environment;
 
     private ProgramSettings() {
+    }
+
+    public static void refresh() throws IOException {
+        EnvSettings envSettings = EnvSettingsFactory.getInstance(InstanceHolder.INSTANCE.environment);
+        Files.deleteIfExists(envSettings.connectionPath());
+        Files.deleteIfExists(envSettings.settingsPath());
+        initProgramSettings();
     }
 
     private static class InstanceHolder {
@@ -28,11 +36,11 @@ public final class ProgramSettings {
     public static void initProgramSettings() throws IOException {
         EnvSettings envSettings = EnvSettingsFactory.getInstance(InstanceHolder.INSTANCE.environment);
         InstanceHolder.INSTANCE.cipherDetails = envSettings.loadCipherDetails()
-                .orElseGet(() -> getbackupCipherDetails(envSettings));
+                .orElseGet(() -> getBackupCipherDetails(envSettings));
         InstanceHolder.INSTANCE.dbProperties = envSettings.loadDbProperties().orElseGet(Properties::new);
     }
 
-    private static CipherDetails getbackupCipherDetails(EnvSettings envSettings) {
+    private static CipherDetails getBackupCipherDetails(EnvSettings envSettings) {
         try {
             return envSettings.backupCipherDetails();
         } catch (IOException ex) {

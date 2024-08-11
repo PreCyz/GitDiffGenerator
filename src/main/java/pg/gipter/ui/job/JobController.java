@@ -6,15 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DateCell;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.quartz.SchedulerException;
@@ -27,33 +19,18 @@ import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.RunConfig;
-import pg.gipter.jobs.JobCreator;
-import pg.gipter.jobs.JobParam;
-import pg.gipter.jobs.JobProperty;
-import pg.gipter.jobs.JobService;
-import pg.gipter.jobs.JobType;
-import pg.gipter.jobs.UploadItemJobBuilder;
+import pg.gipter.jobs.*;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.LogLinkAction;
-import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -62,6 +39,7 @@ import static java.util.stream.Collectors.toList;
 
 public class JobController extends AbstractController {
 
+    private static final String NOT_AVAILABLE = "N/A";
     private static final Logger logger = LoggerFactory.getLogger(JobController.class);
 
     @FXML
@@ -135,20 +113,15 @@ public class JobController extends AbstractController {
             setDefinedJobDetails(jobParam);
             setExecutionDetails(programData);
         } else {
-            jobTypeLabel.setText(JobType.EVERY_WEEK.name());
             everyWeekSwitch();
-            jobDetailsLabel.setText(String.format("%s: %s%n%s: %s%n%s: %s",
-                    JobProperty.SCHEDULE_START,
-                    LocalDate.now().format(DateTimeFormatter.ISO_DATE),
-                    JobProperty.DAY_OF_WEEK,
-                    DayOfWeek.FRIDAY.name(),
-                    JobProperty.HOUR_OF_THE_DAY,
-                    LocalTime.of(hourOfDayComboBox.getValue(), minuteComboBox.getValue())
-                            .format(DateTimeFormatter.ofPattern("H:mm"))
-            ));
-            lastExecutionLabel.setText("");
-            nextExecutionLabel.setText("");
+            clearInfo();
         }
+    }
+
+    private void clearInfo() {
+        jobTypeLabel.setText(NOT_AVAILABLE);
+        jobDetailsLabel.setText(NOT_AVAILABLE);
+        configsLabel.setText(NOT_AVAILABLE);
     }
 
     private void initValues() {
@@ -183,7 +156,6 @@ public class JobController extends AbstractController {
     private void setDefinedJobDetails(JobParam jobParam) {
         if (jobParam.getJobType() != null) {
             cancelJobButton.setVisible(true);
-            jobDetailsLabel.setAlignment(Pos.TOP_LEFT);
             updateJobDetails(jobParam);
             switch (jobParam.getJobType()) {
                 case EVERY_MONTH:
@@ -249,18 +221,15 @@ public class JobController extends AbstractController {
             uiLauncher.cancelJob();
             setDefaultsForJobDetailsControls();
             initValues();
+            clearInfo();
         };
     }
 
     private void setDefaultsForJobDetailsControls() {
-        String NOT_AVAILABLE = "N/A";
         jobTypeLabel.setText(NOT_AVAILABLE);
-        jobTypeLabel.setAlignment(Pos.CENTER);
         jobDetailsLabel.setText(NOT_AVAILABLE);
-        jobDetailsLabel.setAlignment(Pos.TOP_CENTER);
         cancelJobButton.setVisible(false);
         nextExecutionLabel.setText("");
-        configsLabel.setAlignment(Pos.TOP_LEFT);
         if (runConfigMap.isEmpty()) {
             configsLabel.setText(NOT_AVAILABLE);
         } else {
@@ -279,7 +248,7 @@ public class JobController extends AbstractController {
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 LocalDate today = LocalDate.now();
-                setDisable(empty || date.compareTo(today) < 0);
+                setDisable(empty || date.isBefore(today));
             }
         };
     }
@@ -354,6 +323,11 @@ public class JobController extends AbstractController {
             try {
                 Map<String, Object> additionalJobParams = new HashMap<>();
                 additionalJobParams.put(UILauncher.class.getName(), uiLauncher);
+
+                String configName = configurationNameComboBox.getSelectionModel().getSelectedItem();
+                if (ALL_CONFIGS.equals(configName)) {
+                    configName = String.join(JobService.CONFIG_DELIMITER, runConfigMap.keySet());
+                }
                 UploadItemJobBuilder builder = new UploadItemJobBuilder()
                         .withJobType(calculateJobType())
                         .withStartDate(startDatePicker.getValue())
@@ -362,7 +336,7 @@ public class JobController extends AbstractController {
                         .withMinuteOfHour(minuteComboBox.getValue())
                         .withDayOfWeek(dayNameComboBox.getValue())
                         .withCronExpression(cronExpressionTextField.getText())
-                        .withConfigs(configsLabel.getText())
+                        .withConfigs(configName)
                         .withAdditionalParams(additionalJobParams);
 
                 JobService jobService = uiLauncher.getJobService();
@@ -404,7 +378,7 @@ public class JobController extends AbstractController {
                 .addListener((options, oldValue, newValue) -> {
                     if (ALL_CONFIGS.equals(newValue)) {
                         configsLabel.setText(String.join(JobService.CONFIG_DELIMITER, runConfigMap.keySet()));
-                    } else if (oldValue.equals(ALL_CONFIGS)) {
+                    } else if (ALL_CONFIGS.equals(oldValue)) {
                         configsLabel.setText(newValue);
                     } else {
                         Set<String> currentSelection = Stream.of(configsLabel.getText().split(JobService.CONFIG_DELIMITER))
@@ -496,35 +470,27 @@ public class JobController extends AbstractController {
         String details = "";
         switch (jobParam.getJobType()) {
             case CRON:
-                details = String.format("%s: %s", JobProperty.CRON, jobParam.getCronExpression());
+                details = String.format("CRON: %s", jobParam.getCronExpression());
                 break;
             case EVERY_WEEK:
-                details = String.format("%s: %s%n%s: %s%n%s: %d:%02d",
-                        JobProperty.SCHEDULE_START,
+                details = String.format("SCHEDULE_START: %s%nDAY_OF_WEEK: %s%nHOUR_OF_THE_DAY: %d:%02d",
                         jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE),
-                        JobProperty.DAY_OF_WEEK,
                         jobParam.getDayOfWeek(),
-                        JobProperty.HOUR_OF_THE_DAY,
                         jobParam.getHourOfDay(),
                         jobParam.getMinuteOfHour()
                 );
                 break;
             case EVERY_2_WEEKS:
-                details = String.format("%s: %s%n%s: %d:%02d",
-                        JobProperty.SCHEDULE_START,
+                details = String.format("SCHEDULE_START: %s%nHOUR_OF_THE_DAY: %d:%02d",
                         jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE),
-                        JobProperty.HOUR_OF_THE_DAY,
                         jobParam.getHourOfDay(),
                         jobParam.getMinuteOfHour()
                 );
                 break;
             case EVERY_MONTH:
-                details = String.format("%s: %s%n%s: %s%n%s: %d:%02d",
-                        JobProperty.SCHEDULE_START,
+                details = String.format("SCHEDULE_START: %s%nDAY_OF_MONTH: %s%nHOUR_OF_THE_DAY: %d:%02d",
                         jobParam.getScheduleStart().format(DateTimeFormatter.ISO_DATE),
-                        JobProperty.DAY_OF_MONTH,
                         jobParam.getDayOfMonth(),
-                        JobProperty.HOUR_OF_THE_DAY,
                         jobParam.getHourOfDay(),
                         jobParam.getMinuteOfHour()
                 );

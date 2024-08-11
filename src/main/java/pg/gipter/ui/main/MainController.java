@@ -452,4 +452,12 @@ public class MainController extends AbstractController {
         csvDetailsSectionController.setApplicationProperties(applicationProperties);
         buttonController.setApplicationProperties(applicationProperties);
     }
+
+    public LocalDate startDate() {
+        return datesSectionController.getStartDate();
+    }
+
+    public LocalDate endDate() {
+        return datesSectionController.getEndDate();
+    }
 }

@@ -54,7 +54,8 @@ public class StartupService {
                     logger.info("Link arguments [{}]", shellLink.getCMDArgs());
                     logger.info("Shortcut created and placed in Windows startup folder.");
                 } catch (IOException e) {
-                    logger.warn("Can not create shortcut to [{}] file and place it in Windows startup folder. [{}]", target, shortcutLnkPath, e);
+                    logger.warn("Can not create shortcut to [{}] file and place it in Windows startup folder: [{}]. {}",
+                            target, shortcutLnkPath, e.getMessage());
                 }
             } else {
                 logger.info("Gipter have already been set to start on startup. Shortcut already exists [{}]. ", shortcutLnkPath);
@@ -82,7 +83,7 @@ public class StartupService {
                     Files.deleteIfExists(shortcutLnkPath);
                     logger.info("Deletion of link done: [{}]", shortcutLnkPath);
                 } catch (IOException e) {
-                    logger.error("Can not delete link: [{}]", shortcutLnkPath, e);
+                    logger.error("Can not delete link: [{}]. {}", shortcutLnkPath, e.getMessage());
                 }
             }
         }

@@ -136,6 +136,7 @@ public class ToolkitService extends Task<List<CasesData>> {
                 ).collect(toList()),
                 false
         );
+
         try {
             int statusCode = httpRequester.postForStatusCode(url, headers, payload);
             return Stream.of(HttpStatus.SC_FORBIDDEN, HttpStatus.SC_UNAUTHORIZED, HttpStatus.SC_INTERNAL_SERVER_ERROR)
@@ -302,9 +303,8 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public Optional<String> getUserId() {
         try {
-            String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
+            String fullUrl = String.format("%s/_api/web/siteusers/getbyemail('%s')",
                     applicationProperties.toolkitHostUrl(),
-                    applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitUserEmail()
             );
             SharePointConfig sharePointConfig = new SharePointConfig(

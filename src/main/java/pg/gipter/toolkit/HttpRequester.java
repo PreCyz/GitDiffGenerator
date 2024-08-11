@@ -193,9 +193,8 @@ public class HttpRequester {
         }
     }
 
-    public int postForStatusCode(String url, Map<String, String> headers, Object payload) throws IOException {
-        HttpPost httppost = new HttpPost(url);
-        httppost.setEntity(new StringEntity(new Gson().toJson(payload)));
+    public int getForStatusCode(String url, Map<String, String> headers) throws IOException {
+        HttpGet httppost = new HttpGet(url);
         Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httppost::addHeader);
         logRequest(httppost);
 
@@ -227,6 +226,12 @@ public class HttpRequester {
     }
 
     private void logRequest(HttpUriRequestBase requestBase) {
-        logger.info("Executing request {}", requestBase.getRequestUri());
+        HashMap<String, List<String>> headers = new HashMap<>(requestBase.getHeaders().map());
+        headers.replace("Cookie", List.of("***"));
+        logger.info("Executing request {} {} {} Headers: {}",
+                requestBase.getVersion().getProtocol(),
+                requestBase.getMethod(),
+                requestBase.getRequestUri(),
+                headers);
     }
 }
