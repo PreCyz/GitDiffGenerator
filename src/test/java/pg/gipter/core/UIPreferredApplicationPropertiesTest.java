@@ -9,12 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**Created by Pawel Gawedzki on 06-Mar-2019.*/
 class UIPreferredApplicationPropertiesTest {
 
-    private UIApplicationProperties appProps;
+    private ApplicationProperties appProps;
 
     @Test
     void given_emptyActiveTray_when_isActiveTray_then_returnTrue() {
         String[] args = {""};
-        appProps = new UIApplicationProperties(args);
+        appProps = new UIApplicationProperties(args).init();
         appProps.init(TestUtils.mockConfigurationDao(new ApplicationConfig()));
 
         boolean actual = appProps.isActiveTray();
@@ -25,7 +25,7 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void given_activeTrayYAndCliSetN_when_isActiveTray_then_returnFalse() {
         String[] args = {"activeTray=N"};
-        appProps = new UIApplicationProperties(args);
+        appProps = new UIApplicationProperties(args).init();
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setActiveTray(Boolean.TRUE);
         appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
@@ -38,7 +38,7 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void given_noUseUICliAndPropertySetN_when_isActiveTray_then_returnFalse() {
         String[] args = {""};
-        appProps = new UIApplicationProperties(args);
+        appProps = new UIApplicationProperties(args).init();
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setActiveTray(Boolean.FALSE);
         appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
@@ -50,7 +50,7 @@ class UIPreferredApplicationPropertiesTest {
 
     @Test
     void givenNoEnableOnStartup_whenIsEnableOnStartup_thenReturnDefault() {
-        appProps = new UIApplicationProperties(new String[]{});
+        appProps = new UIApplicationProperties(new String[]{}).init();
 
         boolean actual = appProps.isEnableOnStartup();
 
@@ -71,7 +71,7 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void givenEnableOnStartupFileAndCLI_whenIsEnableOnStartup_thenReturnCliEnableOnStartup() {
         String[] args = {"enableOnStartup=n"};
-        appProps = new UIApplicationProperties(args);
+        appProps = new UIApplicationProperties(args).init();
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setEnableOnStartup(Boolean.TRUE);
         appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
@@ -84,7 +84,7 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void givenEnableOnStartupFromProperties_whenIsEnableOnStartup_thenReturnEnableOnStartupFromProperties() {
         String[] args = {};
-        appProps = new UIApplicationProperties(args);
+        appProps = new UIApplicationProperties(args).init();
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setEnableOnStartup(Boolean.FALSE);
         appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
@@ -97,7 +97,7 @@ class UIPreferredApplicationPropertiesTest {
     @Test
     void givenEnableOnStartupFromPropertiesAndOtherArgs_whenIsEnableOnStartup_thenReturnEnableOnStartupFromProperties() {
         String[] args = {"author=test"};
-        appProps = new UIApplicationProperties(args);
+        appProps = new UIApplicationProperties(args).init();
         ApplicationConfig applicationConfig = new ApplicationConfig();
         applicationConfig.setEnableOnStartup(Boolean.FALSE);
         appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
