@@ -15,8 +15,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.stream.Stream;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class GithubService {
 
@@ -112,32 +112,7 @@ public class GithubService {
         if (latestReleaseDetails != null) {
             Optional<String> downloadLink = getDownloadLink(latestReleaseDetails);
             if (downloadLink.isPresent()) {
-                HttpGet request = new HttpGet(downloadLink.get());
-                request.addHeader(HttpHeaders.ACCEPT, "application/octet-stream");
-                request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
-                request.addHeader("X-GitHub-Api-Version", "2022-11-28");
-                try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                    return httpClient.execute(request, res -> {
-                        HttpEntity entity = res.getEntity();
-                        if (res.getCode() == HttpStatus.SC_OK && entity != null) {
-                            downloadFile(entity, downloadLocation, taskService);
-                            EntityUtils.consume(entity);
-                            return Optional.of(distributionName);
-                        } else if (IntStream.of(301, 302, 307).anyMatch(it -> it == res.statusCode())) {
-                            String newLocationUrl = res.headers()
-                                    .firstValue("location")
-                                    .orElseThrow(() -> new IllegalStateException(
-                                            "Github reallocated asset and there is no location header in the response."
-                                    ));
-                            return executeRequest(downloadLocation, taskService, newLocationUrl);
-                        }
-                    });
-                } catch (IOException e) {
-                    taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
-                    taskService.workCompleted();
-                    logger.error("Can not download latest distribution details.", e);
-                    throw new IllegalStateException("Can not download latest distribution details.");
-                }
+                return executeRequest(downloadLocation, taskService, downloadLink.get());
             }
         } else {
             taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
@@ -149,29 +124,32 @@ public class GithubService {
     }
 
     private Optional<String> executeRequest(String downloadLocation, TaskService<?> taskService, String requestUrl) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(requestUrl))
-                    .GET()
-                    .header("Accept", "application/octet-stream")
-                    .header("Authorization", "Bearer " + githubToken)
-                    .header("X-GitHub-Api-Version", "2022-11-28")
-                    .build();
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            if (res.statusCode() == 200) {
-                downloadFile(res.body(), downloadLocation, taskService);
-                res.body().close();
-                return Optional.of(distributionName);
-            } else if (IntStream.of(301, 302, 307).anyMatch(it -> it == res.statusCode())) {
-                String newLocationUrl = res.headers()
-                        .firstValue("location")
-                        .orElseThrow(() -> new IllegalStateException(
-                                "Github reallocated asset and there is no location header in the response."
-                        ));
-                return executeRequest(downloadLocation, taskService, newLocationUrl);
-            }
-            return Optional.empty();
-        } catch (InterruptedException | IOException e) {
+        HttpGet request = new HttpGet(requestUrl);
+        request.addHeader(HttpHeaders.ACCEPT, "application/octet-stream");
+        request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
+        request.addHeader("X-GitHub-Api-Version", "2022-11-28");
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            return httpClient.execute(request, res -> {
+                HttpEntity entity = res.getEntity();
+                if (res.getCode() == HttpStatus.SC_OK && entity != null) {
+                    downloadFile(entity, downloadLocation, taskService);
+                    EntityUtils.consume(entity);
+                    return Optional.of(distributionName);
+                } else if (IntStream.of(
+                        HttpStatus.SC_MOVED_PERMANENTLY,
+                        HttpStatus.SC_MOVED_TEMPORARILY,
+                        HttpStatus.SC_TEMPORARY_REDIRECT
+                ).anyMatch(it -> it == res.getCode())) {
+                    String newLocationUrl = Optional.ofNullable(res.getFirstHeader("location"))
+                            .map(NameValuePair::getValue)
+                            .orElseThrow(() -> new IllegalStateException(
+                                    "Github reallocated asset and there is no location header in the response."
+                            ));
+                    return executeRequest(downloadLocation, taskService, newLocationUrl);
+                }
+                return Optional.empty();
+            });
+        } catch (IOException e) {
             taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
             taskService.workCompleted();
             logger.error("Can not download latest distribution details. {}", e.getMessage());

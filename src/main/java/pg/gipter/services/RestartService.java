@@ -6,10 +6,12 @@ import pg.gipter.utils.JarHelper;
 import pg.gipter.utils.SystemUtils;
 
 import java.nio.file.*;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 public class RestartService {
     private static final Logger logger = LoggerFactory.getLogger(RestartService.class);
@@ -40,8 +42,8 @@ public class RestartService {
     private Optional<Path> validateAndGetJarPath() {
         Optional<Path> jarPath = JarHelper.getJarPath();
 
-        if (jarPath.isEmpty()) {
-            logger.error("Error when restarting application. Could not file jar file.");
+        if (!jarPath.isPresent()) {
+            logger.error("Error when restarting application. Could not find jar file.");
             System.exit(-1);
         }
         if ("DEV".equalsIgnoreCase(getProfile())) {
@@ -60,9 +62,10 @@ public class RestartService {
     private String getProfile() {
         String profile = "PROD";
         try {
-            profile = Set.of(
+            profile = Stream.of(
                             Optional.ofNullable(System.getenv().get(PROFILE_ENV_PARAM_NAME)).orElse(""),
                             Optional.ofNullable(System.getProperty(PROFILE_ENV_PARAM_NAME)).orElse(""))
+                    .collect(toSet())
                     .contains("DEV") ? "DEV" : "PROD";
         } catch (Exception ex) {
             logger.error("Error when getting profile. {}", ex.getMessage());

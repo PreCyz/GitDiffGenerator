@@ -136,7 +136,6 @@ public class ToolkitService extends Task<List<CasesData>> {
                 ).collect(toList()),
                 false
         );
-
         try {
             int statusCode = httpRequester.postForStatusCode(url, headers, payload);
             return Stream.of(HttpStatus.SC_FORBIDDEN, HttpStatus.SC_UNAUTHORIZED, HttpStatus.SC_INTERNAL_SERVER_ERROR)

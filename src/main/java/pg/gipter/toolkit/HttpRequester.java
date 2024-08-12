@@ -20,7 +20,8 @@ import java.util.*;
 
 public class HttpRequester {
 
-    protected final static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
+    private final static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
+    private static final Gson GSON = new Gson();
 
     private final ApplicationProperties applicationProperties;
 
@@ -42,7 +43,7 @@ public class HttpRequester {
             return httpclient.execute(httpGet, res -> {
                 try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
                     logResponse(res);
-                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                    JsonObject result = GSON.fromJson(reader, JsonObject.class);
                     logIfError(result);
                     EntityUtils.consume(res.getEntity());
                     return result;
@@ -101,7 +102,7 @@ public class HttpRequester {
                 logResponse(res);
                 if (res.getCode() != HttpStatus.SC_NO_CONTENT) {
                     try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
-                        JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                        JsonObject result = GSON.fromJson(reader, JsonObject.class);
                         reader.close();
                         EntityUtils.consume(res.getEntity());
                         logIfError(result);
@@ -132,7 +133,7 @@ public class HttpRequester {
             return httpclient.execute(httpPost, res -> {
                 try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
                     logResponse(res);
-                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                    JsonObject result = GSON.fromJson(reader, JsonObject.class);
                     EntityUtils.consume(res.getEntity());
                     logIfError(result);
                     return result;
@@ -163,7 +164,7 @@ public class HttpRequester {
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             return httpclient.execute(httpPost, res -> {
                 try (Reader reader = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
-                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
+                    JsonObject result = GSON.fromJson(reader, JsonObject.class);
                     EntityUtils.consume(res.getEntity());
                     return result.get("d").getAsJsonObject()
                             .get("GetContextWebInformation").getAsJsonObject()
@@ -176,30 +177,19 @@ public class HttpRequester {
     public <T> T post(String url, Map<String, String> headers, Object payload, Class<T> expectedType) throws IOException {
         HttpPost httpPost = new HttpPost(url);
         headers.forEach(httpPost::addHeader);
-        httpPost.setEntity(new StringEntity(new Gson().toJson(payload)));
+        httpPost.setEntity(new StringEntity(GSON.toJson(payload)));
+        logRequest(httpPost);
+        return executeRequest(expectedType, httpPost);
+    }
+
+    public int postForStatusCode(String url, Map<String, String> headers, Object payload) throws IOException {
+        HttpPost httpPost = new HttpPost(url);
+        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpPost::addHeader);
+        Optional.ofNullable(payload).ifPresent(p -> httpPost.setEntity(new StringEntity(GSON.toJson(payload))));
         logRequest(httpPost);
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             return httpclient.execute(httpPost, res -> {
-                try (InputStreamReader isr = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
-                    logResponse(res);
-                    Gson gson = new GsonBuilder().create();
-                    T entity = gson.fromJson(isr, TypeToken.get(expectedType));
-                    EntityUtils.consume(res.getEntity());
-                    return entity;
-                }
-            });
-
-        }
-    }
-
-    public int getForStatusCode(String url, Map<String, String> headers) throws IOException {
-        HttpGet httppost = new HttpGet(url);
-        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httppost::addHeader);
-        logRequest(httppost);
-
-        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            return httpclient.execute(httppost, res -> {
                 logResponse(res);
                 EntityUtils.consume(res.getEntity());
                 return res.getCode();
@@ -211,9 +201,12 @@ public class HttpRequester {
         HttpGet httpGet = new HttpGet(url);
         Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpGet::addHeader);
         logRequest(httpGet);
+        return executeRequest(expectedType, httpGet);
+    }
 
+    private <T> T executeRequest(Class<T> expectedType, HttpUriRequestBase httpRequest) throws IOException {
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            return httpclient.execute(httpGet, res -> {
+            return httpclient.execute(httpRequest, res -> {
                 try (InputStreamReader isr = new InputStreamReader(res.getEntity().getContent(), StandardCharsets.UTF_8)) {
                     logResponse(res);
                     Gson gson = new GsonBuilder().create();
@@ -226,10 +219,11 @@ public class HttpRequester {
     }
 
     private void logRequest(HttpUriRequestBase requestBase) {
-        HashMap<String, List<String>> headers = new HashMap<>(requestBase.getHeaders().map());
-        headers.replace("Cookie", List.of("***"));
+        Map<String, String> headers = new HashMap<>();
+        Arrays.stream(requestBase.getHeaders()).forEach(it -> headers.put(it.getName(), it.getValue()));
+        headers.replace("Cookie", "***");
         logger.info("Executing request {} {} {} Headers: {}",
-                requestBase.getVersion().getProtocol(),
+                Optional.ofNullable(requestBase.getVersion()).map(ProtocolVersion::getProtocol).orElse(""),
                 requestBase.getMethod(),
                 requestBase.getRequestUri(),
                 headers);
