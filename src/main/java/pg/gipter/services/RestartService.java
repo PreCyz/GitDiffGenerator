@@ -41,7 +41,7 @@ public class RestartService {
         Optional<Path> jarPath = JarHelper.getJarPath();
 
         if (jarPath.isEmpty()) {
-            logger.error("Error when restarting application. Could not file jar file.");
+            logger.error("Error when restarting application. Could not find jar file.");
             System.exit(-1);
         }
         if ("DEV".equalsIgnoreCase(getProfile())) {

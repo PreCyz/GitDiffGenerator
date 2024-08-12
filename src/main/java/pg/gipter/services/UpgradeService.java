@@ -16,7 +16,6 @@ import pg.gipter.utils.JarHelper;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -26,12 +25,10 @@ public class UpgradeService extends TaskService<Void> {
     private static final Logger logger = LoggerFactory.getLogger(UpgradeService.class);
 
     private final GithubService githubService;
-    private final Executor executor;
     private final RestartService restartService;
 
-    public UpgradeService(SemanticVersioning currentVersion, String githubToken, Executor executor) {
+    public UpgradeService(SemanticVersioning currentVersion, String githubToken) {
         super();
-        this.executor = executor;
         githubService = new GithubService(currentVersion, githubToken);
         restartService = new RestartService();
     }
