@@ -6,34 +6,31 @@ import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.FlowType;
 import pg.gipter.core.ArgName;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.LogLinkAction;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.JarHelper;
-import pg.gipter.utils.SystemUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public class UpgradeService extends TaskService<Void> {
 
     private static final Logger logger = LoggerFactory.getLogger(UpgradeService.class);
 
     private final GithubService githubService;
+    private final RestartService restartService;
 
     public UpgradeService(SemanticVersioning currentVersion, String githubToken) {
         super();
         githubService = new GithubService(currentVersion, githubToken);
+        restartService = new RestartService();
     }
 
     void upgradeAndRestartApplication() {
@@ -48,7 +45,14 @@ public class UpgradeService extends TaskService<Void> {
                 if (fileName.isPresent()) {
                     File sevenZFile = Paths.get(homeDirectoryPath.get(), fileName.get()).toFile();
                     decompress(sevenZFile, Paths.get(homeDirectoryPath.get()).toFile());
-                    restartApplication();
+                    updateMsg(BundleUtils.getMsg("upgrade.progress.restarting"));
+                    final List<String> restartArguments = Stream.of(
+                            String.format("%s=%b", ArgName.upgradeFinished.name(), Boolean.TRUE),
+                            String.format("%s=%s", ArgName.flowType.name(), FlowType.REGULAR)
+                    ).collect(toList());
+                    restartService.start(restartArguments);
+                    workCompleted();
+                    System.exit(0);
                 } else {
                     logger.error("Did not download the newest version.");
                     alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
@@ -63,20 +67,23 @@ public class UpgradeService extends TaskService<Void> {
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
+            updateMsg(BundleUtils.getMsg("upgrade.fail"));
             alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
                     .withMessage(ex.getMessage())
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.WARNING);
-        } finally {
-            updateMsg(BundleUtils.getMsg("upgrade.fail"));
-            workCompleted();
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         }
+        workCompleted();
+        logger.info("Is restart task done: [{}]", isDone());
     }
 
     private void decompress(File sevenZSourceFile, File destination) throws IOException {
         updateMsg(BundleUtils.getMsg("upgrade.progress.decompressing"));
-        try (SevenZFile sevenZFile = new SevenZFile(sevenZSourceFile)) {
+        try (SevenZFile sevenZFile = SevenZFile.builder()
+                .setSeekableByteChannel(Files.newByteChannel(sevenZSourceFile.toPath(), EnumSet.of(StandardOpenOption.READ)))
+                .setDefaultName(sevenZSourceFile.getName())
+                .get()) {
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
@@ -85,8 +92,8 @@ public class UpgradeService extends TaskService<Void> {
                 File currentFile = new File(destination, entry.getName());
                 File parent = currentFile.getParentFile();
                 if (!parent.exists()) {
-                    final boolean mkdirs = parent.mkdirs();
-                    logger.info("Directory created [{}]", parent.getAbsolutePath());
+                    final boolean mkdir = parent.mkdirs();
+                    logger.info("Directory created [{}] [{}]", mkdir, parent.getAbsolutePath());
                 }
                 FileOutputStream out = new FileOutputStream(currentFile);
                 byte[] content = new byte[(int) entry.getSize()];
@@ -96,7 +103,7 @@ public class UpgradeService extends TaskService<Void> {
                 updateTaskProgress(Double.valueOf(5 * Math.pow(10, 5)).longValue());
             }
         } catch (IOException ex) {
-            logger.error("What da hell ?", ex);
+            logger.error("What da hell?", ex);
             throw ex;
         } finally {
             updateMsg(BundleUtils.getMsg("upgrade.progress.deleting"));
@@ -118,41 +125,6 @@ public class UpgradeService extends TaskService<Void> {
             logger.error("Could not delete the [{}] file.", sevenZSourceFile.getName(), ex);
             throw ex;
         }
-    }
-
-    private void restartApplication() throws IOException {
-        updateMsg(BundleUtils.getMsg("upgrade.progress.restarting"));
-        final String javaBin = Paths.get(SystemUtils.javaHome(), "bin", "java").toString();
-        Optional<Path> jarPath = JarHelper.getJarPath();
-
-        if (!jarPath.isPresent()) {
-            workCompleted();
-            logger.error("Error when restarting application. Could not file jar file.");
-            return;
-        }
-        if ("DEV".equals(System.getenv().get("PROGRAM-PROFILE"))) {
-            final String jarFilePath = jarPath.get().toAbsolutePath().toString();
-            jarPath = Optional.of(jarFilePath.replaceFirst("classes", "Gipter.jar"))
-                    .map(Paths::get);
-        }
-
-        if (!Files.exists(jarPath.get()) || !Files.isRegularFile(jarPath.get())) {
-            logger.error("Error when restarting application. [{}] is not a file.",
-                    jarPath.get().toAbsolutePath().toString());
-            workCompleted();
-            return;
-        }
-
-        workCompleted();
-        final LinkedList<String> command = Stream.of(
-                javaBin, "-jar",
-                jarPath.get().toAbsolutePath().toString(),
-                ArgName.upgradeFinished.name() + "=" + Boolean.TRUE
-        ).collect(Collectors.toCollection(LinkedList::new));
-
-        new ProcessBuilder(command).start();
-
-        System.exit(0);
     }
 
     @Override

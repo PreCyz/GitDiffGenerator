@@ -1,38 +1,22 @@
 package pg.gipter.services;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import javafx.concurrent.Task;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.dto.CasesData;
-import pg.gipter.services.dto.ItemField;
-import pg.gipter.services.dto.SortFieldDefinition;
-import pg.gipter.services.dto.ToolkitCasePayload;
-import pg.gipter.services.dto.ToolkitCaseResponse;
+import pg.gipter.services.dto.*;
 import pg.gipter.toolkit.HttpRequester;
 import pg.gipter.utils.BundleUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.nio.file.*;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -58,8 +42,8 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     private List<CasesData> getAvailableCases() {
         Map<String, String> headers = new HashMap<>();
-        headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
-        headers.put("Cookie", CookiesService.getFedAuthString());
+        headers.put(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
+        headers.put(HttpHeaders.COOKIE, CookiesService.getFedAuthString());
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
         List<CasesData> cases = new LinkedList<>();
         try {
@@ -141,7 +125,7 @@ public class ToolkitService extends Task<List<CasesData>> {
     public boolean isCookieWorking(String fedAuthString) {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
-        headers.put("Cookie", fedAuthString);
+        headers.put(HttpHeaders.COOKIE, fedAuthString);
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
         ToolkitCasePayload payload = new ToolkitCasePayload(
                 new SortFieldDefinition("ows_Created", "datetime"),
@@ -191,9 +175,9 @@ public class ToolkitService extends Task<List<CasesData>> {
         );
 
         Map<String, String> requestHeaders = new LinkedHashMap<>();
-        requestHeaders.put("Accept", "application/json;odata=nometadata");
-        requestHeaders.put("Content-Type", "application/json;odata=nometadata");
-        requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
+        requestHeaders.put(HttpHeaders.ACCEPT, "application/json;odata=nometadata");
+        requestHeaders.put(HttpHeaders.CONTENT_TYPE, "application/json;odata=nometadata");
+        requestHeaders.put(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
 
         JsonObject item = httpRequester.executePOST(sharePointConfig, createItemJson(), requestHeaders);
 
@@ -226,7 +210,7 @@ public class ToolkitService extends Task<List<CasesData>> {
         LocalDateTime submissionDate = LocalDateTime.of(endDate, LocalTime.now());
 
         JsonObject decodedUrl = new JsonObject();
-        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitUserFolder());
+        decodedUrl.addProperty("DecodedUrl", applicationProperties.toolkitUserFolderUrl());
 
         JsonObject listItemCreateInfo = new JsonObject();
         listItemCreateInfo.add("FolderPath", decodedUrl);
@@ -318,9 +302,8 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public Optional<String> getUserId() {
         try {
-            String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
+            String fullUrl = String.format("%s/_api/web/siteusers/getbyemail('%s')",
                     applicationProperties.toolkitHostUrl(),
-                    applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitUserEmail()
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
@@ -360,10 +343,10 @@ public class ToolkitService extends Task<List<CasesData>> {
         payload.addProperty("ClassificationId", 12);
 
         Map<String, String> requestHeaders = new LinkedHashMap<>();
-        requestHeaders.put("Accept", "application/json;odata=verbose");
-        requestHeaders.put("If-Match", "*");
+        requestHeaders.put(HttpHeaders.ACCEPT, "application/json;odata=verbose");
+        requestHeaders.put(HttpHeaders.IF_MATCH, "*");
         requestHeaders.put("X-HTTP-Method", "MERGE");
-        requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
+        requestHeaders.put(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
 
         JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, payload, requestHeaders);
         if (jsonObject.has("odata.error")) {
@@ -393,10 +376,10 @@ public class ToolkitService extends Task<List<CasesData>> {
             );
 
             Map<String, String> requestHeaders = new LinkedHashMap<>();
-            requestHeaders.put("Accept", "application/json;odata=verbose");
-            requestHeaders.put("If-Match", "*");
+            requestHeaders.put(HttpHeaders.ACCEPT, "application/json;odata=verbose");
+            requestHeaders.put(HttpHeaders.IF_MATCH, "*");
             requestHeaders.put("X-HTTP-Method", "DELETE");
-            requestHeaders.put("Cookie", sharePointConfig.getFedAuth());
+            requestHeaders.put(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
 
             httpRequester.executePOST(sharePointConfig, requestHeaders);
             logger.info("Cleanup done.");

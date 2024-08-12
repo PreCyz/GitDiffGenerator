@@ -8,16 +8,10 @@ import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.ui.AbstractController;
-import pg.gipter.ui.MultiConfigRunner;
-import pg.gipter.ui.RunType;
-import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.*;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -75,6 +69,7 @@ public class ButtonController extends AbstractController {
                 Arrays.stream(runConfig.toArgumentArray()),
                 Arrays.stream(toolkitConfig.toArgumentArray())
         ).toArray(String[]::new));
+        uiAppProperties.updateCurrentRunConfig(runConfig);
 
         MultiConfigRunner runner = new MultiConfigRunner(
                 Stream.of(uiAppProperties).collect(toList()),

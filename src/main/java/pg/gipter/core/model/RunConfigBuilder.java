@@ -133,6 +133,6 @@ public class RunConfigBuilder {
     public RunConfig create() {
         return new RunConfig(author, gitAuthor, mercurialAuthor, svnAuthor, committerEmail, itemType, skipRemote, fetchAll,
                 itemPath, projectPath, itemFileNamePrefix, periodInDays, startDate, endDate, configurationName, toolkitProjectListNames,
-                deleteDownloadedFiles, preferredArgSource, sharePointConfigs, fetchTimeout);
+                deleteDownloadedFiles, preferredArgSource, fetchTimeout);
     }
 }

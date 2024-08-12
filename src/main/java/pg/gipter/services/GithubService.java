@@ -1,31 +1,21 @@
 package pg.gipter.services;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import com.google.gson.*;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.SystemUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class GithubService {
@@ -74,45 +64,43 @@ public class GithubService {
     }
 
     Optional<JsonObject> downloadLatestDistributionDetails() {
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()){
-            HttpGet request = new HttpGet("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest");
-            request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
-            request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
-            request.addHeader("X-GitHub-Api-Version", "2022-11-28");
-            HttpResponse response = httpClient.execute(request);
+        HttpGet request = new HttpGet("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest");
+        request.addHeader(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
+        request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
+        request.addHeader("X-GitHub-Api-Version", "2022-11-28");
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            return httpClient.execute(request, res -> {
+                if (res.getCode() == HttpStatus.SC_OK) {
+                    try (InputStream content = res.getEntity().getContent();
+                         InputStreamReader inputStreamReader = new InputStreamReader(content);
+                         BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
 
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                try (InputStream content = response.getEntity().getContent();
-                     InputStreamReader inputStreamReader = new InputStreamReader(content);
-                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+                        StringBuilder result = new StringBuilder();
+                        String line;
+                        while ((line = bufferedReader.readLine()) != null) {
+                            result.append(line);
+                        }
 
-                    StringBuilder result = new StringBuilder();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        result.append(line);
+                        Gson gson = new Gson();
+                        Optional<JsonObject> distributionDetails = Optional.ofNullable(gson.fromJson(result.toString(), JsonObject.class));
+                        if (distributionDetails.isPresent()) {
+                            logger.info("Last distribution details downloaded.");
+                            logger.debug("Last distribution details: {}", result);
+                        } else {
+                            logger.warn("Last distribution details is not available.");
+                        }
+                        return distributionDetails;
                     }
-
-                    Gson gson = new Gson();
-                    Optional<JsonObject> distributionDetails = Optional.ofNullable(gson.fromJson(result.toString(), JsonObject.class));
-                    if (distributionDetails.isPresent()) {
-                        logger.info("Last distribution details downloaded.");
-                        logger.debug("Last distribution details: {}", result);
-                    } else {
-                        logger.warn("Last distribution details is not available.");
-                    }
-                    return distributionDetails;
+                } else {
+                    Stream.of(res.getHeaders())
+                            .forEach(header -> logger.error("Name: {}, Value {}.", header.getName(), header.getValue()));
                 }
-            } else {
-                Stream.of(response.getAllHeaders())
-                        .map(Header::getElements)
-                        .flatMap(Arrays::stream)
-                        .forEach(headerElement -> logger.error("Name: {}, Value {}.", headerElement.getName(), headerElement.getValue()));
-            }
+                return Optional.empty();
+            });
         } catch (IOException e) {
             logger.warn("Can not download latest distribution details.", e);
         }
         return Optional.empty();
-
     }
 
     Optional<String> downloadLatestDistribution(String downloadLocation, TaskService<?> taskService) {
@@ -124,24 +112,7 @@ public class GithubService {
         if (latestReleaseDetails != null) {
             Optional<String> downloadLink = getDownloadLink(latestReleaseDetails);
             if (downloadLink.isPresent()) {
-                try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-                    HttpGet request = new HttpGet(downloadLink.get());
-                    request.addHeader(HttpHeaders.ACCEPT, "application/octet-stream");
-                    request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
-                    request.addHeader("X-GitHub-Api-Version", "2022-11-28");
-                    HttpResponse response = httpClient.execute(request);
-                    HttpEntity entity = response.getEntity();
-
-                    if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK && entity != null) {
-                        downloadFile(entity, downloadLocation, taskService);
-                        return Optional.of(distributionName);
-                    }
-                } catch (IOException e) {
-                    taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
-                    taskService.workCompleted();
-                    logger.error("Can not download latest distribution details.", e);
-                    throw new IllegalStateException("Can not download latest distribution details.");
-                }
+                return executeRequest(downloadLocation, taskService, downloadLink.get());
             }
         } else {
             taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
@@ -150,6 +121,40 @@ public class GithubService {
             throw new IllegalStateException("Can not download latest distribution details.");
         }
         return Optional.empty();
+    }
+
+    private Optional<String> executeRequest(String downloadLocation, TaskService<?> taskService, String requestUrl) {
+        HttpGet request = new HttpGet(requestUrl);
+        request.addHeader(HttpHeaders.ACCEPT, "application/octet-stream");
+        request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + githubToken);
+        request.addHeader("X-GitHub-Api-Version", "2022-11-28");
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            return httpClient.execute(request, res -> {
+                HttpEntity entity = res.getEntity();
+                if (res.getCode() == HttpStatus.SC_OK && entity != null) {
+                    downloadFile(entity, downloadLocation, taskService);
+                    EntityUtils.consume(entity);
+                    return Optional.of(distributionName);
+                } else if (IntStream.of(
+                        HttpStatus.SC_MOVED_PERMANENTLY,
+                        HttpStatus.SC_MOVED_TEMPORARILY,
+                        HttpStatus.SC_TEMPORARY_REDIRECT
+                ).anyMatch(it -> it == res.getCode())) {
+                    String newLocationUrl = Optional.ofNullable(res.getFirstHeader("location"))
+                            .map(NameValuePair::getValue)
+                            .orElseThrow(() -> new IllegalStateException(
+                                    "Github reallocated asset and there is no location header in the response."
+                            ));
+                    return executeRequest(downloadLocation, taskService, newLocationUrl);
+                }
+                return Optional.empty();
+            });
+        } catch (IOException e) {
+            taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.failed"));
+            taskService.workCompleted();
+            logger.error("Can not download latest distribution details. {}", e.getMessage());
+            throw new IllegalStateException("Can not download latest distribution details.");
+        }
     }
 
     private void downloadFile(HttpEntity entity, String downloadLocation, TaskService<?> taskService) throws IOException {
@@ -214,7 +219,7 @@ public class GithubService {
             if (isProperAsset(name, assetName)) {
                 distributionName = assetName.getAsString();
                 size = Optional.of(element.get("size").getAsLong());
-                logger.info("New version file size: [{}]", size.orElseGet(() -> 0L));
+                logger.info("New version file size: [{}]", size.orElse(0L));
                 break;
             }
         }

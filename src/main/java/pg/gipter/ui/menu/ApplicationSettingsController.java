@@ -3,15 +3,7 @@ package pg.gipter.ui.menu;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -27,9 +19,7 @@ import pg.gipter.core.producers.command.DiffCommandFactory;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.jobs.JobCreator;
 import pg.gipter.jobs.JobCreatorFactory;
-import pg.gipter.services.FXWebService;
-import pg.gipter.services.StartupService;
-import pg.gipter.services.TextFieldIntelliSense;
+import pg.gipter.services.*;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
@@ -38,9 +28,7 @@ import pg.gipter.utils.BundleUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -72,6 +60,8 @@ public class ApplicationSettingsController extends AbstractController {
     private ComboBox<PreferredArgSource> preferredArgSourceComboBox;
     @FXML
     private CheckBox useUICheckBox;
+    @FXML
+    private CheckBox noSSOCheckBox;
     @FXML
     private CheckBox activateTrayCheckBox;
     @FXML
@@ -138,6 +128,7 @@ public class ApplicationSettingsController extends AbstractController {
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
+        noSSOCheckBox.setSelected(applicationProperties.isNoSSO());
         activateTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
         autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
         silentModeCheckBox.setSelected(applicationProperties.isSilentMode());
@@ -274,6 +265,7 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setConfirmationWindow(confirmationWindowCheckBox.isSelected());
         applicationConfig.setPreferredArgSource(preferredArgSourceComboBox.getValue());
         applicationConfig.setUseUI(useUICheckBox.isSelected());
+        applicationConfig.setNoSSO(noSSOCheckBox.isSelected());
         applicationConfig.setActiveTray(activateTrayCheckBox.isSelected());
         applicationConfig.setEnableOnStartup(autostartCheckBox.isSelected());
         applicationConfig.setSilentMode(silentModeCheckBox.isSelected());
@@ -316,7 +308,7 @@ public class ApplicationSettingsController extends AbstractController {
     private void setActions() {
         refreshSettingsButton.setOnAction(actionEvent -> {
             try {
-                ProgramSettings.initProgramSettings();
+                ProgramSettings.refresh();
                 MongoDaoConfig.refresh(ProgramSettings.getInstance().getDbProperties());
                 new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("launch.panel.refreshed"))
@@ -336,6 +328,7 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.language", languageLabel);
         labelsAffectedByLanguage.put("launch.panel.preferredArgSource", preferredArgSourceLabel);
         labelsAffectedByLanguage.put("launch.panel.useUI", useUICheckBox);
+        labelsAffectedByLanguage.put("launch.panel.noSSO", noSSOCheckBox);
         labelsAffectedByLanguage.put("launch.panel.silentMode", silentModeCheckBox);
         labelsAffectedByLanguage.put("launch.panel.lastItemJob", checkLastItemLabel);
         labelsAffectedByLanguage.put("launch.customCommand.override", overrideLabel);

@@ -7,16 +7,14 @@ import pg.gipter.core.dao.command.CustomCommand;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public class ApplicationConfig {
 
     private Boolean confirmationWindow;
     private PreferredArgSource preferredArgSource;
     private Boolean useUI;
+    private Boolean noSSO;
     private Boolean activeTray;
     private Boolean silentMode;
     private Boolean enableOnStartup;
@@ -35,6 +33,7 @@ public class ApplicationConfig {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
         preferredArgSource = PreferredArgSource.valueFor(ArgName.preferredArgSource.defaultValue());
         useUI = StringUtils.getBoolean(ArgName.useUI.defaultValue());
+        noSSO = StringUtils.getBoolean(ArgName.noSSO.defaultValue());
         activeTray = StringUtils.getBoolean(ArgName.activeTray.defaultValue());
         silentMode = StringUtils.getBoolean(ArgName.silentMode.defaultValue());
         enableOnStartup = StringUtils.getBoolean(ArgName.enableOnStartup.defaultValue());
@@ -70,6 +69,14 @@ public class ApplicationConfig {
 
     public void setUseUI(Boolean useUI) {
         this.useUI = useUI;
+    }
+
+    public Boolean getNoSSO() {
+        return noSSO;
+    }
+
+    public void setNoSSO(Boolean noSSO) {
+        this.noSSO = noSSO;
     }
 
     public Boolean getActiveTray() {
@@ -187,6 +194,9 @@ public class ApplicationConfig {
         if (getUseUI() != null) {
             arguments.add(ArgName.useUI.name() + "=" + getUseUI());
         }
+        if (getNoSSO() != null) {
+            arguments.add(ArgName.noSSO.name() + "=" + getNoSSO());
+        }
         if (getConfirmationWindow() != null) {
             arguments.add(ArgName.confirmationWindow.name() + "=" + getConfirmationWindow());
         }
@@ -236,6 +246,8 @@ public class ApplicationConfig {
                     applicationConfig.setPreferredArgSource(PreferredArgSource.valueFor(argumentValue));
                 } else if (ArgName.useUI.name().equals(argumentName)) {
                     applicationConfig.setUseUI(StringUtils.getBoolean(argumentValue));
+                } else if (ArgName.noSSO.name().equals(argumentName)) {
+                    applicationConfig.setNoSSO(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.activeTray.name().equals(argumentName)) {
                     applicationConfig.setActiveTray(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.silentMode.name().equals(argumentName)) {
@@ -270,6 +282,7 @@ public class ApplicationConfig {
                 "confirmationWindow=" + confirmationWindow +
                 ", preferredArgSource=" + preferredArgSource +
                 ", useUI=" + useUI +
+                ", noSSO=" + noSSO +
                 ", activeTray=" + activeTray +
                 ", silentMode=" + silentMode +
                 ", enableOnStartup=" + enableOnStartup +

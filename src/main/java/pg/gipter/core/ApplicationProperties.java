@@ -4,36 +4,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.command.CustomCommand;
-import pg.gipter.core.dao.configuration.CachedConfiguration;
-import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.dao.configuration.SecurityProviderFactory;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.Configuration;
-import pg.gipter.core.model.NamePatternValue;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.dao.configuration.*;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
-import pg.gipter.services.CookiesService;
-import pg.gipter.services.SemanticVersioning;
-import pg.gipter.services.ToolkitService;
+import pg.gipter.services.*;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public abstract class ApplicationProperties {
@@ -56,7 +38,11 @@ public abstract class ApplicationProperties {
         logger = LoggerFactory.getLogger(this.getClass());
         vcs = new HashSet<>();
         cachedConfiguration = DaoFactory.getCachedConfiguration();
+    }
+
+    public final ApplicationProperties init() {
         init(cachedConfiguration);
+        return this;
     }
 
     protected final void init(ConfigurationDao configurationDao) {
@@ -270,7 +256,8 @@ public abstract class ApplicationProperties {
 
         Configuration configuration = new Configuration(
                 applicationConfig,
-                toolkitConfig, new LinkedList<>(tmpRunConfigs.values()),
+                toolkitConfig,
+                new ArrayList<>(tmpRunConfigs.values()),
                 SecurityProviderFactory.getSecurityProvider()
                         .readCipherDetails()
                         .orElseThrow(() -> new IllegalStateException("There is no CipherDetails"))
@@ -328,6 +315,7 @@ public abstract class ApplicationProperties {
                     ", mercurialAuthor='" + mercurialAuthor() + '\'' +
                     ", svnAuthor='" + svnAuthor() + '\'' +
                     ", committerEmail='" + committerEmail() + '\'' +
+                    ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + "'" +
                     ", itemPath='" + itemPath() + '\'' +
                     ", fileName='" + fileName() + '\'' +
                     ", projectPath='" + String.join(",", projectPaths()) + '\'' +
@@ -342,6 +330,7 @@ public abstract class ApplicationProperties {
         if (applicationConfig != null) {
             log += ", preferredArgSource='" + preferredArgSource() + '\'' +
                     ", useUI='" + isUseUI() + '\'' +
+                    ", noSSO='" + isNoSSO() + '\'' +
                     ", silentMode='" + isSilentMode() + '\'' +
                     ", enableOnStartup='" + isEnableOnStartup() + '\'' +
                     ", upgradeFinished='" + isUpgradeFinished() + '\'' +
@@ -352,16 +341,14 @@ public abstract class ApplicationProperties {
                     ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
         }
         if (toolkitConfig != null) {
-            log += ", toolkitCredentialsSet='" + isToolkitCredentialsSet() + '\'' +
-                    ", toolkitUsername='" + toolkitUsername() + '\'' +
+            log += ", toolkitUsername='" + toolkitUsername() + '\'' +
+                    ", toolkitFolderName='" + toolkitFolderName() + '\'' +
                     ", toolkitUserEmail='" + toolkitUserEmail() + '\'' +
-                    ", toolkitHistUrl='" + toolkitHostUrl() + '\'' +
+                    ", toolkitHostUrl='" + toolkitHostUrl() + '\'' +
                     ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                     ", toolkitDomain='" + toolkitDomain() + '\'' +
                     ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
-                    ", toolkitUserFolder='" + toolkitUserFolder() + '\'' +
-                    ", toolkitProjectListNames='" + String.join(",", toolkitProjectListNames()) + "'";
-
+                    ", toolkitUserFolderUrl='" + toolkitUserFolderUrl() + '\'';
         }
         return  log;
     }
@@ -384,16 +371,18 @@ public abstract class ApplicationProperties {
     public abstract boolean isSkipRemote();
 
     public abstract String toolkitUsername();
+    public abstract String toolkitFolderName();
     public abstract String toolkitDomain();
-    public abstract String toolkitUserFolder();
+    public abstract String toolkitUserFolderUrl();
     public abstract String toolkitCopyListName();
     public abstract Set<String> toolkitProjectListNames();
-
     public abstract String toolkitHostUrl();
+
     public abstract boolean isConfirmationWindow();
     public abstract boolean isActiveTray();
     public abstract boolean isEnableOnStartup();
     public abstract boolean isUseUI();
+    public abstract boolean isNoSSO();
     public abstract String loggerLevel();
     public abstract String uiLanguage();
     public abstract boolean isCheckLastItemEnabled();

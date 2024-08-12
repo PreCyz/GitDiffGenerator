@@ -13,11 +13,7 @@ import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.dao.data.ProgramData;
-import pg.gipter.jobs.JobCreator;
-import pg.gipter.jobs.JobCreatorFactory;
-import pg.gipter.jobs.JobParam;
-import pg.gipter.jobs.JobService;
-import pg.gipter.jobs.UploadItemJob;
+import pg.gipter.jobs.*;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.job.JobController;
@@ -159,7 +155,7 @@ class TrayHandler {
     private ActionListener createGoToToolkitActionListener() {
         return e -> {
             AppManager instance = AppManagerFactory.getInstance();
-            instance.launchDefaultBrowser(applicationProperties.toolkitUserFolder());
+            instance.launchDefaultBrowser(applicationProperties.toolkitUserFolderUrl());
         };
     }
 
