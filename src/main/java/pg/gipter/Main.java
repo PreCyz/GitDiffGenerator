@@ -96,8 +96,7 @@ public class Main extends Application {
 
     private static boolean isCookieWorking(String[] args) {
         try {
-            return new ToolkitService(ApplicationPropertiesFactory.getInstance(args))
-                    .isCookieWorking(CookiesService.getFedAuthString());
+            return new ToolkitService(ApplicationPropertiesFactory.getInstance(args)).isCookieWorking();
         } catch (IllegalStateException ex) {
             logger.error("SSO is not working: {}", ex.getMessage());
             return false;

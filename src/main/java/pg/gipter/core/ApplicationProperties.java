@@ -302,8 +302,7 @@ public abstract class ApplicationProperties {
     }
 
     public boolean hasConnectionToToolkit() {
-        return CookiesService.hasValidFedAuth()
-                && new ToolkitService(this).isCookieWorking(CookiesService.getFedAuthString());
+        return CookiesService.hasValidFedAuth() && new ToolkitService(this).isCookieWorking();
     }
 
     protected final String log() {

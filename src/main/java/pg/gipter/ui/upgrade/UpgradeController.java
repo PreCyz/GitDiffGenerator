@@ -37,9 +37,17 @@ public class UpgradeController  extends AbstractController {
     }
 
     private void upgrade() {
-        uiLauncher.executeOutsideUIThread(upgradeService);
-        uiLauncher.hideUpgradeWindow();
-        //uiLauncher.execute();
+        try {
+            uiLauncher.executeOutsideUIThread(upgradeService);
+            uiLauncher.hideUpgradeWindow();
+            while (upgradeService.isRunning()) {
+                Thread.currentThread().wait(1000);
+            }
+        } catch (Exception e) {
+            logger.warn("Upgrade service is still working and I can not wait. {}", e.getMessage());
+        } finally {
+            uiLauncher.execute();
+        }
     }
 
     private void resetIndicatorProperties(Task<?> task) {
