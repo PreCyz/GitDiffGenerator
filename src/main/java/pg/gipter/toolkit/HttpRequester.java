@@ -52,6 +52,18 @@ public class HttpRequester {
         }
     }
 
+    private void logRequest(HttpUriRequestBase requestBase) {
+        Map<String, String> headers = new HashMap<>();
+        Arrays.stream(requestBase.getHeaders()).forEach(it -> headers.put(it.getName(), it.getValue()));
+        headers.replace("Cookie", "***");
+        headers.replace("X-RequestDigest", "***");
+        logger.info("Executing request {} {} {} Headers: {}",
+                Optional.ofNullable(requestBase.getVersion()).map(ProtocolVersion::getProtocol).orElse(""),
+                requestBase.getMethod(),
+                requestBase.getRequestUri(),
+                headers);
+    }
+
     private void logResponse(ClassicHttpResponse res) {
         logger.info("Response: {} {} {}", res.getVersion().format(), res.getCode(), res.getReasonPhrase());
     }
@@ -109,10 +121,6 @@ public class HttpRequester {
                 return new JsonObject();
             });
         }
-    }
-
-    public JsonObject executePOST(SharePointConfig sharePointConfig, Map<String, String> requestHeaders) throws IOException {
-        return executePOST(sharePointConfig, null, requestHeaders);
     }
 
     public JsonObject executePOST(SharePointConfig sharePointConfig, File attachment) throws IOException {
@@ -214,15 +222,4 @@ public class HttpRequester {
         }
     }
 
-    private void logRequest(HttpUriRequestBase requestBase) {
-        Map<String, String> headers = new HashMap<>();
-        Arrays.stream(requestBase.getHeaders()).forEach(it -> headers.put(it.getName(), it.getValue()));
-        headers.replace("Cookie", "***");
-        headers.replace("X-RequestDigest", "***");
-        logger.info("Executing request {} {} {} Headers: {}",
-                Optional.ofNullable(requestBase.getVersion()).map(ProtocolVersion::getProtocol).orElse(""),
-                requestBase.getMethod(),
-                requestBase.getRequestUri(),
-                headers);
-    }
 }
