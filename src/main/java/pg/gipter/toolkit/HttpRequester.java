@@ -94,10 +94,7 @@ public class HttpRequester {
             requestBuilder.POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString()));
         }
 
-        if (requestHeaders != null && !requestHeaders.isEmpty()) {
-            Map<String, String> filteredHeaders = new HashMap<>(requestHeaders);
-            filteredHeaders.replace("Cookie", "***");
-            logger.info("Request headers [{}]", filteredHeaders);
+        if (requestHeaders != null) {
             requestHeaders.forEach(requestBuilder::header);
         }
         requestBuilder.header("X-RequestDigest", sharePointConfig.getFormDigest());
@@ -254,6 +251,7 @@ public class HttpRequester {
     private void logRequest(HttpRequest request) {
         HashMap<String, List<String>> headers = new HashMap<>(request.headers().map());
         headers.replace("Cookie", List.of("***"));
+        headers.replace("X-RequestDigest", List.of("***"));
         logger.info("Executing request: {} {} {} Headers: {}",
                 request.version().map(Enum::toString).orElseGet(() -> ""),
                 request.method(),
