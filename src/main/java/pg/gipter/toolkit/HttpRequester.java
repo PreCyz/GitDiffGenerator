@@ -87,10 +87,7 @@ public class HttpRequester {
             httpPost.setEntity(new StringEntity(jsonObject.toString(), ContentType.APPLICATION_JSON));
         }
 
-        if (requestHeaders != null && !requestHeaders.isEmpty()) {
-            Map<String, String> filteredHeaders = new HashMap<>(requestHeaders);
-            filteredHeaders.replace(HttpHeaders.COOKIE, "***");
-            logger.info("Request headers [{}]", filteredHeaders);
+        if (requestHeaders != null) {
             requestHeaders.forEach(httpPost::addHeader);
         }
         httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
@@ -182,14 +179,13 @@ public class HttpRequester {
         return executeRequest(expectedType, httpPost);
     }
 
-    public int postForStatusCode(String url, Map<String, String> headers, Object payload) throws IOException {
-        HttpPost httpPost = new HttpPost(url);
-        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpPost::addHeader);
-        Optional.ofNullable(payload).ifPresent(p -> httpPost.setEntity(new StringEntity(GSON.toJson(payload))));
-        logRequest(httpPost);
+    public int getForStatusCode(String url, Map<String, String> headers) throws IOException {
+        HttpGet httpGet = new HttpGet(url);
+        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpGet::addHeader);
+        logRequest(httpGet);
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            return httpclient.execute(httpPost, res -> {
+            return httpclient.execute(httpGet, res -> {
                 logResponse(res);
                 EntityUtils.consume(res.getEntity());
                 return res.getCode();
@@ -222,6 +218,7 @@ public class HttpRequester {
         Map<String, String> headers = new HashMap<>();
         Arrays.stream(requestBase.getHeaders()).forEach(it -> headers.put(it.getName(), it.getValue()));
         headers.replace("Cookie", "***");
+        headers.replace("X-RequestDigest", "***");
         logger.info("Executing request {} {} {} Headers: {}",
                 Optional.ofNullable(requestBase.getVersion()).map(ProtocolVersion::getProtocol).orElse(""),
                 requestBase.getMethod(),

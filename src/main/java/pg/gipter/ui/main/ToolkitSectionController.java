@@ -6,7 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.ToolkitConfig;
-import pg.gipter.services.*;
+import pg.gipter.services.FXWebService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 
@@ -58,8 +58,7 @@ class ToolkitSectionController extends AbstractController {
                 connectionCheckInProgress.set(false);
             });
         }
-        boolean showVerifyHyperLink = !(CookiesService.hasValidFedAuth() &&
-                new ToolkitService(applicationProperties).isCookieWorking(CookiesService.getFedAuthString()));
+        boolean showVerifyHyperLink = !applicationProperties.hasConnectionToToolkit();
         verifyCredentialsHyperlink.setVisible(showVerifyHyperLink);
     }
 
