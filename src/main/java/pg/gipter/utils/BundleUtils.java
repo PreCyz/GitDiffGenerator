@@ -18,7 +18,7 @@ public final class BundleUtils {
         EN("en"),
         PL("pl");
 
-        String language;
+        final String language;
 
         SupportedLanguages(String language) {
             this.language = language;

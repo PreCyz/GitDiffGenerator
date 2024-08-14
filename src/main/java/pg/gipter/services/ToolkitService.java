@@ -1,21 +1,36 @@
 package pg.gipter.services;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.concurrent.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.dto.*;
+import pg.gipter.services.dto.CasesData;
+import pg.gipter.services.dto.ItemField;
+import pg.gipter.services.dto.SortFieldDefinition;
+import pg.gipter.services.dto.ToolkitCasePayload;
+import pg.gipter.services.dto.ToolkitCaseResponse;
 import pg.gipter.toolkit.HttpRequester;
 import pg.gipter.utils.BundleUtils;
 
 import java.io.IOException;
-import java.nio.file.*;
-import java.time.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -124,8 +139,9 @@ public class ToolkitService extends Task<List<CasesData>> {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
         headers.put("Cookie", fedAuthString);
-        String url = String.format("%s/_api/web/siteusers/getbyemail('%s')",
+        String url = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
                 applicationProperties.toolkitHostUrl(),
+                applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitUserEmail()
         );
 
@@ -140,7 +156,10 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public String getFormDigest() throws IOException {
         if (formDigest == null) {
-            String fullUrl = applicationProperties.toolkitHostUrl() + applicationProperties.toolkitCopyCase() + "/_api/contextinfo";
+            String fullUrl = String.format("%s%s/_api/contextinfo",
+                    applicationProperties.toolkitHostUrl(),
+                    applicationProperties.toolkitCopyCase()
+            );
             SharePointConfig sharePointConfig = new SharePointConfig(
                     applicationProperties.toolkitHostUrl(),
                     fullUrl,
@@ -294,8 +313,9 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public Optional<String> getUserId() {
         try {
-            String fullUrl = String.format("%s/_api/web/siteusers/getbyemail('%s')",
+            String fullUrl = String.format("%s%s/_api/web/siteusers/getbyemail('%s')",
                     applicationProperties.toolkitHostUrl(),
+                    applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitUserEmail()
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
@@ -308,11 +328,11 @@ public class ToolkitService extends Task<List<CasesData>> {
             JsonObject jsonObject = httpRequester.executeGET(sharePointConfig);
             if (jsonObject != null && jsonObject.has("d")) {
                 String userId = jsonObject.get("d").getAsJsonObject().get("Id").getAsString();
-                logger.info("UserId got from toolkit: {}", userId);
+                logger.info("UserId got from toolkit: [{}]", userId);
                 return Optional.ofNullable(userId);
             }
         } catch (Exception ex) {
-            logger.warn("Can not get user id by email");
+            logger.warn("Can not get user id by email: {}", ex.getMessage());
         }
         return Optional.empty();
     }
@@ -376,7 +396,7 @@ public class ToolkitService extends Task<List<CasesData>> {
             httpRequester.executePOST(sharePointConfig, requestHeaders);
             logger.info("Cleanup done.");
         } catch (IOException ex) {
-            logger.error("Problems with cleaning up.", ex);
+            logger.error("Problems with cleaning up. {}", ex.getMessage());
         }
     }
 }
