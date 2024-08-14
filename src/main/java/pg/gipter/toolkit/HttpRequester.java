@@ -53,6 +53,18 @@ public class HttpRequester {
         }
     }
 
+    private void logRequest(HttpRequest request) {
+        HashMap<String, List<String>> headers = new HashMap<>(request.headers().map());
+        headers.replace("Cookie", List.of("***"));
+        headers.replace("X-RequestDigest", List.of("***"));
+        logger.info("Executing request: {} {} {} Headers: {}",
+                request.version().map(Enum::toString).orElseGet(() -> ""),
+                request.method(),
+                request.uri().toString(),
+                headers
+        );
+    }
+
     private void logResponse(HttpResponse<?> res) {
         logger.info("Response: {} {}", res.version(), res.statusCode());
     }
@@ -117,10 +129,6 @@ public class HttpRequester {
         } catch (InterruptedException ex) {
             throw new IOException(ex);
         }
-    }
-
-    public JsonObject executePOST(SharePointConfig sharePointConfig, Map<String, String> requestHeaders) throws IOException {
-        return executePOST(sharePointConfig, null, requestHeaders);
     }
 
     public JsonObject executePOST(SharePointConfig sharePointConfig, File attachment) throws IOException {
@@ -194,19 +202,7 @@ public class HttpRequester {
                 .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(payload)));
         headers.forEach(builder::header);
         HttpRequest request = builder.build();
-        logRequest(request);
-
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            try (InputStream inputStream = res.body();
-                 InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                logResponse(res);
-                Gson gson = new GsonBuilder().create();
-                return gson.fromJson(isr, TypeToken.get(expectedType));
-            }
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
-        }
+        return executeRequest(expectedType, request);
     }
 
     public int getForStatusCode(String url, Map<String, String> headers) throws IOException {
@@ -233,9 +229,12 @@ public class HttpRequester {
                 .GET();
         Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(builder::header);
         HttpRequest request = builder.build();
-        logRequest(request);
+        return executeRequest(expectedType, request);
+    }
 
+    private <T> T executeRequest(Class<T> expectedType, HttpRequest request) throws IOException {
         try {
+            logRequest(request);
             HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
             try (InputStream inputStream = res.body();
                  InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
@@ -248,15 +247,4 @@ public class HttpRequester {
         }
     }
 
-    private void logRequest(HttpRequest request) {
-        HashMap<String, List<String>> headers = new HashMap<>(request.headers().map());
-        headers.replace("Cookie", List.of("***"));
-        headers.replace("X-RequestDigest", List.of("***"));
-        logger.info("Executing request: {} {} {} Headers: {}",
-                request.version().map(Enum::toString).orElseGet(() -> ""),
-                request.method(),
-                request.uri().toString(),
-                headers
-        );
-    }
 }
