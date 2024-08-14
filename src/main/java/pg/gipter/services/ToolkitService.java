@@ -122,22 +122,42 @@ public class ToolkitService extends Task<List<CasesData>> {
         return modifiedDate;
     }
 
-    public boolean isCookieWorking(String fedAuthString) {
+    public Optional<String> getUserId() {
+        try {
+            String fullUrl = String.format("%s/_api/web/siteusers/getbyemail('%s')",
+                    applicationProperties.toolkitHostUrl(),
+                    applicationProperties.toolkitUserEmail()
+            );
+            SharePointConfig sharePointConfig = new SharePointConfig(
+                    applicationProperties.toolkitHostUrl(),
+                    fullUrl,
+                    CookiesService.getFedAuthString(),
+                    getFormDigest()
+            );
+
+            JsonObject jsonObject = httpRequester.executeGET(sharePointConfig);
+            if (jsonObject != null && jsonObject.has("d")) {
+                String userId = jsonObject.get("d").getAsJsonObject().get("Id").getAsString();
+                logger.info("UserId got from toolkit: {}", userId);
+                return Optional.ofNullable(userId);
+            }
+        } catch (Exception ex) {
+            logger.warn("Can not get user id by email");
+        }
+        return Optional.empty();
+    }
+
+    public boolean isCookieWorking() {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
-        headers.put(HttpHeaders.COOKIE, fedAuthString);
-        String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
-        ToolkitCasePayload payload = new ToolkitCasePayload(
-                new SortFieldDefinition("ows_Created", "datetime"),
-                Stream.of(
-                        new ItemField("title", "", "ows_Title"),
-                        new ItemField("id", "", "CaseID"),
-                        new ItemField("created", "", "ows_Created")
-                ).collect(toList()),
-                false
+        headers.put(HttpHeaders.COOKIE, CookiesService.getFedAuthString());
+        String url = String.format("%s%s/_api/web/SiteUsers/getByEmail('%s')",
+                applicationProperties.toolkitHostUrl(),
+                applicationProperties.toolkitCopyCase(),
+                applicationProperties.toolkitUserEmail()
         );
         try {
-            int statusCode = httpRequester.postForStatusCode(url, headers, payload);
+            int statusCode = httpRequester.getForStatusCode(url, headers, payload);
             return Stream.of(HttpStatus.SC_FORBIDDEN, HttpStatus.SC_UNAUTHORIZED, HttpStatus.SC_INTERNAL_SERVER_ERROR)
                     .noneMatch(sc -> sc == statusCode);
         } catch (IOException ex) {
@@ -148,7 +168,10 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public String getFormDigest() throws IOException {
         if (formDigest == null) {
-            String fullUrl = applicationProperties.toolkitHostUrl() + applicationProperties.toolkitCopyCase() + "/_api/contextinfo";
+            String fullUrl = String.format("%s%s/_api/ContextInfo",
+                    applicationProperties.toolkitHostUrl(),
+                    applicationProperties.toolkitCopyCase()
+            );
             SharePointConfig sharePointConfig = new SharePointConfig(
                     applicationProperties.toolkitHostUrl(),
                     fullUrl,
@@ -300,31 +323,6 @@ public class ToolkitService extends Task<List<CasesData>> {
         }
     }
 
-    public Optional<String> getUserId() {
-        try {
-            String fullUrl = String.format("%s/_api/web/siteusers/getbyemail('%s')",
-                    applicationProperties.toolkitHostUrl(),
-                    applicationProperties.toolkitUserEmail()
-            );
-            SharePointConfig sharePointConfig = new SharePointConfig(
-                    applicationProperties.toolkitHostUrl(),
-                    fullUrl,
-                    CookiesService.getFedAuthString(),
-                    getFormDigest()
-            );
-
-            JsonObject jsonObject = httpRequester.executeGET(sharePointConfig);
-            if (jsonObject != null && jsonObject.has("d")) {
-                String userId = jsonObject.get("d").getAsJsonObject().get("Id").getAsString();
-                logger.info("UserId got from toolkit: {}", userId);
-                return Optional.ofNullable(userId);
-            }
-        } catch (Exception ex) {
-            logger.warn("Can not get user id by email");
-        }
-        return Optional.empty();
-    }
-
     public void updateClassificationId(String itemId) throws IOException {
         String fullUrl = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items(%s)",
                 applicationProperties.toolkitHostUrl(),
@@ -384,7 +382,7 @@ public class ToolkitService extends Task<List<CasesData>> {
             httpRequester.executePOST(sharePointConfig, requestHeaders);
             logger.info("Cleanup done.");
         } catch (IOException ex) {
-            logger.error("Problems with cleaning up.", ex);
+            logger.error("Problems with cleaning up. {}", ex.getMessage());
         }
     }
 }
