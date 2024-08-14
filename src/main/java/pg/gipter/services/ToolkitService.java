@@ -380,7 +380,7 @@ public class ToolkitService extends Task<List<CasesData>> {
             requestHeaders.put("X-HTTP-Method", "DELETE");
             requestHeaders.put(HttpHeaders.COOKIE, sharePointConfig.getFedAuth());
 
-            httpRequester.executePOST(sharePointConfig, requestHeaders);
+            httpRequester.executePOST(sharePointConfig, null, requestHeaders);
             logger.info("Cleanup done.");
         } catch (IOException ex) {
             logger.error("Problems with cleaning up. {}", ex.getMessage());
