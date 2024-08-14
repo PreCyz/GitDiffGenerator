@@ -87,10 +87,7 @@ public class HttpRequester {
             httpPost.setEntity(new StringEntity(jsonObject.toString(), ContentType.APPLICATION_JSON));
         }
 
-        if (requestHeaders != null && !requestHeaders.isEmpty()) {
-            Map<String, String> filteredHeaders = new HashMap<>(requestHeaders);
-            filteredHeaders.replace(HttpHeaders.COOKIE, "***");
-            logger.info("Request headers [{}]", filteredHeaders);
+        if (requestHeaders != null) {
             requestHeaders.forEach(httpPost::addHeader);
         }
         httpPost.addHeader("X-RequestDigest", sharePointConfig.getFormDigest());
@@ -221,6 +218,7 @@ public class HttpRequester {
         Map<String, String> headers = new HashMap<>();
         Arrays.stream(requestBase.getHeaders()).forEach(it -> headers.put(it.getName(), it.getValue()));
         headers.replace("Cookie", "***");
+        headers.replace("X-RequestDigest", "***");
         logger.info("Executing request {} {} {} Headers: {}",
                 Optional.ofNullable(requestBase.getVersion()).map(ProtocolVersion::getProtocol).orElse(""),
                 requestBase.getMethod(),

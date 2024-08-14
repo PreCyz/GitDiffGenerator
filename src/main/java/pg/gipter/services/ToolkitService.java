@@ -124,8 +124,9 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public Optional<String> getUserId() {
         try {
-            String fullUrl = String.format("%s/_api/web/siteusers/getbyemail('%s')",
+            String fullUrl = String.format("%s%s/_api/web/SiteUsers/GetByEmail('%s')",
                     applicationProperties.toolkitHostUrl(),
+                    applicationProperties.toolkitCopyCase(),
                     applicationProperties.toolkitUserEmail()
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
@@ -151,7 +152,7 @@ public class ToolkitService extends Task<List<CasesData>> {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, "application/json");
         headers.put(HttpHeaders.COOKIE, CookiesService.getFedAuthString());
-        String url = String.format("%s%s/_api/web/SiteUsers/getByEmail('%s')",
+        String url = String.format("%s%s/_api/web/SiteUsers/GetByEmail('%s')",
                 applicationProperties.toolkitHostUrl(),
                 applicationProperties.toolkitCopyCase(),
                 applicationProperties.toolkitUserEmail()
