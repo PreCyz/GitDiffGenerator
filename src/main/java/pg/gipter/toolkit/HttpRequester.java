@@ -182,14 +182,13 @@ public class HttpRequester {
         return executeRequest(expectedType, httpPost);
     }
 
-    public int postForStatusCode(String url, Map<String, String> headers, Object payload) throws IOException {
-        HttpPost httpPost = new HttpPost(url);
-        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpPost::addHeader);
-        Optional.ofNullable(payload).ifPresent(p -> httpPost.setEntity(new StringEntity(GSON.toJson(payload))));
-        logRequest(httpPost);
+    public int getForStatusCode(String url, Map<String, String> headers) throws IOException {
+        HttpGet httpGet = new HttpGet(url);
+        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(httpGet::addHeader);
+        logRequest(httpGet);
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-            return httpclient.execute(httpPost, res -> {
+            return httpclient.execute(httpGet, res -> {
                 logResponse(res);
                 EntityUtils.consume(res.getEntity());
                 return res.getCode();
