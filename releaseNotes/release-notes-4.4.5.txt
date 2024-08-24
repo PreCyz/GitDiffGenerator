@@ -1,0 +1,6 @@
+**Release notes:**
+
+Improvements:
+* Upgrading mongodb driver to the latest version
+Fixes:
+* Fixing NPE when init program settings.
