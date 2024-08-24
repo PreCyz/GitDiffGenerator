@@ -1,15 +1,8 @@
 package pg.gipter.core.dao;
 
-import com.mongodb.MongoClient;
-import org.bson.BsonReader;
-import org.bson.BsonString;
-import org.bson.BsonValue;
-import org.bson.BsonWriter;
-import org.bson.Document;
-import org.bson.codecs.Codec;
-import org.bson.codecs.CollectibleCodec;
-import org.bson.codecs.DecoderContext;
-import org.bson.codecs.EncoderContext;
+import com.mongodb.MongoClientSettings;
+import org.bson.*;
+import org.bson.codecs.*;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.types.ObjectId;
 import pg.gipter.core.model.CipherDetails;
@@ -21,14 +14,14 @@ public class CipherDetailsCodec implements CollectibleCodec<CipherDetails> {
     private final CipherDetailsConverter converter;
 
     public CipherDetailsCodec() {
-        this.registry = MongoClient.getDefaultCodecRegistry();
+        this.registry = MongoClientSettings.getDefaultCodecRegistry();
         this.documentCodec = this.registry.get(Document.class);
         this.converter = new CipherDetailsConverter();
     }
 
     public CipherDetailsCodec(Codec<Document> codec) {
         this.documentCodec = codec;
-        this.registry = MongoClient.getDefaultCodecRegistry();
+        this.registry = MongoClientSettings.getDefaultCodecRegistry();
         this.converter = new CipherDetailsConverter();
     }
 
