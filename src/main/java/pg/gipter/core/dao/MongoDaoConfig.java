@@ -1,11 +1,12 @@
 package pg.gipter.core.dao;
 
 import com.mongodb.*;
-import com.mongodb.client.MongoCollection;
+import com.mongodb.client.*;
 import org.bson.Document;
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.ProgramSettings;
@@ -31,7 +32,6 @@ public abstract class MongoDaoConfig {
     protected MongoDaoConfig(String collectionName) {
         logger = LoggerFactory.getLogger(getClass());
         this.collectionName = collectionName;
-        init(ProgramSettings.getInstance().getDbProperties());
     }
 
     public static void refresh(Properties dbConfig) {
@@ -43,7 +43,8 @@ public abstract class MongoDaoConfig {
         }
     }
 
-    private void init(Properties dbConfig) {
+    public void init() {
+        Properties dbConfig = ProgramSettings.getInstance().getDbProperties();
         if (!isValidDbConfig(dbConfig)) {
             return;
         }
@@ -65,31 +66,34 @@ public abstract class MongoDaoConfig {
     }
 
     private static MongoClient createMongoClient(Properties dbConfig) throws GeneralSecurityException {
-        CodecRegistry codecRegistry = MongoClient.getDefaultCodecRegistry();
+        CodecRegistry codecRegistry = MongoClientSettings.getDefaultCodecRegistry();
         Codec<Document> documentCodec = codecRegistry.get(Document.class);
         Codec<Statistic> statisticCodec = new StatisticCodec(codecRegistry);
         Codec<ExceptionDetails> exceptionDetailsCodec = new ExceptionDetailsCodec(codecRegistry);
         Codec<CipherDetails> cipherDetailsCodec = new CipherDetailsCodec(codecRegistry);
         Codec<GeneralSettings> generalSettingsCodec = new GeneralSettingsCodec(codecRegistry);
         codecRegistry = CodecRegistries.fromRegistries(
-                MongoClient.getDefaultCodecRegistry(),
+                MongoClientSettings.getDefaultCodecRegistry(),
                 CodecRegistries.fromCodecs(documentCodec,
                         statisticCodec,
                         exceptionDetailsCodec,
                         cipherDetailsCodec,
-                        generalSettingsCodec)
+                        generalSettingsCodec),
+                CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
         );
 
         String host = dbConfig.getProperty("db.host");
         String username = dbConfig.getProperty("db.username");
         String password = CryptoUtils.decrypt(dbConfig.getProperty("db.password"));
 
-        MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
+        String dbUrl = String.format("mongodb+srv://%s:%s@%s", username, password, host);
+        ConnectionString connectionString = new ConnectionString(dbUrl);
+        MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
                 .writeConcern(WriteConcern.ACKNOWLEDGED)
-                .codecRegistry(codecRegistry);
-        String uri = String.format("mongodb+srv://%s:%s@%s", username, password, host);
-        MongoClientURI mongoClientURI = new MongoClientURI(uri, mongoClientOptionsBuilder);
-        return new MongoClient(mongoClientURI);
+                .codecRegistry(codecRegistry)
+                .applyConnectionString(connectionString)
+                .build();
+        return MongoClients.create(mongoClientSettings);
     }
 
     public boolean isStatisticsAvailable() {
