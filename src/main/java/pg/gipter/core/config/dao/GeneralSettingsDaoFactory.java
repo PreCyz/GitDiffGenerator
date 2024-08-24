@@ -5,6 +5,8 @@ public final class GeneralSettingsDaoFactory {
     private GeneralSettingsDaoFactory() {}
 
     public static GeneralSettingsDao getInstance() {
-        return new GeneralSettingsRepository();
+        GeneralSettingsRepository repository = new GeneralSettingsRepository();
+        repository.init();
+        return repository;
     }
 }

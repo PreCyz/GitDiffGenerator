@@ -28,7 +28,7 @@ public class SettingsService {
 
         try {
             HttpResponse<InputStream> res = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            logger.info("Response: {} {}", res.version().name(), res.statusCode());
+            logger.info("Response [{}]: {} {}", url, res.version().name(), res.statusCode());
             if (Arrays.asList(403, 401).contains(res.statusCode())) {
                 throw new IOException("Authentication failed.");
             }

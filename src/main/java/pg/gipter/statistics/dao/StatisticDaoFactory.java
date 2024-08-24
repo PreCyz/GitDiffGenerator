@@ -4,6 +4,8 @@ public final class StatisticDaoFactory {
     private StatisticDaoFactory() { }
 
     public static StatisticDao getStatisticDao() {
-        return new StatisticRepository();
+        StatisticRepository repository = new StatisticRepository();
+        repository.init();
+        return repository;
     }
 }
