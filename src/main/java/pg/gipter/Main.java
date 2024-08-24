@@ -82,8 +82,9 @@ public class Main extends Application {
         if (flowType == FlowType.INIT) {
             launch(args);
         } else {
+            boolean settingsInitiated = initProgramSettings(args);
             if (flowType == FlowType.REGULAR) {
-                flowType = initProgramSettings(args) ? FlowType.REGULAR : FlowType.NO_UPLOAD;
+                flowType = settingsInitiated ? FlowType.REGULAR : FlowType.NO_UPLOAD;
             }
             if (Main.applicationProperties.isUseUI()) {
                 launch(args);
