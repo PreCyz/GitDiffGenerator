@@ -6,7 +6,8 @@ services:
       args:
         - VERSION=${VERSION}
         - GITHUB_TOKEN=${GITHUB_TOKEN}
-    container_name: gipter_release
+      no_cache: true
+    container_name: gipter_release-11
   release-java8:
     build:
       context: ./.
@@ -14,5 +15,7 @@ services:
       args:
         - VERSION=${VERSION}
         - GITHUB_TOKEN=${GITHUB_TOKEN}
+      no_cache: true
+    container_name: gipter_release-8
     depends_on:
       - release-java11

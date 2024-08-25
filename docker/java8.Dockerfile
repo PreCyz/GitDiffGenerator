@@ -44,4 +44,4 @@ RUN RELEASE_ID=$(curl \
     --url https://uploads.github.com/repos/PreCyz/GitDiffGenerator/releases/${RELEASE_ID}/assets?name=Gipter_v${VERSION}.7z \
     --data-binary "@./target/Gipter_v${VERSION}.7z") \
     && echo "${RESPONSE}"
-RUN echo 'release java8 done'
+CMD ["echo", "release java8 done"]

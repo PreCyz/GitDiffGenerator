@@ -39,4 +39,4 @@ RUN ls -lah ./target  \
     --url https://uploads.github.com/repos/PreCyz/GitDiffGenerator/releases/$RELEASE_ID/assets?name=11%2BGipter_v$VERSION.7z  \
     --data-binary "@./target/11+Gipter_v$VERSION.7z") \
     && echo "${RESPONSE}"
-RUN echo "release java11 done"
+CMD ["echo", "release java11 done"]
