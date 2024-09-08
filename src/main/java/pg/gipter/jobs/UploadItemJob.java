@@ -1,15 +1,16 @@
 package pg.gipter.jobs;
 
+import javafx.application.Platform;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.FlowType;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.services.CookiesService;
-import pg.gipter.services.ToolkitService;
+import pg.gipter.services.*;
 import pg.gipter.ui.*;
 
 import java.text.ParseException;
@@ -38,9 +39,11 @@ public class UploadItemJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
         if (!CookiesService.hasValidFedAuth()) {
-            logger.warn("Cookies are not set. Item is going to be generated BUT NOT UPLOADED!!!");
+            logger.warn("Cookies are not valid. Trying to refresh cookies and continuing the job.");
+            Platform.runLater(() -> new FXWebService(jobDataMap).initSSO(FlowType.JOB));
+        } else {
+            runJob(jobDataMap);
         }
-        runJob(jobDataMap);
     }
 
     public void runJob(Map<String, ?> jobDataMap) throws JobExecutionException {

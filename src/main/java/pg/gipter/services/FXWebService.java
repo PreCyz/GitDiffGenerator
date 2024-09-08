@@ -5,17 +5,21 @@ import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 import org.w3c.dom.html.HTMLInputElement;
 import pg.gipter.FlowType;
 import pg.gipter.core.ArgName;
+import pg.gipter.jobs.UploadItemJob;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
@@ -23,6 +27,8 @@ import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -33,6 +39,9 @@ public class FXWebService {
     private final Stage stage;
     private WebEngine webEngine;
     private FlowType flowType;
+    private JobDataMap jobDataMap;
+    private final ExecutorService executorService;
+    private Label label;
 
     public FXWebService() {
         this(new Stage());
@@ -40,9 +49,19 @@ public class FXWebService {
 
     public FXWebService(Stage stage) {
         this.stage = stage;
+        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    }
+    public FXWebService(JobDataMap jobDataMap) {
+        this(new Stage());
+        this.jobDataMap = jobDataMap;
     }
 
     public void initSSO() {
+        initSSO(FlowType.REGULAR);
+    }
+
+    public void initSSO(Label label) {
+        this.label = label;
         initSSO(FlowType.REGULAR);
     }
 
@@ -85,10 +104,22 @@ public class FXWebService {
                     String.format("%s=%s", ArgName.flowType.name(), FlowType.REGULAR)
             ).collect(toList());
             new RestartService().start(restartArguments);
+        } else if (flowType == FlowType.JOB) {
+            logger.info("Webview opened from JOB. Continuing job.");
+            executorService.submit(this::continueJob, Void.class);
         } else {
             logger.info("Webview opened regularly.");
+            label.setText(BundleUtils.getMsg("toolkit.panel.cookieExpires", CookiesService.expiryDate()));
         }
         logger.info("Webview was closed.");
+    }
+
+    private void continueJob() {
+        try {
+            new UploadItemJob().runJob(jobDataMap);
+        } catch (JobExecutionException e) {
+            logger.error("Could not finish job", e);
+        }
     }
 
     private ChangeListener<Worker.State> changeListener() {
