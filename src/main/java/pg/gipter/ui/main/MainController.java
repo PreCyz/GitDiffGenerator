@@ -1,5 +1,6 @@
 package pg.gipter.ui.main;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -14,6 +15,7 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.DataService;
+import pg.gipter.services.FXWebService;
 import pg.gipter.services.vcs.VcsService;
 import pg.gipter.ui.*;
 import pg.gipter.utils.StringUtils;
@@ -64,7 +66,7 @@ public class MainController extends AbstractController {
     @FXML
     private TextField toolkitFolderNameTextField;
     @FXML
-    private Hyperlink verifyCredentialsHyperlink;
+    private Label cookieExpiryLabel;
     @FXML
     private ProgressIndicator verifyProgressIndicator;
 
@@ -153,7 +155,7 @@ public class MainController extends AbstractController {
         Map<String, Control> map = new HashMap<>();
         map.put("toolkitUsernameTextField", toolkitUsernameTextField);
         map.put("toolkitFolderNameTextField", toolkitFolderNameTextField);
-        map.put("verifyCredentialsHyperlink", verifyCredentialsHyperlink);
+        map.put("cookieExpiryLabel", cookieExpiryLabel);
         map.put("verifyProgressIndicator", verifyProgressIndicator);
         return map;
     }
@@ -248,6 +250,15 @@ public class MainController extends AbstractController {
         configurationSectionController.setDisableDependOnConfigurations();
 
         setDisable(applicationProperties.itemType());
+        verifyProgressIndicator.setVisible(true);
+
+        Platform.runLater(() -> {
+            final boolean hasConnection = applicationProperties.hasConnectionToToolkit();
+            if (!hasConnection) {
+                new FXWebService().initSSO(cookieExpiryLabel);
+            }
+            verifyProgressIndicator.setVisible(false);
+        });
     }
 
     private void setAccelerators() {
