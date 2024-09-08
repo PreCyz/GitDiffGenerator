@@ -1,0 +1,4 @@
+**Release notes:**
+
+Improvements:
+* Bringing back and improving automate to refresh cookie.
