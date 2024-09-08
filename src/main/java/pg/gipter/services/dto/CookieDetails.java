@@ -8,6 +8,7 @@ public class CookieDetails {
     public final String path;
     public final boolean secureOnly;
     public final boolean httpOnly;
+    public final CreationTime creationTime;
 
     public CookieDetails(String name,
                          String value,
@@ -15,7 +16,8 @@ public class CookieDetails {
                          String domain,
                          String path,
                          boolean secureOnly,
-                         boolean httpOnly) {
+                         boolean httpOnly,
+                         CreationTime creationTime) {
         this.name = name;
         this.value = value;
         this.expiryTime = expiryTime;
@@ -23,5 +25,6 @@ public class CookieDetails {
         this.path = path;
         this.secureOnly = secureOnly;
         this.httpOnly = httpOnly;
+        this.creationTime = creationTime;
     }
 }

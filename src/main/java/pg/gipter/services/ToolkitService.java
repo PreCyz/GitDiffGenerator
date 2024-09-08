@@ -18,6 +18,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
+import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
+import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 import static java.util.stream.Collectors.joining;
 
 /** Created by Pawel Gawedzki on 26-Jul-2019. */
@@ -158,7 +161,7 @@ public class ToolkitService extends Task<List<CasesData>> {
 
         try {
             int statusCode = httpRequester.getForStatusCode(url, headers);
-            return Stream.of(401, 403, 500).noneMatch(sc -> sc == statusCode);
+            return Stream.of(HTTP_UNAUTHORIZED, HTTP_FORBIDDEN, HTTP_INTERNAL_ERROR).noneMatch(sc -> sc == statusCode);
         } catch (IOException ex) {
             logger.error("Could not download toolkit projects for user [{}]. ", applicationProperties.toolkitUsername(), ex);
         }

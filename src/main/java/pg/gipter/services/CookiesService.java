@@ -17,8 +17,8 @@ import java.net.CookieHandler;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,6 +27,7 @@ public final class CookiesService {
     private static final Logger logger = LoggerFactory.getLogger(CookiesService.class);
     private static final String[] DAYS = {"Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     private static final String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"};
+    private static final ZoneId GMT_ZONE_ID = TimeZone.getTimeZone("GMT").toZoneId();
 
     static final Path COOKIES_PATH = Paths.get("cookies.json");
 
@@ -38,7 +39,7 @@ public final class CookiesService {
                     .orElseThrow(() -> new IllegalStateException("The cookie FedAuth does not exist."));
             LocalDateTime expirationDate = LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(fedAuthCookie.expiryTime),
-                    TimeZone.getDefault().toZoneId()
+                    GMT_ZONE_ID
             );
             return expirationDate.isAfter(LocalDateTime.now());
         } catch (Exception ex) {
@@ -132,7 +133,7 @@ public final class CookiesService {
      * @param date the date in milliseconds
      */
     private static String formatCookieDate(long date) {
-        LocalDateTime gc = LocalDateTime.ofInstant(Instant.ofEpochMilli(date), TimeZone.getTimeZone("GMT").toZoneId());
+        LocalDateTime gc = LocalDateTime.ofInstant(Instant.ofEpochMilli(date), GMT_ZONE_ID);
 
         int day_of_week = gc.getDayOfWeek().getValue();
         int day_of_month = gc.getDayOfMonth();
@@ -245,5 +246,19 @@ public final class CookiesService {
             Files.write(CookiesService.COOKIES_PATH, json.getBytes(StandardCharsets.UTF_8));
         }
         logger.info("Cookies saved in [{}]", CookiesService.COOKIES_PATH);
+    }
+
+    public static String expiryDate() {
+        try {
+            CookieDetails fedAuthCookie = loadFedAuthCookie()
+                    .orElseThrow(() -> new IllegalStateException("The cookie FedAuth does not exist."));
+            LocalDateTime expirationDate = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(fedAuthCookie.expiryTime),
+                    GMT_ZONE_ID
+            );
+            return expirationDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        } catch (IllegalStateException ex) {
+            return "";
+        }
     }
 }

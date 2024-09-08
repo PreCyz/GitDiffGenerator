@@ -43,11 +43,6 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="200.0">
                      <children>
-                        <Hyperlink fx:id="verifyCredentialsHyperlink" layoutX="404.0" layoutY="6.0" prefHeight="23.0" text="%toolkit.panel.link">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Hyperlink>
                         <ProgressIndicator fx:id="verifyProgressIndicator" layoutX="551.0" layoutY="6.0" prefHeight="25.0" prefWidth="25.0" />
                         <Label layoutX="10.0" layoutY="9.0" text="%toolkit.panel.username" />
                         <TextField fx:id="toolkitUsernameTextField" layoutX="78.0" layoutY="4.0" prefHeight="27.0" prefWidth="90.0" stylesheets="@../css/main.css" />
@@ -57,6 +52,10 @@
                               <Font size="10.0" />
                            </font>
                         </TextField>
+                        <Label fx:id="cookieExpiryLabel" layoutX="416.0" layoutY="2.0" textFill="#2102f8" wrapText="true">
+                           <font>
+                              <Font size="11.0" />
+                           </font></Label>
                      </children>
                   </AnchorPane>
                </content>
