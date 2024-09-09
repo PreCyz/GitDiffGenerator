@@ -1,5 +1,6 @@
 package pg.gipter.ui.upgrade;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -37,17 +38,13 @@ public class UpgradeController  extends AbstractController {
     }
 
     private void upgrade() {
-        try {
-            uiLauncher.executeOutsideUIThread(upgradeService);
-            uiLauncher.hideUpgradeWindow();
-            while (upgradeService.isRunning()) {
-                Thread.currentThread().wait(1000);
-            }
-        } catch (Exception e) {
-            logger.warn("Upgrade service is still working and I can not wait. {}", e.getMessage());
-        } finally {
-            uiLauncher.execute();
-        }
+        uiLauncher.executeOutsideUIThread(() -> {
+            upgradeService.run();
+            Platform.runLater(() -> {
+                uiLauncher.hideUpgradeWindow();
+                uiLauncher.execute();
+            });
+        });
     }
 
     private void resetIndicatorProperties(Task<?> task) {
