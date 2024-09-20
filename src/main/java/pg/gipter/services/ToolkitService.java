@@ -1,21 +1,38 @@
 package pg.gipter.services;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.concurrent.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.dto.*;
+import pg.gipter.services.dto.CasesData;
+import pg.gipter.services.dto.ItemField;
+import pg.gipter.services.dto.SortFieldDefinition;
+import pg.gipter.services.dto.ToolkitCasePayload;
+import pg.gipter.services.dto.ToolkitCaseResponse;
 import pg.gipter.toolkit.HttpRequester;
 import pg.gipter.utils.BundleUtils;
 
 import java.io.IOException;
-import java.nio.file.*;
-import java.time.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
@@ -208,20 +225,24 @@ public class ToolkitService extends Task<List<CasesData>> {
 
         String itemId = "";
         JsonArray value = item.get("value").getAsJsonArray();
+        Set<String> errors = new LinkedHashSet<>();
         for (int idx = 0; idx < value.size(); ++idx) {
             JsonObject jsonObject = value.get(idx).getAsJsonObject();
             if (Boolean.parseBoolean(jsonObject.get("HasException").getAsString())) {
                 String errMsg = String.format("Field name [%s], error message: [%s]",
-                        jsonObject.has("FieldName"),
-                        jsonObject.has("ErrorMessage")
+                        jsonObject.has("FieldName") ? jsonObject.get("FieldName").getAsString() : "N/A",
+                        jsonObject.has("ErrorMessage") ? jsonObject.get("ErrorMessage").getAsString() : "N/A"
                 );
                 logger.error(errMsg);
-                throw new IOException(errMsg);
+                errors.add(errMsg);
             }
             if (jsonObject.has("FieldName") && "Id".equals(jsonObject.get("FieldName").getAsString())) {
                 itemId = jsonObject.get("FieldValue").getAsString();
                 logger.info("New item created. ItemId [{}]", itemId);
             }
+        }
+        if (!errors.isEmpty()) {
+            throw new IOException(String.join(" ", errors));
         }
         return itemId;
     }
