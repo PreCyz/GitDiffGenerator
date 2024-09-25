@@ -277,7 +277,7 @@ public class ToolkitService extends Task<List<CasesData>> {
         formValues.add(arrayElement);
         arrayElement = new JsonObject();
         arrayElement.addProperty("FieldName", "Employee");
-        arrayElement.addProperty("FieldValue", "[{'Key':'" + applicationProperties.toolkitUsername() + "'}]");
+        arrayElement.addProperty("FieldValue", "[{'Key':'" + applicationProperties.toolkitUserEmail() + "'}]");
         formValues.add(arrayElement);
 
         JsonObject item = new JsonObject();
