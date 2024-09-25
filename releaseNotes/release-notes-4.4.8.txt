@@ -1,0 +1,7 @@
+**Release notes:**
+
+Fixes:
+* Multiple entries matched, please click to resolve.
+
+Improvements:
+* Error log messages.
