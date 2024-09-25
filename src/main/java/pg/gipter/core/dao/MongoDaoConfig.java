@@ -92,6 +92,7 @@ public abstract class MongoDaoConfig {
                 .writeConcern(WriteConcern.ACKNOWLEDGED)
                 .codecRegistry(codecRegistry)
                 .applyConnectionString(connectionString)
+                .retryWrites(true)
                 .build();
         return MongoClients.create(mongoClientSettings);
     }
