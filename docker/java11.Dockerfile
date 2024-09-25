@@ -16,8 +16,7 @@ RUN mvn versions:set -DnewVersion=$VERSION
 RUN mvn clean package
 RUN mv ./target/Gipter-$VERSION.jar ./target/Gipter.jar
 RUN 7z a ./target/11+Gipter_v$VERSION.7z ./target/Gipter.jar ./docs/Gipter-ui-description.pdf ./docs/gifs.json
-RUN ls -lah ./target  \
-    && RELEASE_NOTES=`cat ./releaseNotes/release-notes-$VERSION.txt`  \
+RUN RELEASE_NOTES=`cat ./releaseNotes/release-notes-$VERSION.txt`  \
     && JSON_STRING=$( jq -n  \
                       --arg tag "v$VERSION" \
                       --arg gv "Gipter_v$VERSION" \
