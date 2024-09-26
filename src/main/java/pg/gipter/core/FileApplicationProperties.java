@@ -196,14 +196,6 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
-    public String toolkitDomain() {
-        if (StringUtils.notEmpty(toolkitConfig.getToolkitDomain())) {
-            return toolkitConfig.getToolkitDomain();
-        }
-        return argExtractor.toolkitDomain();
-    }
-
-    @Override
     public String toolkitHostUrl() {
         if (StringUtils.notEmpty(toolkitConfig.getToolkitHostUrl())) {
             return toolkitConfig.getToolkitHostUrl();

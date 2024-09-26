@@ -29,8 +29,6 @@ public class ToolkitSettingsController extends AbstractController {
     @FXML
     private TextField toolkitFolderNameTextField;
     @FXML
-    private TextField toolkitDomainTextField;
-    @FXML
     private TextField toolkitListNameTextField;
     @FXML
     private TextField toolkitUrlTextField;
@@ -57,7 +55,6 @@ public class ToolkitSettingsController extends AbstractController {
     private void setInitValues() {
         toolkitUsernameTextField.setText(applicationProperties.toolkitUsername());
         toolkitFolderNameTextField.setText(applicationProperties.toolkitFolderName());
-        toolkitDomainTextField.setText(applicationProperties.toolkitDomain());
         toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
         toolkitUrlTextField.setText(applicationProperties.toolkitHostUrl());
         toolkitWSTextField.setText(applicationProperties.toolkitWSUrl());
@@ -83,6 +80,7 @@ public class ToolkitSettingsController extends AbstractController {
                 uiLauncher.closeToolkitWindow();
             } else if (e.isControlDown() && e.getCode() == KeyCode.S) {
                 saveToolkitSettings();
+                toolkitUserFolderHyperlink.setText(applicationProperties.toolkitUserFolderUrl());
                 new AlertWindowBuilder()
                         .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                         .withAlertType(Alert.AlertType.INFORMATION)

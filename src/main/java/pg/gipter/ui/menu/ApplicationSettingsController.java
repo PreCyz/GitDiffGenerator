@@ -128,11 +128,11 @@ public class ApplicationSettingsController extends AbstractController {
         preferredArgSourceComboBox.setItems(FXCollections.observableArrayList(PreferredArgSource.values()));
         preferredArgSourceComboBox.setValue(PreferredArgSource.UI);
         useUICheckBox.setSelected(applicationProperties.isUseUI());
-        noSSOCheckBox.setSelected(applicationProperties.isNoSSO());
         activateTrayCheckBox.setSelected(uiLauncher.isTrayActivated());
         autostartCheckBox.setSelected(applicationProperties.isEnableOnStartup() && uiLauncher.isTrayActivated());
         silentModeCheckBox.setSelected(applicationProperties.isSilentMode());
         uploadItemCheckBox.setSelected(applicationProperties.isUploadItem());
+        noSSOCheckBox.setSelected(applicationProperties.isNoSSO());
         smartZipCheckBox.setSelected(applicationProperties.isSmartZip());
 
         if (languageComboBox.getItems().isEmpty()) {
