@@ -329,13 +329,13 @@ public abstract class ApplicationProperties {
         if (applicationConfig != null) {
             log += ", preferredArgSource='" + preferredArgSource() + '\'' +
                     ", useUI='" + isUseUI() + '\'' +
-                    ", noSSO='" + isNoSSO() + '\'' +
                     ", silentMode='" + isSilentMode() + '\'' +
                     ", enableOnStartup='" + isEnableOnStartup() + '\'' +
                     ", upgradeFinished='" + isUpgradeFinished() + '\'' +
                     ", loggerLevel='" + loggerLevel() + '\'' +
                     ", checkLastItemEnabled='" + isCheckLastItemEnabled() + '\'' +
                     ", uploadItem='" + isUploadItem() + '\'' +
+                    ", noSSO='" + isNoSSO() + '\'' +
                     ", smartZip='" + isSmartZip() + '\'' +
                     ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
         }
@@ -345,7 +345,6 @@ public abstract class ApplicationProperties {
                     ", toolkitUserEmail='" + toolkitUserEmail() + '\'' +
                     ", toolkitHostUrl='" + toolkitHostUrl() + '\'' +
                     ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
-                    ", toolkitDomain='" + toolkitDomain() + '\'' +
                     ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
                     ", toolkitUserFolderUrl='" + toolkitUserFolderUrl() + '\'';
         }
@@ -371,7 +370,6 @@ public abstract class ApplicationProperties {
 
     public abstract String toolkitUsername();
     public abstract String toolkitFolderName();
-    public abstract String toolkitDomain();
     public abstract String toolkitUserFolderUrl();
     public abstract String toolkitCopyListName();
     public abstract Set<String> toolkitProjectListNames();

@@ -200,12 +200,6 @@ public enum ArgName {
             return SystemUtils.userName();
         }
     },
-    toolkitDomain {
-        @Override
-        public String defaultValue() {
-            return "NCDMZ";
-        }
-    },
     toolkitCopyListName {
         @Override
         public String defaultValue() {

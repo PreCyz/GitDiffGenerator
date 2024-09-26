@@ -1,9 +1,6 @@
 package pg.gipter;
 
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestInstancePostProcessor;
+import org.junit.jupiter.api.extension.*;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -15,7 +12,10 @@ public class MockitoExtension implements TestInstancePostProcessor, ParameterRes
 
     @Override
     public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
-        MockitoAnnotations.initMocks(testInstance);
+        try (AutoCloseable autoCloseable = MockitoAnnotations.openMocks(testInstance)) {
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+        }
     }
 
     @Override
