@@ -1,0 +1,7 @@
+**Release notes:**
+
+Fixes:
+* Fail when run type FIXING_JOB_EXECUTION.
+
+Improvements:
+* Removing NCDMZ domain from the code.
