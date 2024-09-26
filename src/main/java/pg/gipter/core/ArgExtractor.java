@@ -164,10 +164,6 @@ final class ArgExtractor {
         return ArgName.toolkitFolderName.defaultValue();
     }
 
-    String toolkitDomain() {
-        return ArgName.toolkitDomain.defaultValue();
-    }
-
     String toolkitHostUrl() {
         if (containsArg(ArgName.toolkitHostUrl.name())) {
             return getValue(ArgName.toolkitHostUrl, ArgName.toolkitHostUrl.defaultValue());

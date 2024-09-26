@@ -944,65 +944,6 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void given_noToolkitDomain_when_toolkitDomain_then_returnDefault() {
-        applicationProperties = new CliApplicationProperties(new String[]{}).init();
-
-        String actual = applicationProperties.toolkitDomain();
-
-        assertThat(actual).isEqualTo("NCDMZ");
-    }
-
-    @Test
-    void given_toolkitDomainFromCLI_when_toolkitDomain_then_returnDefault() {
-        applicationProperties = new CliApplicationProperties(
-                new String[]{"toolkitDomain=cliDomain"}
-        );
-
-        String actual = applicationProperties.toolkitDomain();
-
-        assertThat(actual).isEqualTo("NCDMZ");
-    }
-
-    @Test
-    void given_toolkitDomainFileAndCLI_when_toolkitDomain_then_returnDefault() {
-        String[] args = {"toolkitDomain=cliDomain"};
-        applicationProperties = new CliApplicationProperties(args).init();
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitDomain("propertiesDomain");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitDomain();
-
-        assertThat(actual).isEqualTo("NCDMZ");
-    }
-
-    @Test
-    void given_toolkitDomainFromProperties_when_toolkitDomain_then_returnToolkitDomainFromProperties() {
-        String[] args = {};
-        applicationProperties = new CliApplicationProperties(args).init();
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitDomain("propertiesDomain");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitDomain();
-
-        assertThat(actual).isEqualTo("propertiesDomain");
-    }
-
-    @Test
-    void given_toolkitDomainFromPropertiesAndOtherArgs_when_toolkitDomain_then_returnToolkitDomainFromProperties() {
-        String[] args = {"uploadType=statement"};
-        applicationProperties = new CliApplicationProperties(args).init();
-        ToolkitConfig toolkitConfig = new ToolkitConfig();
-        toolkitConfig.setToolkitDomain("propertiesDomain");
-        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
-
-        String actual = applicationProperties.toolkitDomain();
-
-        assertThat(actual).isEqualTo("propertiesDomain");
-    }
-
-    @Test
     void givenNoToolkitHostUrl_whenToolkitHostUrl_thenReturnDefault() {
         applicationProperties = new CliApplicationProperties(new String[]{}).init();
 
