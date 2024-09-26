@@ -213,7 +213,7 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
 
     private boolean upload(ApplicationProperties applicationProperties) {
         try {
-            if (applicationProperties.isUploadItem()) {
+            if (applicationProperties.isUploadItem() && !applicationProperties.isNoSSO()) {
                 DiffUploader diffUploader = new DiffUploader(applicationProperties);
                 incrementProgress();
                 updateMessage(BundleUtils.getMsg("progress.uploadingToToolkit"));

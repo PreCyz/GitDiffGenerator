@@ -179,7 +179,9 @@ public class UILauncher implements Launcher {
     private void scheduleJobs() {
         scheduleUploadJob();
         scheduleUpgradeJob();
-        jobService.executeUploadJobIfMissed(executor);
+        if (CookiesService.hasValidFedAuth()) {
+            jobService.executeUploadJobIfMissed(executor);
+        }
         if (applicationProperties.isCheckLastItemEnabled()) {
             scheduleCheckLastItemJob();
         }

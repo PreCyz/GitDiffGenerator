@@ -372,23 +372,6 @@ class ArgExtractorTest {
         assertThat(actual).isEqualTo("USERNAME");
     }
 
-    @Test
-    void when_toolkitDomain_then_returnNCDMZ() {
-        argExtractor = new ArgExtractor(new String[]{});
-
-        String actual = argExtractor.toolkitDomain();
-
-        assertThat(actual).isEqualTo("NCDMZ");
-    }
-
-    @Test
-    void given_toolkitDomainFromCommandLine_when_toolkitDomain_then_returnNCDMZ() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitDomain=sthElse"});
-
-        String actual = argExtractor.toolkitDomain();
-
-        assertThat(actual).isEqualTo("NCDMZ");
-    }
 
     @Test
     void when_toolkitHostUrl_thenReturnDefaultHostUrl() {

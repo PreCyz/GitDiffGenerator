@@ -33,7 +33,7 @@ class Runner implements Starter {
             DiffProducer diffProducer = DiffProducerFactory.getInstance(applicationProperties);
             diffProducer.produceDiff();
 
-            if (applicationProperties.isUploadItem()) {
+            if (applicationProperties.isUploadItem() && !applicationProperties.isNoSSO()) {
                 if (!applicationProperties.isToolkitCredentialsSet()) {
                     String errorMsg = "Toolkit credentials not set. Check your settings.";
                     logger.error(errorMsg);
