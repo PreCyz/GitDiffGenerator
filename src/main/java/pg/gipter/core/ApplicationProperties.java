@@ -125,10 +125,6 @@ public abstract class ApplicationProperties {
         return argExtractor.containsArg(argName);
     }
 
-    public final String toolkitWSUrl() {
-        return argExtractor.toolkitWSUrl();
-    }
-
     public final String toolkitCopyCase() {
         return argExtractor.toolkitCopyCase();
     }
@@ -344,7 +340,6 @@ public abstract class ApplicationProperties {
                     ", toolkitFolderName='" + toolkitFolderName() + '\'' +
                     ", toolkitUserEmail='" + toolkitUserEmail() + '\'' +
                     ", toolkitHostUrl='" + toolkitHostUrl() + '\'' +
-                    ", toolkitWSUrl='" + toolkitWSUrl() + '\'' +
                     ", toolkitCopyListName='" + toolkitCopyListName() + '\'' +
                     ", toolkitUserFolderUrl='" + toolkitUserFolderUrl() + '\'';
         }

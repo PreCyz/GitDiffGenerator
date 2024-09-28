@@ -397,15 +397,6 @@ class ArgExtractorTest {
     }
 
     @Test
-    void given_toolkitWSUrlFromCommandLine_when_toolkitWSUrl_then_returnDefaultUrl() {
-        argExtractor = new ArgExtractor(new String[]{"toolkitWSUrl=sthElse"});
-
-        String actual = argExtractor.toolkitWSUrl();
-
-        assertThat(actual).isEqualTo("https://goto.netcompany.com/cases/GTE106/NCSCOPY/_vti_bin/lists.asmx");
-    }
-
-    @Test
     void givenToolkitUserFolderFromCommandLine_whenToolkitUserFolderUrl_thenReturnDefaultValue() {
         argExtractor = new ArgExtractor(new String[]{"toolkitFolderName=sthElse", "toolkitUsername=XXX"});
 
