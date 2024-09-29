@@ -218,12 +218,6 @@ public enum ArgName {
             return "/cases/GTE106/NCSCOPY";
         }
     },
-    toolkitWSUrl {
-        @Override
-        public String defaultValue() {
-            return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/_vti_bin/lists.asmx";
-        }
-    },
     toolkitUserFolderUrl {
         @Override
         public String defaultValue() {

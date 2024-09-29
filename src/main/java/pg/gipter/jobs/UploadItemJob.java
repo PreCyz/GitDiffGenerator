@@ -38,12 +38,32 @@ public class UploadItemJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
+        if (hasRefreshedCredentials(jobDataMap)) {
+            runJob(jobDataMap);
+        } else {
+            logger.warn("Outdated credentials. Job is terminated.");
+        }
+    }
+
+    private boolean hasRefreshedCredentials(JobDataMap jobDataMap) {
         if (!CookiesService.hasValidFedAuth()) {
             logger.warn("Cookies are not valid. Trying to refresh cookies and continuing the job.");
-            Platform.runLater(() -> new FXWebService(jobDataMap).initSSO(FlowType.JOB));
-        } else {
-            runJob(jobDataMap);
+            Platform.runLater(() -> {
+                FXWebService fxWebService = new FXWebService(jobDataMap);
+                fxWebService.initMinimizedSSO(FlowType.JOB);
+            });
         }
+        LocalDateTime waitStart = LocalDateTime.now();
+        while (FXWebService.isRunning() && waitStart.isAfter(LocalDateTime.now().minusMinutes(1))) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                logger.error("Problems with sleeping.", e);
+            }
+        }
+        logger.info("Done waiting for authentication after {} seconds.",
+                Duration.between(waitStart, LocalDateTime.now()).toSeconds());
+        return CookiesService.hasValidFedAuth();
     }
 
     public void runJob(Map<String, ?> jobDataMap) throws JobExecutionException {

@@ -33,8 +33,6 @@ public class ToolkitSettingsController extends AbstractController {
     @FXML
     private TextField toolkitUrlTextField;
     @FXML
-    private TextField toolkitWSTextField;
-    @FXML
     private TextField toolkitUserFolderTextField;
     @FXML
     private Hyperlink toolkitUserFolderHyperlink;
@@ -57,7 +55,6 @@ public class ToolkitSettingsController extends AbstractController {
         toolkitFolderNameTextField.setText(applicationProperties.toolkitFolderName());
         toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
         toolkitUrlTextField.setText(applicationProperties.toolkitHostUrl());
-        toolkitWSTextField.setText(applicationProperties.toolkitWSUrl());
         toolkitUserFolderHyperlink.setText(applicationProperties.toolkitUserFolderUrl());
     }
 
