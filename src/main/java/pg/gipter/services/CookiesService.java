@@ -203,8 +203,8 @@ public final class CookiesService {
                     Map<String, List<String>> m = new LinkedHashMap<>();
                     m.put("Set-Cookie", list);
                     CookieHandler.getDefault().put(new URI(String.format("http://%s/", domain)), m);
-                    logger.info("Cookies successfully loaded from [{}]", COOKIES_PATH.toAbsolutePath());
                 }
+                logger.info("Cookies successfully loaded from [{}]", COOKIES_PATH.toAbsolutePath());
             } catch (Exception e) {
                 logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath(), e);
             }

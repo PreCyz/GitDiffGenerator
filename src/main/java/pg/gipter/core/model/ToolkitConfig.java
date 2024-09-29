@@ -109,9 +109,6 @@ public class ToolkitConfig {
         if (getToolkitCopyCase() != null) {
             arguments.add(ArgName.toolkitCopyCase.name() + "=" + getToolkitCopyCase());
         }
-        if (getToolkitWSUrl() != null) {
-            arguments.add(ArgName.toolkitWSUrl.name() + "=" + getToolkitWSUrl());
-        }
         if (getToolkitUserFolderUrl() != null) {
             arguments.add(ArgName.toolkitUserFolderUrl.name() + "=" + getToolkitUserFolderUrl());
         }
@@ -135,8 +132,6 @@ public class ToolkitConfig {
                     toolkitConfig.setToolkitHostUrl(argumentValue);
                 } else if (ArgName.toolkitCopyCase.name().equals(argumentName)) {
                     toolkitConfig.setToolkitCopyCase(argumentValue);
-                } else if (ArgName.toolkitWSUrl.name().equals(argumentName)) {
-                    toolkitConfig.setToolkitWSUrl(argumentValue);
                 } else if (ArgName.toolkitUserFolderUrl.name().equals(argumentName)) {
                     toolkitConfig.setToolkitUserFolderUrl(argumentValue);
                 }
