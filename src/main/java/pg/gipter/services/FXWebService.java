@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -22,11 +23,12 @@ import pg.gipter.core.ArgName;
 import pg.gipter.jobs.UploadItemJob;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.SystemUtils;
+import pg.gipter.utils.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
@@ -42,6 +44,12 @@ public class FXWebService {
     private JobDataMap jobDataMap;
     private final ExecutorService executorService;
     private Label label;
+    private boolean iconified = false;
+    private static boolean running = false;
+
+    public static boolean isRunning() {
+        return running;
+    }
 
     public FXWebService() {
         this(new Stage());
@@ -65,7 +73,17 @@ public class FXWebService {
         initSSO(FlowType.REGULAR);
     }
 
+    public FXWebService initMinimizedSSO(FlowType flowType) {
+        this.iconified = true;
+        initSSO(flowType);
+        return this;
+    }
+
     public void initSSO(FlowType flowType) {
+        if (isRunning()) {
+            return;
+        }
+        running = true;
         this.flowType = flowType;
         String ssoUrl = ArgName.toolkitUserFolderUrl.defaultValue();
         logger.info("Launching SSO for [{}]", ssoUrl);
@@ -84,12 +102,27 @@ public class FXWebService {
         stage.setScene(new Scene(stackPane, 600, 600));
         stage.setOnCloseRequest(createOnCloseRequest(flowType));
         stage.setTitle(BundleUtils.getMsg("webview.title"));
+        stage.setIconified(iconified);
+        addIcon(stage);
         stage.show();
 
         CookiesService.loadCookies();
 
         webEngine.getLoadWorker().stateProperty().addListener(changeListener());
         webEngine.load(ssoUrl);
+    }
+
+    private void addIcon(Stage stage) {
+        try (InputStream is = getClass()
+                .getClassLoader()
+                .getResourceAsStream(ResourceUtils.getImgResourcePath(ImageFile.CHICKEN_FACE_PNG.fileUrl()))) {
+            Optional.ofNullable(is).ifPresent(it -> {
+                Image icon = new Image(is);
+                stage.getIcons().add(icon);
+            });
+        } catch (IOException ex) {
+            logger.warn("Problem with loading window icon: {}.", ex.getMessage());
+        }
     }
 
     private EventHandler<WindowEvent> createOnCloseRequest(FlowType flowType) {
@@ -107,10 +140,13 @@ public class FXWebService {
         } else if (flowType == FlowType.JOB) {
             logger.info("Webview opened from JOB. Continuing job.");
             executorService.submit(this::continueJob, Void.class);
+        } else if (flowType == FlowType.MISSED_JOB) {
+            logger.info("Webview opened from {}. Continuing missed job.", flowType);
         } else {
             logger.info("Webview opened regularly.");
             label.setText(BundleUtils.getMsg("toolkit.panel.cookieExpires", CookiesService.expiryDate()));
         }
+        running = false;
         logger.info("Webview was closed.");
     }
 
@@ -142,12 +178,14 @@ public class FXWebService {
                     try {
                         checkProblem(webEngine.getDocument());
                         CookiesService.extractAndSaveCookies();
-                        new AlertWindowBuilder()
-                                .withHeaderText(BundleUtils.getMsg(this.flowType == FlowType.INIT ?
-                                        "webview.cookies.restarted" : "webview.cookies.saved"))
-                                .withAlertType(Alert.AlertType.INFORMATION)
-                                .withImageFile(ImageFile.FINGER_UP_PNG)
-                                .buildAndDisplayWindow();
+                        if (!iconified) {
+                            new AlertWindowBuilder()
+                                    .withHeaderText(BundleUtils.getMsg(this.flowType == FlowType.INIT ?
+                                            "webview.cookies.restarted" : "webview.cookies.saved"))
+                                    .withAlertType(Alert.AlertType.INFORMATION)
+                                    .withImageFile(ImageFile.FINGER_UP_PNG)
+                                    .buildAndDisplayWindow();
+                        }
                     } catch (Exception e) {
                         logger.error("Could not save cookies.", e);
                         new AlertWindowBuilder()

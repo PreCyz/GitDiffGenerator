@@ -6,25 +6,23 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.FlowType;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
+import pg.gipter.services.CookiesService;
+import pg.gipter.services.FXWebService;
 import pg.gipter.ui.MultiConfigRunner;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 public class JobService {
@@ -102,18 +100,13 @@ public class JobService {
 
                     if (shouldExecute) {
                         if (!jobParam.getConfigs().isEmpty()) {
-                            logger.info("Fixing missed job execution for following configs [{}].", jobParam.getConfigs());
-                            List<ApplicationProperties> applicationPropertiesCollection = new ArrayList<>(jobParam.getConfigs().size());
-                            for (String configName : jobParam.getConfigs()) {
-                                Optional<RunConfig> runConfig = DaoFactory.getCachedConfiguration().loadRunConfig(configName);
-                                if (runConfig.isPresent()) {
-                                    runConfig.get().setStartDate(startDate);
-                                    applicationPropertiesCollection.add(
-                                            ApplicationPropertiesFactory.getInstance(runConfig.get().toArgumentArray())
-                                    );
-                                }
+                            final LocalDate start = LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth());
+                            if (!CookiesService.hasValidFedAuth()) {
+                                FXWebService fxWebService = new FXWebService().initMinimizedSSO(FlowType.MISSED_JOB);
+                                executor.execute(() -> delayExecuteMissedJob(fxWebService, executor, jobParam, start));
+                            } else {
+                                executor.execute(() -> executeMissedJob(executor, jobParam, start));
                             }
-                            new MultiConfigRunner(applicationPropertiesCollection, executor, RunType.FIXING_JOB_EXECUTION).start();
                         } else {
                             logger.warn("From some reason the job is defined but without any specific configurations. I do not know how this happened and can do nothing with it.");
                         }
@@ -140,5 +133,38 @@ public class JobService {
         } catch (SchedulerException e) {
             return false;
         }
+    }
+
+    private void executeMissedJob(Executor executor, JobParam jobParam, LocalDate startDate) {
+        logger.info("Fixing missed job execution for following configs [{}].", jobParam.getConfigs());
+        List<ApplicationProperties> applicationPropertiesCollection = new ArrayList<>(jobParam.getConfigs().size());
+        for (String configName : jobParam.getConfigs()) {
+            Optional<RunConfig> runConfig = DaoFactory.getCachedConfiguration().loadRunConfig(configName);
+            if (runConfig.isPresent()) {
+                runConfig.get().setStartDate(startDate);
+                applicationPropertiesCollection.add(
+                        ApplicationPropertiesFactory.getInstance(runConfig.get().toArgumentArray())
+                );
+            }
+        }
+        new MultiConfigRunner(applicationPropertiesCollection, executor, RunType.FIXING_JOB_EXECUTION).start();
+    }
+
+    private void delayExecuteMissedJob(FXWebService fxWebService, Executor executor, JobParam jobParam, LocalDate startDate) {
+        LocalDateTime waitStart = LocalDateTime.now();
+        while (FXWebService.isRunning() && waitStart.isAfter(LocalDateTime.now().minusMinutes(1))) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                logger.error("Problems with sleeping.", e);
+            }
+        }
+        logger.info("Done waiting for authentication after {} seconds.",
+                Duration.between(waitStart, LocalDateTime.now()).toSeconds());
+        if (!CookiesService.hasValidFedAuth()) {
+            logger.warn("Authentication process is not successful. Fix is terminated.");
+            return;
+        }
+        executeMissedJob(executor, jobParam, startDate);
     }
 }

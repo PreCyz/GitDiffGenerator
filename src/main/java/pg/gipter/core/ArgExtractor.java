@@ -179,10 +179,6 @@ final class ArgExtractor {
         return ArgName.toolkitCopyListName.defaultValue();
     }
 
-    String toolkitWSUrl() {
-        return ArgName.toolkitWSUrl.defaultValue();
-    }
-
     String toolkitUserFolderUrl() {
         return ArgName.toolkitUserFolderUrl.defaultValue() + toolkitFolderName();
     }
