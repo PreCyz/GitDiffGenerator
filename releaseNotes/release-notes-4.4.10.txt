@@ -1,0 +1,9 @@
+**Release notes:**
+Fixes:
+
+Improvements:
+* Removing toolkit WS URL.
+* Cleaning FXMLs.
+* Only one authentication process is allowed.
+* Missing job trigger.
+* Job with authentication.
