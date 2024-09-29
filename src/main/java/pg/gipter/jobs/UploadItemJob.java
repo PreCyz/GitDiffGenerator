@@ -62,7 +62,7 @@ public class UploadItemJob implements Job {
             }
         }
         logger.info("Done waiting for authentication after {} seconds.",
-                Duration.between(waitStart, LocalDateTime.now()).toSeconds());
+                Duration.between(waitStart, LocalDateTime.now()).getSeconds());
         return CookiesService.hasValidFedAuth();
     }
 

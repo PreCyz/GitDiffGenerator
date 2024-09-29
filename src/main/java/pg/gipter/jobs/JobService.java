@@ -160,7 +160,7 @@ public class JobService {
             }
         }
         logger.info("Done waiting for authentication after {} seconds.",
-                Duration.between(waitStart, LocalDateTime.now()).toSeconds());
+                Duration.between(waitStart, LocalDateTime.now()).getSeconds());
         if (!CookiesService.hasValidFedAuth()) {
             logger.warn("Authentication process is not successful. Fix is terminated.");
             return;
