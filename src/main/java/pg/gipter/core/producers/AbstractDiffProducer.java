@@ -170,6 +170,9 @@ abstract class AbstractDiffProducer implements DiffProducer {
         DiffDetails diffDetails = new DiffDetails(projectPath);
         LinkedList<String> fullCommand = new LinkedList<>();
         fullCommand.add("powershell.exe");
+        fullCommand.add("-NoProfile");
+        fullCommand.add("-NoLogo");
+        fullCommand.add("-NonInteractive");
         fullCommand.addAll(cmd);
         ProcessBuilder processBuilder = new ProcessBuilder(fullCommand);
         processBuilder.directory(Paths.get(projectPath).toFile());
