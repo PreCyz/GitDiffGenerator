@@ -6,7 +6,7 @@
 
     <groupId>pg.gipter</groupId>
     <artifactId>Gipter</artifactId>
-    <version>4.4.10</version>
+    <version>4.4.11</version>
     <packaging>jar</packaging>
 
     <properties>

@@ -1,0 +1,5 @@
+**Release notes:**
+Fixes:
+
+Improvements:
+* Skip PowerShell profile loading, logo and run as non-interactive when producing diff on Windows.
