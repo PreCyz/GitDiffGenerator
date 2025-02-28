@@ -315,6 +315,12 @@
             <artifactId>guava</artifactId>
             <version>33.2.1-jre</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>error_prone_annotations</artifactId>
+                    <groupId>com.google.errorprone</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.testfx</groupId>
