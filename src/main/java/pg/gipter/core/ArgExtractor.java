@@ -4,7 +4,10 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -330,5 +333,19 @@ final class ArgExtractor {
             return getValue(ArgName.emailDomain, ArgName.emailDomain.defaultValue());
         }
         return ArgName.emailDomain.defaultValue();
+    }
+
+    boolean isToolkitFileAuthorIncluded() {
+        if (containsArg(ArgName.toolkitFileAuthorIncluded.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.toolkitFileAuthorIncluded, ArgName.toolkitFileAuthorIncluded.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.toolkitFileAuthorIncluded.defaultValue());
+    }
+
+    boolean isToolkitFileModifiedByIncluded() {
+        if (containsArg(ArgName.toolkitFileModifiedByIncluded.name())) {
+            return StringUtils.getBoolean(getValue(ArgName.toolkitFileModifiedByIncluded, ArgName.toolkitFileModifiedByIncluded.defaultValue()));
+        }
+        return StringUtils.getBoolean(ArgName.toolkitFileModifiedByIncluded.defaultValue());
     }
 }

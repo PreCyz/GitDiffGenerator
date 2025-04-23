@@ -281,12 +281,17 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
     }
 
     protected String select() {
-        return "$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
+        String select = "$select=Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
                 "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
-                "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +
-                "File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email," +
                 "File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel," +
                 "File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email";
+        if (applicationProperties.isToolkitFileAuthorIncluded()) {
+            select += ",File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email";
+        }
+        if (applicationProperties.isToolkitFileModifiedByIncluded()) {
+            select += ",File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email";
+        }
+        return select;
     }
 
     protected String filter() {
@@ -297,7 +302,14 @@ abstract class AbstractDocumentFinder implements DocumentFinder {
     }
 
     protected String expand() {
-        return "$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy";
+        String expand = "$expand=File,File/Versions,File/Versions/CreatedBy";
+        if (applicationProperties.isToolkitFileAuthorIncluded()) {
+            expand += ",File/Author";
+        }
+        if (applicationProperties.isToolkitFileModifiedByIncluded()) {
+            expand += ",File/ModifiedBy";
+        }
+        return expand;
     }
 
     public abstract List<Path> find();

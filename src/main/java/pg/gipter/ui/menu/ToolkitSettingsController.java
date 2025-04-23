@@ -3,8 +3,13 @@ package pg.gipter.ui.menu;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.ToolkitConfig;
@@ -36,6 +41,10 @@ public class ToolkitSettingsController extends AbstractController {
     private TextField toolkitUserFolderTextField;
     @FXML
     private Hyperlink toolkitUserFolderHyperlink;
+    @FXML
+    private CheckBox toolkitFileAuthorIncludedCheckBox;
+    @FXML
+    private CheckBox toolkitFileModifiedByIncludedCheckBox;
 
     public ToolkitSettingsController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
@@ -56,6 +65,8 @@ public class ToolkitSettingsController extends AbstractController {
         toolkitListNameTextField.setText(applicationProperties.toolkitCopyListName());
         toolkitUrlTextField.setText(applicationProperties.toolkitHostUrl());
         toolkitUserFolderHyperlink.setText(applicationProperties.toolkitUserFolderUrl());
+        toolkitFileAuthorIncludedCheckBox.setSelected(applicationProperties.isToolkitFileAuthorIncluded());
+        toolkitFileModifiedByIncludedCheckBox.setSelected(applicationProperties.isToolkitFileModifiedByIncluded());
     }
 
     private void setActions() {
@@ -96,6 +107,8 @@ public class ToolkitSettingsController extends AbstractController {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername(toolkitUsernameTextField.getText());
         toolkitConfig.setToolkitFolderName(toolkitFolderNameTextField.getText());
+        toolkitConfig.setToolkitFileAuthorIncluded(toolkitFileAuthorIncludedCheckBox.isSelected());
+        toolkitConfig.setToolkitFileModifiedByIncluded(toolkitFileModifiedByIncludedCheckBox.isSelected());
         applicationProperties.updateToolkitConfig(toolkitConfig);
         applicationProperties.save();
     }

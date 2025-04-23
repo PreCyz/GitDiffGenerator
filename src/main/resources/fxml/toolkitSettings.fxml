@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<AnchorPane fx:id="mainAnchorPane" prefHeight="210.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
-   <TitledPane animated="false" collapsible="false" prefHeight="210.0" prefWidth="678.0" text="%toolkit.panel.title">
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<AnchorPane fx:id="mainAnchorPane" prefHeight="237.0" prefWidth="678.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <TitledPane animated="false" collapsible="false" prefHeight="237.0" prefWidth="678.0" text="%toolkit.panel.title">
       <font>
          <Font name="System Bold" size="12.0" />
       </font>
-      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="210.0" prefWidth="603.0">
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="212.0" prefWidth="676.0">
          <Label layoutX="10.0" layoutY="11.0" text="%toolkit.panel.username" />
          <Label layoutX="10.0" layoutY="83.0" text="%toolkit.panel.listName" />
          <Label layoutX="10.0" layoutY="117.0" text="%toolkit.panel.url" />
@@ -36,6 +41,8 @@
          <Pane id="amazing-pane" layoutX="332.0" layoutY="2.0" prefHeight="111.0" prefWidth="335.0" stylesheets="@../css/toolkitSettings.css" />
          <Label layoutX="10.0" layoutY="47.0" text="%toolkit.panel.folderName" />
          <TextField fx:id="toolkitFolderNameTextField" layoutX="106.0" layoutY="45.0" prefHeight="26.0" prefWidth="216.0" />
+         <CheckBox fx:id="toolkitFileAuthorIncludedCheckBox" layoutX="106.0" layoutY="182.0" mnemonicParsing="false" text="%toolkit.panel.includeAuthor" />
+         <CheckBox fx:id="toolkitFileModifiedByIncludedCheckBox" layoutX="235.0" layoutY="182.0" mnemonicParsing="false" text="%toolkit.panel.includeModifier" />
       </AnchorPane>
    </TitledPane>
 </AnchorPane>
