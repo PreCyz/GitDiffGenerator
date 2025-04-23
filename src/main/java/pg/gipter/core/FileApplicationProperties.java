@@ -177,12 +177,11 @@ class FileApplicationProperties extends ApplicationProperties {
 
     @Override
     public String toolkitUsername() {
-        return "MAKI";
-        /*if (StringUtils.notEmpty(toolkitConfig.getToolkitUsername()) &&
+        if (StringUtils.notEmpty(toolkitConfig.getToolkitUsername()) &&
                 !toolkitConfig.getToolkitUsername().equals(ArgName.toolkitUsername.defaultValue())) {
             return toolkitConfig.getToolkitUsername().trim().toUpperCase();
         }
-        return argExtractor.toolkitUsername();*/
+        return argExtractor.toolkitUsername();
     }
 
     @Override
