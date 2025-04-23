@@ -5,19 +5,13 @@ import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
-import pg.gipter.core.PreferredArgSource;
+import pg.gipter.core.*;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.services.CookiesService;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helpers.XmlHelper;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -231,15 +225,15 @@ class ComplexDocumentFinderTest {
         assertThat(actual).startsWith("https://goto.netcompany.com/cases/GTE440/TOEDNLD/_api/web/lists/GetByTitle('Deliverables')/items" +
                 "?$select=Id,Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
                 "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
-                "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +
-                "File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email," +
                 "File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size," +
                 "File/Versions/Url,File/Versions/VersionLabel," +
                 "File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email" +
+                ",File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email" +
+                ",File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email" +
                 "&$filter=");
         assertThat(actual).contains("Created+lt+datetime'2019-03-02");
         assertThat(actual).contains("+or+Modified+ge+datetime'2019-02-24");
-        assertThat(actual).contains("&$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy");
+        assertThat(actual).contains("&$expand=File,File/Versions,File/Versions/CreatedBy,File/Author,File/ModifiedBy");
         assertThat(actual).contains("&$top=100");
         assertThat(actual).endsWith("&$skiptoken=Paged=TRUE&p_SortBehavior=0&p_ID=" + documentId);
     }
