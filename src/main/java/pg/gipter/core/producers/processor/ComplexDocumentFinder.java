@@ -12,10 +12,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -99,6 +96,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
             select += ",File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email";
         }
         String filter = String.format("$filter=Created+lt+datetime'%s'+or+Modified+ge+datetime'%s'",
+                LocalDateTime.of(applicationProperties.endDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME),
                 LocalDateTime.of(applicationProperties.startDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME)
         );
         String top = "$top=" + TOP_LIMIT;
