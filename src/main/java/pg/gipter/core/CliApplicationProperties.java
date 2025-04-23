@@ -7,7 +7,9 @@ import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -222,6 +224,24 @@ class CliApplicationProperties extends ApplicationProperties {
     @Override
     public String toolkitUserFolderUrl() {
         return ArgName.toolkitUserFolderUrl.defaultValue() + toolkitUsername();
+    }
+
+    @Override
+    public boolean isToolkitFileAuthorIncluded() {
+        boolean value = argExtractor.isToolkitFileAuthorIncluded();
+        if (!containsArg(ArgName.toolkitFileAuthorIncluded.name()) && toolkitConfig.isToolkitFileAuthorIncluded()) {
+            value = toolkitConfig.isToolkitFileAuthorIncluded();
+        }
+        return value;
+    }
+
+    @Override
+    public boolean isToolkitFileModifiedByIncluded() {
+        boolean value = argExtractor.isToolkitFileModifiedByIncluded();
+        if (!containsArg(ArgName.toolkitFileModifiedByIncluded.name()) && toolkitConfig.isToolkitFileModifiedByIncluded()) {
+            value = toolkitConfig.isToolkitFileModifiedByIncluded();
+        }
+        return value;
     }
 
     @Override

@@ -89,17 +89,19 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
     String buildPageableUrl(String project, String listTitle, int documentId) {
         String select = "$select=Id,Title,Modified,GUID,Created,DocIcon,FileRef,FileLeafRef,OData__UIVersionString," +
                 "File/ServerRelativeUrl,File/TimeLastModified,File/Title,File/Name,File/MajorVersion,File/MinorVersion,File/UIVersionLabel," +
-                "File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email," +
-                "File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email," +
                 "File/Versions/CheckInComment,File/Versions/Created,File/Versions/ID,File/Versions/IsCurrentVersion,File/Versions/Size,File/Versions/Url,File/Versions/VersionLabel," +
                 "File/Versions/CreatedBy/Id,File/Versions/CreatedBy/LoginName,File/Versions/CreatedBy/Title,File/Versions/CreatedBy/Email";
+
+        if (applicationProperties.isToolkitFileAuthorIncluded()) {
+            select += ",File/Author/Id,File/Author/LoginName,File/Author/Title,File/Author/Email";
+        }
+        if (applicationProperties.isToolkitFileModifiedByIncluded()) {
+            select += ",File/ModifiedBy/Id,File/ModifiedBy/LoginName,File/ModifiedBy/Title,File/ModifiedBy/Email";
+        }
         String filter = String.format("$filter=Created+lt+datetime'%s'+or+Modified+ge+datetime'%s'",
-                LocalDateTime.of(applicationProperties.endDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME),
                 LocalDateTime.of(applicationProperties.startDate(), LocalTime.now()).format(DateTimeFormatter.ISO_DATE_TIME)
         );
         String top = "$top=" + TOP_LIMIT;
-        String expand = "$expand=File,File/Author,File/ModifiedBy,File/Versions,File/Versions/CreatedBy";
-
 
         String url = String.format("%s%s/_api/web/lists/GetByTitle('%s')/items",
                 applicationProperties.toolkitHostUrl(),
@@ -110,6 +112,6 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
         if (documentId == 0) {
             paging = "";
         }
-        return String.format("%s?%s&%s&%s&%s%s", url, select, filter, expand, top, paging);
+        return String.format("%s?%s&%s&%s&%s%s", url, select, filter, expand(), top, paging);
     }
 }

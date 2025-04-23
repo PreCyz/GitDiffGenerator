@@ -3,7 +3,6 @@ package pg.gipter.core;
 import pg.gipter.FlowType;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.SystemUtils;
 
 import java.time.LocalDate;
 
@@ -191,13 +190,15 @@ public enum ArgName {
     toolkitUsername {
         @Override
         public String defaultValue() {
-            return SystemUtils.userName();
+//            return SystemUtils.userName();
+            return "MAKI";
         }
     },
     toolkitFolderName {
         @Override
         public String defaultValue() {
-            return SystemUtils.userName();
+//            return SystemUtils.userName();
+            return "MAKI";
         }
     },
     toolkitCopyListName {
@@ -229,6 +230,18 @@ public enum ArgName {
         @Override
         public String defaultValue() {
             return toolkitHostUrl.defaultValue() + toolkitCopyCase.defaultValue() + "/SiteAssets/";
+        }
+    },
+    toolkitFileAuthorIncluded {
+        @Override
+        public String defaultValue() {
+            return "Y";
+        }
+    },
+    toolkitFileModifiedByIncluded {
+        @Override
+        public String defaultValue() {
+            return "Y";
         }
     },
     emailDomain {

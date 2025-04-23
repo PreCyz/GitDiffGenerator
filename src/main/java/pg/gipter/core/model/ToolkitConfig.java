@@ -1,6 +1,7 @@
 package pg.gipter.core.model;
 
 import pg.gipter.core.ArgName;
+import pg.gipter.utils.StringUtils;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -17,15 +18,21 @@ public class ToolkitConfig {
     private transient String toolkitCopyCase;
     private transient String toolkitWSUrl;
     private transient String toolkitUserFolderUrl;
+    private boolean toolkitFileAuthorIncluded;
+    private boolean toolkitFileModifiedByIncluded;
 
     public ToolkitConfig() {
         toolkitUsername = ArgName.toolkitUsername.defaultValue();
         toolkitFolderName = ArgName.toolkitFolderName.defaultValue();
+        toolkitFileAuthorIncluded = StringUtils.getBoolean(ArgName.toolkitFileAuthorIncluded.defaultValue());
+        toolkitFileModifiedByIncluded = StringUtils.getBoolean(ArgName.toolkitFileModifiedByIncluded.defaultValue());
     }
 
     public ToolkitConfig(ToolkitConfig toolkitConfig) {
         toolkitUsername = toolkitConfig.getToolkitUsername();
         toolkitFolderName = toolkitConfig.getToolkitFolderName();
+        toolkitFileAuthorIncluded = toolkitConfig.isToolkitFileAuthorIncluded();
+        toolkitFileModifiedByIncluded = toolkitConfig.isToolkitFileModifiedByIncluded();
     }
 
     public String getToolkitUsername() {
@@ -92,6 +99,22 @@ public class ToolkitConfig {
         this.toolkitUserFolderUrl = toolkitUserFolder;
     }
 
+    public boolean isToolkitFileAuthorIncluded() {
+        return toolkitFileAuthorIncluded;
+    }
+
+    public void setToolkitFileAuthorIncluded(boolean toolkitFileAuthorIncluded) {
+        this.toolkitFileAuthorIncluded = toolkitFileAuthorIncluded;
+    }
+
+    public boolean isToolkitFileModifiedByIncluded() {
+        return toolkitFileModifiedByIncluded;
+    }
+
+    public void setToolkitFileModifiedByIncluded(boolean toolkitFileModifiedByIncluded) {
+        this.toolkitFileModifiedByIncluded = toolkitFileModifiedByIncluded;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getToolkitUsername() != null) {
@@ -112,6 +135,8 @@ public class ToolkitConfig {
         if (getToolkitUserFolderUrl() != null) {
             arguments.add(ArgName.toolkitUserFolderUrl.name() + "=" + getToolkitUserFolderUrl());
         }
+        arguments.add(ArgName.toolkitFileAuthorIncluded.name() + "=" + isToolkitFileAuthorIncluded());
+        arguments.add(ArgName.toolkitFileModifiedByIncluded.name() + "=" + isToolkitFileModifiedByIncluded());
         return arguments.toArray(new String[0]);
     }
 
@@ -134,6 +159,10 @@ public class ToolkitConfig {
                     toolkitConfig.setToolkitCopyCase(argumentValue);
                 } else if (ArgName.toolkitUserFolderUrl.name().equals(argumentName)) {
                     toolkitConfig.setToolkitUserFolderUrl(argumentValue);
+                } else if (ArgName.toolkitFileAuthorIncluded.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitFileAuthorIncluded(Boolean.parseBoolean(argumentValue));
+                } else if (ArgName.toolkitFileModifiedByIncluded.name().equals(argumentName)) {
+                    toolkitConfig.setToolkitFileModifiedByIncluded(Boolean.parseBoolean(argumentValue));
                 }
             }
         }
@@ -151,6 +180,8 @@ public class ToolkitConfig {
                 ", toolkitCopyCase='" + toolkitCopyCase + '\'' +
                 ", toolkitWSUrl='" + toolkitWSUrl + '\'' +
                 ", toolkitUserFolder='" + toolkitUserFolderUrl + '\'' +
+                ", toolkitFileAuthorIncluded='" + toolkitFileAuthorIncluded + '\'' +
+                ", toolkitFileModifiedByIncluded='" + toolkitFileModifiedByIncluded + '\'' +
                 '}';
     }
 }

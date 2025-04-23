@@ -6,7 +6,11 @@ import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.model.*;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.model.NamePatternValue;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.RunConfigBuilder;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.SemanticVersioning;
 import pg.gipter.utils.SystemUtils;
@@ -17,7 +21,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -2167,5 +2173,53 @@ class CliApplicationPropertiesTest {
         String actual = applicationProperties.githubToken();
 
         assertThat(actual).isEqualTo("file");
+    }
+
+    @Test
+    void givenNoToolkitFileAuthorIncluded_whenIsToolkitFileAuthorIncluded_thenReturnDefaultTrue() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args).init();
+        assertThat(applicationProperties.isToolkitFileAuthorIncluded()).isTrue();
+    }
+
+    @Test
+    void givenIsToolkitFileAuthorIncludedCliTrue_whenIsToolkitFileAuthorIncluded_thenReturnTrue() {
+        String[] args = {"toolkitFileAuthorIncluded=Y"};
+        applicationProperties = new CliApplicationProperties(args).init();
+        assertThat(applicationProperties.isToolkitFileAuthorIncluded()).isTrue();
+    }
+
+    @Test
+    void givenIsToolkitFileAuthorIncludedCliTrueAndFalseFromFile_whenIsToolkitFileAuthorIncluded_thenReturnFalse() {
+        String[] args = {"toolkitFileAuthorIncluded=false"};
+        applicationProperties = new CliApplicationProperties(args).init();
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitFileAuthorIncluded(true);
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        assertThat(applicationProperties.isToolkitFileAuthorIncluded()).isFalse();
+    }
+
+    @Test
+    void givenNoToolkitFileModifiedByIncluded_whenIsToolkitFileModifiedByIncluded_thenReturnDefaultTrue() {
+        String[] args = {};
+        applicationProperties = new CliApplicationProperties(args).init();
+        assertThat(applicationProperties.isToolkitFileModifiedByIncluded()).isTrue();
+    }
+
+    @Test
+    void givenToolkitFileModifiedByIncludedCliTrue_whenIsToolkitFileModifiedByIncluded_thenReturnTrue() {
+        String[] args = {"toolkitFileModifiedByIncluded=Y"};
+        applicationProperties = new CliApplicationProperties(args).init();
+        assertThat(applicationProperties.isToolkitFileModifiedByIncluded()).isTrue();
+    }
+
+    @Test
+    void givenToolkitFileModifiedByIncludedCliTrueAndFalseFromFile_whenIsToolkitFileModifiedByIncluded_thenReturnFalse() {
+        String[] args = {"toolkitFileModifiedByIncluded=false"};
+        applicationProperties = new CliApplicationProperties(args).init();
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitFileModifiedByIncluded(true);
+        applicationProperties.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        assertThat(applicationProperties.isToolkitFileModifiedByIncluded()).isFalse();
     }
 }

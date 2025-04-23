@@ -7,7 +7,9 @@ import pg.gipter.utils.StringUtils;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -175,11 +177,12 @@ class FileApplicationProperties extends ApplicationProperties {
 
     @Override
     public String toolkitUsername() {
-        if (StringUtils.notEmpty(toolkitConfig.getToolkitUsername()) &&
+        return "MAKI";
+        /*if (StringUtils.notEmpty(toolkitConfig.getToolkitUsername()) &&
                 !toolkitConfig.getToolkitUsername().equals(ArgName.toolkitUsername.defaultValue())) {
             return toolkitConfig.getToolkitUsername().trim().toUpperCase();
         }
-        return argExtractor.toolkitUsername();
+        return argExtractor.toolkitUsername();*/
     }
 
     @Override
@@ -229,6 +232,16 @@ class FileApplicationProperties extends ApplicationProperties {
     }
 
     @Override
+    public boolean isToolkitFileAuthorIncluded() {
+        return toolkitConfig.isToolkitFileAuthorIncluded();
+    }
+
+    @Override
+    public boolean isToolkitFileModifiedByIncluded() {
+        return toolkitConfig.isToolkitFileModifiedByIncluded();
+    }
+
+    @Override
     public boolean isUseUI() {
         if (applicationConfig.getUseUI() != null) {
             return applicationConfig.getUseUI();
@@ -251,7 +264,6 @@ class FileApplicationProperties extends ApplicationProperties {
         }
         Optional<String> gt = GeneralSettingsService.getInstance().getGithubToken();
         return gt.orElseGet(argExtractor::githubToken);
-
     }
 
     @Override

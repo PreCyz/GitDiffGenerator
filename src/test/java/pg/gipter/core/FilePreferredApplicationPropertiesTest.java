@@ -7,7 +7,10 @@ import org.mockito.Mockito;
 import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.model.*;
+import pg.gipter.core.model.ApplicationConfig;
+import pg.gipter.core.model.RunConfig;
+import pg.gipter.core.model.RunConfigBuilder;
+import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.CookiesService;
 
@@ -1245,5 +1248,36 @@ class FilePreferredApplicationPropertiesTest {
         String actual = appProps.githubToken();
 
         assertThat(actual).isEqualTo("file");
+    }
+
+    @Test
+    void givenEmptyToolkitFileAuthorIncluded_whenIsToolkitFileAuthorIncluded_thenReturnTrue() {
+        String[] args = {""};
+        appProps = new FileApplicationProperties(args).init();
+        appProps.init(TestUtils.mockConfigurationDao(new ToolkitConfig()));
+
+        assertThat(appProps.isToolkitFileAuthorIncluded()).isTrue();
+    }
+
+    @Test
+    void givenToolkitFileAuthorIncludedY_whenIsToolkitFileAuthorIncluded_thenReturnFalse() {
+        String[] args = {"toolkitFileAuthorIncluded=Y"};
+        appProps = new FileApplicationProperties(args).init();
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitFileAuthorIncluded(Boolean.FALSE);
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        assertThat(appProps.isToolkitFileAuthorIncluded()).isFalse();
+    }
+
+    @Test
+    void givenToolkitFileAuthorIncludedY_whenIsToolkitFileAuthorIncluded_thenReturnTrue() {
+        String[] args = {""};
+        ToolkitConfig toolkitConfig = new ToolkitConfig();
+        toolkitConfig.setToolkitFileAuthorIncluded(Boolean.TRUE);
+        appProps = new FileApplicationProperties(args).init();
+        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+
+        assertThat(appProps.isToolkitFileAuthorIncluded()).isTrue();
     }
 }
