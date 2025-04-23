@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+#set -e
 
 #Below variable is taken from the env vars and those are set in Dockerfile
 GITHUB_TOKEN=$githubToken

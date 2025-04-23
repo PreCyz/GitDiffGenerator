@@ -1,5 +1,5 @@
 **Release notes:**
 Fixes:
-* Configuration for File/Author and File/ModifiedBy expansion.
+* Configuration for File-Author and File-ModifiedBy expansion.
 
 Improvements:
