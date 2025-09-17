@@ -1,0 +1,3 @@
+**Release notes:**
+Fixes:
+* Fixing cookies for the WebView after migration to Sharepoint subscription.
