@@ -62,6 +62,7 @@ class ParallelProcessor {
                 logger.error("Error when getting items.", e);
             }
         }
+        executor.shutdown();
         return result;
     }
 

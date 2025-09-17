@@ -16,10 +16,19 @@ import java.lang.reflect.Type;
 import java.net.CookieHandler;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.time.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 public final class CookiesService {
@@ -89,7 +98,10 @@ public final class CookiesService {
             final String path,
             final long maxAge,
             final boolean isSecure,
-            final boolean isHttpOnly) {
+            final boolean isHttpOnly,
+            final boolean isPersistent,
+            final boolean isHostOnly
+            ) {
 
         if (StringUtils.nullOrEmpty(name)) {
             throw new IllegalArgumentException("Bad cookie name");
@@ -123,6 +135,12 @@ public final class CookiesService {
         }
         if (isHttpOnly) {
             buf.append(";HttpOnly");
+        }
+        if (isPersistent) {
+            buf.append(";Persistent");
+        }
+        if (isHostOnly) {
+            buf.append(";HostOnly");
         }
 
         return buf.toString();
@@ -197,7 +215,9 @@ public final class CookiesService {
                                     cookie.path,
                                     cookie.expiryTime,
                                     cookie.secureOnly,
-                                    cookie.httpOnly))
+                                    cookie.httpOnly,
+                                    cookie.persistent,
+                                    cookie.hostOnly))
                             .collect(Collectors.toList());
                     Map<String, List<String>> m = new LinkedHashMap<>();
                     m.put("Set-Cookie", list);
@@ -243,7 +263,7 @@ public final class CookiesService {
         String json = gson.toJson(cookiesToSave);
 
         if (!json.isEmpty() && !"{}".equals(json)) {
-            Files.write(CookiesService.COOKIES_PATH, json.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(CookiesService.COOKIES_PATH, json);
         }
         logger.info("Cookies saved in [{}]", CookiesService.COOKIES_PATH);
     }
