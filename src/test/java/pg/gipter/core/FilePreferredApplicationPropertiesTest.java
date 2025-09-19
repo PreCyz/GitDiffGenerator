@@ -602,7 +602,7 @@ class FilePreferredApplicationPropertiesTest {
     @Test
     void givenToolkitUsernameAndPassword_whenIsToolkitPropertiesSet_thenReturnTrue() {
         try (MockedStatic<CookiesService> utilities = Mockito.mockStatic(CookiesService.class)) {
-            utilities.when(CookiesService::hasValidFedAuth).thenReturn(true);
+            utilities.when(CookiesService::hasValidCookies).thenReturn(true);
             String[] args = {};
             appProps = new FileApplicationProperties(args).init();
 

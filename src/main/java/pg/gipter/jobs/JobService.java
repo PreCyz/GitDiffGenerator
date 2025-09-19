@@ -20,9 +20,15 @@ import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 
 public class JobService {
@@ -101,7 +107,7 @@ public class JobService {
                     if (shouldExecute) {
                         if (!jobParam.getConfigs().isEmpty()) {
                             final LocalDate start = LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth());
-                            if (!CookiesService.hasValidFedAuth()) {
+                            if (!CookiesService.hasValidCookies()) {
                                 FXWebService fxWebService = new FXWebService().initMinimizedSSO(FlowType.MISSED_JOB);
                                 executor.execute(() -> delayExecuteMissedJob(fxWebService, executor, jobParam, start));
                             } else {
@@ -161,7 +167,7 @@ public class JobService {
         }
         logger.info("Done waiting for authentication after {} seconds.",
                 Duration.between(waitStart, LocalDateTime.now()).toSeconds());
-        if (!CookiesService.hasValidFedAuth()) {
+        if (!CookiesService.hasValidCookies()) {
             logger.warn("Authentication process is not successful. Fix is terminated.");
             return;
         }

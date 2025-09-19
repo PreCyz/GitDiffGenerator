@@ -6,7 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.configuration.ConfigurationDaoFactory;
 import pg.gipter.core.model.SharePointConfig;
@@ -15,10 +18,15 @@ import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helpers.XmlHelper;
 import pg.gipter.utils.StringUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -285,6 +293,7 @@ class SimpleDocumentFinderTest {
     void givenProperties_whenBuildUrls_thenReturnUrls() {
         try (MockedStatic<CookiesService> utilities = Mockito.mockStatic(CookiesService.class)) {
             utilities.when(CookiesService::getFedAuthString).thenReturn("qq");
+            utilities.when(CookiesService::getGotoString).thenReturn("qq");
             ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                     new String[]{
                             ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
@@ -333,5 +342,26 @@ class SimpleDocumentFinderTest {
         String actual = finder.getProject("/cases/GTE440/TOEDNLD/Deliverables/D0180 - Integration design/Topdanmark integrations/D0180 - Integration Design - Topdanmark integrations - Party Master.docx");
 
         assertThat(actual).isEqualTo("/cases/GTE440/TOEDNLD/");
+    }
+
+    @Test
+    void givenResponseWithoutFileAuthor_whenGetFilesToDownload_thenReturnThem() throws FileNotFoundException {
+        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
+                new String[]{
+                        ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
+                        ArgName.startDate + "=2019-04-01",
+                        ArgName.endDate + "=2019-04-13",
+                        ArgName.toolkitUsername + "=pawg",
+                        ArgName.projectPath + "=/cases/GTE440/TOEDNLD"
+                });
+        finder = new ToolkitDocumentFinder(applicationProperties);
+        JsonObject js = getJsonObject("Item-case-9.json");
+        List<DocumentDetails> documentDetails = finder.convertToDocumentDetails(js).stream()
+                .filter(dd -> !StringUtils.nullOrEmpty(dd.getDocType()))
+                .collect(toList());
+
+        Map<String, String> filesToDownload = finder.getFilesToDownload(documentDetails);
+
+        assertThat(filesToDownload).isNotEmpty();
     }
 }

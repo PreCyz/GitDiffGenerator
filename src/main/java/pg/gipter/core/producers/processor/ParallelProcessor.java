@@ -86,7 +86,8 @@ class ParallelProcessor {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitHostUrl(),
                 fullUrl,
-                CookiesService.getFedAuthString()
+                CookiesService.getFedAuthString(),
+                CookiesService.getGotoString()
         );
         return new ItemCountResponse(
                 listAndProject.getProject(),

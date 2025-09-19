@@ -4,17 +4,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
-import java.net.http.*;
-import java.nio.file.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
 public class SettingsService {
 
     protected final static Logger logger = LoggerFactory.getLogger(SettingsService.class);
 
-    public File downloadAsset(final String assetName, final String fedAuth) throws IOException {
+    public File downloadAsset(final String assetName) throws IOException {
         String url = ArgName.toolkitSiteAssetsUrl.defaultValue() + assetName;
         File destination = Paths.get(".", assetName).toFile();
 
@@ -23,7 +29,7 @@ public class SettingsService {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .GET()
-                .header("Cookie", fedAuth)
+                .header("Cookie", CookiesService.getFedAuthString() + "; " + CookiesService.getGotoString())
                 .build();
 
         try {

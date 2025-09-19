@@ -33,6 +33,10 @@ import java.util.stream.Collectors;
 
 public final class CookiesService {
 
+    enum CookieName {
+        FedAuth, Goto
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(CookiesService.class);
     private static final String[] DAYS = {"Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
     private static final String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"};
@@ -42,15 +46,22 @@ public final class CookiesService {
 
     private CookiesService() {}
 
-    public static boolean hasValidFedAuth() {
+    public static boolean hasValidCookies() {
         try {
             CookieDetails fedAuthCookie = loadFedAuthCookie()
                     .orElseThrow(() -> new IllegalStateException("The cookie FedAuth does not exist."));
-            LocalDateTime expirationDate = LocalDateTime.ofInstant(
+            LocalDateTime fedAuthExpirationDate = LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(fedAuthCookie.expiryTime),
                     GMT_ZONE_ID
             );
-            return expirationDate.isAfter(LocalDateTime.now());
+            CookieDetails gotoCookie = loadGotoCookie()
+                    .orElseThrow(() -> new IllegalStateException("The cookie Goto does not exist."));
+            LocalDateTime goToExpirationDate = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(gotoCookie.expiryTime),
+                    GMT_ZONE_ID
+            );
+            LocalDateTime now = LocalDateTime.now();
+            return fedAuthExpirationDate.isAfter(now) && goToExpirationDate.isAfter(now);
         } catch (Exception ex) {
             logger.error("Problem with FedAuth cookie. Source of cookie [{}]. {}", COOKIES_PATH.toAbsolutePath(), ex.getMessage());
             return false;
@@ -58,18 +69,35 @@ public final class CookiesService {
     }
 
     public static String getFedAuthString() {
-        CookieDetails fedAuthCookie = loadFedAuthCookie().orElseThrow(() -> new IllegalStateException("The cookie FedAuth does not exist."));
-        return fedAuthCookie.name + "=" + fedAuthCookie.value;
+        return getCookieString(CookieName.FedAuth);
+    }
+
+    public static String getGotoString() {
+        return getCookieString(CookieName.Goto);
+    }
+
+    private static String getCookieString(CookieName cookieName) {
+        CookieDetails cookieDetails = getCookieDetails(cookieName)
+                .orElseThrow(() -> new IllegalStateException("The cookie " + cookieName.name() + " does not exist."));
+        return cookieDetails.name + "=" + cookieDetails.value;
     }
 
     private static Optional<CookieDetails> loadFedAuthCookie() {
+        return getCookieDetails(CookieName.FedAuth);
+    }
+
+    private static Optional<CookieDetails> loadGotoCookie() {
+        return getCookieDetails(CookieName.Goto);
+    }
+
+    private static Optional<CookieDetails> getCookieDetails(CookieName cookieName) {
         Optional<CookieDetails> result;
         if (isCookiesFileExist()) {
             try {
                 Map<String, Collection<CookieDetails>> cookiesToLoad = readCookiesFromFile();
                 result = cookiesToLoad.get(ArgName.toolkitHostUrl.defaultValue().replace("https://", ""))
                         .stream()
-                        .filter(cookie -> "FedAuth".equals(cookie.name))
+                        .filter(cookie -> cookieName.name().equals(cookie.name))
                         .findFirst();
             } catch (Exception e) {
                 logger.error("Could not load cookies from [{}]. {}", COOKIES_PATH.toAbsolutePath(), e.getMessage());
@@ -91,55 +119,44 @@ public final class CookiesService {
         return gson.fromJson(Files.readString(COOKIES_PATH, StandardCharsets.UTF_8), type);
     }
 
-    private static String format(
-            final String name,
-            final String value,
-            final String domain,
-            final String path,
-            final long maxAge,
-            final boolean isSecure,
-            final boolean isHttpOnly,
-            final boolean isPersistent,
-            final boolean isHostOnly
-            ) {
-
-        if (StringUtils.nullOrEmpty(name)) {
+    private static String format(CookieDetails cookie) {
+        if (StringUtils.nullOrEmpty(cookie.name)) {
             throw new IllegalArgumentException("Bad cookie name");
         }
 
         final StringBuilder buf = new StringBuilder();
         buf.setLength(0);
-        buf.append(name).append('=').append(Optional.ofNullable(value).orElseGet(() -> ""));
+        buf.append(cookie.name).append('=').append(Optional.ofNullable(cookie.value).orElse(""));
 
-        if (StringUtils.notEmpty(path)) {
-            buf.append(";Path=").append(path);
+        if (StringUtils.notEmpty(cookie.path)) {
+            buf.append(";Path=").append(cookie.path);
         }
 
-        if (StringUtils.notEmpty(domain)) {
-            buf.append(";Domain=").append(domain);
+        if (StringUtils.notEmpty(cookie.domain)) {
+            buf.append(";Domain=").append(cookie.domain);
         }
 
-        if (maxAge >= 0) {
+        if (cookie.expiryTime >= 0) {
             buf.append(";Expires=");
-            if (maxAge == 0) {
+            if (cookie.expiryTime == 0) {
                 buf.append(formatCookieDate(0).trim());
             } else {
-                buf.append(formatCookieDate(System.currentTimeMillis() + 1000L * maxAge));
+                buf.append(formatCookieDate(System.currentTimeMillis() + 1000L * cookie.expiryTime));
             }
             buf.append(";Max-Age=");
-            buf.append(maxAge);
+            buf.append(cookie.expiryTime);
         }
 
-        if (isSecure) {
+        if (cookie.secureOnly) {
             buf.append(";Secure");
         }
-        if (isHttpOnly) {
+        if (cookie.httpOnly) {
             buf.append(";HttpOnly");
         }
-        if (isPersistent) {
+        if (cookie.persistent) {
             buf.append(";Persistent");
         }
-        if (isHostOnly) {
+        if (cookie.hostOnly) {
             buf.append(";HostOnly");
         }
 
@@ -208,21 +225,13 @@ public final class CookiesService {
                 for (String domain : cookiesToLoad.keySet()) {
                     Collection<CookieDetails> cookies = cookiesToLoad.get(domain);
                     List<String> list = cookies.stream()
-                            .map(cookie -> format(
-                                    cookie.name,
-                                    cookie.value,
-                                    cookie.domain,
-                                    cookie.path,
-                                    cookie.expiryTime,
-                                    cookie.secureOnly,
-                                    cookie.httpOnly,
-                                    cookie.persistent,
-                                    cookie.hostOnly))
+                            .map(CookiesService::format)
                             .collect(Collectors.toList());
                     Map<String, List<String>> m = new LinkedHashMap<>();
                     m.put("Set-Cookie", list);
                     CookieHandler.getDefault().put(new URI(String.format("http://%s/", domain)), m);
                 }
+//                CookieHandler.setDefault(BulkCookieManagerExample.createCookieManager(cookiesToLoad));
                 logger.info("Cookies successfully loaded from [{}]", COOKIES_PATH.toAbsolutePath());
             } catch (Exception e) {
                 logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath(), e);

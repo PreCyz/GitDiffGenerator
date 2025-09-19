@@ -8,7 +8,9 @@ import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
@@ -40,6 +42,7 @@ class CookiesServiceTest {
     @Test
     void getFedAuth() {
         assertThat(CookiesService.getFedAuthString()).isEqualTo("aaaa");
+        assertThat(CookiesService.getGotoString()).isEqualTo("bbbb");
     }
 
     @Test

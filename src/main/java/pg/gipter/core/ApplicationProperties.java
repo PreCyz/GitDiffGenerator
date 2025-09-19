@@ -148,7 +148,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitCredentialsSet() {
-        return CookiesService.hasValidFedAuth();
+        return CookiesService.hasValidCookies();
     }
 
     public final String fileName() {
@@ -316,7 +316,7 @@ public abstract class ApplicationProperties {
     }
 
     public boolean hasConnectionToToolkit() {
-        return CookiesService.hasValidFedAuth() && new ToolkitService(this).isCookieWorking();
+        return CookiesService.hasValidCookies() && new ToolkitService(this).isCookieWorking();
     }
 
     protected final String log() {
