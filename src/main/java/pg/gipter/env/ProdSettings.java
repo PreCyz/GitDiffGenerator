@@ -2,12 +2,13 @@ package pg.gipter.env;
 
 import pg.gipter.Environment;
 import pg.gipter.core.model.CipherDetails;
-import pg.gipter.services.CookiesService;
 import pg.gipter.services.SettingsService;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -31,7 +32,7 @@ public class ProdSettings extends DevSettings {
     private void downloadSettingsFile() throws IOException {
         String settingsFileName = "settings.txt";
         try {
-            File settingsTxt = settingsService.downloadAsset(settingsFileName, CookiesService.getFedAuthString());
+            File settingsTxt = settingsService.downloadAsset(settingsFileName);
             Files.deleteIfExists(settingsPath());
             boolean result = settingsTxt.renameTo(settingsPath().toFile());
             if (!result) {
@@ -59,7 +60,7 @@ public class ProdSettings extends DevSettings {
                 Files.move(connectionPath(), bck);
             }
 
-            File file = settingsService.downloadAsset(connectionPath().toString(), CookiesService.getFedAuthString());
+            File file = settingsService.downloadAsset(connectionPath().toString());
 
             if (file.exists()) {
                 Files.deleteIfExists(bck);

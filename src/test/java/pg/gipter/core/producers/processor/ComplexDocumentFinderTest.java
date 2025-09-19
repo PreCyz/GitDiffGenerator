@@ -5,13 +5,19 @@ import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import pg.gipter.core.*;
+import pg.gipter.core.ApplicationProperties;
+import pg.gipter.core.ApplicationPropertiesFactory;
+import pg.gipter.core.ArgName;
+import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.services.CookiesService;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.toolkit.helpers.XmlHelper;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -242,6 +248,7 @@ class ComplexDocumentFinderTest {
     void givenProperties_whenBuildUrls_thenReturnListOfUrls() throws FileNotFoundException {
         try (MockedStatic<CookiesService> utilities = Mockito.mockStatic(CookiesService.class)) {
             utilities.when(CookiesService::getFedAuthString).thenReturn("qq");
+            utilities.when(CookiesService::getGotoString).thenReturn("qq");
             ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                     new String[]{
                             ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),

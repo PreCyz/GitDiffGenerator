@@ -61,7 +61,7 @@ public class ToolkitService extends Task<List<CasesData>> {
     private List<CasesData> getAvailableCases() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        headers.put("Cookie", CookiesService.getFedAuthString());
+        headers.put("Cookie", CookiesService.getFedAuthString() + "; " + CookiesService.getGotoString());
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
         List<CasesData> cases = new LinkedList<>();
         try {
@@ -112,7 +112,8 @@ public class ToolkitService extends Task<List<CasesData>> {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitHostUrl(),
                 fullUrl,
-                CookiesService.getFedAuthString()
+                CookiesService.getFedAuthString(),
+                CookiesService.getGotoString()
         );
 
         try {
@@ -151,6 +152,7 @@ public class ToolkitService extends Task<List<CasesData>> {
                     applicationProperties.toolkitHostUrl(),
                     fullUrl,
                     CookiesService.getFedAuthString(),
+                    CookiesService.getGotoString(),
                     getFormDigest()
             );
 
@@ -169,7 +171,7 @@ public class ToolkitService extends Task<List<CasesData>> {
     public boolean isCookieWorking() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        headers.put("Cookie", CookiesService.getFedAuthString());
+        headers.put("Cookie", CookiesService.getFedAuthString() + "; " + CookiesService.getGotoString());
         String url = String.format("%s%s/_api/web/SiteUsers/getByEmail('%s')",
                 applicationProperties.toolkitHostUrl(),
                 applicationProperties.toolkitCopyCase(),
@@ -194,7 +196,8 @@ public class ToolkitService extends Task<List<CasesData>> {
             SharePointConfig sharePointConfig = new SharePointConfig(
                     applicationProperties.toolkitHostUrl(),
                     fullUrl,
-                    CookiesService.getFedAuthString()
+                    CookiesService.getFedAuthString(),
+                    CookiesService.getGotoString()
             );
 
             formDigest = httpRequester.requestDigest(sharePointConfig);
@@ -213,6 +216,7 @@ public class ToolkitService extends Task<List<CasesData>> {
                 applicationProperties.toolkitHostUrl(),
                 fullUrl,
                 CookiesService.getFedAuthString(),
+                CookiesService.getGotoString(),
                 getFormDigest()
         );
 
@@ -322,6 +326,7 @@ public class ToolkitService extends Task<List<CasesData>> {
                 applicationProperties.toolkitHostUrl(),
                 fullUrl,
                 CookiesService.getFedAuthString(),
+                CookiesService.getGotoString(),
                 getFormDigest()
         );
 
@@ -357,6 +362,7 @@ public class ToolkitService extends Task<List<CasesData>> {
                 applicationProperties.toolkitHostUrl(),
                 fullUrl,
                 CookiesService.getFedAuthString(),
+                CookiesService.getGotoString(),
                 getFormDigest()
         );
 
@@ -393,6 +399,7 @@ public class ToolkitService extends Task<List<CasesData>> {
                     applicationProperties.toolkitHostUrl(),
                     fullUrl,
                     CookiesService.getFedAuthString(),
+                    CookiesService.getGotoString(),
                     getFormDigest()
             );
 
