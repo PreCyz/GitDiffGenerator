@@ -22,15 +22,12 @@ Write-Host "jpackage: $jPackage" -ForegroundColor Green
     --main-jar Gipter-5.0.0.jar `
     --type exe `
     --dest target/dist `
-    --verbose `
-    --copyright "Paweł Gawędzki" `
-    --vendor "pawgit" `
     --win-dir-chooser `
     --win-shortcut `
     --win-shortcut-prompt `
     --win-menu `
     --win-menu-group NCPawg `
-    --icon "src/main/resources/img/png/minion.png" `
+    --icon "src/main/resources/img/icons/minion.ico" `
     --app-version 5.0.0
 
 Write-Host "=======================================================" -ForegroundColor DarkYellow
