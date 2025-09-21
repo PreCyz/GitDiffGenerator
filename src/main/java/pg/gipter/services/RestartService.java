@@ -20,7 +20,11 @@ public class RestartService {
 
     public void start(List<String> programArguments) {
         logger.info("Restart with arguments {}.", programArguments);
-        logger.info("Normalized path: {}", Path.of(".").toAbsolutePath().normalize());
+        if (Path.of(".").toAbsolutePath().normalize().endsWith("runtime\\bin\\java")) {
+            Path installationDir = Path.of(".").getParent().getParent().getParent();
+            logger.info("Executing: {}", installationDir);
+            Path gipterExe = Path.of(installationDir.toAbsolutePath().normalize().toString(), "Gipter.exe");
+        }
         try {
             final String javaHome = Paths.get(SystemUtils.javaHome(), "bin", "java").toString();
             logger.info("[{}}] java home is going to be used", javaHome);
