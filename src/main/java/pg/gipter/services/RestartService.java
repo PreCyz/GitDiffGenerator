@@ -20,6 +20,7 @@ public class RestartService {
 
     public void start(List<String> programArguments) {
         logger.info("Restart with arguments {}.", programArguments);
+        logger.info("Normalized path: {}", Path.of(".").toAbsolutePath().normalize());
         try {
             final String javaHome = Paths.get(SystemUtils.javaHome(), "bin", "java").toString();
             logger.info("[{}}] java home is going to be used", javaHome);
