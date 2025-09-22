@@ -8,14 +8,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.FlowType;
 import pg.gipter.core.ArgName;
+import pg.gipter.services.restart.RestartService;
+import pg.gipter.services.restart.RestartServiceFactory;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.LogLinkAction;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.JarHelper;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -30,7 +39,7 @@ public class UpgradeService extends TaskService<Void> {
     public UpgradeService(SemanticVersioning currentVersion, String githubToken) {
         super();
         githubService = new GithubService(currentVersion, githubToken);
-        restartService = new RestartService();
+        restartService = RestartServiceFactory.getRestartService();
     }
 
     void upgradeAndRestartApplication() {

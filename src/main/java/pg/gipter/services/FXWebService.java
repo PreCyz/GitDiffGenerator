@@ -16,14 +16,20 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.html.HTMLInputElement;
 import pg.gipter.FlowType;
 import pg.gipter.core.ArgName;
 import pg.gipter.jobs.UploadItemJob;
+import pg.gipter.services.restart.RestartServiceFactory;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.utils.*;
+import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.ResourceUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -136,7 +142,7 @@ public class FXWebService {
                     String.format("%s=%s", ArgName.useUI.name(), ArgName.useUI.defaultValue()),
                     String.format("%s=%s", ArgName.flowType.name(), FlowType.REGULAR)
             ).collect(toList());
-            new RestartService().start(restartArguments);
+            RestartServiceFactory.getRestartService().start(restartArguments);
         } else if (flowType == FlowType.JOB) {
             logger.info("Webview opened from JOB. Continuing job.");
             executorService.submit(this::continueJob, Void.class);

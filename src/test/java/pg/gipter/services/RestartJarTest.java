@@ -6,7 +6,7 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class RestartServiceTest {
+class RestartJarTest {
 
 //    2025-09-21 13:35:45 [ERROR] [JavaFX Application Thread] gipter.services.RestartService:
 //    Could not restart application gracefully.
