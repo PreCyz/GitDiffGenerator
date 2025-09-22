@@ -1,6 +1,9 @@
 package pg.gipter.toolkit;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,12 +11,23 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.DownloadDetails;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
-import java.net.http.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class HttpRequester {
 
@@ -35,7 +49,7 @@ public class HttpRequester {
                 .uri(URI.create(replaceSpaces(sharePointConfig.getFullRequestUrl())))
                 .GET()
                 .header("Accept", "application/json;odata=verbose")
-                .header("Cookie", sharePointConfig.getFedAuth())
+                .header("Cookie", sharePointConfig.getFedAuth() + "; " + sharePointConfig.getGoto())
                 .build();
         logRequest(request);
 
@@ -140,7 +154,7 @@ public class HttpRequester {
                 .header("Content-Type", "application/octet-stream")
                 .header("Accept", "application/json")
                 .header("X-RequestDigest", sharePointConfig.getFormDigest())
-                .header("Cookie", sharePointConfig.getFedAuth())
+                .header("Cookie", sharePointConfig.getFedAuth() + "; " +  sharePointConfig.getGoto())
                 .build();
         logRequest(request);
 
@@ -177,7 +191,7 @@ public class HttpRequester {
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .header("Accept", "application/json;odata=verbose")
                 .header("X-ClientService-ClientTag", "SDK-JAVA")
-                .header("Cookie", sharePointConfig.getFedAuth())
+                .header("Cookie", sharePointConfig.getFedAuth() + "; " +  sharePointConfig.getGoto())
                 .build();
         logRequest(request);
 

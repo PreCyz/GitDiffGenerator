@@ -29,7 +29,7 @@ public class SettingsService {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .GET()
-                .header("Cookie", CookiesService.getFedAuthString() + "; " + CookiesService.getGotoString())
+                .header("Cookie", CookiesService.getFedAuthString().orElse("") + "; " + CookiesService.getGotoString().orElse(""))
                 .build();
 
         try {

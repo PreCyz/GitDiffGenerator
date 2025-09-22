@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +29,7 @@ class CookiesServiceTest {
     @Test
     void name(FxRobot robot) {
         CookiesService.getFedAuthString();
+        CookiesService.getGotoString();
         assertTrue(true);
     }
 
@@ -41,8 +43,8 @@ class CookiesServiceTest {
 
     @Test
     void getFedAuth() {
-        assertThat(CookiesService.getFedAuthString()).isEqualTo("aaaa");
-        assertThat(CookiesService.getGotoString()).isEqualTo("bbbb");
+        assertThat(CookiesService.getFedAuthString()).isEqualTo(Optional.of("aaaa"));
+        assertThat(CookiesService.getGotoString()).isEqualTo(Optional.of("bbbb"));
     }
 
     @Test

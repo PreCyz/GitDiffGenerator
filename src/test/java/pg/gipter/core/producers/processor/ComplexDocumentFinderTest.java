@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -247,8 +248,8 @@ class ComplexDocumentFinderTest {
     @Test
     void givenProperties_whenBuildUrls_thenReturnListOfUrls() throws FileNotFoundException {
         try (MockedStatic<CookiesService> utilities = Mockito.mockStatic(CookiesService.class)) {
-            utilities.when(CookiesService::getFedAuthString).thenReturn("qq");
-            utilities.when(CookiesService::getGotoString).thenReturn("qq");
+            utilities.when(CookiesService::getFedAuthString).thenReturn(Optional.of("qq"));
+            utilities.when(CookiesService::getGotoString).thenReturn(Optional.of("qq"));
             ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                     new String[]{
                             ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),
