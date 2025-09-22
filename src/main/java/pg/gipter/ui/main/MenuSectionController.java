@@ -5,19 +5,28 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
-import pg.gipter.ui.*;
-import pg.gipter.ui.alerts.*;
+import pg.gipter.ui.AbstractController;
+import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.WizardLauncher;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.BrowserLinkAction;
+import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.SystemUtils;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -56,9 +65,18 @@ public class MenuSectionController extends AbstractController {
     }
 
     private void setProperties() {
-        instructionMenuItem.setDisable(!(Paths.get("Gipter-ui-description.pdf").toFile().exists() && Desktop.isDesktopSupported()));
+        instructionMenuItem.setDisable(!(getPDFPath().toFile().exists() && Desktop.isDesktopSupported()));
 
         setUpgradeMenuItemDisabled();
+    }
+
+    private Path getPDFPath() {
+        String pdfName = "Gipter-ui-description.pdf";
+        Path pdf = Paths.get(pdfName);
+        if (SystemUtils.isExe()) {
+            pdf = Paths.get(".","app", pdfName);
+        }
+        return pdf;
     }
 
     private void setUpgradeMenuItemDisabled() {
@@ -118,14 +136,13 @@ public class MenuSectionController extends AbstractController {
 
     private EventHandler<ActionEvent> instructionActionEventHandler() {
         return event -> {
-            String pdfFileName = "Gipter-ui-description.pdf";
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withMessage(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
                     .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolderUrl()))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
             try {
-                Path pdfFile = Paths.get(pdfFileName);
+                Path pdfFile = getPDFPath();
                 if (Files.exists(pdfFile)) {
                     if (Desktop.isDesktopSupported()) {
                         Desktop.getDesktop().open(pdfFile.toFile());
@@ -135,7 +152,7 @@ public class MenuSectionController extends AbstractController {
                     }
                 }
             } catch (IOException e) {
-                logger.error("Could not find [{}] file with instructions.", pdfFileName, e);
+                logger.error("Could not find [Gipter-ui-description.pdf] file with instructions.", e);
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         };

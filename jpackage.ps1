@@ -15,6 +15,7 @@ if (-not (Test-Path $jPackage)) {
 Write-Host "Copy jar to target\input\ " -ForegroundColor Green
 mkdir target\input
 Copy-Item -Path target\Gipter-5.0.0.jar -Destination target\input\ -Verbose
+Copy-Item -Path docs\*.* -Destination target\input\ -Verbose -Force -Exclude *.odt
 
 Write-Host "jpackage: " -NoNewline
 Write-Host "$jPackage" -ForegroundColor Green

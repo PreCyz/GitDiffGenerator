@@ -1,5 +1,8 @@
 package pg.gipter.utils;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 /** Created by Pawel Gawedzki on 16-Sep-2019. */
 public final class SystemUtils {
 
@@ -46,5 +49,9 @@ public final class SystemUtils {
 
     public static String processorArchitecture() {
         return System.getProperty("processor.architecture");
+    }
+
+    public static boolean isExe() {
+        return SystemUtils.javaHome().endsWith("runtime") && Files.exists(Path.of(".", "Gipter.exe"));
     }
 }

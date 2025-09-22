@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.command.CustomCommandDao;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +24,11 @@ public class GifDao {
     public static Optional<List<CustomGif>> readCustomGifs() {
         Optional<List<CustomGif>> result = Optional.empty();
         final Gson gson = new GsonBuilder().create();
-        try (InputStream fis = new FileInputStream(DaoConstants.CUSTOM_GIFS_JSON);
+        String gifFilePath = DaoConstants.CUSTOM_GIFS_JSON;
+        if (SystemUtils.isExe()) {
+            gifFilePath = Path.of(".", "app", DaoConstants.CUSTOM_GIFS_JSON).toAbsolutePath().normalize().toString();
+        }
+        try (InputStream fis = new FileInputStream(gifFilePath);
              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
              BufferedReader reader = new BufferedReader(isr)
         ) {
