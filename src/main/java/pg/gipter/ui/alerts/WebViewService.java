@@ -13,7 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -113,7 +113,7 @@ public class WebViewService {
 
     private boolean hasInternetConnection() {
         try {
-            new URL(Gif.randomFailGif().url()).openConnection().connect();
+            URI.create(Gif.randomFailGif().url()).toURL().openConnection().connect();
             return true;
         } catch (IOException e) {
             logger.error("No Internet connection", e);
@@ -137,14 +137,11 @@ public class WebViewService {
     }
 
     public WebViewDetails pullWebView(UploadStatus uploadStatus) {
-        switch (uploadStatus) {
-            case PARTIAL_SUCCESS:
-                return pullWebView(uploadStatus, Gif.randomPartialSuccessGif());
-            case SUCCESS:
-                return pullWebView(uploadStatus, Gif.randomSuccessGif());
-            default:
-                return pullWebView(uploadStatus, Gif.randomFailGif());
-        }
+        return switch (uploadStatus) {
+            case PARTIAL_SUCCESS -> pullWebView(uploadStatus, Gif.randomPartialSuccessGif());
+            case SUCCESS -> pullWebView(uploadStatus, Gif.randomSuccessGif());
+            default -> pullWebView(uploadStatus, Gif.randomFailGif());
+        };
     }
 
     public WebViewDetails pullFailWebView() {

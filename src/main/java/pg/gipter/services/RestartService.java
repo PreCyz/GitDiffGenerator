@@ -5,8 +5,12 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.utils.JarHelper;
 import pg.gipter.utils.SystemUtils;
 
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -15,27 +19,32 @@ public class RestartService {
     private static final Logger logger = LoggerFactory.getLogger(RestartService.class);
     public static final String PROFILE_ENV_PARAM_NAME = "GIPTER-PROFILE";
 
-    RestartService() {
-    }
+    RestartService() {}
 
     public void start(List<String> programArguments) {
-        logger.info("Restart with arguments {}.", programArguments);
-        if (Path.of(".").toAbsolutePath().normalize().endsWith("runtime\\bin\\java")) {
-            Path installationDir = Path.of(".").getParent().getParent().getParent();
-            logger.info("Executing: {}", installationDir);
-            Path gipterExe = Path.of(installationDir.toAbsolutePath().normalize().toString(), "Gipter.exe");
-        }
         try {
-            final String javaHome = Paths.get(SystemUtils.javaHome(), "bin", "java").toString();
-            logger.info("[{}}] java home is going to be used", javaHome);
-            Optional<Path> jarPath = validateAndGetJarPath();
+            logger.info("Restart with arguments {}.", programArguments);
+            final String systemJavaHome = SystemUtils.javaHome();
+            logger.info("System JAVA_HOME: [{}]", systemJavaHome);
 
-            final List<String> command = Stream.of(
-                    javaHome, "-jar",
-                    jarPath.get().toAbsolutePath().toString()
-            ).collect(toList());
+            List<String> command;
+            if (systemJavaHome.endsWith("runtime")) {
+                Path exe = Path.of(".", "Gipter.exe");
+                logger.info("Exe file detected: [{}]. File exists: [{}]", exe.toAbsolutePath().normalize(), exe.toFile().exists());
+                command = Stream.of(exe.toAbsolutePath().normalize().toString()).collect(toList());
+            } else {
+                Optional<Path> jarPath = validateAndGetJarPath();
+
+                final String javaHome = Paths.get(SystemUtils.javaHome(), "bin", "java").toAbsolutePath().normalize().toString();
+
+                command = Stream.of(
+                        javaHome,
+                        "-jar",
+                        jarPath.orElseThrow(() -> new IllegalArgumentException("Could not find path to jar.")).toAbsolutePath().toString()
+                ).collect(toList());
+            }
+
             command.addAll(programArguments);
-
             executeCommand(command);
         } catch (Exception e) {
             logger.error(e.getMessage());
