@@ -76,8 +76,8 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
                     SharePointConfig sharePointConfig = new SharePointConfig(
                             applicationProperties.toolkitHostUrl(),
                             fullRequestUrl,
-                            CookiesService.getFedAuthString(),
-                            CookiesService.getGotoString()
+                            CookiesService.getFedAuthString().orElse(""),
+                            CookiesService.getGotoString().orElse("")
                     );
                     sharePointConfigs.add(sharePointConfig);
                 }

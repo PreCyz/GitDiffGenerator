@@ -57,7 +57,10 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
                         expand()
                 );
                 SharePointConfig sharePointConfig = new SharePointConfig(
-                        applicationProperties.toolkitHostUrl(), fullUrl, CookiesService.getFedAuthString(), CookiesService.getGotoString()
+                        applicationProperties.toolkitHostUrl(),
+                        fullUrl,
+                        CookiesService.getFedAuthString().orElse(""),
+                        CookiesService.getGotoString().orElse("")
                 );
                 sharePointConfig.setProject(project);
                 sharePointConfig.setListNames(Stream.of(listTitle).collect(toSet()));

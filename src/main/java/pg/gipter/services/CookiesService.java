@@ -63,17 +63,27 @@ public final class CookiesService {
             LocalDateTime now = LocalDateTime.now();
             return fedAuthExpirationDate.isAfter(now) && goToExpirationDate.isAfter(now);
         } catch (Exception ex) {
-            logger.error("Problem with FedAuth cookie. Source of cookie [{}]. {}", COOKIES_PATH.toAbsolutePath(), ex.getMessage());
+            logger.error("Problem with cookies. Source of cookie [{}]. {}", COOKIES_PATH.toAbsolutePath(), ex.getMessage());
             return false;
         }
     }
 
-    public static String getFedAuthString() {
-        return getCookieString(CookieName.FedAuth);
+    public static Optional<String> getFedAuthString() {
+        try {
+            return Optional.of(getCookieString(CookieName.FedAuth));
+        } catch (IllegalStateException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+        return Optional.empty();
     }
 
-    public static String getGotoString() {
-        return getCookieString(CookieName.Goto);
+    public static Optional<String> getGotoString() {
+        try {
+            return Optional.of(getCookieString(CookieName.Goto));
+        } catch (IllegalStateException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+        return Optional.empty();
     }
 
     private static String getCookieString(CookieName cookieName) {
@@ -231,7 +241,6 @@ public final class CookiesService {
                     m.put("Set-Cookie", list);
                     CookieHandler.getDefault().put(new URI(String.format("http://%s/", domain)), m);
                 }
-//                CookieHandler.setDefault(BulkCookieManagerExample.createCookieManager(cookiesToLoad));
                 logger.info("Cookies successfully loaded from [{}]", COOKIES_PATH.toAbsolutePath());
             } catch (Exception e) {
                 logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath(), e);
