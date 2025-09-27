@@ -16,19 +16,10 @@ import java.lang.reflect.Type;
 import java.net.CookieHandler;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.nio.file.*;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class CookiesService {
@@ -87,9 +78,12 @@ public final class CookiesService {
     }
 
     private static String getCookieString(CookieName cookieName) {
-        CookieDetails cookieDetails = getCookieDetails(cookieName)
-                .orElseThrow(() -> new IllegalStateException("The cookie " + cookieName.name() + " does not exist."));
-        return cookieDetails.name + "=" + cookieDetails.value;
+        return getCookieDetails(cookieName)
+                .map(cd -> cd.name + "=" + cd.value)
+                .orElseGet(() -> {
+                    logger.warn("Cookie name [{}] does not exist.", cookieName);
+                    return "";
+                });
     }
 
     private static Optional<CookieDetails> loadFedAuthCookie() {

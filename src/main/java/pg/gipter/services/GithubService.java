@@ -36,7 +36,7 @@ public class GithubService {
         return serverVersion.getVersion();
     }
 
-    Optional<SemanticVersioning> getLatestVersion() {
+    public Optional<SemanticVersioning> getLatestVersion() {
         Optional<SemanticVersioning> latestVersion = Optional.empty();
 
         Optional<JsonObject> latestDistroDetails = downloadLatestDistributionDetails();
@@ -60,7 +60,7 @@ public class GithubService {
         return result;
     }
 
-    Optional<JsonObject> downloadLatestDistributionDetails() {
+    public Optional<JsonObject> downloadLatestDistributionDetails() {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.github.com/repos/PreCyz/GitDiffGenerator/releases/latest"))
                 .GET()
@@ -104,7 +104,7 @@ public class GithubService {
         return Optional.empty();
     }
 
-    Optional<String> downloadLatestDistribution(String downloadLocation, TaskService<?> taskService) {
+    public Optional<String> downloadLatestDistribution(String downloadLocation, TaskService<?> taskService) {
         if (latestReleaseDetails == null) {
             taskService.updateMsg(BundleUtils.getMsg("upgrade.progress.distributionDetails"));
             downloadLatestDistributionDetails().ifPresent(jsonObject -> latestReleaseDetails = jsonObject);
@@ -170,7 +170,7 @@ public class GithubService {
         }
     }
 
-    Optional<String> getDownloadLink(JsonObject jsonObject) {
+    public Optional<String> getDownloadLink(JsonObject jsonObject) {
         Optional<String> downloadLink = Optional.empty();
         String name = jsonObject.get("name").getAsString();
         JsonArray assets = jsonObject.get("assets").getAsJsonArray();
@@ -180,7 +180,7 @@ public class GithubService {
             if (isProperAsset(name, assetName)) {
                 distributionName = assetName.getAsString();
                 downloadLink = Optional.ofNullable(element.get("url").getAsString());
-                logger.info("New version download link: [{}]", downloadLink.orElseGet(() -> "N/A"));
+                logger.info("New version download link: [{}]", downloadLink.orElse("N/A"));
                 break;
             }
         }
@@ -192,13 +192,13 @@ public class GithubService {
             return false;
         }
 
-        final String version_1_8 = "1.8";
         final String elevenPlus = "11+";
+        final String msi = "msi";
 
         boolean result = !assetName.isJsonNull();
         result &= assetName.getAsString().contains(name);
-        if (SystemUtils.javaVersion().startsWith(version_1_8)) {
-            result &= !assetName.getAsString().startsWith(elevenPlus);
+        if (SystemUtils.isExe()) {
+            result &= assetName.getAsString().endsWith(msi);
         } else {
             result &= assetName.getAsString().startsWith(elevenPlus);
         }
@@ -229,7 +229,7 @@ public class GithubService {
         return Optional.empty();
     }
 
-    Optional<Long> getFileSize() {
+    public Optional<Long> getFileSize() {
         return getFileSize(latestReleaseDetails);
     }
 

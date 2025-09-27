@@ -1,48 +1,28 @@
-package pg.gipter.services;
+package pg.gipter.services.upgrade;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import pg.gipter.FlowType;
-import pg.gipter.core.ArgName;
-import pg.gipter.services.restart.RestartService;
-import pg.gipter.services.restart.RestartServiceFactory;
+import pg.gipter.services.SemanticVersioning;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.LogLinkAction;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.JarHelper;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.io.*;
+import java.nio.file.*;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
+class UpgradeJar extends AbstractUpgradeService {
 
-public class UpgradeService extends TaskService<Void> {
-
-    private static final Logger logger = LoggerFactory.getLogger(UpgradeService.class);
-
-    private final GithubService githubService;
-    private final RestartService restartService;
-
-    public UpgradeService(SemanticVersioning currentVersion, String githubToken) {
-        super();
-        githubService = new GithubService(currentVersion, githubToken);
-        restartService = RestartServiceFactory.getRestartService();
+    UpgradeJar(SemanticVersioning currentVersion, String githubToken) {
+        super(currentVersion, githubToken);
     }
 
-    void upgradeAndRestartApplication() {
+    @Override
+    public void upgradeAndRestartApplication() {
         updateMessage(BundleUtils.getMsg("upgrade.progress.started"));
         initProgress(githubService.getFileSize().orElse(0L));
         increaseProgress();
@@ -54,14 +34,7 @@ public class UpgradeService extends TaskService<Void> {
                 if (fileName.isPresent()) {
                     File sevenZFile = Paths.get(homeDirectoryPath.get(), fileName.get()).toFile();
                     decompress(sevenZFile, Paths.get(homeDirectoryPath.get()).toFile());
-                    updateMsg(BundleUtils.getMsg("upgrade.progress.restarting"));
-                    final List<String> restartArguments = Stream.of(
-                            String.format("%s=%b", ArgName.upgradeFinished.name(), Boolean.TRUE),
-                            String.format("%s=%s", ArgName.flowType.name(), FlowType.REGULAR)
-                    ).collect(toList());
-                    restartService.start(restartArguments);
-                    workCompleted();
-                    System.exit(0);
+                    finalizeUpgrade();
                 } else {
                     logger.error("Did not download the newest version.");
                     alertWindowBuilder.withHeaderText(BundleUtils.getMsg("upgrade.fail"))
@@ -136,9 +109,4 @@ public class UpgradeService extends TaskService<Void> {
         }
     }
 
-    @Override
-    protected Void call() {
-        upgradeAndRestartApplication();
-        return null;
-    }
 }

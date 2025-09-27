@@ -8,25 +8,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.converters.Converter;
 import pg.gipter.converters.ConverterFactory;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import pg.gipter.core.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
-import pg.gipter.services.ConcurrentService;
-import pg.gipter.services.CookiesService;
-import pg.gipter.services.FXWebService;
-import pg.gipter.services.ToolkitService;
+import pg.gipter.services.*;
 import pg.gipter.services.restart.AbstractRestartService;
+import pg.gipter.services.upgrade.BackupService;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
 import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -69,8 +62,7 @@ public class Main extends Application {
                     return FlowType.valueOf(flowName);
                 })
                 .findFirst()
-                .orElse(FlowType.REGULAR)
-        ;
+                .orElse(FlowType.REGULAR);
 
         if (flowType != FlowType.INIT) {
             flowType = CookiesService.isCookiesFileExist() ? FlowType.REGULAR : FlowType.INIT;
@@ -127,14 +119,16 @@ public class Main extends Application {
         }
     }
 
-    private static class InternalMain {
-        private final String[] args;
-
-        InternalMain(String[] args) {
-            this.args = args;
-        }
+    private record InternalMain(String[] args) {
 
         private void setup() {
+            if (SystemUtils.isExe() && Arrays.stream(args)
+                    .filter(arg -> arg.startsWith(ArgName.upgradeFinished.name()))
+                    .anyMatch(arg -> arg.endsWith(Boolean.toString(true)))
+            ) {
+                BackupService.restoreBackup();
+            }
+
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             Optional<String> javaHome = Stream.of(args).filter(arg -> arg.startsWith("java.home")).findFirst();
             if (javaHome.isPresent()) {

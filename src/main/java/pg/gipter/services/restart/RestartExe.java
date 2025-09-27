@@ -22,9 +22,8 @@ class RestartExe extends AbstractRestartService {
             final String systemJavaHome = SystemUtils.javaHome();
             logger.info("System JAVA_HOME: [{}]", systemJavaHome);
 
-
-                Path exe = Path.of(".", "Gipter.exe");
-                logger.info("Exe file detected: [{}]. File exists: [{}]", exe.toAbsolutePath().normalize(), Files.exists(exe));
+            Path exe = Path.of(".", "Gipter.exe");
+            logger.info("Exe file detected: [{}]. File exists: [{}]", exe.toAbsolutePath().normalize(), Files.exists(exe));
             List<String> command = Stream.of(exe.toAbsolutePath().normalize().toString()).collect(toList());
 
             command.addAll(programArguments);

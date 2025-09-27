@@ -2,6 +2,7 @@ package pg.gipter.utils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 /** Created by Pawel Gawedzki on 16-Sep-2019. */
 public final class SystemUtils {
@@ -28,7 +29,7 @@ public final class SystemUtils {
     }
 
     public static String lineSeparator() {
-        return System.getProperty("line.separator");
+        return System.lineSeparator();
     }
 
     public static String javaVersion() {
@@ -53,5 +54,11 @@ public final class SystemUtils {
 
     public static boolean isExe() {
         return SystemUtils.javaHome().endsWith("runtime") && Files.exists(Path.of(".", "Gipter.exe"));
+    }
+
+    public static String tmp() {
+        return Optional.ofNullable(
+                Optional.ofNullable(System.getenv("TMP")).orElseGet(() -> System.getenv("TEMP"))
+                ).orElseThrow(() -> new IllegalArgumentException("Cannot find TMP directory"));
     }
 }

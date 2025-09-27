@@ -1,6 +1,6 @@
 # --- Define the path to your Java executable ---
 $javaHome = $env:JAVA_HOME
-$javaHome = $env:J21
+$javaHome = $env:J25
 if (-not $javaHome) {
     Write-Error "JAVA_HOME environment variable is not set."
     exit 1
@@ -15,6 +15,7 @@ if (-not (Test-Path $jfxMods)) {
     Write-Error "jfxMods executable not found at: $jfxMods"
     exit 1
 }
+$target = "../target"
 
 & $jLink `
     --verbose `
@@ -26,7 +27,7 @@ if (-not (Test-Path $jfxMods)) {
     --no-header-files `
     --no-man-pages `
     --strip-debug `
-    --output target/java-runtime
+    --output "$target/java-runtime"
 
 Write-Host "jlink done"
 
@@ -40,7 +41,7 @@ if (-not (Test-Path $jPackage)) {
     --name Gipter `
     --input target `
     --main-jar Gipter-1.0-SNAPSHOT.jar `
-    --runtime-image target/java-runtime `
+    --runtime-image "$target/java-runtime" `
     --type exe `
     --dest target `
     --verbose `

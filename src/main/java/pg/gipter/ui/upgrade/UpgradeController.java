@@ -7,7 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.services.UpgradeService;
+import pg.gipter.services.upgrade.UpgradeServiceFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 
@@ -26,7 +26,7 @@ public class UpgradeController  extends AbstractController {
     public UpgradeController(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
         super(uiLauncher);
         this.applicationProperties = applicationProperties;
-        this.upgradeService = new UpgradeService(applicationProperties.version(), applicationProperties.githubToken());
+        this.upgradeService = UpgradeServiceFactory.getUpgradeServiceInstance(applicationProperties.version(), applicationProperties.githubToken());
     }
 
     @Override

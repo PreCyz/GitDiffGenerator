@@ -4,7 +4,7 @@ import javafx.concurrent.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class TaskService<T> extends Task<T> {
+public abstract class TaskService<T> extends Task<T> {
 
     protected Logger logger;
     private long maxWork;
@@ -18,34 +18,34 @@ abstract class TaskService<T> extends Task<T> {
         maxWork = defaultValue;
     }
 
-    void initProgress(long maxWork) {
+    public void initProgress(long maxWork) {
         if (maxWork == 0) {
             maxWork = 20 * defaultValue;
         }
         this.maxWork = maxWork + (NUMBER_OF_STEPS - 1) * defaultValue;
     }
 
-    void increaseProgress() {
+    public void increaseProgress() {
         workDone++;
         updateProgress(workDone, maxWork);
     }
 
-    void increaseProgress(long workDone) {
+    public void increaseProgress(long workDone) {
         this.workDone = workDone;
         updateProgress(this.workDone, maxWork);
     }
 
-    void updateTaskProgress(long workDone) {
+    public void updateTaskProgress(long workDone) {
         this.workDone += workDone;
         updateProgress(this.workDone, maxWork);
     }
 
-    void updateMsg(String message) {
+    public void updateMsg(String message) {
         logger.info(message);
         updateMessage(message);
     }
 
-    void workCompleted() {
+    public void workCompleted() {
         updateProgress(maxWork, maxWork);
     }
 }
