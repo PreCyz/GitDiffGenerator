@@ -15,37 +15,43 @@ if (-not (Test-Path $jPackage)) {
     Write-Error "jpackage executable not found at: $jPackage"
     exit 1
 }
-
 $target = "..\target"
+if (-not (Test-Path $target))
+{
+    Write-Error "target folder not found at: $target"
+    exit 1
+}
+Remove-Item "$target\dist" -Force -Recurse -Verbose
+Remove-Item "$target\input" -Force -Recurse -Verbose
 
-Write-Host "Copy jar to $target\input\ " -ForegroundColor Green
-mkdir target\input
-Copy-Item -Path "$target\Gipter-$version.jar" -Destination "$target\input\" -Verbose
-Copy-Item -Path docs\*.* -Destination "$target\input\" -Verbose -Force -Exclude *.odt
+Write-Host "Preparing input to $target\input\ " -ForegroundColor Green
+mkdir "$target\input"
+Copy-Item -Path "$target\Gipter-$version.jar" -Destination "$target\input\Gipter-$version.jar" -Verbose
+Copy-Item -Path ..\docs\*.* -Destination "$target\input\" -Force -Exclude *.odt -Verbose
 
-Write-Host "Execute jpackage: " -NoNewline
-Write-Host "$jPackage" -ForegroundColor Green
+Write-Host "Creating msi installer with jpackage: " -NoNewline -ForegroundColor Green
+Write-Host "$jPackage"
 
 & $jPackage `
     --name Gipter `
-    --input "$target\input" `
+    --input "$target/input" `
+    --dest "$target/dist" `
     --main-class pg.gipter.Java11Main `
     --main-jar "Gipter-$version.jar" `
     --type msi `
+    --icon "../src/main/resources/img/icons/gipter.ico" `
+    --app-version "$version" `
     --vendor pawgit `
-    --dest "$target/dist" `
     --win-dir-chooser `
     --win-shortcut `
     --win-shortcut-prompt `
     --win-menu `
     --win-menu-group NCPawg `
-    --icon "../src/main/resources/img/icons/chicken.ico" `
-    --app-version "$version" `
     --verbose
 
 Write-Host "=======================================================" -ForegroundColor DarkYellow
 Write-Host "jpackage DONE!" -ForegroundColor Green
 
 $ls = Get-ChildItem -Path "$currentLocation\$target\dist"
-Write-Host "Directory: $currentLocation\$target\dist"
-Write-Host $ls
+Write-Host "Item produced: " -NoNewline
+Write-Host "$ls" -ForegroundColor Green

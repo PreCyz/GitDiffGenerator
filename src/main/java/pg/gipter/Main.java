@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.converters.Converter;
 import pg.gipter.converters.ConverterFactory;
 import pg.gipter.core.*;
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.*;
@@ -19,6 +20,7 @@ import pg.gipter.utils.StringUtils;
 import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
+import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -122,11 +124,23 @@ public class Main extends Application {
     private record InternalMain(String[] args) {
 
         private void setup() {
-            if (SystemUtils.isExe() && Arrays.stream(args)
-                    .filter(arg -> arg.startsWith(ArgName.upgradeFinished.name()))
-                    .anyMatch(arg -> arg.endsWith(Boolean.toString(true)))
-            ) {
-                BackupService.restoreBackup();
+            if (SystemUtils.isExe()) {
+
+                if (Arrays.stream(args)
+                        .filter(arg -> arg.startsWith(ArgName.upgradeFinished.name()))
+                        .anyMatch(arg -> arg.endsWith(Boolean.toString(true)))) {
+                    BackupService.restoreBackup();
+                }
+
+                Path gifJson = Path.of(".", DaoConstants.CUSTOM_GIFS_JSON);
+                if (!Files.exists(gifJson)) {
+                    Path source = Path.of(".", "app", DaoConstants.CUSTOM_GIFS_JSON);
+                    try {
+                        Files.copy(source, gifJson, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+                    } catch (IOException e) {
+                        logger.warn("Failed to move gif files from [{}] to [{}]: {}", gifJson, source, e.getMessage());
+                    }
+                }
             }
 
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);

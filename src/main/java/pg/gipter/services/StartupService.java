@@ -36,13 +36,19 @@ public class StartupService {
             );
 
             Path target = JarHelper.getJarPath().orElseGet(() -> Paths.get(""));
+            if (SystemUtils.isExe()) {
+                target = Paths.get(".", "Gipter.exe");
+            }
             if (!Files.exists(shortcutLnkPath)) {
                 logger.info("Creating shortcut to [{}] and placing it in Windows startup folder. [{}]", target, shortcutLnkPath);
                 try {
                     String workingDir = JarHelper.homeDirectoryPath().orElse("");
+                    if (SystemUtils.isWindows()) {
+                        workingDir = Paths.get(".").toAbsolutePath().normalize().toString();
+                    }
 
                     int iconNumber = 130;
-                    ShellLink shellLink = ShellLink.createLink(target.toAbsolutePath().toString())
+                    ShellLink shellLink = ShellLink.createLink(target.toAbsolutePath().normalize().toString())
                             .setWorkingDir(workingDir)
                             .setIconLocation("%SystemRoot%\\system32\\SHELL32.dll")
                             .setCMDArgs(ArgName.silentMode.name() + "=" + Boolean.TRUE);
