@@ -53,7 +53,11 @@ public final class SystemUtils {
     }
 
     public static boolean isExe() {
-        return SystemUtils.javaHome().endsWith("runtime") && Files.exists(Path.of(".", "Gipter.exe"));
+        return Files.exists(Path.of(".", "Gipter.exe"));
+    }
+
+    public static boolean isCustomRuntime() {
+        return SystemUtils.javaHome().endsWith("runtime");
     }
 
     public static String tmp() {
