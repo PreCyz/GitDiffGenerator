@@ -33,6 +33,14 @@
                     <exclude>**/version.txt</exclude>
                 </excludes>
             </resource>
+            <resource>
+                <directory>installer</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>launch4j.xml</include>
+                    <include>installer-config.iss</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
             <plugin>

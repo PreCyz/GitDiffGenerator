@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+    <dontWrapJar>false</dontWrapJar>
+    <headerType>gui</headerType>
+    <jar>C:\Workspace\GitDiffGenerator\target\input\Gipter-${project.version}.jar</jar>
+    <outfile>C:\Workspace\GitDiffGenerator\target\dist\Gipter.exe</outfile>
+    <errTitle/>
+    <cmdLine/>
+    <chdir>.</chdir>
+    <priority>normal</priority>
+    <downloadUrl/>
+    <supportUrl/>
+    <stayAlive>false</stayAlive>
+    <restartOnCrash>false</restartOnCrash>
+    <manifest/>
+    <icon>C:\Workspace\GitDiffGenerator\target\input\gipter.ico</icon>
+    <jre>
+        <path>runtime</path>
+        <requiresJdk>true</requiresJdk>
+        <requires64Bit>true</requires64Bit>
+        <minVersion>25</minVersion>
+        <maxVersion/>
+    </jre>
+</launch4jConfig>

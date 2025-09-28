@@ -21,6 +21,10 @@ if (-not (Test-Path $target))
     Write-Error "target folder not found at: $target"
     exit 1
 }
+$jfxMods = "C:\Install\Java\JavaFX\javafx-jmods-25"
+Write-Host "JavaFX mods location " -NoNewline -ForegroundColor Green
+Write-Host "JavaFX mods location: $jfxMods"
+
 Remove-Item "$target\dist" -Force -Recurse -Verbose
 Remove-Item "$target\input" -Force -Recurse -Verbose
 
@@ -33,6 +37,8 @@ Write-Host "Creating msi installer with jpackage: " -NoNewline -ForegroundColor 
 Write-Host "$jPackage"
 
 & $jPackage `
+    --module-path "$javaHome/jmods;$jfxMods" `
+    --add-modules=jdk.naming.dns `
     --name Gipter `
     --input "$target/input" `
     --dest "$target/dist" `
@@ -47,6 +53,8 @@ Write-Host "$jPackage"
     --win-shortcut-prompt `
     --win-menu `
     --win-menu-group NCPawg `
+    --java-options "--add-exports=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED" `
+    --java-options "--add-opens=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED" `
     --verbose
 
 Write-Host "=======================================================" -ForegroundColor DarkYellow
