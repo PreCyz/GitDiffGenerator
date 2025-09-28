@@ -28,7 +28,7 @@ Write-Host "JavaFX mods location: $jfxMods"
 Remove-Item "$target\dist" -Force -Recurse -Verbose
 Remove-Item "$target\input" -Force -Recurse -Verbose
 
-Write-Host "Preparing input to $target\input\ " -ForegroundColor Green
+Write-Host "Preparing input: $target\input\ " -ForegroundColor Green
 mkdir "$target\input"
 Copy-Item -Path "$target\Gipter-$version.jar" -Destination "$target\input\Gipter-$version.jar" -Verbose
 Copy-Item -Path ..\docs\*.* -Destination "$target\input\" -Force -Exclude *.odt -Verbose
@@ -37,8 +37,6 @@ Write-Host "Creating msi installer with jpackage: " -NoNewline -ForegroundColor 
 Write-Host "$jPackage"
 
 & $jPackage `
-    --module-path "$javaHome/jmods;$jfxMods" `
-    --add-modules=jdk.naming.dns `
     --name Gipter `
     --input "$target/input" `
     --dest "$target/dist" `
@@ -54,7 +52,6 @@ Write-Host "$jPackage"
     --win-menu `
     --win-menu-group NCPawg `
     --java-options "--add-exports=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED" `
-    --java-options "--add-opens=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED" `
     --verbose
 
 Write-Host "=======================================================" -ForegroundColor DarkYellow

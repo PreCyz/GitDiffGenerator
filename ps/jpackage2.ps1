@@ -47,42 +47,12 @@ Write-Host "$jLink"
 
 & $jlink `
     --output "$target\dist\gipter-jvm" `
-    --module-path "$javaHome\jmods;$jfxMods" `
-    --add-modules=javafx.base,javafx.controls,javafx.fxml,javafx.graphics,javafx.web,javafx.media,javafx.swing `
-    --add-modules=java.base,java.compiler,java.datatransfer,java.desktop,java.instrument,java.logging,java.management `
-    --add-modules=java.management.rmi,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.se `
-    --add-modules=java.security.jgss,java.xml,jdk.crypto.mscapi,jdk.httpserver,jdk.internal.opt,jdk.jfr `
-    --add-modules=java.security.sasl,java.smartcardio,java.sql,java.sql.rowset,java.transaction.xa,java.xml.crypto `
-    --add-modules=jdk.accessibility,jdk.attach,jdk.charsets,jdk.compiler,jdk.crypto.cryptoki,jdk.crypto.ec `
-    --add-modules=jdk.dynalink,jdk.editpad,jdk.graal.compiler,jdk.graal.compiler.management,jdk.hotspot.agent `
-    --add-modules=jdk.incubator.vector,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.md `
-    --add-modules=jdk.internal.vm.ci,jdk.jartool,jdk.javadoc,jdk.jcmd,jdk.jconsole,jdk.jdeps,jdk.jdi,jdk.jdwp.agent `
-    --add-modules=jdk.jlink,jdk.jpackage,jdk.jshell,jdk.jsobject,jdk.jstatd,jdk.localedata,jdk.management.agent `
-    --add-modules=jdk.management.jfr,jdk.management,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.nio.mapmode,jdk.sctp `
-    --add-modules=jdk.security.auth,jdk.security.jgss,jdk.unsupported.desktop,jdk.unsupported,jdk.xml.dom,jdk.zipfs `
+    --add-modules jdk.naming.dns,jdk.management.jfr,java.rmi,jdk.jdi,java.xml,jdk.xml.dom,java.datatransfer,jdk.httpserver,java.desktop,java.security.sasl,jdk.zipfs,java.base,jdk.javadoc,jdk.management.agent,jdk.jshell,jdk.jsobject,java.sql.rowset,jdk.sctp,java.smartcardio,jdk.unsupported,java.security.jgss,java.compiler,jdk.nio.mapmode,jdk.dynalink,jdk.unsupported.desktop,jdk.accessibility,jdk.security.jgss,jdk.incubator.vector,java.sql,java.logging,java.transaction.xa,java.xml.crypto,jdk.jfr,jdk.internal.md,jdk.net,java.naming,jdk.internal.ed,java.prefs,java.net.http,jdk.compiler,jdk.internal.opt,jdk.jconsole,jdk.attach,jdk.internal.le,java.management,jdk.jdwp.agent,jdk.internal.jvmstat,java.instrument,jdk.management,jdk.security.auth,java.scripting,jdk.jartool,java.management.rmi `
     --strip-native-commands `
     --strip-debug `
     --no-man-pages `
     --no-header-files `
-    --compress zip-6 `
     --verbose
-
-#--add-modules=java.base,java.compiler,java.logging,java.management,java.naming,java.net.http,java.rmi,java.desktop `
-#--add-modules=java.scripting,java.security.jgss,java.security.sasl,java.sql,java.xml,jdk.xml.dom `
-#--add-modules=java.base,java.compiler,java.desktop,java.logging,java.management,java.naming,java.net.http,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.sql,java.xml,jdk.jfr,jdk.xml.dom `
-#--add-modules=jdk.xml.dom,java.xml,jdk.httpserver,java.security.sasl,jdk.zipfs,java.base,jdk.jsobject,jdk.sctp,jdk.unsupported,java.security.jgss,java.compiler,jdk.nio.mapmode,jdk.dynalink,jdk.security.jgss,java.sql,java.xml.crypto,java.logging,jdk.internal.md,jdk.net,jdk.attach,jdk.internal.ed,java.net.http,jdk.internal.opt,jdk.internal.le,jdk.internal.jvmstat,jdk.management,jdk.security.auth `
-
-<#--add-modules=java.rmi,java.xml,java.datatransfer,java.desktop `
---add-modules=jdk.management.jfr,jdk.jdi,jdk.xml.dom,jdk.httpserver,jdk.zipfs,jdk.javadoc,jdk.management.agent, `
---add-modules=jdk.jshell,jdk.jsobject,jdk.sctp,jdk.unsupported,jdk.nio.mapmode,jdk.dynalink,jdk.unsupported.desktop `
---add-modules=jdk.accessibility,jdk.security.jgss,jdk.incubator.vector,jdk.jfr,jdk.internal.md,jdk.net,jdk.internal.ed `
---add-modules=jdk.compiler,jdk.internal.opt,jdk.jconsole,jdk.attach,jdk.internal.le,jdk.jdwp.agent,jdk.internal.jvmstat `
---add-modules=jdk.jartool `
---add-modules=java.security.sasl,java.base,java.sql.rowset,java.smartcardio,java.security.jgss,java.compiler `
---add-modules=java.sql,java.transaction.xa,java.logging,java.xml.crypto,java.naming,java.prefs,java.net.http `
---add-modules=java.management,java.instrument,jdk.management,jdk.security.auth,java.scripting,java.management.rmi `
-#>
-
 
 Write-Host "Create msi installer with jpackage: " -NoNewline -ForegroundColor Green
 Write-Host "$jPackage"
