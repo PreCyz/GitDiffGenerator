@@ -39,20 +39,24 @@ public final class CookiesService {
 
     public static boolean hasValidCookies() {
         try {
+            LocalDateTime now = LocalDateTime.now();
             CookieDetails fedAuthCookie = loadFedAuthCookie()
                     .orElseThrow(() -> new IllegalStateException("The cookie FedAuth does not exist."));
             LocalDateTime fedAuthExpirationDate = LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(fedAuthCookie.expiryTime),
                     GMT_ZONE_ID
             );
-            CookieDetails gotoCookie = loadGotoCookie()
-                    .orElseThrow(() -> new IllegalStateException("The cookie Goto does not exist."));
-            LocalDateTime goToExpirationDate = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(gotoCookie.expiryTime),
-                    GMT_ZONE_ID
-            );
-            LocalDateTime now = LocalDateTime.now();
-            return fedAuthExpirationDate.isAfter(now) && goToExpirationDate.isAfter(now);
+            boolean result = fedAuthExpirationDate.isAfter(now);
+
+            Optional<CookieDetails> cookieDetails = loadGotoCookie();
+            if (cookieDetails.isPresent()) {
+                LocalDateTime goToExpirationDate = LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(cookieDetails.get().expiryTime),
+                        GMT_ZONE_ID
+                );
+                result &= goToExpirationDate.isAfter(now);
+            }
+            return result;
         } catch (Exception ex) {
             logger.error("Problem with cookies. Source of cookie [{}]. {}", COOKIES_PATH.toAbsolutePath(), ex.getMessage());
             return false;

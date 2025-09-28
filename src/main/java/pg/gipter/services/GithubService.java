@@ -193,12 +193,13 @@ public class GithubService {
         }
 
         final String elevenPlus = "11+";
-        final String msi = "msi";
+        final String msi = ".msi";
+        final String exe = ".exe";
 
         boolean result = !assetName.isJsonNull();
         result &= assetName.getAsString().contains(name);
         if (SystemUtils.isExe()) {
-            result &= assetName.getAsString().endsWith(msi);
+            result &= (assetName.getAsString().endsWith(msi) || assetName.getAsString().endsWith(exe));
         } else {
             result &= assetName.getAsString().startsWith(elevenPlus);
         }

@@ -18,7 +18,7 @@ public final class BackupService {
 
     private BackupService() {}
 
-    public static void backup(TaskService<Void> taskService) throws Exception {
+    public static void backupAppFiles(TaskService<Void> taskService) throws Exception {
         Path gipterTmp = Files.createDirectory(Paths.get(SystemUtils.tmp(), "Gipter"));
 
         int counter = 0;

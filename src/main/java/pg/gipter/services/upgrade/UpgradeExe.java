@@ -8,6 +8,7 @@ import pg.gipter.ui.alerts.LogLinkAction;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.JarHelper;
 
+import java.nio.file.*;
 import java.util.Optional;
 
 class UpgradeExe extends AbstractUpgradeService {
@@ -27,8 +28,13 @@ class UpgradeExe extends AbstractUpgradeService {
             if (homeDirectoryPath.isPresent()) {
                 Optional<String> fileName = githubService.downloadLatestDistribution(homeDirectoryPath.get(), this);
                 if (fileName.isPresent()) {
+                    Files.move(
+                            Paths.get(homeDirectoryPath.get(), fileName.get()),
+                            Paths.get(homeDirectoryPath.get(), "Gipter.exe"),
+                            StandardCopyOption.REPLACE_EXISTING
+                    );
                     updateMsg(BundleUtils.getMsg("upgrade.progress.backup"));
-                    BackupService.backup(this);
+                    BackupService.backupAppFiles(this);
                     finalizeUpgrade();
                 } else {
                     logger.error("Did not download the newest version.");
