@@ -82,9 +82,12 @@ public final class CookiesService {
     }
 
     private static String getCookieString(CookieName cookieName) {
-        CookieDetails cookieDetails = getCookieDetails(cookieName)
-                .orElseThrow(() -> new IllegalStateException("The cookie " + cookieName.name() + " does not exist."));
-        return cookieDetails.name + "=" + cookieDetails.value;
+        return getCookieDetails(cookieName)
+                .map(cd -> cd.name + "=" + cd.value)
+                .orElseGet(() -> {
+                    logger.warn("Cookie name [{}] does not exist.", cookieName);
+                    return "";
+                });
     }
 
     private static Optional<CookieDetails> loadFedAuthCookie() {
