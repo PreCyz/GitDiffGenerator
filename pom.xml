@@ -6,7 +6,7 @@
 
     <groupId>pg.gipter</groupId>
     <artifactId>Gipter</artifactId>
-    <version>4.4.14</version>
+    <version>5.0.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -171,7 +171,7 @@
             <classifier>win</classifier>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javaFX.version}</version>
@@ -231,7 +231,7 @@
             <artifactId>javafx-web</artifactId>
             <version>${javaFX.version}</version>
             <classifier>mac</classifier>
-        </dependency>
+        </dependency>-->
 
         <!--Unit tests-->
         <dependency>
