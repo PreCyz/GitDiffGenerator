@@ -15,9 +15,9 @@ import java.nio.file.*;
 import java.util.EnumSet;
 import java.util.Optional;
 
-class UpgradeJar extends AbstractUpgradeService {
+class UpgradeZip extends AbstractUpgradeService {
 
-    UpgradeJar(SemanticVersioning currentVersion, String githubToken) {
+    UpgradeZip(SemanticVersioning currentVersion, String githubToken) {
         super(currentVersion, githubToken);
     }
 
@@ -72,16 +72,20 @@ class UpgradeJar extends AbstractUpgradeService {
                     continue;
                 }
                 File currentFile = new File(destination, entry.getName());
-                File parent = currentFile.getParentFile();
-                if (!parent.exists()) {
-                    final boolean mkdir = parent.mkdirs();
-                    logger.info("Directory created [{}] [{}]", mkdir, parent.getAbsolutePath());
+                if (currentFile.isFile() && "gifs.json".equalsIgnoreCase(currentFile.getName())) {
+                    logger.info("[gifs.json] already exist - skipping it.");
+                } else {
+                    File parent = currentFile.getParentFile();
+                    if (!parent.exists()) {
+                        final boolean mkdir = parent.mkdirs();
+                        logger.info("Directory created [{}] [{}]", mkdir, parent.getAbsolutePath());
+                    }
+                    FileOutputStream out = new FileOutputStream(currentFile);
+                    byte[] content = new byte[(int) entry.getSize()];
+                    sevenZFile.read(content, 0, content.length);
+                    out.write(content);
+                    out.close();
                 }
-                FileOutputStream out = new FileOutputStream(currentFile);
-                byte[] content = new byte[(int) entry.getSize()];
-                sevenZFile.read(content, 0, content.length);
-                out.write(content);
-                out.close();
                 updateTaskProgress(Double.valueOf(5 * Math.pow(10, 5)).longValue());
             }
         } catch (IOException ex) {

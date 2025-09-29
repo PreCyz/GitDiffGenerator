@@ -8,9 +8,11 @@ public final class UpgradeServiceFactory {
     private UpgradeServiceFactory() {}
 
     public static Task<Void> getUpgradeServiceInstance(SemanticVersioning currentVersion, String githubToken) {
-        if (SystemUtils.isExe()) {
-            return new UpgradeExe(currentVersion, githubToken);
+        if (SystemUtils.isPortable()) {
+            return new UpgradeZip(currentVersion, githubToken);
+        } else if (SystemUtils.isMsi()) {
+            return new UpgradeMsi(currentVersion, githubToken);
         }
-        return new UpgradeJar(currentVersion, githubToken);
+        return new UpgradeZip(currentVersion, githubToken);
     }
 }

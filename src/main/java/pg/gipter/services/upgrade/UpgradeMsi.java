@@ -11,9 +11,9 @@ import pg.gipter.utils.JarHelper;
 import java.nio.file.*;
 import java.util.Optional;
 
-class UpgradeExe extends AbstractUpgradeService {
+class UpgradeMsi extends AbstractUpgradeService {
 
-    UpgradeExe(SemanticVersioning currentVersion, String githubToken) {
+    UpgradeMsi(SemanticVersioning currentVersion, String githubToken) {
         super(currentVersion, githubToken);
     }
 

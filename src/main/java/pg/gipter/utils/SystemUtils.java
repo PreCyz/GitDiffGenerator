@@ -1,8 +1,10 @@
 package pg.gipter.utils;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.*;
 import java.util.Optional;
+import java.util.Properties;
 
 /** Created by Pawel Gawedzki on 16-Sep-2019. */
 public final class SystemUtils {
@@ -64,5 +66,31 @@ public final class SystemUtils {
         return Optional.ofNullable(
                 Optional.ofNullable(System.getenv("TMP")).orElseGet(() -> System.getenv("TEMP"))
                 ).orElseThrow(() -> new IllegalArgumentException("Cannot find TMP directory"));
+    }
+
+    public static boolean isPortable() {
+        if (isCustomRuntime()) {
+            Properties properties = new Properties();
+            try (InputStream is = Files.newInputStream(Paths.get(SystemUtils.javaHome(), "release"))) {
+                properties.load(is);
+                return properties.getProperty("IMAGE_TYPE", "").toUpperCase().contains("JRE");
+            } catch (IOException ex) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isMsi() {
+        if (isCustomRuntime()) {
+            Properties properties = new Properties();
+            try (InputStream is = Files.newInputStream(Paths.get(SystemUtils.javaHome(), "release"))) {
+                properties.load(is);
+                return properties.getProperty("IMAGE_TYPE", "").isEmpty();
+            } catch (IOException ex) {
+                return false;
+            }
+        }
+        return false;
     }
 }

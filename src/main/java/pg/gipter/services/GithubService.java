@@ -192,16 +192,18 @@ public class GithubService {
             return false;
         }
 
-        final String elevenPlus = "11+";
+        final String jar = "11+";
         final String msi = ".msi";
-        final String exe = ".exe";
+        final String portable = "portable";
 
         boolean result = !assetName.isJsonNull();
         result &= assetName.getAsString().contains(name);
-        if (SystemUtils.isExe()) {
-            result &= (assetName.getAsString().endsWith(msi) || assetName.getAsString().endsWith(exe));
+        if (SystemUtils.isPortable()) {
+            result &= assetName.getAsString().contains(portable);
+        } else if (SystemUtils.isExe()) {
+            result &= assetName.getAsString().endsWith(msi);
         } else {
-            result &= assetName.getAsString().startsWith(elevenPlus);
+            result &= assetName.getAsString().startsWith(jar);
         }
         return result;
     }
