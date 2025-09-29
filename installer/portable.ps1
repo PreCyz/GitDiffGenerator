@@ -9,6 +9,9 @@ Write-Host "$currentLocation" -ForegroundColor Yellow
 # --- Define the path to your Java executable ---
 $javaHome = $env:J25
 Write-Host "$javaHome" -ForegroundColor Green
+$jre25 = "C:\Install\Java\jdk-25+36-jre"
+Write-Host "jre25: " -NoNewline -ForegroundColor Green
+Write-Host "$jre25"
 
 $launch4j = "C:\Install\Launch4j\launch4jc.exe"
 if (-not (Test-Path $launch4j)) {
@@ -26,20 +29,14 @@ if (-not (Test-Path $target))
     Write-Error "target folder not found at: $target"
     exit 1
 }
-Remove-Item "$target\input" -Force -Recurse -Verbose
-Remove-Item "$target\dist" -Force -Recurse -Verbose
 
 Write-Host "Preparing input to $target\input\ " -ForegroundColor Green
-mkdir "$target\input"
-mkdir "$target\dist"
-Copy-Item -Path "$target\Gipter-$version.jar" -Destination "$target\input\Gipter-$version.jar" -Verbose
-Copy-Item -Path ..\docs\*.* -Destination "$target\input\" -Force -Exclude *.odt -Verbose
-Copy-Item -Path "$target\classes\*.xml" -Destination "$target\input\" -Exclude logback.xml -Force -Verbose
-Copy-Item -Path "$target\classes\installer-config.iss" -Destination "$target\input\" -Force -Verbose
+Copy-Item -Path "$target\classes\launch4j.xml" -Destination "$target\input\" -Force -Verbose
 Copy-Item -Path "..\src\main\resources\img\icons\gipter.ico" -Destination "$target\input\" -Force -Verbose
-Copy-Item -Path "$env:J25" -Destination "$target\dist\runtime\" -Force -Recurse -Verbose
-Copy-Item -Path ..\docs\*.* -Destination "$target\dist\" -Force -Exclude *.odt -Verbose
-Remove-Item "$target\dist\runtime\jmods" -Force -Recurse -Verbose
+#Copy-Item -Path "$target\classes\installer-config.iss" -Destination "$target\input\" -Force -Verbose
+
+Copy-Item -Path "$jre25" -Destination "$target\dist\portable\runtime\" -Force -Recurse
+Copy-Item -Path ..\docs\*.* -Destination "$target\dist\portable\" -Force -Exclude *.odt -Verbose
 
 Write-Host "launch4j: " -NoNewline -ForegroundColor Green
 Write-Host "$launch4j"
@@ -48,11 +45,16 @@ Write-Host "$launch4j"
 
 Write-Host "===============launch4j DONE!==========================" -ForegroundColor Green
 
-Write-Host "inno compile setup: " -NoNewline -ForegroundColor Green
-Write-Host "$innoSetupCompiler"
+#Write-Host "inno compile setup: " -NoNewline -ForegroundColor Green
+#Write-Host "$innoSetupCompiler"
 
-& $innoSetupCompiler "$target\input\installer-config.iss"
+#& $innoSetupCompiler "$target\input\installer-config.iss"
 
-$ls = Get-ChildItem -Path "$currentLocation\$target\dist"
-Write-Host "Item produced: " -NoNewline
-Write-Host "$ls" -ForegroundColor Green
+Write-Host "Zipping portable ..."
+
+& 7z a "$target\dist\Gipter-$version-portable.7z" "$target\dist\portable\*"
+
+$lsDist = Get-ChildItem -Path "$currentLocation\$target\dist"
+$lsPortable = Get-ChildItem -Path "$currentLocation\$target\dist"
+Write-Host "Item produced: " -NoNewline -ForegroundColor Cyan
+Write-Host "$lsDist $lsPortable"
