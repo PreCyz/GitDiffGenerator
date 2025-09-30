@@ -35,6 +35,16 @@ public final class SystemUtils {
     }
 
     public static String javaVersion() {
+        if (isCustomRuntime()) {
+            Properties properties = new Properties();
+            try (InputStream is = Files.newInputStream(Paths.get(SystemUtils.javaHome(), "release"))) {
+                properties.load(is);
+                return properties.getProperty("JAVA_RUNTIME_VERSION", "custom")
+                        .replaceAll("\"", "");
+            } catch (IOException ex) {
+                return "N/A";
+            }
+        }
         return System.getProperty("java.version");
     }
 
