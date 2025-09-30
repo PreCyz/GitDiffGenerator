@@ -27,6 +27,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -292,8 +293,8 @@ class SimpleDocumentFinderTest {
     @Test
     void givenProperties_whenBuildUrls_thenReturnUrls() {
         try (MockedStatic<CookiesService> utilities = Mockito.mockStatic(CookiesService.class)) {
-            utilities.when(CookiesService::getFedAuthString).thenReturn("qq");
-            utilities.when(CookiesService::getGotoString).thenReturn("qq");
+            utilities.when(CookiesService::getFedAuthString).thenReturn(Optional.of("qq"));
+            utilities.when(CookiesService::getGotoString).thenReturn(Optional.of("qq"));
             ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
                     new String[]{
                             ArgName.preferredArgSource + "=" + PreferredArgSource.CLI.name(),

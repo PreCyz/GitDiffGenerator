@@ -5,36 +5,18 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Control;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.UploadResult;
 import pg.gipter.ui.alerts.controls.CustomControl;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.ResourceUtils;
-import pg.gipter.utils.StringUtils;
-import pg.gipter.utils.SystemUtils;
+import pg.gipter.utils.*;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -196,7 +178,7 @@ public class AlertWindowBuilder {
                 preferredWidth = pixelsPerLetterFactor * Arrays.stream(lines)
                         .map(String::length)
                         .max((o1, o2) -> o1 > o2 ? o1 : o2)
-                        .orElseGet(() -> 0);
+                        .orElse(0);
                 gridPane.add(messageLabel, 0, gridPaneRow++);
             }
         }
@@ -207,7 +189,7 @@ public class AlertWindowBuilder {
             double messageWidth = pixelsPerLetterFactor * Arrays.stream(message.split(SystemUtils.lineSeparator()))
                     .map(String::length)
                     .max((o1, o2) -> o1 > o2 ? o1 : o2)
-                    .orElseGet(() -> 0);
+                    .orElse(0);
             preferredWidth = Math.max(preferredWidth, messageWidth);
         }
 

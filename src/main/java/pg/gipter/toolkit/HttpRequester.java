@@ -35,7 +35,7 @@ public class HttpRequester {
                 .uri(URI.create(replaceSpaces(sharePointConfig.getFullRequestUrl())))
                 .GET()
                 .header("Accept", "application/json;odata=verbose")
-                .header("Cookie", sharePointConfig.getFedAuth())
+                .header("Cookie", sharePointConfig.getFedAuth() + "; " + sharePointConfig.getGoto())
                 .build();
         logRequest(request);
 
@@ -58,7 +58,7 @@ public class HttpRequester {
         headers.replace("Cookie", List.of("***"));
         headers.replace("X-RequestDigest", List.of("***"));
         logger.info("Executing request: {} {} {} Headers: {}",
-                request.version().map(Enum::toString).orElseGet(() -> ""),
+                request.version().map(Enum::toString).orElse(""),
                 request.method(),
                 request.uri().toString(),
                 headers
@@ -140,7 +140,7 @@ public class HttpRequester {
                 .header("Content-Type", "application/octet-stream")
                 .header("Accept", "application/json")
                 .header("X-RequestDigest", sharePointConfig.getFormDigest())
-                .header("Cookie", sharePointConfig.getFedAuth())
+                .header("Cookie", sharePointConfig.getFedAuth() + "; " +  sharePointConfig.getGoto())
                 .build();
         logRequest(request);
 
@@ -177,7 +177,7 @@ public class HttpRequester {
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .header("Accept", "application/json;odata=verbose")
                 .header("X-ClientService-ClientTag", "SDK-JAVA")
-                .header("Cookie", sharePointConfig.getFedAuth())
+                .header("Cookie", sharePointConfig.getFedAuth() + "; " +  sharePointConfig.getGoto())
                 .build();
         logRequest(request);
 

@@ -16,19 +16,10 @@ import java.lang.reflect.Type;
 import java.net.CookieHandler;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.nio.file.*;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public final class CookiesService {
@@ -48,38 +39,55 @@ public final class CookiesService {
 
     public static boolean hasValidCookies() {
         try {
+            LocalDateTime now = LocalDateTime.now();
             CookieDetails fedAuthCookie = loadFedAuthCookie()
                     .orElseThrow(() -> new IllegalStateException("The cookie FedAuth does not exist."));
             LocalDateTime fedAuthExpirationDate = LocalDateTime.ofInstant(
                     Instant.ofEpochMilli(fedAuthCookie.expiryTime),
                     GMT_ZONE_ID
             );
-            CookieDetails gotoCookie = loadGotoCookie()
-                    .orElseThrow(() -> new IllegalStateException("The cookie Goto does not exist."));
-            LocalDateTime goToExpirationDate = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(gotoCookie.expiryTime),
-                    GMT_ZONE_ID
-            );
-            LocalDateTime now = LocalDateTime.now();
-            return fedAuthExpirationDate.isAfter(now) && goToExpirationDate.isAfter(now);
+            boolean result = fedAuthExpirationDate.isAfter(now);
+
+            Optional<CookieDetails> cookieDetails = loadGotoCookie();
+            if (cookieDetails.isPresent()) {
+                LocalDateTime goToExpirationDate = LocalDateTime.ofInstant(
+                        Instant.ofEpochMilli(cookieDetails.get().expiryTime),
+                        GMT_ZONE_ID
+                );
+                result &= goToExpirationDate.isAfter(now);
+            }
+            return result;
         } catch (Exception ex) {
-            logger.error("Problem with FedAuth cookie. Source of cookie [{}]. {}", COOKIES_PATH.toAbsolutePath(), ex.getMessage());
+            logger.error("Problem with cookies. Source of cookie [{}]. {}", COOKIES_PATH.toAbsolutePath(), ex.getMessage());
             return false;
         }
     }
 
-    public static String getFedAuthString() {
-        return getCookieString(CookieName.FedAuth);
+    public static Optional<String> getFedAuthString() {
+        try {
+            return Optional.of(getCookieString(CookieName.FedAuth));
+        } catch (IllegalStateException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+        return Optional.empty();
     }
 
-    public static String getGotoString() {
-        return getCookieString(CookieName.Goto);
+    public static Optional<String> getGotoString() {
+        try {
+            return Optional.of(getCookieString(CookieName.Goto));
+        } catch (IllegalStateException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+        return Optional.empty();
     }
 
     private static String getCookieString(CookieName cookieName) {
-        CookieDetails cookieDetails = getCookieDetails(cookieName)
-                .orElseThrow(() -> new IllegalStateException("The cookie " + cookieName.name() + " does not exist."));
-        return cookieDetails.name + "=" + cookieDetails.value;
+        return getCookieDetails(cookieName)
+                .map(cd -> cd.name + "=" + cd.value)
+                .orElseGet(() -> {
+                    logger.warn("Cookie name [{}] does not exist.", cookieName);
+                    return "";
+                });
     }
 
     private static Optional<CookieDetails> loadFedAuthCookie() {
@@ -231,7 +239,6 @@ public final class CookiesService {
                     m.put("Set-Cookie", list);
                     CookieHandler.getDefault().put(new URI(String.format("http://%s/", domain)), m);
                 }
-//                CookieHandler.setDefault(BulkCookieManagerExample.createCookieManager(cookiesToLoad));
                 logger.info("Cookies successfully loaded from [{}]", COOKIES_PATH.toAbsolutePath());
             } catch (Exception e) {
                 logger.error("Could not load cookies from [{}]", COOKIES_PATH.toAbsolutePath(), e);

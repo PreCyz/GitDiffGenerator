@@ -1,13 +1,7 @@
 package pg.gipter.jobs;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -82,8 +76,7 @@ public class UploadItemJobBuilder {
         Set<String> configSet = Optional.ofNullable(configs)
                 .map(s-> Stream.of(s.split(",")).collect(toSet()))
                 .orElseGet(Collections::emptySet);
-        LocalDate scheduleDate = Optional.ofNullable(startDateTime).orElseGet(() -> null);
-        return new JobParam(minuteOfHour, hourOfDay, dayOfMonth, dayOfWeek, cronExpression, jobType, scheduleDate,
+        return new JobParam(minuteOfHour, hourOfDay, dayOfMonth, dayOfWeek, cronExpression, jobType, startDateTime,
                 nextFireDateTime, configSet, additionalParams);
     }
 }
