@@ -9,20 +9,25 @@ Write-Host "$currentLocation" -ForegroundColor Yellow
 # --- Define the path to your Java executable ---
 $javaHome = $env:J25
 Write-Host "$javaHome" -ForegroundColor Green
+
 $jre25 = "C:\Install\Java\jdk-25+36-jre"
 Write-Host "jre25: " -NoNewline -ForegroundColor Green
 Write-Host "$jre25"
+if (-not (Test-Path $jre25)) {
+    Write-Error "jre not found at: [$jre25]"
+    exit 1
+}
 
 $launch4j = "C:\Install\Launch4j\launch4jc.exe"
 if (-not (Test-Path $launch4j)) {
     Write-Error "launch4j executable not found at: $launch4j"
     exit 1
 }
-$innoSetupCompiler = "C:\Install\Inno Setup 6\ISCC.exe"
+<#$innoSetupCompiler = "C:\Install\Inno Setup 6\ISCC.exe"
 if (-not (Test-Path $innoSetupCompiler)) {
     Write-Error "innoSetupCompiler executable not found at: $innoSetupCompiler"
     exit 1
-}
+}#>
 $target = "..\target"
 if (-not (Test-Path $target))
 {
@@ -50,9 +55,13 @@ Write-Host "===============launch4j DONE!==========================" -Foreground
 
 #& $innoSetupCompiler "$target\input\installer-config.iss"
 
+if (-not (Test-Path "$target\dist\portable"))
+{
+    Write-Error "portable folder not found at: [$target\dist\portable]"
+    exit 1
+}
 Write-Host "Zipping portable ..."
-
-& 7z a "$target\dist\Gipter-$version-portable.7z" "$target\dist\portable\*"
+& 7z a "$target\dist\Gipter-v$version-portable.7z" "$target\dist\portable\*"
 
 $lsDist = Get-ChildItem -Path "$currentLocation\$target\dist"
 $lsPortable = Get-ChildItem -Path "$currentLocation\$target\dist"

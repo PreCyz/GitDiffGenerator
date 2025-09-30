@@ -35,10 +35,12 @@ if (-not (Test-Path $target))
     exit 1
 }
 if (Test-Path "$target\dist") {
-    Remove-Item "$target\dist" -Force -Recurse -Verbose
+    Write-Host "Removing $target\dist" -ForegroundColor Yellow
+    Remove-Item "$target\dist" -Force -Recurse
 }
 if (Test-Path "$target\input") {
-    Remove-Item "$target\input" -Force -Recurse -Verbose
+    Write-Host "Removing $target\input" -ForegroundColor Yellow
+    Remove-Item "$target\input" -Force -Recurse
 }
 
 Write-Host "Copy jar to $target\input\ " -ForegroundColor Green
@@ -88,6 +90,8 @@ Write-Host "$jPackage"
     --description "Gipter JavaFX msi installer." `
     --java-options "--add-exports=jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED" `
     --verbose
+
+Rename-Item -Path "$target/dist/Gipter-$version.msi" -NewName "Gipter-v$version.msi"
 
 Write-Host "=======================================================" -ForegroundColor DarkYellow
 Write-Host "jpackage DONE!" -ForegroundColor Green
