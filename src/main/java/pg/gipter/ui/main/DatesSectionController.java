@@ -2,9 +2,7 @@ package pg.gipter.ui.main;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.*;
 import javafx.util.StringConverter;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.producers.command.ItemType;
@@ -17,9 +15,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static pg.gipter.core.ApplicationProperties.yyyy_MM_dd;
 
@@ -65,7 +61,7 @@ public class DatesSectionController extends AbstractController {
         uiLauncher.executeOutsideUIThread(() -> {
             if (uiLauncher.getLastItemSubmissionDate() == null) {
                 Optional<String> userId = new ToolkitService(applicationProperties).getUserId();
-                Optional<String> submissionDate = new ToolkitService(applicationProperties).lastItemModifiedDate(userId.orElseGet(() -> ""));
+                Optional<String> submissionDate = new ToolkitService(applicationProperties).lastItemModifiedDate(userId.orElse(""));
                 if (submissionDate.isPresent()) {
                     uiLauncher.setLastItemSubmissionDate(LocalDateTime.parse(submissionDate.get(), DateTimeFormatter.ISO_DATE_TIME));
                     Platform.runLater(() -> {

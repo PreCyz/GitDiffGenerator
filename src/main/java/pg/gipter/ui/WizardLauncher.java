@@ -174,7 +174,7 @@ public class WizardLauncher implements Launcher {
     }
 
     private String getValue(Wizard wizard, String argName) {
-        return Optional.ofNullable(wizard.getSettings().get(argName)).map(String::valueOf).orElseGet(() -> "");
+        return Optional.ofNullable(wizard.getSettings().get(argName)).map(String::valueOf).orElse("");
     }
 
     private TextField createTextField(String id) {
@@ -347,7 +347,7 @@ public class WizardLauncher implements Launcher {
             final Optional<Path> statementPath = Optional.ofNullable(fileChooser.showOpenDialog(primaryStage))
                     .map(File::toPath);
             boolean isStatementFileSet = statementPath.map(path -> Files.exists(path) && Files.isRegularFile(path))
-                    .orElseGet(() -> false);
+                    .orElse(false);
             if (isStatementFileSet) {
                 itemPathStringProperty.setValue(statementPath.get().toAbsolutePath().toString());
                 wizardProperties.put(ArgName.itemPath.name(), statementPath.get().toAbsolutePath().toString());
@@ -359,7 +359,7 @@ public class WizardLauncher implements Launcher {
             final Optional<Path> directoryPath = Optional.ofNullable(directoryChooser.showDialog(primaryStage))
                     .map(File::toPath);
             boolean isItemPathDirectorySet = directoryPath.map(path -> Files.exists(path) && Files.isDirectory(path))
-                    .orElseGet(() -> false);
+                    .orElse(false);
             if (isItemPathDirectorySet) {
                 itemPathStringProperty.setValue(directoryPath.get().toAbsolutePath().toString());
                 wizardProperties.put(ArgName.itemPath.name(), directoryPath.get().toAbsolutePath().toString());

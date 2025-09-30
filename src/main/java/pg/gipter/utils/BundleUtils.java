@@ -2,12 +2,7 @@ package pg.gipter.utils;
 
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static java.util.stream.Collectors.toCollection;
 
@@ -52,7 +47,7 @@ public final class BundleUtils {
         SupportedLanguages supportedLanguage = Arrays.stream(SupportedLanguages.values())
                 .filter(sl -> sl.language.equals(language))
                 .findFirst()
-                .orElseGet(() -> SupportedLanguages.EN);
+                .orElse(SupportedLanguages.EN);
 
         if (supportedLanguage == SupportedLanguages.PL) {
             bundle = ResourceBundle.getBundle(String.format("%s_%s", BUNDLE_BASE_NAME, language));

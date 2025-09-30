@@ -4,10 +4,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import pg.gipter.core.ApplicationProperties;
@@ -24,11 +21,7 @@ import pg.gipter.utils.StringUtils;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.toSet;
@@ -140,7 +133,7 @@ class CsvDetailsSectionController extends AbstractController {
     private void setTooltipOnUseDefaultAuthor() {
         if (ItemType.isCodeRelated(applicationProperties.itemType())) {
             vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-            String userName = vcsService.getUserName().orElseGet(() -> "");
+            String userName = vcsService.getUserName().orElse("");
             Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultAuthor.tooltip", userName));
             tooltip.setTextAlignment(TextAlignment.LEFT);
             tooltip.setFont(Font.font("Courier New", 16));
@@ -151,7 +144,7 @@ class CsvDetailsSectionController extends AbstractController {
     private void setTooltipOnUseDefaultEmail() {
         if (ItemType.isCodeRelated(applicationProperties.itemType())) {
             vcsService.setProjectPath(new LinkedList<>(applicationProperties.projectPaths()).getFirst());
-            String userEmail = vcsService.getUserEmail().orElseGet(() -> "");
+            String userEmail = vcsService.getUserEmail().orElse("");
             Tooltip tooltip = new Tooltip(BundleUtils.getMsg("vcs.panel.useDefaultEmail.tooltip", userEmail));
             tooltip.setTextAlignment(TextAlignment.LEFT);
             tooltip.setFont(Font.font("Courier New", 16));

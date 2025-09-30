@@ -293,7 +293,7 @@ public class ApplicationConfig {
                 ", checkLastItemJobCronExpression=" + checkLastItemJobCronExpression +
                 ", uploadItem=" + uploadItem +
                 ", smartZip=" + smartZip +
-                ", githubToken=" + Optional.of(githubToken).map(it -> "***").orElseGet(() -> "N/A") +
+                ", githubToken=" + Optional.of(githubToken).map(it -> "***").orElse("N/A") +
                 '}';
     }
 }

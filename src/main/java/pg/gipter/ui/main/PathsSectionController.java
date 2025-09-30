@@ -3,12 +3,7 @@ package pg.gipter.ui.main;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.DirectoryChooser;
@@ -23,19 +18,12 @@ import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.WebViewService;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
-import pg.gipter.utils.SystemUtils;
+import pg.gipter.utils.*;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.nio.file.*;
+import java.util.*;
 
 import static java.util.stream.Collectors.joining;
 
@@ -153,7 +141,7 @@ class PathsSectionController extends AbstractController {
                 final Optional<Path> statementFile = Optional.ofNullable(fileChooser.showOpenDialog(uiLauncher.currentWindow()))
                         .map(File::toPath);
                 boolean isStatementFileSet = statementFile.map(path -> Files.exists(path) && Files.isRegularFile(path))
-                        .orElseGet(() -> false);
+                        .orElse(false);
                 if (isStatementFileSet) {
                     itemPathLabel.setText(statementFile.get().toAbsolutePath().toString());
                     itemPathButton.setText(resources.getString("button.open"));
@@ -166,7 +154,7 @@ class PathsSectionController extends AbstractController {
                 final Optional<Path> itemPathDirectory = Optional.ofNullable(directoryChooser.showDialog(uiLauncher.currentWindow()))
                         .map(File::toPath);
                 boolean isDirectorySet = itemPathDirectory.map(path -> Files.exists(path) && Files.isDirectory(path))
-                        .orElseGet(() -> false);
+                        .orElse(false);
                 if (isDirectorySet) {
                     itemPathLabel.setText(itemPathDirectory.get().toAbsolutePath().toString());
                     itemPathButton.setText(resources.getString("button.change"));

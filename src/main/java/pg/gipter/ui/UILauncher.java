@@ -153,7 +153,7 @@ public class UILauncher implements Launcher {
                     logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
                             .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
-                            .withMessage(service.getReleaseNotes().orElseGet(() -> ""))
+                            .withMessage(service.getReleaseNotes().orElse(""))
                             .withAlertType(Alert.AlertType.INFORMATION)
                             .withCustomControl(ControlFactory.createUpgradeButton(this))
                             .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())

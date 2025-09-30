@@ -180,7 +180,7 @@ public class GithubService {
             if (isProperAsset(name, assetName)) {
                 distributionName = assetName.getAsString();
                 downloadLink = Optional.ofNullable(element.get("url").getAsString());
-                logger.info("New version download link: [{}]", downloadLink.orElseGet(() -> "N/A"));
+                logger.info("New version download link: [{}]", downloadLink.orElse("N/A"));
                 break;
             }
         }

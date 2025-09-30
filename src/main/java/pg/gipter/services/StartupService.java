@@ -35,7 +35,7 @@ public class StartupService {
                     "Gipter.lnk"
             );
 
-            Path target = JarHelper.getJarPath().orElseGet(() -> Paths.get(""));
+            Path target = JarHelper.getJarPath().orElse(Paths.get(""));
             if (!Files.exists(shortcutLnkPath)) {
                 logger.info("Creating shortcut to [{}] and placing it in Windows startup folder. [{}]", target, shortcutLnkPath);
                 try {
