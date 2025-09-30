@@ -3,10 +3,7 @@ package pg.gipter.ui.alerts;
 import pg.gipter.core.dao.gif.CustomGif;
 import pg.gipter.core.dao.gif.GifDao;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,7 +45,7 @@ public final class Gif {
 
     public static Gif randomPartialSuccessGif() {
         Collection<CustomGif> customGifs = GifDao.readCustomGifs()
-                .orElseGet(() -> defaults)
+                .orElse(defaults)
                 .stream()
                 .filter(CustomGif::isPartialSuccess)
                 .collect(Collectors.toList());
@@ -57,7 +54,7 @@ public final class Gif {
 
     public static Gif randomSuccessGif() {
         Collection<CustomGif> customGifs = GifDao.readCustomGifs()
-                .orElseGet(() -> defaults)
+                .orElse(defaults)
                 .stream()
                 .filter(CustomGif::isSuccess)
                 .collect(Collectors.toList());
@@ -66,7 +63,7 @@ public final class Gif {
 
     public static Gif randomFailGif() {
         Collection<CustomGif> customGifs = GifDao.readCustomGifs()
-                .orElseGet(() -> defaults)
+                .orElse(defaults)
                 .stream()
                 .filter(CustomGif::isFail)
                 .collect(Collectors.toList());

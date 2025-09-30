@@ -35,7 +35,7 @@ public class StartupService {
                     "Gipter.lnk"
             );
 
-            Path target = JarHelper.getJarPath().orElseGet(() -> Paths.get(""));
+            Path target = JarHelper.getJarPath().orElse(Paths.get(""));
             if (SystemUtils.isExe()) {
                 target = Paths.get(".", "Gipter.exe");
             }

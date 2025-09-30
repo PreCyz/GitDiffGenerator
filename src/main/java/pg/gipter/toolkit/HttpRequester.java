@@ -1,9 +1,6 @@
 package pg.gipter.toolkit;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,23 +8,12 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.DownloadDetails;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.nio.file.*;
+import java.util.*;
 
 public class HttpRequester {
 
@@ -72,7 +58,7 @@ public class HttpRequester {
         headers.replace("Cookie", List.of("***"));
         headers.replace("X-RequestDigest", List.of("***"));
         logger.info("Executing request: {} {} {} Headers: {}",
-                request.version().map(Enum::toString).orElseGet(() -> ""),
+                request.version().map(Enum::toString).orElse(""),
                 request.method(),
                 request.uri().toString(),
                 headers
