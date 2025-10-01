@@ -22,8 +22,7 @@ import pg.gipter.launchers.Launcher;
 import pg.gipter.services.*;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.ui.alerts.controls.ControlFactory;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
+import pg.gipter.utils.*;
 
 import java.awt.*;
 import java.io.IOException;
@@ -124,7 +123,7 @@ public class UILauncher implements Launcher {
         }
         if (applicationProperties.isUpgradeFinished()) {
             displayUpgradeInfo();
-        } else {
+        } else if (!SystemUtils.isPortable()) {
             checkUpgrades();
         }
         setStartOnStartup();
