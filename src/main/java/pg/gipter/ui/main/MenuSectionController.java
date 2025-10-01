@@ -72,17 +72,21 @@ public class MenuSectionController extends AbstractController {
     }
 
     private void setUpgradeMenuItemDisabled() {
-        uiLauncher.executeOutsideUIThread(() -> {
-            logger.info("Checking new version.");
-            GithubService service = new GithubService(applicationProperties.version(), applicationProperties.githubToken());
-            final boolean newVersion = service.isNewVersion();
-            if (newVersion) {
-                logger.info("New version [{}] available.", service.getServerVersion());
-            } else {
-                logger.info("This version is up to date.");
-            }
-            Platform.runLater(() -> upgradeMenuItem.setDisable(!newVersion));
-        });
+        if (SystemUtils.isPortable()) {
+            upgradeMenuItem.setDisable(true);
+        } else {
+            uiLauncher.executeOutsideUIThread(() -> {
+                logger.info("Checking new version.");
+                GithubService service = new GithubService(applicationProperties.version(), applicationProperties.githubToken());
+                final boolean newVersion = service.isNewVersion();
+                if (newVersion) {
+                    logger.info("New version [{}] available.", service.getServerVersion());
+                } else {
+                    logger.info("This version is up to date.");
+                }
+                Platform.runLater(() -> upgradeMenuItem.setDisable(!newVersion));
+            });
+        }
     }
 
     private void setAccelerators() {
