@@ -200,7 +200,7 @@ public class GithubService {
         result &= assetName.getAsString().contains(name);
         if (SystemUtils.isPortable()) {
             result &= assetName.getAsString().contains(portable);
-        } else if (SystemUtils.isExe()) {
+        } else if (SystemUtils.isMsi()) {
             result &= assetName.getAsString().endsWith(msi);
         } else {
             result &= assetName.getAsString().startsWith(jar);

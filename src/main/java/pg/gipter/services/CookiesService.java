@@ -7,6 +7,7 @@ import com.sun.webkit.network.CookieManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.services.dto.CookieDetails;
 import pg.gipter.utils.StringUtils;
 
@@ -33,7 +34,7 @@ public final class CookiesService {
     private static final String[] MONTHS = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan"};
     private static final ZoneId GMT_ZONE_ID = TimeZone.getTimeZone("GMT").toZoneId();
 
-    static final Path COOKIES_PATH = Paths.get("cookies.json");
+    static final Path COOKIES_PATH = Paths.get(DaoConstants.COOKIES_JSON);
 
     private CookiesService() {}
 

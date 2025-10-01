@@ -47,6 +47,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         logger.info("Gipter is starting ...");
+        restoreBackup();
         InternalMain mObj = new InternalMain(args);
         mObj.setup();
         mObj.setLoggerLevel(applicationProperties.loggerLevel());
@@ -98,6 +99,29 @@ public class Main extends Application {
         }
     }
 
+    private static void restoreBackup() {
+        if (SystemUtils.isMsi()) {
+            if (Files.exists(BackupService.gipterTmp())) {
+                BackupService.restoreBackup();
+            }
+            Path gifJson = Path.of(".", DaoConstants.CUSTOM_GIFS_JSON);
+            if (!Files.exists(gifJson)) {
+                Path source = Path.of("app", DaoConstants.CUSTOM_GIFS_JSON);
+                try {
+                    Files.copy(
+                            source,
+                            gifJson,
+                            StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.COPY_ATTRIBUTES
+                    );
+                    logger.info("Gifs definition was moved from the [{}].", source);
+                } catch (IOException e) {
+                    logger.warn("Failed to move gif files from [{}] to [{}]: {}", gifJson, source, e.getMessage());
+                }
+            }
+        }
+    }
+
     private static boolean isCookieWorking(String[] args) {
         try {
             return new ToolkitService(ApplicationPropertiesFactory.getInstance(args)).isCookieWorking();
@@ -124,25 +148,6 @@ public class Main extends Application {
     private record InternalMain(String[] args) {
 
         private void setup() {
-            if (SystemUtils.isExe()) {
-
-                if (Arrays.stream(args)
-                        .filter(arg -> arg.startsWith(ArgName.upgradeFinished.name()))
-                        .anyMatch(arg -> arg.endsWith(Boolean.toString(true)))) {
-                    BackupService.restoreBackup();
-                }
-
-                Path gifJson = Path.of(".", DaoConstants.CUSTOM_GIFS_JSON);
-                if (!Files.exists(gifJson)) {
-                    Path source = Path.of(".", "app", DaoConstants.CUSTOM_GIFS_JSON);
-                    try {
-                        Files.copy(source, gifJson, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-                    } catch (IOException e) {
-                        logger.warn("Failed to move gif files from [{}] to [{}]: {}", gifJson, source, e.getMessage());
-                    }
-                }
-            }
-
             applicationProperties = ApplicationPropertiesFactory.getInstance(args);
             Optional<String> javaHome = Stream.of(args).filter(arg -> arg.startsWith("java.home")).findFirst();
             if (javaHome.isPresent()) {

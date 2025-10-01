@@ -20,7 +20,7 @@ public class GifDao {
         Optional<List<CustomGif>> result = Optional.empty();
         final Gson gson = new GsonBuilder().create();
         String gifFilePath = DaoConstants.CUSTOM_GIFS_JSON;
-        if (SystemUtils.isExe()) {
+        if (SystemUtils.isMsi()) {
             gifFilePath = Path.of(".", "app", DaoConstants.CUSTOM_GIFS_JSON).toAbsolutePath().normalize().toString();
         }
         try (InputStream fis = new FileInputStream(gifFilePath);

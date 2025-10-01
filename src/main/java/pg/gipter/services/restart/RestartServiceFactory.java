@@ -6,7 +6,7 @@ public class RestartServiceFactory {
     private RestartServiceFactory() {}
 
     public static RestartService getRestartService() {
-        if (SystemUtils.isExe()) {
+        if (SystemUtils.isMsi()) {
             return new RestartExe();
         }
         return new RestartJar();

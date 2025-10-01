@@ -1,5 +1,6 @@
 package pg.gipter.env;
 
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.model.CipherDetails;
 
 import java.io.IOException;
@@ -15,9 +16,9 @@ public interface EnvSettings {
     }
     Optional<Properties> loadDbProperties();
     default Path settingsPath() {
-        return Paths.get("settings.json");
+        return Paths.get(DaoConstants.SETTINGS_JSON);
     }
     default Path connectionPath() {
-        return Paths.get("db.connection");
+        return Paths.get(DaoConstants.DB_CONNECTION);
     }
 }
