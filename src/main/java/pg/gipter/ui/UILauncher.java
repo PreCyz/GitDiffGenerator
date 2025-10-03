@@ -1,5 +1,7 @@
 package pg.gipter.ui;
 
+import atlantafx.base.theme.*;
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.event.EventHandler;
@@ -117,6 +119,11 @@ public class UILauncher implements Launcher {
 
     @Override
     public void execute() {
+        if (true) {
+            Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+            Application.setUserAgentStylesheet(new Dracula().getUserAgentStylesheet());
+            Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+        }
         if (!isTraySupported() && silentMode) {
             logger.info("Tray icon is not supported. Can't launch in silent mode. Program is terminated");
             Platform.exit();
@@ -203,7 +210,7 @@ public class UILauncher implements Launcher {
     public void buildAndShowMainWindow() {
         buildScene(
                 mainWindow,
-                WindowFactory.MAIN.createWindow(applicationProperties, this)
+                WindowFactory.MAIN_THEMED.createWindow(applicationProperties, this)
         );
         Platform.runLater(mainWindow::show);
     }

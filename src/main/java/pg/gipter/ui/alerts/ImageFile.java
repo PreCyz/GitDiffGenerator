@@ -1,13 +1,11 @@
 package pg.gipter.ui.alerts;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public enum ImageFile {
 
     CHICKEN_FACE_PNG("png/chicken-face.png"),
+    OFFICER_PNG("png/officer.png"),
     ERROR_CHICKEN_PNG("png/error-chicken.png"),
     GOOD_JOB_PNG("png/good-job.png"),
     OVERRIDE_PNG("png/override.png"),
