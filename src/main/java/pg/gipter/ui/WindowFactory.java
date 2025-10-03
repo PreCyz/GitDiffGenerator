@@ -17,12 +17,9 @@ public enum WindowFactory {
     MAIN {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new MainWindow(new MainController(applicationProperties, uiLauncher));
-        }
-    },
-    MAIN_THEMED {
-        @Override
-        public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
+            if (applicationProperties.uiTheme() == UITheme.DEFAULT) {
+                return new MainWindow(new MainController(applicationProperties, uiLauncher));
+            }
             return new MainThemedWindow(new MainController(applicationProperties, uiLauncher));
         }
     },
@@ -41,7 +38,10 @@ public enum WindowFactory {
     APPLICATION_MENU {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new ApplicationSettingsWindow(new ApplicationSettingsController(applicationProperties, uiLauncher));
+            if (applicationProperties.uiTheme() == UITheme.DEFAULT) {
+                return new ApplicationSettingsWindow(new ApplicationSettingsController(applicationProperties, uiLauncher));
+            }
+            return new ApplicationSettingsThemedWindow(new ApplicationSettingsController(applicationProperties, uiLauncher));
         }
     },
     TOOLKIT_MENU {

@@ -4,36 +4,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.command.CustomCommand;
-import pg.gipter.core.dao.configuration.CachedConfiguration;
-import pg.gipter.core.dao.configuration.ConfigurationDao;
-import pg.gipter.core.dao.configuration.SecurityProviderFactory;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.Configuration;
-import pg.gipter.core.model.NamePatternValue;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.dao.configuration.*;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
-import pg.gipter.services.CookiesService;
-import pg.gipter.services.SemanticVersioning;
-import pg.gipter.services.ToolkitService;
+import pg.gipter.services.*;
+import pg.gipter.ui.UITheme;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 /**Created by Pawel Gawedzki on 17-Sep-2018.*/
 public abstract class ApplicationProperties {
@@ -319,6 +302,10 @@ public abstract class ApplicationProperties {
         return CookiesService.hasValidCookies() && new ToolkitService(this).isCookieWorking();
     }
 
+    public UITheme uiTheme() {
+        return argExtractor.uiTheme();
+    }
+
     protected final String log() {
         String log = "version='" + version().getVersion() + '\'';
         if (currentRunConfig != null) {
@@ -351,7 +338,8 @@ public abstract class ApplicationProperties {
                     ", uploadItem='" + isUploadItem() + '\'' +
                     ", noSSO='" + isNoSSO() + '\'' +
                     ", smartZip='" + isSmartZip() + '\'' +
-                    ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'';
+                    ", checkLastItemCronExpression='" + getCheckLastItemJobCronExpression() + '\'' +
+                    ", uiTheme='" + uiTheme() + '\'';
         }
         if (toolkitConfig != null) {
             log += ", toolkitUsername='" + toolkitUsername() + '\'' +

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.String?>
+<AnchorPane fx:id="mainAnchorPane" prefHeight="180.0" prefWidth="513.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+    <TabPane fx:id="applicationSettingsTabPane" prefHeight="297.0" prefWidth="539.0" tabClosingPolicy="UNAVAILABLE">
+        <Tab fx:id="applicationSettingsTab" text="%launch.panel.title">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="281.0" prefWidth="426.0">
+                <Label fx:id="confirmationWindowLabel" layoutX="27.0" layoutY="8.0" prefWidth="134.0" text="%launch.panel.confirmationWindow" textAlignment="RIGHT" />
+                <CheckBox fx:id="confirmationWindowCheckBox" layoutX="170.0" layoutY="8.0" mnemonicParsing="false" />
+                <Label fx:id="preferredArgSourceLabel" disable="true" layoutX="25.0" layoutY="174.0" prefWidth="134.0" text="%launch.panel.preferredArgSource" textAlignment="RIGHT" />
+                <ComboBox fx:id="preferredArgSourceComboBox" layoutX="170.0" layoutY="166.0" prefHeight="25.0" />
+                <CheckBox fx:id="useUICheckBox" layoutX="202.0" layoutY="8.0" mnemonicParsing="false" text="%launch.panel.useUI" />
+                <Label fx:id="activateTrayLabel" layoutX="27.0" layoutY="37.0" prefWidth="134.0" text="%launch.panel.activateTray" textAlignment="RIGHT" />
+                <CheckBox fx:id="activateTrayCheckBox" layoutX="170.0" layoutY="37.0" mnemonicParsing="false" />
+                <Label fx:id="autoStartLabel" layoutX="27.0" layoutY="67.0" prefWidth="134.0" text="%launch.panel.autoStart" textAlignment="RIGHT" />
+                <CheckBox fx:id="autostartCheckBox" layoutX="170.0" layoutY="67.0" mnemonicParsing="false" />
+                <ComboBox fx:id="languageComboBox" layoutX="170.0" layoutY="126.0" />
+                <Label fx:id="languageLabel" layoutX="27.0" layoutY="134.0" prefWidth="134.0" text="%launch.panel.language" textAlignment="RIGHT" />
+                <CheckBox fx:id="silentModeCheckBox" layoutX="202.0" layoutY="37.0" mnemonicParsing="false" text="%launch.panel.silentMode" />
+                <Label fx:id="checkLastItemLabel" layoutX="27.0" layoutY="96.0" prefWidth="134.0" text="%launch.panel.lastItemJob" textAlignment="RIGHT" />
+                <CheckBox fx:id="checkLastItemCheckBox" layoutX="170.0" layoutY="96.0" mnemonicParsing="false" />
+                <CheckBox fx:id="uploadItemCheckBox" layoutX="202.0" layoutY="67.0" mnemonicParsing="false" text="%launch.panel.uploadItem" />
+                <CheckBox fx:id="smartZipCheckBox" layoutX="202.0" layoutY="96.0" mnemonicParsing="false" text="%launch.panel.smartZip" />
+                <Button fx:id="refreshSettingsButton" layoutX="401.0" layoutY="213.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="123.0" text="%launch.panel.refreshSettings">
+               <styleClass>
+                  <String fx:value="button-outlined" />
+                  <String fx:value="success" />
+               </styleClass>
+                </Button>
+                <CheckBox fx:id="noSSOCheckBox" layoutX="423.0" layoutY="8.0" mnemonicParsing="false" text="%launch.panel.noSSO" />
+            <ComboBox fx:id="themeComboBox" layoutX="170.0" layoutY="206.0" />
+            <Label fx:id="themeLabel" layoutX="25.0" layoutY="214.0" prefWidth="134.0" text="%launch.panel.theme" textAlignment="RIGHT" />
+            </AnchorPane>
+        </Tab>
+        <Tab fx:id="customCommandTab" text="%launch.customCommand.tab">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <Label fx:id="gitLabel" layoutX="14.0" layoutY="45.0" text="GIT" />
+                <Label fx:id="svnLabel" layoutX="14.0" layoutY="86.0" text="SVN" />
+                <Label fx:id="mercurialLabel" layoutX="14.0" layoutY="128.0" text="MERCURIAL" />
+                <TextField fx:id="gitCommandTextField" layoutX="101.0" layoutY="41.0" prefHeight="23.0" prefWidth="377.0">
+                    <font>
+                        <Font size="10.0" />
+                    </font>
+                </TextField>
+                <TextField fx:id="svnCommandTextField" layoutX="101.0" layoutY="83.0" prefHeight="23.0" prefWidth="377.0">
+                    <font>
+                        <Font size="10.0" />
+                    </font>
+                </TextField>
+                <TextField fx:id="mercurialCommandTextField" layoutX="101.0" layoutY="125.0" prefHeight="23.0" prefWidth="377.0">
+                    <font>
+                        <Font size="10.0" />
+                    </font>
+                </TextField>
+                <Label fx:id="overrideLabel" layoutX="473.0" layoutY="14.0" text="Override" />
+                <CheckBox fx:id="overrideGitCheckBox" layoutX="489.0" layoutY="46.0" mnemonicParsing="false" />
+                <CheckBox fx:id="overrideSvnCheckBox" layoutX="489.0" layoutY="88.0" mnemonicParsing="false" />
+                <CheckBox fx:id="overrideMercurialCheckBox" layoutX="489.0" layoutY="130.0" mnemonicParsing="false" />
+            </AnchorPane>
+        </Tab>
+    </TabPane>
+</AnchorPane>

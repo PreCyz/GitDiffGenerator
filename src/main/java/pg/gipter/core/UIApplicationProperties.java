@@ -1,5 +1,7 @@
 package pg.gipter.core;
 
+import pg.gipter.ui.UITheme;
+
 /** Created by Pawel Gawedzki on 06-Mar-2019. */
 class UIApplicationProperties extends FileApplicationProperties {
 
@@ -30,6 +32,14 @@ class UIApplicationProperties extends FileApplicationProperties {
             enableOnStartup = applicationConfig.getEnableOnStartup();
         }
         return enableOnStartup;
+    }
+
+    @Override
+    public UITheme uiTheme() {
+        if (applicationConfig.getUiTheme() != null) {
+            return applicationConfig.getUiTheme();
+        }
+        return argExtractor.uiTheme();
     }
 
 }

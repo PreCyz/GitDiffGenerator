@@ -4,6 +4,7 @@ import org.slf4j.event.Level;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.command.CustomCommand;
+import pg.gipter.ui.UITheme;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
@@ -28,6 +29,7 @@ public class ApplicationConfig {
     private Boolean uploadItem;
     private Boolean smartZip;
     private String githubToken;
+    private UITheme uiTheme;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -45,6 +47,7 @@ public class ApplicationConfig {
         uploadItem = StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
         smartZip = StringUtils.getBoolean(ArgName.smartZip.defaultValue());
         githubToken = ArgName.githubToken.defaultValue();
+        uiTheme = UITheme.DEFAULT;
     }
 
     public Boolean getConfirmationWindow() {
@@ -183,6 +186,14 @@ public class ApplicationConfig {
         this.githubToken = githubToken;
     }
 
+    public UITheme getUiTheme() {
+        return uiTheme;
+    }
+
+    public void setUiTheme(UITheme uiTheme) {
+        this.uiTheme = uiTheme;
+    }
+
     public String[] toArgumentArray() {
         Collection<String> arguments = new LinkedHashSet<>();
         if (getLoggingLevel() != null) {
@@ -230,6 +241,9 @@ public class ApplicationConfig {
         if (getGithubToken() != null) {
             arguments.add(ArgName.githubToken.name() + "=" + getGithubToken());
         }
+        if (getUiTheme() != null) {
+            arguments.add(ArgName.uiTheme.name() + "=" + getUiTheme());
+        }
         return arguments.toArray(new String[0]);
     }
 
@@ -270,6 +284,8 @@ public class ApplicationConfig {
                     applicationConfig.setSmartZip(StringUtils.getBoolean(argumentValue));
                 } else if (ArgName.githubToken.name().equals(argumentName)) {
                     applicationConfig.setGithubToken(argumentValue);
+                } else if (ArgName.uiTheme.name().equals(argumentName)) {
+                    applicationConfig.setUiTheme(UITheme.valueFromKey(argumentValue));
                 }
             }
         }

@@ -1,13 +1,11 @@
 package pg.gipter.core;
 
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.ui.UITheme;
 import pg.gipter.utils.StringUtils;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -347,5 +345,9 @@ final class ArgExtractor {
             return StringUtils.getBoolean(getValue(ArgName.toolkitFileModifiedByIncluded, ArgName.toolkitFileModifiedByIncluded.defaultValue()));
         }
         return StringUtils.getBoolean(ArgName.toolkitFileModifiedByIncluded.defaultValue());
+    }
+
+    UITheme uiTheme() {
+        return UITheme.valueOf(ArgName.uiTheme.defaultValue());
     }
 }

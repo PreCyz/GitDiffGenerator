@@ -2,6 +2,7 @@ package pg.gipter.core;
 
 import pg.gipter.FlowType;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.ui.UITheme;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.SystemUtils;
 
@@ -277,6 +278,12 @@ public enum ArgName {
         @Override
         public String defaultValue() {
             return FlowType.REGULAR.name();
+        }
+    },
+    uiTheme {
+        @Override
+        public String defaultValue() {
+            return UITheme.DEFAULT.name();
         }
     };
 

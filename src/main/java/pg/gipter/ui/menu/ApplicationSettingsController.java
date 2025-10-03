@@ -20,8 +20,7 @@ import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.jobs.JobCreator;
 import pg.gipter.jobs.JobCreatorFactory;
 import pg.gipter.services.*;
-import pg.gipter.ui.AbstractController;
-import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.*;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.BundleUtils;
@@ -51,6 +50,10 @@ public class ApplicationSettingsController extends AbstractController {
     private Label preferredArgSourceLabel;
     @FXML
     private Label checkLastItemLabel;
+    @FXML
+    private Label overrideLabel;
+    @FXML
+    private Label themeLabel;
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -92,9 +95,9 @@ public class ApplicationSettingsController extends AbstractController {
     @FXML
     private CheckBox overrideMercurialCheckBox;
     @FXML
-    private Label overrideLabel;
-    @FXML
     private Button refreshSettingsButton;
+    @FXML
+    private ComboBox<String> themeComboBox;
 
     private final Map<String, Labeled> labelsAffectedByLanguage;
 
@@ -140,6 +143,10 @@ public class ApplicationSettingsController extends AbstractController {
         }
         languageComboBox.setValue(applicationProperties.uiLanguage());
         checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
+        themeComboBox.setItems(FXCollections.observableList(EnumSet.allOf(UITheme.class)
+                        .stream().map(UITheme::value).toList().stream().sorted(Comparator.naturalOrder()).toList())
+        );
+        themeComboBox.setValue(applicationProperties.uiTheme().value());
 
         final CustomCommand gitCustomCommand = applicationProperties.getCustomCommand(VersionControlSystem.GIT);
         overrideGitCheckBox.setSelected(gitCustomCommand.isOverride());
@@ -174,6 +181,9 @@ public class ApplicationSettingsController extends AbstractController {
         gitCommandTextField.setDisable(!overrideGitCheckBox.isSelected());
         svnCommandTextField.setDisable(!overrideSvnCheckBox.isSelected());
         mercurialCommandTextField.setDisable(!overrideMercurialCheckBox.isSelected());
+        if (applicationProperties.uiTheme().isDarkMode()) {
+            refreshSettingsButton.getStyleClass().remove("button-outlined");
+        }
     }
 
     private void setListeners() {
@@ -273,6 +283,7 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
         applicationConfig.setUploadItem(uploadItemCheckBox.isSelected());
         applicationConfig.setSmartZip(smartZipCheckBox.isSelected());
+        applicationConfig.setUiTheme(UITheme.valueFromKey(themeComboBox.getValue()));
         applicationConfig.setCustomCommands(
                 Stream.of(
                         new CustomCommand(
@@ -335,5 +346,6 @@ public class ApplicationSettingsController extends AbstractController {
         labelsAffectedByLanguage.put("launch.panel.uploadItem", uploadItemCheckBox);
         labelsAffectedByLanguage.put("launch.panel.smartZip", smartZipCheckBox);
         labelsAffectedByLanguage.put("launch.panel.refreshSettings", refreshSettingsButton);
+        labelsAffectedByLanguage.put("launch.panel.theme", themeLabel);
     }
 }

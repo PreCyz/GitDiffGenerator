@@ -3,6 +3,7 @@ package pg.gipter.ui.main;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -241,8 +242,31 @@ public class MainController extends AbstractController {
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
         buttonController.initialize(location, resources, initButtonMap());
 
+        processTheme();
         setProperties();
         setAccelerators();
+    }
+
+    private void processTheme() {
+        if (applicationProperties.uiTheme().isDarkMode()) {
+            List<Button> allButtons = new ArrayList<>();
+            getButtons(mainAnchorPane, allButtons);
+            allButtons.forEach(button -> button.getStyleClass().remove("button-outlined"));
+        }
+    }
+
+    public void getButtons(Node node, List<Button> list) {
+        if (node instanceof TitledPane) {
+            getButtons(((TitledPane) node).getContent(), list);
+        } else if (node instanceof AnchorPane) {
+            for (Node child : ((AnchorPane) node).getChildren()) {
+                if (child instanceof Button) {
+                    list.add((Button)child);
+                } else {
+                    getButtons(child, list);
+                }
+            }
+        }
     }
 
     private void setProperties() {
