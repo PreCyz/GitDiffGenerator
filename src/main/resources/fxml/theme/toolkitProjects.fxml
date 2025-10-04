@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import java.lang.*?>
+<AnchorPane prefHeight="575.0" prefWidth="544.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+   <Label layoutX="10.0" layoutY="10.0" text="%toolkit.projects.instructions">
+      <font>
+         <Font name="System Bold" size="12.0" />
+      </font>
+   </Label>
+   <Label layoutX="10.0" layoutY="161.0" text="https://goto.netcompany.com/cases/">
+      <font>
+         <Font name="System Bold" size="12.0" />
+      </font>
+   </Label>
+   <Hyperlink fx:id="showMyProjectsHyperlink" layoutX="212.0" layoutY="123.0" text="%toolkit.projects.showMyProjects">
+      <font>
+         <Font name="System Bold" size="12.0" />
+      </font>
+   </Hyperlink>
+   <TextField fx:id="projectIdTextField" alignment="CENTER" layoutX="224.0" layoutY="150.0" prefHeight="25.0" prefWidth="70.0" />
+   <Label layoutX="10.0" layoutY="99.0" text="%toolkit.projects.example" />
+   <Label layoutX="296.0" layoutY="161.0" text="/">
+      <font>
+         <Font name="System Bold" size="12.0" />
+      </font>
+   </Label>
+   <TextField fx:id="projectNameTextField" alignment="CENTER" layoutX="304.0" layoutY="150.0" prefHeight="25.0" prefWidth="80.0" />
+   <Label layoutX="386.0" layoutY="161.0" text="/default.aspx">
+      <font>
+         <Font name="System Bold" size="12.0" />
+      </font>
+   </Label>
+   <Hyperlink fx:id="checkProjectHyperlink" layoutX="467.0" layoutY="161.0" text="%toolkit.projects.checkProject">
+      <font>
+         <Font name="System Bold" size="12.0" />
+      </font>
+   </Hyperlink>
+   <TableView fx:id="projectsTableView" layoutX="10.0" layoutY="192.0" prefHeight="330.0" prefWidth="518.0">
+      <columns>
+         <TableColumn editable="false" prefWidth="161.0" sortable="false" text="%projects.column.name" />
+         <TableColumn editable="false" prefWidth="123.0" sortable="false" text="%projects.column.vcsType" />
+         <TableColumn editable="false" prefWidth="231.0" sortable="false" text="%projects.column.path" />
+      </columns>
+   </TableView>
+   <Button fx:id="saveButton" layoutX="282.0" layoutY="533.0" mnemonicParsing="false" prefWidth="142.0" text="%projects.button.save">
+      <styleClass>
+         <String fx:value="button-outlined" />
+         <String fx:value="success" />
+      </styleClass>
+   </Button>
+   <Button fx:id="addProjectButton" layoutX="434.0" layoutY="533.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0">
+      <font>
+         <Font size="9.0" />
+      </font>
+      <styleClass>
+         <String fx:value="success" />
+         <String fx:value="button-outlined" />
+      </styleClass>
+      <graphic>
+         <FontIcon iconLiteral="fth-plus" iconSize="64" />
+      </graphic>
+   </Button>
+   <Button fx:id="removeProjectButton" layoutX="486.0" layoutY="533.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0">
+      <font>
+         <Font size="9.0" />
+      </font>
+      <styleClass>
+         <String fx:value="danger" />
+         <String fx:value="button-outlined" />
+      </styleClass>
+      <graphic>
+         <FontIcon iconLiteral="fth-minus" iconSize="64" />
+      </graphic>
+   </Button>
+   <ProgressIndicator fx:id="downloadProgressIndicator" layoutX="11.0" layoutY="532.0" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" />
+   <Label fx:id="downloadLabel" layoutX="62.0" layoutY="550.0" />
+</AnchorPane>

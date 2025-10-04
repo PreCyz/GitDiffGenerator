@@ -7,15 +7,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
@@ -28,19 +20,12 @@ import pg.gipter.services.platforms.AppManager;
 import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.LogLinkAction;
-import pg.gipter.ui.alerts.WebViewDetails;
-import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.ui.project.ProjectDetails;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -263,6 +248,9 @@ public class ToolkitProjectsController extends AbstractController {
 
     private void setProperties() {
         saveButton.setDisable(projectsTableView.getItems().contains(ProjectDetails.DEFAULT));
+        if (applicationProperties.uiTheme().isDarkMode()) {
+            saveButton.getStyleClass().remove("button-outlined");
+        }
     }
 
     private void resetIndicatorProperties(Task<?> task) {
