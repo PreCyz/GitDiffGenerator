@@ -46,7 +46,9 @@ public enum WindowFactory {
     TOOLKIT_MENU {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new ToolkitSettingsWindow(new ToolkitSettingsController(applicationProperties, uiLauncher));
+            return applicationProperties.uiTheme() == UITheme.DEFAULT ?
+                    new ToolkitSettingsWindow(new ToolkitSettingsController(applicationProperties, uiLauncher)) :
+                    new ToolkitSettingsThemedWindow(new ToolkitSettingsController(applicationProperties, uiLauncher));
         }
     },
     TOOLKIT_PROJECTS {
