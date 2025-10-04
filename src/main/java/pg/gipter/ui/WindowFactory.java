@@ -1,8 +1,7 @@
 package pg.gipter.ui;
 
 import pg.gipter.core.ApplicationProperties;
-import pg.gipter.ui.job.JobController;
-import pg.gipter.ui.job.JobWindow;
+import pg.gipter.ui.job.*;
 import pg.gipter.ui.main.*;
 import pg.gipter.ui.menu.*;
 import pg.gipter.ui.project.ProjectsController;
@@ -12,21 +11,22 @@ import pg.gipter.ui.project.toolkit.ToolkitProjectsWindow;
 import pg.gipter.ui.upgrade.UpgradeController;
 import pg.gipter.ui.upgrade.UpgradeWindow;
 
-/**Created by Gawa 2017-10-04*/
+/** Created by Gawa 2017-10-04 */
 public enum WindowFactory {
     MAIN {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            if (applicationProperties.uiTheme() == UITheme.DEFAULT) {
-                return new MainWindow(new MainController(applicationProperties, uiLauncher));
-            }
-            return new MainThemedWindow(new MainController(applicationProperties, uiLauncher));
+            return applicationProperties.uiTheme() == UITheme.DEFAULT ?
+                    new MainWindow(new MainController(applicationProperties, uiLauncher)) :
+                    new MainThemedWindow(new MainController(applicationProperties, uiLauncher));
         }
     },
     JOB {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new JobWindow(new JobController(applicationProperties, uiLauncher));
+            return applicationProperties.uiTheme() == UITheme.DEFAULT ?
+                    new JobWindow(new JobController(applicationProperties, uiLauncher)) :
+                    new JobThemedWindow(new JobController(applicationProperties, uiLauncher));
         }
     },
     PROJECTS {
@@ -38,10 +38,9 @@ public enum WindowFactory {
     APPLICATION_MENU {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            if (applicationProperties.uiTheme() == UITheme.DEFAULT) {
-                return new ApplicationSettingsWindow(new ApplicationSettingsController(applicationProperties, uiLauncher));
-            }
-            return new ApplicationSettingsThemedWindow(new ApplicationSettingsController(applicationProperties, uiLauncher));
+            return applicationProperties.uiTheme() == UITheme.DEFAULT ?
+                    new ApplicationSettingsWindow(new ApplicationSettingsController(applicationProperties, uiLauncher)) :
+                    new ApplicationSettingsThemedWindow(new ApplicationSettingsController(applicationProperties, uiLauncher));
         }
     },
     TOOLKIT_MENU {

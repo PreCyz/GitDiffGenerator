@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<AnchorPane prefHeight="470.0" prefWidth="766.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="14.0" prefHeight="356.0" prefWidth="376.0" text="%job.clickWay.title">
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="238.0" prefWidth="378.0">
+         <ComboBox fx:id="dayNameComboBox" layoutX="116.0" layoutY="148.0" />
+         <ComboBox fx:id="dayOfMonthComboBox" layoutX="116.0" layoutY="109.0" />
+         <ComboBox fx:id="hourOfDayComboBox" layoutX="116.0" layoutY="70.0" prefWidth="65.0" />
+         <Label layoutX="14.0" layoutY="115.0" text="%job.clickWay.dayOfMonth" />
+         <Label layoutX="14.0" layoutY="75.0" text="%job.clickWay.hourOfTheDay" />
+         <Label layoutX="14.0" layoutY="152.0" text="%job.clickWay.dayOfWeek" />
+         <RadioButton fx:id="everyMonthRadioButton" layoutX="11.0" layoutY="29.0" mnemonicParsing="false" text="%job.clickWay.everyMonth">
+            <toggleGroup>
+               <ToggleGroup fx:id="triggerOptionsToggleGroup" />
+            </toggleGroup>
+         </RadioButton>
+         <RadioButton fx:id="every2WeeksRadioButton" layoutX="121.0" layoutY="29.0" mnemonicParsing="false" text="%job.clickWay.every2Weeks" toggleGroup="$triggerOptionsToggleGroup" />
+         <RadioButton fx:id="everyWeekRadioButton" layoutX="242.0" layoutY="29.0" mnemonicParsing="false" selected="true" text="%job.clickWay.everyWeek" toggleGroup="$triggerOptionsToggleGroup" />
+         <Label layoutX="14.0" layoutY="192.0" text="%job.clickWay.startDate" />
+         <DatePicker fx:id="startDatePicker" layoutX="116.0" layoutY="187.0" />
+         <ComboBox fx:id="minuteComboBox" layoutX="200.0" layoutY="69.0" prefWidth="65.0" />
+         <Label layoutX="187.0" layoutY="70.0" text=":">
+            <font>
+               <Font name="System Bold" size="18.0" />
+            </font>
+         </Label>
+         <Label layoutX="14.0" layoutY="231.0" text="%job.clickWay.configs" />
+         <ComboBox fx:id="configurationNameComboBox" layoutX="116.0" layoutY="226.0" />
+      </AnchorPane>
+   </TitledPane>
+   <TitledPane animated="false" collapsible="false" layoutX="395.0" layoutY="14.0" prefHeight="145.0" prefWidth="363.0" text="%job.cronWay.title">
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="143.0" prefWidth="313.0">
+         <TextField fx:id="cronExpressionTextField" layoutX="131.0" layoutY="22.0" />
+         <Label layoutX="9.0" layoutY="29.0" text="%job.cronWay.cronExp" />
+      </AnchorPane>
+   </TitledPane>
+   <Button fx:id="scheduleButton" layoutX="552.0" layoutY="425.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="102.0" text="%job.schedule">
+      <styleClass>
+         <String fx:value="success" />
+         <String fx:value="button-outlined" />
+      </styleClass></Button>
+   <TitledPane animated="false" collapsible="false" layoutX="395.0" layoutY="166.0" prefHeight="204.0" prefWidth="363.0" text="%job.definition.title">
+      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="143.0" prefWidth="313.0">
+         <Label layoutX="9.0" layoutY="3.0" text="%job.definition.type" />
+         <Label layoutX="9.0" layoutY="32.0" text="%job.definition.details" />
+         <Label fx:id="jobTypeLabel" alignment="CENTER" layoutX="101.0" layoutY="3.0" prefWidth="210.0" style="-fx-border-image-width: 1px; -fx-border-color: GAINSBORO;" textAlignment="CENTER">
+            <font>
+               <Font name="System Bold" size="10.0" />
+            </font>
+         </Label>
+         <Label fx:id="jobDetailsLabel" alignment="CENTER" layoutX="101.0" layoutY="32.0" prefHeight="45.0" prefWidth="210.0" style="-fx-border-image-width: 1px; -fx-border-color: GAINSBORO;" textAlignment="CENTER">
+            <font>
+               <Font name="System Bold" size="10.0" />
+            </font>
+         </Label>
+         <Label fx:id="configsLabel" alignment="CENTER" layoutX="101.0" layoutY="88.0" prefHeight="35.0" prefWidth="210.0" style="-fx-border-image-width: 1px; -fx-border-color: GAINSBORO;" textAlignment="CENTER" wrapText="true">
+            <font>
+               <Font name="System Bold" size="10.0" />
+            </font>
+         </Label>
+         <Label layoutX="9.0" layoutY="88.0" text="%job.clickWay.configs" />
+      </AnchorPane>
+   </TitledPane>
+   <Button fx:id="cancelJobButton" layoutX="665.0" layoutY="425.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="93.0" text="%job.cancel">
+      <styleClass>
+         <String fx:value="danger" />
+         <String fx:value="button-outlined" />
+      </styleClass></Button>
+   <Pane layoutX="558.0" layoutY="371.0" prefHeight="50.0" prefWidth="200.0">
+      <Label fx:id="lastExecutionLabel" layoutX="2.0" layoutY="5.0">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
+      <Label fx:id="nextExecutionLabel" layoutX="2.0" layoutY="30.0">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
+   </Pane>
+</AnchorPane>
