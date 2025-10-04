@@ -241,6 +241,10 @@ public class JobController extends AbstractController {
         startDatePicker.setConverter(startDateConverter());
         startDatePicker.setDayCellFactory(datePickerDateCellCallback());
         scheduleButton.setDisable(runConfigMap.isEmpty());
+        if (applicationProperties.uiTheme().isDarkMode()) {
+            cancelJobButton.getStyleClass().remove("button-outlined");
+            scheduleButton.getStyleClass().remove("button-outlined");
+        }
     }
 
     private Callback<DatePicker, DateCell> datePickerDateCellCallback() {
