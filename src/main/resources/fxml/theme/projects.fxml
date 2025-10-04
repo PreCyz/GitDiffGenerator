@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import java.lang.*?>
+<AnchorPane prefHeight="400.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+    <TableView fx:id="projectsTableView" layoutX="14.0" layoutY="14.0" prefHeight="330.0" prefWidth="649.0">
+        <columns>
+            <TableColumn editable="false" prefWidth="161.0" sortable="false" text="%projects.column.name" />
+            <TableColumn editable="false" prefWidth="123.0" sortable="false" text="%projects.column.vcsType" />
+            <TableColumn editable="false" prefWidth="361.0" sortable="false" text="%projects.column.path" />
+        </columns>
+    </TableView>
+    <Button fx:id="searchProjectsButton" defaultButton="true" layoutX="14.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" styleClass="button-outlined" text="%projects.button.search" />
+    <Button fx:id="removeProjectButton" layoutX="621.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0">
+        <font>
+            <Font size="9.0" />
+        </font>
+      <styleClass>
+         <String fx:value="danger" />
+         <String fx:value="button-outlined" />
+      </styleClass>
+      <graphic>
+         <FontIcon iconLiteral="fth-minus" iconSize="64" />
+      </graphic>
+    </Button>
+    <Button fx:id="addProjectButton" layoutX="569.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0">
+        <font>
+            <Font size="9.0" />
+        </font>
+        <graphic>
+            <FontIcon iconLiteral="fth-plus" iconSize="64" />
+        </graphic>
+      <styleClass>
+         <String fx:value="success" />
+         <String fx:value="button-outlined" />
+      </styleClass>
+    </Button>
+    <Button fx:id="saveButton" layoutX="168.0" layoutY="355.0" mnemonicParsing="false" prefHeight="30.0" text="%projects.button.save">
+      <styleClass>
+         <String fx:value="success" />
+         <String fx:value="button-outlined" />
+      </styleClass>
+    </Button>
+</AnchorPane>

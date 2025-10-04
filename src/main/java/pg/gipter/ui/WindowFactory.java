@@ -4,8 +4,7 @@ import pg.gipter.core.ApplicationProperties;
 import pg.gipter.ui.job.*;
 import pg.gipter.ui.main.*;
 import pg.gipter.ui.menu.*;
-import pg.gipter.ui.project.ProjectsController;
-import pg.gipter.ui.project.ProjectsWindow;
+import pg.gipter.ui.project.*;
 import pg.gipter.ui.project.toolkit.ToolkitProjectsController;
 import pg.gipter.ui.project.toolkit.ToolkitProjectsWindow;
 import pg.gipter.ui.upgrade.UpgradeController;
@@ -32,7 +31,10 @@ public enum WindowFactory {
     PROJECTS {
         @Override
         public AbstractWindow createWindow(ApplicationProperties applicationProperties, UILauncher uiLauncher) {
-            return new ProjectsWindow(new ProjectsController(applicationProperties, uiLauncher));
+            return applicationProperties.uiTheme() == UITheme.DEFAULT ?
+                    new ProjectsWindow(new ProjectsController(applicationProperties, uiLauncher)) :
+                    new ProjectsThemedWindow(new ProjectsController(applicationProperties, uiLauncher));
+
         }
     },
     APPLICATION_MENU {
