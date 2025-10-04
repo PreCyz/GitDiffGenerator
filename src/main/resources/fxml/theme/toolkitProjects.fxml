@@ -5,7 +5,7 @@
 <?import javafx.scene.text.*?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import java.lang.*?>
-<AnchorPane prefHeight="575.0" prefWidth="544.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="575.0" prefWidth="544.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <Label layoutX="10.0" layoutY="10.0" text="%toolkit.projects.instructions">
       <font>
          <Font name="System Bold" size="12.0" />

@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
-<AnchorPane prefHeight="470.0" prefWidth="766.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="470.0" prefWidth="766.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
    <TitledPane animated="false" collapsible="false" layoutX="10.0" layoutY="14.0" prefHeight="356.0" prefWidth="376.0" text="%job.clickWay.title">
       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="238.0" prefWidth="378.0">
          <ComboBox fx:id="dayNameComboBox" layoutX="116.0" layoutY="148.0" />
