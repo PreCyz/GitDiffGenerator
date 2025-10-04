@@ -29,7 +29,7 @@ public class ApplicationConfig {
     private Boolean uploadItem;
     private Boolean smartZip;
     private String githubToken;
-    private UITheme uiTheme;
+    private String uiTheme;
 
     public ApplicationConfig() {
         confirmationWindow = StringUtils.getBoolean(ArgName.confirmationWindow.defaultValue());
@@ -47,7 +47,7 @@ public class ApplicationConfig {
         uploadItem = StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
         smartZip = StringUtils.getBoolean(ArgName.smartZip.defaultValue());
         githubToken = ArgName.githubToken.defaultValue();
-        uiTheme = UITheme.DEFAULT;
+        uiTheme = UITheme.DEFAULT.getTranslation();
     }
 
     public Boolean getConfirmationWindow() {
@@ -186,11 +186,11 @@ public class ApplicationConfig {
         this.githubToken = githubToken;
     }
 
-    public UITheme getUiTheme() {
+    public String getUiTheme() {
         return uiTheme;
     }
 
-    public void setUiTheme(UITheme uiTheme) {
+    public void setUiTheme(String uiTheme) {
         this.uiTheme = uiTheme;
     }
 
@@ -285,7 +285,7 @@ public class ApplicationConfig {
                 } else if (ArgName.githubToken.name().equals(argumentName)) {
                     applicationConfig.setGithubToken(argumentValue);
                 } else if (ArgName.uiTheme.name().equals(argumentName)) {
-                    applicationConfig.setUiTheme(UITheme.valueFromKey(argumentValue));
+                    applicationConfig.setUiTheme(argumentValue);
                 }
             }
         }

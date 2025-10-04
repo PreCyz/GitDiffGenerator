@@ -2226,25 +2226,25 @@ class CliApplicationPropertiesTest {
     }
 
     @Test
-    void givenUIThemeOtherThenDEFAULT_whenUITheme_thenReturnDEFAULT() {
+    void givenUIThemeOtherThanDEFAULT_whenUITheme_thenReturnDEFAULT() {
         String[] args = {"uiTheme=DRACULA"};
         applicationProperties = new CliApplicationProperties(args).init();
         assertThat(applicationProperties.uiTheme()).isEqualTo(UITheme.DEFAULT);
     }
 
     @Test
-    void givenUIThemeOtherEqualDEFAULT_whenUITheme_thenReturnDEFAULT() {
-        String[] args = {"uiTheme=DEFAULT"};
+    void givenUIThemeDEFAULT_whenUITheme_thenReturnDEFAULT() {
+        String[] args = {"uiTheme=YODA"};
         applicationProperties = new CliApplicationProperties(args).init();
         assertThat(applicationProperties.uiTheme()).isEqualTo(UITheme.DEFAULT);
     }
 
     @Test
-    void givenAnyUIToolkit_whenUIToolkit_returnDEFAULT() {
-        String[] args = {"uiTheme=DRACULA"};
+    void givenAnyUITheme_whenUIToolkit_returnDEFAULT() {
+        String[] args = {"uiTheme=BARSZCZ"};
         applicationProperties = new CliApplicationProperties(args).init();
         ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setUiTheme(UITheme.CUPERTINO_DARK);
+        applicationConfig.setUiTheme(UITheme.CUPERTINO_DARK.getTranslation());
         applicationProperties.init(TestUtils.mockConfigurationDao(applicationConfig));
         assertThat(applicationProperties.uiTheme()).isEqualTo(UITheme.DEFAULT);
     }

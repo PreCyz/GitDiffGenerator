@@ -131,7 +131,7 @@ class UIPreferredApplicationPropertiesTest {
         String[] args = {"uiTheme=DEFAULT"};
         appProps = new UIApplicationProperties(args).init();
         ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setUiTheme(UITheme.NORD_DARK);
+        applicationConfig.setUiTheme(UITheme.NORD_DARK.getTranslation());
         appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         UITheme actual = appProps.uiTheme();
@@ -144,7 +144,7 @@ class UIPreferredApplicationPropertiesTest {
         String[] args = {};
         appProps = new UIApplicationProperties(args).init();
         ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setUiTheme(UITheme.CUPERTINO_DARK);
+        applicationConfig.setUiTheme(UITheme.CUPERTINO_DARK.getTranslation());
         appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         UITheme actual = appProps.uiTheme();
@@ -157,7 +157,7 @@ class UIPreferredApplicationPropertiesTest {
         String[] args = {"author=test"};
         appProps = new UIApplicationProperties(args).init();
         ApplicationConfig applicationConfig = new ApplicationConfig();
-        applicationConfig.setUiTheme(UITheme.DRACULA);
+        applicationConfig.setUiTheme(UITheme.DRACULA.getTranslation());
         appProps.init(TestUtils.mockConfigurationDao(applicationConfig));
 
         UITheme actual = appProps.uiTheme();

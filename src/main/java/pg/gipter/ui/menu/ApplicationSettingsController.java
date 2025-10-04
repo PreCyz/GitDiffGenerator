@@ -144,9 +144,9 @@ public class ApplicationSettingsController extends AbstractController {
         languageComboBox.setValue(applicationProperties.uiLanguage());
         checkLastItemCheckBox.setSelected(applicationProperties.isCheckLastItemEnabled());
         themeComboBox.setItems(FXCollections.observableList(EnumSet.allOf(UITheme.class)
-                        .stream().map(UITheme::value).toList().stream().sorted(Comparator.naturalOrder()).toList())
+                        .stream().map(UITheme::getTranslation).toList().stream().sorted(Comparator.naturalOrder()).toList())
         );
-        themeComboBox.setValue(applicationProperties.uiTheme().value());
+        themeComboBox.setValue(applicationProperties.uiTheme().getTranslation());
 
         final CustomCommand gitCustomCommand = applicationProperties.getCustomCommand(VersionControlSystem.GIT);
         overrideGitCheckBox.setSelected(gitCustomCommand.isOverride());
@@ -189,9 +189,14 @@ public class ApplicationSettingsController extends AbstractController {
     private void setListeners() {
         languageComboBox.getSelectionModel()
                 .selectedItemProperty()
-                .addListener((options, oldValue, newValue) -> {
+                .addListener((_, _, _) -> {
+                    UITheme value = UITheme.valueOfTranslation(themeComboBox.getValue());
                     BundleUtils.changeBundle(languageComboBox.getValue());
                     labelsAffectedByLanguage.forEach((key, labeled) -> labeled.setText(BundleUtils.getMsg(key)));
+                    themeComboBox.setItems(FXCollections.observableList(EnumSet.allOf(UITheme.class)
+                            .stream().map(UITheme::getTranslation).toList().stream().sorted(Comparator.naturalOrder()).toList())
+                    );
+                    themeComboBox.setValue(value.getTranslation());
                     applicationSettingsTab.setText(BundleUtils.getMsg("launch.panel.title"));
                     customCommandTab.setText(BundleUtils.getMsg("launch.customCommand.tab"));
                     uiLauncher.changeApplicationSettingsWindowTitle();
@@ -201,7 +206,7 @@ public class ApplicationSettingsController extends AbstractController {
                 });
 
         final StartupService startupService = new StartupService();
-        activateTrayCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        activateTrayCheckBox.selectedProperty().addListener((_, _, newValue) -> {
             if (newValue) {
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.initTrayHandler();
@@ -226,25 +231,33 @@ public class ApplicationSettingsController extends AbstractController {
             saveNewSettings();
         });
 
-        final ChangeListener<Boolean> saveNewSettingsChangeListener = (observable, oldValue, newValue) -> saveNewSettings();
+        final ChangeListener<Boolean> saveNewSettingsChangeListener = (_, _, _) -> saveNewSettings();
         confirmationWindowCheckBox.selectedProperty().addListener(saveNewSettingsChangeListener);
 
-        checkLastItemCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        checkLastItemCheckBox.selectedProperty().addListener((_, _, newValue) -> {
             processLastItemJob(newValue);
             saveNewSettings();
         });
 
-        overrideGitCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        themeComboBox.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((_, _, _) -> {
+                    applicationProperties.updateApplicationConfig(createApplicationConfigFromUI());
+                    applicationProperties.save();
+                    uiLauncher.setApplicationProperties(applicationProperties);
+                });
+
+        overrideGitCheckBox.selectedProperty().addListener((_, oldValue, _) -> {
             gitCommandTextField.setDisable(oldValue);
             saveNewSettings();
         });
 
-        overrideSvnCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        overrideSvnCheckBox.selectedProperty().addListener((_, oldValue, _) -> {
             svnCommandTextField.setDisable(oldValue);
             saveNewSettings();
         });
 
-        overrideMercurialCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        overrideMercurialCheckBox.selectedProperty().addListener((_, oldValue, _) -> {
             mercurialCommandTextField.setDisable(oldValue);
             saveNewSettings();
         });
@@ -283,7 +296,7 @@ public class ApplicationSettingsController extends AbstractController {
         applicationConfig.setCheckLastItemEnabled(checkLastItemCheckBox.isSelected());
         applicationConfig.setUploadItem(uploadItemCheckBox.isSelected());
         applicationConfig.setSmartZip(smartZipCheckBox.isSelected());
-        applicationConfig.setUiTheme(UITheme.valueFromKey(themeComboBox.getValue()));
+        applicationConfig.setUiTheme(themeComboBox.getValue());
         applicationConfig.setCustomCommands(
                 Stream.of(
                         new CustomCommand(

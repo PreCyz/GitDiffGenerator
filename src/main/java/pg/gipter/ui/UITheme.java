@@ -4,46 +4,53 @@ import atlantafx.base.theme.*;
 import pg.gipter.utils.BundleUtils;
 
 public enum UITheme {
-    DEFAULT(null, BundleUtils.getMsg("ui.theme.default"), false),
-    DRACULA(new Dracula(), BundleUtils.getMsg("ui.theme.dracula"), true),
-    PRIMER_DARK(new PrimerDark(), BundleUtils.getMsg("ui.theme.primerDark"), true),
-    CUPERTINO_DARK(new CupertinoDark(), BundleUtils.getMsg("ui.theme.cupertinoDark"), true),
-    NORD_DARK(new NordDark(), BundleUtils.getMsg("ui.theme.nordDark"), true),
-    NORD_LIGHT(new NordLight(), BundleUtils.getMsg("ui.theme.nordLight"), false),
-    PRIMER_LIGHT(new PrimerLight(), BundleUtils.getMsg("ui.theme.primerLight"), false),
-    CUPERTINO_LIGHT(new CupertinoLight(), BundleUtils.getMsg("ui.theme.cupertinoLight"), false);
+    DEFAULT(null, false),
+    DRACULA(new Dracula(), true),
+    PRIMER_DARK(new PrimerDark(), true),
+    CUPERTINO_DARK(new CupertinoDark(), true),
+    NORD_DARK(new NordDark(), true),
+    NORD_LIGHT(new NordLight(), false),
+    PRIMER_LIGHT(new PrimerLight(), false),
+    CUPERTINO_LIGHT(new CupertinoLight(), false);
 
     private final Theme theme;
-    private final String value;
     private final boolean darkMode;
 
-    UITheme(Theme theme, String value, boolean darkMode) {
+    UITheme(Theme theme, boolean darkMode) {
         this.theme = theme;
-        this.value = value;
         this.darkMode = darkMode;
     }
 
-    public static UITheme valueFromKey(String argumentValue) {
-        if (DRACULA.value.equals(argumentValue)) {
+    public static UITheme valueOfTranslation(String translation) {
+        if (DRACULA.getTranslation().equals(translation)) {
             return UITheme.DRACULA;
-        } else if (PRIMER_DARK.value.equals(argumentValue)) {
+        } else if (PRIMER_DARK.getTranslation().equals(translation)) {
             return UITheme.PRIMER_DARK;
-        } else if (CUPERTINO_DARK.value.equals(argumentValue)) {
+        } else if (CUPERTINO_DARK.getTranslation().equals(translation)) {
             return UITheme.CUPERTINO_DARK;
-        } else if (NORD_DARK.value.equals(argumentValue)) {
+        } else if (NORD_DARK.getTranslation().equals(translation)) {
             return UITheme.NORD_DARK;
-        } else if (NORD_LIGHT.value.equals(argumentValue)) {
+        } else if (NORD_LIGHT.getTranslation().equals(translation)) {
             return UITheme.NORD_LIGHT;
-        } else if (PRIMER_LIGHT.value.equals(argumentValue)) {
+        } else if (PRIMER_LIGHT.getTranslation().equals(translation)) {
             return UITheme.PRIMER_LIGHT;
-        } else if (CUPERTINO_LIGHT.value.equals(argumentValue)) {
+        } else if (CUPERTINO_LIGHT.getTranslation().equals(translation)) {
             return UITheme.CUPERTINO_LIGHT;
         }
         return UITheme.DEFAULT;
     }
 
-    public String value() {
-        return value;
+    public String getTranslation() {
+        return switch (this) {
+            case DRACULA -> BundleUtils.getMsg("ui.theme.dracula");
+            case NORD_DARK -> BundleUtils.getMsg("ui.theme.nordDark");
+            case NORD_LIGHT -> BundleUtils.getMsg("ui.theme.nordLight");
+            case PRIMER_DARK -> BundleUtils.getMsg("ui.theme.primerDark");
+            case PRIMER_LIGHT -> BundleUtils.getMsg("ui.theme.primerLight");
+            case CUPERTINO_DARK -> BundleUtils.getMsg("ui.theme.cupertinoDark");
+            case CUPERTINO_LIGHT -> BundleUtils.getMsg("ui.theme.cupertinoLight");
+            default -> BundleUtils.getMsg("ui.theme.default");
+        };
     }
 
     public boolean isDarkMode() {

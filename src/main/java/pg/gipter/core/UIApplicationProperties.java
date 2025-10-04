@@ -37,7 +37,7 @@ class UIApplicationProperties extends FileApplicationProperties {
     @Override
     public UITheme uiTheme() {
         if (applicationConfig.getUiTheme() != null) {
-            return applicationConfig.getUiTheme();
+            return UITheme.valueOfTranslation(applicationConfig.getUiTheme());
         }
         return argExtractor.uiTheme();
     }
