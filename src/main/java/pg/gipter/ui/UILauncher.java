@@ -202,7 +202,9 @@ public class UILauncher implements Launcher {
     }
 
     public void buildAndShowMainWindow() {
-        if (applicationProperties.uiTheme() != UITheme.DEFAULT) {
+        if (applicationProperties.uiTheme() == UITheme.DEFAULT) {
+            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+        } else {
             Application.setUserAgentStylesheet(applicationProperties.uiTheme().userAgentStylesheet());
         }
         buildScene(
