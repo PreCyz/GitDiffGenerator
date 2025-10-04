@@ -11,6 +11,7 @@ public enum ImageFile {
     OVERRIDE_PNG("png/override.png"),
     FINGER_UP_PNG("png/finger-up.png"),
     ALMOST_ALL_PNG("png/almost-all.png"),
+    MINION("png/minion.png"),
 
     MINION_DISCO_GIF("gif/minion-disco.gif"),
     MINION_FART_GIF("gif/minion-fart.gif"),

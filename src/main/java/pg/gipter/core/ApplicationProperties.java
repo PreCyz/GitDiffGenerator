@@ -10,6 +10,7 @@ import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.*;
 import pg.gipter.ui.UITheme;
+import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.io.InputStream;
@@ -48,6 +49,7 @@ public abstract class ApplicationProperties {
 
     protected final void init(ConfigurationDao configurationDao) {
         applicationConfig = configurationDao.loadApplicationConfig();
+        BundleUtils.changeBundle(applicationConfig.getUiLanguage());
         toolkitConfig = configurationDao.loadToolkitConfig();
         runConfigMap = configurationDao.loadRunConfigMap();
         if (runConfigMap.isEmpty()) {
@@ -303,7 +305,7 @@ public abstract class ApplicationProperties {
     }
 
     public UITheme uiTheme() {
-        return argExtractor.uiTheme();
+        return UITheme.valueOfTranslation(applicationConfig.getUiTheme());
     }
 
     protected final String log() {

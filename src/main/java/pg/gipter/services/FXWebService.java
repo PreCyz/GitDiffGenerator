@@ -16,10 +16,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.w3c.dom.html.HTMLInputElement;
 import pg.gipter.FlowType;
 import pg.gipter.core.ArgName;
@@ -27,9 +24,7 @@ import pg.gipter.jobs.UploadItemJob;
 import pg.gipter.services.restart.RestartServiceFactory;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.ResourceUtils;
-import pg.gipter.utils.SystemUtils;
+import pg.gipter.utils.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,7 +116,7 @@ public class FXWebService {
     private void addIcon(Stage stage) {
         try (InputStream is = getClass()
                 .getClassLoader()
-                .getResourceAsStream(ResourceUtils.getImgResourcePath(ImageFile.CHICKEN_FACE_PNG.fileUrl()))) {
+                .getResourceAsStream(ResourceUtils.getImgResourcePath(ImageFile.MINION.fileUrl()))) {
             Optional.ofNullable(is).ifPresent(it -> {
                 Image icon = new Image(is);
                 stage.getIcons().add(icon);
@@ -132,7 +127,7 @@ public class FXWebService {
     }
 
     private EventHandler<WindowEvent> createOnCloseRequest(FlowType flowType) {
-        return windowEvent -> runOnCloseActivity(flowType);
+        return _ -> runOnCloseActivity(flowType);
     }
 
     private void runOnCloseActivity(FlowType flowType) {

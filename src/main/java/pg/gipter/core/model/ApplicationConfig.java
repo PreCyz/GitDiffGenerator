@@ -4,8 +4,6 @@ import org.slf4j.event.Level;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.PreferredArgSource;
 import pg.gipter.core.dao.command.CustomCommand;
-import pg.gipter.ui.UITheme;
-import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
 
 import java.util.*;
@@ -41,13 +39,11 @@ public class ApplicationConfig {
         enableOnStartup = StringUtils.getBoolean(ArgName.enableOnStartup.defaultValue());
         loggingLevel = Level.INFO;
         upgradeFinished = StringUtils.getBoolean(ArgName.upgradeFinished.defaultValue());
-        uiLanguage = BundleUtils.getDefaultLanguage();
         checkLastItemEnabled = StringUtils.getBoolean(ArgName.checkLastItem.defaultValue());
         checkLastItemJobCronExpression = ArgName.checkLastItemJobCronExpression.defaultValue();
         uploadItem = StringUtils.getBoolean(ArgName.uploadItem.defaultValue());
         smartZip = StringUtils.getBoolean(ArgName.smartZip.defaultValue());
         githubToken = ArgName.githubToken.defaultValue();
-        uiTheme = UITheme.DEFAULT.getTranslation();
     }
 
     public Boolean getConfirmationWindow() {
@@ -310,6 +306,7 @@ public class ApplicationConfig {
                 ", uploadItem=" + uploadItem +
                 ", smartZip=" + smartZip +
                 ", githubToken=" + Optional.of(githubToken).map(it -> "***").orElse("N/A") +
+                ", uiTheme=" + uiTheme +
                 '}';
     }
 }

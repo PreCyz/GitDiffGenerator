@@ -34,19 +34,19 @@
       <AnchorPane fx:id="mainAnchorPane" prefHeight="705.0" prefWidth="590.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
          <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="16.0" prefHeight="110.0" prefWidth="682.0" text="%toolkit.panel.title">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="171.0" prefWidth="200.0">
-               <ProgressIndicator fx:id="verifyProgressIndicator" layoutX="596.0" layoutY="5.0" minHeight="50.0" minWidth="50.0" />
+               <ProgressIndicator fx:id="verifyProgressIndicator" layoutX="609.0" layoutY="11.0" maxHeight="40.0" maxWidth="40.0" minHeight="25.0" minWidth="25.0" />
                <Label layoutX="10.0" layoutY="15.0" text="%toolkit.panel.username" />
                <TextField fx:id="toolkitUsernameTextField" layoutX="91.0" layoutY="10.0" prefHeight="27.0" prefWidth="90.0">
                   <font>
                      <Font size="10.0" />
                   </font></TextField>
                <Label layoutX="194.0" layoutY="15.0" text="%toolkit.panel.folderName" />
-               <TextField fx:id="toolkitFolderNameTextField" editable="false" layoutX="295.0" layoutY="10.0" prefHeight="27.0" prefWidth="148.0">
+               <TextField fx:id="toolkitFolderNameTextField" editable="false" layoutX="295.0" layoutY="10.0" prefHeight="27.0" prefWidth="170.0">
                   <font>
                      <Font size="10.0" />
                   </font>
                </TextField>
-               <Label fx:id="cookieExpiryLabel" layoutX="453.0" layoutY="10.0" wrapText="true">
+               <Label fx:id="cookieExpiryLabel" layoutX="475.0" layoutY="10.0" wrapText="true">
                   <styleClass>
                      <String fx:value="text" />
                      <String fx:value="accent" />
@@ -175,10 +175,7 @@
                      <CheckBox fx:id="deleteDownloadedFilesCheckBox" layoutX="11.0" mnemonicParsing="false" text="%additional.panel.deleteFiles" />
                      <CheckBox fx:id="skipRemoteCheckBox" layoutX="11.0" layoutY="27.0" mnemonicParsing="false" text="%additional.panel.skipRemote" />
                      <CheckBox fx:id="fetchAllCheckBox" layoutX="11.0" layoutY="54.0" mnemonicParsing="false" text="%additional.panel.fetchAll" />
-                     <TextField fx:id="fetchTimeoutTextField" alignment="CENTER_RIGHT" layoutX="98.0" layoutY="50.0" prefWidth="40.0">
-                        <font>
-                           <Font size="10.0" />
-                        </font></TextField>
+                     <TextField fx:id="fetchTimeoutTextField" alignment="CENTER_RIGHT" layoutX="98.0" layoutY="47.0" prefWidth="40.0" />
                      <Label layoutX="144.0" layoutY="54.0" prefHeight="20.0" prefWidth="152.0" text="%launch.panel.fetchTimeout" />
                   </AnchorPane>
                </TitledPane>
