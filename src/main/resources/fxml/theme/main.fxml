@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
-<BorderPane fx:id="mainBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="790.0" prefWidth="696.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="mainBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="790.0" prefWidth="696.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <Pane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" BorderPane.alignment="CENTER">
          <MenuBar>
@@ -146,7 +146,7 @@
                      <DatePicker fx:id="endDatePicker" layoutX="104.0" layoutY="32.0" prefHeight="25.0" prefWidth="160.0" />
                   </AnchorPane>
                </TitledPane>
-               <Label fx:id="infoLabel" alignment="CENTER_RIGHT" layoutX="4.0" layoutY="561.0" prefHeight="20.0" prefWidth="457.0">
+               <Label fx:id="infoLabel" alignment="CENTER_RIGHT" layoutX="132.0" layoutY="561.0" prefHeight="20.0" prefWidth="457.0">
                   <font>
                      <Font size="10.0" />
                   </font>
