@@ -32,7 +32,7 @@ if (-not (Test-Path "$target\dist\portable-jar"))
     exit 1
 }
 Write-Host "Zipping portable jar ..."
-& 7z a "$target\dist\Gipter-v$version.7z" "$target\dist\portable-jar\*"
+& 7z a "$target\dist\11+Gipter-v$version.7z" "$target\dist\portable-jar\*"
 
 $lsDist = Get-ChildItem -Path "$currentLocation\$target\dist"
 $lsPortable = Get-ChildItem -Path "$currentLocation\$target\dist"

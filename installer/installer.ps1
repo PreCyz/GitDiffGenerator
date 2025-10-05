@@ -101,5 +101,3 @@ Write-Host "Directory: $currentLocation\$target\dist" -ForegroundColor Cyan
 Write-Host $ls
 
 Write-Host "executing portable-exe.ps1" -ForegroundColor Cyan
-& "$PSScriptRoot\portable-exe.ps1 $version"
-& "$PSScriptRoot\portable-jar.ps1 $version"
