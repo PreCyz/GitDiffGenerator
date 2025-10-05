@@ -19,9 +19,9 @@ public class GifDao {
     public static Optional<List<CustomGif>> readCustomGifs() {
         Optional<List<CustomGif>> result = Optional.empty();
         final Gson gson = new GsonBuilder().create();
-        String gifFilePath = DaoConstants.CUSTOM_GIFS_JSON;
+        String gifFilePath = DaoConstants.GIFS_JSON;
         if (SystemUtils.isMsi()) {
-            gifFilePath = Path.of(".", "app", DaoConstants.CUSTOM_GIFS_JSON).toAbsolutePath().normalize().toString();
+            gifFilePath = Path.of(".", "app", DaoConstants.GIFS_JSON).toAbsolutePath().normalize().toString();
         }
         try (InputStream fis = new FileInputStream(gifFilePath);
              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
@@ -31,7 +31,7 @@ public class GifDao {
             result = Optional.ofNullable(gson.fromJson(reader, listType));
         } catch (IOException | NullPointerException e) {
             LoggerFactory.getLogger(GifDao.class).warn("Warning when loading {}. Exception message is: {}",
-                    DaoConstants.CUSTOM_GIFS_JSON, e.getMessage());
+                    DaoConstants.GIFS_JSON, e.getMessage());
         }
         return result;
     }

@@ -104,9 +104,9 @@ public class Main extends Application {
             if (Files.exists(BackupService.gipterTmp())) {
                 BackupService.restoreBackup();
             }
-            Path gifJson = Path.of(".", DaoConstants.CUSTOM_GIFS_JSON);
+            Path gifJson = Path.of(".", DaoConstants.GIFS_JSON);
             if (!Files.exists(gifJson)) {
-                Path source = Path.of("app", DaoConstants.CUSTOM_GIFS_JSON);
+                Path source = Path.of("app", DaoConstants.GIFS_JSON);
                 try {
                     Files.copy(
                             source,

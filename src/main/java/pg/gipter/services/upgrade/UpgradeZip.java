@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
+import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.services.SemanticVersioning;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.LogLinkAction;
@@ -72,7 +73,7 @@ class UpgradeZip extends AbstractUpgradeService {
                     continue;
                 }
                 File currentFile = new File(destination, entry.getName());
-                if (currentFile.isFile() && "gifs.json".equalsIgnoreCase(currentFile.getName())) {
+                if (currentFile.isFile() && DaoConstants.GIFS_JSON.equalsIgnoreCase(currentFile.getName())) {
                     logger.info("[gifs.json] already exist - skipping it.");
                 } else {
                     File parent = currentFile.getParentFile();
