@@ -1,0 +1,8 @@
+**Release notes:**
+Improvements:
+* From now on users may change themes of the app.
+* General improvements.
+* From now on portable jar version comes with custom runtime image.
+* From this version portable jar must be executed by Java version 25.
+
+Fixes:
