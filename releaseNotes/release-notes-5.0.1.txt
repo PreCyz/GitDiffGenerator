@@ -1,0 +1,6 @@
+**Release notes:**
+Improvements:
+* Preparing for what it is to come in 5.0.1
+
+Fixes:
+* `decompression` method in upgrade service.
