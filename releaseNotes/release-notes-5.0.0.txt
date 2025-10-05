@@ -1,0 +1,9 @@
+**Release notes:**
+Improvements:
+* Adding new distribution types: `portable` and `msi` installer.
+* New distribution types built with the newest Java (25).
+* New distribution types comes with runtime images - runs without installed java.
+
+Fixes:
+* Fixing Goto cookie - skipping it when it does not exist.
+* `gifs.json` is not overwritten during the upgrade, when the exists.
