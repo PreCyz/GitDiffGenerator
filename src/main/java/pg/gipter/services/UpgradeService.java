@@ -87,6 +87,10 @@ public class UpgradeService extends TaskService<Void> {
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
+                    Path directory = Paths.get(destination.getName(), entry.getName());
+                    if (!Files.exists(directory)) {
+                        Files.createDirectory(directory);
+                    }
                     continue;
                 }
                 File currentFile = new File(destination, entry.getName());
