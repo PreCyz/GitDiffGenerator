@@ -99,3 +99,5 @@ Write-Host "jpackage DONE!" -ForegroundColor Green
 $ls = Get-ChildItem -Path "$currentLocation\$target\dist"
 Write-Host "Directory: $currentLocation\$target\dist" -ForegroundColor Cyan
 Write-Host $ls
+
+Write-Host "executing portable-exe.ps1" -ForegroundColor Cyan
