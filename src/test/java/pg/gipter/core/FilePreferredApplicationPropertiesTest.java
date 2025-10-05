@@ -7,10 +7,7 @@ import org.mockito.Mockito;
 import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
-import pg.gipter.core.model.ApplicationConfig;
-import pg.gipter.core.model.RunConfig;
-import pg.gipter.core.model.RunConfigBuilder;
-import pg.gipter.core.model.ToolkitConfig;
+import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.CookiesService;
 
@@ -57,7 +54,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"author=testAuthor"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withAuthor("propsAuthor1,propsAuthor2").create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         Set<String> actual = appProps.authors();
 
@@ -69,7 +66,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenCommitterEmailCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
         String[] args = {ArgName.committerEmail.name() + "=testAuthor"};
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new RunConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         Set<String> actual = appProps.authors();
 
@@ -80,7 +77,7 @@ class FilePreferredApplicationPropertiesTest {
     void givengitAuthorCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
         String[] args = {ArgName.gitAuthor.name() + "=testAuthor"};
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new RunConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         Set<String> actual = appProps.authors();
 
@@ -91,7 +88,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenMercurialAuthorCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
         String[] args = {ArgName.mercurialAuthor.name() + "=testAuthor"};
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new RunConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         Set<String> actual = appProps.authors();
 
@@ -102,7 +99,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenSvnAuthorCommandLineAndNoAuthor_whenAuthors_thenReturnEmptyCollection() {
         String[] args = {ArgName.svnAuthor.name() + "=testAuthor"};
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new RunConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         Set<String> actual = appProps.authors();
 
@@ -118,7 +115,7 @@ class FilePreferredApplicationPropertiesTest {
                 ArgName.svnAuthor.name() + "=testAuthor",
         };
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new RunConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         Set<String> actual = appProps.authors();
 
@@ -140,7 +137,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"gitAuthor=testAuthor"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withGitAuthor("propsAuthor").create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         String actual = appProps.gitAuthor();
 
@@ -162,7 +159,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"mercurialAuthor=testAuthor"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withMercurialAuthor("propsAuthor").create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         String actual = appProps.mercurialAuthor();
 
@@ -184,7 +181,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"svnAuthor=testAuthor"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withSvnAuthor("propsAuthor").create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         String actual = appProps.svnAuthor();
 
@@ -206,7 +203,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"itemPath=testItemPath"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withItemPath("propertiesItemPath").create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         String actual = appProps.itemPath();
 
@@ -259,7 +256,7 @@ class FilePreferredApplicationPropertiesTest {
                 .withItemFileNamePrefix("custom")
                 .create();
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         String actual = appProps.fileName();
 
@@ -362,7 +359,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"startDate=2018-10-18"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withStartDate(LocalDate.of(2018, 10, 19)).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         LocalDate actual = appProps.startDate();
 
@@ -374,7 +371,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"startDate=2018-10-18"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withPeriodInDays(12).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         LocalDate actual = appProps.startDate();
 
@@ -396,7 +393,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"itemFileNamePrefix=testItemFileNamePrefix"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withItemFileNamePrefix("propsItemFileNamePrefix").create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         String actual = appProps.itemFileNamePrefix();
 
@@ -427,7 +424,7 @@ class FilePreferredApplicationPropertiesTest {
     void given_noEndDateInAppPropertiesAndEndDateFromCliArgs_when_endDate_then_returnEndDateFromCliArgs() {
         String[] args = {"startDate=2018-09-19", "endDate=2018-10-15"};
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new RunConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         LocalDate actual = appProps.endDate();
 
@@ -439,7 +436,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"startDate=2018-09-19", "endDate=2018-10-15"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withEndDate(LocalDate.of(2018, 10, 19)).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         LocalDate actual = appProps.endDate();
 
@@ -451,7 +448,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"startDate=2018-09-19", "endDate=2018-10-15"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withEndDate(null).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         LocalDate actual = appProps.endDate();
 
@@ -508,7 +505,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"projectPath=Proj1,Proj2"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withProjectPath("Proj3").create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         Set<String> actual = appProps.projectPaths();
 
@@ -539,7 +536,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"periodInDays=1"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withPeriodInDays(2).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         int actual = appProps.periodInDays();
 
@@ -561,7 +558,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"committerEmail=testCommitterEmail"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withCommitterEmail("propsCommitterEmail").create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         String actual = appProps.committerEmail();
 
@@ -592,7 +589,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"uploadType=Simple"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withItemType(ItemType.STATEMENT).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         ItemType actual = appProps.itemType();
 
@@ -653,7 +650,7 @@ class FilePreferredApplicationPropertiesTest {
     void given_emptySkipRemote_when_isSkipRemote_then_returnTrue() {
         String[] args = {""};
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new RunConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         boolean actual = appProps.isSkipRemote();
 
@@ -665,7 +662,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"skipRemote=Y"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withSkipRemote(Boolean.FALSE).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         boolean actual = appProps.isSkipRemote();
 
@@ -677,7 +674,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withSkipRemote(Boolean.TRUE).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         boolean actual = appProps.isSkipRemote();
 
@@ -688,7 +685,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenEmptyFetchAll_whenIsFetchAll_thenReturnTrue() {
         String[] args = {""};
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new RunConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         boolean actual = appProps.isFetchAll();
 
@@ -700,7 +697,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"fetchAll=Y"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withFetchAll(Boolean.FALSE).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         boolean actual = appProps.isFetchAll();
 
@@ -712,7 +709,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withFetchAll(Boolean.TRUE).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         boolean actual = appProps.isFetchAll();
 
@@ -782,7 +779,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitFolderName();
 
@@ -795,7 +792,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitFolderName();
 
@@ -809,7 +806,7 @@ class FilePreferredApplicationPropertiesTest {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
         toolkitConfig.setToolkitFolderName("file_folder");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitFolderName();
 
@@ -822,7 +819,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitFolderName("file_folder");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitFolderName();
 
@@ -836,7 +833,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitFolderName();
 
@@ -849,7 +846,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitFolderName("file_folder");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitFolderName();
 
@@ -882,7 +879,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitUserFolderUrl();
 
@@ -895,7 +892,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitUserFolderUrl();
 
@@ -908,7 +905,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitUserFolderUrl();
 
@@ -922,7 +919,7 @@ class FilePreferredApplicationPropertiesTest {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("aaa");
         toolkitConfig.setToolkitFolderName("sss");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitUserFolderUrl();
 
@@ -934,7 +931,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"toolkitFolderName=qqq"};
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitUserFolderUrl();
 
@@ -946,7 +943,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"toolkitFolderName=qqq", "toolkitUsername=ddd"};
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitUserFolderUrl();
 
@@ -960,7 +957,7 @@ class FilePreferredApplicationPropertiesTest {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("fileUser");
         toolkitConfig.setToolkitFolderName("fileFolder");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitUserFolderUrl();
 
@@ -974,7 +971,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitUsername("fileUser");
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         String actual = appProps.toolkitUserFolderUrl();
 
@@ -997,7 +994,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfig();
         runConfig.setToolkitProjectListNames("Proj3");
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         Set<String> actual = appProps.toolkitProjectListNames();
 
@@ -1018,7 +1015,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenEmptyDeleteDownloadedFiles_whenIsDeleteDownloadedFiles_thenReturnTrue() {
         String[] args = {""};
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new RunConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         boolean actual = appProps.isDeleteDownloadedFiles();
 
@@ -1030,7 +1027,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"deleteDownloadedFiles=Y"};
         RunConfig runConfig = new RunConfigBuilder().withDeleteDownloadedFiles(Boolean.FALSE).create();
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         boolean actual = appProps.isDeleteDownloadedFiles();
 
@@ -1042,7 +1039,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {""};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withDeleteDownloadedFiles(Boolean.TRUE).create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         boolean actual = appProps.isDeleteDownloadedFiles();
 
@@ -1111,7 +1108,7 @@ class FilePreferredApplicationPropertiesTest {
         String[] args = {"configurationName=testAuthor"};
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfigBuilder().withConfigurationName("propsAuthor").create();
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         String actual = appProps.configurationName();
 
@@ -1203,7 +1200,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         RunConfig runConfig = new RunConfig();
         runConfig.setFetchTimeout(2);
-        appProps.init(TestUtils.mockConfigurationDao(runConfig));
+        appProps.init(TestUtils.mockConfigurationDao(runConfig, new ApplicationConfig(), new ToolkitConfig()));
 
         int actual = appProps.fetchTimeout();
 
@@ -1254,7 +1251,7 @@ class FilePreferredApplicationPropertiesTest {
     void givenEmptyToolkitFileAuthorIncluded_whenIsToolkitFileAuthorIncluded_thenReturnTrue() {
         String[] args = {""};
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(new ToolkitConfig()));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), new ToolkitConfig()));
 
         assertThat(appProps.isToolkitFileAuthorIncluded()).isTrue();
     }
@@ -1265,7 +1262,7 @@ class FilePreferredApplicationPropertiesTest {
         appProps = new FileApplicationProperties(args).init();
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitFileAuthorIncluded(Boolean.FALSE);
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         assertThat(appProps.isToolkitFileAuthorIncluded()).isFalse();
     }
@@ -1276,7 +1273,7 @@ class FilePreferredApplicationPropertiesTest {
         ToolkitConfig toolkitConfig = new ToolkitConfig();
         toolkitConfig.setToolkitFileAuthorIncluded(Boolean.TRUE);
         appProps = new FileApplicationProperties(args).init();
-        appProps.init(TestUtils.mockConfigurationDao(toolkitConfig));
+        appProps.init(TestUtils.mockConfigurationDao(new RunConfig(), new ApplicationConfig(), toolkitConfig));
 
         assertThat(appProps.isToolkitFileAuthorIncluded()).isTrue();
     }
