@@ -92,7 +92,7 @@ public class SemanticVersioning {
 
     private static String removeSnapshot(String value) {
         String result = "1.0.0";
-        if (value != null) {
+        if (value != null && !value.isEmpty()) {
             final String SNAPSHOT = "-SNAPSHOT";
             if (!value.contains(SNAPSHOT)) {
                 result = value;

@@ -6,12 +6,15 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import mslinks.ShellLink;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.services.UpgradeService;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.utils.SystemUtils;
 
 import java.net.URL;
+import java.nio.file.*;
 import java.util.ResourceBundle;
 
 public class UpgradeController  extends AbstractController {
@@ -38,6 +41,7 @@ public class UpgradeController  extends AbstractController {
     }
 
     private void upgrade() {
+        createShortcut(Paths.get(".").normalize().toAbsolutePath());
         uiLauncher.executeOutsideUIThread(() -> {
             upgradeService.run();
             Platform.runLater(() -> {
@@ -53,5 +57,39 @@ public class UpgradeController  extends AbstractController {
         upgradeProgressBar.progressProperty().bind(task.progressProperty());
         upgradeLabel.textProperty().unbind();
         upgradeLabel.textProperty().bind(task.messageProperty());
+    }
+
+    /** This method ?from some reason? must be called here, otherwise,
+     * shortcut creation does not work in UpgradeService!
+     * */
+    private void createShortcut(Path destinationDir) {
+        Path jar = Paths.get(destinationDir.toString(), "Gipter.jar").normalize().toAbsolutePath();
+        if (Files.exists(jar)) {
+            try {
+                Path shortcutLnkPath = Paths.get(destinationDir.toString(), "Gipter.lnk");
+                String target = Paths.get(SystemUtils.javaHome(), "bin", "javaw.exe").toString();
+
+                logger.info("Creating shortcut [{}] for [{}] with Java runtime [{}].",
+                        shortcutLnkPath,
+                        jar,
+                        target
+                );
+
+                ShellLink shellLink = ShellLink.createLink(target)
+                        .setWorkingDir(destinationDir.toString())
+                        .setCMDArgs(String.format(" -jar \"%s\"", jar));
+
+                Path iconPath = Paths.get(destinationDir.toString(), "gipter.ico").toAbsolutePath();
+                if (Files.exists(iconPath)) {
+                    shellLink = shellLink.setIconLocation(iconPath.toString());
+                    shellLink.getHeader().setIconIndex(0);
+                }
+
+                shellLink.saveTo(shortcutLnkPath.toString());
+                logger.info("Shortcut created. [{}]", shortcutLnkPath);
+            } catch (Exception e) {
+                logger.error("Shortcut [Gipter.lnk] was not created. {}", e.getMessage());
+            }
+        }
     }
 }
