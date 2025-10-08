@@ -15,19 +15,28 @@ public class RestartService {
     private static final Logger logger = LoggerFactory.getLogger(RestartService.class);
     public static final String PROFILE_ENV_PARAM_NAME = "GIPTER-PROFILE";
 
-    RestartService() {
-    }
+    RestartService() {}
 
     public void start(List<String> programArguments) {
         logger.info("Restart with arguments {}.", programArguments);
         try {
-            final String javaHome = Paths.get(SystemUtils.javaHome(), "bin", "java").toString();
-            logger.info("[{}}] java home is going to be used", javaHome);
+            String javaLocation = SystemUtils.javaHome();
+            Optional<String> homeDirectoryPath = JarHelper.homeDirectoryPath();
+            if (homeDirectoryPath.isPresent() && Files.exists(Paths.get(homeDirectoryPath.get(), "runtime"))) {
+                javaLocation = Paths.get(homeDirectoryPath.get(), "runtime").normalize().toAbsolutePath().toString();
+            }
+
+            logger.info("Java used to execute application: [{}]", javaLocation);
+
             Optional<Path> jarPath = validateAndGetJarPath();
 
-            final List<String> command = Stream.of(
-                    javaHome, "-jar",
-                    jarPath.get().toAbsolutePath().toString()
+            final String javaHome = Paths.get(javaLocation, "bin", "javaw.exe").toString();
+
+            List<String> command = Stream.of(
+                    javaHome,
+                    "-jar",
+                    jarPath.orElseThrow(() -> new IllegalArgumentException("Could not find path to jar."))
+                            .normalize().toAbsolutePath().toString()
             ).collect(toList());
             command.addAll(programArguments);
 
