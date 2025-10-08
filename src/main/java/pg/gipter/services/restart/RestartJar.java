@@ -3,12 +3,8 @@ package pg.gipter.services.restart;
 import pg.gipter.utils.JarHelper;
 import pg.gipter.utils.SystemUtils;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.nio.file.*;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -23,17 +19,23 @@ class RestartJar extends AbstractRestartService implements RestartService {
     public void start(List<String> programArguments) {
         try {
             logger.info("Restart with arguments {}.", programArguments);
-            final String systemJavaHome = SystemUtils.javaHome();
-            logger.info("System JAVA_HOME: [{}]", systemJavaHome);
+            String javaLocation = SystemUtils.javaHome();
+            Optional<String> homeDirectoryPath = JarHelper.homeDirectoryPath();
+            if (homeDirectoryPath.isPresent() && Files.exists(Paths.get(homeDirectoryPath.get(), "runtime"))) {
+                javaLocation = Paths.get(homeDirectoryPath.get(), "runtime").normalize().toAbsolutePath().toString();
+            }
+
+            logger.info("Java used to execute application: [{}]", javaLocation);
 
             Optional<Path> jarPath = validateAndGetJarPath();
 
-            final String javaHome = Paths.get(SystemUtils.javaHome(), "bin", "java").toAbsolutePath().normalize().toString();
+            final String javaW = Paths.get(javaLocation, "bin", "javaw.exe").toString();
 
             List<String> command = Stream.of(
-                    javaHome,
+                    javaW,
                     "-jar",
-                    jarPath.orElseThrow(() -> new IllegalArgumentException("Could not find path to jar.")).toAbsolutePath().toString()
+                    jarPath.orElseThrow(() -> new IllegalArgumentException("Could not find path to jar."))
+                            .normalize().toAbsolutePath().toString()
             ).collect(toList());
 
             command.addAll(programArguments);
