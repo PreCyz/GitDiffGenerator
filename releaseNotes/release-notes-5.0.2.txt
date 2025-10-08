@@ -1,0 +1,7 @@
+**Release notes:**
+Improvements:
+* Release process.
+* Preparing for what it is to come in 5.0.2
+
+Fixes:
+* Calculating application version.
