@@ -11,7 +11,7 @@
 
     <properties>
         <java.version>25</java.version>
-        <javaFX.version>17.0.10</javaFX.version>
+        <javaFX.version>17.0.14</javaFX.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit-jupiter.version>5.13.4</junit-jupiter.version>
         <junit-platform.version>1.13.4</junit-platform.version>
