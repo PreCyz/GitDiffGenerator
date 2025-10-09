@@ -9,6 +9,7 @@ import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Optional;
 
 public class StartupService {
 
@@ -35,23 +36,28 @@ public class StartupService {
                     "Gipter.lnk"
             );
 
+            String cmdArgs = ArgName.silentMode.name() + "=" + Boolean.TRUE;
             Path target = JarHelper.getJarPath().orElse(Paths.get(""));
+            Optional<String> jarHomeDirectory = JarHelper.homeDirectoryPath();
             if (SystemUtils.isExe()) {
-                target = Paths.get(".", "Gipter.exe");
+                target = Paths.get(".", "Gipter.exe").normalize().toAbsolutePath();
+            } else if (jarHomeDirectory.isPresent() && Files.exists(Paths.get(jarHomeDirectory.get(), "runtime"))) {
+                target = Paths.get(jarHomeDirectory.get(), "runtime", "bin", "javaw.exe");
+                cmdArgs = "-jar Gipter.jar "  + cmdArgs;
             }
             if (!Files.exists(shortcutLnkPath)) {
                 logger.info("Creating shortcut to [{}] and placing it in Windows startup folder. [{}]", target, shortcutLnkPath);
                 try {
-                    String workingDir = JarHelper.homeDirectoryPath().orElse("");
+                    String workingDir = jarHomeDirectory.orElse("");
                     if (SystemUtils.isWindows()) {
-                        workingDir = Paths.get(".").toAbsolutePath().normalize().toString();
+                        workingDir = Paths.get(".").normalize().toAbsolutePath().toString();
                     }
 
                     int iconNumber = 130;
                     ShellLink shellLink = ShellLink.createLink(target.toAbsolutePath().normalize().toString())
                             .setWorkingDir(workingDir)
                             .setIconLocation("%SystemRoot%\\system32\\SHELL32.dll")
-                            .setCMDArgs(ArgName.silentMode.name() + "=" + Boolean.TRUE);
+                            .setCMDArgs(cmdArgs);
                     shellLink.getHeader().setIconIndex(iconNumber);
                     shellLink.saveTo(shortcutLnkPath.toAbsolutePath().toString());
                     logger.info("Shortcut located in startup folder [{}].", shortcutLnkPath);
