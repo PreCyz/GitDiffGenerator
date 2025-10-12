@@ -39,16 +39,18 @@ public class WizardLauncher implements Launcher {
     private final String lastChosenConfiguration;
     private UILauncher uiLauncher;
     private ApplicationProperties applicationProperties;
+    private final ApplicationConfig applicationConfig;
 
     static final String projectLabelPropertyName = "projectLabelProperty";
 
     public WizardLauncher(Stage stage) {
-        this(stage, ArgName.configurationName.defaultValue());
+        this(stage, ArgName.configurationName.defaultValue(), new ApplicationConfig());
     }
 
-    public WizardLauncher(Stage stage, String lastChosenConfiguration) {
+    public WizardLauncher(Stage stage, String lastChosenConfiguration, ApplicationConfig applicationConfig) {
         this.primaryStage = stage;
         this.lastChosenConfiguration = lastChosenConfiguration;
+        this.applicationConfig = applicationConfig;
         wizardProperties = new Properties();
         applicationProperties = ApplicationPropertiesFactory.getInstance(new String[]{});
     }
@@ -325,7 +327,7 @@ public class WizardLauncher implements Launcher {
 
         applicationProperties.updateCurrentRunConfig(runConfig);
         applicationProperties.updateToolkitConfig(ToolkitConfig.valueFrom(args));
-        applicationProperties.updateApplicationConfig(ApplicationConfig.valueFrom(args));
+        applicationProperties.updateApplicationConfig(applicationConfig);
         applicationProperties.save();
     }
 
