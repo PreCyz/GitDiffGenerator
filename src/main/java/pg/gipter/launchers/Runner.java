@@ -52,6 +52,7 @@ class Runner implements Starter {
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
                     .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                    .withUITheme(applicationProperties.uiTheme())
                     .buildAndDisplayWindow()
             );
         } finally {

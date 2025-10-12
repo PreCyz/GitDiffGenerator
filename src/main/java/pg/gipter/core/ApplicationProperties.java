@@ -68,8 +68,8 @@ public abstract class ApplicationProperties {
         logger.info("Application properties loaded: {}.", log());
     }
 
-    public final String[] getCliArgs() {
-        return Arrays.copyOf(cliArgs, cliArgs.length);
+    public final ApplicationConfig getApplicationConfig() {
+        return applicationConfig;
     }
 
     public final void updateApplicationConfig(ApplicationConfig applicationConfig) {

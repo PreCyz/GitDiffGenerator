@@ -88,7 +88,8 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
                     .withMessage(BundleUtils.getMsg("popup.error.messageWithLog"))
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                    .withUITheme(new LinkedList<>(applicationPropertiesCollection).getFirst().uiTheme());
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } else {
             try {

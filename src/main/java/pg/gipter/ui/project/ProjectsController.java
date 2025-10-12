@@ -232,6 +232,7 @@ public class ProjectsController extends AbstractController {
                     .withMessage(BundleUtils.getMsg("projects.alert.git.unavailable.msg",
                             lineSeparator, lineSeparator, lineSeparator))
                     .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                    .withUITheme(applicationProperties.uiTheme())
                     .buildAndDisplayWindow();
         }
 

@@ -120,23 +120,24 @@ public class MenuSectionController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> applicationActionEventHandler() {
-        return event -> uiLauncher.showApplicationSettingsWindow();
+        return _ -> uiLauncher.showApplicationSettingsWindow();
     }
 
     private EventHandler<ActionEvent> toolkitActionEventHandler() {
-        return event -> {
+        return _ -> {
             uiLauncher.setApplicationProperties(applicationProperties);
             uiLauncher.showToolkitSettingsWindow();
         };
     }
 
     private EventHandler<ActionEvent> instructionActionEventHandler() {
-        return event -> {
+        return _ -> {
             AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                     .withMessage(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
                     .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolderUrl()))
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                    .withUITheme(applicationProperties.uiTheme());
             try {
                 Path pdfFile = getPDFPath();
                 if (Files.exists(pdfFile)) {
@@ -155,21 +156,23 @@ public class MenuSectionController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> upgradeActionEventHandler() {
-        return event -> {
+        return _ -> {
             uiLauncher.hideMainWindow();
             uiLauncher.showUpgradeWindow();
         };
     }
 
     private EventHandler<ActionEvent> launchWizardActionEventHandler() {
-        return event -> {
+        return _ -> {
             uiLauncher.hideMainWindow();
-            new WizardLauncher(uiLauncher.currentWindow(), mainController.getConfigurationNameComboBoxValue()).execute();
+            new WizardLauncher(
+                    uiLauncher.currentWindow(), mainController.getConfigurationNameComboBoxValue(), applicationProperties.getApplicationConfig()
+            ).execute();
         };
     }
 
     private EventHandler<ActionEvent> wikiActionEventHandler() {
-        return event -> {
+        return _ -> {
             AppManager instance = AppManagerFactory.getInstance();
             instance.launchDefaultBrowser(GithubService.GITHUB_URL + "/wiki");
         };

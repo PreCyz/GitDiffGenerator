@@ -80,6 +80,7 @@ class PathsSectionController extends AbstractController {
                                     SystemUtils.lineSeparator()
                             ))
                             .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                            .withUITheme(applicationProperties.uiTheme())
                             .buildAndDisplayWindow();
                 }
             });

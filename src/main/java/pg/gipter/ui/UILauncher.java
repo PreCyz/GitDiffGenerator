@@ -70,6 +70,10 @@ public class UILauncher implements Launcher {
         this.applicationProperties = applicationProperties;
     }
 
+    public ApplicationProperties getApplicationProperties() {
+        return applicationProperties;
+    }
+
     boolean isSilentMode() {
         return silentMode;
     }
@@ -150,6 +154,11 @@ public class UILauncher implements Launcher {
             executor.execute(() -> {
                 final GithubService service = new GithubService(applicationProperties.version(), applicationProperties.githubToken());
                 if (service.isNewVersion()) {
+                    if (applicationProperties.uiTheme() == UITheme.DEFAULT) {
+                        Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+                    } else {
+                        Application.setUserAgentStylesheet(applicationProperties.uiTheme().userAgentStylesheet());
+                    }
                     logger.info("New version available: {}.", service.getServerVersion());
                     Platform.runLater(() -> new AlertWindowBuilder()
                             .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
@@ -157,6 +166,7 @@ public class UILauncher implements Launcher {
                             .withAlertType(Alert.AlertType.INFORMATION)
                             .withCustomControl(ControlFactory.createUpgradeButton(this))
                             .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
+                            .withUITheme(applicationProperties.uiTheme())
                             .buildAndDisplayWindow()
                     );
                 }
@@ -240,6 +250,7 @@ public class UILauncher implements Launcher {
                     .withLinkAction(new LogLinkAction())
                     .withMessage(ex.getCause().getMessage())
                     .withImageFile(ImageFile.ERROR_CHICKEN_PNG)
+                    .withUITheme(applicationProperties.uiTheme())
                     .buildAndDisplayWindow();
             System.exit(-1);
         }
@@ -329,7 +340,8 @@ public class UILauncher implements Launcher {
                     .withMessage(errorMessage)
                     .withLinkAction(new LogLinkAction())
                     .withAlertType(Alert.AlertType.ERROR)
-                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                    .withUITheme(applicationProperties.uiTheme());
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         } finally {
             dataDao.removeJobParam();
@@ -367,7 +379,8 @@ public class UILauncher implements Launcher {
                         .withMessage(BundleUtils.getMsg("popup.job.errorMsg", e.getMessage()))
                         .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
+                        .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                        .withUITheme(applicationProperties.uiTheme());
                 Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
             }
         }
