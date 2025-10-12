@@ -6,3 +6,4 @@ Improvements:
 * From this version portable jar must be executed by Java version 25.
 
 Fixes:
+* Reducing memory footprint.
