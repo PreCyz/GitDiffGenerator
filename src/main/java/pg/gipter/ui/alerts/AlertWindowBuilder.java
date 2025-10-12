@@ -12,8 +12,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.UploadResult;
+import pg.gipter.ui.*;
 import pg.gipter.ui.alerts.controls.CustomControl;
 import pg.gipter.utils.*;
 
@@ -36,9 +35,11 @@ public class AlertWindowBuilder {
     private Map<String, UploadResult> msgResultMap;
     private int gridPaneRow;
     private CustomControl customControl;
+    private UITheme uiTheme;
 
     public AlertWindowBuilder() {
         linkActions = Collections.emptySet();
+        uiTheme = UITheme.DEFAULT;
     }
 
     public AlertWindowBuilder withHeaderText(String headerText) {
@@ -88,6 +89,11 @@ public class AlertWindowBuilder {
 
     public AlertWindowBuilder withCustomControl(CustomControl customControl) {
         this.customControl = customControl;
+        return this;
+    }
+
+    public AlertWindowBuilder withUITheme(UITheme uiTheme) {
+        this.uiTheme = uiTheme;
         return this;
     }
 
@@ -176,9 +182,21 @@ public class AlertWindowBuilder {
                         "-fx-font-style:normal; " +
                         "-fx-font-weight:bolder; ";
                 if (entry.getValue().getSuccess()) {
-                    style += "-fx-text-fill:forestgreen;";
+                    if (uiTheme == UITheme.DEFAULT) {
+                        style += "-fx-text-fill:forestgreen;";
+                    } else if (uiTheme.isDarkMode()) {
+                        style += "-fx-text-fill:-color-success-4;";
+                    } else {
+                        style += "-fx-text-fill:-color-success-7;";
+                    }
                 } else {
-                    style += "-fx-text-fill:crimson;";
+                    if (uiTheme == UITheme.DEFAULT) {
+                        style += "-fx-text-fill:crimson;";
+                    } else if (uiTheme.isDarkMode()) {
+                        style += "-fx-text-fill:-color-danger-4;";
+                    } else {
+                        style += "-fx-text-fill:-color-danger-7;";
+                    }
                 }
                 messageLabel.setStyle(style);
 
@@ -212,10 +230,22 @@ public class AlertWindowBuilder {
                 "-fx-text-alignment:left; " +
                 "-fx-font-style:normal; ";
         if (alertType == Alert.AlertType.ERROR) {
-            style += "-fx-font-weight:bolder; " +
-                    "-fx-text-fill:crimson;";
+            style += "-fx-font-weight:bolder;";
+            if (uiTheme == UITheme.DEFAULT) {
+                style += "-fx-text-fill:crimson;";
+            } else if (uiTheme.isDarkMode()) {
+                style += "-fx-text-fill:-color-danger-4;";
+            } else {
+                style += "-fx-text-fill:-color-danger-5;";
+            }
         } else {
-            style += "-fx-text-fill:mediumblue;";
+            if (uiTheme == UITheme.DEFAULT) {
+                style += "-fx-text-fill:mediumblue;";
+            } else if (uiTheme.isDarkMode()) {
+                style += "-fx-text-fill:-color-accent-4;";
+            } else {
+                style += "-fx-text-fill:-color-accent-5;";
+            }
         }
         messageLabel.setStyle(style);
         return messageLabel;

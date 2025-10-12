@@ -1,5 +1,6 @@
 package pg.gipter.ui.alerts.controls;
 
+import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -8,6 +9,7 @@ import javafx.scene.text.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.ui.UILauncher;
+import pg.gipter.ui.UITheme;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.ResourceUtils;
 
@@ -30,16 +32,26 @@ public class ButtonControl implements CustomControl {
     public Control create(EventHandler<ActionEvent> actionEventHandler) {
         button.setText(BundleUtils.getMsg("main.menu.help.upgradeApplication"));
         button.setOnAction(actionEventHandler);
-        button.setFont(Font.font("System", FontWeight.BOLD, FontPosture.REGULAR, 15));
-        final String cssFile = "buttons.css";
-        final String cssStyle = "green";
-        Optional<URL> cssResource = ResourceUtils.getCssResource(cssFile);
-        try {
-            button.getStylesheets().add(cssResource.get().toURI().toString());
-            button.getStyleClass().add(cssStyle);
-        } catch (URISyntaxException e) {
-            logger.error("Could not add style to button. File [{}], style [{}]", cssFile, cssStyle);
+        if (uiLauncher.getApplicationProperties().uiTheme() == UITheme.DEFAULT) {
+            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+            button.setFont(Font.font("System", FontWeight.BOLD, FontPosture.REGULAR, 15));
+            final String cssFile = "buttons.css";
+            final String cssStyle = "green";
+            Optional<URL> cssResource = ResourceUtils.getCssResource(cssFile);
+            try {
+                button.getStylesheets().add(cssResource.get().toURI().toString());
+                button.getStyleClass().add(cssStyle);
+            } catch (URISyntaxException e) {
+                logger.error("Could not add style to button. File [{}], style [{}]", cssFile, cssStyle);
+            }
+        } else {
+            Application.setUserAgentStylesheet(uiLauncher.getApplicationProperties().uiTheme().userAgentStylesheet());
+            button.getStyleClass().add("success");
+            if (!uiLauncher.getApplicationProperties().uiTheme().isDarkMode()) {
+                button.getStyleClass().add("button-outlined");
+            }
         }
+
         return button;
     }
 

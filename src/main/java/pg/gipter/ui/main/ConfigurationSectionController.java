@@ -6,38 +6,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextInputDialog;
-import pg.gipter.core.ApplicationProperties;
-import pg.gipter.core.ApplicationPropertiesFactory;
-import pg.gipter.core.ArgName;
+import javafx.scene.control.*;
+import pg.gipter.core.*;
 import pg.gipter.core.dao.configuration.CacheManager;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.ui.alerts.LogLinkAction;
-import pg.gipter.ui.alerts.WebViewService;
-import pg.gipter.utils.BundleUtils;
-import pg.gipter.utils.StringUtils;
-import pg.gipter.utils.SystemUtils;
+import pg.gipter.ui.alerts.*;
+import pg.gipter.utils.*;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 class ConfigurationSectionController extends AbstractController {
 
@@ -123,7 +104,8 @@ class ConfigurationSectionController extends AbstractController {
         AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
                 .withHeaderText(BundleUtils.getMsg("main.config.changed"))
                 .withAlertType(Alert.AlertType.INFORMATION)
-                .withWebViewDetails(WebViewService.getInstance().pullPartialSuccessWebView());
+                .withWebViewDetails(WebViewService.getInstance().pullPartialSuccessWebView())
+                .withUITheme(applicationProperties.uiTheme());
         boolean isOverride = applicationProperties.getCustomCommand(VersionControlSystem.GIT).isOverride() ||
                 applicationProperties.getCustomCommand(VersionControlSystem.SVN).isOverride() ||
                 applicationProperties.getCustomCommand(VersionControlSystem.MERCURIAL).isOverride();
@@ -264,7 +246,8 @@ class ConfigurationSectionController extends AbstractController {
                         .withMessage(ex.getMessage())
                         .withLinkAction(new LogLinkAction())
                         .withAlertType(Alert.AlertType.ERROR)
-                        .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
+                        .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                        .withUITheme(applicationProperties.uiTheme());
             }
             Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
         };

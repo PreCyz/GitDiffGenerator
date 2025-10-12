@@ -136,7 +136,8 @@ public class MenuSectionController extends AbstractController {
                     .withMessage(BundleUtils.getMsg("popup.warning.desktopNotSupported"))
                     .withLinkAction(new BrowserLinkAction(applicationProperties.toolkitUserFolderUrl()))
                     .withAlertType(Alert.AlertType.INFORMATION)
-                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView())
+                    .withUITheme(applicationProperties.uiTheme());
             try {
                 Path pdfFile = getPDFPath();
                 if (Files.exists(pdfFile)) {
