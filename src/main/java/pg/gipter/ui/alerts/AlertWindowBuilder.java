@@ -10,6 +10,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pg.gipter.ui.UILauncher;
 import pg.gipter.ui.UploadResult;
 import pg.gipter.ui.alerts.controls.CustomControl;
@@ -23,6 +25,7 @@ import static java.util.stream.Collectors.toCollection;
 
 /** Created by Pawel Gawedzki on 01-Apr-2019. */
 public class AlertWindowBuilder {
+    private static final Logger log = LoggerFactory.getLogger(AlertWindowBuilder.class);
     private String headerText;
     private String message;
     private Set<AbstractLinkAction> linkActions;
@@ -92,9 +95,15 @@ public class AlertWindowBuilder {
         Alert alert = buildDefaultAlert();
         List<Hyperlink> hyperLinks = buildHyperlinks(alert);
         GridPane gridPane = buildGridPane(hyperLinks, alert);
-
         alert.getDialogPane().contentProperty().set(gridPane);
-        alert.showAndWait();
+        try {
+            alert.showAndWait();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        } finally {
+            alert.close();
+        }
     }
 
     private Alert buildDefaultAlert() {
@@ -296,6 +305,12 @@ public class AlertWindowBuilder {
         GridPane fp = buildGridPane(Collections.singletonList(new Hyperlink("")), alert);
         alert.getDialogPane().contentProperty().set(fp);
 
-        return alert.showAndWait().orElse(cancelButton) == okButton;
+        try {
+            return alert.showAndWait().orElse(cancelButton) == okButton;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            alert.close();
+        }
     }
 }
