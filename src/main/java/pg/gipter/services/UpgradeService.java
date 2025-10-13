@@ -89,7 +89,7 @@ public class UpgradeService extends TaskService<Void> {
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
-                    Path directory = Paths.get(destination.getName(), entry.getName());
+                    Path directory = Paths.get(entry.getName()).normalize().toAbsolutePath();
                     if (!Files.exists(directory)) {
                         Files.createDirectory(directory);
                     }
@@ -110,7 +110,6 @@ public class UpgradeService extends TaskService<Void> {
                     out.write(content);
                     out.close();
                 }
-                updateTaskProgress(Double.valueOf(5 * Math.pow(10, 5)).longValue());
             }
         } catch (IOException ex) {
             logger.error("What da hell?", ex);
