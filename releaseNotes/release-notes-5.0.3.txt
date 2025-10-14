@@ -1,0 +1,6 @@
+**Release notes:**
+Improvements:
+* Preparing for what it is to come in 5.0.4
+
+Fixes:
+* Release process.
