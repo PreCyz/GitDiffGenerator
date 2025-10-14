@@ -2,7 +2,6 @@ package pg.gipter.services;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
-import mslinks.ShellLink;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 import org.slf4j.Logger;
@@ -46,7 +45,6 @@ public class UpgradeService extends TaskService<Void> {
                 if (fileName.isPresent()) {
                     File sevenZFile = Paths.get(homeDirectoryPath.get(), fileName.get()).toFile();
                     decompress(sevenZFile, Paths.get(homeDirectoryPath.get()).toFile());
-                    createShortcut(Paths.get(homeDirectoryPath.get()).normalize().toAbsolutePath());
                     updateMsg(BundleUtils.getMsg("upgrade.progress.restarting"));
                     final List<String> restartArguments = Stream.of(
                             String.format("%s=%b", ArgName.upgradeFinished.name(), Boolean.TRUE),
@@ -89,7 +87,7 @@ public class UpgradeService extends TaskService<Void> {
             SevenZArchiveEntry entry;
             while ((entry = sevenZFile.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
-                    Path directory = Paths.get(destination.getName(), entry.getName());
+                    Path directory = Paths.get(entry.getName()).normalize().toAbsolutePath();
                     if (!Files.exists(directory)) {
                         Files.createDirectory(directory);
                     }
@@ -110,7 +108,6 @@ public class UpgradeService extends TaskService<Void> {
                     out.write(content);
                     out.close();
                 }
-                updateTaskProgress(Double.valueOf(5 * Math.pow(10, 5)).longValue());
             }
         } catch (IOException ex) {
             logger.error("What da hell?", ex);
@@ -134,44 +131,6 @@ public class UpgradeService extends TaskService<Void> {
         } catch (IOException ex) {
             logger.error("Could not delete the [{}] file.", sevenZSourceFile.getName(), ex);
             throw ex;
-        }
-    }
-
-    /** Conditions: When jar-distro with custom runtime
-     *      - runtime folder exists
-     *      - Gipter.jar exists
-     **/
-    private void createShortcut(Path destinationDir) {
-        Path runtime = Paths.get(destinationDir.toString(), "runtime").normalize().toAbsolutePath();
-        Path jar = Paths.get(destinationDir.toString(), "Gipter.jar").normalize().toAbsolutePath();
-        if (Files.exists(runtime) && Files.exists(jar)) {
-            try {
-                Path shortcutLnkPath = Paths.get(destinationDir.toString(), "Gipter.lnk");
-                Files.deleteIfExists(shortcutLnkPath);
-
-                String target = Paths.get(runtime.toString(), "bin", "javaw.exe").toString();
-
-                logger.info("Creating shortcut [{}] for [{}] with custom runtime image [{}].",
-                        shortcutLnkPath,
-                        jar,
-                        target
-                );
-
-                ShellLink shellLink = ShellLink.createLink(target)
-                        .setWorkingDir(destinationDir.toString())
-                        .setCMDArgs(String.format(" -jar \"%s\"", jar));
-
-                Path iconPath = Paths.get(destinationDir.toString(), "gipter.ico").toAbsolutePath();
-                if (Files.exists(iconPath)) {
-                    shellLink = shellLink.setIconLocation(iconPath.toString());
-                    shellLink.getHeader().setIconIndex(0);
-                }
-
-                shellLink.saveTo(shortcutLnkPath.toString());
-                logger.info("Shortcut created. [{}]", shortcutLnkPath);
-            } catch (Exception e) {
-                logger.error("Shortcut [Gipter.lnk] was not created. {}", e.getMessage());
-            }
         }
     }
 
