@@ -9,6 +9,7 @@ import pg.gipter.utils.SystemUtils;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Optional;
 
 public class StartupService {
 
@@ -85,6 +86,51 @@ public class StartupService {
                 } catch (IOException e) {
                     logger.error("Can not delete link: [{}]. {}", shortcutLnkPath, e.getMessage());
                 }
+            }
+        }
+    }
+
+    /** Conditions: When jar-distro with custom runtime
+     *      - runtime folder exists
+     *      - Gipter.jar exists
+     **/
+    public void createShortcut() {
+        Optional<String> homeDirectory = JarHelper.homeDirectoryPath();
+        if (homeDirectory.isEmpty()) {
+            return;
+        }
+        Path runtime = Paths.get(homeDirectory.toString(), "runtime").normalize().toAbsolutePath();
+        Path jar = Paths.get(homeDirectory.toString(), "Gipter.jar").normalize().toAbsolutePath();
+        if (Files.exists(runtime) && Files.exists(jar)) {
+            try {
+                Path shortcutLnkPath = Paths.get(homeDirectory.toString(), "Gipter.lnk");
+                if (Files.exists(shortcutLnkPath)) {
+                    logger.info("Shortcut [{}] exists.", shortcutLnkPath);
+                    return;
+                }
+
+                String target = Paths.get(runtime.toString(), "bin", "javaw.exe").toString();
+
+                logger.info("Creating shortcut [{}] for [{}] with custom runtime image [{}].",
+                        shortcutLnkPath,
+                        jar,
+                        target
+                );
+
+                ShellLink shellLink = ShellLink.createLink(target)
+                        .setWorkingDir(homeDirectory.toString())
+                        .setCMDArgs(String.format(" -jar \"%s\"", jar));
+
+                Path iconPath = Paths.get(homeDirectory.toString(), "gipter.ico").toAbsolutePath();
+                if (Files.exists(iconPath)) {
+                    shellLink = shellLink.setIconLocation(iconPath.toString());
+                    shellLink.getHeader().setIconIndex(0);
+                }
+
+                shellLink.saveTo(shortcutLnkPath.toString());
+                logger.info("Shortcut created. [{}]", shortcutLnkPath);
+            } catch (Exception e) {
+                logger.error("Shortcut [Gipter.lnk] was not created. {}", e.getMessage());
             }
         }
     }
