@@ -13,11 +13,11 @@ import pg.gipter.core.ArgName;
 import pg.gipter.core.model.NamePatternValue;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.TextFieldIntelliSense;
 import pg.gipter.ui.AbstractController;
 import pg.gipter.ui.UILauncher;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.WebViewService;
+import pg.gipter.ui.alerts.*;
 import pg.gipter.utils.*;
 
 import java.io.File;
@@ -50,10 +50,56 @@ class PathsSectionController extends AbstractController {
         itemFileNamePrefixTextField = (TextField) controlsMap.get("itemFileNamePrefixTextField");
         projectPathButton = (Button) controlsMap.get("projectPathButton");
         itemPathButton = (Button) controlsMap.get("itemPathButton");
+        verifyRepoPaths();
         setInitValues();
         setProperties(resources);
         setActions(resources);
         TextFieldIntelliSense.init(itemFileNamePrefixTextField, NamePatternValue.class);
+    }
+
+    private void verifyRepoPaths() {
+        Set<String> invalidRepos = findInvalidRepos();
+        if (!invalidRepos.isEmpty()) {
+            Set<String> paths = applicationProperties.projectPaths();
+            if (paths.removeAll(invalidRepos)) {
+                logger.warn("Broken repos {} removed from the configuration [{}]",
+                        invalidRepos, applicationProperties.configurationName());
+            }
+            applicationProperties.addProjectPath(String.join(",", paths));
+            applicationProperties.save();
+
+            for (String invalidRepo : invalidRepos) {
+                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                        .withHeaderText(BundleUtils.getMsg("vcs.invalid.repo.removed",
+                                invalidRepo, applicationProperties.configurationName()
+                        ))
+                        .withMessage(BundleUtils.getMsg("vcs.invalid.repo.tip",
+                                applicationProperties.configurationName()
+                        ))
+                        .withAlertType(Alert.AlertType.WARNING)
+                        .withUITheme(applicationProperties.uiTheme());
+
+                WebViewDetails webViewDetails = WebViewService.getInstance().pullFailWebView();
+                if (webViewDetails.getWebView() != null) {
+                    alertWindowBuilder.withWebViewDetails(webViewDetails);
+                } else {
+                    alertWindowBuilder.withImageFile(ImageFile.randomFailImage());
+                }
+                alertWindowBuilder.buildAndDisplayWindow();
+            }
+        }
+    }
+
+    private Set<String> findInvalidRepos() {
+        Set<String> invalidRepos = new HashSet<>();
+        for (String path : applicationProperties.projectPaths()) {
+            try {
+                VersionControlSystem.valueFrom(Paths.get(path));
+            } catch (Exception e) {
+                invalidRepos.add(path);
+            }
+        }
+        return invalidRepos;
     }
 
     private void setInitValues() {

@@ -31,8 +31,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
+import java.util.stream.Stream;
 
 public class ProjectsController extends AbstractController {
 
@@ -154,7 +153,7 @@ public class ProjectsController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> searchButtonActionEventHandler(ResourceBundle resources) {
-        return event -> {
+        return _ -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(Paths.get(".").toFile());
             directoryChooser.setTitle(resources.getString("directory.search.title"));
@@ -186,8 +185,8 @@ public class ProjectsController extends AbstractController {
                     directory.getFileName().toString(), vcs.name(), directory.toAbsolutePath().toString()
             ));
         } catch (IllegalArgumentException ex) {
-            try {
-                List<Path> files = Files.list(directory).collect(toList());
+            try (Stream<Path> list = Files.list(directory)){
+                List<Path> files = list.toList();
                 for (Path file : files) {
                     if (file != null && Files.isDirectory(file)) {
                         result.addAll(searchForProjects(file));
@@ -201,7 +200,7 @@ public class ProjectsController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> saveButtonActionEventHandler() {
-        return event -> {
+        return _ -> {
             final String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
             applicationProperties.addProjectPath(projects);
             applicationProperties.save();
@@ -239,7 +238,7 @@ public class ProjectsController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> addButtonActionEventHandler(ResourceBundle resources) {
-        return event -> {
+        return _ -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(Paths.get(".").toFile());
             directoryChooser.setTitle(resources.getString("directory.item.title"));
@@ -272,7 +271,7 @@ public class ProjectsController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> removeButtonActionEventHandler() {
-        return event -> {
+        return _ -> {
             LinkedHashSet<ProjectDetails> projectsToDelete = new LinkedHashSet<>(projectsTableView.getSelectionModel().getSelectedItems());
             projectsTableView.getItems().removeAll(projectsToDelete);
             if (projectsTableView.getItems().isEmpty()) {
