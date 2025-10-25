@@ -40,8 +40,8 @@ Copy-Item -Path "$target\classes\launch4j.xml" -Destination "$target\input\" -Fo
 Copy-Item -Path "..\src\main\resources\img\icons\gipter.ico" -Destination "$target\input\" -Force -Verbose
 #Copy-Item -Path "$target\classes\installer-config.iss" -Destination "$target\input\" -Force -Verbose
 
-Copy-Item -Path "$jre25" -Destination "$target\dist\portable\runtime\" -Force -Recurse
-Copy-Item -Path ..\docs\*.* -Destination "$target\dist\portable\" -Force -Exclude *.odt -Verbose
+Copy-Item -Path "$jre25" -Destination "$target\dist\portable-exe\runtime\" -Force -Recurse
+Copy-Item -Path ..\docs\*.* -Destination "$target\dist\portable-exe\" -Force -Exclude *.odt -Verbose
 
 Write-Host "launch4j: " -NoNewline -ForegroundColor Green
 Write-Host "$launch4j"
@@ -55,13 +55,13 @@ Write-Host "===============launch4j DONE!==========================" -Foreground
 
 #& $innoSetupCompiler "$target\input\installer-config.iss"
 
-if (-not (Test-Path "$target\dist\portable"))
+if (-not (Test-Path "$target\dist\portable-exe"))
 {
-    Write-Error "portable folder not found at: [$target\dist\portable]"
+    Write-Error "portable-exe folder not found at: [$target\dist\portable-exe]"
     exit 1
 }
 Write-Host "Zipping portable ..."
-& 7z a "$target\dist\Gipter-v$version-portable.7z" "$target\dist\portable\*"
+& 7z a "$target\dist\Gipter-v$version-portable.7z" "$target\dist\portable-exe\*"
 
 $lsDist = Get-ChildItem -Path "$currentLocation\$target\dist"
 $lsPortable = Get-ChildItem -Path "$currentLocation\$target\dist"
