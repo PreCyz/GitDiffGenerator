@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -58,7 +57,7 @@ public class FXWebService {
 
     public FXWebService(Stage stage) {
         this.stage = stage;
-        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        executorService = ConcurrentService.getInstance().executor();
     }
     public FXWebService(JobDataMap jobDataMap) {
         this(new Stage());
