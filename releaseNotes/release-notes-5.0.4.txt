@@ -1,12 +1,12 @@
 **Release notes:**
 Improvements:
-* From now on users may change themes of the app.
-* General improvements.
+* Users may change themes in the app.
 * From now on portable jar version comes with custom runtime image.
 * From this version portable jar must be executed by Java version 25.
 * Using virtual threads instead of platform threads.
+* General improvements and cleaning.
 
 Fixes:
 * Reducing memory footprint.
-* Fixing exiting application when discovered broken repo.
-* Disallowing execute operation on main window when sso is in progress.
+* Exiting application when discovered broken repo.
+* Disallowing execute operations when sso is in progress.
