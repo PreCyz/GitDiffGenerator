@@ -1,6 +1,5 @@
 package pg.gipter.ui.main;
 
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -276,13 +275,18 @@ public class MainController extends AbstractController {
         setDisable(applicationProperties.itemType());
         verifyProgressIndicator.setVisible(true);
 
-        Platform.runLater(() -> {
-            final boolean hasConnection = applicationProperties.hasConnectionToToolkit();
-            if (!hasConnection) {
-                new FXWebService().initSSO(cookieExpiryLabel);
-            }
-            verifyProgressIndicator.setVisible(false);
-        });
+        final boolean hasConnection = applicationProperties.hasConnectionToToolkit();
+        if (!hasConnection) {
+            cookieExpiryLabel.textProperty().addListener(_ -> disableExecutionButtons(false));
+            new FXWebService().initSSO(cookieExpiryLabel);
+            disableExecutionButtons(true);
+        }
+        verifyProgressIndicator.setVisible(false);
+    }
+
+    private void disableExecutionButtons(boolean value) {
+        executeButton.setDisable(value);
+        executeAllButton.setDisable(value);
     }
 
     private void setAccelerators() {
@@ -291,28 +295,20 @@ public class MainController extends AbstractController {
                 e.consume();
             } else if (e.isControlDown()) {
                 switch (e.getCode()) {
-                    case ENTER:
+                    case ENTER -> {
                         if (e.isShiftDown()) {
                             buttonController.executeAll();
                         } else {
                             buttonController.execute();
                         }
-                        break;
-                    case J:
-                        uiLauncher.showJobWindow();
-                        break;
-                    case ESCAPE:
-                        UILauncher.platformExit();
-                        break;
-                    case M:
+                    }
+                    case J -> uiLauncher.showJobWindow();
+                    case ESCAPE -> UILauncher.platformExit();
+                    case M -> {
                         uiLauncher.hideMainWindow();
                         CacheManager.clearAllCache();
-                        break;
-                    case S:
-                        saveConfiguration();
-                        break;
-                    default:
-                        break;
+                    }
+                    case S -> saveConfiguration();
                 }
             }
         });
