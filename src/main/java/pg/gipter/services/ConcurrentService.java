@@ -1,25 +1,25 @@
 package pg.gipter.services;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ConcurrentService {
 
-    private final Executor executor;
+    private final ExecutorService executor;
 
     private static class ExecutorServiceHolder {
         private static final ConcurrentService INSTANCE = new ConcurrentService();
     }
 
     private ConcurrentService() {
-        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        executor = Executors.newVirtualThreadPerTaskExecutor();
     }
 
     public static ConcurrentService getInstance() {
         return ExecutorServiceHolder.INSTANCE;
     }
 
-    public Executor executor() {
+    public ExecutorService executor() {
         return executor;
     }
 

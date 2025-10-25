@@ -31,7 +31,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -58,7 +57,7 @@ public class FXWebService {
 
     public FXWebService(Stage stage) {
         this.stage = stage;
-        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        executorService = ConcurrentService.getInstance().executor();
     }
     public FXWebService(JobDataMap jobDataMap) {
         this(new Stage());
@@ -131,21 +130,26 @@ public class FXWebService {
     }
 
     private void runOnCloseActivity(FlowType flowType) {
-        if (flowType == FlowType.INIT) {
-            logger.info("Webview opened from Main. Application is going to be restarted.");
-            final List<String> restartArguments = Stream.of(
-                    String.format("%s=%s", ArgName.useUI.name(), ArgName.useUI.defaultValue()),
-                    String.format("%s=%s", ArgName.flowType.name(), FlowType.REGULAR)
-            ).collect(toList());
-            RestartServiceFactory.getRestartService().start(restartArguments);
-        } else if (flowType == FlowType.JOB) {
-            logger.info("Webview opened from JOB. Continuing job.");
-            executorService.submit(this::continueJob, Void.class);
-        } else if (flowType == FlowType.MISSED_JOB) {
-            logger.info("Webview opened from {}. Continuing missed job.", flowType);
-        } else {
-            logger.info("Webview opened regularly.");
-            label.setText(BundleUtils.getMsg("toolkit.panel.cookieExpires", CookiesService.expiryDate()));
+        switch (flowType) {
+            case INIT -> {
+                logger.info("Webview opened from Main. Application is going to be restarted.");
+                final List<String> restartArguments = Stream.of(
+                        String.format("%s=%s", ArgName.useUI.name(), ArgName.useUI.defaultValue()),
+                        String.format("%s=%s", ArgName.flowType.name(), FlowType.REGULAR)
+                ).collect(toList());
+                RestartServiceFactory.getRestartService().start(restartArguments);
+            }
+            case JOB -> {
+                logger.info("Webview opened from JOB. Continuing job.");
+                executorService.submit(this::continueJob, Void.class);
+            }
+            case MISSED_JOB -> {
+                logger.info("Webview opened from {}. Continuing missed job.", flowType);
+            }
+            default -> {
+                logger.info("Webview opened regularly.");
+                label.setText(BundleUtils.getMsg("toolkit.panel.cookieExpires", CookiesService.expiryDate()));
+            }
         }
         running = false;
         logger.info("Webview was closed.");

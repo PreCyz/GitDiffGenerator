@@ -222,7 +222,7 @@ public class ApplicationSettingsController extends AbstractController {
             saveNewSettings();
         });
 
-        autostartCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        autostartCheckBox.selectedProperty().addListener((_, _, newValue) -> {
             if (newValue) {
                 startupService.startOnStartup();
             } else {
@@ -330,7 +330,7 @@ public class ApplicationSettingsController extends AbstractController {
     }
 
     private void setActions() {
-        refreshSettingsButton.setOnAction(actionEvent -> {
+        refreshSettingsButton.setOnAction(_ -> {
             try {
                 ProgramSettings.refresh();
                 MongoDaoConfig.refresh(ProgramSettings.getInstance().getDbProperties());
