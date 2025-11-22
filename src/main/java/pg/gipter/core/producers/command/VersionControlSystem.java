@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -32,22 +33,19 @@ public enum VersionControlSystem {
         final IllegalArgumentException iae = new IllegalArgumentException(
                 String.format("Can not determine version control system for%n[%s].", path.toString())
         );
-        try {
-            if (Files.list(path) != null) {
-                final Map<String, VersionControlSystem> vcsStringMap = EnumSet.allOf(VersionControlSystem.class)
-                        .stream()
-                        .collect(toMap(k -> k.dirName, v -> v, (v1, v2) -> v1));
-                return Files.list(path)
-                        .filter(p -> vcsStringMap.containsKey(p.getFileName().toString()))
-                        .findFirst()
-                        .map(vcs -> vcsStringMap.get(vcs.toFile().getName()))
-                        .orElseThrow(() -> iae);
-            }
+        try (Stream<Path> list = Files.list(path)){
+            final Map<String, VersionControlSystem> vcsStringMap = EnumSet.allOf(VersionControlSystem.class)
+                    .stream()
+                    .collect(toMap(k -> k.dirName, v -> v, (v1, v2) -> v1));
+            return list
+                    .filter(p -> vcsStringMap.containsKey(p.getFileName().toString()))
+                    .findFirst()
+                    .map(vcs -> vcsStringMap.get(vcs.toFile().getName()))
+                    .orElseThrow(() -> iae);
         } catch (Exception ex) {
             iae.setStackTrace(ex.getStackTrace());
             throw iae;
         }
-        throw iae;
     }
 
     public static VersionControlSystem valueFor(String value) {
