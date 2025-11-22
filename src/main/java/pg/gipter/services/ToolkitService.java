@@ -1,38 +1,21 @@
 package pg.gipter.services;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import javafx.concurrent.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.dto.CasesData;
-import pg.gipter.services.dto.ItemField;
-import pg.gipter.services.dto.SortFieldDefinition;
-import pg.gipter.services.dto.ToolkitCasePayload;
-import pg.gipter.services.dto.ToolkitCaseResponse;
+import pg.gipter.services.dto.*;
 import pg.gipter.toolkit.HttpRequester;
 import pg.gipter.utils.BundleUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.nio.file.*;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
@@ -61,7 +44,7 @@ public class ToolkitService extends Task<List<CasesData>> {
     private List<CasesData> getAvailableCases() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        headers.put("Cookie", CookiesService.getFedAuthString() + "; " + CookiesService.getGotoString());
+        headers.put("Cookie", CookiesService.getFedAuthString().orElse("") + "; " + CookiesService.getGotoString().orElse(""));
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
         List<CasesData> cases = new LinkedList<>();
         try {
