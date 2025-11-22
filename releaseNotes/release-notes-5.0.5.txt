@@ -1,0 +1,8 @@
+**Release notes:**
+Improvements:
+* None
+
+Fixes:
+* Fixing toolkit project window.
+* Fixing toolkit project removal.
+* Fixing UserProfile request.
