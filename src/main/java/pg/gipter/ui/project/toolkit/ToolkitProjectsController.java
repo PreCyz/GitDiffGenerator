@@ -14,6 +14,7 @@ import javafx.scene.input.MouseEvent;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.ToolkitService;
 import pg.gipter.services.dto.CasesData;
 import pg.gipter.services.platforms.AppManager;
@@ -25,6 +26,7 @@ import pg.gipter.ui.project.ProjectDetails;
 import pg.gipter.utils.BundleUtils;
 
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -101,7 +103,7 @@ public class ToolkitProjectsController extends AbstractController {
 
     private void initValues() {
         downloadAvailableProjectNames();
-        Set<String> projects = applicationProperties.projectPaths();
+        Set<String> projects = removeVcsProjects(applicationProperties.projectPaths());
         String[] args = applicationProperties.getCurrentRunConfigArray();
         if (args.length == 0) {
             projects.clear();
@@ -120,6 +122,18 @@ public class ToolkitProjectsController extends AbstractController {
             }
             projectsTableView.setItems(projectsPaths);
         }
+    }
+
+    private Set<String> removeVcsProjects(Set<String> projectPaths) {
+        Set<String> projects = new LinkedHashSet<>();
+        for (String projectPath : projectPaths) {
+            try {
+                VersionControlSystem.valueFrom(Paths.get(projectPath));
+            } catch (Exception e) {
+                projects.add(projectPath);
+            }
+        }
+        return projects;
     }
 
     private void downloadAvailableProjectNames() {
