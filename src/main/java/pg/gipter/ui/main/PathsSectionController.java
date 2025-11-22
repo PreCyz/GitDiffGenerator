@@ -92,6 +92,9 @@ class PathsSectionController extends AbstractController {
 
     private Set<String> findInvalidRepos() {
         Set<String> invalidRepos = new HashSet<>();
+        if (EnumSet.of(ItemType.STATEMENT, ItemType.TOOLKIT_DOCS).contains(applicationProperties.itemType())) {
+            return invalidRepos;
+        }
         for (String path : applicationProperties.projectPaths()) {
             try {
                 VersionControlSystem.valueFrom(Paths.get(path));
