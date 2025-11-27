@@ -25,7 +25,8 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.LinkedList;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 class TrayHandler {
 
@@ -36,12 +37,10 @@ class TrayHandler {
     private static TrayIcon trayIcon;
     private static PopupMenu trayPopupMenu;
     private final DataDao dataDao;
-    private final Executor executor;
 
-    TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties, Executor executor) {
+    TrayHandler(UILauncher uiLauncher, ApplicationProperties applicationProperties) {
         this.uiLauncher = uiLauncher;
         this.applicationProperties = applicationProperties;
-        this.executor = executor;
         this.dataDao = DaoFactory.getDataDao();
     }
 
@@ -78,78 +77,83 @@ class TrayHandler {
     }
 
     private void addMenuItemsToMenu(PopupMenu popupMenu) {
-        executor.execute(() -> {
-            JobService jobService = uiLauncher.getJobService();
-            ProgramData programData = dataDao.readProgramData();
-            if (programData.getJobParam() != null) {
-                JobParam jobParam = programData.getJobParam();
+        try (ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
+            executor.execute(() -> {
+                JobService jobService = uiLauncher.getJobService();
+                ProgramData programData = dataDao.readProgramData();
+                if (programData.getJobParam() != null) {
+                    JobParam jobParam = programData.getJobParam();
 
-                boolean addSeparator = false;
+                    boolean addSeparator = false;
 
-                if (programData.getLastUploadDateTime() != null && programData.getUploadStatus() != null) {
-                    String uploadInfo = String.format("%s [%s]",
-                            programData.getLastUploadDateTime().format(DaoConstants.DATE_TIME_FORMATTER),
-                            programData.getUploadStatus()
-                    );
-                    popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
-                    addSeparator = true;
+                    if (programData.getLastUploadDateTime() != null && programData.getUploadStatus() != null) {
+                        String uploadInfo = String.format("%s [%s]",
+                                programData.getLastUploadDateTime().format(DaoConstants.DATE_TIME_FORMATTER),
+                                programData.getUploadStatus()
+                        );
+                        popupMenu.add(BundleUtils.getMsg("tray.item.lastUpdate", uploadInfo));
+                        addSeparator = true;
+                    }
+                    if (jobParam.getNextFireDate() != null) {
+                        popupMenu.add(BundleUtils.getMsg(
+                                "tray.item.nextUpdate",
+                                jobParam.getNextFireDate().format(DaoConstants.DATE_TIME_FORMATTER)
+                        ));
+                        addSeparator = true;
+                    }
+
+                    if (jobParam.getJobType() != null) {
+                        Menu jobMenu = new Menu(String.format("%s %s", UploadItemJob.NAME, jobParam.getJobType()));
+
+                        LinkedList<String> labels = JobController.jobTrayLabels(jobParam);
+                        labels.forEach(jobMenu::add);
+                        jobMenu.addSeparator();
+
+                        MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));
+                        cancelJobItem.addActionListener(cancelJobActionListener());
+                        jobMenu.add(cancelJobItem);
+
+                        popupMenu.add(jobMenu);
+                        addSeparator = true;
+                    }
+                    if (addSeparator) {
+                        popupMenu.addSeparator();
+                    }
                 }
-                if (jobParam.getNextFireDate() != null) {
-                    popupMenu.add(BundleUtils.getMsg(
-                            "tray.item.nextUpdate",
-                            jobParam.getNextFireDate().format(DaoConstants.DATE_TIME_FORMATTER)
-                    ));
-                    addSeparator = true;
+
+                MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
+                showItem.addActionListener(showActionListener());
+                popupMenu.add(showItem);
+
+                MenuItem uploadItem = new MenuItem(BundleUtils.getMsg("tray.item.upload"));
+                uploadItem.addActionListener(uploadActionListener());
+                popupMenu.add(uploadItem);
+
+                MenuItem createJobItem = new MenuItem(BundleUtils.getMsg("tray.item.createJob"));
+                createJobItem.addActionListener(createJobActionListener());
+                popupMenu.add(createJobItem);
+
+                if (applicationProperties.isToolkitCredentialsSet()) {
+                    MenuItem goToToolkitItem = new MenuItem(BundleUtils.getMsg("tray.item.goToToolkit"));
+                    goToToolkitItem.addActionListener(createGoToToolkitActionListener());
+                    popupMenu.add(goToToolkitItem);
                 }
 
-                if (jobParam.getJobType() != null) {
-                    Menu jobMenu = new Menu(String.format("%s %s", UploadItemJob.NAME, jobParam.getJobType()));
+                MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(
+                        jobService.isJobExist(JobCreatorFactory.upgradeJobCreator()) ?
+                                "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
+                upgradeItem.addActionListener(upgradeJobActionListener());
+                popupMenu.add(upgradeItem);
+                popupMenu.addSeparator();
 
-                    LinkedList<String> labels = JobController.jobTrayLabels(jobParam);
-                    labels.forEach(jobMenu::add);
-                    jobMenu.addSeparator();
-
-                    MenuItem cancelJobItem = new MenuItem(BundleUtils.getMsg("job.cancel"));
-                    cancelJobItem.addActionListener(cancelJobActionListener());
-                    jobMenu.add(cancelJobItem);
-
-                    popupMenu.add(jobMenu);
-                    addSeparator = true;
-                }
-                if (addSeparator) {
-                    popupMenu.addSeparator();
-                }
-            }
-
-            MenuItem showItem = new MenuItem(BundleUtils.getMsg("tray.item.show"));
-            showItem.addActionListener(showActionListener());
-            popupMenu.add(showItem);
-
-            MenuItem uploadItem = new MenuItem(BundleUtils.getMsg("tray.item.upload"));
-            uploadItem.addActionListener(uploadActionListener());
-            popupMenu.add(uploadItem);
-
-            MenuItem createJobItem = new MenuItem(BundleUtils.getMsg("tray.item.createJob"));
-            createJobItem.addActionListener(createJobActionListener());
-            popupMenu.add(createJobItem);
-
-            if (applicationProperties.isToolkitCredentialsSet()) {
-                MenuItem goToToolkitItem = new MenuItem(BundleUtils.getMsg("tray.item.goToToolkit"));
-                goToToolkitItem.addActionListener(createGoToToolkitActionListener());
-                popupMenu.add(goToToolkitItem);
-            }
-
-            MenuItem upgradeItem = new MenuItem(BundleUtils.getMsg(
-                    jobService.isJobExist(JobCreatorFactory.upgradeJobCreator()) ?
-                    "tray.item.upgradeJobDisable" : "tray.item.upgradeJobEnable"));
-            upgradeItem.addActionListener(upgradeJobActionListener());
-            popupMenu.add(upgradeItem);
-            popupMenu.addSeparator();
-
-            MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
-            closeItem.addActionListener(closeActionListener());
-            popupMenu.add(closeItem);
-        });
+                MenuItem closeItem = new MenuItem(BundleUtils.getMsg("tray.item.close"));
+                closeItem.addActionListener(closeActionListener());
+                popupMenu.add(closeItem);
+            });
+            executor.shutdown();
+        } catch (Exception ex) {
+            logger.error("Error when creating tray.", ex);
+        }
     }
 
     private ActionListener createGoToToolkitActionListener() {
@@ -213,9 +217,14 @@ class TrayHandler {
     }
 
     private ActionListener uploadActionListener() {
-        return e -> executor.execute(() ->
-                new MultiConfigRunner(applicationProperties.getRunConfigMap().keySet(), executor, RunType.TRAY).start()
-        );
+        return _ -> {
+            try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+                executor.execute(() -> new MultiConfigRunner(applicationProperties.getRunConfigMap().keySet(), RunType.TRAY).start());
+                executor.shutdown();
+            } catch (Exception ex) {
+                logger.error("Error when uploading tray.", ex);
+            }
+        };
     }
 
     private ActionListener cancelJobActionListener() {

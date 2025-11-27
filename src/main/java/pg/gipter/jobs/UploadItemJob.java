@@ -1,11 +1,7 @@
 package pg.gipter.jobs;
 
 import javafx.application.Platform;
-import org.quartz.CronExpression;
-import org.quartz.Job;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.FlowType;
@@ -14,22 +10,13 @@ import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.services.CookiesService;
-import pg.gipter.services.FXWebService;
-import pg.gipter.services.ToolkitService;
-import pg.gipter.ui.MultiConfigRunner;
-import pg.gipter.ui.RunType;
-import pg.gipter.ui.UILauncher;
+import pg.gipter.services.*;
+import pg.gipter.ui.*;
 
 import java.text.ParseException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class UploadItemJob implements Job {
 
@@ -89,9 +76,7 @@ public class UploadItemJob implements Job {
 
         UILauncher uiLauncher = (UILauncher) jobDataMap.get(UILauncher.class.getName());
 
-        new MultiConfigRunner(
-                jobParam.getConfigs(), uiLauncher.nonUIExecutor(), RunType.UPLOAD_ITEM_JOB, startDate
-        ).start();
+        new MultiConfigRunner(jobParam.getConfigs(), RunType.UPLOAD_ITEM_JOB, startDate).start();
 
         logger.info("{} finished {}.", NAME, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         dataDao.saveNextUploadDateTime(nextUploadDate);

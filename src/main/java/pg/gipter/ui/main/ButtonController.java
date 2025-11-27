@@ -73,7 +73,6 @@ public class ButtonController extends AbstractController {
 
         MultiConfigRunner runner = new MultiConfigRunner(
                 Stream.of(uiAppProperties).collect(toList()),
-                uiLauncher.nonUIExecutor(),
                 RunType.EXECUTE
         );
         mainController.resetIndicatorProperties(runner);
@@ -87,7 +86,7 @@ public class ButtonController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> executeAllActionEventHandler() {
-        return event -> executeAll();
+        return _ -> executeAll();
     }
 
     void executeAll() {
@@ -96,7 +95,7 @@ public class ButtonController extends AbstractController {
         Map<String, ApplicationProperties> map = CacheManager.getAllApplicationProperties();
         map.put(uiAppProperties.configurationName(), uiAppProperties);
 
-        MultiConfigRunner runner = new MultiConfigRunner(map.values(), uiLauncher.nonUIExecutor(), RunType.EXECUTE_ALL);
+        MultiConfigRunner runner = new MultiConfigRunner(map.values(), RunType.EXECUTE_ALL);
         mainController.resetIndicatorProperties(runner);
         uiLauncher.executeOutsideUIThread(() -> {
             runner.call();

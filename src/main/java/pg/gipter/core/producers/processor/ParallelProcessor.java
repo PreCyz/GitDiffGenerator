@@ -10,33 +10,26 @@ import pg.gipter.toolkit.HttpRequester;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
+import java.util.concurrent.*;
 
 class ParallelProcessor {
 
     private final static Logger logger = LoggerFactory.getLogger(ParallelProcessor.class);
 
-    private final ExecutorService executor;
     private final ApplicationProperties applicationProperties;
 
     public ParallelProcessor(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     List<Path> downloadFiles(List<DownloadDetails> downloadDetails) {
-        CompletionService<Path> ecs = new ExecutorCompletionService<>(executor);
-        downloadDetails.forEach(downloadDetail ->
-                ecs.submit(() -> new HttpRequester(applicationProperties).downloadFile(downloadDetail))
-        );
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+        ExecutorCompletionService<Path> ecs = new ExecutorCompletionService<>(executor);
+        for (DownloadDetails downloadDetail : downloadDetails) {
+            ecs.submit(() -> new HttpRequester(applicationProperties).downloadFile(downloadDetail));
+        }
+        executor.shutdown();
 
         int numberOfCalls = downloadDetails.size();
         List<Path> result = new ArrayList<>(numberOfCalls);
@@ -51,8 +44,10 @@ class ParallelProcessor {
     }
 
     List<JsonObject> processConfigs(List<SharePointConfig> sharePointConfigs) {
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
         CompletionService<JsonObject> ecs = new ExecutorCompletionService<>(executor);
         sharePointConfigs.forEach(scp -> ecs.submit(() -> new HttpRequester(applicationProperties).executeGET(scp)));
+        executor.shutdown();
 
         List<JsonObject> result = new LinkedList<>();
         for (int i = 0; i < sharePointConfigs.size(); i++) {
@@ -62,14 +57,14 @@ class ParallelProcessor {
                 logger.error("Error when getting items.", e);
             }
         }
-        executor.shutdown();
         return result;
     }
 
     List<ItemCountResponse> processMap(Map<CustomizedTuple, String> projectUrlsMap) {
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
         CompletionService<ItemCountResponse> ecs = new ExecutorCompletionService<>(executor);
-
         projectUrlsMap.forEach((listAndProject, fullUrl) -> ecs.submit(() -> getItemCountResponse(listAndProject, fullUrl)));
+        executor.shutdown();
 
         List<ItemCountResponse> result = new LinkedList<>();
         for (int i = 0; i < projectUrlsMap.size(); i++) {
