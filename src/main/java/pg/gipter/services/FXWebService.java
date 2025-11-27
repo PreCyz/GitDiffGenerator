@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -42,7 +43,6 @@ public class FXWebService {
     private WebEngine webEngine;
     private FlowType flowType;
     private JobDataMap jobDataMap;
-    private final ExecutorService executorService;
     private Label label;
     private boolean iconified = false;
     private static boolean running = false;
@@ -57,7 +57,6 @@ public class FXWebService {
 
     public FXWebService(Stage stage) {
         this.stage = stage;
-        executorService = ConcurrentService.getInstance().executor();
     }
     public FXWebService(JobDataMap jobDataMap) {
         this(new Stage());
@@ -141,7 +140,12 @@ public class FXWebService {
             }
             case JOB -> {
                 logger.info("Webview opened from JOB. Continuing job.");
-                executorService.submit(this::continueJob, Void.class);
+                try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+                    executorService.submit(this::continueJob, Void.class);
+                    executorService.shutdown();
+                } catch (Exception e) {
+                    logger.error("Error when Webview opened from JOB.", e);
+                }
             }
             case MISSED_JOB -> {
                 logger.info("Webview opened from {}. Continuing missed job.", flowType);

@@ -20,16 +20,11 @@ import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.Executor;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class JobService {
 
@@ -64,7 +59,7 @@ public class JobService {
         return jobCreator.getJobParam();
     }
 
-    public void executeUploadJobIfMissed(Executor executor) {
+    public void executeUploadJobIfMissed() {
         try {
             DataDao dataDao = DaoFactory.getDataDao();
             final Optional<JobParam> jobParamOpt = dataDao.loadJobParam();
@@ -106,12 +101,17 @@ public class JobService {
 
                     if (shouldExecute) {
                         if (!jobParam.getConfigs().isEmpty()) {
-                            final LocalDate start = LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth());
-                            if (!CookiesService.hasValidCookies()) {
-                                FXWebService fxWebService = new FXWebService().initMinimizedSSO(FlowType.MISSED_JOB);
-                                executor.execute(() -> delayExecuteMissedJob(fxWebService, executor, jobParam, start));
-                            } else {
-                                executor.execute(() -> executeMissedJob(executor, jobParam, start));
+                            try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+                                final LocalDate start = LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth());
+                                if (!CookiesService.hasValidCookies()) {
+                                    FXWebService fxWebService = new FXWebService().initMinimizedSSO(FlowType.MISSED_JOB);
+                                    executor.execute(() -> delayExecuteMissedJob(fxWebService, jobParam, start));
+                                } else {
+                                    executor.execute(() -> executeMissedJob(jobParam, start));
+                                }
+                                executor.shutdown();
+                            } catch (Exception ex) {
+                                logger.error(ex.getMessage(), ex);
                             }
                         } else {
                             logger.warn("From some reason the job is defined but without any specific configurations. I do not know how this happened and can do nothing with it.");
@@ -141,7 +141,7 @@ public class JobService {
         }
     }
 
-    private void executeMissedJob(Executor executor, JobParam jobParam, LocalDate startDate) {
+    private void executeMissedJob(JobParam jobParam, LocalDate startDate) {
         logger.info("Fixing missed job execution for following configs [{}].", jobParam.getConfigs());
         List<ApplicationProperties> applicationPropertiesCollection = new ArrayList<>(jobParam.getConfigs().size());
         for (String configName : jobParam.getConfigs()) {
@@ -153,10 +153,10 @@ public class JobService {
                 );
             }
         }
-        new MultiConfigRunner(applicationPropertiesCollection, executor, RunType.FIXING_JOB_EXECUTION).start();
+        new MultiConfigRunner(applicationPropertiesCollection, RunType.FIXING_JOB_EXECUTION).start();
     }
 
-    private void delayExecuteMissedJob(FXWebService fxWebService, Executor executor, JobParam jobParam, LocalDate startDate) {
+    private void delayExecuteMissedJob(FXWebService fxWebService, JobParam jobParam, LocalDate startDate) {
         LocalDateTime waitStart = LocalDateTime.now();
         while (FXWebService.isRunning() && waitStart.isAfter(LocalDateTime.now().minusMinutes(1))) {
             try {
@@ -171,6 +171,6 @@ public class JobService {
             logger.warn("Authentication process is not successful. Fix is terminated.");
             return;
         }
-        executeMissedJob(executor, jobParam, startDate);
+        executeMissedJob(jobParam, startDate);
     }
 }

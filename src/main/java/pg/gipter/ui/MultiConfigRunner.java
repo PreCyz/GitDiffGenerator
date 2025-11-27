@@ -35,7 +35,6 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
     private static final Logger logger = LoggerFactory.getLogger(MultiConfigRunner.class);
 
     private final LinkedList<String> configurationNames;
-    private final Executor executor;
     private static Boolean toolkitCredentialsSet = null;
     private final Map<String, UploadResult> resultMap = new LinkedHashMap<>();
     private Collection<ApplicationProperties> applicationPropertiesCollection;
@@ -45,14 +44,13 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
     private final LocalDate startDate;
     private WebViewService webViewService;
 
-    public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType) {
-        this(configurationNames, executor, runType, null);
+    public MultiConfigRunner(Set<String> configurationNames, RunType runType) {
+        this(configurationNames, runType, null);
     }
 
-    public MultiConfigRunner(Set<String> configurationNames, Executor executor, RunType runType, LocalDate startDate) {
+    public MultiConfigRunner(Set<String> configurationNames, RunType runType, LocalDate startDate) {
         super();
         this.configurationNames = new LinkedList<>(configurationNames);
-        this.executor = executor;
         this.applicationPropertiesCollection = Collections.emptyList();
         this.configurationDao = DaoFactory.getCachedConfiguration();
         this.dataDao = DaoFactory.getDataDao();
@@ -60,12 +58,11 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
         this.startDate = startDate;
     }
 
-    public MultiConfigRunner(Collection<ApplicationProperties> applicationPropertiesCollection, Executor executor, RunType runType) {
+    public MultiConfigRunner(Collection<ApplicationProperties> applicationPropertiesCollection, RunType runType) {
         this(
                 applicationPropertiesCollection.stream()
                         .map(ApplicationProperties::configurationName)
                         .collect(toCollection(LinkedHashSet::new)),
-                executor,
                 runType
         );
         this.applicationPropertiesCollection = applicationPropertiesCollection;
@@ -116,6 +113,7 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
     }
 
     private void executeForNames() throws InterruptedException, ExecutionException {
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
         List<CompletableFuture<Boolean>> tasks = new LinkedList<>();
         for (String configName : configurationNames) {
             if (isToolkitCredentialsSet()) {
@@ -140,10 +138,12 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
             }
         }
         CompletableFuture.allOf(tasks.toArray(new CompletableFuture<?>[0])).get();
+        executor.shutdown();
     }
 
     private void executeForApplicationProperties() throws InterruptedException, ExecutionException {
         List<CompletableFuture<Boolean>> tasks = new LinkedList<>();
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
         for (ApplicationProperties applicationProperties : applicationPropertiesCollection) {
             String configName = applicationProperties.configurationName();
@@ -167,6 +167,7 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
             }
             CompletableFuture.allOf(tasks.toArray(new CompletableFuture<?>[0])).get();
         }
+        executor.shutdown();
     }
 
     private boolean isConfirmationWindow() {
@@ -243,16 +244,21 @@ public class MultiConfigRunner extends UpdatableTask<Void> implements Starter {
     }
 
     private void updateStatistics(final UploadStatus status, final List<ExceptionDetails> exceptionDetails) {
-        executor.execute(() -> {
-            StatisticService statisticService = new StatisticService();
-            LinkedList<ApplicationProperties> appProps = new LinkedList<>(applicationPropertiesCollection);
-            if (appProps.isEmpty()) {
-                for (String configName : configurationNames) {
-                    appProps.add(ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configName)));
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            executor.execute(() -> {
+                StatisticService statisticService = new StatisticService();
+                LinkedList<ApplicationProperties> appProps = new LinkedList<>(applicationPropertiesCollection);
+                if (appProps.isEmpty()) {
+                    for (String configName : configurationNames) {
+                        appProps.add(ApplicationPropertiesFactory.getInstance(configurationDao.loadArgumentArray(configName)));
+                    }
                 }
-            }
-            statisticService.updateStatistics(new RunDetails(appProps, status, runType, exceptionDetails));
-        });
+                statisticService.updateStatistics(new RunDetails(appProps, status, runType, exceptionDetails));
+            });
+            executor.shutdown();
+        } catch (Exception ex) {
+            logger.error("Diff upload failure.", ex);
+        }
     }
 
     private UploadStatus calculateFinalStatus() {

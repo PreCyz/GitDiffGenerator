@@ -4,37 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.dao.command.CustomCommand;
-import pg.gipter.core.producers.command.DiffCommand;
-import pg.gipter.core.producers.command.DiffCommandFactory;
-import pg.gipter.core.producers.command.VersionControlSystem;
+import pg.gipter.core.producers.command.*;
 import pg.gipter.core.producers.vcs.VCSVersionProducer;
 import pg.gipter.core.producers.vcs.VCSVersionProducerFactory;
-import pg.gipter.services.ConcurrentService;
 import pg.gipter.ui.task.UpdatableTask;
 import pg.gipter.utils.SystemUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
+import java.nio.file.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 import static java.util.stream.Collectors.joining;
 
@@ -42,12 +22,10 @@ abstract class AbstractDiffProducer implements DiffProducer {
 
     protected final ApplicationProperties applicationProperties;
     protected final Logger logger;
-    private final Executor executor;
     private UpdatableTask<Void> task;
 
     AbstractDiffProducer(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        this.executor = ConcurrentService.getInstance().executor();
         logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -115,10 +93,12 @@ abstract class AbstractDiffProducer implements DiffProducer {
              InputStreamReader isr = new InputStreamReader(is);
              BufferedReader br = new BufferedReader(isr)) {
 
+            ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
             Future<String> future = new ExecutorCompletionService<String>(executor).submit(() -> br.lines()
                     .filter(Objects::nonNull)
                     .collect(joining(SystemUtils.lineSeparator()))
             );
+            executor.shutdown();
 
             final int interval = 500;
             int timeout = 0;
@@ -247,8 +227,10 @@ abstract class AbstractDiffProducer implements DiffProducer {
     }
 
     private List<DiffDetails> processCallable(List<Callable<DiffDetails>> diffs) {
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         CompletionService<DiffDetails> completionService = new ExecutorCompletionService<>(executor);
         diffs.forEach(completionService::submit);
+        executor.shutdown();
 
         List<DiffDetails> result = new ArrayList<>(diffs.size());
         for (int i = 0; i < diffs.size(); i++) {

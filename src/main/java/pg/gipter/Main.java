@@ -53,7 +53,7 @@ public class Main extends Application {
         mObj.setLoggerLevel(applicationProperties.loggerLevel());
         logger.info("Java version [{}].", SystemUtils.javaVersion());
         logger.info("Version of application [{}].", applicationProperties.version().getVersion());
-        logger.info("Gipter can use [{}] threads.", ConcurrentService.getInstance().availableThreads());
+        logger.info("Gipter can use [{}] threads.", Runtime.getRuntime().availableProcessors());
         mObj.runConverters(applicationProperties);
         mObj.setDefaultConfig();
 

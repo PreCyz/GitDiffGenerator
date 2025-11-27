@@ -20,7 +20,8 @@ import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.jobs.*;
 import pg.gipter.launchers.Launcher;
-import pg.gipter.services.*;
+import pg.gipter.services.GithubService;
+import pg.gipter.services.StartupService;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.ui.alerts.controls.ControlFactory;
 import pg.gipter.utils.*;
@@ -30,7 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.Executor;
+import java.util.concurrent.*;
 
 /** Created by Gawa 2017-10-04 */
 public class UILauncher implements Launcher {
@@ -52,7 +53,6 @@ public class UILauncher implements Launcher {
     private boolean silentMode;
     private boolean upgradeChecked = false;
     private LocalDateTime lastItemSubmissionDate;
-    private final Executor executor;
     private final JobService jobService;
     private Properties wizardProperties;
 
@@ -62,7 +62,6 @@ public class UILauncher implements Launcher {
         configurationDao = DaoFactory.getCachedConfiguration();
         dataDao = DaoFactory.getDataDao();
         silentMode = applicationProperties.isSilentMode();
-        this.executor = ConcurrentService.getInstance().executor();
         jobService = new JobService();
     }
 
@@ -102,15 +101,15 @@ public class UILauncher implements Launcher {
     }
 
     public void executeOutsideUIThread(Runnable runnable) {
-        executor.execute(runnable);
+        Thread.ofPlatform().start(runnable);
     }
 
     public Executor nonUIExecutor() {
-        return executor;
+        return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     public void initTrayHandler() {
-        trayHandler = new TrayHandler(this, applicationProperties, executor);
+        trayHandler = new TrayHandler(this, applicationProperties);
         if (trayHandler.tryIconExists()) {
             logger.info("Updating tray icon. Silent mode [{}].", silentMode);
             trayHandler.updateTrayLabels();
@@ -151,27 +150,30 @@ public class UILauncher implements Launcher {
 
     private void checkUpgrades() {
         if (!upgradeChecked) {
-            executor.execute(() -> {
-                final GithubService service = new GithubService(applicationProperties.version(), applicationProperties.githubToken());
-                if (service.isNewVersion()) {
-                    if (applicationProperties.uiTheme() == UITheme.DEFAULT) {
-                        Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
-                    } else {
-                        Application.setUserAgentStylesheet(applicationProperties.uiTheme().userAgentStylesheet());
+            try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                executor.execute(() -> {
+                    final GithubService service = new GithubService(applicationProperties.version(), applicationProperties.githubToken());
+                    if (service.isNewVersion()) {
+                        if (applicationProperties.uiTheme() == UITheme.DEFAULT) {
+                            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+                        } else {
+                            Application.setUserAgentStylesheet(applicationProperties.uiTheme().userAgentStylesheet());
+                        }
+                        logger.info("New version available: {}.", service.getServerVersion());
+                        Platform.runLater(() -> new AlertWindowBuilder()
+                                .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
+                                .withMessage(service.getReleaseNotes().orElse(""))
+                                .withAlertType(Alert.AlertType.INFORMATION)
+                                .withCustomControl(ControlFactory.createUpgradeButton(this))
+                                .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
+                                .withUITheme(applicationProperties.uiTheme())
+                                .buildAndDisplayWindow()
+                        );
                     }
-                    logger.info("New version available: {}.", service.getServerVersion());
-                    Platform.runLater(() -> new AlertWindowBuilder()
-                            .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", service.getServerVersion()))
-                            .withMessage(service.getReleaseNotes().orElse(""))
-                            .withAlertType(Alert.AlertType.INFORMATION)
-                            .withCustomControl(ControlFactory.createUpgradeButton(this))
-                            .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
-                            .withUITheme(applicationProperties.uiTheme())
-                            .buildAndDisplayWindow()
-                    );
-                }
-            });
-            upgradeChecked = true;
+                });
+                upgradeChecked = true;
+                executor.shutdown();
+            }
         }
     }
 
@@ -189,7 +191,7 @@ public class UILauncher implements Launcher {
     private void scheduleJobs() {
         scheduleUploadJob();
         scheduleUpgradeJob();
-        jobService.executeUploadJobIfMissed(executor);
+        jobService.executeUploadJobIfMissed();
         if (applicationProperties.isCheckLastItemEnabled()) {
             scheduleCheckLastItemJob();
         }
