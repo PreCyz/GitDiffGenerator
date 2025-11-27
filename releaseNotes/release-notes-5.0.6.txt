@@ -1,6 +1,6 @@
 **Release notes:**
 Improvements:
-* Proper executor service shoutdown.
+* Proper executor service shutdown.
 
 Fixes:
 * Fixing toolkit upload.
