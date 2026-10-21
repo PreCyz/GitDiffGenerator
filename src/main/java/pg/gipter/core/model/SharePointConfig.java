@@ -20,8 +20,6 @@ public class SharePointConfig {
     private Set<String> listNames;
     private transient String fullRequestUrl;
     private String formDigest;
-    private String fedAuth;
-    private String gotoCookie;
 
     public SharePointConfig() {
         listNames = Stream.of(ArgName.toolkitProjectListNames.defaultValue()).collect(toCollection(LinkedHashSet::new));
@@ -34,28 +32,21 @@ public class SharePointConfig {
         listNames = sharePointConfig.getListNames();
         fullRequestUrl = sharePointConfig.getFullRequestUrl();
         formDigest = sharePointConfig.getFormDigest();
-        fedAuth = sharePointConfig.getFedAuth();
-        gotoCookie = sharePointConfig.getGoto();
     }
 
     public SharePointConfig(String url, String fullRequestUrl) {
-        this("", url, fullRequestUrl, null, null, null);
-    }
-    public SharePointConfig(String url, String fullRequestUrl, String fedAuth, String gotoCookie) {
-        this("", url, fullRequestUrl, null, fedAuth, gotoCookie);
+        this("", url, fullRequestUrl, null);
     }
 
-    public SharePointConfig(String url, String fullRequestUrl, String fedAuth, String gotoCookie, String formDigest) {
-        this("", url, fullRequestUrl, formDigest, fedAuth, gotoCookie);
+    public SharePointConfig(String url, String fullRequestUrl, String formDigest) {
+        this("", url, fullRequestUrl, formDigest);
     }
 
-    public SharePointConfig(String name, String url, String fullRequestUrl, String formDigest, String fedAuth, String gotoCookie) {
+    public SharePointConfig(String name, String url, String fullRequestUrl, String formDigest) {
         this.name = name;
         this.url = url;
         this.fullRequestUrl = fullRequestUrl;
         this.formDigest = formDigest;
-        this.fedAuth = fedAuth;
-        this.gotoCookie = gotoCookie;
     }
 
     public String getName() {
@@ -106,22 +97,6 @@ public class SharePointConfig {
         this.formDigest = formDigest;
     }
 
-    public String getFedAuth() {
-        return fedAuth;
-    }
-
-    public void setFedAuth(String fedAuth) {
-        this.fedAuth = fedAuth;
-    }
-
-    public String getGoto() {
-        return gotoCookie;
-    }
-
-    public void setGoto(String gotoCookie) {
-        this.gotoCookie = gotoCookie;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -131,15 +106,13 @@ public class SharePointConfig {
                 Objects.equals(getUrl(), that.getUrl()) &&
                 Objects.equals(getProject(), that.getProject()) &&
                 Objects.equals(getListNames(), that.getListNames()) &&
-                Objects.equals(getFormDigest(), that.getFormDigest()) &&
-                Objects.equals(getFedAuth(), that.getFedAuth()) &&
-                Objects.equals(getGoto(), that.getGoto());
+                Objects.equals(getFormDigest(), that.getFormDigest());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                getName(), getUrl(), getProject(), getListNames(), getFormDigest(), getFedAuth(), getGoto()
+                getName(), getUrl(), getProject(), getListNames(), getFormDigest()
         );
     }
 
@@ -151,8 +124,6 @@ public class SharePointConfig {
                 ", listName='" + getListNames() + '\'' +
                 ", fullRequestUrl='" + getFullRequestUrl() + '\'' +
                 ", formDigest='" + getFormDigest() + '\'' +
-                ", FedAuth='" + getFedAuth() + '\'' +
-                ", Goto='" + getGoto() + '\'' +
                 '}';
     }
 }

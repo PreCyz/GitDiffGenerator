@@ -9,8 +9,6 @@ import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.processor.DownloadDetails;
 
 import java.io.*;
-import java.net.URI;
-import java.net.http.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
@@ -18,7 +16,6 @@ import java.util.*;
 public class HttpRequester {
 
     protected final static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
-    private static final HttpClient CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
     private final ApplicationProperties applicationProperties;
 
@@ -31,132 +28,84 @@ public class HttpRequester {
     }
 
     public JsonObject executeGET(SharePointConfig sharePointConfig) throws IOException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(replaceSpaces(sharePointConfig.getFullRequestUrl())))
-                .GET()
-                .header("Accept", "application/json;odata=verbose")
-                .header("Cookie", sharePointConfig.getFedAuth() + "; " + sharePointConfig.getGoto())
-                .build();
-        logRequest(request);
-
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            try (InputStream inputStream = res.body();
-                 Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                logResponse(res);
-                JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                logIfError(result);
-                return result;
-            }
-        } catch (InterruptedException e) {
-            throw new IOException(e);
-        }
-    }
-
-    private void logRequest(HttpRequest request) {
-        HashMap<String, List<String>> headers = new HashMap<>(request.headers().map());
-        headers.replace("Cookie", List.of("***"));
-        headers.replace("X-RequestDigest", List.of("***"));
-        logger.info("Executing request: {} {} {} Headers: {}",
-                request.version().map(Enum::toString).orElse(""),
-                request.method(),
-                request.uri().toString(),
-                headers
+        EdgeCdpClient.Response response = send(
+                "GET",
+                replaceSpaces(sharePointConfig.getFullRequestUrl()),
+                Map.of("Accept", "application/json;odata=verbose"),
+                null
         );
+        JsonObject result = toJson(response);
+        logIfError(result);
+        return result;
     }
 
-    private void logResponse(HttpResponse<?> res) {
-        logger.info("Response: {} {}", res.version(), res.statusCode());
+    private EdgeCdpClient.Response send(
+            String method, String url, Map<String, String> headers, byte[] body
+    ) throws IOException {
+        Map<String, String> safeHeaders = Optional.ofNullable(headers).orElseGet(HashMap::new);
+        Map<String, String> loggedHeaders = new HashMap<>(safeHeaders);
+        loggedHeaders.replace("X-RequestDigest", "***");
+        logger.info("Executing request: {} {} Headers: {}", method, url, loggedHeaders);
+
+        EdgeCdpClient.Response response = EdgeCdpClient.request(method, url, safeHeaders, body);
+        logger.info("Response: {}", response.status());
+        return response;
+    }
+
+    private JsonObject toJson(EdgeCdpClient.Response response) {
+        return new Gson().fromJson(new String(response.body(), StandardCharsets.UTF_8), JsonObject.class);
     }
 
     public Path downloadFile(DownloadDetails downloadDetails) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(replaceSpaces(downloadDetails.getDownloadLink())))
-                .GET()
-                .header("Cookie", downloadDetails.getSharePointConfig().getFedAuth())
-                .build();
-        logRequest(request);
-
-        String callId = this.toString().substring(this.toString().lastIndexOf("@") + 1);
-        logger.info("Executing request {} {}", callId, request.uri());
-
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            logResponse(res);
-            String downloadFilePath = applicationProperties.itemPath()
-                    .substring(0, applicationProperties.itemPath().lastIndexOf(File.separator));
-            Path downloadedPath = Paths.get(downloadFilePath, downloadDetails.getFileName());
-            Files.copy(res.body(), downloadedPath);
-            return downloadedPath;
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
-        }
+        EdgeCdpClient.Response response = send(
+                "GET", replaceSpaces(downloadDetails.getDownloadLink()), Map.of(), null
+        );
+        String downloadFilePath = applicationProperties.itemPath()
+                .substring(0, applicationProperties.itemPath().lastIndexOf(File.separator));
+        Path downloadedPath = Paths.get(downloadFilePath, downloadDetails.getFileName());
+        Files.write(downloadedPath, response.body(), StandardOpenOption.CREATE_NEW);
+        return downloadedPath;
     }
 
     public JsonObject executePOST(
             SharePointConfig sharePointConfig, JsonObject jsonObject, Map<String, String> requestHeaders
     ) throws IOException {
+        Map<String, String> headers = new HashMap<>(Optional.ofNullable(requestHeaders).orElseGet(HashMap::new));
+        headers.put("X-RequestDigest", sharePointConfig.getFormDigest());
 
-        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-                .uri(URI.create(replaceSpaces(sharePointConfig.getFullRequestUrl())))
-                .POST(HttpRequest.BodyPublishers.noBody());
-
+        byte[] body = null;
         if (jsonObject != null) {
             logger.info("Request json: {}", jsonObject);
-            requestBuilder.POST(HttpRequest.BodyPublishers.ofString(jsonObject.toString()));
+            body = jsonObject.toString().getBytes(StandardCharsets.UTF_8);
         }
 
-        if (requestHeaders != null) {
-            requestHeaders.forEach(requestBuilder::header);
-        }
-        requestBuilder.header("X-RequestDigest", sharePointConfig.getFormDigest());
-
-        HttpRequest request = requestBuilder.build();
-        logRequest(request);
-
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            logResponse(res);
-            if (res.statusCode() != 204) {
-                try (InputStream inputStream = res.body();
-                     Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                    JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                    logIfError(result);
-                    return result;
-                }
-            }
+        EdgeCdpClient.Response response = send(
+                "POST", replaceSpaces(sharePointConfig.getFullRequestUrl()), headers, body
+        );
+        if (response.status() == 204) {
             return new JsonObject();
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
         }
+        JsonObject result = toJson(response);
+        logIfError(result);
+        return result;
     }
 
     public JsonObject executePOST(SharePointConfig sharePointConfig, File attachment) throws IOException {
         logger.info("Attachment: {}", attachment.getAbsolutePath());
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(replaceSpaces(replaceSpaces(sharePointConfig.getFullRequestUrl()))))
-                .POST(HttpRequest.BodyPublishers.ofFile(attachment.toPath()))
-                .header("Content-Type", "application/octet-stream")
-                .header("Accept", "application/json")
-                .header("X-RequestDigest", sharePointConfig.getFormDigest())
-                .header("Cookie", sharePointConfig.getFedAuth() + "; " +  sharePointConfig.getGoto())
-                .build();
-        logRequest(request);
-
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
-            try (InputStream inputStream = res.body();
-                 Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                logResponse(res);
-                JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                logIfError(result);
-                return result;
-            }
-        } catch (InterruptedException e) {
-            throw new IOException(e);
-        }
+        EdgeCdpClient.Response response = send(
+                "POST",
+                replaceSpaces(sharePointConfig.getFullRequestUrl()),
+                Map.of(
+                        "Content-Type", "application/octet-stream",
+                        "Accept", "application/json",
+                        "X-RequestDigest", sharePointConfig.getFormDigest()
+                ),
+                Files.readAllBytes(attachment.toPath())
+        );
+        JsonObject result = toJson(response);
+        logIfError(result);
+        return result;
     }
 
     private void logIfError(JsonObject result) {
@@ -172,79 +121,39 @@ public class HttpRequester {
     }
 
     public String requestDigest(SharePointConfig sharePointConfig) throws IOException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(sharePointConfig.getFullRequestUrl()))
-                .POST(HttpRequest.BodyPublishers.noBody())
-                .header("Accept", "application/json;odata=verbose")
-                .header("X-ClientService-ClientTag", "SDK-JAVA")
-                .header("Cookie", sharePointConfig.getFedAuth() + "; " +  sharePointConfig.getGoto())
-                .build();
-        logRequest(request);
-
-        try {
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-
-            try (InputStream inputStream = res.body();
-                 Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                JsonObject result = new Gson().fromJson(reader, JsonObject.class);
-                return result.get("d").getAsJsonObject()
-                        .get("GetContextWebInformation").getAsJsonObject()
-                        .get("FormDigestValue").getAsString();
-            }
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
-        }
+        EdgeCdpClient.Response response = send(
+                "POST",
+                sharePointConfig.getFullRequestUrl(),
+                Map.of(
+                        "Accept", "application/json;odata=verbose",
+                        "X-ClientService-ClientTag", "SDK-JAVA"
+                ),
+                null
+        );
+        return toJson(response).get("d").getAsJsonObject()
+                .get("GetContextWebInformation").getAsJsonObject()
+                .get("FormDigestValue").getAsString();
     }
 
     public <T> T post(String url, Map<String, String> headers, Object payload, Class<T> expectedType) throws IOException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(payload)));
-        headers.forEach(builder::header);
-        HttpRequest request = builder.build();
-        return executeRequest(expectedType, request);
+        EdgeCdpClient.Response response = send(
+                "POST", url, headers, new Gson().toJson(payload).getBytes(StandardCharsets.UTF_8)
+        );
+        return fromJson(response, expectedType);
     }
 
     public int getForStatusCode(String url, Map<String, String> headers) throws IOException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET();
-
-        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(builder::header);
-        HttpRequest request = builder.build();
-        logRequest(request);
-
-        try {
-            HttpResponse<String> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            logResponse(res);
-            return res.statusCode();
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
-        }
+        return send("GET", url, headers, null).status();
     }
 
     public <T> T get(String url, Map<String, String> headers, Class<T> expectedType) throws IOException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET();
-        Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(builder::header);
-        HttpRequest request = builder.build();
-        return executeRequest(expectedType, request);
+        return fromJson(send("GET", url, headers, null), expectedType);
     }
 
-    private <T> T executeRequest(Class<T> expectedType, HttpRequest request) throws IOException {
-        try {
-            logRequest(request);
-            HttpResponse<InputStream> res = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            try (InputStream inputStream = res.body();
-                 InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                logResponse(res);
-                Gson gson = new GsonBuilder().create();
-                return gson.fromJson(isr, TypeToken.get(expectedType));
-            }
-        } catch (InterruptedException ex) {
-            throw new IOException(ex);
-        }
+    private <T> T fromJson(EdgeCdpClient.Response response, Class<T> expectedType) {
+        return new GsonBuilder().create().fromJson(
+                new String(response.body(), StandardCharsets.UTF_8), TypeToken.get(expectedType)
+        );
     }
 
 }

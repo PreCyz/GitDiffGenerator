@@ -133,7 +133,7 @@ public abstract class ApplicationProperties {
     }
 
     public final boolean isToolkitCredentialsSet() {
-        return CookiesService.hasValidCookies();
+        return new ToolkitService(this).hasValidToolkitSession();
     }
 
     public final String fileName() {
@@ -298,10 +298,6 @@ public abstract class ApplicationProperties {
 
     public final String toolkitUserEmail() {
         return toolkitUsername().toLowerCase() + argExtractor.emailDomain();
-    }
-
-    public boolean hasConnectionToToolkit() {
-        return CookiesService.hasValidCookies() && new ToolkitService(this).isCookieWorking();
     }
 
     public UITheme uiTheme() {

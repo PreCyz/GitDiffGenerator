@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
-import pg.gipter.services.CookiesService;
 import pg.gipter.toolkit.HttpRequester;
 
 import java.io.IOException;
@@ -80,9 +79,7 @@ class ParallelProcessor {
     private ItemCountResponse getItemCountResponse(CustomizedTuple listAndProject, String fullUrl) throws IOException {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitHostUrl(),
-                fullUrl,
-                CookiesService.getFedAuthString().orElse(""),
-                CookiesService.getGotoString().orElse("")
+                fullUrl
         );
         return new ItemCountResponse(
                 listAndProject.getProject(),

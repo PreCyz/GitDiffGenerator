@@ -6,14 +6,12 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.FlowType;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.data.DataDao;
 import pg.gipter.core.model.RunConfig;
-import pg.gipter.services.CookiesService;
-import pg.gipter.services.FXWebService;
+import pg.gipter.services.ToolkitService;
 import pg.gipter.ui.MultiConfigRunner;
 import pg.gipter.ui.RunType;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
@@ -103,11 +101,10 @@ public class JobService {
                         if (!jobParam.getConfigs().isEmpty()) {
                             try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
                                 final LocalDate start = LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth());
-                                if (!CookiesService.hasValidCookies()) {
-                                    FXWebService fxWebService = new FXWebService().initMinimizedSSO(FlowType.MISSED_JOB);
-                                    executor.execute(() -> delayExecuteMissedJob(fxWebService, jobParam, start));
-                                } else {
+                                if (hasValidToolkitSession(jobParam)) {
                                     executor.execute(() -> executeMissedJob(jobParam, start));
+                                } else {
+                                    logger.warn("Microsoft Edge session is not authenticated. Missed job is not executed.");
                                 }
                                 executor.shutdown();
                             } catch (Exception ex) {
@@ -156,21 +153,10 @@ public class JobService {
         new MultiConfigRunner(applicationPropertiesCollection, RunType.FIXING_JOB_EXECUTION).start();
     }
 
-    private void delayExecuteMissedJob(FXWebService fxWebService, JobParam jobParam, LocalDate startDate) {
-        LocalDateTime waitStart = LocalDateTime.now();
-        while (FXWebService.isRunning() && waitStart.isAfter(LocalDateTime.now().minusMinutes(1))) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                logger.error("Problems with sleeping.", e);
-            }
-        }
-        logger.info("Done waiting for authentication after {} seconds.",
-                Duration.between(waitStart, LocalDateTime.now()).toSeconds());
-        if (!CookiesService.hasValidCookies()) {
-            logger.warn("Authentication process is not successful. Fix is terminated.");
-            return;
-        }
-        executeMissedJob(jobParam, startDate);
+    private boolean hasValidToolkitSession(JobParam jobParam) {
+        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
+                DaoFactory.getCachedConfiguration().loadArgumentArray(jobParam.getConfigs().iterator().next())
+        );
+        return new ToolkitService(applicationProperties).hasValidToolkitSession();
     }
 }

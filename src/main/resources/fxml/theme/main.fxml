@@ -46,12 +46,6 @@
                      <Font size="10.0" />
                   </font>
                </TextField>
-               <Label fx:id="cookieExpiryLabel" layoutX="475.0" layoutY="10.0" wrapText="true">
-                  <styleClass>
-                     <String fx:value="text" />
-                     <String fx:value="accent" />
-                  </styleClass>
-               </Label>
             </AnchorPane>
             <styleClass>
                <String fx:value="elevated-4" />

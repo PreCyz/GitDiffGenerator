@@ -15,7 +15,6 @@ import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.services.DataService;
-import pg.gipter.services.FXWebService;
 import pg.gipter.services.vcs.VcsService;
 import pg.gipter.ui.*;
 import pg.gipter.utils.StringUtils;
@@ -65,8 +64,6 @@ public class MainController extends AbstractController {
     private TextField toolkitUsernameTextField;
     @FXML
     private TextField toolkitFolderNameTextField;
-    @FXML
-    private Label cookieExpiryLabel;
     @FXML
     private ProgressIndicator verifyProgressIndicator;
 
@@ -155,7 +152,6 @@ public class MainController extends AbstractController {
         Map<String, Control> map = new HashMap<>();
         map.put("toolkitUsernameTextField", toolkitUsernameTextField);
         map.put("toolkitFolderNameTextField", toolkitFolderNameTextField);
-        map.put("cookieExpiryLabel", cookieExpiryLabel);
         map.put("verifyProgressIndicator", verifyProgressIndicator);
         return map;
     }
@@ -275,18 +271,7 @@ public class MainController extends AbstractController {
         setDisable(applicationProperties.itemType());
         verifyProgressIndicator.setVisible(true);
 
-        final boolean hasConnection = applicationProperties.hasConnectionToToolkit();
-        if (!hasConnection) {
-            cookieExpiryLabel.textProperty().addListener(_ -> disableExecutionButtons(false));
-            new FXWebService().initSSO(cookieExpiryLabel);
-            disableExecutionButtons(true);
-        }
         verifyProgressIndicator.setVisible(false);
-    }
-
-    private void disableExecutionButtons(boolean value) {
-        executeButton.setDisable(value);
-        executeAllButton.setDisable(value);
     }
 
     private void setAccelerators() {

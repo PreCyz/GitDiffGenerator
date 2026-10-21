@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.CookiesService;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.utils.StringUtils;
 
@@ -58,9 +57,7 @@ class ToolkitDocumentFinder extends AbstractDocumentFinder {
                 );
                 SharePointConfig sharePointConfig = new SharePointConfig(
                         applicationProperties.toolkitHostUrl(),
-                        fullUrl,
-                        CookiesService.getFedAuthString().orElse(""),
-                        CookiesService.getGotoString().orElse("")
+                        fullUrl
                 );
                 sharePointConfig.setProject(project);
                 sharePointConfig.setListNames(Stream.of(listTitle).collect(toSet()));

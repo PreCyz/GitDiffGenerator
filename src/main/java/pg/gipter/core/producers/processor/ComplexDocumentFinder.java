@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.CookiesService;
 import pg.gipter.toolkit.dto.DocumentDetails;
 import pg.gipter.utils.StringUtils;
 
@@ -75,9 +74,7 @@ class ComplexDocumentFinder extends AbstractDocumentFinder {
                     String fullRequestUrl = buildPageableUrl(response.getProject(), response.getListName(), TOP_LIMIT * i);
                     SharePointConfig sharePointConfig = new SharePointConfig(
                             applicationProperties.toolkitHostUrl(),
-                            fullRequestUrl,
-                            CookiesService.getFedAuthString().orElse(""),
-                            CookiesService.getGotoString().orElse("")
+                            fullRequestUrl
                     );
                     sharePointConfigs.add(sharePointConfig);
                 }

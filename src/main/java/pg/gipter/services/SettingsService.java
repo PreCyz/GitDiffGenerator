@@ -3,18 +3,13 @@ package pg.gipter.services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.ArgName;
+import pg.gipter.toolkit.EdgeCdpClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
+import java.util.Map;
 
 public class SettingsService {
 
@@ -24,26 +19,13 @@ public class SettingsService {
         String url = ArgName.toolkitSiteAssetsUrl.defaultValue() + assetName;
         File destination = Paths.get(".", assetName).toFile();
 
-        HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .header("Cookie", CookiesService.getFedAuthString().orElse("") + "; " + CookiesService.getGotoString().orElse(""))
-                .build();
-
-        try {
-            HttpResponse<InputStream> res = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            logger.info("Response [{}]: {} {}", url, res.version().name(), res.statusCode());
-            if (Arrays.asList(403, 401).contains(res.statusCode())) {
-                throw new IOException("Authentication failed.");
-            }
-            Files.copy(res.body(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            res.body().close();
-            return destination;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        EdgeCdpClient.Response response = EdgeCdpClient.request("GET", url, Map.of(), null);
+        logger.info("Response [{}]: {}", url, response.status());
+        if (response.status() == 403 || response.status() == 401) {
+            throw new IOException("Authentication failed.");
         }
+        Files.write(destination.toPath(), response.body());
+        return destination;
     }
 
 }

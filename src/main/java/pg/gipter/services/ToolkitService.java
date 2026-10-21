@@ -44,7 +44,6 @@ public class ToolkitService extends Task<List<CasesData>> {
     private List<CasesData> getAvailableCases() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        headers.put("Cookie", CookiesService.getFedAuthString().orElse("") + "; " + CookiesService.getGotoString().orElse(""));
         String url = applicationProperties.toolkitHostUrl() + "/_goapi/UserProfile/Cases";
         List<CasesData> cases = new LinkedList<>();
         try {
@@ -94,9 +93,7 @@ public class ToolkitService extends Task<List<CasesData>> {
         );
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitHostUrl(),
-                fullUrl,
-                CookiesService.getFedAuthString().orElse(""),
-                CookiesService.getGotoString().orElse("")
+                fullUrl
         );
 
         try {
@@ -134,8 +131,6 @@ public class ToolkitService extends Task<List<CasesData>> {
             SharePointConfig sharePointConfig = new SharePointConfig(
                     applicationProperties.toolkitHostUrl(),
                     fullUrl,
-                    CookiesService.getFedAuthString().orElse(""),
-                    CookiesService.getGotoString().orElse(""),
                     getFormDigest()
             );
 
@@ -151,10 +146,9 @@ public class ToolkitService extends Task<List<CasesData>> {
         return Optional.empty();
     }
 
-    public boolean isCookieWorking() {
+    public boolean hasValidToolkitSession() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/json");
-        headers.put("Cookie", CookiesService.getFedAuthString().orElse("") + "; " + CookiesService.getGotoString().orElse(""));
         String url = String.format("%s%s/_api/web/SiteUsers/getByEmail('%s')",
                 applicationProperties.toolkitHostUrl(),
                 applicationProperties.toolkitCopyCase(),
@@ -178,9 +172,7 @@ public class ToolkitService extends Task<List<CasesData>> {
             );
             SharePointConfig sharePointConfig = new SharePointConfig(
                     applicationProperties.toolkitHostUrl(),
-                    fullUrl,
-                    CookiesService.getFedAuthString().orElse(""),
-                    CookiesService.getGotoString().orElse("")
+                    fullUrl
             );
 
             formDigest = httpRequester.requestDigest(sharePointConfig);
@@ -198,15 +190,12 @@ public class ToolkitService extends Task<List<CasesData>> {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitHostUrl(),
                 fullUrl,
-                CookiesService.getFedAuthString().orElse(""),
-                CookiesService.getGotoString().orElse(""),
                 getFormDigest()
         );
 
         Map<String, String> requestHeaders = new LinkedHashMap<>();
         requestHeaders.put("Accept", "application/json;odata=nometadata");
         requestHeaders.put("Content-Type", "application/json;odata=nometadata");
-        requestHeaders.put("Cookie", sharePointConfig.getFedAuth() + "; " + sharePointConfig.getGoto());
 
         JsonObject item = httpRequester.executePOST(sharePointConfig, createItemJson(), requestHeaders);
 
@@ -308,8 +297,6 @@ public class ToolkitService extends Task<List<CasesData>> {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitHostUrl(),
                 fullUrl,
-                CookiesService.getFedAuthString().orElse(""),
-                CookiesService.getGotoString().orElse(""),
                 getFormDigest()
         );
 
@@ -344,8 +331,6 @@ public class ToolkitService extends Task<List<CasesData>> {
         SharePointConfig sharePointConfig = new SharePointConfig(
                 applicationProperties.toolkitHostUrl(),
                 fullUrl,
-                CookiesService.getFedAuthString().orElse(""),
-                CookiesService.getGotoString().orElse(""),
                 getFormDigest()
         );
 
@@ -356,7 +341,6 @@ public class ToolkitService extends Task<List<CasesData>> {
         requestHeaders.put("Accept", "application/json;odata=verbose");
         requestHeaders.put("If-Match", "*");
         requestHeaders.put("X-HTTP-Method", "MERGE");
-        requestHeaders.put("Cookie", sharePointConfig.getFedAuth() + "; " + sharePointConfig.getGoto());
 
         JsonObject jsonObject = httpRequester.executePOST(sharePointConfig, payload, requestHeaders);
         if (jsonObject.has("odata.error")) {
@@ -381,8 +365,6 @@ public class ToolkitService extends Task<List<CasesData>> {
             SharePointConfig sharePointConfig = new SharePointConfig(
                     applicationProperties.toolkitHostUrl(),
                     fullUrl,
-                    CookiesService.getFedAuthString().orElse(""),
-                    CookiesService.getGotoString().orElse(""),
                     getFormDigest()
             );
 
@@ -390,7 +372,6 @@ public class ToolkitService extends Task<List<CasesData>> {
             requestHeaders.put("Accept", "application/json;odata=verbose");
             requestHeaders.put("If-Match", "*");
             requestHeaders.put("X-HTTP-Method", "DELETE");
-            requestHeaders.put("Cookie", sharePointConfig.getFedAuth() + "; " + sharePointConfig.getGoto());
 
             httpRequester.executePOST(sharePointConfig, null, requestHeaders);
             logger.info("Cleanup done.");

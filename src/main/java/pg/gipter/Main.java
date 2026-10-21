@@ -15,6 +15,7 @@ import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.*;
 import pg.gipter.services.restart.AbstractRestartService;
 import pg.gipter.services.upgrade.BackupService;
+import pg.gipter.toolkit.EdgeCdpClient;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
 import pg.gipter.utils.SystemUtils;
@@ -36,13 +37,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         logger.info("Calculated flow type is [{}].", flowType);
-        if (FlowType.INIT == flowType) {
-            new FXWebService(primaryStage).initSSO(flowType);
-        } else {
-            WebViewService.getInstance();
-            Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
-            launcher.execute();
-        }
+        WebViewService.getInstance();
+        Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
+        launcher.execute();
     }
 
     public static void main(String[] args) {
@@ -67,35 +64,24 @@ public class Main extends Application {
                 .findFirst()
                 .orElse(FlowType.REGULAR);
 
-        if (flowType != FlowType.INIT) {
-            flowType = CookiesService.isCookiesFileExist() ? FlowType.REGULAR : FlowType.INIT;
-        }
-
-        if (applicationProperties.isNoSSO()) {
-            flowType = FlowType.NO_UPLOAD;
-        } else if (flowType != FlowType.INIT) {
-            boolean cookieWorking = isCookieWorking(args);
-            if (cookieWorking) {
-                flowType = FlowType.REGULAR;
-            } else {
+        if (flowType == FlowType.REGULAR) {
+            if (applicationProperties.isNoSSO()) {
                 flowType = FlowType.NO_UPLOAD;
-                logger.warn("Cookies are not available. Upload is not going to be executed.");
+            } else if (!hasValidToolkitSession(args)) {
+                flowType = FlowType.NO_UPLOAD;
+                logger.warn("Microsoft Edge session is not authenticated. Upload is not going to be executed.");
             }
         }
 
-        if (flowType == FlowType.INIT) {
+        boolean settingsInitiated = initProgramSettings(args);
+        if (flowType == FlowType.REGULAR) {
+            flowType = settingsInitiated ? FlowType.REGULAR : FlowType.NO_UPLOAD;
+        }
+        if (Main.applicationProperties.isUseUI()) {
             launch(args);
         } else {
-            boolean settingsInitiated = initProgramSettings(args);
-            if (flowType == FlowType.REGULAR) {
-                flowType = settingsInitiated ? FlowType.REGULAR : FlowType.NO_UPLOAD;
-            }
-            if (Main.applicationProperties.isUseUI()) {
-                launch(args);
-            } else {
-                Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
-                launcher.execute();
-            }
+            Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
+            launcher.execute();
         }
     }
 
@@ -122,11 +108,11 @@ public class Main extends Application {
         }
     }
 
-    private static boolean isCookieWorking(String[] args) {
+    private static boolean hasValidToolkitSession(String[] args) {
         try {
-            return new ToolkitService(ApplicationPropertiesFactory.getInstance(args)).isCookieWorking();
+            return new ToolkitService(ApplicationPropertiesFactory.getInstance(args)).hasValidToolkitSession();
         } catch (IllegalStateException ex) {
-            logger.error("SSO is not working: {}", ex.getMessage());
+            logger.error("Toolkit session check failed: {}", ex.getMessage());
             return false;
         }
     }

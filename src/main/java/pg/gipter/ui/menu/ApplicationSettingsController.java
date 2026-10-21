@@ -340,7 +340,7 @@ public class ApplicationSettingsController extends AbstractController {
                         .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
                         .buildAndDisplayWindow();
             } catch (IOException e) {
-                new FXWebService().initSSO();
+                logger.error("Could not refresh application settings.", e);
             }
         });
     }

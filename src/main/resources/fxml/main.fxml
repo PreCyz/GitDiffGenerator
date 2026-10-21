@@ -52,11 +52,6 @@
                      <Font size="10.0"/>
                   </font>
                </TextField>
-               <Label fx:id="cookieExpiryLabel" layoutX="416.0" layoutY="2.0" textFill="#2102f8" wrapText="true">
-                  <font>
-                     <Font size="11.0"/>
-                  </font>
-               </Label>
             </AnchorPane>
          </TitledPane>
          <TitledPane animated="false" collapsible="false" layoutX="1.0" layoutY="62.0" prefHeight="558.0"

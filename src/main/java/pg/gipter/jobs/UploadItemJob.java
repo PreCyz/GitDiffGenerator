@@ -1,16 +1,14 @@
 package pg.gipter.jobs;
 
-import javafx.application.Platform;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pg.gipter.FlowType;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ApplicationPropertiesFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.configuration.ConfigurationDao;
 import pg.gipter.core.dao.data.DataDao;
-import pg.gipter.services.*;
+import pg.gipter.services.ToolkitService;
 import pg.gipter.ui.*;
 
 import java.text.ParseException;
@@ -38,32 +36,22 @@ public class UploadItemJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getMergedJobDataMap();
-        if (hasRefreshedCredentials(jobDataMap)) {
+        if (hasValidToolkitSession(jobDataMap)) {
             runJob(jobDataMap);
         } else {
-            logger.warn("Outdated credentials. Job is terminated.");
+            logger.warn("Toolkit session is not authenticated. Job is terminated.");
         }
     }
 
-    private boolean hasRefreshedCredentials(JobDataMap jobDataMap) {
-        if (!CookiesService.hasValidCookies()) {
-            logger.warn("Cookies are not valid. Trying to refresh cookies and continuing the job.");
-            Platform.runLater(() -> {
-                FXWebService fxWebService = new FXWebService(jobDataMap);
-                fxWebService.initMinimizedSSO(FlowType.JOB);
-            });
+    private boolean hasValidToolkitSession(JobDataMap jobDataMap) {
+        JobParam jobParam = (JobParam) jobDataMap.get(JobParam.class.getSimpleName());
+        ApplicationProperties applicationProperties = ApplicationPropertiesFactory.getInstance(
+                configurationDao.loadArgumentArray(jobParam.getConfigs().iterator().next())
+        );
+        if (new ToolkitService(applicationProperties).hasValidToolkitSession()) {
+            return true;
         }
-        LocalDateTime waitStart = LocalDateTime.now();
-        while (FXWebService.isRunning() && waitStart.isAfter(LocalDateTime.now().minusMinutes(1))) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                logger.error("Problems with sleeping.", e);
-            }
-        }
-        logger.info("Done waiting for authentication after {} seconds.",
-                Duration.between(waitStart, LocalDateTime.now()).toSeconds());
-        return CookiesService.hasValidCookies();
+        return false;
     }
 
     public void runJob(Map<String, ?> jobDataMap) throws JobExecutionException {

@@ -2,14 +2,11 @@ package pg.gipter.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import pg.gipter.TestUtils;
 import pg.gipter.core.dao.DaoConstants;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
-import pg.gipter.services.CookiesService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -594,19 +591,6 @@ class FilePreferredApplicationPropertiesTest {
         ItemType actual = appProps.itemType();
 
         assertThat(actual).isEqualTo(ItemType.STATEMENT);
-    }
-
-    @Test
-    void givenToolkitUsernameAndPassword_whenIsToolkitPropertiesSet_thenReturnTrue() {
-        try (MockedStatic<CookiesService> utilities = Mockito.mockStatic(CookiesService.class)) {
-            utilities.when(CookiesService::hasValidCookies).thenReturn(true);
-            String[] args = {};
-            appProps = new FileApplicationProperties(args).init();
-
-            boolean actual = appProps.isToolkitCredentialsSet();
-
-            assertThat(actual).isTrue();
-        }
     }
 
     @Test
