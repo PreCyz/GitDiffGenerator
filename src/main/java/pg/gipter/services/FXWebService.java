@@ -1,55 +1,23 @@
 package pg.gipter.services;
 
-import javafx.beans.value.ChangeListener;
-import javafx.concurrent.Worker;
-import javafx.event.EventHandler;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.layout.StackPane;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import org.quartz.JobDataMap;
-import org.quartz.JobExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.*;
-import org.w3c.dom.html.HTMLInputElement;
 import pg.gipter.FlowType;
-import pg.gipter.core.ArgName;
-import pg.gipter.jobs.UploadItemJob;
-import pg.gipter.services.restart.RestartServiceFactory;
-import pg.gipter.ui.alerts.AlertWindowBuilder;
-import pg.gipter.ui.alerts.ImageFile;
-import pg.gipter.utils.*;
+import pg.gipter.utils.BundleUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Stream;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static java.util.stream.Collectors.toList;
-
+/** JavaFX status/continuation facade. Authentication itself runs in the Windows WebView2 host. */
 public class FXWebService {
-
-    private static final Logger logger = LoggerFactory.getLogger(FXWebService.class);
+    private static final AtomicReference<CompletableFuture<Boolean>> CURRENT = new AtomicReference<>();
     private final Stage stage;
-    private WebEngine webEngine;
-    private FlowType flowType;
-    private JobDataMap jobDataMap;
-    private Label label;
-    private boolean iconified = false;
-    private static boolean running = false;
-
-    public static boolean isRunning() {
-        return running;
-    }
+    private Label expiryLabel;
+    private Runnable onAuthenticated;
 
     public FXWebService() {
         this(new Stage());
@@ -58,9 +26,14 @@ public class FXWebService {
     public FXWebService(Stage stage) {
         this.stage = stage;
     }
-    public FXWebService(JobDataMap jobDataMap) {
-        this(new Stage());
-        this.jobDataMap = jobDataMap;
+
+    public FXWebService onAuthenticated(Runnable action) {
+        this.onAuthenticated = action;
+        return this;
+    }
+
+    public static boolean isRunning() {
+        return CURRENT.get() != null;
     }
 
     public void initSSO() {
@@ -68,163 +41,105 @@ public class FXWebService {
     }
 
     public void initSSO(Label label) {
-        this.label = label;
+        expiryLabel = label;
         initSSO(FlowType.REGULAR);
     }
 
-    public FXWebService initMinimizedSSO(FlowType flowType) {
-        this.iconified = true;
+    /*public FXWebService initMinimizedSSO(FlowType flowType) {
         initSSO(flowType);
         return this;
-    }
+    }*/
 
     public void initSSO(FlowType flowType) {
-        if (isRunning()) {
-            return;
-        }
-        running = true;
-        this.flowType = flowType;
-        String ssoUrl = ArgName.toolkitUserFolderUrl.defaultValue();
-        logger.info("Launching SSO for [{}]", ssoUrl);
-
-        WebView webView = new WebView();
-        webEngine = webView.getEngine();
-        webEngine.setJavaScriptEnabled(true);
-        webEngine.setUserAgent(String.format("Mozilla/5.0 (%s; %s) Gipter-WebView",
-                SystemUtils.osName(),
-                SystemUtils.processorArchitecture())
-        );
-
-        StackPane stackPane = new StackPane();
-        stackPane.getChildren().add(webView);
-
-        stage.setScene(new Scene(stackPane, 600, 600));
-        stage.setOnCloseRequest(createOnCloseRequest(flowType));
-        stage.setTitle(BundleUtils.getMsg("webview.title"));
-        stage.setIconified(iconified);
-        addIcon(stage);
-        stage.show();
-
-        CookiesService.loadCookies();
-
-        webEngine.getLoadWorker().stateProperty().addListener(changeListener());
-        webEngine.load(ssoUrl);
+        authenticate(flowType);
     }
 
-    private void addIcon(Stage stage) {
-        try (InputStream is = getClass()
-                .getClassLoader()
-                .getResourceAsStream(ResourceUtils.getImgResourcePath(ImageFile.MINION.fileUrl()))) {
-            Optional.ofNullable(is).ifPresent(it -> {
-                Image icon = new Image(is);
-                stage.getIcons().add(icon);
+    public static CompletableFuture<Boolean> requestAuthentication(FlowType flowType) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        Runnable start = () -> new FXWebService().authenticate(flowType).whenComplete((success, error) -> {
+            if (error != null) result.completeExceptionally(error);
+            else result.complete(success);
+        });
+        if (Platform.isFxApplicationThread()) start.run();
+        else Platform.runLater(start);
+        return result;
+    }
+
+    public CompletableFuture<Boolean> authenticate(FlowType flowType) {
+        if (!Platform.isFxApplicationThread())
+            throw new IllegalStateException("Sign-in UI must start on the JavaFX thread.");
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        if (!CURRENT.compareAndSet(null, result)) {
+            CompletableFuture<Boolean> existing = CURRENT.get();
+            existing.thenAccept(success -> {
+                if (success) {
+                    if (expiryLabel != null)
+                        expiryLabel.setText(BundleUtils.getMsg("toolkit.panel.cookieExpires", CookiesService.expiryDate()));
+                    if (onAuthenticated != null) onAuthenticated.run();
+                }
             });
-        } catch (IOException ex) {
-            logger.warn("Problem with loading window icon: {}.", ex.getMessage());
+            return existing;
         }
-    }
-
-    private EventHandler<WindowEvent> createOnCloseRequest(FlowType flowType) {
-        return _ -> runOnCloseActivity(flowType);
-    }
-
-    private void runOnCloseActivity(FlowType flowType) {
-        switch (flowType) {
-            case INIT -> {
-                logger.info("Webview opened from Main. Application is going to be restarted.");
-                final List<String> restartArguments = Stream.of(
-                        String.format("%s=%s", ArgName.useUI.name(), ArgName.useUI.defaultValue()),
-                        String.format("%s=%s", ArgName.flowType.name(), FlowType.REGULAR)
-                ).collect(toList());
-                RestartServiceFactory.getRestartService().start(restartArguments);
-            }
-            case JOB -> {
-                logger.info("Webview opened from JOB. Continuing job.");
-                try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
-                    executorService.submit(this::continueJob, Void.class);
-                    executorService.shutdown();
-                } catch (Exception e) {
-                    logger.error("Error when Webview opened from JOB.", e);
-                }
-            }
-            case MISSED_JOB -> {
-                logger.info("Webview opened from {}. Continuing missed job.", flowType);
-            }
-            default -> {
-                logger.info("Webview opened regularly.");
-                label.setText(BundleUtils.getMsg("toolkit.panel.cookieExpires", CookiesService.expiryDate()));
-            }
-        }
-        running = false;
-        logger.info("Webview was closed.");
-    }
-
-    private void continueJob() {
-        try {
-            new UploadItemJob().runJob(jobDataMap);
-        } catch (JobExecutionException e) {
-            logger.error("Could not finish job", e);
-        }
-    }
-
-    private ChangeListener<Worker.State> changeListener() {
-        return (observable, oldValue, newValue) -> {
-            if (newValue == Worker.State.SUCCEEDED) {
-                if (webEngine.getLocation().startsWith("https://goto.netcompany.com/_trust/default.aspx")) {
-                    ((HTMLInputElement) webEngine.getDocument().getElementById("azure")).click();
-                }
-                if (webEngine.getLocation().startsWith("https://login.microsoftonline.com/")) {
-                    HTMLInputElement idSIButton9 = (HTMLInputElement) webEngine.getDocument().getElementById("idSIButton9");
-                    Element emailInput = webEngine.getDocument().getElementById("i0116");
-                    if (emailInput != null) {
-                        emailInput.setAttribute("value", ArgName.toolkitUsername.defaultValue() + ArgName.emailDomain.defaultValue());
-                        ((HTMLInputElement) emailInput).blur();
-                        ((HTMLInputElement) emailInput).focus();
-                        idSIButton9.click();
-                    }
-                }
-                if (webEngine.getLocation().contains(ArgName.toolkitCopyCase.defaultValue())) {
-                    try {
-                        checkProblem(webEngine.getDocument());
-                        CookiesService.extractAndSaveCookies();
-                        if (!iconified) {
-                            new AlertWindowBuilder()
-                                    .withHeaderText(BundleUtils.getMsg(this.flowType == FlowType.INIT ?
-                                            "webview.cookies.restarted" : "webview.cookies.saved"))
-                                    .withAlertType(Alert.AlertType.INFORMATION)
-                                    .withImageFile(ImageFile.FINGER_UP_PNG)
-                                    .buildAndDisplayWindow();
-                        }
-                    } catch (Exception e) {
-                        logger.error("Could not save cookies.", e);
-                        new AlertWindowBuilder()
-                                .withHeaderText(BundleUtils.getMsg("webview.cookies.error"))
-                                .withAlertType(Alert.AlertType.ERROR)
-                                .withImageFile(ImageFile.ERROR_CHICKEN_PNG)
-                                .buildAndDisplayWindow();
-                    } finally {
-                        stage.close();
-                        runOnCloseActivity(flowType);
-                    }
-                }
-            }
+        Label status = new Label(BundleUtils.getMsg("webview2.signin.wait"));
+        status.setWrapText(true);
+        ProgressIndicator progress = new ProgressIndicator();
+        AtomicReference<Thread> worker = new AtomicReference<>();
+        Runnable cancelLogin = () -> {
+            CookiesService.cancelAuthentication();
+            Thread thread = worker.get();
+            if (thread != null) thread.interrupt();
         };
-    }
-
-    private void checkProblem(Document document) throws IOException {
-        NodeList childNodes = document.getChildNodes();
-        checkSomethingWrong(childNodes);
-    }
-
-    private void checkSomethingWrong(NodeList childNodes) throws IOException {
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node item = childNodes.item(i);
-            if (item.getChildNodes().getLength() > 0) {
-                checkSomethingWrong(item.getChildNodes());
+        Button cancel = new Button(BundleUtils.getMsg("webview2.signin.cancel"));
+        Button retry = new Button(BundleUtils.getMsg("webview2.signin.retry"));
+        retry.setVisible(false);
+        retry.setOnAction(_ -> authenticate(flowType));
+        cancel.setOnAction(_ -> {
+            status.setText(BundleUtils.getMsg("webview2.signin.cancelling"));
+            cancelLogin.run();
+        });
+        VBox content = new VBox(14, status, progress, cancel, retry);
+        content.setPadding(new Insets(24));
+        stage.setTitle(BundleUtils.getMsg("webview.title"));
+        stage.setScene(new Scene(content, 460, 240));
+        stage.setOnCloseRequest(event -> {
+            if (!result.isDone()) {
+                event.consume();
+                cancelLogin.run();
             }
-            if (item.getNodeValue() != null && item.getNodeValue().contains("Sorry, something went wrong")) {
-                throw new IOException("Sorry, something went wrong with SSO. " + item.getNodeValue());
+        });
+        stage.show();
+        Thread vThread = Thread.ofVirtual().name("webview2-sign-in").unstarted(() -> {
+            String failure = null;
+            try {
+                CookiesService.authenticate();
+            } catch (Exception ex) {
+                failure = ex.getMessage() == null ? "WebView2 sign-in failed." : ex.getMessage();
             }
-        }
+            String error = failure;
+            Platform.runLater(() -> {
+                CURRENT.compareAndSet(result, null);
+                progress.setVisible(false);
+                if (error == null) {
+                    if (expiryLabel != null)
+                        expiryLabel.setText(BundleUtils.getMsg("toolkit.panel.cookieExpires", CookiesService.expiryDate()));
+                    // INIT continues in this JVM so session-only cookies are not lost in a restart.
+                    if (onAuthenticated != null) onAuthenticated.run();
+                    result.complete(true);
+                    if (flowType != FlowType.INIT) stage.close();
+                } else {
+                    status.setText(error);
+                    retry.setVisible(true);
+                    cancel.setText(BundleUtils.getMsg("webview2.signin.close"));
+                    cancel.setOnAction(_ -> {
+                        stage.close();
+                        if (flowType == FlowType.INIT) Platform.exit();
+                    });
+                    result.complete(false);
+                }
+            });
+        });
+        worker.set(vThread);
+        vThread.start();
+        return result;
     }
 }

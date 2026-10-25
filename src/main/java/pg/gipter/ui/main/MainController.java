@@ -275,13 +275,18 @@ public class MainController extends AbstractController {
         setDisable(applicationProperties.itemType());
         verifyProgressIndicator.setVisible(true);
 
-        final boolean hasConnection = applicationProperties.hasConnectionToToolkit();
-        if (!hasConnection) {
-            cookieExpiryLabel.textProperty().addListener(_ -> disableExecutionButtons(false));
-            new FXWebService().initSSO(cookieExpiryLabel);
-            disableExecutionButtons(true);
-        }
-        verifyProgressIndicator.setVisible(false);
+        disableExecutionButtons(true);
+        Thread.ofVirtual().start(() -> {
+            final boolean hasConnection = applicationProperties.hasConnectionToToolkit();
+            javafx.application.Platform.runLater(() -> {
+                verifyProgressIndicator.setVisible(false);
+                if (!hasConnection) {
+                    new FXWebService().onAuthenticated(() -> disableExecutionButtons(false)).initSSO(cookieExpiryLabel);
+                } else {
+                    disableExecutionButtons(false);
+                }
+            });
+        });
     }
 
     private void disableExecutionButtons(boolean value) {

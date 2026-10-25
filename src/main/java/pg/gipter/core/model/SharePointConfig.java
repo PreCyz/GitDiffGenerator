@@ -2,9 +2,7 @@ package pg.gipter.core.model;
 
 import pg.gipter.core.ArgName;
 
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
@@ -150,9 +148,9 @@ public class SharePointConfig {
                 ", project='" + getProject() + '\'' +
                 ", listName='" + getListNames() + '\'' +
                 ", fullRequestUrl='" + getFullRequestUrl() + '\'' +
-                ", formDigest='" + getFormDigest() + '\'' +
-                ", FedAuth='" + getFedAuth() + '\'' +
-                ", Goto='" + getGoto() + '\'' +
+                ", formDigest='***'" +
+                ", FedAuth='***'" +
+                ", Goto='***'" +
                 '}';
     }
 }

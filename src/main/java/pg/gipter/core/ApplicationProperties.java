@@ -297,7 +297,8 @@ public abstract class ApplicationProperties {
     }
 
     public final String toolkitUserEmail() {
-        return toolkitUsername().toLowerCase() + argExtractor.emailDomain();
+//        return toolkitUsername().toLowerCase() + argExtractor.emailDomain();
+        return "pawg@netcompany.com";
     }
 
     public boolean hasConnectionToToolkit() {
