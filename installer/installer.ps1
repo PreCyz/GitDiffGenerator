@@ -2,6 +2,7 @@ param (
     [Parameter(Mandatory = $true)][string]$version = "5.0.0"
 )
 
+$ErrorActionPreference = 'Stop'
 $currentLocation = Get-Location
 Write-Host "Current location: " -NoNewline
 Write-Host "$currentLocation" -ForegroundColor Yellow
@@ -22,7 +23,7 @@ if (-not (Test-Path $jLink))
     Write-Error "jlink executable not found at: $jLink"
     exit 1
 }
-$jfxMods = "C:\Install\Java\JavaFX\javafx-jmods-25"
+$jfxMods = "C:\Install\Java\JavaFX\javafx-jmods-25.0.5"
 if (-not (Test-Path $jfxMods))
 {
     Write-Error "jfxMods mods not found at: $jfxMods"
@@ -47,6 +48,7 @@ Write-Host "Copy jar to $target\input\ " -ForegroundColor Green
 mkdir "$target\input"
 Copy-Item -Path "$target\Gipter-$version.jar" -Destination "$target\input\Gipter-$version.jar" -Verbose
 Copy-Item -Path ..\docs\*.* -Destination "$target\input\" -Force -Exclude *.odt -Verbose
+& (Join-Path $PSScriptRoot 'Publish-WebView2Auth.ps1') -Destination (Join-Path $PSScriptRoot '../target/input/auth')
 
 Write-Host "Create runtime-image with jlink: " -NoNewline -ForegroundColor Green
 Write-Host "$jLink"

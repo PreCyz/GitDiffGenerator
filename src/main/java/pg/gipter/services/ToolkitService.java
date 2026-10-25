@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.model.SharePointConfig;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.services.auth.ToolkitIdentity;
 import pg.gipter.services.dto.*;
 import pg.gipter.toolkit.HttpRequester;
 import pg.gipter.utils.BundleUtils;
@@ -16,11 +17,7 @@ import java.nio.file.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Stream;
 
-import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
-import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
-import static java.net.HttpURLConnection.HTTP_UNAUTHORIZED;
 import static java.util.stream.Collectors.joining;
 
 /** Created by Pawel Gawedzki on 26-Jul-2019. */
@@ -153,18 +150,18 @@ public class ToolkitService extends Task<List<CasesData>> {
 
     public boolean isCookieWorking() {
         Map<String, String> headers = new HashMap<>();
+        headers.put("Accept", "application/json;odata=verbose");
         headers.put("Content-Type", "application/json");
         headers.put("Cookie", CookiesService.getFedAuthString().orElse("") + "; " + CookiesService.getGotoString().orElse(""));
-        String url = String.format("%s%s/_api/web/SiteUsers/getByEmail('%s')",
+        String url = String.format("%s%s/_api/web/currentuser",
                 applicationProperties.toolkitHostUrl(),
-                applicationProperties.toolkitCopyCase(),
-                applicationProperties.toolkitUserEmail()
+                applicationProperties.toolkitCopyCase()
         );
 
         try {
-            int statusCode = httpRequester.getForStatusCode(url, headers);
-            return Stream.of(HTTP_UNAUTHORIZED, HTTP_FORBIDDEN, HTTP_INTERNAL_ERROR).noneMatch(sc -> sc == statusCode);
-        } catch (IOException ex) {
+            JsonObject user = httpRequester.get(url, headers, JsonObject.class);
+            return ToolkitIdentity.matches(200, "application/json", user == null ? "null" : user.toString(), applicationProperties.toolkitUserEmail());
+        } catch (IOException | com.google.gson.JsonParseException ex) {
             logger.error("Could not download toolkit projects for user [{}]. ", applicationProperties.toolkitUsername(), ex);
         }
         return false;
@@ -184,7 +181,7 @@ public class ToolkitService extends Task<List<CasesData>> {
             );
 
             formDigest = httpRequester.requestDigest(sharePointConfig);
-            logger.debug("Form digest: [{}]", formDigest);
+            logger.debug("Toolkit form digest acquired.");
         }
         return formDigest;
     }

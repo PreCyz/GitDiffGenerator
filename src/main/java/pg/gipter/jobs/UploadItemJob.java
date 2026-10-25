@@ -1,6 +1,5 @@
 package pg.gipter.jobs;
 
-import javafx.application.Platform;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,24 +45,20 @@ public class UploadItemJob implements Job {
     }
 
     private boolean hasRefreshedCredentials(JobDataMap jobDataMap) {
-        if (!CookiesService.hasValidCookies()) {
-            logger.warn("Cookies are not valid. Trying to refresh cookies and continuing the job.");
-            Platform.runLater(() -> {
-                FXWebService fxWebService = new FXWebService(jobDataMap);
-                fxWebService.initMinimizedSSO(FlowType.JOB);
-            });
+        JobParam jobParam = (JobParam) jobDataMap.get(JobParam.class.getSimpleName());
+        ApplicationProperties properties = ApplicationPropertiesFactory.getInstance(
+                configurationDao.loadArgumentArray(jobParam.getConfigs().iterator().next()));
+        if (CookiesService.hasValidCookies() && new ToolkitService(properties).isCookieWorking()) return true;
+        try {
+            return FXWebService.requestAuthentication(FlowType.JOB)
+                    .get(7, java.util.concurrent.TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            return false;
+        } catch (java.util.concurrent.ExecutionException | java.util.concurrent.TimeoutException ex) {
+            logger.warn("Toolkit authentication did not complete. Job was not submitted.");
+            return false;
         }
-        LocalDateTime waitStart = LocalDateTime.now();
-        while (FXWebService.isRunning() && waitStart.isAfter(LocalDateTime.now().minusMinutes(1))) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                logger.error("Problems with sleeping.", e);
-            }
-        }
-        logger.info("Done waiting for authentication after {} seconds.",
-                Duration.between(waitStart, LocalDateTime.now()).toSeconds());
-        return CookiesService.hasValidCookies();
     }
 
     public void runJob(Map<String, ?> jobDataMap) throws JobExecutionException {

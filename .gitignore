@@ -13,3 +13,4 @@ dependency-reduced-pom.xml
 !command.json
 !releaseNotes/release-notes-*.txt
 bck/
+!native/webview2-auth/packages.lock.json

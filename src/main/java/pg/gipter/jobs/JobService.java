@@ -23,8 +23,6 @@ import pg.gipter.utils.BundleUtils;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class JobService {
 
@@ -101,23 +99,31 @@ public class JobService {
 
                     if (shouldExecute) {
                         if (!jobParam.getConfigs().isEmpty()) {
-                            try (ExecutorService executor = Executors.newSingleThreadExecutor()) {
+                            try {
                                 final LocalDate start = LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth());
+                                final LocalDateTime next = LocalDateTime.ofInstant(nextFireDate.toInstant(), ZoneId.systemDefault());
                                 if (!CookiesService.hasValidCookies()) {
-                                    FXWebService fxWebService = new FXWebService().initMinimizedSSO(FlowType.MISSED_JOB);
-                                    executor.execute(() -> delayExecuteMissedJob(fxWebService, jobParam, start));
+                                    FXWebService.requestAuthentication(FlowType.MISSED_JOB).thenAccept(success -> {
+                                        if (success) Thread.ofVirtual().start(() -> {
+                                            executeMissedJob(jobParam, start);
+                                            dataDao.saveNextUploadDateTime(next);
+                                        });
+                                    });
                                 } else {
-                                    executor.execute(() -> executeMissedJob(jobParam, start));
+                                    Thread.ofVirtual().start(() -> {
+                                        executeMissedJob(jobParam, start);
+                                        dataDao.saveNextUploadDateTime(next);
+                                    });
                                 }
-                                executor.shutdown();
                             } catch (Exception ex) {
                                 logger.error(ex.getMessage(), ex);
                             }
                         } else {
                             logger.warn("From some reason the job is defined but without any specific configurations. I do not know how this happened and can do nothing with it.");
                         }
+                    } else {
+                        dataDao.saveNextUploadDateTime(LocalDateTime.ofInstant(nextFireDate.toInstant(), ZoneId.systemDefault()));
                     }
-                    dataDao.saveNextUploadDateTime(LocalDateTime.ofInstant(nextFireDate.toInstant(), ZoneId.systemDefault()));
                 }
             }
         } catch (Exception ex) {
@@ -156,21 +162,4 @@ public class JobService {
         new MultiConfigRunner(applicationPropertiesCollection, RunType.FIXING_JOB_EXECUTION).start();
     }
 
-    private void delayExecuteMissedJob(FXWebService fxWebService, JobParam jobParam, LocalDate startDate) {
-        LocalDateTime waitStart = LocalDateTime.now();
-        while (FXWebService.isRunning() && waitStart.isAfter(LocalDateTime.now().minusMinutes(1))) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                logger.error("Problems with sleeping.", e);
-            }
-        }
-        logger.info("Done waiting for authentication after {} seconds.",
-                Duration.between(waitStart, LocalDateTime.now()).toSeconds());
-        if (!CookiesService.hasValidCookies()) {
-            logger.warn("Authentication process is not successful. Fix is terminated.");
-            return;
-        }
-        executeMissedJob(jobParam, startDate);
-    }
 }

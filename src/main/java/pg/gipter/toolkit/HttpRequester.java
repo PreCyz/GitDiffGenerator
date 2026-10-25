@@ -18,7 +18,8 @@ import java.util.*;
 public class HttpRequester {
 
     protected final static Logger logger = LoggerFactory.getLogger(HttpRequester.class);
-    private static final HttpClient CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
+    private static final HttpClient CLIENT = HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10))
+            .version(HttpClient.Version.HTTP_1_1).build();
 
     private final ApplicationProperties applicationProperties;
 
@@ -55,8 +56,8 @@ public class HttpRequester {
 
     private void logRequest(HttpRequest request) {
         HashMap<String, List<String>> headers = new HashMap<>(request.headers().map());
-        headers.replace("Cookie", List.of("***"));
-        headers.replace("X-RequestDigest", List.of("***"));
+        headers.replaceAll((name, values) -> Set.of("cookie", "set-cookie", "authorization", "x-requestdigest")
+                .contains(name.toLowerCase(Locale.ROOT)) ? List.of("***") : values);
         logger.info("Executing request: {} {} {} Headers: {}",
                 request.version().map(Enum::toString).orElse(""),
                 request.method(),
@@ -226,6 +227,7 @@ public class HttpRequester {
     public <T> T get(String url, Map<String, String> headers, Class<T> expectedType) throws IOException {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(url))
+                .timeout(java.time.Duration.ofSeconds(30))
                 .GET();
         Optional.ofNullable(headers).orElseGet(HashMap::new).forEach(builder::header);
         HttpRequest request = builder.build();
@@ -239,6 +241,10 @@ public class HttpRequester {
             try (InputStream inputStream = res.body();
                  InputStreamReader isr = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
                 logResponse(res);
+                if (res.statusCode() < 200 || res.statusCode() >= 300
+                        || !res.headers().firstValue("Content-Type").orElse("").toLowerCase(Locale.ROOT).contains("json")) {
+                    throw new IOException("Toolkit returned an unexpected status or content type: " + res.statusCode());
+                }
                 Gson gson = new GsonBuilder().create();
                 return gson.fromJson(isr, TypeToken.get(expectedType));
             }

@@ -3,6 +3,7 @@ package pg.gipter;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +33,20 @@ public class Main extends Application {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private static ApplicationProperties applicationProperties;
     private static FlowType flowType;
+    private static String[] startupArguments;
 
     @Override
     public void start(Stage primaryStage) {
         logger.info("Calculated flow type is [{}].", flowType);
         if (FlowType.INIT == flowType) {
-            new FXWebService(primaryStage).initSSO(flowType);
+            new FXWebService(primaryStage).onAuthenticated(() -> Thread.ofVirtual().start(() -> {
+                boolean initialized = initProgramSettings(startupArguments);
+                flowType = initialized ? FlowType.REGULAR : FlowType.NO_UPLOAD;
+                Platform.runLater(() -> {
+                    WebViewService.getInstance();
+                    LauncherFactory.getLauncher(applicationProperties, primaryStage).execute();
+                });
+            })).initSSO(flowType);
         } else {
             WebViewService.getInstance();
             Launcher launcher = LauncherFactory.getLauncher(applicationProperties, primaryStage);
@@ -46,6 +55,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        startupArguments = args.clone();
         logger.info("Gipter is starting ...");
         restoreBackup();
         InternalMain mObj = new InternalMain(args);
@@ -56,6 +66,9 @@ public class Main extends Application {
         logger.info("Gipter can use [{}] threads.", Runtime.getRuntime().availableProcessors());
         mObj.runConverters(applicationProperties);
         mObj.setDefaultConfig();
+        CookiesService.configure(applicationProperties.toolkitUserFolderUrl(),
+                applicationProperties.toolkitHostUrl() + applicationProperties.toolkitCopyCase() + "/_api/web/currentuser",
+                applicationProperties.toolkitUserEmail());
 
         flowType = Stream.of(args)
                 .filter(a -> a.startsWith(ArgName.flowType.name()))
@@ -78,8 +91,8 @@ public class Main extends Application {
             if (cookieWorking) {
                 flowType = FlowType.REGULAR;
             } else {
-                flowType = FlowType.NO_UPLOAD;
-                logger.warn("Cookies are not available. Upload is not going to be executed.");
+                flowType = FlowType.INIT;
+                logger.info("Toolkit session requires WebView2 sign-in.");
             }
         }
 

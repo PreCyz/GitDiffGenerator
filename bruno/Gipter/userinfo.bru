@@ -1,0 +1,43 @@
+meta {
+  name: userinfo
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://goto.netcompany.com/_goapi/UserProfile/Cases
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Cookie: FedAuth=77u/PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48U1A+MGUudHxhenVyZWFkdHJ1c3R8cGF3Z0BuZXRjb21wYW55LmNvbSwwZS50fGF6dXJlYWR0cnVzdHxwYXdnQG5ldGNvbXBhbnkuY29tLDEzNDA4NzMxMzUwOTc4NzEzNixUcnVlLG5TWVdCejZMRkxiY0hVMTRzZzc5cDlHRnNJZzMvRkY3RXE1QW9tUk1UK2YyUzAvV2V3V0NGTi9WM21WazVCRGhJVFB4Y3hKL2MzbDg3amJBaUlGbE1ldW55TFdiNW92TlN2ZWVsTDJ5dHl3VkFLd0lWcmtxdFI5R3FWL1NKWklPZUprZTRueG4rRmlvbEh1bmtjV1pyVTRJYmJOaUxIYWE3a0VJTFNudlJvVU9odkcxbytIY0YzWDhvYjlIVmw4SmFxTFBOSURGVUlkL3BuOFJOR0VIWUpHVnRUUUp4VkNTTVRNejFjVmhydXdZbFQ4S3dsend6TzNQUDVrZ05iZXp3aVRoejNMWXVPYUNzbWpLYko2MEpYNlJ0REhmTEtNbC9FckZ4UFpyYmM5Qk5pd1FaS1h2UnRUZ1BrUFpxa1ZKMU1MVmtqZi9EM0pUUWlLenJ0TU9xdz09LGh0dHBzOi8vZ290by5uZXRjb21wYW55LmNvbS88L1NQPg==
+}
+
+body:json {
+  {
+    "SortFieldDefinition": {
+      "InternalName": "ows_Created",
+      "DataType": "datetime"
+    },
+    "ItemFields": [
+      {
+        "DisplayName": "title",
+        "FieldType": "",
+        "InternalName": "ows_Title"
+      },
+      {
+        "DisplayName": "id",
+        "FieldType": "",
+        "InternalName": "CaseID"
+      },
+      {
+        "DisplayName": "created",
+        "FieldType": "",
+        "InternalName": "ows_Created"
+      }
+    ],
+    "SortAscending": false
+  }
+}

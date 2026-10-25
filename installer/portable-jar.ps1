@@ -2,6 +2,7 @@ param (
     [Parameter(Mandatory=$true)][string]$version = "5.0.0"
 )
 
+$ErrorActionPreference = 'Stop'
 $currentLocation = Get-Location
 Write-Host "Current location: " -NoNewline
 Write-Host "$currentLocation" -ForegroundColor Yellow
@@ -25,6 +26,7 @@ Copy-Item -Path "..\src\main\resources\img\icons\gipter.ico" -Destination "$targ
 Copy-Item -Path "$jre25" -Destination "$target\dist\portable-jar\runtime\" -Force -Recurse
 Copy-Item -Path ..\docs\*.* -Destination "$target\dist\portable-jar\" -Force -Exclude *.odt -Verbose
 Copy-Item -Path "$target\Gipter-$version.jar" -Destination "$target\dist\portable-jar\Gipter.jar" -Force -Verbose
+& (Join-Path $PSScriptRoot 'Publish-WebView2Auth.ps1') -Destination (Join-Path $PSScriptRoot '../target/dist/portable-jar/auth')
 
 if (-not (Test-Path "$target\dist\portable-jar"))
 {

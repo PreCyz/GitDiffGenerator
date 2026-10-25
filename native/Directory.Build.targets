@@ -1,0 +1,8 @@
+<Project>
+  <!-- The SDK adds WPF references even to a WinForms-only host. Avoid pulling that unused UI stack in. -->
+  <Target Name="RemoveUnusedWebView2WpfReference" BeforeTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <Reference Remove="@(Reference)" Condition="'%(Reference.Filename)' == 'Microsoft.Web.WebView2.Wpf'" />
+    </ItemGroup>
+  </Target>
+</Project>
