@@ -3,10 +3,15 @@ package pg.gipter.services;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import pg.gipter.FlowType;
+import pg.gipter.ui.alerts.AlertWindowBuilder;
+import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
 
 import java.util.concurrent.CompletableFuture;
@@ -122,6 +127,14 @@ public class FXWebService {
                 if (error == null) {
                     if (expiryLabel != null)
                         expiryLabel.setText(BundleUtils.getMsg("toolkit.panel.cookieExpires", CookiesService.expiryDate()));
+                    if (flowType != FlowType.JOB && flowType != FlowType.MISSED_JOB) {
+                        new AlertWindowBuilder()
+                                .withHeaderText(BundleUtils.getMsg(flowType == FlowType.INIT ?
+                                        "webview.cookies.continuing" : "webview.cookies.saved"))
+                                .withAlertType(Alert.AlertType.INFORMATION)
+                                .withImageFile(ImageFile.FINGER_UP_PNG)
+                                .buildAndDisplayWindow();
+                    }
                     // INIT continues in this JVM so session-only cookies are not lost in a restart.
                     if (onAuthenticated != null) onAuthenticated.run();
                     result.complete(true);
@@ -135,6 +148,12 @@ public class FXWebService {
                         if (flowType == FlowType.INIT) Platform.exit();
                     });
                     result.complete(false);
+                    new AlertWindowBuilder()
+                            .withHeaderText(BundleUtils.getMsg("webview.cookies.error"))
+                            .withMessage(error)
+                            .withAlertType(Alert.AlertType.ERROR)
+                            .withImageFile(ImageFile.ERROR_CHICKEN_PNG)
+                            .buildAndDisplayWindow();
                 }
             });
         });
