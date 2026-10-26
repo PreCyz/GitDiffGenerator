@@ -4,11 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pg.gipter.core.dao.DaoFactory;
 import pg.gipter.core.dao.command.CustomCommand;
-import pg.gipter.core.dao.configuration.*;
+import pg.gipter.core.dao.configuration.CachedConfiguration;
+import pg.gipter.core.dao.configuration.ConfigurationDao;
+import pg.gipter.core.dao.configuration.SecurityProviderFactory;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.core.producers.command.VersionControlSystem;
-import pg.gipter.services.*;
+import pg.gipter.services.CookiesService;
+import pg.gipter.services.SemanticVersioning;
+import pg.gipter.services.ToolkitService;
 import pg.gipter.ui.UITheme;
 import pg.gipter.utils.BundleUtils;
 import pg.gipter.utils.StringUtils;
@@ -297,8 +301,7 @@ public abstract class ApplicationProperties {
     }
 
     public final String toolkitUserEmail() {
-//        return toolkitUsername().toLowerCase() + argExtractor.emailDomain();
-        return "pawg@netcompany.com";
+        return toolkitUsername().toLowerCase() + argExtractor.emailDomain();
     }
 
     public boolean hasConnectionToToolkit() {
