@@ -1,18 +1,20 @@
 package pg.gipter.services;
 
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import pg.gipter.FlowType;
+import pg.gipter.core.dao.DaoFactory;
+import pg.gipter.ui.UITheme;
 import pg.gipter.ui.alerts.AlertWindowBuilder;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.BundleUtils;
+import pg.gipter.utils.ResourceUtils;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -104,6 +106,15 @@ public class FXWebService {
         });
         VBox content = new VBox(14, status, progress, cancel, retry);
         content.setPadding(new Insets(24));
+        UITheme theme = UITheme.valueOfTranslation(
+                DaoFactory.getCachedConfiguration().loadApplicationConfig().getUiTheme());
+        if (theme == UITheme.DEFAULT) {
+            Application.setUserAgentStylesheet(Application.STYLESHEET_MODENA);
+        } else {
+            Application.setUserAgentStylesheet(theme.userAgentStylesheet());
+        }
+        ResourceUtils.getImgResource("icons/gipter.png")
+                .ifPresent(icon -> stage.getIcons().setAll(new Image(icon.toExternalForm())));
         stage.setTitle(BundleUtils.getMsg("webview.title"));
         stage.setScene(new Scene(content, 460, 240));
         stage.setOnCloseRequest(event -> {
