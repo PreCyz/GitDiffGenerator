@@ -1,0 +1,14 @@
+**Release notes:**
+Improvements:
+* Replacing Toolkit SSO web view with Windows native WebView2, supporting sign-in with the Windows work account.
+* Saving persistent Toolkit sessions with Windows user encryption.
+* Adding cancel and retry options to the sign-in window.
+* Upgrading dependencies.
+
+Fixes:
+* Restoring success and error alerts during Toolkit SSO.
+* Continuing application startup after sign-in without restarting and losing session cookies.
+* Verifying the signed-in Toolkit account matches the configured user.
+* Waiting for authentication before submitting scheduled and missed uploads.
+* Moving Toolkit connection checks off the UI thread.
+* Masking authentication cookies and request digests in logs.

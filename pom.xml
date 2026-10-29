@@ -6,15 +6,15 @@
 
     <groupId>pg.gipter</groupId>
     <artifactId>Gipter</artifactId>
-    <version>5.0.7</version>
+    <version>5.0.8</version>
     <packaging>jar</packaging>
 
     <properties>
         <java.version>25</java.version>
         <javaFX.version>25.0.5</javaFX.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit-jupiter.version>5.13.4</junit-jupiter.version>
-        <junit-platform.version>1.13.4</junit-platform.version>
+        <junit-jupiter.version>5.14.2</junit-jupiter.version>
+        <junit-platform.version>1.14.2</junit-platform.version>
     </properties>
 
     <build>
