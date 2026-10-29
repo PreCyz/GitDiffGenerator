@@ -222,7 +222,36 @@ uploadType=STATEMENT
 To download the latest stable version go [here](https://github.com/PreCyz/GitDiffGenerator/releases/latest).
 
 ### Development
-In order to execute the application from the IDE for Java 11+ use the following as VM options:
+Build prerequisites:
+
+- JDK 25, with `JAVA_HOME` pointing to the JDK and `java` on `PATH`.
+- Apache Maven 3.6.3 or newer, with `mvn` on `PATH`.
+- On Windows, the [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0), with `dotnet` on `PATH`. The native WebView2 sign-in helper and its regression harness target `net10.0-windows`.
+- Network access to Maven Central and NuGet for dependency restoration.
+
+From the repository root, build the application and run the Java tests:
+
+```shell
+mvn clean package
+```
+
+The application JAR is written to `target/Gipter-<version>.jar`. On Windows, Maven automatically publishes the native sign-in helper to `target/webview2-auth` during `generate-resources`. It bundles the .NET 10 runtime as a self-contained executable, so users do not need to install .NET separately. Microsoft Edge WebView2 Evergreen Runtime is required on Windows to run sign-in and the native browser fixture.
+
+To publish only the native helper on Windows:
+
+```powershell
+.\installer\Publish-WebView2Auth.ps1
+```
+
+To run the native authentication regression checks, including the isolated WebView2 browser fixture:
+
+```powershell
+dotnet run --project native/webview2-auth-tests/Gipter.AuthHost.Tests.csproj --configuration Release
+```
+
+On non-Windows systems, the Maven build skips the Windows-only helper; the .NET SDK is not required for the Java build.
+
+For IDE launches that use a separate JavaFX SDK, use JDK 25 and JavaFX SDK 25.0.5 with the following VM options:
 ```
 -p {PATH-TO-JAVAFX-SDK}\lib --add-modules=javafx.fxml,javafx.controls,javafx.media,javafx.web,javafx.swing --add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED
 ```
