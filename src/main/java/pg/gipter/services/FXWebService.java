@@ -113,7 +113,7 @@ public class FXWebService {
         } else {
             Application.setUserAgentStylesheet(theme.userAgentStylesheet());
         }
-        ResourceUtils.getImgResource("icons/gipter.png")
+        ResourceUtils.getImgResource("icons/gipter.ico")
                 .ifPresent(icon -> stage.getIcons().setAll(new Image(icon.toExternalForm())));
         stage.setTitle(BundleUtils.getMsg("webview.title"));
         stage.setScene(new Scene(content, 460, 240));
