@@ -91,43 +91,24 @@ public class ProjectsController extends AbstractController {
     }
 
     private void initValues() {
-        Set<String> projects = applicationProperties.projectPaths();
-        if (projects.size() == 1 && projects.contains(ProjectDetails.DEFAULT.getName())) {
-            projectsTableView.setItems(FXCollections.observableArrayList(ProjectDetails.DEFAULT));
-        } else {
-            ObservableList<ProjectDetails> projectsPaths = FXCollections.observableArrayList();
-            for (String path : projects) {
-                Path project = Paths.get(path);
-                Optional<String> supportedVcs = getSupportedVcs(Paths.get(path));
-                if (supportedVcs.isEmpty() && applicationProperties.itemType() == ItemType.TOOLKIT_DOCS) {
-                    ProjectDetails pd = new ProjectDetails(
-                            project.getFileName().toString(),
-                            applicationProperties.itemType().name(),
-                            path
-                    );
-                    projectsPaths.add(pd);
-                } else if (supportedVcs.isPresent() && applicationProperties.itemType() != ItemType.TOOLKIT_DOCS) {
-                    ProjectDetails pd = new ProjectDetails(
-                            project.getFileName().toString(),
-                            supportedVcs.get(),
-                            path
-                    );
-                    projectsPaths.add(pd);
-                }
-            }
-            if (projectsPaths.isEmpty()) {
-                projectsPaths.add(ProjectDetails.DEFAULT);
-            }
-            projectsTableView.setItems(projectsPaths);
-        }
+        projectsTableView.setItems(FXCollections.observableArrayList(configuredProjects()));
     }
 
-    private Optional<String> getSupportedVcs(Path project) {
-        try {
-            return Optional.of(VersionControlSystem.valueFrom(project)).map(Enum::name);
-        } catch (IllegalArgumentException ex) {
-            return Optional.empty();
-        }
+    List<ProjectDetails> configuredProjects() {
+        List<ProjectDetails> projects = new ArrayList<>();
+        boolean toolkit = applicationProperties.itemType() == ItemType.TOOLKIT_DOCS;
+        VersionControlSystem.inspectProjectPaths(applicationProperties.projectPaths()).forEach((path, vcs) -> {
+            if (toolkit && vcs != VersionControlSystem.NA) {
+                return;
+            }
+            String type = vcs.name();
+            if (vcs == VersionControlSystem.NA) {
+                type = toolkit ? ItemType.TOOLKIT_DOCS.name() : BundleUtils.getMsg("projects.repo.unavailable");
+            }
+            String name = new File(path).getName();
+            projects.add(new ProjectDetails(name.isEmpty() ? path : name, type, path));
+        });
+        return projects.isEmpty() ? List.of(ProjectDetails.DEFAULT) : projects;
     }
 
     private void setActions(ResourceBundle resources) {
@@ -168,6 +149,13 @@ public class ProjectsController extends AbstractController {
     }
 
     private void refreshProjectTableView(ObservableList<ProjectDetails> observableList) {
+        Set<String> foundPaths = observableList.stream().map(ProjectDetails::getPath).collect(Collectors.toSet());
+        String unavailable = BundleUtils.getMsg("projects.repo.unavailable");
+        for (ProjectDetails existing : projectsTableView.getItems()) {
+            if (unavailable.equals(existing.getVcsType()) && !foundPaths.contains(existing.getPath())) {
+                observableList.add(existing);
+            }
+        }
         if (observableList.isEmpty()) {
             projectsTableView.setItems(FXCollections.observableArrayList(ProjectDetails.DEFAULT));
         } else {

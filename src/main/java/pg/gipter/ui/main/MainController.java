@@ -14,6 +14,7 @@ import pg.gipter.core.dao.data.ProgramData;
 import pg.gipter.core.model.RunConfig;
 import pg.gipter.core.model.ToolkitConfig;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.core.producers.command.VersionControlSystem;
 import pg.gipter.services.DataService;
 import pg.gipter.services.FXWebService;
 import pg.gipter.services.vcs.VcsService;
@@ -474,10 +475,12 @@ public class MainController extends AbstractController {
         setApplicationProperties(applicationProperties);
 
         toolkitSectionController.initialize(location, resources, initToolkitSectionMap());
-        pathsSectionController.initialize(location, resources, initPathsSectionMap());
+        Map<String, VersionControlSystem> repositories = ItemType.isCodeRelated(applicationProperties.itemType())
+                ? VersionControlSystem.inspectProjectPaths(applicationProperties.projectPaths()) : Map.of();
+        pathsSectionController.initialize(location, resources, initPathsSectionMap(), repositories);
         datesSectionController.initialize(location, resources, initDatesSectionMap());
         additionalSettingsSectionController.initialize(location, resources, initAdditionalSettingsSectionMap());
-        csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap());
+        csvDetailsSectionController.initialize(location, resources, initCsvDetailsSectionMap(), repositories);
         buttonController.initialize(location, resources, initButtonMap());
     }
 
