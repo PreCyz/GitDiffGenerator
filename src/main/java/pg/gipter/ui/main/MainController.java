@@ -273,6 +273,11 @@ public class MainController extends AbstractController {
         configurationSectionController.setDisableDependOnConfigurations();
 
         setDisable(applicationProperties.itemType());
+        if (applicationProperties.isNoSSO()) {
+            verifyProgressIndicator.setVisible(false);
+            disableExecutionButtons(false);
+            return;
+        }
         verifyProgressIndicator.setVisible(true);
 
         disableExecutionButtons(true);

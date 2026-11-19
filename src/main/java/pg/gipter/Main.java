@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import pg.gipter.launchers.LauncherFactory;
 import pg.gipter.services.*;
 import pg.gipter.services.restart.AbstractRestartService;
 import pg.gipter.services.upgrade.BackupService;
+import pg.gipter.ui.WizardLauncher;
 import pg.gipter.ui.alerts.WebViewService;
 import pg.gipter.utils.StringUtils;
 import pg.gipter.utils.SystemUtils;
@@ -37,7 +39,35 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        logger.info("Calculated flow type is [{}].", flowType);
+        if (flowType == FlowType.CONFIGURE) {
+            // Keep JavaFX alive between closing the wizard and showing the next window.
+            Platform.setImplicitExit(false);
+            if (!new WizardLauncher(primaryStage, applicationProperties).showAndSave()) {
+                Platform.exit();
+                return;
+            }
+            Thread.ofVirtual().start(() -> {
+                try {
+                    flowType = prepareConfiguredStartup(applicationProperties, startupArguments);
+                } catch (RuntimeException ex) {
+                    logger.error("Could not start with the saved configuration.", ex);
+                    Platform.runLater(() -> {
+                        new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
+                        Platform.exit();
+                    });
+                    return;
+                }
+                Platform.runLater(() -> {
+                    Platform.setImplicitExit(true);
+                    startConfigured(primaryStage);
+                });
+            });
+        } else {
+            startConfigured(primaryStage);
+        }
+    }
+
+    private void startConfigured(Stage primaryStage) {
         if (FlowType.INIT == flowType) {
             new FXWebService(primaryStage).onAuthenticated(() -> Thread.ofVirtual().start(() -> {
                 boolean initialized = initProgramSettings(startupArguments);
@@ -66,50 +96,36 @@ public class Main extends Application {
         logger.info("Gipter can use [{}] threads.", Runtime.getRuntime().availableProcessors());
         mObj.runConverters(applicationProperties);
         mObj.setDefaultConfig();
-        CookiesService.configure(applicationProperties.toolkitUserFolderUrl(),
-                applicationProperties.toolkitHostUrl() + applicationProperties.toolkitCopyCase() + "/_api/web/currentuser",
-                applicationProperties.toolkitUserEmail());
 
-        flowType = Stream.of(args)
-                .filter(a -> a.startsWith(ArgName.flowType.name()))
-                .map(a -> {
-                    String flowName = a.split("=")[1];
-                    logger.info("Flow passed as program argument: [{}]", flowName);
-                    return FlowType.valueOf(flowName);
-                })
-                .findFirst()
-                .orElse(FlowType.REGULAR);
-
-        if (flowType != FlowType.INIT) {
-            flowType = CookiesService.isCookiesFileExist() ? FlowType.REGULAR : FlowType.INIT;
-        }
-
-        if (applicationProperties.isNoSSO()) {
-            flowType = FlowType.NO_UPLOAD;
-        } else if (flowType != FlowType.INIT) {
-            boolean cookieWorking = isCookieWorking(args);
-            if (cookieWorking) {
-                flowType = FlowType.REGULAR;
-            } else {
-                flowType = FlowType.INIT;
-                logger.info("Toolkit session requires WebView2 sign-in.");
-            }
-        }
-
-        if (flowType == FlowType.INIT) {
+        flowType = startupFlow(applicationProperties, args);
+        logger.info("Calculated flow type is [{}].", flowType);
+        if (applicationProperties.isUseUI() || flowType == FlowType.INIT) {
             launch(args);
         } else {
-            boolean settingsInitiated = initProgramSettings(args);
-            if (flowType == FlowType.REGULAR) {
-                flowType = settingsInitiated ? FlowType.REGULAR : FlowType.NO_UPLOAD;
-            }
-            if (Main.applicationProperties.isUseUI()) {
-                launch(args);
-            } else {
-                Launcher launcher = LauncherFactory.getLauncher(applicationProperties);
-                launcher.execute();
-            }
+            LauncherFactory.getLauncher(applicationProperties).execute();
         }
+    }
+
+    static FlowType startupFlow(ApplicationProperties properties, String[] args) {
+        if (properties.isUseUI() && properties.getRunConfigMap().isEmpty()) {
+            return FlowType.CONFIGURE;
+        }
+        return prepareConfiguredStartup(properties, args);
+    }
+
+    private static FlowType prepareConfiguredStartup(ApplicationProperties properties, String[] args) {
+        CookiesService.configure(properties);
+        FlowType requested = Stream.of(args)
+                .filter(arg -> arg.startsWith(ArgName.flowType.name() + "="))
+                .map(arg -> FlowType.valueOf(arg.substring(arg.indexOf('=') + 1)))
+                .findFirst().orElse(FlowType.REGULAR);
+        if (!properties.isNoSSO() && (requested == FlowType.INIT
+                || !CookiesService.isCookiesFileExist() || !isCookieWorking(properties))) {
+            logger.info("Toolkit session requires WebView2 sign-in.");
+            return FlowType.INIT;
+        }
+        boolean initialized = initProgramSettings(args);
+        return initialized && !properties.isNoSSO() ? FlowType.REGULAR : FlowType.NO_UPLOAD;
     }
 
     private static void restoreBackup() {
@@ -135,9 +151,9 @@ public class Main extends Application {
         }
     }
 
-    private static boolean isCookieWorking(String[] args) {
+    private static boolean isCookieWorking(ApplicationProperties properties) {
         try {
-            return new ToolkitService(ApplicationPropertiesFactory.getInstance(args)).isCookieWorking();
+            return new ToolkitService(properties).isCookieWorking();
         } catch (IllegalStateException ex) {
             logger.error("SSO is not working: {}", ex.getMessage());
             return false;

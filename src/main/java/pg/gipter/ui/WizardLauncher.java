@@ -23,6 +23,7 @@ import pg.gipter.core.*;
 import pg.gipter.core.model.*;
 import pg.gipter.core.producers.command.ItemType;
 import pg.gipter.launchers.Launcher;
+import pg.gipter.services.CookiesService;
 import pg.gipter.ui.alerts.ImageFile;
 import pg.gipter.utils.*;
 
@@ -37,26 +38,42 @@ public class WizardLauncher implements Launcher {
     private final Stage primaryStage;
     private final Properties wizardProperties;
     private final String lastChosenConfiguration;
-    private UILauncher uiLauncher;
-    private ApplicationProperties applicationProperties;
+    private final ApplicationProperties applicationProperties;
     private final ApplicationConfig applicationConfig;
 
     static final String projectLabelPropertyName = "projectLabelProperty";
 
-    public WizardLauncher(Stage stage) {
-        this(stage, ArgName.configurationName.defaultValue(), new ApplicationConfig());
+    public WizardLauncher(Stage stage, ApplicationProperties applicationProperties) {
+        this(stage, ArgName.configurationName.defaultValue(), applicationProperties.getApplicationConfig(), applicationProperties);
     }
 
     public WizardLauncher(Stage stage, String lastChosenConfiguration, ApplicationConfig applicationConfig) {
+        this(stage, lastChosenConfiguration, applicationConfig, ApplicationPropertiesFactory.getInstance(new String[]{}));
+    }
+
+    private WizardLauncher(Stage stage, String lastChosenConfiguration, ApplicationConfig applicationConfig,
+                           ApplicationProperties applicationProperties) {
         this.primaryStage = stage;
         this.lastChosenConfiguration = lastChosenConfiguration;
         this.applicationConfig = applicationConfig;
         wizardProperties = new Properties();
-        applicationProperties = ApplicationPropertiesFactory.getInstance(new String[]{});
+        this.applicationProperties = applicationProperties;
     }
 
     @Override
     public void execute() {
+        boolean finished = showAndSave();
+        String configurationName = finished ? applicationProperties.configurationName() : lastChosenConfiguration;
+        ApplicationProperties selected = ApplicationPropertiesFactory.getInstance(new String[]{
+                ArgName.configurationName.name() + "=" + configurationName
+        });
+        if (finished) {
+            CookiesService.configure(selected);
+        }
+        new UILauncher(primaryStage, selected).execute();
+    }
+
+    public boolean showAndSave() {
         short step = 1;
         Wizard wizard = new Wizard();
         wizard.setTitle(BundleUtils.getMsg("wizard.title"));
@@ -68,27 +85,14 @@ public class WizardLauncher implements Launcher {
 
         wizard.setFlow(buildFlow(welcomePage, configurationPage, committerPage, projectPage, finishPage));
 
-        wizard.showAndWait().ifPresent(result -> {
-            ApplicationProperties instance = ApplicationPropertiesFactory.getInstance(new String[]{});
-            if (result == ButtonType.FINISH) {
-                logger.info("Wizard finished.");
-                saveConfiguration();
-            } else if (result == ButtonType.CANCEL) {
-                final String configurationName = wizardProperties.getProperty(ArgName.configurationName.name());
-                applicationProperties.getRunConfig(configurationName)
-                        .ifPresent(runConfig -> applicationProperties.removeConfig(configurationName));
-                logger.info("Wizard canceled.");
-                applicationProperties = ApplicationPropertiesFactory.getInstance(new String[]{});
-                if (!StringUtils.nullOrEmpty(lastChosenConfiguration)) {
-                    Optional<RunConfig> lastConfiguration = applicationProperties.getRunConfig(lastChosenConfiguration);
-                    if (lastConfiguration.isPresent()) {
-                        instance = ApplicationPropertiesFactory.getInstance(lastConfiguration.get().toArgumentArray());
-                    }
-                }
-            }
-            uiLauncher = new UILauncher(primaryStage, instance);
-            uiLauncher.execute();
-        });
+        if (wizard.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.FINISH) {
+            applyWizardProperties();
+            applicationProperties.save();
+            logger.info("Wizard finished.");
+            return true;
+        }
+        logger.info("Wizard canceled.");
+        return false;
     }
 
     private WizardPane buildWelcomePage(int step) {
@@ -121,7 +125,12 @@ public class WizardLauncher implements Launcher {
 
         gridPane.add(new Label(BundleUtils.getMsg("vcs.panel.itemType")), 0, row);
         ComboBox<ItemType> comboBox = createUploadTypeComboBox(ArgName.itemType.name());
-        gridPane.add(comboBox, 1, row);
+        gridPane.add(comboBox, 1, row++);
+
+        gridPane.add(new Label(BundleUtils.getMsg("toolkit.panel.username")), 0, row);
+        TextField username = createTextField(ArgName.toolkitUsername.name());
+        username.setText(applicationProperties.toolkitUsername());
+        gridPane.add(username, 1, row);
 
         WizardPane wizardPane = new WizardPane() {
             @Override
@@ -134,12 +143,6 @@ public class WizardLauncher implements Launcher {
                 if (StringUtils.nullOrEmpty(getValue(wizard, ArgName.configurationName.name()))) {
                     wizard.getSettings().put(ArgName.configurationName.name(), "wizard-config");
                 }
-                if (!StringUtils.nullOrEmpty(lastChosenConfiguration)) {
-                    ApplicationProperties applicationProperties = propertiesWithCredentials();
-                    if (applicationProperties.isToolkitCredentialsSet()) {
-                        wizard.getSettings().put(ArgName.toolkitUsername.name(), applicationProperties.toolkitUsername());
-                    }
-                }
                 String uploadType = wizardProperties.getProperty(ArgName.itemType.name());
                 if (StringUtils.nullOrEmpty(uploadType)) {
                     wizardProperties.put(ArgName.itemType.name(), comboBox.getValue().name());
@@ -149,13 +152,6 @@ public class WizardLauncher implements Launcher {
         wizardPane.setHeaderText(BundleUtils.getMsg("wizard.configuration.details") + stepMsg(step));
         wizardPane.setContent(gridPane);
         return wizardPane;
-    }
-
-    private ApplicationProperties propertiesWithCredentials() {
-        if (!applicationProperties.isToolkitConfigExists()) {
-            applicationProperties.updateToolkitConfig(new ToolkitConfig());
-        }
-        return applicationProperties;
     }
 
     private void updateProperties(Wizard wizard, Properties properties) {
@@ -313,12 +309,12 @@ public class WizardLauncher implements Launcher {
     }
 
     private void addProjects() {
-        saveConfiguration();
-        uiLauncher = new UILauncher(primaryStage, applicationProperties);
+        applyWizardProperties();
+        UILauncher uiLauncher = new UILauncher(primaryStage, applicationProperties);
         uiLauncher.showProject(applicationProperties.itemType(), wizardProperties);
     }
 
-    public void saveConfiguration() {
+    private void applyWizardProperties() {
         String[] args = wizardProperties.entrySet().stream()
                 .filter(entry -> !SharePointConfig.SHARE_POINT_CONFIGS.equals(entry.getKey()))
                 .map(entry -> String.format("%s=%s", entry.getKey(), entry.getValue()))
@@ -328,7 +324,6 @@ public class WizardLauncher implements Launcher {
         applicationProperties.updateCurrentRunConfig(runConfig);
         applicationProperties.updateToolkitConfig(ToolkitConfig.valueFrom(args));
         applicationProperties.updateApplicationConfig(applicationConfig);
-        applicationProperties.save();
     }
 
     private EventHandler<MouseEvent> labelAddItemEventHandler(StringProperty itemPathStringProperty) {
@@ -374,11 +369,6 @@ public class WizardLauncher implements Launcher {
             @Override
             public void onEnteringPage(Wizard wizard) {
                 updateProperties(wizard, wizardProperties);
-            }
-
-            @Override
-            public void onExitingPage(Wizard wizard) {
-                saveConfiguration();
             }
         };
         wizardPane.setHeaderText(BundleUtils.getMsg("wizard.finish.text", String.valueOf(step), String.valueOf(MAX_STEPS)));
