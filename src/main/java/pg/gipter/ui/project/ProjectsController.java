@@ -203,7 +203,6 @@ public class ProjectsController extends AbstractController {
         return _ -> {
             final String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
             applicationProperties.addProjectPath(projects);
-            applicationProperties.save();
 
             validateVcsAvailability();
 
@@ -211,6 +210,7 @@ public class ProjectsController extends AbstractController {
             if (uiLauncher.hasWizardProperties()) {
                 uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
             } else {
+                applicationProperties.save();
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
             }

@@ -248,12 +248,12 @@ public class ToolkitProjectsController extends AbstractController {
         return event -> {
             String projects = projectsTableView.getItems().stream().map(ProjectDetails::getPath).collect(Collectors.joining(","));
             applicationProperties.addProjectPath(projects);
-            applicationProperties.save();
 
             uiLauncher.hideToolkitProjectsWindow();
             if (uiLauncher.hasWizardProperties()) {
                 uiLauncher.addPropertyToWizard(ArgName.projectPath.name(), projects);
             } else {
+                applicationProperties.save();
                 uiLauncher.setApplicationProperties(applicationProperties);
                 uiLauncher.buildAndShowMainWindow();
             }
