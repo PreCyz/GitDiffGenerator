@@ -3,7 +3,7 @@
     <dontWrapJar>false</dontWrapJar>
     <headerType>gui</headerType>
     <jar>${project.build.directory}\Gipter-${project.version}.jar</jar>
-    <outfile>${project.build.directory}\dist\portable\Gipter.exe</outfile>
+    <outfile>${project.build.directory}\dist\portable-exe\Gipter.exe</outfile>
     <errTitle/>
     <cmdLine/>
     <chdir>.</chdir>
