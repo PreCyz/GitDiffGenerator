@@ -2,6 +2,7 @@ package pg.gipter.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
 import pg.gipter.services.auth.ToolkitSession;
 import pg.gipter.services.auth.WebView2AuthClient;
@@ -24,6 +25,12 @@ public final class CookiesService {
     private static boolean restored;
 
     private CookiesService() { }
+
+    public static void configure(ApplicationProperties properties) {
+        configure(properties.toolkitUserFolderUrl(),
+                properties.toolkitHostUrl() + properties.toolkitCopyCase() + "/_api/web/currentuser",
+                properties.toolkitUserEmail());
+    }
 
     public static synchronized void configure(String loginUrl, String identityUrl, String expectedEmail) {
         if (!startUrl.equals(loginUrl) || !probeUrl.equals(identityUrl) || !email.equalsIgnoreCase(expectedEmail)) {
