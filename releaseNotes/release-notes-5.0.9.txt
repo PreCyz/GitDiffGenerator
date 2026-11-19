@@ -1,0 +1,6 @@
+**Release notes**
+
+* On first launch, Gipter now completes configuration before opening Toolkit sign-in and uses the account selected during setup.
+* Gipter keeps configured repositories when a drive is locked or disconnected. One startup warning lists the affected paths. After unlocking or reconnecting the drive, retry generation in the same session.
+* The main window opens with an empty project list. Git author and email defaults come from an accessible Git repository.
+* The project editor shows unavailable repositories and preserves them when saving or searching for projects.
