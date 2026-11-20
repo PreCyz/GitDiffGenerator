@@ -73,7 +73,7 @@ public class MenuSectionController extends AbstractController {
 
     private void setUpgradeMenuItemDisabled() {
         if (SystemUtils.isPortableExe()) {
-            upgradeMenuItem.setDisable(true);
+            upgradeMenuItem.setDisable(false);
         } else {
             uiLauncher.executeOutsideUIThread(() -> {
                 logger.info("Checking new version.");
@@ -156,10 +156,7 @@ public class MenuSectionController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> upgradeActionEventHandler() {
-        return _ -> {
-            uiLauncher.hideMainWindow();
-            uiLauncher.showUpgradeWindow();
-        };
+        return _ -> uiLauncher.requestUpgrade();
     }
 
     private EventHandler<ActionEvent> launchWizardActionEventHandler() {

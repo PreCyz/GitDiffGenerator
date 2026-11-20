@@ -22,6 +22,7 @@ import pg.gipter.jobs.*;
 import pg.gipter.launchers.Launcher;
 import pg.gipter.services.GithubService;
 import pg.gipter.services.StartupService;
+import pg.gipter.services.platforms.AppManagerFactory;
 import pg.gipter.ui.alerts.*;
 import pg.gipter.ui.alerts.controls.ControlFactory;
 import pg.gipter.utils.*;
@@ -508,7 +509,13 @@ public class UILauncher implements Launcher {
         return jobService;
     }
 
-    public void showUpgradeWindow() {
+    public void requestUpgrade() {
+        if (SystemUtils.isPortableExe()) {
+            AppManagerFactory.getInstance().launchDefaultBrowser(GithubService.LATEST_RELEASE_URL);
+            return;
+        }
+
+        hideMainWindow();
         upgradeWindow = new Stage();
         upgradeWindow.initModality(Modality.APPLICATION_MODAL);
         buildScene(upgradeWindow, WindowFactory.UPGRADE.createWindow(applicationProperties, this));

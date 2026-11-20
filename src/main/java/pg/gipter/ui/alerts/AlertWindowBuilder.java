@@ -267,10 +267,7 @@ public class AlertWindowBuilder {
             final UILauncher uiLauncher = customControl.getUiLauncher();
             EventHandler<ActionEvent> eventHandler = event -> {
                 alert.close();
-                Platform.runLater(() -> {
-                    uiLauncher.hideMainWindow();
-                    uiLauncher.showUpgradeWindow();
-                });
+                Platform.runLater(uiLauncher::requestUpgrade);
             };
             Control control = customControl.create(eventHandler);
 
