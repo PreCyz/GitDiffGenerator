@@ -134,18 +134,22 @@ public class ProjectsController extends AbstractController {
     }
 
     private EventHandler<ActionEvent> searchButtonActionEventHandler(ResourceBundle resources) {
-        return _ -> {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(Paths.get(".").toFile());
-            directoryChooser.setTitle(resources.getString("directory.search.title"));
-            final Optional<File> directory = Optional.ofNullable(directoryChooser.showDialog(uiLauncher.currentWindow()));
-            if (directory.isPresent() && Files.exists(directory.get().toPath()) &&
-                    Files.isDirectory(directory.get().toPath())) {
+        return _ -> chooseProjectDirectory(resources.getString("directory.search.title")).ifPresent(directory ->
                 CompletableFuture.supplyAsync(() ->
-                        FXCollections.observableList(searchForProjects(directory.get().toPath())), uiLauncher.nonUIExecutor()
-                ).thenAcceptAsync(this::refreshProjectTableView, Platform::runLater);
-            }
-        };
+                        FXCollections.observableList(searchForProjects(directory)), uiLauncher.nonUIExecutor()
+                ).thenAcceptAsync(this::refreshProjectTableView, Platform::runLater));
+    }
+
+    private Optional<Path> chooseProjectDirectory(String title) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setInitialDirectory(Paths.get(".").toFile());
+        chooser.setTitle(title);
+        File selected = chooser.showDialog(uiLauncher.currentWindow());
+        if (selected == null) {
+            logger.warn("Project folder selection cancelled.");
+            return Optional.empty();
+        }
+        return Optional.of(selected.toPath()).filter(Files::isDirectory);
     }
 
     private void refreshProjectTableView(ObservableList<ProjectDetails> observableList) {
@@ -225,37 +229,33 @@ public class ProjectsController extends AbstractController {
 
     }
 
-    private EventHandler<ActionEvent> addButtonActionEventHandler(ResourceBundle resources) {
-        return _ -> {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(Paths.get(".").toFile());
-            directoryChooser.setTitle(resources.getString("directory.item.title"));
-            Path itemPathDirectory = directoryChooser.showDialog(uiLauncher.currentWindow()).toPath();
-            if (Files.exists(itemPathDirectory) && Files.isDirectory(itemPathDirectory)) {
-                try {
-                    String vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
-                    ProjectDetails project = new ProjectDetails(
-                            itemPathDirectory.getFileName().toString(),
-                            vcsType,
-                            itemPathDirectory.toAbsolutePath().toString()
-                    );
-                    if (projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
-                        projectsTableView.setItems(FXCollections.observableArrayList(project));
-                        saveButton.setDisable(false);
-                    } else {
-                        projectsTableView.getItems().add(project);
-                    }
-                    projectsTableView.refresh();
-                } catch (IllegalArgumentException ex) {
-                    AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                            .withHeaderText(ex.getMessage())
-                            .withLinkAction(new LogLinkAction())
-                            .withAlertType(Alert.AlertType.ERROR)
-                            .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
-                    Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
-                }
+    EventHandler<ActionEvent> addButtonActionEventHandler(ResourceBundle resources) {
+        return _ -> chooseProjectDirectory(resources.getString("directory.item.title")).ifPresent(this::addProject);
+    }
+
+    private void addProject(Path itemPathDirectory) {
+        try {
+            String vcsType = VersionControlSystem.valueFrom(itemPathDirectory).name();
+            ProjectDetails project = new ProjectDetails(
+                    itemPathDirectory.getFileName().toString(),
+                    vcsType,
+                    itemPathDirectory.toAbsolutePath().toString()
+            );
+            if (projectsTableView.getItems().contains(ProjectDetails.DEFAULT)) {
+                projectsTableView.setItems(FXCollections.observableArrayList(project));
+                saveButton.setDisable(false);
+            } else {
+                projectsTableView.getItems().add(project);
             }
-        };
+            projectsTableView.refresh();
+        } catch (IllegalArgumentException ex) {
+            AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
+                    .withHeaderText(ex.getMessage())
+                    .withLinkAction(new LogLinkAction())
+                    .withAlertType(Alert.AlertType.ERROR)
+                    .withWebViewDetails(WebViewService.getInstance().pullFailWebView());
+            Platform.runLater(alertWindowBuilder::buildAndDisplayWindow);
+        }
     }
 
     private EventHandler<ActionEvent> removeButtonActionEventHandler() {
