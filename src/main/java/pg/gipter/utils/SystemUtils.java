@@ -3,6 +3,7 @@ package pg.gipter.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.*;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -78,17 +79,11 @@ public final class SystemUtils {
                 ).orElseThrow(() -> new IllegalArgumentException("Cannot find TMP directory"));
     }
 
-    public static boolean isPortable() {
-        if (isCustomRuntime()) {
-            Properties properties = new Properties();
-            try (InputStream is = Files.newInputStream(Paths.get(SystemUtils.javaHome(), "release"))) {
-                properties.load(is);
-                return properties.getProperty("IMAGE_TYPE", "").toUpperCase().contains("JRE");
-            } catch (IOException ex) {
-                return false;
-            }
-        }
-        return false;
+    public static boolean isPortableExe() {
+        // Launch4j embeds the JAR in the EXE. Both portable editions bundle the same JRE.
+        return JarHelper.getJarPath().map(Path::getFileName)
+                .map(name -> name.toString().toLowerCase(Locale.ROOT).endsWith(".exe"))
+                .orElse(false);
     }
 
     public static boolean isMsi() {

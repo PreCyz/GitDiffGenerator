@@ -198,12 +198,12 @@ public class GithubService {
 
         boolean result = !assetName.isJsonNull();
         result &= assetName.getAsString().contains(name);
-        if (SystemUtils.isPortable()) {
+        if (SystemUtils.isPortableExe()) {
             result &= assetName.getAsString().contains(portable);
         } else if (SystemUtils.isMsi()) {
             result &= assetName.getAsString().endsWith(msi);
         } else {
-            result &= assetName.getAsString().startsWith(jar);
+            result &= assetName.getAsString().startsWith(jar) && assetName.getAsString().endsWith(".7z");
         }
         return result;
     }

@@ -72,7 +72,7 @@ public class MenuSectionController extends AbstractController {
     }
 
     private void setUpgradeMenuItemDisabled() {
-        if (SystemUtils.isPortable()) {
+        if (SystemUtils.isPortableExe()) {
             upgradeMenuItem.setDisable(true);
         } else {
             uiLauncher.executeOutsideUIThread(() -> {

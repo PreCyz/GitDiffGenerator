@@ -127,7 +127,7 @@ public class UILauncher implements Launcher {
         }
         if (applicationProperties.isUpgradeFinished()) {
             displayUpgradeInfo();
-        } else if (!(SystemUtils.isPortable() && SystemUtils.isExe())) {
+        } else if (!SystemUtils.isPortableExe()) {
             checkUpgrades();
         }
         setStartOnStartup();
