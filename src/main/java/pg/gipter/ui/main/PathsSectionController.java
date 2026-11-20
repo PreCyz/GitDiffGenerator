@@ -43,66 +43,45 @@ class PathsSectionController extends AbstractController {
         this.mainController = mainController;
     }
 
-    public void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap) {
+    void initialize(URL location, ResourceBundle resources, Map<String, Control> controlsMap,
+                    Map<String, VersionControlSystem> repositories) {
         super.initialize(location, resources);
         projectPathLabel = (Label) controlsMap.get("projectPathLabel");
         itemPathLabel = (Label) controlsMap.get("itemPathLabel");
         itemFileNamePrefixTextField = (TextField) controlsMap.get("itemFileNamePrefixTextField");
         projectPathButton = (Button) controlsMap.get("projectPathButton");
         itemPathButton = (Button) controlsMap.get("itemPathButton");
-        verifyRepoPaths();
+        warnAboutUnavailableRepositories(repositories);
         setInitValues();
         setProperties(resources);
         setActions(resources);
         TextFieldIntelliSense.init(itemFileNamePrefixTextField, NamePatternValue.class);
     }
 
-    private void verifyRepoPaths() {
-        Set<String> invalidRepos = findInvalidRepos();
-        if (!invalidRepos.isEmpty()) {
-            Set<String> paths = applicationProperties.projectPaths();
-            if (paths.removeAll(invalidRepos)) {
-                logger.warn("Broken repos {} removed from the configuration [{}]",
-                        invalidRepos, applicationProperties.configurationName());
-            }
-            applicationProperties.addProjectPath(String.join(",", paths));
-            applicationProperties.save();
-
-            for (String invalidRepo : invalidRepos) {
-                AlertWindowBuilder alertWindowBuilder = new AlertWindowBuilder()
-                        .withHeaderText(BundleUtils.getMsg("vcs.invalid.repo.removed",
-                                invalidRepo, applicationProperties.configurationName()
-                        ))
-                        .withMessage(BundleUtils.getMsg("vcs.invalid.repo.tip",
-                                applicationProperties.configurationName()
-                        ))
-                        .withAlertType(Alert.AlertType.WARNING)
-                        .withUITheme(applicationProperties.uiTheme());
-
-                WebViewDetails webViewDetails = WebViewService.getInstance().pullFailWebView();
-                if (webViewDetails.getWebView() != null) {
-                    alertWindowBuilder.withWebViewDetails(webViewDetails);
-                } else {
-                    alertWindowBuilder.withImageFile(ImageFile.randomFailImage());
-                }
-                alertWindowBuilder.buildAndDisplayWindow();
-            }
+    void warnAboutUnavailableRepositories(Map<String, VersionControlSystem> repositories) {
+        List<String> unavailable = repositories.entrySet().stream()
+                .filter(entry -> entry.getValue() == VersionControlSystem.NA)
+                .map(Map.Entry::getKey)
+                .toList();
+        if (unavailable.isEmpty()) {
+            return;
         }
-    }
 
-    private Set<String> findInvalidRepos() {
-        Set<String> invalidRepos = new HashSet<>();
-        if (EnumSet.of(ItemType.STATEMENT, ItemType.TOOLKIT_DOCS).contains(applicationProperties.itemType())) {
-            return invalidRepos;
+        String configuration = applicationProperties.configurationName();
+        logger.warn("Repositories unavailable in configuration [{}]: {}", configuration, unavailable);
+        AlertWindowBuilder alert = new AlertWindowBuilder()
+                .withHeaderText(BundleUtils.getMsg("vcs.repo.unavailable.header", configuration))
+                .withMessage(BundleUtils.getMsg("vcs.repo.unavailable.message",
+                        String.join(System.lineSeparator(), unavailable)))
+                .withAlertType(Alert.AlertType.WARNING)
+                .withUITheme(applicationProperties.uiTheme());
+        WebViewDetails details = WebViewService.getInstance().pullFailWebView();
+        if (details.getWebView() != null) {
+            alert.withWebViewDetails(details);
+        } else {
+            alert.withImageFile(ImageFile.randomFailImage());
         }
-        for (String path : applicationProperties.projectPaths()) {
-            try {
-                VersionControlSystem.valueFrom(Paths.get(path));
-            } catch (Exception e) {
-                invalidRepos.add(path);
-            }
-        }
-        return invalidRepos;
+        alert.buildAndDisplayWindow();
     }
 
     private void setInitValues() {

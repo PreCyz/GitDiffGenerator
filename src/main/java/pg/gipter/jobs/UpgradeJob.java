@@ -43,7 +43,7 @@ public class UpgradeJob implements Job {
             logger.info("New version available: {}.", githubService.getServerVersion());
             Platform.runLater(() -> new AlertWindowBuilder()
                     .withHeaderText(BundleUtils.getMsg("popup.upgrade.message", githubService.getServerVersion()))
-                    .withLinkAction(new BrowserLinkAction(GithubService.GITHUB_URL + "/releases/latest"))
+                    .withLinkAction(new BrowserLinkAction(GithubService.LATEST_RELEASE_URL))
                     .withAlertType(Alert.AlertType.INFORMATION)
                     .withWebViewDetails(WebViewService.getInstance().pullSuccessWebView())
                     .buildAndDisplayWindow()

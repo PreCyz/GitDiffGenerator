@@ -1,0 +1,9 @@
+**Release notes**
+
+* On first launch, Gipter now completes configuration before opening Toolkit sign-in and uses the account selected during setup.
+* Gipter keeps configured repositories when a drive is locked or disconnected. One startup warning lists the affected paths. After unlocking or reconnecting the drive, retry generation in the same session.
+* The main window opens with an empty project list. Git author and email defaults come from an accessible Git repository.
+* The project editor shows unavailable repositories and preserves them when saving or searching for projects.
+* Cancelling the project folder chooser in the setup wizard now logs a single warning and returns you to the project list with your selections intact.
+* In the portable EXE edition, choosing Upgrade opens the latest GitHub release in your default browser so you can download the package manually. Gipter stays open.
+* When you run Gipter.jar with its bundled Java runtime, Upgrade now selects the JAR release archive.

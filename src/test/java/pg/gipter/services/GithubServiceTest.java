@@ -4,18 +4,26 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import pg.gipter.core.ApplicationProperties;
+import pg.gipter.utils.JarHelper;
+import pg.gipter.utils.SystemUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +32,26 @@ class GithubServiceTest {
 
     private final ApplicationProperties mockAppProps = mock(ApplicationProperties.class);
     private GithubService spyGithubService;
+
+    @Test
+    void jarWithBundledJreSelectsJarArchive(@TempDir Path installation) throws IOException {
+        Path runtime = Files.createDirectory(installation.resolve("runtime"));
+        Files.writeString(runtime.resolve("release"), "IMAGE_TYPE=\"JRE\"");
+        Files.createFile(installation.resolve("Gipter.exe"));
+        JsonObject release = new Gson().fromJson("""
+                {"name":"v5.1","assets":[
+                    {"name":"Gipter-v5.1-portable.7z","url":"exe"},
+                    {"name":"11+Gipter-v5.1.msi","url":"msi"},
+                    {"name":"11+Gipter-v5.1.7z","url":"jar"}]}
+                """, JsonObject.class);
+        try (var system = mockStatic(SystemUtils.class, CALLS_REAL_METHODS);
+             var source = mockStatic(JarHelper.class)) {
+            system.when(SystemUtils::javaHome).thenReturn(runtime.toString());
+            source.when(JarHelper::getJarPath).thenReturn(Optional.of(installation.resolve("Gipter.jar")));
+            var service = new GithubService(new SemanticVersioning(5, 0, 0), "");
+            assertThat(service.getDownloadLink(release)).contains("jar");
+        }
+    }
 
     @Test
     void givenNewerVersionInGithub_whenIsNewVersion_thenReturnTrue() {

@@ -17,6 +17,7 @@ import java.util.stream.IntStream;
 public class GithubService {
 
     public static final String GITHUB_URL = "https://github.com/PreCyz/GitDiffGenerator";
+    public static final String LATEST_RELEASE_URL = GITHUB_URL + "/releases/latest";
     private static final Logger logger = LoggerFactory.getLogger(GithubService.class);
     private static final HttpClient CLIENT = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
@@ -198,12 +199,12 @@ public class GithubService {
 
         boolean result = !assetName.isJsonNull();
         result &= assetName.getAsString().contains(name);
-        if (SystemUtils.isPortable()) {
+        if (SystemUtils.isPortableExe()) {
             result &= assetName.getAsString().contains(portable);
         } else if (SystemUtils.isMsi()) {
             result &= assetName.getAsString().endsWith(msi);
         } else {
-            result &= assetName.getAsString().startsWith(jar);
+            result &= assetName.getAsString().startsWith(jar) && assetName.getAsString().endsWith(".7z");
         }
         return result;
     }

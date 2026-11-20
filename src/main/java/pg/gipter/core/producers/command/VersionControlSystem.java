@@ -1,8 +1,11 @@
 package pg.gipter.core.producers.command;
 
+import pg.gipter.core.ArgName;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -46,6 +49,21 @@ public enum VersionControlSystem {
             iae.setStackTrace(ex.getStackTrace());
             throw iae;
         }
+    }
+
+    public static Map<String, VersionControlSystem> inspectProjectPaths(Iterable<String> paths) {
+        Map<String, VersionControlSystem> repositories = new LinkedHashMap<>();
+        for (String path : paths) {
+            if (path.isBlank() || ArgName.projectPath.defaultValue().equals(path)) {
+                continue;
+            }
+            try {
+                repositories.put(path, valueFrom(Path.of(path)));
+            } catch (IllegalArgumentException ex) {
+                repositories.put(path, NA);
+            }
+        }
+        return repositories;
     }
 
     public static VersionControlSystem valueFor(String value) {
