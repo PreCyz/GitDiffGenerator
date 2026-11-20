@@ -1,11 +1,13 @@
 package pg.gipter.ui.project;
 
+import javafx.stage.DirectoryChooser;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import pg.gipter.core.ApplicationProperties;
 import pg.gipter.core.ArgName;
 import pg.gipter.core.producers.command.ItemType;
+import pg.gipter.ui.UILauncher;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,12 +15,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.LinkedHashSet;
+import java.util.ResourceBundle;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ProjectsControllerTest {
+
+    @Test
+    void cancellingAddProjectReturnsWithoutUpdatingTheTable() {
+        var controller = new ProjectsController(null, mock(UILauncher.class));
+        try (var choosers = mockConstruction(DirectoryChooser.class)) {
+            controller.addButtonActionEventHandler(mock(ResourceBundle.class)).handle(null);
+            verify(choosers.constructed().getFirst()).showDialog(null);
+        }
+    }
 
     @Test
     void editorPreservesUnavailableProjectsAlongsideAvailableOnes(@TempDir Path drive) throws IOException {
