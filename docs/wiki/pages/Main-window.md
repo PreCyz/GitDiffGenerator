@@ -6,7 +6,7 @@ The main window manages run configurations and starts generation/upload operatio
 
 The top section shows the configured username, destination folder, and session-expiry information. The folder field is read-only here; edit it in **Settings → Toolkit**. The expiry label reports session status; a failed connection check can open sign-in automatically. See [Toolkit details](https://github.com/PreCyz/GitDiffGenerator/wiki/Toolkit-details) and [Toolkit sign in](https://github.com/PreCyz/GitDiffGenerator/wiki/Toolkit-sign-in).
 
-This section uses work-account SSO rather than a password-entry form. Gipter checks the signed-in identity against the configured account. Generation/upload actions are blocked while authentication is in progress.
+This section uses work-account SSO rather than a password-entry form. Gipter checks the signed-in identity against the configured account. Generation/upload actions are blocked while authentication is in progress. With No SSO enabled, main-window initialization skips the Toolkit connection check and enables local execution; Toolkit uploads and document retrieval still require access.
 
 ## Configurations
 
@@ -20,6 +20,14 @@ Use the configuration selector to switch between saved named configurations. **A
 | Additional settings | Delete downloaded document files, remote filtering, repository fetching, and fetch timeout. Availability depends on the item type. |
 
 Project selection differs for local VCS repositories and Toolkit documents. Check the selected projects after changing the item type. See [Item types](https://github.com/PreCyz/GitDiffGenerator/wiki/Item-types) and [Custom item name](https://github.com/PreCyz/GitDiffGenerator/wiki/Custom-item-name).
+
+### Unavailable repositories
+
+For code item types, Gipter keeps configured paths when a drive is locked, disconnected, or no supported repository can be detected. A single warning for the current configuration lists the affected paths; opening the window does not remove them from saved settings. The project editor labels these entries **Unavailable** and preserves them when saving or searching for projects. Remove a path explicitly only when you no longer need it.
+
+Unlock or reconnect the drive, verify the repository is accessible, and retry generation in the same session. A warning does not mean generation can succeed while the path is unavailable. The main window can also open with an empty project list; select repositories before generating a code item. Git author/email defaults come from an accessible Git repository, not an unavailable first entry; without a usable Git default, those default controls are disabled.
+
+Cancelling the project folder chooser leaves existing selections intact.
 
 The last-item date comes from the most recent Toolkit item's **modified date**. Selecting it as the next start date is a convenience; review the intended coverage period before submission.
 
@@ -43,4 +51,4 @@ Execute and All-in generate items; whether they also upload depends on **Upload 
 
 Closing the window can minimize it to the tray when that feature is enabled and supported. Jobs run only while Gipter is running; see [Job window](https://github.com/PreCyz/GitDiffGenerator/wiki/Job-window).
 
-Source: [main.fxml](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/resources/fxml/main.fxml), [MainController.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/ui/main/MainController.java), [ToolkitSectionController.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/ui/main/ToolkitSectionController.java), [translation.properties](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/resources/bundle/translation.properties).
+Source: [main.fxml](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/resources/fxml/main.fxml), [MainController.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/ui/main/MainController.java), [ToolkitSectionController.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/ui/main/ToolkitSectionController.java), [translation.properties](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/resources/bundle/translation.properties).

@@ -34,6 +34,16 @@ Check that the selected paths exist, the relevant VCS executable is on PATH, the
 
 For Toolkit documents, check project selection, document list names, permissions, and author/modifier metadata settings in **Settings → Toolkit**. A site's document-query capabilities may differ. Recheck the query error before changing these options.
 
+## Repositories unavailable after startup
+
+A locked or disconnected drive can cause one warning listing unavailable repositories in the selected configuration. The paths remain configured and appear as **Unavailable** in the project editor, including after saving or searching. Unlock/reconnect the drive and check that each path contains a supported repository, then retry generation without restarting Gipter. If a repository was permanently moved or removed, update or explicitly remove its entry.
+
+An empty project list no longer prevents the main window from opening; add the required repositories before generating code items. Git author/email default controls require an accessible Git repository.
+
+## Portable EXE Upgrade only opens a browser
+
+This is expected in 5.0.9. Download the portable EXE package from the release page, close Gipter, retain configuration/job data, and replace the full distribution manually. For JAR installations, including a JAR launched with its bundled runtime, Upgrade uses the JAR archive updater. See [Installation and upgrade](https://github.com/PreCyz/GitDiffGenerator/wiki/Installation-and-upgrade).
+
 ## Job did not run
 
 Keep Gipter running, save/select the intended configurations, check the schedule and system clock/time zone, and complete interactive sign-in if requested. A job cannot upload while the machine/application is off. Use the missed-execution prompt on restart when offered, then verify its output and submission.
@@ -45,7 +55,6 @@ The reminder and upload schedules are different jobs. `logs/quartz-job.log` and 
 These are observations in the documented source, not configuration guarantees:
 
 - **CLI SSO override:** an explicit CLI `noSSO` value reads the UI flag in the current CLI property implementation. For generation-only CLI runs, store `appConfig.noSSO=true` and `uploadItem=false`, then omit the `noSSO` argument; see [Examples](https://github.com/PreCyz/GitDiffGenerator/wiki/Examples).
-- **UI generation-only launch:** the main window currently checks Toolkit connectivity and can open sign-in even when No SSO was selected. Use the saved-settings CLI example for a local-generation workflow that skips that sign-in path.
 - **Historical start-date precedence:** a saved `periodInDays` can replace an explicit CLI start date if the period argument is omitted. Supply the explicit period argument too when following the historical-range example.
 - **CLI exit status:** the CLI launcher exits with `-1` after running. Do not treat it as a reliable distinction between successful and failed generation.
 - **Theme override:** select/save the theme through the UI; the current theme argument extractor always returns its default.
@@ -55,4 +64,4 @@ These are observations in the documented source, not configuration guarantees:
 
 These documentation changes do not modify the application behavior. For support, include the application version, distribution type, operation, and relevant error text. Inspect/redact logs before sharing; never include session cookies or other credentials.
 
-Source: [WebView2AuthClient.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/services/auth/WebView2AuthClient.java), [CliApplicationProperties.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/core/CliApplicationProperties.java), [CLILauncher.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/launchers/CLILauncher.java), [UploadItemJob.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/jobs/UploadItemJob.java), [LastItemJob.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/jobs/LastItemJob.java).
+Source: [WebView2AuthClient.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/services/auth/WebView2AuthClient.java), [CliApplicationProperties.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/core/CliApplicationProperties.java), [CLILauncher.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/launchers/CLILauncher.java), [UploadItemJob.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/jobs/UploadItemJob.java), [LastItemJob.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/jobs/LastItemJob.java).

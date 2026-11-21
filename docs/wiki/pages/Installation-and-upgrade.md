@@ -31,12 +31,16 @@ Linux-specific producer classes exist, but the shared VCS executor currently lau
 
 ## Upgrade
 
-Use **Help → Upgrade** to start the application's upgrade workflow. The selected distribution depends on the running installation. Portable updates extract the downloaded archive and restart the application. An existing `gifs.json` is preserved by the archive updater.
+Use **Help → Upgrade**. The behavior depends on the running distribution:
+
+- **Portable EXE:** opens the latest GitHub release in your default browser and leaves Gipter open. Download the matching portable EXE package and replace it manually; this action does not install or restart Gipter.
+- **Portable JAR or standalone JAR:** uses the archive updater. Running `Gipter.jar` with a bundled Java runtime still selects the JAR `.7z` release archive. The updater extracts the archive and restarts the application, preserving an existing `gifs.json`.
+- **MSI:** uses the installer workflow described below.
 
 MSI updates download an installer and back up application files under `%TEMP%\Gipter-backup` before starting it. On subsequent startup the application attempts to restore missing non-executable files from that backup. This is an upgrade recovery mechanism, not a complete backup policy.
 
 Before a manual replacement, close Gipter and retain a copy of your configuration and local job data. Extract/install the full matching distribution. Do not assume a saved Windows sign-in session transfers to another Windows user or device.
 
-The source baseline for these pages is 5.0.8 at `af01f8c8`, including its .NET 10 change. Release assets can predate that commit. This page does not assert that any particular downloaded archive already contains .NET 10.
+The upgrade behavior above is proposed in 5.0.9 [PR #33](https://github.com/PreCyz/GitDiffGenerator/pull/33), reviewed at commit `e569b2d75dab791217132437b87a964021655fe7`. Release assets can predate these changes; check the downloaded package rather than assuming it includes them.
 
-Source: [portable-jar.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/installer/portable-jar.ps1), [portable-exe.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/installer/portable-exe.ps1), [installer.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/installer/installer.ps1), [UpgradeZip.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/services/upgrade/UpgradeZip.java), [BackupService.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/services/upgrade/BackupService.java).
+Source: [portable-jar.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/installer/portable-jar.ps1), [portable-exe.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/installer/portable-exe.ps1), [installer.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/installer/installer.ps1), [UpgradeZip.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/services/upgrade/UpgradeZip.java), [BackupService.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/services/upgrade/BackupService.java).
