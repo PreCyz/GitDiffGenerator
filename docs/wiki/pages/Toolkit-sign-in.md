@@ -5,10 +5,10 @@ Toolkit uploads and document retrieval use the Windows native WebView2 sign-in h
 ## Sign in
 
 1. Start Gipter on Windows with WebView2 Evergreen Runtime installed.
-2. If no usable saved session is available, Gipter opens a sign-in status window and the native work-account sign-in window.
+2. On first UI launch, finish the configuration wizard, including the Toolkit username, before sign-in. With SSO enabled, if no usable saved session is available, Gipter opens a sign-in status window and the native work-account sign-in window.
 3. Complete your organization's work-account sign-in, including any required MFA or device checks.
 4. Gipter verifies the returned Toolkit identity against the configured account and checks that the session works for Java's Toolkit requests.
-5. Successful initial sign-in continues startup in the same application process. If no configurations exist, the wizard follows.
+5. Successful initial sign-in continues startup in the same application process using the configuration saved during setup.
 
 Use **Cancel** in the status window to stop an in-progress attempt. A failed/cancelled attempt can be retried with **Retry** when offered. Startup and main-window connection checks can request another sign-in when the session is unusable. The session-expiry label is a status display, not a refresh button. Operations wait for authentication rather than submitting an upload while sign-in is incomplete.
 
@@ -28,4 +28,4 @@ Scheduled and accepted missed uploads request authentication when necessary and 
 
 See [Troubleshooting](https://github.com/PreCyz/GitDiffGenerator/wiki/Troubleshooting) for missing components, account mismatch, and failed-session checks.
 
-Source: [Main.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/Main.java), [FXWebService.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/services/FXWebService.java), [WebView2AuthClient.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/services/auth/WebView2AuthClient.java), [SessionStore.cs](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/native/webview2-auth/SessionStore.cs), [Protocol.cs](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/native/webview2-auth/Protocol.cs).
+Source: [Main.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/Main.java), [FXWebService.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/services/FXWebService.java), [WebView2AuthClient.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/services/auth/WebView2AuthClient.java), [SessionStore.cs](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/native/webview2-auth/SessionStore.cs), [Protocol.cs](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/native/webview2-auth/Protocol.cs).

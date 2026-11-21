@@ -2,13 +2,13 @@
 
 Gipter generates copyright items from Git, Mercurial, SVN, or Toolkit documents. You can generate items locally, upload them to Toolkit, and schedule work while the application is running.
 
-These pages describe application source version **5.0.8**, checked against commit `af01f8c8`. That source includes the .NET 10 build update. Check the contents of a downloaded release separately; a source change does not mean an existing release archive has been rebuilt.
+These pages include proposed application version **5.0.9** from [PR #33](https://github.com/PreCyz/GitDiffGenerator/pull/33), checked at commit `e569b2d75dab791217132437b87a964021655fe7`. The PR is still open. Unchanged topics retain their pinned 5.0.8 references. Check the contents of a downloaded release separately; these pages do not imply that 5.0.9 is published.
 
 ## Get started
 
 1. Choose a distribution in [Installation and upgrade](https://github.com/PreCyz/GitDiffGenerator/wiki/Installation-and-upgrade). Windows portable and MSI distributions include their Java runtime.
-2. For Toolkit uploads, complete [Toolkit sign in](https://github.com/PreCyz/GitDiffGenerator/wiki/Toolkit-sign-in) on Windows with Microsoft Edge WebView2 Runtime installed.
-3. Create a named configuration using the [Wizard](https://github.com/PreCyz/GitDiffGenerator/wiki/Wizard) or [Main window](https://github.com/PreCyz/GitDiffGenerator/wiki/Main-window).
+2. Create a named configuration using the [Wizard](https://github.com/PreCyz/GitDiffGenerator/wiki/Wizard) or [Main window](https://github.com/PreCyz/GitDiffGenerator/wiki/Main-window). On first UI launch, finish setup before signing in.
+3. For Toolkit uploads, complete [Toolkit sign in](https://github.com/PreCyz/GitDiffGenerator/wiki/Toolkit-sign-in) on Windows with Microsoft Edge WebView2 Runtime installed.
 4. Choose an [Item types](https://github.com/PreCyz/GitDiffGenerator/wiki/Item-types) value, check authors, projects, output location, and dates, then save the configuration.
 5. Execute one configuration or use All-in for all saved configurations. Uploading depends on the application settings.
 
@@ -25,4 +25,4 @@ These pages describe application source version **5.0.8**, checked against commi
 
 The current execution path is Windows-oriented: Toolkit device SSO requires Windows, Maven selects Windows JavaFX native artifacts, and the shared VCS executor launches `powershell.exe`. Linux-specific producer classes exist, but a non-Windows Java compilation does not establish a working Linux distribution.
 
-Source: [pom.xml](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/pom.xml), [WebView2AuthClient.java](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/src/main/java/pg/gipter/services/auth/WebView2AuthClient.java).
+Source: [pom.xml](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/pom.xml), [WebView2AuthClient.java](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/src/main/java/pg/gipter/services/auth/WebView2AuthClient.java).

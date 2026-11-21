@@ -1,5 +1,18 @@
 # Wiki refresh notes
 
+## PR #33 follow-up (2026-11-21)
+
+This follow-up documents the proposed 5.0.9 changes in [PR #33](https://github.com/PreCyz/GitDiffGenerator/pull/33), reviewed at head `e569b2d75dab791217132437b87a964021655fe7`. The application PR is open; this documentation does not claim that the release is published. The original 5.0.8 audit below remains historical evidence for unchanged topics.
+
+- First UI launch saves wizard configuration before Toolkit sign-in, including the selected username. First-run cancellation exits; cancellation from Help returns to the previous configuration. Project chooser cancellation preserves selections.
+- Unavailable repositories remain configured, appear as Unavailable in the editor, survive save/search, and produce one warning listing the affected paths for the current configuration. Users can unlock/reconnect a drive and retry generation in the same session. Empty project lists no longer prevent opening the main window, and Git identity defaults use an accessible Git repository.
+- Main-window initialization now skips its connectivity check with No SSO enabled. This supersedes the UI generation-only limitation recorded in the original audit below; the explicit CLI override issue is unchanged by this PR.
+- Portable EXE Upgrade opens the latest release in the browser without closing Gipter. JAR installations select the JAR `.7z` archive even with a bundled runtime.
+
+Changed page source links are pinned to the reviewed PR head. No application files, screenshots, PDF/ODT guides, or live GitHub Wiki pages are modified. Verification for this follow-up covers page/local link targets, balanced Markdown fences, heading structure, JSON example parsing, the documentation-only diff, and Git whitespace checks. Application tests are not rerun for prose-only changes; PR #33's own test results remain separate evidence.
+
+## Original 5.0.8 refresh
+
 Documentation baseline: application version 5.0.8, commit `af01f8c8` on `codex/webview2-device-sso`, reviewed on 2026-10-29. The committed .NET 10 source change is included. This is not a statement that published release assets have been rebuilt.
 
 ## Delivered scope

@@ -2,7 +2,7 @@
 
 This `wiki` branch contains the reviewable Markdown sources for Gipter's wiki. Start with [Home](docs/wiki/pages/Home.md).
 
-The pages describe application source version **5.0.8** at commit `af01f8c8` on `codex/webview2-device-sso`, including its committed .NET 10 build update. Release archives may predate that commit. Build commands belong in an application source checkout; this documentation branch retains an old POM and is not the current application build tree.
+The pages include the proposed **5.0.9** behavior from [PR #33](https://github.com/PreCyz/GitDiffGenerator/pull/33), reviewed at commit `e569b2d75dab791217132437b87a964021655fe7`. PR #33 is still open; these updates do not imply that 5.0.9 has been released. Unchanged topics retain their pinned 5.0.8 source references. Release archives may predate these changes. Build commands belong in an application source checkout; this documentation branch retains an old POM and is not the current application build tree.
 
 ## Pages
 
@@ -37,7 +37,7 @@ GitHub stores the live pages in [GitDiffGenerator.wiki.git](https://github.com/P
 
 ## Legacy guides
 
-[ODT guide](docs/Gipter-ui-description.odt) and [PDF guide](docs/Gipter-ui-description.pdf) are retained as **legacy documentation**. They contain older requirements/screens and are not the current 5.0.8 instructions. Use the Markdown pages above for current behavior.
+[ODT guide](docs/Gipter-ui-description.odt) and [PDF guide](docs/Gipter-ui-description.pdf) are retained as **legacy documentation**. They contain older requirements/screens and are not the current application instructions. Use the Markdown pages above for current behavior.
 
 ## License
 
