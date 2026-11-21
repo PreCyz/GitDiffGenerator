@@ -1,6 +1,6 @@
 # Gipter from CLI
 
-Use Java 25, or the Java runtime included in a portable JAR distribution. Run commands from the application's directory so relative configuration/data/log paths resolve consistently. The examples below assume `Gipter.jar` is the distribution filename; use `target/Gipter-5.0.8.jar` for the current Maven build.
+Use Java 25, or the Java runtime included in a portable JAR distribution. Run commands from the application's directory so relative configuration/data/log paths resolve consistently. The examples below assume `Gipter.jar` is the distribution filename; use `target/Gipter-5.0.9.jar` when building the proposed 5.0.9 source in [PR #33](https://github.com/PreCyz/GitDiffGenerator/pull/33). For another source revision, match the version in its POM.
 
 ## Launch modes
 

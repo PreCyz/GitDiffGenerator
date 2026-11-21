@@ -2,7 +2,7 @@
 
 Run these commands in an **application source checkout**. The `wiki` branch is a documentation branch with an old POM and no current application source; it is not the build checkout.
 
-The source used for this documentation is `codex/webview2-device-sso` at `af01f8c8` (application version 5.0.8). Its .NET 10 update is committed there. This describes source requirements rather than the contents of every published release archive.
+The source used for these build instructions is the proposed 5.0.9 [PR #33](https://github.com/PreCyz/GitDiffGenerator/pull/33) at commit `e569b2d75dab791217132437b87a964021655fe7` on `codex/preserve-unavailable-repositories`. The PR remains open; use that application source revision to reproduce the filenames below. This describes source requirements rather than the contents of every published release archive.
 
 ## Prerequisites
 
@@ -34,7 +34,7 @@ From the application repository root:
 mvn clean package
 ```
 
-The build runs the configured Java tests and creates `target/Gipter-5.0.8.jar` for the current POM version. On Windows, the `windows-webview2` Maven profile automatically invokes `dotnet publish` during `generate-resources`. It publishes a self-contained `win-x64` helper under `target/webview2-auth`; place/keep that helper with the application for sign-in.
+The build runs the configured Java tests and creates `target/Gipter-5.0.9.jar` for the current POM version. On Windows, the `windows-webview2` Maven profile automatically invokes `dotnet publish` during `generate-resources`. It publishes a self-contained `win-x64` helper under `target/webview2-auth`; place/keep that helper with the application for sign-in.
 
 To verify just that Maven integration:
 
@@ -89,4 +89,4 @@ java '-Dgipter.webview2.helper=C:\Gipter\auth\Gipter.AuthHost.exe' -jar .\Gipter
 
 The scripts expect the installer directory as their working directory and use the supplied version to find the already-built JAR. Configure the external paths/tools for your machine before using them. The presence of an Inno Setup file does not mean the current MSI script invokes Inno Setup; its current packaging path uses `jpackage`.
 
-Source: [pom.xml](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/pom.xml), [Gipter.AuthHost.csproj](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/native/webview2-auth/Gipter.AuthHost.csproj), [Program.cs](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/native/webview2-auth-tests/Program.cs), [Publish-WebView2Auth.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/installer/Publish-WebView2Auth.ps1), [installer.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/af01f8c8/installer/installer.ps1).
+Source: [pom.xml](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/pom.xml), [Gipter.AuthHost.csproj](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/native/webview2-auth/Gipter.AuthHost.csproj), [Program.cs](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/native/webview2-auth-tests/Program.cs), [Publish-WebView2Auth.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/installer/Publish-WebView2Auth.ps1), [installer.ps1](https://github.com/PreCyz/GitDiffGenerator/blob/e569b2d75dab791217132437b87a964021655fe7/installer/installer.ps1).
