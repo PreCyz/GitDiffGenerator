@@ -11,6 +11,10 @@ This follow-up documents the proposed 5.0.9 changes in [PR #33](https://github.c
 
 Changed page source links are pinned to the reviewed PR head. No application files, screenshots, PDF/ODT guides, or live GitHub Wiki pages are modified. Verification for this follow-up covers page/local link targets, balanced Markdown fences, heading structure, JSON example parsing, the documentation-only diff, and Git whitespace checks. Application tests are not rerun for prose-only changes; PR #33's own test results remain separate evidence.
 
+### PR #35 review corrections
+
+The review aligned build/CLI output filenames with PR #33's 5.0.9 POM and identified the exact build source branch. It moved last-item date guidance out of the unavailable-repositories subsection, clarified that Finish saves wizard setup, and limited the folder-cancellation warning description to the local repository editor. Git default guidance now describes the first detected Git repository rather than implying a search for usable identity values across every Git repository. Upgrade guidance distinguishes the new-version-gated JAR/MSI menu item from the always-enabled portable EXE release link. Added source links point directly to the controllers and services implementing these behaviors.
+
 ## Original 5.0.8 refresh
 
 Documentation baseline: application version 5.0.8, commit `af01f8c8` on `codex/webview2-device-sso`, reviewed on 2026-10-29. The committed .NET 10 source change is included. This is not a statement that published release assets have been rebuilt.
