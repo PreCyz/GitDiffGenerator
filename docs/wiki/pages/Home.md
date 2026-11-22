@@ -14,7 +14,7 @@ These pages include proposed application version **5.0.9** from [PR #33](https:/
 
 ## Guides
 
-- [Upload and scheduling workflows](https://github.com/PreCyz/GitDiffGenerator/wiki/Upload-and-scheduling-workflows) shows the steps for first and repeat uploads, job creation, and running a saved job at Windows startup.
+- [Upload and scheduling workflows](https://github.com/PreCyz/GitDiffGenerator/blob/wiki/docs/wiki/pages/Upload-and-scheduling-workflows.md) shows the steps for first and repeat uploads, job creation, and running a saved job at Windows startup.
 - [Gipter from CLI](https://github.com/PreCyz/GitDiffGenerator/wiki/Gipter-from-CLI) and [Examples](https://github.com/PreCyz/GitDiffGenerator/wiki/Examples): launch commands and configuration examples.
 - [Parameters](https://github.com/PreCyz/GitDiffGenerator/wiki/Parameters): inputs, defaults, and configuration precedence.
 - [Application settings](https://github.com/PreCyz/GitDiffGenerator/wiki/Application-settings) and [Toolkit details](https://github.com/PreCyz/GitDiffGenerator/wiki/Toolkit-details): application preferences and Toolkit settings.
