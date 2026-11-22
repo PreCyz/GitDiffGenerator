@@ -1,6 +1,7 @@
 # Gipter documentation
 
 - [Home](https://github.com/PreCyz/GitDiffGenerator/wiki/Home)
+- [Upload and scheduling workflows](https://github.com/PreCyz/GitDiffGenerator/wiki/Upload-and-scheduling-workflows)
 - [Installation and upgrade](https://github.com/PreCyz/GitDiffGenerator/wiki/Installation-and-upgrade)
 - [Toolkit sign in](https://github.com/PreCyz/GitDiffGenerator/wiki/Toolkit-sign-in)
 - [Wizard](https://github.com/PreCyz/GitDiffGenerator/wiki/Wizard)

@@ -7,6 +7,7 @@ The pages include the proposed **5.0.9** behavior from [PR #33](https://github.c
 ## Pages
 
 - [Home](docs/wiki/pages/Home.md)
+- [Upload and scheduling workflows](docs/wiki/pages/Upload-and-scheduling-workflows.md)
 - [Installation and upgrade](docs/wiki/pages/Installation-and-upgrade.md)
 - [Toolkit sign in](docs/wiki/pages/Toolkit-sign-in.md)
 - [Wizard](docs/wiki/pages/Wizard.md)
@@ -28,7 +29,8 @@ The pages include the proposed **5.0.9** behavior from [PR #33](https://github.c
 
 ## Layout and publishing
 
-- `docs/wiki/pages/` contains the 15 existing wiki pages, four new topic pages, and `_Sidebar.md`. Existing page filenames/public names are preserved.
+- `docs/wiki/pages/` contains the wiki pages and `_Sidebar.md`.
+- `docs/wiki/diagrams/` contains editable draw.io sources and PNG previews. The workflow page links to a specific revision of these assets so the images also render in the separate GitHub Wiki.
 - Page-to-page links target the public wiki names so the Markdown is ready to copy into the separate Wiki repository. Use the local index above to review the new pages before publication.
 - `docs/wiki/UPDATE-NOTES.md` records the source evidence, verification, and current limitations.
 - `docs/wiki/*.png` are legacy screenshots retained for existing asset URLs. The revised pages do not reference unverified old UI captures.
