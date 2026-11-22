@@ -1,0 +1,54 @@
+name: Publish workflow diagrams to the Wiki
+
+on:
+  push:
+    branches: [wiki]
+    paths:
+      - .github/workflows/publish-workflow-diagrams.yml
+      - docs/wiki/pages/Upload-and-scheduling-workflows.md
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-workflow-diagrams
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: wiki
+          persist-credentials: false
+
+      - name: Publish the guide and link it from Wiki Home
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh auth setup-git --hostname github.com
+          wiki_dir="$RUNNER_TEMP/live-wiki"
+          repo_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY"
+          git clone --depth 1 "$repo_url.wiki.git" "$wiki_dir"
+
+          page=Upload-and-scheduling-workflows
+          cp "docs/wiki/pages/$page.md" "$wiki_dir/$page.md"
+          home="$wiki_dir/Home.md"
+          link="[Upload and scheduling workflows]($repo_url/wiki/$page)"
+          if ! grep -Fq "]($repo_url/wiki/$page)" "$home"; then
+            printf '\n%s\n' "$link" >> "$home"
+          fi
+
+          cd "$wiki_dir"
+          git add -- "$page.md" Home.md
+          if git diff --cached --quiet; then
+            echo "The guide and Home link are up to date."
+            exit 0
+          fi
+
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -m "Publish upload and scheduling workflows"
+          git push origin HEAD

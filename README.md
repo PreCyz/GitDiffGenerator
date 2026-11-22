@@ -35,7 +35,9 @@ The pages include the proposed **5.0.9** behavior from [PR #33](https://github.c
 - `docs/wiki/UPDATE-NOTES.md` records the source evidence, verification, and current limitations.
 - `docs/wiki/*.png` are legacy screenshots retained for existing asset URLs. The revised pages do not reference unverified old UI captures.
 
-GitHub stores the live pages in [GitDiffGenerator.wiki.git](https://github.com/PreCyz/GitDiffGenerator.wiki.git), separately from this branch. Publishing requires copying the reviewed page files to that repository's root and pushing there. Updating `origin/wiki` alone does not publish the pages. No publishing has been performed as part of this local documentation refresh.
+GitHub stores the live pages in [GitDiffGenerator.wiki.git](https://github.com/PreCyz/GitDiffGenerator.wiki.git). When a change to the diagram guide or its publishing workflow reaches `wiki`, GitHub Actions publishes the guide and adds a link on Wiki Home. After the workflow succeeds, open **Wiki → Home → Upload and scheduling workflows** to see all four diagrams. [View the live guide](https://github.com/PreCyz/GitDiffGenerator/wiki/Upload-and-scheduling-workflows).
+
+Publish other reviewed pages by copying their Markdown to the root of the Wiki repository and pushing there.
 
 ## Legacy guides
 
