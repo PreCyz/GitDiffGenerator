@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mxfile host="app.diagrams.net">
+  <diagram id="first-run-toolkit-upload" name="First upload to Toolkit">
+    <mxGraphModel grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1050" pageHeight="1350" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="First upload to Toolkit" style="html=1;whiteSpace=wrap;fontFamily=Helvetica;text;align=left;verticalAlign=middle;spacing=0;fontSize=29;fontStyle=1;fontColor=#15354A;" vertex="1" parent="1">
+          <mxGeometry x="32" y="20" width="986" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="First run of the Gipter desktop application" style="html=1;whiteSpace=wrap;fontFamily=Helvetica;text;align=left;verticalAlign=middle;spacing=0;fontSize=16;fontColor=#465F70;" vertex="1" parent="1">
+          <mxGeometry x="32" y="66" width="986" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="launch" value="&lt;b&gt;Launch Gipter&lt;/b&gt;" style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=50;fillColor=#21536B;strokeColor=#21536B;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="390" y="115" width="270" height="46" as="geometry" />
+        </mxCell>
+        <mxCell id="signin" value="&lt;b&gt;Sign in to Toolkit if prompted&lt;/b&gt;&lt;br/&gt;Use the work account selected in the wizard.&lt;br/&gt;Dismiss the session confirmation to continue." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="280" y="876" width="490" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="welcome" value="&lt;b&gt;In the Gipter Wizard, select Next.&lt;/b&gt;" style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="280" y="194" width="490" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="config" value="&lt;b&gt;Name the run configuration&lt;/b&gt;&lt;br/&gt;Choose the Item type and check the Toolkit username.&lt;br/&gt;Select Next." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="280" y="278" width="490" height="74" as="geometry" />
+        </mxCell>
+        <mxCell id="committer" value="&lt;b&gt;Review the committer details&lt;/b&gt;&lt;br/&gt;For repository items, enter the applicable Authors&lt;br/&gt;and Committer email. Select Next." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="280" y="378" width="490" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="type" value="&lt;b&gt;Which item type&lt;/b&gt;&lt;br/&gt;did you select?" style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rhombus;fillColor=#FFF4D6;strokeColor=#B98927;strokeWidth=1.5;fontColor=#5C4214;" vertex="1" parent="1">
+          <mxGeometry x="415" y="478" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="repos" value="&lt;b&gt;SIMPLE or PROTECTED&lt;/b&gt;&lt;br/&gt;Use Add to choose the output folder.&lt;br/&gt;Under Choose your projects, open Add,&lt;br/&gt;use + to add repositories, then Save." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="30" y="612" width="316" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="statement" value="&lt;b&gt;STATEMENT&lt;/b&gt;&lt;br/&gt;Use Add to choose the existing&lt;br/&gt;statement file to upload." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="367" y="612" width="316" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="docs" value="&lt;b&gt;TOOLKIT_DOCS&lt;/b&gt;&lt;br/&gt;Use Add to choose the output folder.&lt;br/&gt;Open Choose your projects, enter the&lt;br/&gt;project ID and name, then select +&lt;br/&gt;and Save." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="704" y="612" width="316" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="finish" value="&lt;b&gt;Select Next, then Finish&lt;/b&gt;&lt;br/&gt;Gipter saves the named configuration." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="280" y="780" width="490" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="destination" value="&lt;b&gt;Check the Toolkit destination&lt;/b&gt;&lt;br/&gt;Verify Username and Folder name. To change the folder,&lt;br/&gt;open Settings → Toolkit, edit Folder name, then close the window." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="245" y="972" width="560" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="execute" value="&lt;b&gt;Review the Time frame and select Execute&lt;/b&gt;&lt;br/&gt;Use the configuration you just created. Upload item must be on&lt;br/&gt;and No SSO off in Settings → Application." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=16;fillColor=#F4F8FB;strokeColor=#7893A4;strokeWidth=1.5;fontColor=#183749;" vertex="1" parent="1">
+          <mxGeometry x="245" y="1094" width="560" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="success" value="&lt;b&gt;Copyright item uploaded to Toolkit&lt;/b&gt;&lt;br/&gt;The progress message reads “Finished with SUCCESS”." style="html=1;whiteSpace=wrap;fontFamily=Helvetica;align=center;verticalAlign=middle;spacing=5;fontSize=16;rounded=1;arcSize=50;fillColor=#DDF4E9;strokeColor=#298163;strokeWidth=2;fontColor=#144D3C;" vertex="1" parent="1">
+          <mxGeometry x="240" y="1210" width="570" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-launch-welcome" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="launch" target="welcome">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-finish-signin" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="finish" target="signin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-welcome-config" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="welcome" target="config">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-config-committer" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="config" target="committer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-committer-type" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="committer" target="type">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-type-repos" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="type" target="repos">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="188" y="528" /></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-type-statement" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="type" target="statement">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-type-docs" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="type" target="docs">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="862" y="528" /></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-repos-finish" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="repos" target="finish">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="188" y="812" /></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-statement-finish" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="statement" target="finish">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-docs-finish" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="docs" target="finish">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="862" y="812" /></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="edge-signin-destination" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="signin" target="destination">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-destination-execute" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="destination" target="execute">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-execute-success" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=14;html=1;strokeColor=#567385;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Helvetica;fontSize=14;fontStyle=1;fontColor=#395666;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="execute" target="success">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
